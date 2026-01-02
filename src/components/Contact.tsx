@@ -114,7 +114,7 @@ export const Contact = () => {
                       className="w-12 h-12 rounded-xl bg-card border border-border flex items-center justify-center hover:border-accent/50 hover:text-accent transition-all group"
                       aria-label={social.label}
                     >
-                      <social.Icon className="w-5 h-5" />
+                      <social.Icon className="w-5 h-5 group-hover:scale-110 transition-transform" />
                     </a>
                   ))}
                 </div>
