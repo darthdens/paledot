@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/ThemeToggle";
 
@@ -54,11 +53,11 @@ export const Navigation = () => {
 
           {/* Mobile Menu Toggle */}
           <button
-            className="md:hidden p-2"
+            className="md:hidden p-2 text-xl"
             onClick={() => setIsOpen(!isOpen)}
             aria-label="Toggle menu"
           >
-            {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+            {isOpen ? "✕" : "☰"}
           </button>
         </div>
 
@@ -74,14 +73,17 @@ export const Navigation = () => {
                 {item.label}
               </button>
             ))}
-            <Button
-              variant="secondary"
-              size="sm"
-              className="w-full mt-4"
-              onClick={() => scrollToSection("#contact")}
-            >
-              Hire Me
-            </Button>
+            <div className="flex items-center gap-4 pt-4">
+              <ThemeToggle />
+              <Button
+                variant="secondary"
+                size="sm"
+                className="flex-1"
+                onClick={() => scrollToSection("#contact")}
+              >
+                Hire Me
+              </Button>
+            </div>
           </div>
         )}
       </div>

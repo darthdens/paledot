@@ -1,4 +1,3 @@
-import { ArrowDown, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export const Hero = () => {
@@ -17,7 +16,7 @@ export const Hero = () => {
           <div className="space-y-8 order-2 lg:order-1">
             <div className="space-y-4">
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-muted text-muted-foreground text-sm">
-                <MapPin className="h-4 w-4" />
+                <span>📍</span>
                 <span>Dundee, Scotland 🏴󠁧󠁢󠁳󠁣󠁴󠁿</span>
               </div>
               
@@ -43,7 +42,7 @@ export const Hero = () => {
                 className="group"
               >
                 View My Work
-                <ArrowDown className="ml-2 h-4 w-4 group-hover:translate-y-1 transition-transform" />
+                <span className="ml-2 group-hover:translate-y-1 transition-transform inline-block">↓</span>
               </Button>
               <Button
                 variant="outline"
@@ -55,7 +54,7 @@ export const Hero = () => {
             </div>
 
             <div className="flex items-center gap-6 pt-4">
-            <div className="text-center">
+              <div className="text-center">
                 <div className="text-3xl font-bold font-serif">7+</div>
                 <div className="text-sm text-muted-foreground">Years Experience</div>
               </div>

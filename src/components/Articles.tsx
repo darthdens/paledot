@@ -1,4 +1,3 @@
-import { ArrowRight, Calendar } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
 const articles = [
@@ -30,7 +29,7 @@ export const Articles = () => {
     <section id="articles" className="py-24">
       <div className="container mx-auto px-6">
         <div className="text-center mb-16">
-        <h2 className="font-serif text-4xl md:text-5xl font-bold mb-4">
+          <h2 className="font-serif text-4xl md:text-5xl font-bold mb-4">
             Latest Thoughts
           </h2>
           <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
@@ -47,7 +46,7 @@ export const Articles = () => {
               <div className="space-y-4">
                 <div className="flex items-center gap-4 text-sm text-muted-foreground">
                   <div className="flex items-center gap-1">
-                    <Calendar className="h-4 w-4" />
+                    <span>📅</span>
                     {article.date}
                   </div>
                   <span>•</span>
@@ -67,8 +66,7 @@ export const Articles = () => {
                 </p>
                 
                 <div className="flex items-center gap-2 text-sm font-medium text-accent group-hover:gap-3 transition-all">
-                  Read More
-                  <ArrowRight className="h-4 w-4" />
+                  Read More →
                 </div>
               </div>
             </article>
