@@ -8,7 +8,7 @@ export const EchoIcon = ({ className = "w-5 h-5" }: IconProps) => (
   <img
     src={echoLogo}
     alt="Echo"
-    className={`${className} dark:invert`}
+    className={`${className} dark:invert object-contain`}
   />
 );
 
