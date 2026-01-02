@@ -1,48 +1,33 @@
-import { 
-  Palette, 
-  Code, 
-  Megaphone, 
-  Users, 
-  Bot, 
-  Briefcase 
-} from "lucide-react";
-
 const services = [
   {
-    icon: Code,
+    emoji: "💻",
     title: "Website Design & Development",
     description: "Beautiful, responsive websites built with modern technologies. From landing pages to complex web applications.",
-    emoji: "💻",
   },
   {
-    icon: Palette,
+    emoji: "🎨",
     title: "Graphic & Brand Design",
     description: "Complete brand identities including logos, color palettes, typography, and brand guidelines.",
-    emoji: "🎨",
   },
   {
-    icon: Megaphone,
+    emoji: "📱",
     title: "Social Media & Marketing",
     description: "Strategic content creation, community management, and marketing campaigns that drive engagement.",
-    emoji: "📱",
   },
   {
-    icon: Briefcase,
+    emoji: "📊",
     title: "Product Management",
     description: "End-to-end product strategy, roadmap planning, and execution for digital products.",
-    emoji: "📊",
   },
   {
-    icon: Users,
+    emoji: "🤝",
     title: "Account Management",
     description: "Client relationship management, project coordination, and stakeholder communication.",
-    emoji: "🤝",
   },
   {
-    icon: Bot,
+    emoji: "🤖",
     title: "AI Assistant Implementation",
     description: "Custom AI solutions including chatbots, digital twins, and automation tools for your business.",
-    emoji: "🤖",
   },
 ];
 
@@ -51,7 +36,7 @@ export const Services = () => {
     <section id="services" className="py-24">
       <div className="container mx-auto px-6">
         <div className="text-center mb-16">
-        <h2 className="font-serif text-4xl md:text-5xl font-bold mb-4">
+          <h2 className="font-serif text-4xl md:text-5xl font-bold mb-4">
             What I Do
           </h2>
           <p className="text-muted-foreground text-lg max-w-2xl mx-auto">

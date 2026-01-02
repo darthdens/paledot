@@ -1,4 +1,3 @@
-import { ExternalLink, Github, Award } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 
@@ -37,7 +36,7 @@ export const Projects = () => {
     <section id="projects" className="py-24 bg-muted/30">
       <div className="container mx-auto px-6">
         <div className="text-center mb-16">
-        <h2 className="font-serif text-4xl md:text-5xl font-bold mb-4">
+          <h2 className="font-serif text-4xl md:text-5xl font-bold mb-4">
             Featured Projects
           </h2>
           <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
@@ -46,7 +45,7 @@ export const Projects = () => {
         </div>
 
         <div className="grid md:grid-cols-2 gap-8">
-          {projects.map((project, index) => (
+          {projects.map((project) => (
             <div
               key={project.title}
               className={`group bg-card rounded-2xl overflow-hidden border border-border hover:border-accent/50 transition-all duration-300 hover:shadow-xl ${
@@ -63,7 +62,6 @@ export const Projects = () => {
               <div className="p-6 space-y-4">
                 {project.award && (
                   <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-accent/20 text-sm font-medium">
-                    <Award className="h-4 w-4" />
                     {project.award}
                   </div>
                 )}
@@ -87,8 +85,7 @@ export const Projects = () => {
 
         <div className="text-center mt-12">
           <Button variant="outline" size="lg">
-            View All Projects
-            <ExternalLink className="ml-2 h-4 w-4" />
+            View All Projects 🔗
           </Button>
         </div>
       </div>

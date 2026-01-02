@@ -1,14 +1,13 @@
 import { useState } from "react";
-import { Mail, Send, Linkedin, Github, Twitter, Calendar } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 
 const socialLinks = [
-  { icon: Linkedin, label: "LinkedIn", href: "#" },
-  { icon: Github, label: "GitHub", href: "#" },
-  { icon: Twitter, label: "Twitter", href: "#" },
+  { emoji: "💼", label: "LinkedIn", href: "#" },
+  { emoji: "🐙", label: "GitHub", href: "#" },
+  { emoji: "🐦", label: "Twitter", href: "#" },
 ];
 
 export const Contact = () => {
@@ -33,7 +32,7 @@ export const Contact = () => {
       <div className="container mx-auto px-6">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-16">
-          <h2 className="font-serif text-4xl md:text-5xl font-bold mb-4">
+            <h2 className="font-serif text-4xl md:text-5xl font-bold mb-4">
               Let's Connect
             </h2>
             <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
@@ -56,8 +55,8 @@ export const Contact = () => {
                   href="mailto:hello@densakoka.com"
                   className="flex items-center gap-4 p-4 rounded-xl bg-card border border-border hover:border-accent/50 transition-colors group"
                 >
-                  <div className="w-12 h-12 rounded-xl bg-muted flex items-center justify-center">
-                    <Mail className="h-5 w-5" />
+                  <div className="w-12 h-12 rounded-xl bg-muted flex items-center justify-center text-xl">
+                    ✉️
                   </div>
                   <div>
                     <div className="font-medium group-hover:text-accent transition-colors">
@@ -73,8 +72,8 @@ export const Contact = () => {
                   href="#"
                   className="flex items-center gap-4 p-4 rounded-xl bg-card border border-border hover:border-accent/50 transition-colors group"
                 >
-                  <div className="w-12 h-12 rounded-xl bg-muted flex items-center justify-center">
-                    <Calendar className="h-5 w-5" />
+                  <div className="w-12 h-12 rounded-xl bg-muted flex items-center justify-center text-xl">
+                    📅
                   </div>
                   <div>
                     <div className="font-medium group-hover:text-accent transition-colors">
@@ -94,10 +93,10 @@ export const Contact = () => {
                     <a
                       key={social.label}
                       href={social.href}
-                      className="w-12 h-12 rounded-xl bg-card border border-border flex items-center justify-center hover:border-accent/50 hover:text-accent transition-colors"
+                      className="w-12 h-12 rounded-xl bg-card border border-border flex items-center justify-center hover:border-accent/50 hover:scale-110 transition-all text-xl"
                       aria-label={social.label}
                     >
-                      <social.icon className="h-5 w-5" />
+                      {social.emoji}
                     </a>
                   ))}
                 </div>
@@ -148,8 +147,7 @@ export const Contact = () => {
                 />
               </div>
               <Button type="submit" variant="secondary" size="lg" className="w-full">
-                Send Message
-                <Send className="ml-2 h-4 w-4" />
+                Send Message ✨
               </Button>
             </form>
           </div>
