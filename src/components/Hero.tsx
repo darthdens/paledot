@@ -97,17 +97,17 @@ export const Hero = () => {
           {/* Profile Image */}
           <div className="order-1 lg:order-2 flex justify-start lg:justify-end">
             <div className="relative">
-              <div className="w-64 h-64 md:w-80 md:h-80 lg:w-96 lg:h-96 rounded-3xl bg-muted overflow-hidden shadow-xl">
+              <div className="w-40 h-40 md:w-56 md:h-56 lg:w-96 lg:h-96 rounded-3xl bg-muted overflow-hidden shadow-xl">
                 <img
                   src="https://images.spr.so/cdn-cgi/imagedelivery/j42No7y-dcokJuNgXeA0ig/6364ed24-d073-426f-9f7a-5f679c6b957f/dens-new-pfp/w=512,quality=90,fit=scale-down"
                   alt="Dens Akoka"
                   className="w-full h-full object-cover"
                 />
               </div>
-              <div className="absolute -bottom-4 -left-4 bg-card rounded-2xl p-4 shadow-lg border border-border">
-                <div className="flex items-center gap-3">
-                  <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse" />
-                  <span className="text-sm font-medium">Available for work</span>
+              <div className="absolute -bottom-4 -right-4 md:-right-4 lg:-left-4 lg:right-auto bg-card rounded-2xl p-3 lg:p-4 shadow-lg border border-border">
+                <div className="flex items-center gap-2 lg:gap-3">
+                  <div className="w-2.5 h-2.5 lg:w-3 lg:h-3 bg-green-500 rounded-full animate-pulse" />
+                  <span className="text-xs lg:text-sm font-medium">Available for work</span>
                 </div>
               </div>
             </div>
