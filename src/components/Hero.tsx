@@ -10,9 +10,9 @@ export const Hero = () => {
   };
 
   return (
-    <section className="min-h-screen flex justify-center items-start md:items-center pt-16 md:pt-20 pb-12 md:pb-16">
+    <section className="min-h-screen flex items-center justify-center pt-24 md:pt-20 pb-16">
       <div className="container mx-auto px-6">
-        <div className="grid lg:grid-cols-2 gap-6 md:gap-8 lg:gap-12 items-center">
+        <div className="grid lg:grid-cols-2 gap-10 md:gap-8 lg:gap-12 items-center">
           {/* Text Content */}
           <div className="space-y-5 md:space-y-6 lg:space-y-8 order-2 lg:order-1">
             <div className="space-y-4">
@@ -95,7 +95,7 @@ export const Hero = () => {
           </div>
 
           {/* Profile Image */}
-          <div className="order-1 lg:order-2 flex justify-start lg:justify-end mb-4 md:mb-2 lg:mb-0">
+          <div className="order-1 lg:order-2 flex justify-start lg:justify-end mb-8 md:mb-2 lg:mb-0">
             <div className="relative">
               <div className="w-40 h-40 md:w-56 md:h-56 lg:w-96 lg:h-96 rounded-3xl bg-muted overflow-hidden shadow-xl">
                 <img
