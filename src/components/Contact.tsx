@@ -1,21 +1,21 @@
 import { useState } from "react";
-import { Mail, Send, Calendar, Linkedin, Github, Twitter } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
-import type { LucideIcon } from "lucide-react";
+import { 
+  IconMail, 
+  IconCalendar, 
+  IconSend, 
+  IconLinkedIn, 
+  IconGitHub, 
+  IconTwitter 
+} from "@/components/icons/CustomIcons";
 
-interface SocialLink {
-  icon: LucideIcon;
-  label: string;
-  href: string;
-}
-
-const socialLinks: SocialLink[] = [
-  { icon: Linkedin, label: "LinkedIn", href: "#" },
-  { icon: Github, label: "GitHub", href: "#" },
-  { icon: Twitter, label: "Twitter", href: "#" },
+const socialLinks = [
+  { Icon: IconLinkedIn, label: "LinkedIn", href: "#" },
+  { Icon: IconGitHub, label: "GitHub", href: "#" },
+  { Icon: IconTwitter, label: "Twitter", href: "#" },
 ];
 
 export const Contact = () => {
@@ -64,7 +64,7 @@ export const Contact = () => {
                   className="flex items-center gap-4 p-4 rounded-xl bg-card border border-border hover:border-accent/50 transition-colors group"
                 >
                   <div className="w-12 h-12 rounded-xl bg-muted flex items-center justify-center group-hover:bg-accent/20 transition-colors">
-                    <Mail className="h-5 w-5 text-muted-foreground group-hover:text-accent transition-colors" />
+                    <IconMail className="w-5 h-5 text-muted-foreground group-hover:text-accent transition-colors" />
                   </div>
                   <div>
                     <div className="font-medium group-hover:text-accent transition-colors">
@@ -81,7 +81,7 @@ export const Contact = () => {
                   className="flex items-center gap-4 p-4 rounded-xl bg-card border border-border hover:border-accent/50 transition-colors group"
                 >
                   <div className="w-12 h-12 rounded-xl bg-muted flex items-center justify-center group-hover:bg-accent/20 transition-colors">
-                    <Calendar className="h-5 w-5 text-muted-foreground group-hover:text-accent transition-colors" />
+                    <IconCalendar className="w-5 h-5 text-muted-foreground group-hover:text-accent transition-colors" />
                   </div>
                   <div>
                     <div className="font-medium group-hover:text-accent transition-colors">
@@ -104,7 +104,7 @@ export const Contact = () => {
                       className="w-12 h-12 rounded-xl bg-card border border-border flex items-center justify-center hover:border-accent/50 hover:text-accent transition-all group"
                       aria-label={social.label}
                     >
-                      <social.icon className="h-5 w-5" />
+                      <social.Icon className="w-5 h-5" />
                     </a>
                   ))}
                 </div>
@@ -156,7 +156,7 @@ export const Contact = () => {
               </div>
               <Button type="submit" variant="secondary" size="lg" className="w-full">
                 Send Message
-                <Send className="ml-2 h-4 w-4" />
+                <IconSend className="ml-2 w-4 h-4" />
               </Button>
             </form>
           </div>

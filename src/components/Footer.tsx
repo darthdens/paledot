@@ -1,4 +1,4 @@
-import { Sparkles } from "lucide-react";
+import { IconSparkle } from "@/components/icons/CustomIcons";
 
 export const Footer = () => {
   const currentYear = new Date().getFullYear();
@@ -11,7 +11,7 @@ export const Footer = () => {
           
           <div className="flex items-center gap-2 text-muted-foreground text-sm">
             <span>Made with</span>
-            <Sparkles className="h-4 w-4 text-accent" />
+            <IconSparkle className="w-4 h-4 text-accent" />
             <span>in Scotland</span>
           </div>
           

@@ -1,5 +1,5 @@
-import { MapPin, ArrowDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { IconLocation, IconArrowDown } from "@/components/icons/CustomIcons";
 
 export const Hero = () => {
   const scrollToProjects = () => {
@@ -17,7 +17,7 @@ export const Hero = () => {
           <div className="space-y-8 order-2 lg:order-1">
             <div className="space-y-4">
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-muted text-muted-foreground text-sm">
-                <MapPin className="h-3.5 w-3.5" />
+                <IconLocation className="w-3.5 h-3.5" />
                 <span>Dundee, Scotland</span>
               </div>
               
@@ -43,7 +43,7 @@ export const Hero = () => {
                 className="group"
               >
                 View My Work
-                <ArrowDown className="ml-2 h-4 w-4 group-hover:translate-y-1 transition-transform" />
+                <IconArrowDown className="ml-2 w-4 h-4 group-hover:translate-y-1 transition-transform" />
               </Button>
               <Button
                 variant="outline"
