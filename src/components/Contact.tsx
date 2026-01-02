@@ -104,7 +104,7 @@ export const Contact = () => {
 
               <div>
                 <h4 className="font-medium mb-4">Find me on</h4>
-                <div className="flex gap-3">
+                <div className="flex flex-wrap gap-3">
                   {socialLinks.map((social) => (
                     <a
                       key={social.label}
