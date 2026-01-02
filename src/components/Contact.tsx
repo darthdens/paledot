@@ -3,12 +3,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
-import { Mail, Calendar, SendDiagonal, Linkedin, Github, Twitter } from "iconoir-react";
+import { Mail, Calendar } from "iconoir-react";
+import { LinkedInIcon, GitHubIcon, XIcon } from "@/components/SocialIcons";
 
 const socialLinks = [
-  { Icon: Linkedin, label: "LinkedIn", href: "#" },
-  { Icon: Github, label: "GitHub", href: "#" },
-  { Icon: Twitter, label: "Twitter", href: "#" },
+  { Icon: LinkedInIcon, label: "LinkedIn", href: "https://linkedin.com/in/densakoka" },
+  { Icon: GitHubIcon, label: "GitHub", href: "https://github.com/densakoka" },
+  { Icon: XIcon, label: "X", href: "https://x.com/densakoka" },
 ];
 
 export const Contact = () => {
@@ -53,28 +54,30 @@ export const Contact = () => {
 
               <div className="space-y-4">
                 <a
-                  href="mailto:hello@densakoka.com"
+                  href="mailto:denis.akoka@gmail.com"
                   className="flex items-center gap-4 p-4 rounded-xl bg-card border border-border hover:border-accent/50 transition-colors group"
                 >
                   <div className="w-12 h-12 rounded-xl bg-muted flex items-center justify-center group-hover:bg-accent/20 transition-colors">
-                    <Mail className="w-5 h-5 text-muted-foreground group-hover:text-accent transition-colors" />
+                    <Mail className="w-5 h-5 text-muted-foreground group-hover:text-accent transition-colors" strokeWidth={2} />
                   </div>
                   <div>
                     <div className="font-medium group-hover:text-accent transition-colors">
                       Email Me
                     </div>
                     <div className="text-sm text-muted-foreground">
-                      hello@densakoka.com
+                      denis.akoka@gmail.com
                     </div>
                   </div>
                 </a>
 
                 <a
-                  href="#"
+                  href="https://calendly.com/densakoka/new-meeting"
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="flex items-center gap-4 p-4 rounded-xl bg-card border border-border hover:border-accent/50 transition-colors group"
                 >
                   <div className="w-12 h-12 rounded-xl bg-muted flex items-center justify-center group-hover:bg-accent/20 transition-colors">
-                    <Calendar className="w-5 h-5 text-muted-foreground group-hover:text-accent transition-colors" />
+                    <Calendar className="w-5 h-5 text-muted-foreground group-hover:text-accent transition-colors" strokeWidth={2} />
                   </div>
                   <div>
                     <div className="font-medium group-hover:text-accent transition-colors">
@@ -94,6 +97,8 @@ export const Contact = () => {
                     <a
                       key={social.label}
                       href={social.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
                       className="w-12 h-12 rounded-xl bg-card border border-border flex items-center justify-center hover:border-accent/50 hover:text-accent transition-all group"
                       aria-label={social.label}
                     >
@@ -149,7 +154,6 @@ export const Contact = () => {
               </div>
               <Button type="submit" variant="secondary" size="lg" className="w-full">
                 Send Message
-                <SendDiagonal className="ml-2 w-4 h-4" />
               </Button>
             </form>
           </div>

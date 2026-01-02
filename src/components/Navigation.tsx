@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { Logo } from "@/components/Logo";
 import { Menu, Xmark } from "iconoir-react";
 
 const navItems = [
@@ -27,8 +28,8 @@ export const Navigation = () => {
     <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b border-border">
       <div className="container mx-auto px-6 py-4">
         <div className="flex items-center justify-between">
-          <Link to="/" className="font-serif text-2xl font-bold tracking-tight">
-            Dens
+          <Link to="/" className="flex items-center">
+            <Logo className="w-8 h-8" />
           </Link>
 
           {/* Desktop Navigation */}
@@ -58,7 +59,7 @@ export const Navigation = () => {
             onClick={() => setIsOpen(!isOpen)}
             aria-label="Toggle menu"
           >
-            {isOpen ? <Xmark className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            {isOpen ? <Xmark className="w-6 h-6" strokeWidth={2} /> : <Menu className="w-6 h-6" strokeWidth={2} />}
           </button>
         </div>
 

@@ -1,6 +1,6 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Trophy, ArrowUpRight } from "iconoir-react";
+import { ArrowUpRight } from "iconoir-react";
 
 const projects = [
   {
@@ -8,7 +8,7 @@ const projects = [
     description: "A social platform for verifiable assets and user data autonomy. Won 2nd prize at MultiversX xDay Hackathon 2023.",
     tags: ["Web3", "Blockchain", "Social Platform", "MultiversX"],
     image: "https://images.unsplash.com/photo-1639762681485-074b7f938ba0?w=800&auto=format&fit=crop",
-    award: "2nd Prize - xDay Hackathon 2023",
+    award: "🏆 Award Winner - xDay Hackathon 2023",
     featured: true,
   },
   {
@@ -49,7 +49,7 @@ export const Projects = () => {
           {projects.map((project) => (
             <div
               key={project.title}
-              className={`group bg-card rounded-2xl overflow-hidden border border-border hover:border-accent/50 transition-all duration-300 hover:shadow-xl ${
+              className={`bg-card rounded-2xl overflow-hidden border border-border ${
                 project.featured ? "md:col-span-1" : ""
               }`}
             >
@@ -57,17 +57,16 @@ export const Projects = () => {
                 <img
                   src={project.image}
                   alt={project.title}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  className="w-full h-full object-cover"
                 />
               </div>
               <div className="p-6 space-y-4">
                 {project.award && (
                   <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-accent/20 text-sm font-medium">
-                    <Trophy className="w-3.5 h-3.5" />
                     {project.award}
                   </div>
                 )}
-                <h3 className="font-serif text-2xl font-bold group-hover:text-accent transition-colors">
+                <h3 className="font-serif text-2xl font-bold">
                   {project.title}
                 </h3>
                 <p className="text-muted-foreground leading-relaxed">
@@ -75,7 +74,7 @@ export const Projects = () => {
                 </p>
                 <div className="flex flex-wrap gap-2">
                   {project.tags.map((tag) => (
-                    <Badge key={tag} variant="secondary" className="text-xs">
+                    <Badge key={tag} variant="secondary" className="text-xs pointer-events-none">
                       {tag}
                     </Badge>
                   ))}
@@ -88,7 +87,7 @@ export const Projects = () => {
         <div className="text-center mt-12">
           <Button variant="outline" size="lg">
             View All Projects
-            <ArrowUpRight className="ml-2 w-4 h-4" />
+            <ArrowUpRight className="ml-2 w-4 h-4" strokeWidth={2} />
           </Button>
         </div>
       </div>

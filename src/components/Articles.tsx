@@ -49,12 +49,12 @@ export const Articles = () => {
                   <span>{article.date}</span>
                   <span>·</span>
                   <div className="flex items-center gap-1">
-                    <Clock className="w-3.5 h-3.5" />
+                    <Clock className="w-3.5 h-3.5" strokeWidth={2} />
                     {article.readTime}
                   </div>
                 </div>
                 
-                <Badge variant="secondary" className="text-xs">
+                <Badge variant="secondary" className="text-xs pointer-events-none">
                   {article.category}
                 </Badge>
                 
@@ -66,9 +66,9 @@ export const Articles = () => {
                   {article.excerpt}
                 </p>
                 
-                <div className="flex items-center gap-1 text-sm font-medium text-accent opacity-0 group-hover:opacity-100 transition-opacity">
+                <div className="flex items-center gap-1 text-sm font-medium text-accent">
                   Read More
-                  <ArrowUpRight className="w-4 h-4" />
+                  <ArrowUpRight className="w-4 h-4" strokeWidth={2} />
                 </div>
               </div>
             </article>

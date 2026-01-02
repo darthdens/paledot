@@ -35,7 +35,7 @@ export const ThemeToggle = () => {
       className="h-9 w-9"
       aria-label="Toggle theme"
     >
-      {isDark ? <SunLight className="w-5 h-5" /> : <HalfMoon className="w-5 h-5" />}
+      {isDark ? <HalfMoon className="w-5 h-5" strokeWidth={2} /> : <SunLight className="w-5 h-5" strokeWidth={2} />}
     </Button>
   );
 };

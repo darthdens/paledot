@@ -17,7 +17,7 @@ export const Hero = () => {
           <div className="space-y-8 order-2 lg:order-1">
             <div className="space-y-4">
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-muted text-muted-foreground text-sm">
-                <MapPin className="w-3.5 h-3.5" />
+                <MapPin className="w-3.5 h-3.5" strokeWidth={2} />
                 <span>Dundee, Scotland</span>
               </div>
               
@@ -29,6 +29,28 @@ export const Hero = () => {
               <p className="text-xl md:text-2xl text-muted-foreground leading-relaxed">
                 Passionate <em className="font-serif">thinker</em>, <em className="font-serif">do-er</em>, and <em className="font-serif">leader</em>
               </p>
+            </div>
+
+            <div className="flex flex-wrap gap-2 text-sm text-muted-foreground">
+              <span>Co-Founder at</span>
+              <a 
+                href="https://echoai.so" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="font-medium text-foreground hover:text-accent transition-colors underline underline-offset-2"
+              >
+                Echo AI
+              </a>
+              <span>·</span>
+              <span>Senior Social Media Manager at</span>
+              <a 
+                href="https://lunapr.io" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="font-medium text-foreground hover:text-accent transition-colors underline underline-offset-2"
+              >
+                Luna PR
+              </a>
             </div>
 
             <p className="text-lg text-muted-foreground max-w-xl leading-relaxed">
@@ -43,7 +65,7 @@ export const Hero = () => {
                 className="group"
               >
                 View My Work
-                <NavArrowDown className="ml-2 w-4 h-4 group-hover:translate-y-1 transition-transform" />
+                <NavArrowDown className="ml-2 w-4 h-4 group-hover:translate-y-1 transition-transform" strokeWidth={2} />
               </Button>
               <Button
                 variant="outline"
@@ -66,23 +88,23 @@ export const Hero = () => {
               </div>
               <div className="w-px h-12 bg-border" />
               <div className="text-center">
-                <div className="text-3xl font-bold font-serif">2nd</div>
-                <div className="text-sm text-muted-foreground">Hackathon Prize</div>
+                <div className="text-3xl font-bold font-serif">🏆</div>
+                <div className="text-sm text-muted-foreground">Hackathon Winner</div>
               </div>
             </div>
           </div>
 
           {/* Profile Image */}
-          <div className="order-1 lg:order-2 flex justify-center lg:justify-end">
+          <div className="order-1 lg:order-2 flex justify-start lg:justify-end">
             <div className="relative">
-              <div className="w-72 h-72 md:w-96 md:h-96 rounded-3xl bg-muted overflow-hidden shadow-xl">
+              <div className="w-24 h-24 md:w-32 md:h-32 lg:w-96 lg:h-96 rounded-full lg:rounded-3xl bg-muted overflow-hidden shadow-xl">
                 <img
                   src="https://images.spr.so/cdn-cgi/imagedelivery/j42No7y-dcokJuNgXeA0ig/6364ed24-d073-426f-9f7a-5f679c6b957f/dens-new-pfp/w=512,quality=90,fit=scale-down"
                   alt="Dens Akoka"
                   className="w-full h-full object-cover"
                 />
               </div>
-              <div className="absolute -bottom-4 -left-4 bg-card rounded-2xl p-4 shadow-lg border border-border">
+              <div className="hidden lg:block absolute -bottom-4 -left-4 bg-card rounded-2xl p-4 shadow-lg border border-border">
                 <div className="flex items-center gap-3">
                   <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse" />
                   <span className="text-sm font-medium">Available for work</span>

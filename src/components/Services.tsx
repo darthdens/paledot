@@ -50,14 +50,14 @@ export const Services = () => {
           {services.map((service) => (
             <div
               key={service.title}
-              className="group p-8 rounded-2xl bg-card border border-border hover:border-accent/50 transition-all duration-300 hover:shadow-lg"
+              className="p-8 rounded-2xl bg-card border border-border"
             >
               <div className="mb-6">
-                <div className="inline-flex items-center justify-center w-14 h-14 rounded-xl bg-muted group-hover:bg-accent/20 transition-colors">
-                  <service.Icon className="w-6 h-6 text-muted-foreground group-hover:text-accent transition-colors" />
+                <div className="inline-flex items-center justify-center w-14 h-14 rounded-xl bg-muted">
+                  <service.Icon className="w-6 h-6 text-muted-foreground" strokeWidth={2} />
                 </div>
               </div>
-              <h3 className="font-serif text-xl font-bold mb-3 group-hover:text-accent transition-colors">
+              <h3 className="font-serif text-xl font-bold mb-3">
                 {service.title}
               </h3>
               <p className="text-muted-foreground leading-relaxed">

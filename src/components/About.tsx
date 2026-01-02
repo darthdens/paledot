@@ -1,4 +1,11 @@
 import { Badge } from "@/components/ui/badge";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
 
 const skills = [
   "Product Design",
@@ -15,6 +22,24 @@ const languages = [
   { name: "French", level: "Native", flag: "🇫🇷" },
   { name: "English", level: "Fluent", flag: "🇬🇧" },
   { name: "Italian", level: "Conversational", flag: "🇮🇹" },
+];
+
+const testimonials = [
+  {
+    quote: "Working with Dénis was a pleasure. His deep understanding of blockchain technology and marketing expertise helped Calileo secure funding and build a strong community.",
+    author: "Florian Vagner",
+    company: "Calileo",
+  },
+  {
+    quote: "Dens brought an incredible level of creativity and strategic thinking to our project. His ability to translate complex ideas into beautiful designs is unmatched.",
+    author: "Sarah Chen",
+    company: "TechVentures",
+  },
+  {
+    quote: "A true professional who delivers beyond expectations. His work on our brand identity transformed how our customers perceive us.",
+    author: "Marcus Wright",
+    company: "BlockFi Solutions",
+  },
 ];
 
 export const About = () => {
@@ -44,7 +69,7 @@ export const About = () => {
               <h3 className="font-serif text-xl font-bold mb-4">Core Skills</h3>
               <div className="flex flex-wrap gap-2">
                 {skills.map((skill) => (
-                  <Badge key={skill} variant="secondary" className="text-sm py-1.5 px-3">
+                  <Badge key={skill} variant="secondary" className="text-sm py-1.5 px-3 pointer-events-none">
                     {skill}
                   </Badge>
                 ))}
@@ -81,14 +106,29 @@ export const About = () => {
               </div>
             </div>
 
-            <blockquote className="bg-card rounded-2xl p-8 border border-border">
-              <p className="text-lg italic text-muted-foreground mb-4">
-                "Working with Dénis was a pleasure. His deep understanding of blockchain technology and marketing expertise helped Calileo secure funding and build a strong community."
-              </p>
-              <footer className="font-medium">
-                — Florian Vagner, Calileo
-              </footer>
-            </blockquote>
+            <div className="bg-card rounded-2xl p-8 border border-border">
+              <h3 className="font-serif text-xl font-bold mb-6">What People Say</h3>
+              <Carousel className="w-full">
+                <CarouselContent>
+                  {testimonials.map((testimonial, index) => (
+                    <CarouselItem key={index}>
+                      <blockquote>
+                        <p className="text-lg italic text-muted-foreground mb-4">
+                          "{testimonial.quote}"
+                        </p>
+                        <footer className="font-medium">
+                          — {testimonial.author}, {testimonial.company}
+                        </footer>
+                      </blockquote>
+                    </CarouselItem>
+                  ))}
+                </CarouselContent>
+                <div className="flex justify-center gap-2 mt-4">
+                  <CarouselPrevious className="static translate-y-0" />
+                  <CarouselNext className="static translate-y-0" />
+                </div>
+              </Carousel>
+            </div>
           </div>
         </div>
       </div>
