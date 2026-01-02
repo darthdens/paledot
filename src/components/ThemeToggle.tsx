@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { IconSun, IconMoon } from "@/components/icons/CustomIcons";
+import { SunLight, HalfMoon } from "iconoir-react";
 
 export const ThemeToggle = () => {
   const [isDark, setIsDark] = useState(false);
@@ -35,7 +35,7 @@ export const ThemeToggle = () => {
       className="h-9 w-9"
       aria-label="Toggle theme"
     >
-      {isDark ? <IconSun /> : <IconMoon />}
+      {isDark ? <SunLight className="w-5 h-5" /> : <HalfMoon className="w-5 h-5" />}
     </Button>
   );
 };

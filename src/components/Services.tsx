@@ -1,40 +1,33 @@
-import { 
-  IconWeb, 
-  IconBrand, 
-  IconMegaphone, 
-  IconLayers, 
-  IconHandshake, 
-  IconAI 
-} from "@/components/icons/CustomIcons";
+import { Globe, ColorPicker, Megaphone, ViewGrid, Group, Brain } from "iconoir-react";
 
 const services = [
   {
-    Icon: IconWeb,
+    Icon: Globe,
     title: "Website Design & Development",
     description: "Beautiful, responsive websites built with modern technologies. From landing pages to complex web applications.",
   },
   {
-    Icon: IconBrand,
+    Icon: ColorPicker,
     title: "Graphic & Brand Design",
     description: "Complete brand identities including logos, color palettes, typography, and brand guidelines.",
   },
   {
-    Icon: IconMegaphone,
+    Icon: Megaphone,
     title: "Social Media & Marketing",
     description: "Strategic content creation, community management, and marketing campaigns that drive engagement.",
   },
   {
-    Icon: IconLayers,
+    Icon: ViewGrid,
     title: "Product Management",
     description: "End-to-end product strategy, roadmap planning, and execution for digital products.",
   },
   {
-    Icon: IconHandshake,
+    Icon: Group,
     title: "Account Management",
     description: "Client relationship management, project coordination, and stakeholder communication.",
   },
   {
-    Icon: IconAI,
+    Icon: Brain,
     title: "AI Assistant Implementation",
     description: "Custom AI solutions including chatbots, digital twins, and automation tools for your business.",
   },

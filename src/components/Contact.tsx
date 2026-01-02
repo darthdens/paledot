@@ -3,19 +3,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
-import { 
-  IconMail, 
-  IconCalendar, 
-  IconSend, 
-  IconLinkedIn, 
-  IconGitHub, 
-  IconTwitter 
-} from "@/components/icons/CustomIcons";
+import { Mail, Calendar, SendDiagonal, Linkedin, Github, Twitter } from "iconoir-react";
 
 const socialLinks = [
-  { Icon: IconLinkedIn, label: "LinkedIn", href: "#" },
-  { Icon: IconGitHub, label: "GitHub", href: "#" },
-  { Icon: IconTwitter, label: "Twitter", href: "#" },
+  { Icon: Linkedin, label: "LinkedIn", href: "#" },
+  { Icon: Github, label: "GitHub", href: "#" },
+  { Icon: Twitter, label: "Twitter", href: "#" },
 ];
 
 export const Contact = () => {
@@ -64,7 +57,7 @@ export const Contact = () => {
                   className="flex items-center gap-4 p-4 rounded-xl bg-card border border-border hover:border-accent/50 transition-colors group"
                 >
                   <div className="w-12 h-12 rounded-xl bg-muted flex items-center justify-center group-hover:bg-accent/20 transition-colors">
-                    <IconMail className="w-5 h-5 text-muted-foreground group-hover:text-accent transition-colors" />
+                    <Mail className="w-5 h-5 text-muted-foreground group-hover:text-accent transition-colors" />
                   </div>
                   <div>
                     <div className="font-medium group-hover:text-accent transition-colors">
@@ -81,7 +74,7 @@ export const Contact = () => {
                   className="flex items-center gap-4 p-4 rounded-xl bg-card border border-border hover:border-accent/50 transition-colors group"
                 >
                   <div className="w-12 h-12 rounded-xl bg-muted flex items-center justify-center group-hover:bg-accent/20 transition-colors">
-                    <IconCalendar className="w-5 h-5 text-muted-foreground group-hover:text-accent transition-colors" />
+                    <Calendar className="w-5 h-5 text-muted-foreground group-hover:text-accent transition-colors" />
                   </div>
                   <div>
                     <div className="font-medium group-hover:text-accent transition-colors">
@@ -156,7 +149,7 @@ export const Contact = () => {
               </div>
               <Button type="submit" variant="secondary" size="lg" className="w-full">
                 Send Message
-                <IconSend className="ml-2 w-4 h-4" />
+                <SendDiagonal className="ml-2 w-4 h-4" />
               </Button>
             </form>
           </div>
