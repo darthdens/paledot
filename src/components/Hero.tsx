@@ -10,7 +10,7 @@ export const Hero = () => {
   };
 
   return (
-    <section className="min-h-screen flex items-center justify-center pt-20 pb-16">
+    <section className="min-h-screen flex justify-center items-start md:items-center pt-16 md:pt-20 pb-12 md:pb-16">
       <div className="container mx-auto px-6">
         <div className="grid lg:grid-cols-2 gap-6 md:gap-8 lg:gap-12 items-center">
           {/* Text Content */}
