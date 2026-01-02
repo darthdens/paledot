@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { Logo } from "@/components/Logo";
-import { Menu, Xmark } from "iconoir-react";
+
 
 const navItems = [
   { label: "About", href: "#about" },
@@ -55,39 +55,62 @@ export const Navigation = () => {
 
           {/* Mobile Menu Toggle */}
           <button
-            className="md:hidden p-2"
+            className="md:hidden p-2 relative w-10 h-10 flex items-center justify-center"
             onClick={() => setIsOpen(!isOpen)}
             aria-label="Toggle menu"
           >
-            {isOpen ? <Xmark className="w-6 h-6" strokeWidth={2} /> : <Menu className="w-6 h-6" strokeWidth={2} />}
+            <span
+              className={`absolute h-0.5 w-6 bg-foreground transition-all duration-300 ${
+                isOpen ? "rotate-45" : "-translate-y-2"
+              }`}
+            />
+            <span
+              className={`absolute h-0.5 w-6 bg-foreground transition-all duration-300 ${
+                isOpen ? "opacity-0" : "opacity-100"
+              }`}
+            />
+            <span
+              className={`absolute h-0.5 w-6 bg-foreground transition-all duration-300 ${
+                isOpen ? "-rotate-45" : "translate-y-2"
+              }`}
+            />
           </button>
         </div>
+      </div>
 
-        {/* Mobile Navigation */}
-        {isOpen && (
-          <div className="md:hidden pt-4 pb-2 space-y-2 animate-fade-in">
-            {navItems.map((item) => (
+      {/* Full Screen Mobile Navigation */}
+      <div
+        className={`md:hidden fixed inset-0 top-[65px] bg-background z-40 transition-all duration-300 ${
+          isOpen ? "opacity-100 visible" : "opacity-0 invisible"
+        }`}
+      >
+        <div className="container mx-auto px-6 py-8 flex flex-col h-full">
+          <div className="space-y-6 flex-1">
+            {navItems.map((item, index) => (
               <button
                 key={item.href}
                 onClick={() => scrollToSection(item.href)}
-                className="block w-full text-left py-2 text-muted-foreground hover:text-foreground transition-colors"
+                className={`block w-full text-left text-2xl font-medium text-foreground hover:text-accent transition-all duration-300 ${
+                  isOpen ? "translate-x-0 opacity-100" : "-translate-x-4 opacity-0"
+                }`}
+                style={{ transitionDelay: `${index * 50}ms` }}
               >
                 {item.label}
               </button>
             ))}
-            <div className="flex items-center gap-4 pt-4">
-              <ThemeToggle />
-              <Button
-                variant="secondary"
-                size="sm"
-                className="flex-1"
-                onClick={() => scrollToSection("#contact")}
-              >
-                Hire Me
-              </Button>
-            </div>
           </div>
-        )}
+          <div className="flex items-center gap-4 pb-8">
+            <ThemeToggle />
+            <Button
+              variant="secondary"
+              size="lg"
+              className="flex-1"
+              onClick={() => scrollToSection("#contact")}
+            >
+              Hire Me
+            </Button>
+          </div>
+        </div>
       </div>
     </nav>
   );
