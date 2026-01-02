@@ -5,10 +5,19 @@ interface IconProps {
 }
 
 export const EchoIcon = ({ className = "w-5 h-5" }: IconProps) => (
-  <img
-    src={echoLogo}
-    alt="Echo"
-    className={`${className} dark:invert object-contain`}
+  <span
+    aria-hidden="true"
+    className={`${className} inline-block bg-current`}
+    style={{
+      WebkitMaskImage: `url(${echoLogo})`,
+      maskImage: `url(${echoLogo})`,
+      WebkitMaskRepeat: "no-repeat",
+      maskRepeat: "no-repeat",
+      WebkitMaskSize: "contain",
+      maskSize: "contain",
+      WebkitMaskPosition: "center",
+      maskPosition: "center",
+    }}
   />
 );
 
