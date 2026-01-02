@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { IconMenu, IconClose } from "@/components/icons/CustomIcons";
 
 const navItems = [
   { label: "About", href: "#about" },
@@ -58,7 +58,7 @@ export const Navigation = () => {
             onClick={() => setIsOpen(!isOpen)}
             aria-label="Toggle menu"
           >
-            {isOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            {isOpen ? <IconClose /> : <IconMenu />}
           </button>
         </div>
 

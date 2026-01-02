@@ -1,6 +1,6 @@
-import { ExternalLink, Trophy } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { IconTrophy, IconExternal } from "@/components/icons/CustomIcons";
 
 const projects = [
   {
@@ -63,7 +63,7 @@ export const Projects = () => {
               <div className="p-6 space-y-4">
                 {project.award && (
                   <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-accent/20 text-sm font-medium">
-                    <Trophy className="h-3.5 w-3.5" />
+                    <IconTrophy className="w-3.5 h-3.5" />
                     {project.award}
                   </div>
                 )}
@@ -88,7 +88,7 @@ export const Projects = () => {
         <div className="text-center mt-12">
           <Button variant="outline" size="lg">
             View All Projects
-            <ExternalLink className="ml-2 h-4 w-4" />
+            <IconExternal className="ml-2 w-4 h-4" />
           </Button>
         </div>
       </div>

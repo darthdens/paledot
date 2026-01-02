@@ -1,6 +1,6 @@
-import { Sparkles, Moon } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
+import { IconSun, IconMoon } from "@/components/icons/CustomIcons";
 
 export const ThemeToggle = () => {
   const [isDark, setIsDark] = useState(false);
@@ -35,11 +35,7 @@ export const ThemeToggle = () => {
       className="h-9 w-9"
       aria-label="Toggle theme"
     >
-      {isDark ? (
-        <Sparkles className="h-4 w-4" />
-      ) : (
-        <Moon className="h-4 w-4" />
-      )}
+      {isDark ? <IconSun /> : <IconMoon />}
     </Button>
   );
 };

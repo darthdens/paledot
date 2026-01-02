@@ -1,47 +1,40 @@
 import { 
-  Palette, 
-  Globe, 
-  Megaphone, 
-  Layers, 
-  Handshake, 
-  Cpu 
-} from "lucide-react";
-import type { LucideIcon } from "lucide-react";
+  IconWeb, 
+  IconBrand, 
+  IconMegaphone, 
+  IconLayers, 
+  IconHandshake, 
+  IconAI 
+} from "@/components/icons/CustomIcons";
 
-interface Service {
-  icon: LucideIcon;
-  title: string;
-  description: string;
-}
-
-const services: Service[] = [
+const services = [
   {
-    icon: Globe,
+    Icon: IconWeb,
     title: "Website Design & Development",
     description: "Beautiful, responsive websites built with modern technologies. From landing pages to complex web applications.",
   },
   {
-    icon: Palette,
+    Icon: IconBrand,
     title: "Graphic & Brand Design",
     description: "Complete brand identities including logos, color palettes, typography, and brand guidelines.",
   },
   {
-    icon: Megaphone,
+    Icon: IconMegaphone,
     title: "Social Media & Marketing",
     description: "Strategic content creation, community management, and marketing campaigns that drive engagement.",
   },
   {
-    icon: Layers,
+    Icon: IconLayers,
     title: "Product Management",
     description: "End-to-end product strategy, roadmap planning, and execution for digital products.",
   },
   {
-    icon: Handshake,
+    Icon: IconHandshake,
     title: "Account Management",
     description: "Client relationship management, project coordination, and stakeholder communication.",
   },
   {
-    icon: Cpu,
+    Icon: IconAI,
     title: "AI Assistant Implementation",
     description: "Custom AI solutions including chatbots, digital twins, and automation tools for your business.",
   },
@@ -68,7 +61,7 @@ export const Services = () => {
             >
               <div className="mb-6">
                 <div className="inline-flex items-center justify-center w-14 h-14 rounded-xl bg-muted group-hover:bg-accent/20 transition-colors">
-                  <service.icon className="h-6 w-6 text-muted-foreground group-hover:text-accent transition-colors" />
+                  <service.Icon className="w-6 h-6 text-muted-foreground group-hover:text-accent transition-colors" />
                 </div>
               </div>
               <h3 className="font-serif text-xl font-bold mb-3 group-hover:text-accent transition-colors">

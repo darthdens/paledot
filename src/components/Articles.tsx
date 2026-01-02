@@ -1,5 +1,5 @@
-import { ArrowUpRight, Clock } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { IconClock, IconArrowUpRight } from "@/components/icons/CustomIcons";
 
 const articles = [
   {
@@ -49,7 +49,7 @@ export const Articles = () => {
                   <span>{article.date}</span>
                   <span>·</span>
                   <div className="flex items-center gap-1">
-                    <Clock className="h-3.5 w-3.5" />
+                    <IconClock className="w-3.5 h-3.5" />
                     {article.readTime}
                   </div>
                 </div>
@@ -68,7 +68,7 @@ export const Articles = () => {
                 
                 <div className="flex items-center gap-1 text-sm font-medium text-accent opacity-0 group-hover:opacity-100 transition-opacity">
                   Read More
-                  <ArrowUpRight className="h-4 w-4" />
+                  <IconArrowUpRight className="w-4 h-4" />
                 </div>
               </div>
             </article>
