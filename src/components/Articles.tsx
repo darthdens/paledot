@@ -1,3 +1,4 @@
+import { ArrowUpRight, Clock } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
 const articles = [
@@ -45,12 +46,12 @@ export const Articles = () => {
             >
               <div className="space-y-4">
                 <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                  <span>{article.date}</span>
+                  <span>·</span>
                   <div className="flex items-center gap-1">
-                    <span>📅</span>
-                    {article.date}
+                    <Clock className="h-3.5 w-3.5" />
+                    {article.readTime}
                   </div>
-                  <span>•</span>
-                  <span>{article.readTime}</span>
                 </div>
                 
                 <Badge variant="secondary" className="text-xs">
@@ -65,8 +66,9 @@ export const Articles = () => {
                   {article.excerpt}
                 </p>
                 
-                <div className="flex items-center gap-2 text-sm font-medium text-accent group-hover:gap-3 transition-all">
-                  Read More →
+                <div className="flex items-center gap-1 text-sm font-medium text-accent opacity-0 group-hover:opacity-100 transition-opacity">
+                  Read More
+                  <ArrowUpRight className="h-4 w-4" />
                 </div>
               </div>
             </article>
