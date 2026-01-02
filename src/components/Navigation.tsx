@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 const navItems = [
   { label: "About", href: "#about" },
@@ -41,6 +42,7 @@ export const Navigation = () => {
                 {item.label}
               </button>
             ))}
+            <ThemeToggle />
             <Button
               variant="secondary"
               size="sm"
