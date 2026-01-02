@@ -1,3 +1,4 @@
+import { ExternalLink, Trophy } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 
@@ -7,7 +8,7 @@ const projects = [
     description: "A social platform for verifiable assets and user data autonomy. Won 2nd prize at MultiversX xDay Hackathon 2023.",
     tags: ["Web3", "Blockchain", "Social Platform", "MultiversX"],
     image: "https://images.unsplash.com/photo-1639762681485-074b7f938ba0?w=800&auto=format&fit=crop",
-    award: "🏆 2nd Prize - xDay Hackathon 2023",
+    award: "2nd Prize - xDay Hackathon 2023",
     featured: true,
   },
   {
@@ -62,6 +63,7 @@ export const Projects = () => {
               <div className="p-6 space-y-4">
                 {project.award && (
                   <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-accent/20 text-sm font-medium">
+                    <Trophy className="h-3.5 w-3.5" />
                     {project.award}
                   </div>
                 )}
@@ -85,7 +87,8 @@ export const Projects = () => {
 
         <div className="text-center mt-12">
           <Button variant="outline" size="lg">
-            View All Projects 🔗
+            View All Projects
+            <ExternalLink className="ml-2 h-4 w-4" />
           </Button>
         </div>
       </div>

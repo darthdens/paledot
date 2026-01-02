@@ -1,3 +1,4 @@
+import { Sparkles, Moon } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 
@@ -31,10 +32,14 @@ export const ThemeToggle = () => {
       variant="ghost"
       size="icon"
       onClick={toggleTheme}
-      className="h-9 w-9 text-lg"
+      className="h-9 w-9"
       aria-label="Toggle theme"
     >
-      {isDark ? "☀️" : "🌙"}
+      {isDark ? (
+        <Sparkles className="h-4 w-4" />
+      ) : (
+        <Moon className="h-4 w-4" />
+      )}
     </Button>
   );
 };

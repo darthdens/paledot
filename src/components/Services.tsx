@@ -1,31 +1,47 @@
-const services = [
+import { 
+  Palette, 
+  Globe, 
+  Megaphone, 
+  Layers, 
+  Handshake, 
+  Cpu 
+} from "lucide-react";
+import type { LucideIcon } from "lucide-react";
+
+interface Service {
+  icon: LucideIcon;
+  title: string;
+  description: string;
+}
+
+const services: Service[] = [
   {
-    emoji: "💻",
+    icon: Globe,
     title: "Website Design & Development",
     description: "Beautiful, responsive websites built with modern technologies. From landing pages to complex web applications.",
   },
   {
-    emoji: "🎨",
+    icon: Palette,
     title: "Graphic & Brand Design",
     description: "Complete brand identities including logos, color palettes, typography, and brand guidelines.",
   },
   {
-    emoji: "📱",
+    icon: Megaphone,
     title: "Social Media & Marketing",
     description: "Strategic content creation, community management, and marketing campaigns that drive engagement.",
   },
   {
-    emoji: "📊",
+    icon: Layers,
     title: "Product Management",
     description: "End-to-end product strategy, roadmap planning, and execution for digital products.",
   },
   {
-    emoji: "🤝",
+    icon: Handshake,
     title: "Account Management",
     description: "Client relationship management, project coordination, and stakeholder communication.",
   },
   {
-    emoji: "🤖",
+    icon: Cpu,
     title: "AI Assistant Implementation",
     description: "Custom AI solutions including chatbots, digital twins, and automation tools for your business.",
   },
@@ -40,7 +56,7 @@ export const Services = () => {
             What I Do
           </h2>
           <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-            I'm available for freelance remote work in 🇬🇧 UK, 🇪🇺 EU, and 🇺🇸 US timezones.
+            I'm available for freelance remote work in UK, EU, and US timezones.
           </p>
         </div>
 
@@ -51,8 +67,8 @@ export const Services = () => {
               className="group p-8 rounded-2xl bg-card border border-border hover:border-accent/50 transition-all duration-300 hover:shadow-lg"
             >
               <div className="mb-6">
-                <div className="inline-flex items-center justify-center w-14 h-14 rounded-xl bg-muted text-2xl">
-                  {service.emoji}
+                <div className="inline-flex items-center justify-center w-14 h-14 rounded-xl bg-muted group-hover:bg-accent/20 transition-colors">
+                  <service.icon className="h-6 w-6 text-muted-foreground group-hover:text-accent transition-colors" />
                 </div>
               </div>
               <h3 className="font-serif text-xl font-bold mb-3 group-hover:text-accent transition-colors">

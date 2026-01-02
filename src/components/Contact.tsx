@@ -1,13 +1,21 @@
 import { useState } from "react";
+import { Mail, Send, Calendar, Linkedin, Github, Twitter } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
+import type { LucideIcon } from "lucide-react";
 
-const socialLinks = [
-  { emoji: "💼", label: "LinkedIn", href: "#" },
-  { emoji: "🐙", label: "GitHub", href: "#" },
-  { emoji: "🐦", label: "Twitter", href: "#" },
+interface SocialLink {
+  icon: LucideIcon;
+  label: string;
+  href: string;
+}
+
+const socialLinks: SocialLink[] = [
+  { icon: Linkedin, label: "LinkedIn", href: "#" },
+  { icon: Github, label: "GitHub", href: "#" },
+  { icon: Twitter, label: "Twitter", href: "#" },
 ];
 
 export const Contact = () => {
@@ -21,7 +29,7 @@ export const Contact = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     toast({
-      title: "Message sent! 🎉",
+      title: "Message sent!",
       description: "Thanks for reaching out. I'll get back to you soon.",
     });
     setFormData({ name: "", email: "", message: "" });
@@ -55,8 +63,8 @@ export const Contact = () => {
                   href="mailto:hello@densakoka.com"
                   className="flex items-center gap-4 p-4 rounded-xl bg-card border border-border hover:border-accent/50 transition-colors group"
                 >
-                  <div className="w-12 h-12 rounded-xl bg-muted flex items-center justify-center text-xl">
-                    ✉️
+                  <div className="w-12 h-12 rounded-xl bg-muted flex items-center justify-center group-hover:bg-accent/20 transition-colors">
+                    <Mail className="h-5 w-5 text-muted-foreground group-hover:text-accent transition-colors" />
                   </div>
                   <div>
                     <div className="font-medium group-hover:text-accent transition-colors">
@@ -72,8 +80,8 @@ export const Contact = () => {
                   href="#"
                   className="flex items-center gap-4 p-4 rounded-xl bg-card border border-border hover:border-accent/50 transition-colors group"
                 >
-                  <div className="w-12 h-12 rounded-xl bg-muted flex items-center justify-center text-xl">
-                    📅
+                  <div className="w-12 h-12 rounded-xl bg-muted flex items-center justify-center group-hover:bg-accent/20 transition-colors">
+                    <Calendar className="h-5 w-5 text-muted-foreground group-hover:text-accent transition-colors" />
                   </div>
                   <div>
                     <div className="font-medium group-hover:text-accent transition-colors">
@@ -93,10 +101,10 @@ export const Contact = () => {
                     <a
                       key={social.label}
                       href={social.href}
-                      className="w-12 h-12 rounded-xl bg-card border border-border flex items-center justify-center hover:border-accent/50 hover:scale-110 transition-all text-xl"
+                      className="w-12 h-12 rounded-xl bg-card border border-border flex items-center justify-center hover:border-accent/50 hover:text-accent transition-all group"
                       aria-label={social.label}
                     >
-                      {social.emoji}
+                      <social.icon className="h-5 w-5" />
                     </a>
                   ))}
                 </div>
@@ -147,7 +155,8 @@ export const Contact = () => {
                 />
               </div>
               <Button type="submit" variant="secondary" size="lg" className="w-full">
-                Send Message ✨
+                Send Message
+                <Send className="ml-2 h-4 w-4" />
               </Button>
             </form>
           </div>

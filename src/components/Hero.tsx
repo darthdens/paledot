@@ -1,3 +1,4 @@
+import { MapPin, ArrowDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export const Hero = () => {
@@ -16,8 +17,8 @@ export const Hero = () => {
           <div className="space-y-8 order-2 lg:order-1">
             <div className="space-y-4">
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-muted text-muted-foreground text-sm">
-                <span>📍</span>
-                <span>Dundee, Scotland 🏴󠁧󠁢󠁳󠁣󠁴󠁿</span>
+                <MapPin className="h-3.5 w-3.5" />
+                <span>Dundee, Scotland</span>
               </div>
               
               <h1 className="font-serif text-5xl md:text-7xl font-bold leading-tight">
@@ -31,7 +32,7 @@ export const Hero = () => {
             </div>
 
             <p className="text-lg text-muted-foreground max-w-xl leading-relaxed">
-              I create brands, websites, apps, social profiles, and lead teams of marketers and engineers. Welcome to my personal space where I showcase my work and tell you more about myself. 👋🏻
+              I create brands, websites, apps, social profiles, and lead teams of marketers and engineers. Welcome to my personal space where I showcase my work and tell you more about myself.
             </p>
 
             <div className="flex flex-wrap gap-4">
@@ -42,7 +43,7 @@ export const Hero = () => {
                 className="group"
               >
                 View My Work
-                <span className="ml-2 group-hover:translate-y-1 transition-transform inline-block">↓</span>
+                <ArrowDown className="ml-2 h-4 w-4 group-hover:translate-y-1 transition-transform" />
               </Button>
               <Button
                 variant="outline"
@@ -65,8 +66,8 @@ export const Hero = () => {
               </div>
               <div className="w-px h-12 bg-border" />
               <div className="text-center">
-                <div className="text-3xl font-bold font-serif">🏆</div>
-                <div className="text-sm text-muted-foreground">Award Winner</div>
+                <div className="text-3xl font-bold font-serif">2nd</div>
+                <div className="text-sm text-muted-foreground">Hackathon Prize</div>
               </div>
             </div>
           </div>
