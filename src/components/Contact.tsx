@@ -4,12 +4,24 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { Mail, Calendar } from "iconoir-react";
-import { LinkedInIcon, GitHubIcon, XIcon } from "@/components/SocialIcons";
+import { 
+  EchoIcon, 
+  LinkedInIcon, 
+  XIcon, 
+  WhatsAppIcon, 
+  TelegramIcon, 
+  InstagramIcon, 
+  FacebookIcon 
+} from "@/components/SocialIcons";
 
 const socialLinks = [
-  { Icon: LinkedInIcon, label: "LinkedIn", href: "https://linkedin.com/in/densakoka" },
-  { Icon: GitHubIcon, label: "GitHub", href: "https://github.com/densakoka" },
-  { Icon: XIcon, label: "X", href: "https://x.com/densakoka" },
+  { Icon: EchoIcon, label: "Echo", href: "https://echoai.so/e/dens" },
+  { Icon: WhatsAppIcon, label: "WhatsApp", href: "https://api.whatsapp.com/send/?phone=447552800685&text&type=phone_number&app_absent=0" },
+  { Icon: TelegramIcon, label: "Telegram", href: "https://t.me/densakoka" },
+  { Icon: LinkedInIcon, label: "LinkedIn", href: "https://www.linkedin.com/in/denisakoka/" },
+  { Icon: XIcon, label: "X", href: "https://x.com/densweb3" },
+  { Icon: InstagramIcon, label: "Instagram", href: "https://www.instagram.com/densakoka/" },
+  { Icon: FacebookIcon, label: "Facebook", href: "https://www.facebook.com/densgpt/" },
 ];
 
 export const Contact = () => {
