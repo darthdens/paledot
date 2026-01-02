@@ -95,7 +95,7 @@ export const Hero = () => {
           </div>
 
           {/* Profile Image */}
-          <div className="order-1 lg:order-2 flex justify-start lg:justify-end mb-8 md:mb-2 lg:mb-0">
+          <div className="order-1 lg:order-2 flex justify-start lg:justify-end mb-4 md:mb-2 lg:mb-0">
             <div className="relative">
               <div className="w-40 h-40 md:w-56 md:h-56 lg:w-96 lg:h-96 rounded-3xl bg-muted overflow-hidden shadow-xl">
                 <img
