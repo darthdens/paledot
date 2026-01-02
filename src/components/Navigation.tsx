@@ -4,11 +4,11 @@ import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const navItems = [
-  { label: "🧔🏻 About", href: "#about" },
-  { label: "🛠️ Projects", href: "#projects" },
-  { label: "💼 Services", href: "#services" },
-  { label: "📝 Articles", href: "#articles" },
-  { label: "📩 Contact", href: "#contact" },
+  { label: "About", href: "#about" },
+  { label: "Projects", href: "#projects" },
+  { label: "Services", href: "#services" },
+  { label: "Articles", href: "#articles" },
+  { label: "Contact", href: "#contact" },
 ];
 
 export const Navigation = () => {

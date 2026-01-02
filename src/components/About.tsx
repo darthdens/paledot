@@ -24,8 +24,8 @@ export const About = () => {
         <div className="grid lg:grid-cols-2 gap-16 items-center">
           <div className="space-y-8">
             <div>
-              <h2 className="font-serif text-4xl md:text-5xl font-bold mb-6">
-                🧔🏻 About Me
+            <h2 className="font-serif text-4xl md:text-5xl font-bold mb-6">
+                About Me
               </h2>
               <div className="space-y-4 text-lg text-muted-foreground leading-relaxed">
                 <p>
