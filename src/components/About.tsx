@@ -44,8 +44,8 @@ const testimonials = [
 
 export const About = () => {
   return (
-    <section id="about" className="py-24 bg-muted/30">
-      <div className="container mx-auto px-6">
+    <section id="about" className="py-24 bg-muted/30 overflow-hidden">
+      <div className="container mx-auto px-6 overflow-hidden">
         <div className="grid lg:grid-cols-2 gap-16 items-center">
           <div className="space-y-8">
             <div>
@@ -108,7 +108,7 @@ export const About = () => {
 
             <div className="bg-card rounded-2xl p-5 sm:p-8 border border-border">
               <h3 className="font-serif text-xl font-bold mb-6">What People Say</h3>
-              <Carousel className="w-full">
+              <Carousel className="w-full overflow-hidden">
                 <CarouselContent>
                   {testimonials.map((testimonial, index) => (
                     <CarouselItem key={index}>
