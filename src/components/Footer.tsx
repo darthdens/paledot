@@ -1,4 +1,4 @@
-import { IconSparkle } from "@/components/icons/CustomIcons";
+import { Sparks } from "iconoir-react";
 
 export const Footer = () => {
   const currentYear = new Date().getFullYear();
@@ -11,7 +11,7 @@ export const Footer = () => {
           
           <div className="flex items-center gap-2 text-muted-foreground text-sm">
             <span>Made with</span>
-            <IconSparkle className="w-4 h-4 text-accent" />
+            <Sparks className="w-4 h-4 text-accent" />
             <span>in Scotland</span>
           </div>
           

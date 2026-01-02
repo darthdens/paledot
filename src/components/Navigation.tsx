@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/ThemeToggle";
-import { IconMenu, IconClose } from "@/components/icons/CustomIcons";
+import { Menu, Xmark } from "iconoir-react";
 
 const navItems = [
   { label: "About", href: "#about" },
@@ -58,7 +58,7 @@ export const Navigation = () => {
             onClick={() => setIsOpen(!isOpen)}
             aria-label="Toggle menu"
           >
-            {isOpen ? <IconClose /> : <IconMenu />}
+            {isOpen ? <Xmark className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
           </button>
         </div>
 
