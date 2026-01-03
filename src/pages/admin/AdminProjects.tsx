@@ -201,7 +201,7 @@ const AdminProjects = () => {
               Add Project
             </Button>
           </DialogTrigger>
-          <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto mx-4">
+          <DialogContent className="w-[calc(100vw-2rem)] max-w-3xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>{editingProject ? "Edit Project" : "Create Project"}</DialogTitle>
               <p className="text-sm text-muted-foreground">
