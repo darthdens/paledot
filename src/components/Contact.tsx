@@ -5,6 +5,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { Mail, Calendar } from "iconoir-react";
 import { supabase } from "@/integrations/supabase/client";
+import { useLanguage } from "@/i18n/LanguageContext";
 import { 
   EchoIcon, 
   LinkedInIcon, 
@@ -26,6 +27,7 @@ const socialLinks = [
 ];
 
 export const Contact = () => {
+  const { t } = useLanguage();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
@@ -63,13 +65,13 @@ export const Contact = () => {
 
       if (notifyError) throw notifyError;
 
-      toast.success("Message sent!", {
-        description: "Thanks for reaching out. I'll get back to you soon.",
+      toast.success(t.contact.toast.success, {
+        description: t.contact.toast.successDesc,
       });
       setFormData({ name: "", email: "", message: "" });
     } catch (error) {
       console.error("Error submitting form:", error);
-      toast.error("Failed to send message. Please try again.");
+      toast.error(t.contact.toast.error);
     } finally {
       setIsSubmitting(false);
     }
@@ -81,10 +83,10 @@ export const Contact = () => {
         <div className="max-w-4xl mx-auto">
           <div className="text-left md:text-center mb-16">
             <h2 className="font-serif text-4xl md:text-5xl font-bold mb-4">
-              Let's Connect
+              {t.contact.title}
             </h2>
             <p className="text-muted-foreground text-lg max-w-2xl md:mx-auto">
-              Have a project in mind or just want to chat? I'd love to hear from you.
+              {t.contact.subtitle}
             </p>
           </div>
 
@@ -92,9 +94,9 @@ export const Contact = () => {
             {/* Contact Info */}
             <div className="space-y-8">
               <div>
-                <h3 className="font-serif text-2xl font-bold mb-4">Get in Touch</h3>
+                <h3 className="font-serif text-2xl font-bold mb-4">{t.contact.getInTouch}</h3>
                 <p className="text-muted-foreground leading-relaxed mb-6">
-                  I'm currently available for freelance work and exciting collaborations. Whether you need a website, brand identity, or product strategy, let's talk about how I can help.
+                  {t.contact.description}
                 </p>
               </div>
 
@@ -108,7 +110,7 @@ export const Contact = () => {
                   </div>
                   <div>
                     <div className="font-medium group-hover:text-accent transition-colors">
-                      Email Me
+                      {t.contact.emailMe}
                     </div>
                     <div className="text-sm text-muted-foreground">
                       denis.akoka@gmail.com
@@ -127,17 +129,17 @@ export const Contact = () => {
                   </div>
                   <div>
                     <div className="font-medium group-hover:text-accent transition-colors">
-                      Book a Call
+                      {t.contact.bookCall}
                     </div>
                     <div className="text-sm text-muted-foreground">
-                      Schedule a 30-min chat
+                      {t.contact.scheduleChat}
                     </div>
                   </div>
                 </a>
               </div>
 
               <div>
-                <h4 className="font-medium mb-4">Find me on</h4>
+                <h4 className="font-medium mb-4">{t.contact.findMeOn}</h4>
                 <div className="flex flex-wrap gap-3">
                   {socialLinks.map((social) => (
                     <a
@@ -159,47 +161,47 @@ export const Contact = () => {
             <form onSubmit={handleSubmit} className="space-y-6">
               <div>
                 <label htmlFor="name" className="block text-sm font-medium mb-2">
-                  Your Name
+                  {t.contact.form.yourName}
                 </label>
                 <Input
                   id="name"
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  placeholder="John Doe"
+                  placeholder={t.contact.form.namePlaceholder}
                   required
                   className="bg-card"
                 />
               </div>
               <div>
                 <label htmlFor="email" className="block text-sm font-medium mb-2">
-                  Email Address
+                  {t.contact.form.emailAddress}
                 </label>
                 <Input
                   id="email"
                   type="email"
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  placeholder="john@example.com"
+                  placeholder={t.contact.form.emailPlaceholder}
                   required
                   className="bg-card"
                 />
               </div>
               <div>
                 <label htmlFor="message" className="block text-sm font-medium mb-2">
-                  Message
+                  {t.contact.form.message}
                 </label>
                 <Textarea
                   id="message"
                   value={formData.message}
                   onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                  placeholder="Tell me about your project..."
+                  placeholder={t.contact.form.messagePlaceholder}
                   rows={5}
                   required
                   className="bg-card resize-none"
                 />
               </div>
               <Button type="submit" variant="secondary" size="lg" className="w-full" disabled={isSubmitting}>
-                {isSubmitting ? "Sending..." : "Send Message"}
+                {isSubmitting ? t.contact.form.sending : t.contact.form.send}
               </Button>
             </form>
           </div>
