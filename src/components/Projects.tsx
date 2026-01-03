@@ -36,11 +36,11 @@ export const Projects = () => {
   return (
     <section id="projects" className="py-24 bg-muted/30">
       <div className="container mx-auto px-6">
-        <div className="text-center mb-16">
+        <div className="text-left md:text-center mb-16">
           <h2 className="font-serif text-4xl md:text-5xl font-bold mb-4">
             Featured Projects
           </h2>
-          <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
+          <p className="text-muted-foreground text-lg max-w-2xl md:mx-auto">
             A selection of projects I've built, led, or contributed to over the years.
           </p>
         </div>

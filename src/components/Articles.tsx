@@ -29,11 +29,11 @@ export const Articles = () => {
   return (
     <section id="articles" className="py-24">
       <div className="container mx-auto px-6">
-        <div className="text-center mb-16">
+        <div className="text-left md:text-center mb-16">
           <h2 className="font-serif text-4xl md:text-5xl font-bold mb-4">
             Latest Thoughts
           </h2>
-          <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
+          <p className="text-muted-foreground text-lg max-w-2xl md:mx-auto">
             Occasional writings on technology, design, and the creative journey.
           </p>
         </div>
