@@ -87,6 +87,10 @@ const AdminArticles = () => {
   };
 
   useEffect(() => {
+    document.title = "Articles | Admin | Dens";
+  }, []);
+
+  useEffect(() => {
     fetchArticles();
   }, []);
 

@@ -28,6 +28,10 @@ const ArticlesPage = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    document.title = language === "fr" ? "Articles | Dens" : "Articles | Dens";
+  }, [language]);
+
+  useEffect(() => {
     const fetchArticles = async () => {
       const { data } = await supabase
         .from("articles")

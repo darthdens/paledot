@@ -12,6 +12,7 @@ const NotFound = () => {
   const { t } = useLanguage();
 
   useEffect(() => {
+    document.title = "404 | Dens";
     console.error("404 Error: User attempted to access non-existent route:", location.pathname);
   }, [location.pathname]);
 

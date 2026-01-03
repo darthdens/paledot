@@ -22,6 +22,10 @@ const AdminLogin = () => {
   const [isSignUp, setIsSignUp] = useState(false);
 
   useEffect(() => {
+    document.title = "Admin Login | Dens";
+  }, []);
+
+  useEffect(() => {
     if (!isLoading && user && isAdmin) {
       navigate("/admin/dashboard");
     }

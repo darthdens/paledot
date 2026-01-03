@@ -45,6 +45,15 @@ const ProjectDetail = () => {
     }
   }, [slug]);
 
+  // Update document title when project is loaded
+  useEffect(() => {
+    if (project) {
+      const title = language === "fr" ? project.title_fr : project.title_en;
+      const parentPage = language === "fr" ? "Projets" : "Projects";
+      document.title = `${title} | ${parentPage} | Dens`;
+    }
+  }, [project, language]);
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-background">

@@ -48,6 +48,14 @@ const ArticleDetail = () => {
     }
   }, [slug]);
 
+  // Update document title when article is loaded
+  useEffect(() => {
+    if (article) {
+      const title = language === "fr" ? article.title_fr : article.title_en;
+      document.title = `${title} | Articles | Dens`;
+    }
+  }, [article, language]);
+
   const formatDate = (dateString: string | null) => {
     if (!dateString) return "";
     return new Date(dateString).toLocaleDateString(language === "fr" ? "fr-FR" : "en-US", {
