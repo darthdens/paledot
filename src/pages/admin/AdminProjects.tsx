@@ -136,21 +136,21 @@ const AdminProjects = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h2 className="font-serif text-2xl font-bold">Projects</h2>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <h2 className="font-serif text-xl md:text-2xl font-bold">Projects</h2>
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
-            <Button onClick={() => handleOpenDialog()}>
+            <Button onClick={() => handleOpenDialog()} className="w-full sm:w-auto">
               <Plus className="w-4 h-4 mr-2" />
               Add Project
             </Button>
           </DialogTrigger>
-          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto mx-4">
             <DialogHeader>
               <DialogTitle>{editingProject ? "Edit Project" : "Add Project"}</DialogTitle>
             </DialogHeader>
             <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="slug">Slug</Label>
                   <Input
@@ -172,7 +172,7 @@ const AdminProjects = () => {
                 </div>
               </div>
               
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="title_en">Title (English)</Label>
                   <Input
@@ -193,7 +193,7 @@ const AdminProjects = () => {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="description_en">Description (English)</Label>
                   <Textarea
@@ -244,7 +244,7 @@ const AdminProjects = () => {
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="award_en">Award (English)</Label>
                   <Input
@@ -292,19 +292,19 @@ const AdminProjects = () => {
         ) : (
           projects.map((project) => (
             <Card key={project.id}>
-              <CardHeader className="flex flex-row items-center justify-between py-4">
-                <div>
-                  <CardTitle className="text-lg">{project.title_en}</CardTitle>
-                  <p className="text-sm text-muted-foreground">/{project.slug}</p>
+              <CardHeader className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 py-4">
+                <div className="min-w-0 flex-1">
+                  <CardTitle className="text-base md:text-lg truncate">{project.title_en}</CardTitle>
+                  <p className="text-sm text-muted-foreground truncate">/{project.slug}</p>
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 flex-shrink-0">
                   {project.is_featured && (
-                    <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded">Featured</span>
+                    <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded whitespace-nowrap">Featured</span>
                   )}
-                  <Button variant="ghost" size="sm" onClick={() => handleOpenDialog(project)}>
+                  <Button variant="ghost" size="icon" onClick={() => handleOpenDialog(project)}>
                     <Edit className="w-4 h-4" />
                   </Button>
-                  <Button variant="ghost" size="sm" onClick={() => handleDelete(project.id)}>
+                  <Button variant="ghost" size="icon" onClick={() => handleDelete(project.id)}>
                     <Trash className="w-4 h-4" />
                   </Button>
                 </div>
