@@ -76,8 +76,8 @@ const RichTextEditor = forwardRef<HTMLDivElement, RichTextEditorProps>(
   ({ content, onChange, placeholder }, ref) => {
     const normalizedContent = useMemo(() => sanitizeRichTextHtml(content), [content]);
 
-    const editor = useEditor({
-      extensions: [
+    const extensions = useMemo(
+      () => [
         StarterKit.configure({
           heading: {
             levels: [1, 2, 3],
@@ -111,21 +111,31 @@ const RichTextEditor = forwardRef<HTMLDivElement, RichTextEditorProps>(
           },
         }),
       ],
-      content: normalizedContent,
-      onUpdate: ({ editor }) => {
-        const html = editor.getHTML();
-        const normalized = sanitizeRichTextHtml(html);
-        onChange(normalized);
-      },
-      editorProps: {
-        attributes: {
-          // Match the same typography + theme-aware colors used on the public Project/Article pages.
-          class:
-            'prose prose-lg max-w-none text-muted-foreground prose-headings:text-foreground prose-p:text-muted-foreground prose-li:text-muted-foreground prose-strong:text-foreground prose-a:text-primary prose-blockquote:text-muted-foreground prose-code:text-foreground min-h-[200px] p-4 focus:outline-none',
-          ...(placeholder ? { 'data-placeholder': placeholder } : {}),
+      [],
+    );
+
+    const editor = useEditor(
+      {
+        extensions,
+        // IMPORTANT: content is only used on initial mount. Admin pages remount the editor
+        // when switching items via a React `key`, so selection/formatting stays stable.
+        content: normalizedContent,
+        onUpdate: ({ editor }) => {
+          const html = editor.getHTML();
+          const normalized = sanitizeRichTextHtml(html);
+          onChange(normalized);
+        },
+        editorProps: {
+          attributes: {
+            // Match the same typography + theme-aware colors used on the public Project/Article pages.
+            class:
+              'prose prose-lg max-w-none text-muted-foreground prose-headings:text-foreground prose-p:text-muted-foreground prose-li:text-muted-foreground prose-strong:text-foreground prose-a:text-primary prose-blockquote:text-muted-foreground prose-code:text-foreground min-h-[200px] p-4 focus:outline-none',
+            ...(placeholder ? { 'data-placeholder': placeholder } : {}),
+          },
         },
       },
-    });
+      [],
+    );
 
   // NOTE: We intentionally do NOT sync `content` prop back into the editor on every change.
   // The parent updates `content` on every keystroke; re-setting editor content would reset selection
