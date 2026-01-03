@@ -19,7 +19,7 @@ const NotFound = () => {
         <h2 className="mb-4 text-2xl font-semibold">{t.notFound.title}</h2>
         <p className="mb-8 text-lg text-muted-foreground max-w-md mx-auto">{t.notFound.message}</p>
         <Link to="/">
-          <Button size="lg">
+          <Button variant="secondary" size="lg">
             <Home className="w-4 h-4 mr-2" />
             {t.notFound.backHome}
           </Button>
