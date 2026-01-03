@@ -144,65 +144,19 @@ const RichTextEditor = forwardRef<HTMLDivElement, RichTextEditorProps>(
 
   const imageInputRef = useRef<HTMLInputElement>(null);
   const [isUploadingImage, setIsUploadingImage] = useState(false);
-  const lastSelection = useRef<{ from: number; to: number } | null>(null);
-
-  useEffect(() => {
-    if (!editor) return;
-
-    const storeSelection = () => {
-      const { from, to } = editor.state.selection;
-      // Only treat non-empty selections as "the" selection we want to preserve.
-      // (Toolbar interactions can temporarily collapse selection.)
-      if (from !== to) {
-        lastSelection.current = { from, to };
-        return;
-      }
-
-      // Still keep cursor position updates when the editor is focused.
-      if (editor.view.hasFocus()) {
-        lastSelection.current = { from, to };
-      }
-    };
-
-    storeSelection();
-    editor.on('selectionUpdate', storeSelection);
-
-    const dom = editor.view.dom;
-    dom.addEventListener('mouseup', storeSelection);
-    dom.addEventListener('keyup', storeSelection);
-    dom.addEventListener('touchend', storeSelection);
-
-    return () => {
-      editor.off('selectionUpdate', storeSelection);
-      dom.removeEventListener('mouseup', storeSelection);
-      dom.removeEventListener('keyup', storeSelection);
-      dom.removeEventListener('touchend', storeSelection);
-    };
-  }, [editor]);
 
   if (!editor) {
     return null;
   }
 
-  const chainWithSelection = () => {
-    let chain = editor.chain().focus();
-
-    if (lastSelection.current) {
-      const max = editor.state.doc.content.size;
-      const clamp = (pos: number) => Math.max(0, Math.min(pos, max));
-      chain = chain.setTextSelection({
-        from: clamp(lastSelection.current.from),
-        to: clamp(lastSelection.current.to),
-      });
-    }
-
-    return chain;
-  };
+  // Use the simplest + most reliable approach: keep selection by preventing toolbar mouse down,
+  // and always run commands on a focused editor.
+  const chain = () => editor.chain().focus();
 
   const addLink = () => {
     const url = window.prompt('Enter URL:');
     if (url) {
-      chainWithSelection().extendMarkRange('link').setLink({ href: url }).run();
+      chain().extendMarkRange('link').setLink({ href: url }).run();
     }
   };
 
@@ -326,7 +280,7 @@ const RichTextEditor = forwardRef<HTMLDivElement, RichTextEditorProps>(
             <DropdownMenuItem
               onSelect={(e) => {
                 e.preventDefault();
-                chainWithSelection().setParagraph().run();
+                chain().setParagraph().run();
               }}
             >
               Paragraph
@@ -334,7 +288,7 @@ const RichTextEditor = forwardRef<HTMLDivElement, RichTextEditorProps>(
             <DropdownMenuItem
               onSelect={(e) => {
                 e.preventDefault();
-                chainWithSelection().setHeading({ level: 1 }).run();
+                chain().setHeading({ level: 1 }).run();
               }}
             >
               Heading 1
@@ -342,7 +296,7 @@ const RichTextEditor = forwardRef<HTMLDivElement, RichTextEditorProps>(
             <DropdownMenuItem
               onSelect={(e) => {
                 e.preventDefault();
-                chainWithSelection().setHeading({ level: 2 }).run();
+                chain().setHeading({ level: 2 }).run();
               }}
             >
               Heading 2
@@ -350,7 +304,7 @@ const RichTextEditor = forwardRef<HTMLDivElement, RichTextEditorProps>(
             <DropdownMenuItem
               onSelect={(e) => {
                 e.preventDefault();
-                chainWithSelection().setHeading({ level: 3 }).run();
+                chain().setHeading({ level: 3 }).run();
               }}
             >
               Heading 3
@@ -361,35 +315,35 @@ const RichTextEditor = forwardRef<HTMLDivElement, RichTextEditorProps>(
         <div className="w-px h-6 bg-border mx-1" />
 
         <ToolbarButton
-          onClick={() => chainWithSelection().toggleBold().run()}
+          onClick={() => chain().toggleBold().run()}
           isActive={editor.isActive('bold')}
           title="Bold"
         >
           <Bold className="h-4 w-4" />
         </ToolbarButton>
         <ToolbarButton
-          onClick={() => chainWithSelection().toggleItalic().run()}
+          onClick={() => chain().toggleItalic().run()}
           isActive={editor.isActive('italic')}
           title="Italic"
         >
           <Italic className="h-4 w-4" />
         </ToolbarButton>
         <ToolbarButton
-          onClick={() => chainWithSelection().toggleUnderline().run()}
+          onClick={() => chain().toggleUnderline().run()}
           isActive={editor.isActive('underline')}
           title="Underline"
         >
           <UnderlineIcon className="h-4 w-4" />
         </ToolbarButton>
         <ToolbarButton
-          onClick={() => chainWithSelection().toggleStrike().run()}
+          onClick={() => chain().toggleStrike().run()}
           isActive={editor.isActive('strike')}
           title="Strikethrough"
         >
           <Strikethrough className="h-4 w-4" />
         </ToolbarButton>
         <ToolbarButton
-          onClick={() => chainWithSelection().toggleCode().run()}
+          onClick={() => chain().toggleCode().run()}
           isActive={editor.isActive('code')}
           title="Code"
         >
@@ -412,11 +366,11 @@ const RichTextEditor = forwardRef<HTMLDivElement, RichTextEditorProps>(
                 style={{ backgroundColor: color.value || 'transparent' }}
                 onMouseDown={(e) => {
                   e.preventDefault();
-                  const chain = chainWithSelection();
+                  const c = chain();
                   if (color.value) {
-                    chain.setColor(color.value).run();
+                    c.setColor(color.value).run();
                   } else {
-                    chain.unsetColor().run();
+                    c.unsetColor().run();
                   }
                 }}
                 title={color.name}
@@ -439,11 +393,11 @@ const RichTextEditor = forwardRef<HTMLDivElement, RichTextEditorProps>(
                 style={{ backgroundColor: color.value || 'transparent' }}
                 onMouseDown={(e) => {
                   e.preventDefault();
-                  const chain = chainWithSelection();
+                  const c = chain();
                   if (color.value) {
-                    chain.toggleHighlight({ color: color.value }).run();
+                    c.toggleHighlight({ color: color.value }).run();
                   } else {
-                    chain.unsetHighlight().run();
+                    c.unsetHighlight().run();
                   }
                 }}
                 title={color.name}
@@ -455,21 +409,21 @@ const RichTextEditor = forwardRef<HTMLDivElement, RichTextEditorProps>(
         <div className="w-px h-6 bg-border mx-1" />
 
         <ToolbarButton
-          onClick={() => chainWithSelection().setTextAlign('left').run()}
+          onClick={() => chain().setTextAlign('left').run()}
           isActive={editor.isActive({ textAlign: 'left' })}
           title="Align Left"
         >
           <AlignLeft className="h-4 w-4" />
         </ToolbarButton>
         <ToolbarButton
-          onClick={() => chainWithSelection().setTextAlign('center').run()}
+          onClick={() => chain().setTextAlign('center').run()}
           isActive={editor.isActive({ textAlign: 'center' })}
           title="Align Center"
         >
           <AlignCenter className="h-4 w-4" />
         </ToolbarButton>
         <ToolbarButton
-          onClick={() => chainWithSelection().setTextAlign('right').run()}
+          onClick={() => chain().setTextAlign('right').run()}
           isActive={editor.isActive({ textAlign: 'right' })}
           title="Align Right"
         >
@@ -479,28 +433,28 @@ const RichTextEditor = forwardRef<HTMLDivElement, RichTextEditorProps>(
         <div className="w-px h-6 bg-border mx-1" />
 
         <ToolbarButton
-          onClick={() => chainWithSelection().toggleBulletList().run()}
+          onClick={() => chain().toggleBulletList().run()}
           isActive={editor.isActive('bulletList')}
           title="Bullet List"
         >
           <List className="h-4 w-4" />
         </ToolbarButton>
         <ToolbarButton
-          onClick={() => chainWithSelection().toggleOrderedList().run()}
+          onClick={() => chain().toggleOrderedList().run()}
           isActive={editor.isActive('orderedList')}
           title="Numbered List"
         >
           <NumberedListLeft className="h-4 w-4" />
         </ToolbarButton>
         <ToolbarButton
-          onClick={() => chainWithSelection().toggleBlockquote().run()}
+          onClick={() => chain().toggleBlockquote().run()}
           isActive={editor.isActive('blockquote')}
           title="Quote"
         >
           <Quote className="h-4 w-4" />
         </ToolbarButton>
         <ToolbarButton
-          onClick={() => chainWithSelection().setHorizontalRule().run()}
+          onClick={() => chain().setHorizontalRule().run()}
           title="Horizontal Rule"
         >
           <Minus className="h-4 w-4" />
@@ -524,10 +478,10 @@ const RichTextEditor = forwardRef<HTMLDivElement, RichTextEditorProps>(
 
         <div className="w-px h-6 bg-border mx-1" />
 
-        <ToolbarButton onClick={() => chainWithSelection().undo().run()} title="Undo">
+        <ToolbarButton onClick={() => chain().undo().run()} title="Undo">
           <Undo className="h-4 w-4" />
         </ToolbarButton>
-        <ToolbarButton onClick={() => chainWithSelection().redo().run()} title="Redo">
+        <ToolbarButton onClick={() => chain().redo().run()} title="Redo">
           <Redo className="h-4 w-4" />
         </ToolbarButton>
       </div>
