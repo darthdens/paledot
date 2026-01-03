@@ -197,7 +197,7 @@ export const Contact = () => {
                   placeholder={t.contact.form.messagePlaceholder}
                   rows={5}
                   required
-                  className="bg-card resize-none"
+                  className="bg-card resize-none text-base"
                 />
               </div>
               <Button type="submit" variant="secondary" size="lg" className="w-full" disabled={isSubmitting}>
