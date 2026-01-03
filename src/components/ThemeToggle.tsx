@@ -30,10 +30,10 @@ export const ThemeToggle = () => {
   return (
     <button
       onClick={toggleTheme}
-      className="text-muted-foreground hover:text-foreground transition-colors p-1"
+      className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors flex items-center"
       aria-label="Toggle theme"
     >
-      {isDark ? <HalfMoon className="w-5 h-5" strokeWidth={2} /> : <SunLight className="w-5 h-5" strokeWidth={2} />}
+      {isDark ? <HalfMoon className="w-4 h-4" strokeWidth={2} /> : <SunLight className="w-4 h-4" strokeWidth={2} />}
     </button>
   );
 };
