@@ -34,17 +34,17 @@ const handler = async (req: Request): Promise<Response> => {
     const emailResponse = await resend.emails.send({
       from: `${name} via Contact Form <contact@mail.dens.so>`,
       to: ["denis.akoka@gmail.com"],
-      subject: `Nouveau message de ${name}`,
+      subject: `New message from ${name}`,
       html: `
-        <h2>Nouveau message via le formulaire</h2>
-        <p><strong>Nom :</strong> ${escapeHtml(name)}</p>
-        <p><strong>Email :</strong> ${escapeHtml(email)}</p>
-        <p><strong>Message :</strong></p>
+        <h2>New Contact Form Submission</h2>
+        <p><strong>Name:</strong> ${escapeHtml(name)}</p>
+        <p><strong>Email:</strong> ${escapeHtml(email)}</p>
+        <p><strong>Message:</strong></p>
         <p>${escapeHtml(message).replace(/\n/g, "<br>")}</p>
       `,
       // Reply-To allows you to respond directly to the sender.
       reply_to: email,
-      text: `Nouveau message via le formulaire\n\nNom: ${name}\nEmail: ${email}\n\n${message}`,
+      text: `New Contact Form Submission\n\nName: ${name}\nEmail: ${email}\n\n${message}`,
     });
 
     console.log("Email send response:", emailResponse);
