@@ -3,7 +3,7 @@ import { useNavigate, Link, Outlet, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useAuth } from "@/hooks/useAuth";
-import { LogOut, Folder, Page, Home, Menu } from "iconoir-react";
+import { LogOut, Folder, Page, Home, Menu, ChatBubble } from "iconoir-react";
 import { ThemeToggle } from "@/components/ThemeToggle";
 
 const AdminDashboard = () => {
@@ -59,6 +59,15 @@ const AdminDashboard = () => {
         >
           <Page className="w-4 h-4 mr-2" />
           Articles
+        </Button>
+      </Link>
+      <Link to="/admin/dashboard/testimonials" onClick={onNavigate}>
+        <Button
+          variant={isActive("/admin/dashboard/testimonials") ? "secondary" : "ghost"}
+          className="w-full justify-start"
+        >
+          <ChatBubble className="w-4 h-4 mr-2" />
+          Testimonials
         </Button>
       </Link>
     </>

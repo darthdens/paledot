@@ -7,9 +7,19 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 import { useLanguage } from "@/i18n/LanguageContext";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+
+interface Testimonial {
+  id: string;
+  quote_en: string;
+  quote_fr: string;
+  author: string;
+  company: string;
+}
 
 export const About = () => {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
 
   const skills = [
     t.about.skills.productDesign,
@@ -27,6 +37,29 @@ export const About = () => {
     { name: t.about.languagesList.english.name, level: t.about.languagesList.english.level, flag: "🇬🇧" },
     { name: t.about.languagesList.italian.name, level: t.about.languagesList.italian.level, flag: "🇮🇹" },
   ];
+
+  const { data: dbTestimonials } = useQuery({
+    queryKey: ["testimonials"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("testimonials")
+        .select("*")
+        .eq("is_active", true)
+        .order("display_order", { ascending: true });
+      
+      if (error) throw error;
+      return data as Testimonial[];
+    },
+  });
+
+  // Use database testimonials if available, otherwise fall back to translations
+  const testimonials = dbTestimonials && dbTestimonials.length > 0
+    ? dbTestimonials.map(t => ({
+        quote: language === "fr" ? t.quote_fr : t.quote_en,
+        author: t.author,
+        company: t.company,
+      }))
+    : t.about.testimonialsList;
 
   return (
     <section id="about" className="py-24 bg-muted/30">
@@ -95,7 +128,7 @@ export const About = () => {
               <h3 className="font-serif text-xl font-bold mb-6">{t.about.testimonials}</h3>
               <Carousel className="w-full">
                 <CarouselContent>
-                  {t.about.testimonialsList.map((testimonial, index) => (
+                  {testimonials.map((testimonial, index) => (
                     <CarouselItem key={index}>
                       <blockquote className="break-words">
                         <p className="text-lg italic text-muted-foreground mb-4 break-words">
