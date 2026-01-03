@@ -12,11 +12,24 @@ interface Particle {
   twinkleSpeed: number;
 }
 
+interface ShootingStar {
+  x: number;
+  y: number;
+  length: number;
+  speed: number;
+  angle: number;
+  opacity: number;
+  life: number;
+  maxLife: number;
+}
+
 export const Starfield = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const particlesRef = useRef<Particle[]>([]);
+  const shootingStarsRef = useRef<ShootingStar[]>([]);
   const animationRef = useRef<number>();
   const timeRef = useRef(0);
+  const lastShootingStarRef = useRef(0);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -61,6 +74,26 @@ export const Starfield = () => {
       }
     };
 
+    const createShootingStar = () => {
+      // Random starting position - typically from upper area
+      const startX = Math.random() * canvas.width;
+      const startY = Math.random() * (canvas.height * 0.4);
+      
+      // Angle between 20-60 degrees (going down-right mostly)
+      const angle = (Math.random() * 40 + 20) * (Math.PI / 180);
+      
+      shootingStarsRef.current.push({
+        x: startX,
+        y: startY,
+        length: Math.random() * 80 + 60,
+        speed: Math.random() * 8 + 6,
+        angle: Math.random() > 0.5 ? angle : Math.PI - angle, // Sometimes go left
+        opacity: 1,
+        life: 0,
+        maxLife: Math.random() * 60 + 40,
+      });
+    };
+
     const animate = (timestamp: number) => {
       if (!ctx || !canvas) return;
       
@@ -70,6 +103,7 @@ export const Starfield = () => {
       const isDark = document.documentElement.classList.contains("dark");
       const starColor = isDark ? "255, 255, 255" : "0, 0, 0";
       
+      // Draw regular stars
       particlesRef.current.forEach((particle) => {
         // Smooth continuous drift
         const driftX = Math.sin(timestamp * particle.driftSpeed + particle.phase) * 40;
@@ -97,6 +131,55 @@ export const Starfield = () => {
         ctx.arc(x, y, particle.size * 0.5, 0, Math.PI * 2);
         ctx.fillStyle = `rgba(${starColor}, ${currentOpacity * 1.5})`;
         ctx.fill();
+      });
+
+      // Spawn new shooting star occasionally (every 3-6 seconds on average)
+      if (timestamp - lastShootingStarRef.current > 3000 && Math.random() < 0.02) {
+        createShootingStar();
+        lastShootingStarRef.current = timestamp;
+      }
+
+      // Draw and update shooting stars
+      shootingStarsRef.current = shootingStarsRef.current.filter((star) => {
+        star.life++;
+        star.x += Math.cos(star.angle) * star.speed;
+        star.y += Math.sin(star.angle) * star.speed;
+        
+        // Fade out as life progresses
+        const lifeProgress = star.life / star.maxLife;
+        star.opacity = 1 - lifeProgress;
+        
+        if (star.opacity <= 0) return false;
+        
+        // Draw shooting star trail
+        const tailX = star.x - Math.cos(star.angle) * star.length;
+        const tailY = star.y - Math.sin(star.angle) * star.length;
+        
+        // Create gradient for the trail
+        const gradient = ctx.createLinearGradient(tailX, tailY, star.x, star.y);
+        gradient.addColorStop(0, `rgba(${starColor}, 0)`);
+        gradient.addColorStop(0.7, `rgba(${starColor}, ${star.opacity * 0.5})`);
+        gradient.addColorStop(1, `rgba(${starColor}, ${star.opacity})`);
+        
+        ctx.beginPath();
+        ctx.moveTo(tailX, tailY);
+        ctx.lineTo(star.x, star.y);
+        ctx.strokeStyle = gradient;
+        ctx.lineWidth = 2;
+        ctx.lineCap = "round";
+        ctx.stroke();
+        
+        // Draw bright head
+        const headGradient = ctx.createRadialGradient(star.x, star.y, 0, star.x, star.y, 4);
+        headGradient.addColorStop(0, `rgba(${starColor}, ${star.opacity})`);
+        headGradient.addColorStop(1, `rgba(${starColor}, 0)`);
+        
+        ctx.beginPath();
+        ctx.arc(star.x, star.y, 4, 0, Math.PI * 2);
+        ctx.fillStyle = headGradient;
+        ctx.fill();
+        
+        return true;
       });
       
       animationRef.current = requestAnimationFrame(animate);
