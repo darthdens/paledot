@@ -220,8 +220,8 @@ export const translations = {
 
     // 404
     notFound: {
-      title: "404",
-      message: "Oops! Page not found",
+      title: "Page Not Found",
+      message: "Oops! The page you're looking for doesn't exist.",
       backHome: "Return to Home",
     },
   },
@@ -447,8 +447,8 @@ export const translations = {
 
     // 404
     notFound: {
-      title: "404",
-      message: "Oups ! Page non trouvée",
+      title: "Page Non Trouvée",
+      message: "Oups ! La page que vous recherchez n'existe pas.",
       backHome: "Retour à l'accueil",
     },
   },

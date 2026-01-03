@@ -21,8 +21,8 @@ const NotFound = () => {
       <Navigation />
       <main className="flex min-h-[calc(100vh-200px)] items-center justify-center pt-20">
         <div className="text-center px-6">
-          <h1 className="mb-2 text-8xl font-bold font-serif text-primary">404</h1>
-          <h2 className="mb-4 text-2xl font-semibold">{t.notFound.title}</h2>
+          <h1 className="mb-2 text-8xl font-bold font-serif text-accent">404</h1>
+          <h2 className="mb-4 text-2xl font-semibold text-foreground">{t.notFound.title}</h2>
           <p className="mb-8 text-lg text-muted-foreground max-w-md mx-auto">{t.notFound.message}</p>
           <Link to="/">
             <Button variant="secondary" size="lg">
