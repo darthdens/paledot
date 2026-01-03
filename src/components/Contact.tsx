@@ -49,14 +49,19 @@ export const Contact = () => {
 
       if (error) throw error;
 
-      // Send email notification (fire and forget)
-      supabase.functions.invoke('send-contact-notification', {
-        body: {
-          name: formData.name.trim(),
-          email: formData.email.trim(),
-          message: formData.message.trim(),
-        },
-      });
+      // Send email notification (await so failures are visible)
+      const { error: notifyError } = await supabase.functions.invoke(
+        "send-contact-notification",
+        {
+          body: {
+            name: formData.name.trim(),
+            email: formData.email.trim(),
+            message: formData.message.trim(),
+          },
+        }
+      );
+
+      if (notifyError) throw notifyError;
 
       toast.success("Message sent!", {
         description: "Thanks for reaching out. I'll get back to you soon.",
