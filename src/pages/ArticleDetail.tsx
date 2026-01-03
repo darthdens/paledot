@@ -140,8 +140,8 @@ const ArticleDetail = () => {
             </div>
           )}
 
-          <div 
-            className="prose prose-lg dark:prose-invert max-w-none"
+          <div
+            className="prose prose-lg max-w-none text-foreground prose-headings:text-foreground prose-p:text-foreground prose-li:text-foreground prose-strong:text-foreground prose-a:text-primary prose-blockquote:text-foreground prose-code:text-foreground"
             dangerouslySetInnerHTML={{ __html: content }}
           />
         </article>
