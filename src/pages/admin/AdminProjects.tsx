@@ -260,6 +260,7 @@ const AdminProjects = () => {
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                   placeholder="Brief description"
                   required
+                  className="text-base"
                 />
               </div>
 
