@@ -47,13 +47,21 @@ const normalizeHtmlColors = (html: string) => {
 
     doc.querySelectorAll<HTMLElement>("[style]").forEach((el) => {
       const style = el.getAttribute("style") || "";
-      const next = style
-        // color: white
-        .replace(/color\s*:\s*(#fff(?:fff)?|rgb\(\s*255\s*,\s*255\s*,\s*255\s*\))\s*;?/gi, "")
-        // color: black
-        .replace(/color\s*:\s*(#000(?:000)?|rgb\(\s*0\s*,\s*0\s*,\s*0\s*\))\s*;?/gi, "")
-        .replace(/;;+/g, ";")
-        .trim();
+      const decls = style
+        .split(";")
+        .map((d) => d.trim())
+        .filter(Boolean);
+
+      const filtered = decls.filter((d) => {
+        const prop = d.split(":")[0]?.trim().toLowerCase();
+        return (
+          prop !== "color" &&
+          prop !== "-webkit-text-fill-color" &&
+          prop !== "-webkit-text-stroke-color"
+        );
+      });
+
+      const next = filtered.join("; ").replace(/;;+/g, ";").trim();
 
       if (!next) el.removeAttribute("style");
       else el.setAttribute("style", next);
