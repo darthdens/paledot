@@ -51,10 +51,10 @@ export const Starfield = () => {
             y,
             baseX: x,
             baseY: y,
-            size: Math.random() * 1.2 + 0.3,
-            opacity: Math.random() * 0.4 + 0.1,
+            size: Math.random() * 1.5 + 0.4,
+            opacity: Math.random() * 0.5 + 0.15,
             phase: Math.random() * Math.PI * 2,
-            driftSpeed: Math.random() * 0.0003 + 0.0001,
+            driftSpeed: Math.random() * 0.0008 + 0.0003,
             twinkleSpeed: Math.random() * 0.002 + 0.001,
           });
         }
@@ -71,9 +71,9 @@ export const Starfield = () => {
       const starColor = isDark ? "255, 255, 255" : "0, 0, 0";
       
       particlesRef.current.forEach((particle) => {
-        // Smooth sinusoidal drift
-        const driftX = Math.sin(timestamp * particle.driftSpeed + particle.phase) * 15;
-        const driftY = Math.cos(timestamp * particle.driftSpeed * 0.7 + particle.phase) * 10;
+        // Smooth continuous drift
+        const driftX = Math.sin(timestamp * particle.driftSpeed + particle.phase) * 40;
+        const driftY = Math.cos(timestamp * particle.driftSpeed * 0.8 + particle.phase * 1.3) * 30;
         
         // Smooth twinkle
         const twinkle = (Math.sin(timestamp * particle.twinkleSpeed + particle.phase) + 1) / 2;
