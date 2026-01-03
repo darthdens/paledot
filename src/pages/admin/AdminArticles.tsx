@@ -134,21 +134,21 @@ const AdminArticles = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h2 className="font-serif text-2xl font-bold">Articles</h2>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <h2 className="font-serif text-xl md:text-2xl font-bold">Articles</h2>
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
-            <Button onClick={() => handleOpenDialog()}>
+            <Button onClick={() => handleOpenDialog()} className="w-full sm:w-auto">
               <Plus className="w-4 h-4 mr-2" />
               Add Article
             </Button>
           </DialogTrigger>
-          <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+          <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto mx-4">
             <DialogHeader>
               <DialogTitle>{editingArticle ? "Edit Article" : "Add Article"}</DialogTitle>
             </DialogHeader>
             <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="slug">Slug</Label>
                   <Input
@@ -170,7 +170,7 @@ const AdminArticles = () => {
                 </div>
               </div>
               
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="title_en">Title (English)</Label>
                   <Input
@@ -191,7 +191,7 @@ const AdminArticles = () => {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="category_en">Category (English)</Label>
                   <Input
@@ -212,7 +212,7 @@ const AdminArticles = () => {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="excerpt_en">Excerpt (English)</Label>
                   <Textarea
@@ -292,23 +292,23 @@ const AdminArticles = () => {
         ) : (
           articles.map((article) => (
             <Card key={article.id}>
-              <CardHeader className="flex flex-row items-center justify-between py-4">
-                <div>
-                  <CardTitle className="text-lg">{article.title_en}</CardTitle>
-                  <p className="text-sm text-muted-foreground">
+              <CardHeader className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 py-4">
+                <div className="min-w-0 flex-1">
+                  <CardTitle className="text-base md:text-lg truncate">{article.title_en}</CardTitle>
+                  <p className="text-sm text-muted-foreground truncate">
                     /{article.slug} • {article.read_time} min read
                   </p>
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 flex-shrink-0">
                   {article.is_published ? (
-                    <span className="text-xs bg-green-500/10 text-green-500 px-2 py-1 rounded">Published</span>
+                    <span className="text-xs bg-green-500/10 text-green-500 px-2 py-1 rounded whitespace-nowrap">Published</span>
                   ) : (
-                    <span className="text-xs bg-yellow-500/10 text-yellow-500 px-2 py-1 rounded">Draft</span>
+                    <span className="text-xs bg-yellow-500/10 text-yellow-500 px-2 py-1 rounded whitespace-nowrap">Draft</span>
                   )}
-                  <Button variant="ghost" size="sm" onClick={() => handleOpenDialog(article)}>
+                  <Button variant="ghost" size="icon" onClick={() => handleOpenDialog(article)}>
                     <Edit className="w-4 h-4" />
                   </Button>
-                  <Button variant="ghost" size="sm" onClick={() => handleDelete(article.id)}>
+                  <Button variant="ghost" size="icon" onClick={() => handleDelete(article.id)}>
                     <Trash className="w-4 h-4" />
                   </Button>
                 </div>
