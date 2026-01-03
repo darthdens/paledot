@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useParams, Link } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -25,6 +25,21 @@ interface Project {
   award_fr: string | null;
 }
 
+// Extract image URLs from HTML content
+const extractImagesFromContent = (html: string): string[] => {
+  const imgRegex = /<img[^>]+src=["']([^"']+)["'][^>]*>/g;
+  const images: string[] = [];
+  let match;
+  while ((match = imgRegex.exec(html)) !== null) {
+    images.push(match[1]);
+  }
+  return images;
+};
+
+// Remove images from HTML content
+const removeImagesFromContent = (html: string): string => {
+  return html.replace(/<img[^>]*>/g, '');
+};
 
 const ProjectDetail = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -49,7 +64,6 @@ const ProjectDetail = () => {
     }
   }, [slug]);
 
-  // Update document title when project is loaded
   useEffect(() => {
     if (project) {
       const title = language === "fr" ? project.title_fr : project.title_en;
@@ -58,22 +72,46 @@ const ProjectDetail = () => {
     }
   }, [project, language]);
 
+  const { allImages, textContent } = useMemo(() => {
+    if (!project) return { allImages: [], textContent: null };
+    
+    const content = (language === "fr" && project.content_fr) ? project.content_fr : project.content_en;
+    const images: string[] = [];
+    
+    // Add main image first
+    if (project.image_url) {
+      images.push(project.image_url);
+    }
+    
+    // Extract images from content
+    if (content) {
+      const contentImages = extractImagesFromContent(content);
+      images.push(...contentImages);
+    }
+    
+    // Remove images from content for text column
+    const cleanContent = content ? sanitizeRichTextHtml(removeImagesFromContent(content)) : null;
+    
+    return { allImages: images, textContent: cleanContent };
+  }, [project, language]);
+
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen bg-background flex flex-col">
         <Navigation />
-        <div className="pt-24 container mx-auto px-6">
-          <div className="text-muted-foreground">Loading...</div>
+        <div className="flex-1 pt-24 container mx-auto px-6">
+          <div className="text-muted-foreground">{language === "fr" ? "Chargement..." : "Loading..."}</div>
         </div>
+        <Footer />
       </div>
     );
   }
 
   if (!project) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen bg-background flex flex-col">
         <Navigation />
-        <div className="pt-24 container mx-auto px-6 text-center">
+        <div className="flex-1 pt-24 container mx-auto px-6 text-center">
           <h1 className="font-serif text-3xl font-bold mb-4">
             {language === "fr" ? "Projet non trouvé" : "Project not found"}
           </h1>
@@ -84,14 +122,13 @@ const ProjectDetail = () => {
             </Button>
           </Link>
         </div>
+        <Footer />
       </div>
     );
   }
 
   const title = language === "fr" ? project.title_fr : project.title_en;
   const description = language === "fr" ? project.description_fr : project.description_en;
-  const content = (language === "fr" && project.content_fr) ? project.content_fr : project.content_en;
-  const sanitizedContent = content ? sanitizeRichTextHtml(content) : null;
   const award = language === "fr" ? project.award_fr : project.award_en;
 
   return (
@@ -99,7 +136,7 @@ const ProjectDetail = () => {
       <Navigation />
       
       <main className="flex-1 pt-24 pb-16">
-        <div className="container mx-auto px-6 max-w-4xl">
+        <div className="container mx-auto px-6">
           <Link 
             to="/projects" 
             className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors mb-8"
@@ -108,53 +145,63 @@ const ProjectDetail = () => {
             {language === "fr" ? "Tous les projets" : "All Projects"}
           </Link>
 
-          {award && (
-            <p className="text-primary mb-4">{award}</p>
-          )}
+          <div className="grid lg:grid-cols-2 gap-8 lg:gap-12">
+            {/* Left Column - Text Content */}
+            <div className="lg:max-h-[calc(100vh-12rem)] lg:overflow-y-auto lg:pr-4 space-y-6">
+              {award && (
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-accent/20 text-sm font-medium">
+                  {award}
+                </div>
+              )}
 
-          <h1 className="font-serif text-4xl md:text-5xl font-bold mb-6">
-            {title}
-          </h1>
+              <h1 className="font-serif text-4xl md:text-5xl font-bold">
+                {title}
+              </h1>
 
-          <div className="flex flex-wrap gap-2 mb-8">
-            {project.tags.map((tag) => (
-              <Badge key={tag} variant="secondary">
-                {tag}
-              </Badge>
-            ))}
-          </div>
+              <div className="flex flex-wrap gap-2">
+                {project.tags.map((tag) => (
+                  <Badge key={tag} variant="secondary">
+                    {tag}
+                  </Badge>
+                ))}
+              </div>
 
-          {project.image_url && (
-            <div className="rounded-2xl overflow-hidden mb-8">
-              <img
-                src={project.image_url}
-                alt={title}
-                className="w-full"
-              />
+              <p className="text-lg text-muted-foreground leading-relaxed">
+                {description}
+              </p>
+
+              {project.external_url && (
+                <a href={project.external_url} target="_blank" rel="noopener noreferrer" className="inline-block">
+                  <Button>
+                    {language === "fr" ? "Voir le projet" : "View Project"}
+                    <ArrowUpRight className="w-4 h-4 ml-2" />
+                  </Button>
+                </a>
+              )}
+
+              {textContent && (
+                <div
+                  className="prose prose-lg max-w-none text-muted-foreground prose-headings:text-foreground prose-p:text-muted-foreground prose-li:text-muted-foreground prose-strong:text-foreground prose-a:text-primary prose-blockquote:text-muted-foreground prose-code:text-foreground"
+                  dangerouslySetInnerHTML={{ __html: textContent }}
+                />
+              )}
             </div>
-          )}
 
-          <div className="prose prose-lg dark:prose-invert max-w-none mb-8">
-            <p className="text-lg text-muted-foreground leading-relaxed">
-              {description}
-            </p>
+            {/* Right Column - Images */}
+            {allImages.length > 0 && (
+              <div className="lg:max-h-[calc(100vh-12rem)] lg:overflow-y-auto space-y-6">
+                {allImages.map((imageUrl, index) => (
+                  <div key={index} className="rounded-2xl overflow-hidden">
+                    <img
+                      src={imageUrl}
+                      alt={`${title} - ${language === "fr" ? "Image" : "Image"} ${index + 1}`}
+                      className="w-full"
+                    />
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
-
-          {project.external_url && (
-            <a href={project.external_url} target="_blank" rel="noopener noreferrer" className="inline-block mb-8">
-              <Button>
-                {language === "fr" ? "Voir le projet" : "View Project"}
-                <ArrowUpRight className="w-4 h-4 ml-2" />
-              </Button>
-            </a>
-          )}
-
-          {sanitizedContent && (
-            <div
-              className="prose prose-lg max-w-none text-muted-foreground prose-headings:text-foreground prose-p:text-muted-foreground prose-li:text-muted-foreground prose-strong:text-foreground prose-a:text-primary prose-blockquote:text-muted-foreground prose-code:text-foreground"
-              dangerouslySetInnerHTML={{ __html: sanitizedContent }}
-            />
-          )}
         </div>
       </main>
 
