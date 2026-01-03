@@ -6,10 +6,12 @@ import { About } from "@/components/About";
 import { Articles } from "@/components/Articles";
 import { Contact } from "@/components/Contact";
 import { Footer } from "@/components/Footer";
+import { Starfield } from "@/components/Starfield";
 
 const Index = () => {
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background relative">
+      <Starfield />
       <Navigation />
       <main>
         <Hero />
