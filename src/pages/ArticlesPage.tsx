@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { Navigation } from "@/components/Navigation";
 import { Footer } from "@/components/Footer";
+import { Starfield } from "@/components/Starfield";
 
 interface Article {
   id: string;
@@ -55,7 +56,8 @@ const ArticlesPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="min-h-screen bg-background flex flex-col relative">
+      <Starfield />
       <Navigation />
       
       <main className="flex-1 pt-24 pb-16">
