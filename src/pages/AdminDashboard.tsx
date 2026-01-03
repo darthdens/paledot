@@ -12,6 +12,10 @@ const AdminDashboard = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   useEffect(() => {
+    document.title = "Admin Dashboard | Dens";
+  }, []);
+
+  useEffect(() => {
     if (!isLoading && (!user || !isAdmin)) {
       navigate("/admin");
     }

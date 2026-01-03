@@ -64,6 +64,10 @@ const AdminProjects = () => {
   };
 
   useEffect(() => {
+    document.title = "Projects | Admin | Dens";
+  }, []);
+
+  useEffect(() => {
     fetchProjects();
   }, []);
 

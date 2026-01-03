@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { Navigation } from "@/components/Navigation";
 import { Hero } from "@/components/Hero";
 import { Projects } from "@/components/Projects";
@@ -9,6 +10,9 @@ import { Footer } from "@/components/Footer";
 import { Starfield } from "@/components/Starfield";
 
 const Index = () => {
+  useEffect(() => {
+    document.title = "Home | Dens";
+  }, []);
   return (
     <div className="min-h-screen bg-background relative">
       <Starfield />
