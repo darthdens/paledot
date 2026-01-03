@@ -45,17 +45,6 @@ interface Galaxy {
   rotationSpeed: number;
 }
 
-interface RingedPlanet {
-  x: number;
-  y: number;
-  planetRadius: number;
-  ringInner: number;
-  ringOuter: number;
-  tilt: number;
-  color: string;
-  ringColor: string;
-  opacity: number;
-}
 
 export const Starfield = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -63,7 +52,7 @@ export const Starfield = () => {
   const shootingStarsRef = useRef<ShootingStar[]>([]);
   const nebulasRef = useRef<Nebula[]>([]);
   const galaxiesRef = useRef<Galaxy[]>([]);
-  const planetRef = useRef<RingedPlanet | null>(null);
+  
   const animationRef = useRef<number>();
   const timeRef = useRef(0);
   const lastShootingStarRef = useRef(0);
@@ -81,7 +70,7 @@ export const Starfield = () => {
       initParticles();
       initNebulas();
       initGalaxies();
-      initPlanet();
+      
     };
 
     const initParticles = () => {
@@ -156,28 +145,6 @@ export const Starfield = () => {
       }
     };
 
-    const initPlanet = () => {
-      // Place planet in one of the corners
-      const corners = [
-        { x: canvas.width * 0.12, y: canvas.height * 0.15 },
-        { x: canvas.width * 0.88, y: canvas.height * 0.15 },
-        { x: canvas.width * 0.12, y: canvas.height * 0.85 },
-        { x: canvas.width * 0.88, y: canvas.height * 0.85 },
-      ];
-      const corner = corners[Math.floor(Math.random() * corners.length)];
-      
-      planetRef.current = {
-        x: corner.x,
-        y: corner.y,
-        planetRadius: Math.min(canvas.width, canvas.height) * 0.06,
-        ringInner: Math.min(canvas.width, canvas.height) * 0.08,
-        ringOuter: Math.min(canvas.width, canvas.height) * 0.12,
-        tilt: Math.random() * 0.3 + 0.2,
-        color: "139, 119, 101",
-        ringColor: "180, 160, 140",
-        opacity: 0.15,
-      };
-    };
 
     const createShootingStar = () => {
       const startX = Math.random() * canvas.width;
@@ -272,57 +239,6 @@ export const Starfield = () => {
       ctx.restore();
     };
 
-    const drawRingedPlanet = (ctx: CanvasRenderingContext2D, planet: RingedPlanet, starColor: string) => {
-      ctx.save();
-      ctx.translate(planet.x, planet.y);
-      
-      // Draw back ring half (behind planet)
-      ctx.save();
-      ctx.scale(1, planet.tilt);
-      
-      ctx.beginPath();
-      ctx.arc(0, 0, planet.ringOuter, Math.PI, Math.PI * 2);
-      ctx.arc(0, 0, planet.ringInner, Math.PI * 2, Math.PI, true);
-      ctx.closePath();
-      
-      const ringGradient = ctx.createRadialGradient(0, 0, planet.ringInner, 0, 0, planet.ringOuter);
-      ringGradient.addColorStop(0, `rgba(${planet.ringColor}, ${planet.opacity * 0.6})`);
-      ringGradient.addColorStop(0.5, `rgba(${planet.ringColor}, ${planet.opacity * 0.8})`);
-      ringGradient.addColorStop(1, `rgba(${planet.ringColor}, ${planet.opacity * 0.4})`);
-      
-      ctx.fillStyle = ringGradient;
-      ctx.fill();
-      ctx.restore();
-      
-      // Draw planet body
-      const planetGradient = ctx.createRadialGradient(
-        -planet.planetRadius * 0.3, -planet.planetRadius * 0.3, 0,
-        0, 0, planet.planetRadius
-      );
-      planetGradient.addColorStop(0, `rgba(${planet.color}, ${planet.opacity * 1.2})`);
-      planetGradient.addColorStop(0.7, `rgba(${planet.color}, ${planet.opacity})`);
-      planetGradient.addColorStop(1, `rgba(${starColor}, ${planet.opacity * 0.3})`);
-      
-      ctx.beginPath();
-      ctx.arc(0, 0, planet.planetRadius, 0, Math.PI * 2);
-      ctx.fillStyle = planetGradient;
-      ctx.fill();
-      
-      // Draw front ring half (in front of planet)
-      ctx.save();
-      ctx.scale(1, planet.tilt);
-      
-      ctx.beginPath();
-      ctx.arc(0, 0, planet.ringOuter, 0, Math.PI);
-      ctx.arc(0, 0, planet.ringInner, Math.PI, 0, true);
-      ctx.closePath();
-      
-      ctx.fillStyle = ringGradient;
-      ctx.fill();
-      ctx.restore();
-      
-      ctx.restore();
-    };
 
     const animate = (timestamp: number) => {
       if (!ctx || !canvas) return;
@@ -343,10 +259,6 @@ export const Starfield = () => {
         drawGalaxy(ctx, galaxy, timestamp, starColor);
       });
       
-      // Draw ringed planet
-      if (planetRef.current) {
-        drawRingedPlanet(ctx, planetRef.current, starColor);
-      }
       
       // Draw regular stars
       particlesRef.current.forEach((particle) => {
