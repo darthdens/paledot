@@ -189,9 +189,8 @@ const AdminProjects = () => {
     
     const tags = tagsInput.split(",").map(t => t.trim()).filter(Boolean);
     
-    // Auto-translate English content to French
+    // Auto-translate English content to French (except titles)
     const textsToTranslate: { key: string; value: string }[] = [];
-    if (formData.title_en) textsToTranslate.push({ key: "title_fr", value: formData.title_en });
     if (formData.description_en) textsToTranslate.push({ key: "description_fr", value: formData.description_en });
     if (formData.content_en) textsToTranslate.push({ key: "content_fr", value: formData.content_en });
     if (formData.award_en) textsToTranslate.push({ key: "award_fr", value: formData.award_en });
@@ -205,7 +204,7 @@ const AdminProjects = () => {
     const projectData = {
       slug: formData.slug,
       title_en: formData.title_en,
-      title_fr: frenchTranslations?.title_fr || formData.title_en,
+      title_fr: formData.title_en, // Keep same title for both languages
       description_en: formData.description_en,
       description_fr: frenchTranslations?.description_fr || formData.description_en,
       content_en: formData.content_en || null,
