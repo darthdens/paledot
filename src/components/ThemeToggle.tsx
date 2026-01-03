@@ -28,14 +28,12 @@ export const ThemeToggle = () => {
   }, []);
 
   return (
-    <Button
-      variant="ghost"
-      size="icon"
+    <button
       onClick={toggleTheme}
-      className="h-9 w-9"
+      className="text-muted-foreground hover:text-foreground transition-colors p-1"
       aria-label="Toggle theme"
     >
       {isDark ? <HalfMoon className="w-5 h-5" strokeWidth={2} /> : <SunLight className="w-5 h-5" strokeWidth={2} />}
-    </Button>
+    </button>
   );
 };
