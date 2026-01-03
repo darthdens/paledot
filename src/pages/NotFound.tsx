@@ -1,6 +1,8 @@
-import { useLocation } from "react-router-dom";
+import { useLocation, Link } from "react-router-dom";
 import { useEffect } from "react";
 import { useLanguage } from "@/i18n/LanguageContext";
+import { Button } from "@/components/ui/button";
+import { Home } from "iconoir-react";
 
 const NotFound = () => {
   const location = useLocation();
@@ -11,13 +13,17 @@ const NotFound = () => {
   }, [location.pathname]);
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-muted">
-      <div className="text-center">
-        <h1 className="mb-4 text-4xl font-bold">{t.notFound.title}</h1>
-        <p className="mb-4 text-xl text-muted-foreground">{t.notFound.message}</p>
-        <a href="/" className="text-primary underline hover:text-primary/90">
-          {t.notFound.backHome}
-        </a>
+    <div className="flex min-h-screen items-center justify-center bg-background">
+      <div className="text-center px-6">
+        <h1 className="mb-2 text-8xl font-bold font-serif text-primary">404</h1>
+        <h2 className="mb-4 text-2xl font-semibold">{t.notFound.title}</h2>
+        <p className="mb-8 text-lg text-muted-foreground max-w-md mx-auto">{t.notFound.message}</p>
+        <Link to="/">
+          <Button size="lg">
+            <Home className="w-4 h-4 mr-2" />
+            {t.notFound.backHome}
+          </Button>
+        </Link>
       </div>
     </div>
   );
