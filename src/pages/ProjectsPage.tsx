@@ -113,7 +113,7 @@ const ProjectsPage = () => {
                       </p>
                       <div className="flex flex-wrap gap-2">
                         {project.tags.slice(0, 4).map((tag) => (
-                          <Badge key={tag} variant="secondary">
+                          <Badge key={tag} variant="secondary" className="pointer-events-none">
                             {tag}
                           </Badge>
                         ))}
