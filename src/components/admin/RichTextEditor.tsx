@@ -7,6 +7,7 @@ import Underline from '@tiptap/extension-underline';
 import { TextStyle } from '@tiptap/extension-text-style';
 import { Color } from '@tiptap/extension-color';
 import Highlight from '@tiptap/extension-highlight';
+import Youtube from '@tiptap/extension-youtube';
 import { Button } from '@/components/ui/button';
 import { 
   Bold, 
@@ -26,7 +27,8 @@ import {
   Undo,
   Redo,
   ColorFilter,
-  Palette
+  Palette,
+  Youtube as YoutubeIcon
 } from 'iconoir-react';
 import { useEffect, forwardRef } from 'react';
 
@@ -88,6 +90,13 @@ const RichTextEditor = forwardRef<HTMLDivElement, RichTextEditorProps>(
       TextAlign.configure({
         types: ['heading', 'paragraph'],
       }),
+      Youtube.configure({
+        width: 640,
+        height: 360,
+        HTMLAttributes: {
+          class: 'rounded-lg max-w-full aspect-video',
+        },
+      }),
     ],
     content,
     onUpdate: ({ editor }) => {
@@ -121,6 +130,13 @@ const RichTextEditor = forwardRef<HTMLDivElement, RichTextEditorProps>(
     const url = window.prompt('Enter image URL:');
     if (url) {
       editor.chain().focus().setImage({ src: url }).run();
+    }
+  };
+
+  const addYoutubeVideo = () => {
+    const url = window.prompt('Enter YouTube URL:');
+    if (url) {
+      editor.commands.setYoutubeVideo({ src: url });
     }
   };
 
@@ -342,6 +358,12 @@ const RichTextEditor = forwardRef<HTMLDivElement, RichTextEditorProps>(
           title="Add Image"
         >
           <MediaImage className="h-4 w-4" />
+        </ToolbarButton>
+        <ToolbarButton
+          onClick={addYoutubeVideo}
+          title="Add YouTube Video"
+        >
+          <YoutubeIcon className="h-4 w-4" />
         </ToolbarButton>
 
         <div className="w-px h-6 bg-border mx-1" />

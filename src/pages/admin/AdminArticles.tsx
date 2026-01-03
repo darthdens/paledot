@@ -11,6 +11,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Plus, Edit, Trash } from "iconoir-react";
 import RichTextEditor from "@/components/admin/RichTextEditor";
+import ImageUpload from "@/components/admin/ImageUpload";
 
 interface Article {
   id: string;
@@ -269,13 +270,12 @@ const AdminArticles = () => {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="image_url">Thumbnail</Label>
-                <p className="text-xs text-muted-foreground">16:9 aspect ratio required, max 2MB (JPG, PNG, WebP)</p>
-                <Input
-                  id="image_url"
+                <Label>Thumbnail</Label>
+                <p className="text-xs text-muted-foreground">16:9 aspect ratio recommended</p>
+                <ImageUpload
                   value={formData.image_url}
-                  onChange={(e) => setFormData({ ...formData, image_url: e.target.value })}
-                  placeholder="https://..."
+                  onChange={(url) => setFormData({ ...formData, image_url: url })}
+                  folder="articles"
                 />
               </div>
 
