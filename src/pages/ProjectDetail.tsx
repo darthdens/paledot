@@ -298,7 +298,11 @@ const ProjectDetail = () => {
 
             {/* Right Column - Vertical Auto-Scrolling Images */}
             {allImages.length > 0 && (
-              <div className="md:sticky md:top-24 md:h-[calc(100vh-8rem)] overflow-hidden">
+              <div className="md:sticky md:top-24 md:h-[calc(100vh-8rem)] overflow-hidden relative">
+                {/* Top fade gradient */}
+                <div className="absolute top-0 left-0 right-0 h-24 bg-gradient-to-b from-background to-transparent z-10 pointer-events-none" />
+                {/* Bottom fade gradient */}
+                <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-background to-transparent z-10 pointer-events-none" />
                 <div 
                   className="flex flex-col gap-4 animate-[scroll-vertical_30s_linear_infinite] hover:[animation-play-state:paused]"
                   style={{
