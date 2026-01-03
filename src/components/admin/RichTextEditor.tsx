@@ -143,8 +143,10 @@ const RichTextEditor = forwardRef<HTMLDivElement, RichTextEditorProps>(
       },
       editorProps: {
         attributes: {
+          // Match the same typography + theme-aware colors used on the public Project/Article pages.
+          // This ensures readable text in both light/dark mode.
           class:
-            'max-w-none min-h-[200px] p-4 focus:outline-none text-foreground',
+            'prose prose-lg dark:prose-invert max-w-none min-h-[200px] p-4 focus:outline-none',
           ...(placeholder ? { 'data-placeholder': placeholder } : {}),
         },
       },
