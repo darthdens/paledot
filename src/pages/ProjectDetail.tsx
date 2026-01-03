@@ -296,36 +296,36 @@ const ProjectDetail = () => {
               )}
             </div>
 
-            {/* Right Column - Images Carousel */}
+            {/* Right Column - Vertical Auto-Scrolling Images */}
             {allImages.length > 0 && (
-              <div className="md:sticky md:top-24">
-                <Carousel 
-                  className="w-full"
-                  opts={{
-                    loop: true,
+              <div className="md:sticky md:top-24 md:h-[calc(100vh-8rem)] overflow-hidden">
+                <div 
+                  className="flex flex-col gap-4 animate-[scroll-vertical_30s_linear_infinite] hover:[animation-play-state:paused]"
+                  style={{
+                    animationDuration: `${allImages.length * 8}s`,
                   }}
-                  plugins={[
-                    Autoplay({
-                      delay: 5000,
-                      stopOnInteraction: false,
-                      stopOnMouseEnter: true,
-                    }),
-                  ]}
                 >
-                  <CarouselContent>
-                    {allImages.map((imageUrl, index) => (
-                      <CarouselItem key={index}>
-                        <div className="rounded-2xl overflow-hidden">
-                          <img
-                            src={imageUrl}
-                            alt={`${title} - ${language === "fr" ? "Image" : "Image"} ${index + 1}`}
-                            className="w-full"
-                          />
-                        </div>
-                      </CarouselItem>
-                    ))}
-                  </CarouselContent>
-                </Carousel>
+                  {/* Original images */}
+                  {allImages.map((imageUrl, index) => (
+                    <div key={index} className="rounded-2xl overflow-hidden flex-shrink-0">
+                      <img
+                        src={imageUrl}
+                        alt={`${title} - ${language === "fr" ? "Image" : "Image"} ${index + 1}`}
+                        className="w-full"
+                      />
+                    </div>
+                  ))}
+                  {/* Duplicate for seamless loop */}
+                  {allImages.map((imageUrl, index) => (
+                    <div key={`dup-${index}`} className="rounded-2xl overflow-hidden flex-shrink-0">
+                      <img
+                        src={imageUrl}
+                        alt={`${title} - ${language === "fr" ? "Image" : "Image"} ${index + 1}`}
+                        className="w-full"
+                      />
+                    </div>
+                  ))}
+                </div>
               </div>
             )}
           </div>
