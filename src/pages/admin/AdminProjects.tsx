@@ -130,20 +130,53 @@ const AdminProjects = () => {
     
     const tags = tagsInput.split(",").map(t => t.trim()).filter(Boolean);
     
-    // Map to database fields (EN/FR both get same value for now)
+    // Translate content to French
+    let titleFr = formData.title;
+    let descriptionFr = formData.description;
+    let contentFr = formData.content || null;
+    let awardFr = formData.award || null;
+
+    try {
+      toast.info("Translating content to French...");
+      
+      const textsToTranslate = [
+        { key: "title", value: formData.title },
+        { key: "description", value: formData.description },
+        ...(formData.content ? [{ key: "content", value: formData.content }] : []),
+        ...(formData.award ? [{ key: "award", value: formData.award }] : []),
+      ];
+
+      const { data, error } = await supabase.functions.invoke("translate-content", {
+        body: { texts: textsToTranslate, targetLanguage: "fr" },
+      });
+
+      if (error) {
+        console.error("Translation error:", error);
+        toast.warning("Translation failed, saving with English content for French fields");
+      } else if (data?.translations) {
+        titleFr = data.translations.title || formData.title;
+        descriptionFr = data.translations.description || formData.description;
+        contentFr = data.translations.content || formData.content || null;
+        awardFr = data.translations.award || formData.award || null;
+      }
+    } catch (err) {
+      console.error("Translation error:", err);
+      toast.warning("Translation failed, saving with English content for French fields");
+    }
+    
     const projectData = {
       slug: formData.slug,
       title_en: formData.title,
-      title_fr: formData.title, // Same as EN, auto-translated later
+      title_fr: titleFr,
       description_en: formData.description,
-      description_fr: formData.description, // Same as EN
+      description_fr: descriptionFr,
       content_en: formData.content || null,
-      content_fr: formData.content || null, // Same as EN
+      content_fr: contentFr,
       image_url: formData.image_url || null,
       tags,
       external_url: formData.external_url || null,
       award_en: formData.award || null,
-      award_fr: formData.award || null, // Same as EN
+      award_fr: awardFr,
       is_featured: formData.is_featured,
       display_order: formData.display_order,
     };

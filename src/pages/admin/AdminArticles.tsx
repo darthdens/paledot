@@ -128,18 +128,62 @@ const AdminArticles = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Map to database fields (EN/FR both get same value for now)
+    // Translate content to French
+    let titleFr = formData.title;
+    let excerptFr = formData.description;
+    let contentFr = formData.content;
+    let categoryFr = formData.category || null;
+
+    // Category translations mapping
+    const categoryTranslations: Record<string, string> = {
+      "Getting Started": "Pour commencer",
+      "Tutorials": "Tutoriels",
+      "Case Studies": "Études de cas",
+      "Industry Insights": "Perspectives de l'industrie",
+      "Technology": "Technologie",
+      "Design": "Design",
+    };
+
+    try {
+      toast.info("Translating content to French...");
+      
+      const textsToTranslate = [
+        { key: "title", value: formData.title },
+        { key: "excerpt", value: formData.description },
+        { key: "content", value: formData.content },
+      ];
+
+      const { data, error } = await supabase.functions.invoke("translate-content", {
+        body: { texts: textsToTranslate, targetLanguage: "fr" },
+      });
+
+      if (error) {
+        console.error("Translation error:", error);
+        toast.warning("Translation failed, saving with English content for French fields");
+      } else if (data?.translations) {
+        titleFr = data.translations.title || formData.title;
+        excerptFr = data.translations.excerpt || formData.description;
+        contentFr = data.translations.content || formData.content;
+      }
+      
+      // Use predefined category translation
+      categoryFr = categoryTranslations[formData.category] || formData.category;
+    } catch (err) {
+      console.error("Translation error:", err);
+      toast.warning("Translation failed, saving with English content for French fields");
+    }
+    
     const articleData = {
       slug: formData.slug,
       title_en: formData.title,
-      title_fr: formData.title, // Same as EN, auto-translated later
+      title_fr: titleFr,
       excerpt_en: formData.description,
-      excerpt_fr: formData.description, // Same as EN
+      excerpt_fr: excerptFr,
       content_en: formData.content,
-      content_fr: formData.content, // Same as EN
+      content_fr: contentFr,
       image_url: formData.image_url || null,
       category_en: formData.category || null,
-      category_fr: formData.category || null, // Same as EN
+      category_fr: categoryFr,
       read_time: formData.read_time,
       is_published: formData.is_published,
       published_at: formData.is_published ? new Date().toISOString() : null,
