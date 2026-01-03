@@ -102,10 +102,10 @@ const ArticleDetail = () => {
   const category = language === "fr" ? article.category_fr : article.category_en;
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background flex flex-col">
       <Navigation />
       
-      <main className="pt-24 pb-16">
+      <main className="flex-1 pt-24 pb-16">
         <article className="container mx-auto px-6 max-w-3xl">
           <Link 
             to="/articles" 
