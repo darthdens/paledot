@@ -23,13 +23,18 @@ interface ShootingStar {
   maxLife: number;
 }
 
+interface NebulaCloud {
+  offsetX: number;
+  offsetY: number;
+  radius: number;
+  color: string;
+}
+
 interface Nebula {
   x: number;
   y: number;
-  radiusX: number;
-  radiusY: number;
+  clouds: NebulaCloud[];
   rotation: number;
-  color: string;
   opacity: number;
   phase: number;
   driftSpeed: number;
@@ -102,26 +107,38 @@ export const Starfield = () => {
     };
 
     const initNebulas = () => {
-      const nebulaColors = [
-        "138, 43, 226",  // Purple
-        "75, 0, 130",    // Indigo
-        "219, 112, 147", // Pink
-        "70, 130, 180",  // Steel blue
-        "147, 112, 219", // Medium purple
+      const nebulaColorPalettes = [
+        ["255, 100, 180", "180, 50, 255", "100, 150, 255"], // Pink-purple-blue
+        ["255, 150, 100", "255, 80, 120", "200, 100, 255"], // Orange-pink-purple
+        ["100, 200, 255", "150, 100, 255", "200, 150, 255"], // Cyan-purple
+        ["255, 200, 100", "255, 120, 80", "255, 80, 150"],  // Gold-orange-pink
       ];
       
       nebulasRef.current = [];
       const nebulaCount = Math.floor(Math.random() * 2) + 2; // 2-3 nebulas
       
       for (let i = 0; i < nebulaCount; i++) {
+        const palette = nebulaColorPalettes[Math.floor(Math.random() * nebulaColorPalettes.length)];
+        const cloudCount = Math.floor(Math.random() * 8) + 12; // 12-20 clouds per nebula
+        const clouds: NebulaCloud[] = [];
+        
+        for (let c = 0; c < cloudCount; c++) {
+          const angle = Math.random() * Math.PI * 2;
+          const distance = Math.random() * 120 + 30;
+          clouds.push({
+            offsetX: Math.cos(angle) * distance,
+            offsetY: Math.sin(angle) * distance * 0.6,
+            radius: Math.random() * 80 + 40,
+            color: palette[Math.floor(Math.random() * palette.length)],
+          });
+        }
+        
         nebulasRef.current.push({
           x: Math.random() * canvas.width,
           y: Math.random() * canvas.height,
-          radiusX: Math.random() * 200 + 150,
-          radiusY: Math.random() * 150 + 100,
+          clouds,
           rotation: Math.random() * Math.PI * 2,
-          color: nebulaColors[Math.floor(Math.random() * nebulaColors.length)],
-          opacity: Math.random() * 0.08 + 0.03,
+          opacity: Math.random() * 0.12 + 0.06,
           phase: Math.random() * Math.PI * 2,
           driftSpeed: Math.random() * 0.0002 + 0.0001,
         });
@@ -171,31 +188,50 @@ export const Starfield = () => {
       ctx.save();
       ctx.translate(x, y);
       ctx.rotate(nebula.rotation);
+      ctx.globalCompositeOperation = "screen";
       
-      // Create layered nebula effect
-      for (let layer = 0; layer < 3; layer++) {
-        const scale = 1 - layer * 0.2;
-        const opacity = nebula.opacity * (1 - layer * 0.3);
+      // Draw each cloud with multiple layers for wispy effect
+      nebula.clouds.forEach((cloud, index) => {
+        const cloudDrift = Math.sin(timestamp * 0.0003 + index) * 10;
+        const cloudX = cloud.offsetX + cloudDrift;
+        const cloudY = cloud.offsetY + Math.cos(timestamp * 0.0002 + index * 0.5) * 8;
         
-        const gradient = ctx.createRadialGradient(
-          0, 0, 0,
-          0, 0, nebula.radiusX * scale
-        );
-        
-        if (isDark) {
-          gradient.addColorStop(0, `rgba(${nebula.color}, ${opacity * 0.8})`);
-          gradient.addColorStop(0.5, `rgba(${nebula.color}, ${opacity * 0.4})`);
-          gradient.addColorStop(1, `rgba(${nebula.color}, 0)`);
-        } else {
-          // Lighter version for light mode
-          gradient.addColorStop(0, `rgba(${nebula.color}, ${opacity * 0.3})`);
-          gradient.addColorStop(0.5, `rgba(${nebula.color}, ${opacity * 0.15})`);
-          gradient.addColorStop(1, `rgba(${nebula.color}, 0)`);
+        // Multiple soft layers per cloud
+        for (let layer = 0; layer < 4; layer++) {
+          const layerScale = 1 - layer * 0.15;
+          const layerOpacity = nebula.opacity * (1 - layer * 0.2) * (isDark ? 1 : 0.4);
+          
+          const gradient = ctx.createRadialGradient(
+            cloudX, cloudY, 0,
+            cloudX, cloudY, cloud.radius * layerScale
+          );
+          
+          gradient.addColorStop(0, `rgba(${cloud.color}, ${layerOpacity * 0.6})`);
+          gradient.addColorStop(0.3, `rgba(${cloud.color}, ${layerOpacity * 0.4})`);
+          gradient.addColorStop(0.6, `rgba(${cloud.color}, ${layerOpacity * 0.15})`);
+          gradient.addColorStop(1, `rgba(${cloud.color}, 0)`);
+          
+          ctx.beginPath();
+          ctx.arc(cloudX, cloudY, cloud.radius * layerScale, 0, Math.PI * 2);
+          ctx.fillStyle = gradient;
+          ctx.fill();
         }
+      });
+      
+      // Add some bright spots (stars within nebula)
+      for (let i = 0; i < 5; i++) {
+        const starX = nebula.clouds[i % nebula.clouds.length].offsetX * 0.5;
+        const starY = nebula.clouds[i % nebula.clouds.length].offsetY * 0.5;
+        const starGlow = ctx.createRadialGradient(starX, starY, 0, starX, starY, 15);
+        const starOpacity = nebula.opacity * (isDark ? 2 : 0.8);
+        
+        starGlow.addColorStop(0, `rgba(255, 255, 255, ${starOpacity})`);
+        starGlow.addColorStop(0.3, `rgba(255, 255, 255, ${starOpacity * 0.3})`);
+        starGlow.addColorStop(1, `rgba(255, 255, 255, 0)`);
         
         ctx.beginPath();
-        ctx.ellipse(0, 0, nebula.radiusX * scale, nebula.radiusY * scale, 0, 0, Math.PI * 2);
-        ctx.fillStyle = gradient;
+        ctx.arc(starX, starY, 15, 0, Math.PI * 2);
+        ctx.fillStyle = starGlow;
         ctx.fill();
       }
       
