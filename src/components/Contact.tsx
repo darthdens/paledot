@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { Mail, Calendar } from "iconoir-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useLanguage } from "@/i18n/LanguageContext";
+import { z } from "zod";
 import { 
   EchoIcon, 
   LinkedInIcon, 
@@ -26,6 +27,19 @@ const socialLinks = [
   { Icon: FacebookIcon, label: "Facebook", href: "https://www.facebook.com/densgpt/" },
 ];
 
+// Validation schema matching server-side validation
+const contactSchema = z.object({
+  name: z.string().trim().min(1, "required").max(100, "tooLong"),
+  email: z.string().trim().email("invalidEmail").max(255, "tooLong"),
+  message: z.string().trim().min(1, "required").max(5000, "tooLong"),
+});
+
+type FormErrors = {
+  name?: string;
+  email?: string;
+  message?: string;
+};
+
 export const Contact = () => {
   const { t } = useLanguage();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -34,9 +48,34 @@ export const Contact = () => {
     email: "",
     message: "",
   });
+  const [errors, setErrors] = useState<FormErrors>({});
+
+  const validateForm = (): boolean => {
+    const result = contactSchema.safeParse(formData);
+    
+    if (!result.success) {
+      const newErrors: FormErrors = {};
+      result.error.errors.forEach((err) => {
+        const field = err.path[0] as keyof FormErrors;
+        const errorKey = err.message as keyof typeof t.contact.form.validation;
+        newErrors[field] = t.contact.form.validation[errorKey] || err.message;
+      });
+      setErrors(newErrors);
+      return false;
+    }
+    
+    setErrors({});
+    return true;
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Client-side validation before submission
+    if (!validateForm()) {
+      return;
+    }
+    
     setIsSubmitting(true);
 
     try {
@@ -69,6 +108,7 @@ export const Contact = () => {
         description: t.contact.toast.successDesc,
       });
       setFormData({ name: "", email: "", message: "" });
+      setErrors({});
     } catch (error) {
       console.error("Error submitting form:", error);
       toast.error(t.contact.toast.error);
@@ -166,11 +206,17 @@ export const Contact = () => {
                 <Input
                   id="name"
                   value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  onChange={(e) => {
+                    setFormData({ ...formData, name: e.target.value });
+                    if (errors.name) setErrors({ ...errors, name: undefined });
+                  }}
                   placeholder={t.contact.form.namePlaceholder}
-                  required
-                  className="bg-card"
+                  className={`bg-card ${errors.name ? 'border-destructive' : ''}`}
+                  maxLength={100}
                 />
+                {errors.name && (
+                  <p className="text-sm text-destructive mt-1">{errors.name}</p>
+                )}
               </div>
               <div>
                 <label htmlFor="email" className="block text-sm font-medium mb-2">
@@ -180,11 +226,17 @@ export const Contact = () => {
                   id="email"
                   type="email"
                   value={formData.email}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  onChange={(e) => {
+                    setFormData({ ...formData, email: e.target.value });
+                    if (errors.email) setErrors({ ...errors, email: undefined });
+                  }}
                   placeholder={t.contact.form.emailPlaceholder}
-                  required
-                  className="bg-card"
+                  className={`bg-card ${errors.email ? 'border-destructive' : ''}`}
+                  maxLength={255}
                 />
+                {errors.email && (
+                  <p className="text-sm text-destructive mt-1">{errors.email}</p>
+                )}
               </div>
               <div>
                 <label htmlFor="message" className="block text-sm font-medium mb-2">
@@ -193,12 +245,18 @@ export const Contact = () => {
                 <Textarea
                   id="message"
                   value={formData.message}
-                  onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+                  onChange={(e) => {
+                    setFormData({ ...formData, message: e.target.value });
+                    if (errors.message) setErrors({ ...errors, message: undefined });
+                  }}
                   placeholder={t.contact.form.messagePlaceholder}
                   rows={5}
-                  required
-                  className="bg-card resize-none text-base"
+                  className={`bg-card resize-none text-base ${errors.message ? 'border-destructive' : ''}`}
+                  maxLength={5000}
                 />
+                {errors.message && (
+                  <p className="text-sm text-destructive mt-1">{errors.message}</p>
+                )}
               </div>
               <Button type="submit" variant="secondary" size="lg" className="w-full" disabled={isSubmitting}>
                 {isSubmitting ? t.contact.form.sending : t.contact.form.send}
