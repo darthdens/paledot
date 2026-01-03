@@ -22,5 +22,235 @@
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
+    <!-- Echo AI Chat Widget -->
+    <div
+      id="echo-chat-container"
+      style="position: fixed; bottom: 20px; right: 20px; z-index: 9999; font-family: system-ui, -apple-system, sans-serif;"
+    >
+      <!-- Chat iframe using actual Echo Assistant -->
+      <iframe
+        id="echo-chat-iframe"
+        src="https://echoai.so/e/dens?theme=dark"
+        style="
+            display: none;
+            width: 480px;
+            height: 640px;
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            opacity: 0;
+            transform: translateY(100%);
+            transition: all 0.3s ease-in-out;
+            background: transparent;
+            overflow: hidden;
+        "
+        loading="lazy"
+        allow="microphone"
+        title="Echo - Echo AI Assistant"
+      ></iframe>
+
+      <!-- Toggle Button -->
+      <button
+        id="echo-chat-toggle"
+        style="
+        width: 52px;
+        height: 52px;
+        border-radius: 12px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        padding: 8px;
+        position: relative;
+        outline: none;
+        border: none;
+    "
+      >
+        <svg width="56%" height="56%" viewBox="0 0 680 680" xmlns="http://www.w3.org/2000/svg">
+          <path
+            fill="#8169f9"
+            d="M316,0c16,0,32,0,48,0,.97.21,1.94.53,2.92.6,18,1.23,35.8,3.94,53.15,8.77,126.65,35.24,207.11,118.61,250.12,240.77,5.56,15.78,7.79,32.33,9.82,48.87v35c-.21,1.14-.52,2.27-.63,3.42-4.97,51.07-25.24,95.03-60.34,132.52-43.16,46.11-86.1,92.42-128.59,139.14-24.8,27.27-53.13,48.84-88.19,61.05-14.07,4.9-28.62,7.53-43.26,9.86h-38c-.64-.19-1.26-.47-1.91-.55-48.31-5.84-88.88-26.91-121.9-62.44-46.96-50.53-93.78-101.2-140.53-151.93-24.89-27.02-41.45-58.58-50.4-94.2-3.05-12.14-4.62-24.51-6.26-36.88v-35c1.9-14.87,3.87-29.72,8.35-44.09,20.7-66.47,56.61-123.28,108.66-169.58C161.74,45.52,213.37,19.01,272.08,6.5c14.52-3.1,29.22-4.71,43.92-6.5ZM579.14,310.31c.24-7.55-2.28-21.23-6.99-34.55-13.34-37.76-33.34-71.52-61.28-100.29-47.16-48.56-104.4-74.61-172.44-74.96-27.68-.14-54.7,5.03-80.51,15.34-65.53,26.18-111.14,73.05-140.58,136.41-8.59,18.48-15.59,37.47-16.31,58.28-1.17,33.76,8.9,63.24,32.03,88.15,30.61,32.96,61.06,66.07,91.62,99.07,17.32,18.7,34.23,37.81,52.25,55.81,17.75,17.73,40.03,26.47,65.12,25.85,27.03-.68,49.33-12.4,67.59-32.17,44.87-48.59,89.59-97.33,134.78-145.61,22.47-24.01,34.47-51.82,34.71-91.34Z"
+          />
+        </svg>
+      </button>
+
+      <style>
+        /* Base button styles - light theme default */
+        #echo-chat-toggle {
+            background: rgba(255, 255, 255, 0.95) !important;
+            backdrop-filter: blur(16px) !important;
+            border: 1px solid rgba(255, 255, 255, 0.4) !important;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.3) !important;
+        }
+        /* Light theme - no special styling needed for logo since it's purple */
+
+        #echo-chat-toggle:hover {
+            transform: scale(1.05) !important;
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.4) !important;
+        }
+
+        /* Dark theme styles */
+        #echo-chat-toggle.echo-chat-toggle-dark {
+            background: rgba(30, 35, 42, 0.95) !important;
+            backdrop-filter: blur(16px) !important;
+            border: 1px solid rgba(71, 85, 105, 0.4) !important;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(71, 85, 105, 0.3) !important;
+        }
+        /* Dark theme - no special styling needed for logo since it's purple */
+
+        #echo-chat-toggle.echo-chat-toggle-dark #echo-logo-light-theme {
+            display: none !important;
+        }
+        #echo-chat-toggle.echo-chat-toggle-dark #echo-logo-dark-theme {
+            display: block !important;
+        }
+        #echo-chat-toggle.echo-chat-toggle-dark:hover {
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(71, 85, 105, 0.4) !important;
+        }
+
+        /* Mobile responsive styles */
+        @media (max-width: 768px) {
+            #echo-chat-iframe {
+                width: 100vw !important;
+                height: 100vh !important;
+                border-radius: 0 !important;
+                top: 0 !important;
+                left: 0 !important;
+                right: 0 !important;
+                bottom: 0 !important;
+                position: fixed !important;
+            }
+        }
+      </style>
+    </div>
+
+    <script>
+      (function() {
+          const chatToggle = document.getElementById('echo-chat-toggle');
+          const chatIframe = document.getElementById('echo-chat-iframe');
+
+          let isOpen = false;
+          let currentTheme = null;
+
+          // Detect current language
+          function detectLanguage() {
+              const lng = localStorage.getItem('i18nextLng');
+              return lng ? lng.split('-')[0] : (navigator.language || 'en').split('-')[0];
+          }
+
+          // Update iframe src with current language
+          function updateIframeSrc() {
+              const currentLang = detectLanguage();
+              const currentSrc = chatIframe.getAttribute('src') || '';
+              const baseUrl = currentSrc.split('?')[0];
+              const sessionId = localStorage.getItem('echo_chat_session_id') || '';
+              chatIframe.setAttribute('src', baseUrl + '?theme=dark&sessionId=' + sessionId + '&lng=' + currentLang);
+          }
+
+          // Detect host site theme - simple logic based on .dark class
+          function detectHostTheme() {
+              // Check if dark class is present on html element
+              if (document.documentElement.classList.contains('dark')) {
+                  return 'dark';
+              }
+
+              // No dark class = light mode
+              return 'light';
+          }
+
+          // Update widget button styling based on host site theme (iframe always stays dark)
+          function updateButtonTheme() {
+              const theme = detectHostTheme();
+              console.log('Detected theme:', theme);
+
+              // Only update if theme actually changed
+              if (theme === currentTheme) {
+                  console.log('Theme unchanged, skipping update');
+                  return;
+              }
+
+              currentTheme = theme;
+              console.log('Theme changed to:', theme);
+
+              // Apply theme to widget button ONLY - iframe always stays dark
+              if (theme === 'dark') {
+                  console.log('Applying dark theme to toggle');
+                  chatToggle.classList.add('echo-chat-toggle-dark');
+              } else {
+                  console.log('Applying light theme to toggle');
+                  chatToggle.classList.remove('echo-chat-toggle-dark');
+              }
+          }
+
+          // Initial setup
+          updateButtonTheme();
+          updateIframeSrc();
+
+          // Listen for language change events
+          window.addEventListener('languageChanged', updateIframeSrc);
+
+          // Watch for theme changes on the host site
+          const observer = new MutationObserver(() => {
+              updateButtonTheme();
+          });
+
+          observer.observe(document.documentElement, {
+              attributes: true,
+              attributeFilter: ['class', 'data-theme', 'style']
+          });
+
+          observer.observe(document.body, {
+              attributes: true,
+              attributeFilter: ['class', 'data-theme', 'style']
+          });
+
+          // Listen for system theme changes
+          if (window.matchMedia) {
+              window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', updateButtonTheme);
+          }
+
+          // Toggle chat
+          chatToggle.addEventListener('click', () => {
+              if (!isOpen) {
+                  chatToggle.style.display = 'none';
+                  chatIframe.style.display = 'block';
+                  setTimeout(() => {
+                      chatIframe.style.opacity = '1';
+                      chatIframe.style.transform = 'translateY(0)';
+                  }, 10);
+                  isOpen = true;
+              }
+          });
+
+
+          // Close chat when clicking outside
+          document.addEventListener('click', (e) => {
+              if (isOpen && !chatIframe.contains(e.target) && !chatToggle.contains(e.target)) {
+                  chatIframe.style.opacity = '0';
+                  chatIframe.style.transform = 'translateY(100%)';
+                  setTimeout(() => {
+                      chatIframe.style.display = 'none';
+                      chatToggle.style.display = 'flex';
+                      isOpen = false;
+                  }, 300);
+              }
+          });
+
+          // Handle iframe messages for closing
+          window.addEventListener('message', (event) => {
+              if (event.data.type === 'ECHO_CLOSE_CHAT') {
+                  chatIframe.style.opacity = '0';
+                  chatIframe.style.transform = 'translateY(100%)';
+                  setTimeout(() => {
+                      chatIframe.style.display = 'none';
+                      chatToggle.style.display = 'flex';
+                      isOpen = false;
+                  }, 300);
+              }
+          });
+      })();
+    </script>
+    <!-- End Echo AI Chat Widget -->
   </body>
 </html>
