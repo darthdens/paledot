@@ -426,7 +426,7 @@ const AdminProjects = () => {
                 </div>
                 <div className="flex items-center gap-2 flex-shrink-0">
                   {project.is_featured && (
-                    <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded whitespace-nowrap">Featured</span>
+                    <span className="text-xs bg-primary text-primary-foreground px-2 py-1 rounded font-medium whitespace-nowrap">Featured</span>
                   )}
                   <Button variant="ghost" size="icon" onClick={() => handleOpenDialog(project)}>
                     <Edit className="w-4 h-4" />
