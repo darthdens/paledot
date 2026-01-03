@@ -11,7 +11,7 @@ import { Starfield } from "@/components/Starfield";
 
 const Index = () => {
   useEffect(() => {
-    document.title = "Home | Dens";
+    document.title = "Dens";
   }, []);
   return (
     <div className="min-h-screen bg-background relative">

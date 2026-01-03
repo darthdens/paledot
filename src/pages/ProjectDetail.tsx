@@ -15,12 +15,69 @@ interface Project {
   title_fr: string;
   description_en: string;
   description_fr: string;
+  content_en: string | null;
+  content_fr: string | null;
   image_url: string | null;
   tags: string[];
   external_url: string | null;
   award_en: string | null;
   award_fr: string | null;
 }
+
+// Simple markdown renderer for project content
+const renderMarkdown = (content: string) => {
+  const lines = content.split('\n');
+  const elements: JSX.Element[] = [];
+  let currentList: string[] = [];
+  let listKey = 0;
+
+  const flushList = () => {
+    if (currentList.length > 0) {
+      elements.push(
+        <ul key={`list-${listKey++}`} className="list-disc list-inside space-y-1 mb-4 text-muted-foreground">
+          {currentList.map((item, i) => (
+            <li key={i}>{item}</li>
+          ))}
+        </ul>
+      );
+      currentList = [];
+    }
+  };
+
+  lines.forEach((line, index) => {
+    const trimmed = line.trim();
+    
+    if (trimmed.startsWith('### ')) {
+      flushList();
+      elements.push(
+        <h3 key={index} className="font-serif text-xl font-bold mt-8 mb-4">
+          {trimmed.slice(4)}
+        </h3>
+      );
+    } else if (trimmed.startsWith('## ')) {
+      flushList();
+      elements.push(
+        <h2 key={index} className="font-serif text-2xl font-bold mt-10 mb-4">
+          {trimmed.slice(3)}
+        </h2>
+      );
+    } else if (trimmed.startsWith('- ')) {
+      currentList.push(trimmed.slice(2));
+    } else if (trimmed === '') {
+      flushList();
+    } else if (trimmed) {
+      flushList();
+      elements.push(
+        <p key={index} className="text-muted-foreground leading-relaxed mb-4">
+          {trimmed}
+        </p>
+      );
+    }
+  });
+
+  flushList();
+  return elements;
+};
 
 const ProjectDetail = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -86,6 +143,7 @@ const ProjectDetail = () => {
 
   const title = language === "fr" ? project.title_fr : project.title_en;
   const description = language === "fr" ? project.description_fr : project.description_en;
+  const content = language === "fr" ? project.content_fr : project.content_en;
   const award = language === "fr" ? project.award_fr : project.award_en;
 
   return (
@@ -135,12 +193,18 @@ const ProjectDetail = () => {
           </div>
 
           {project.external_url && (
-            <a href={project.external_url} target="_blank" rel="noopener noreferrer">
+            <a href={project.external_url} target="_blank" rel="noopener noreferrer" className="inline-block mb-8">
               <Button>
                 {language === "fr" ? "Voir le projet" : "View Project"}
                 <ArrowUpRight className="w-4 h-4 ml-2" />
               </Button>
             </a>
+          )}
+
+          {content && (
+            <div className="prose prose-lg dark:prose-invert max-w-none">
+              {renderMarkdown(content)}
+            </div>
           )}
         </div>
       </main>
