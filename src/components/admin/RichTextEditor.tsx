@@ -139,20 +139,34 @@ const RichTextEditor = forwardRef<HTMLDivElement, RichTextEditorProps>(
   useEffect(() => {
     if (!editor) return;
 
-    const updateSelection = () => {
-      // When the toolbar/dropdowns steal focus, TipTap may emit a selection update that collapses
-      // the selection; we don't want to overwrite the user's last real selection.
-      if (!editor.view.hasFocus()) return;
-
+    const storeSelection = () => {
       const { from, to } = editor.state.selection;
-      lastSelection.current = { from, to };
+      // Only treat non-empty selections as "the" selection we want to preserve.
+      // (Toolbar interactions can temporarily collapse selection.)
+      if (from !== to) {
+        lastSelection.current = { from, to };
+        return;
+      }
+
+      // Still keep cursor position updates when the editor is focused.
+      if (editor.view.hasFocus()) {
+        lastSelection.current = { from, to };
+      }
     };
 
-    updateSelection();
-    editor.on('selectionUpdate', updateSelection);
+    storeSelection();
+    editor.on('selectionUpdate', storeSelection);
+
+    const dom = editor.view.dom;
+    dom.addEventListener('mouseup', storeSelection);
+    dom.addEventListener('keyup', storeSelection);
+    dom.addEventListener('touchend', storeSelection);
 
     return () => {
-      editor.off('selectionUpdate', updateSelection);
+      editor.off('selectionUpdate', storeSelection);
+      dom.removeEventListener('mouseup', storeSelection);
+      dom.removeEventListener('keyup', storeSelection);
+      dom.removeEventListener('touchend', storeSelection);
     };
   }, [editor]);
 
@@ -162,9 +176,16 @@ const RichTextEditor = forwardRef<HTMLDivElement, RichTextEditorProps>(
 
   const chainWithSelection = () => {
     let chain = editor.chain().focus();
+
     if (lastSelection.current) {
-      chain = chain.setTextSelection(lastSelection.current);
+      const max = editor.state.doc.content.size;
+      const clamp = (pos: number) => Math.max(0, Math.min(pos, max));
+      chain = chain.setTextSelection({
+        from: clamp(lastSelection.current.from),
+        to: clamp(lastSelection.current.to),
+      });
     }
+
     return chain;
   };
 
@@ -247,8 +268,10 @@ const RichTextEditor = forwardRef<HTMLDivElement, RichTextEditorProps>(
       size="icon"
       className={`h-8 w-8 ${isActive ? 'bg-muted' : ''}`}
       onMouseDown={(e) => e.preventDefault()}
-      onPointerDown={(e) => e.preventDefault()}
-      onClick={onClick}
+      onPointerDown={(e) => {
+        e.preventDefault();
+        onClick();
+      }}
       title={title}
     >
       {children}
@@ -379,8 +402,8 @@ const RichTextEditor = forwardRef<HTMLDivElement, RichTextEditorProps>(
                 className="w-6 h-6 rounded border border-border hover:scale-110 transition-transform"
                 style={{ backgroundColor: color.value || 'transparent' }}
                 onMouseDown={(e) => e.preventDefault()}
-                onPointerDown={(e) => e.preventDefault()}
-                onClick={() => {
+                onPointerDown={(e) => {
+                  e.preventDefault();
                   const chain = chainWithSelection();
                   if (color.value) {
                     chain.setColor(color.value).run();
@@ -407,8 +430,8 @@ const RichTextEditor = forwardRef<HTMLDivElement, RichTextEditorProps>(
                 className="w-6 h-6 rounded border border-border hover:scale-110 transition-transform"
                 style={{ backgroundColor: color.value || 'transparent' }}
                 onMouseDown={(e) => e.preventDefault()}
-                onPointerDown={(e) => e.preventDefault()}
-                onClick={() => {
+                onPointerDown={(e) => {
+                  e.preventDefault();
                   const chain = chainWithSelection();
                   if (color.value) {
                     chain.toggleHighlight({ color: color.value }).run();
