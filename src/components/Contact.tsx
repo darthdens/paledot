@@ -45,11 +45,11 @@ export const Contact = () => {
     <section id="contact" className="py-24 bg-muted/30">
       <div className="container mx-auto px-6">
         <div className="max-w-4xl mx-auto">
-          <div className="text-center mb-16">
+          <div className="text-left md:text-center mb-16">
             <h2 className="font-serif text-4xl md:text-5xl font-bold mb-4">
               Let's Connect
             </h2>
-            <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
+            <p className="text-muted-foreground text-lg max-w-2xl md:mx-auto">
               Have a project in mind or just want to chat? I'd love to hear from you.
             </p>
           </div>
