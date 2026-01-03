@@ -12,6 +12,7 @@ import { toast } from "sonner";
 import { Plus, Edit, Trash } from "iconoir-react";
 import RichTextEditor from "@/components/admin/RichTextEditor";
 import ImageUpload from "@/components/admin/ImageUpload";
+import GalleryUpload from "@/components/admin/GalleryUpload";
 
 interface Project {
   id: string;
@@ -29,6 +30,7 @@ interface Project {
   award_fr: string | null;
   is_featured: boolean;
   display_order: number;
+  gallery_images: string[];
 }
 
 interface FormData {
@@ -46,6 +48,7 @@ interface FormData {
   award_fr: string;
   is_featured: boolean;
   display_order: number;
+  gallery_images: string[];
 }
 
 const emptyFormData: FormData = {
@@ -63,6 +66,7 @@ const emptyFormData: FormData = {
   award_fr: "",
   is_featured: false,
   display_order: 0,
+  gallery_images: [],
 };
 
 const AdminProjects = () => {
@@ -113,6 +117,7 @@ const AdminProjects = () => {
         award_fr: project.award_fr || "",
         is_featured: project.is_featured,
         display_order: project.display_order,
+        gallery_images: project.gallery_images || [],
       });
       setTagsInput(project.tags.join(", "));
     } else {
@@ -212,6 +217,7 @@ const AdminProjects = () => {
       award_fr: frenchTranslations?.award_fr || formData.award_en || null,
       is_featured: formData.is_featured,
       display_order: formData.display_order,
+      gallery_images: formData.gallery_images,
     };
 
     if (editingProject) {
@@ -358,6 +364,16 @@ const AdminProjects = () => {
                   value={formData.image_url}
                   onChange={(url) => setFormData({ ...formData, image_url: url })}
                   folder="projects"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label>Gallery Images</Label>
+                <p className="text-xs text-muted-foreground">These images appear on the right side of the project page</p>
+                <GalleryUpload
+                  value={formData.gallery_images}
+                  onChange={(urls) => setFormData({ ...formData, gallery_images: urls })}
+                  folder="projects/gallery"
                 />
               </div>
 

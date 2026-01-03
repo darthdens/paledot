@@ -19,6 +19,7 @@ interface Project {
   content_en: string | null;
   content_fr: string | null;
   image_url: string | null;
+  gallery_images: string[] | null;
   tags: string[];
   external_url: string | null;
   award_en: string | null;
@@ -78,12 +79,17 @@ const ProjectDetail = () => {
     const content = (language === "fr" && project.content_fr) ? project.content_fr : project.content_en;
     const images: string[] = [];
     
-    // Add main image first
+    // Add main image first (thumbnail)
     if (project.image_url) {
       images.push(project.image_url);
     }
     
-    // Extract images from content
+    // Add gallery images
+    if (project.gallery_images && project.gallery_images.length > 0) {
+      images.push(...project.gallery_images);
+    }
+    
+    // Extract images from content and add them too
     if (content) {
       const contentImages = extractImagesFromContent(content);
       images.push(...contentImages);

@@ -127,6 +127,7 @@ export type Database = {
           description_fr: string
           display_order: number | null
           external_url: string | null
+          gallery_images: string[] | null
           id: string
           image_url: string | null
           is_featured: boolean | null
@@ -146,6 +147,7 @@ export type Database = {
           description_fr: string
           display_order?: number | null
           external_url?: string | null
+          gallery_images?: string[] | null
           id?: string
           image_url?: string | null
           is_featured?: boolean | null
@@ -165,6 +167,7 @@ export type Database = {
           description_fr?: string
           display_order?: number | null
           external_url?: string | null
+          gallery_images?: string[] | null
           id?: string
           image_url?: string | null
           is_featured?: boolean | null

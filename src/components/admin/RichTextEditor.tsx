@@ -30,8 +30,10 @@ import {
   Palette,
   Youtube as YoutubeIcon
 } from 'iconoir-react';
-import { useEffect, forwardRef, useMemo } from 'react';
+import { useEffect, forwardRef, useMemo, useRef, useState } from 'react';
 import { sanitizeRichTextHtml } from '@/lib/richText';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 
 interface RichTextEditorProps {
   content: string;
@@ -135,11 +137,55 @@ const RichTextEditor = forwardRef<HTMLDivElement, RichTextEditorProps>(
     }
   };
 
-  const addImage = () => {
-    const url = window.prompt('Enter image URL:');
-    if (url) {
-      editor.chain().focus().setImage({ src: url }).run();
+  const imageInputRef = useRef<HTMLInputElement>(null);
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const validTypes = ['image/jpeg', 'image/png', 'image/webp'];
+    if (!validTypes.includes(file.type)) {
+      toast.error('Please upload a JPG, PNG, or WebP image');
+      return;
     }
+
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error('Image must be less than 5MB');
+      return;
+    }
+
+    setIsUploadingImage(true);
+
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `content/${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('media')
+        .upload(fileName, file);
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('media')
+        .getPublicUrl(fileName);
+
+      editor.chain().focus().setImage({ src: publicUrl }).run();
+      toast.success('Image added!');
+    } catch (error) {
+      console.error('Upload error:', error);
+      toast.error('Failed to upload image');
+    } finally {
+      setIsUploadingImage(false);
+      if (imageInputRef.current) {
+        imageInputRef.current.value = '';
+      }
+    }
+  };
+
+  const addImage = () => {
+    imageInputRef.current?.click();
   };
 
   const addYoutubeVideo = () => {
@@ -174,6 +220,14 @@ const RichTextEditor = forwardRef<HTMLDivElement, RichTextEditorProps>(
 
   return (
     <div ref={ref} className="border border-border rounded-lg overflow-hidden bg-background">
+      {/* Hidden file input for image uploads */}
+      <input
+        type="file"
+        ref={imageInputRef}
+        accept="image/jpeg,image/png,image/webp"
+        onChange={handleImageUpload}
+        className="hidden"
+      />
       {/* Toolbar */}
       <div className="flex flex-wrap items-center gap-0.5 p-2 border-b border-border bg-muted/30">
         {/* Text Style Dropdown */}
@@ -364,9 +418,13 @@ const RichTextEditor = forwardRef<HTMLDivElement, RichTextEditorProps>(
         </ToolbarButton>
         <ToolbarButton
           onClick={addImage}
-          title="Add Image"
+          title="Upload Image"
         >
-          <MediaImage className="h-4 w-4" />
+          {isUploadingImage ? (
+            <div className="h-4 w-4 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+          ) : (
+            <MediaImage className="h-4 w-4" />
+          )}
         </ToolbarButton>
         <ToolbarButton
           onClick={addYoutubeVideo}
