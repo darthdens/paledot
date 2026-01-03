@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { useParams, Link } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -8,6 +8,7 @@ import { useLanguage } from "@/i18n/LanguageContext";
 import { Navigation } from "@/components/Navigation";
 import { Footer } from "@/components/Footer";
 import { sanitizeRichTextHtml } from "@/lib/richText";
+import Autoplay from "embla-carousel-autoplay";
 import {
   Carousel,
   CarouselContent,
@@ -163,7 +164,19 @@ const ProjectDetail = () => {
             {/* Image Carousel */}
             {allImages.length > 0 && (
               <div className="relative -mx-6">
-                <Carousel className="w-full">
+                <Carousel 
+                  className="w-full"
+                  opts={{
+                    loop: true,
+                  }}
+                  plugins={[
+                    Autoplay({
+                      delay: 4000,
+                      stopOnInteraction: false,
+                      stopOnMouseEnter: true,
+                    }),
+                  ]}
+                >
                   <CarouselContent>
                     {allImages.map((imageUrl, index) => (
                       <CarouselItem key={index}>
