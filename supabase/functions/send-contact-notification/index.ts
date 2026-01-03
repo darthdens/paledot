@@ -1,5 +1,6 @@
 import { Resend } from "https://esm.sh/resend@2.0.0";
 import { z } from "https://esm.sh/zod@3.25.76";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.9";
 
 const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 
@@ -16,10 +17,87 @@ const contactSchema = z.object({
 
 type ContactFormRequest = z.infer<typeof contactSchema>;
 
+// Rate limiting configuration
+const RATE_LIMIT_WINDOW_MS = 60 * 60 * 1000; // 1 hour
+const MAX_REQUESTS_PER_WINDOW = 5; // 5 submissions per hour per IP
+
+// Simple in-memory rate limiter (for single instance)
+const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
+
+function getClientIP(req: Request): string {
+  // Check various headers for client IP
+  const forwardedFor = req.headers.get("x-forwarded-for");
+  if (forwardedFor) {
+    return forwardedFor.split(",")[0].trim();
+  }
+  const realIP = req.headers.get("x-real-ip");
+  if (realIP) {
+    return realIP;
+  }
+  // Fallback to a generic identifier if no IP found
+  return "unknown";
+}
+
+function checkRateLimit(clientIP: string): { allowed: boolean; retryAfter?: number } {
+  const now = Date.now();
+  const record = rateLimitMap.get(clientIP);
+
+  if (!record || now > record.resetTime) {
+    // Create new record or reset expired one
+    rateLimitMap.set(clientIP, { count: 1, resetTime: now + RATE_LIMIT_WINDOW_MS });
+    return { allowed: true };
+  }
+
+  if (record.count >= MAX_REQUESTS_PER_WINDOW) {
+    const retryAfter = Math.ceil((record.resetTime - now) / 1000);
+    return { allowed: false, retryAfter };
+  }
+
+  // Increment count
+  record.count += 1;
+  rateLimitMap.set(clientIP, record);
+  return { allowed: true };
+}
+
+// Clean up old entries periodically (prevent memory leak)
+function cleanupRateLimitMap() {
+  const now = Date.now();
+  for (const [key, value] of rateLimitMap.entries()) {
+    if (now > value.resetTime) {
+      rateLimitMap.delete(key);
+    }
+  }
+}
+
 const handler = async (req: Request): Promise<Response> => {
   // Handle CORS preflight requests
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
+  }
+
+  // Clean up old rate limit entries
+  cleanupRateLimitMap();
+
+  // Check rate limit
+  const clientIP = getClientIP(req);
+  const rateLimitResult = checkRateLimit(clientIP);
+  
+  if (!rateLimitResult.allowed) {
+    console.log(`Rate limit exceeded for IP: ${clientIP}`);
+    return new Response(
+      JSON.stringify({ 
+        error: "Too many requests. Please try again later.",
+        retryAfter: rateLimitResult.retryAfter
+      }),
+      {
+        status: 429,
+        headers: { 
+          "Content-Type": "application/json", 
+          "Retry-After": String(rateLimitResult.retryAfter),
+          ...corsHeaders 
+        },
+      }
+    );
   }
 
   try {

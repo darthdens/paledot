@@ -42,7 +42,8 @@ const AdminLogin = () => {
       const { error } = await signUp(email, password);
       setIsSubmitting(false);
       if (error) {
-        toast.error(error.message);
+        // Use generic error message to prevent email enumeration
+        toast.error("Unable to create account. Please check your details and try again.");
         return;
       }
       toast.success("Account created! Please ask the admin to grant you access.");
@@ -51,7 +52,8 @@ const AdminLogin = () => {
       const { error } = await signIn(email, password);
       setIsSubmitting(false);
       if (error) {
-        toast.error(error.message);
+        // Use generic error message to prevent email enumeration
+        toast.error("Invalid email or password. Please try again.");
         return;
       }
       toast.success("Logged in successfully!");
