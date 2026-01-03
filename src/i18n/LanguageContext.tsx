@@ -9,8 +9,17 @@ interface LanguageContextType {
   t: TranslationType;
 }
 
-const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
+const LANGUAGE_CONTEXT_KEY = "__language_context_singleton__";
 
+const getLanguageContext = () => {
+  const g = globalThis as unknown as Record<string, unknown>;
+  if (!g[LANGUAGE_CONTEXT_KEY]) {
+    g[LANGUAGE_CONTEXT_KEY] = createContext<LanguageContextType | undefined>(undefined);
+  }
+  return g[LANGUAGE_CONTEXT_KEY] as ReturnType<typeof createContext<LanguageContextType | undefined>>;
+};
+
+const LanguageContext = getLanguageContext();
 const detectFrench = (): boolean => {
   const browserLang = navigator.language || (navigator as any).userLanguage || "";
   if (browserLang.toLowerCase().startsWith("fr")) {
