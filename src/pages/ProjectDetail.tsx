@@ -7,6 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { Navigation } from "@/components/Navigation";
 import { Footer } from "@/components/Footer";
+import { sanitizeRichTextHtml } from "@/lib/richText";
 
 interface Project {
   id: string;
@@ -90,6 +91,7 @@ const ProjectDetail = () => {
   const title = language === "fr" ? project.title_fr : project.title_en;
   const description = language === "fr" ? project.description_fr : project.description_en;
   const content = (language === "fr" && project.content_fr) ? project.content_fr : project.content_en;
+  const sanitizedContent = content ? sanitizeRichTextHtml(content) : null;
   const award = language === "fr" ? project.award_fr : project.award_en;
 
   return (
@@ -147,10 +149,10 @@ const ProjectDetail = () => {
             </a>
           )}
 
-          {content && (
+          {sanitizedContent && (
             <div
-              className="prose prose-lg max-w-none text-foreground prose-headings:text-foreground prose-p:text-foreground prose-li:text-foreground prose-strong:text-foreground prose-a:text-primary prose-blockquote:text-foreground prose-code:text-foreground"
-              dangerouslySetInnerHTML={{ __html: content }}
+              className="prose prose-lg max-w-none text-muted-foreground prose-headings:text-foreground prose-p:text-muted-foreground prose-li:text-muted-foreground prose-strong:text-foreground prose-a:text-primary prose-blockquote:text-muted-foreground prose-code:text-foreground"
+              dangerouslySetInnerHTML={{ __html: sanitizedContent }}
             />
           )}
         </div>
