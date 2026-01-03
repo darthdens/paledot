@@ -44,10 +44,10 @@ const testimonials = [
 
 export const About = () => {
   return (
-    <section id="about" className="py-24 bg-muted/30 overflow-hidden">
-      <div className="container mx-auto px-6 overflow-hidden">
+    <section id="about" className="py-24 bg-muted/30">
+      <div className="container mx-auto px-6">
         <div className="grid lg:grid-cols-2 gap-16 items-center">
-          <div className="space-y-8">
+          <div className="space-y-8 min-w-0">
             <div>
             <h2 className="font-serif text-4xl md:text-5xl font-bold mb-6">
                 About Me
@@ -77,7 +77,7 @@ export const About = () => {
             </div>
           </div>
 
-          <div className="space-y-8">
+          <div className="space-y-8 min-w-0">
             <div className="bg-card rounded-2xl p-5 sm:p-8 border border-border">
               <h3 className="font-serif text-xl font-bold mb-6">Languages</h3>
               <div className="space-y-4">
@@ -108,12 +108,12 @@ export const About = () => {
 
             <div className="bg-card rounded-2xl p-5 sm:p-8 border border-border">
               <h3 className="font-serif text-xl font-bold mb-6">What People Say</h3>
-              <Carousel className="w-full overflow-hidden">
+              <Carousel className="w-full">
                 <CarouselContent>
                   {testimonials.map((testimonial, index) => (
                     <CarouselItem key={index}>
-                      <blockquote>
-                        <p className="text-lg italic text-muted-foreground mb-4">
+                      <blockquote className="break-words">
+                        <p className="text-lg italic text-muted-foreground mb-4 break-words">
                           "{testimonial.quote}"
                         </p>
                         <footer className="font-medium">
