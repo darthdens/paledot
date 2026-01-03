@@ -151,7 +151,67 @@ const ProjectDetail = () => {
             {language === "fr" ? "Tous les projets" : "All Projects"}
           </Link>
 
-          <div className="grid lg:grid-cols-2 gap-8 lg:gap-12">
+          {/* Mobile/Tablet: Images first, then content */}
+          <div className="flex flex-col lg:hidden gap-6">
+            {/* Images on top for mobile/tablet */}
+            {allImages.length > 0 && (
+              <div className="space-y-4">
+                {allImages.map((imageUrl, index) => (
+                  <div key={index} className="rounded-xl overflow-hidden">
+                    <img
+                      src={imageUrl}
+                      alt={`${title} - ${language === "fr" ? "Image" : "Image"} ${index + 1}`}
+                      className="w-full"
+                    />
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Text content below */}
+            <div className="space-y-6">
+              {award && (
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-accent/20 text-sm font-medium">
+                  {award}
+                </div>
+              )}
+
+              <h1 className="font-serif text-3xl md:text-4xl font-bold">
+                {title}
+              </h1>
+
+              <div className="flex flex-wrap gap-2">
+                {project.tags.map((tag) => (
+                  <Badge key={tag} variant="secondary">
+                    {tag}
+                  </Badge>
+                ))}
+              </div>
+
+              <p className="text-base md:text-lg text-muted-foreground leading-relaxed">
+                {description}
+              </p>
+
+              {project.external_url && (
+                <a href={project.external_url} target="_blank" rel="noopener noreferrer" className="inline-block">
+                  <Button>
+                    {language === "fr" ? "Voir le projet" : "View Project"}
+                    <ArrowUpRight className="w-4 h-4 ml-2" />
+                  </Button>
+                </a>
+              )}
+
+              {textContent && (
+                <div
+                  className="prose prose-base md:prose-lg max-w-none text-muted-foreground prose-headings:text-foreground prose-p:text-muted-foreground prose-li:text-muted-foreground prose-strong:text-foreground prose-a:text-primary prose-blockquote:text-muted-foreground prose-code:text-foreground"
+                  dangerouslySetInnerHTML={{ __html: textContent }}
+                />
+              )}
+            </div>
+          </div>
+
+          {/* Desktop: Two-column layout */}
+          <div className="hidden lg:grid lg:grid-cols-2 gap-12">
             {/* Left Column - Text Content */}
             <div className="lg:max-h-[calc(100vh-12rem)] lg:overflow-y-auto lg:pr-4 space-y-6">
               {award && (
