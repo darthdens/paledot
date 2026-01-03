@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useAuth } from "@/hooks/useAuth";
 import { LogOut, Folder, Page, Home, Menu } from "iconoir-react";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
@@ -88,6 +89,7 @@ const AdminDashboard = () => {
             <h1 className="font-serif text-lg md:text-xl font-bold">Admin Dashboard</h1>
           </div>
           <div className="flex items-center gap-2 md:gap-4">
+            <ThemeToggle />
             <Link to="/">
               <Button variant="ghost" size="sm" className="hidden sm:flex">
                 <Home className="w-4 h-4 mr-2" />
