@@ -7,6 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { Navigation } from "@/components/Navigation";
 import { Footer } from "@/components/Footer";
+import { sanitizeRichTextHtml } from "@/lib/richText";
 
 interface Article {
   id: string;
@@ -97,6 +98,7 @@ const ArticleDetail = () => {
 
   const title = language === "fr" ? article.title_fr : article.title_en;
   const content = (language === "fr" && article.content_fr) ? article.content_fr : article.content_en;
+  const sanitizedContent = content ? sanitizeRichTextHtml(content) : null;
   const category = language === "fr" ? article.category_fr : article.category_en;
 
   return (
@@ -140,10 +142,12 @@ const ArticleDetail = () => {
             </div>
           )}
 
-          <div
-            className="prose prose-lg max-w-none text-foreground prose-headings:text-foreground prose-p:text-foreground prose-li:text-foreground prose-strong:text-foreground prose-a:text-primary prose-blockquote:text-foreground prose-code:text-foreground"
-            dangerouslySetInnerHTML={{ __html: content }}
-          />
+          {sanitizedContent && (
+            <div
+              className="prose prose-lg max-w-none text-muted-foreground prose-headings:text-foreground prose-p:text-muted-foreground prose-li:text-muted-foreground prose-strong:text-foreground prose-a:text-primary prose-blockquote:text-muted-foreground prose-code:text-foreground"
+              dangerouslySetInnerHTML={{ __html: sanitizedContent }}
+            />
+          )}
         </article>
       </main>
 

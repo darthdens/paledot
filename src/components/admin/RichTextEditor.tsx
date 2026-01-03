@@ -31,6 +31,7 @@ import {
   Youtube as YoutubeIcon
 } from 'iconoir-react';
 import { useEffect, forwardRef, useMemo } from 'react';
+import { sanitizeRichTextHtml } from '@/lib/richText';
 
 interface RichTextEditorProps {
   content: string;
@@ -38,40 +39,6 @@ interface RichTextEditorProps {
   placeholder?: string;
 }
 
-const normalizeHtmlColors = (html: string) => {
-  // Remove hardcoded black/white text colors that become unreadable depending on theme.
-  // This keeps other colors (red/blue/etc.) intact.
-  try {
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(html || "", "text/html");
-
-    doc.querySelectorAll<HTMLElement>("[style]").forEach((el) => {
-      const style = el.getAttribute("style") || "";
-      const decls = style
-        .split(";")
-        .map((d) => d.trim())
-        .filter(Boolean);
-
-      const filtered = decls.filter((d) => {
-        const prop = d.split(":")[0]?.trim().toLowerCase();
-        return (
-          prop !== "color" &&
-          prop !== "-webkit-text-fill-color" &&
-          prop !== "-webkit-text-stroke-color"
-        );
-      });
-
-      const next = filtered.join("; ").replace(/;;+/g, ";").trim();
-
-      if (!next) el.removeAttribute("style");
-      else el.setAttribute("style", next);
-    });
-
-    return doc.body.innerHTML;
-  } catch {
-    return html;
-  }
-};
 
 const TEXT_COLORS = [
   { name: 'Default', value: '' },
@@ -98,7 +65,7 @@ const HIGHLIGHT_COLORS = [
 
 const RichTextEditor = forwardRef<HTMLDivElement, RichTextEditorProps>(
   ({ content, onChange, placeholder }, ref) => {
-    const normalizedContent = useMemo(() => normalizeHtmlColors(content), [content]);
+    const normalizedContent = useMemo(() => sanitizeRichTextHtml(content), [content]);
 
     const editor = useEditor({
       extensions: [
@@ -138,14 +105,14 @@ const RichTextEditor = forwardRef<HTMLDivElement, RichTextEditorProps>(
       content: normalizedContent,
       onUpdate: ({ editor }) => {
         const html = editor.getHTML();
-        const normalized = normalizeHtmlColors(html);
+        const normalized = sanitizeRichTextHtml(html);
         onChange(normalized);
       },
       editorProps: {
         attributes: {
           // Match the same typography + theme-aware colors used on the public Project/Article pages.
           class:
-            'prose prose-lg max-w-none text-foreground prose-headings:text-foreground prose-p:text-foreground prose-li:text-foreground prose-strong:text-foreground prose-a:text-primary prose-blockquote:text-foreground prose-code:text-foreground min-h-[200px] p-4 focus:outline-none',
+            'prose prose-lg max-w-none text-muted-foreground prose-headings:text-foreground prose-p:text-muted-foreground prose-li:text-muted-foreground prose-strong:text-foreground prose-a:text-primary prose-blockquote:text-muted-foreground prose-code:text-foreground min-h-[200px] p-4 focus:outline-none',
           ...(placeholder ? { 'data-placeholder': placeholder } : {}),
         },
       },
