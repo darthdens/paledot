@@ -19,7 +19,7 @@ const NotFound = () => {
     <div className="min-h-screen bg-background relative flex flex-col">
       <Starfield />
       <Navigation />
-      <main className="flex flex-1 items-center justify-center pt-20">
+      <main className="flex flex-1 items-center justify-center">
         <div className="text-center px-6">
           <h1 className="mb-2 text-8xl font-bold font-serif text-accent">404</h1>
           <h2 className="mb-4 text-2xl font-semibold text-foreground">{t.notFound.title}</h2>
