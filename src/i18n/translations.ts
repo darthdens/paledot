@@ -203,6 +203,11 @@ export const translations = {
         messagePlaceholder: "Tell me about your project...",
         send: "Send Message",
         sending: "Sending...",
+        validation: {
+          required: "This field is required",
+          invalidEmail: "Please enter a valid email address",
+          tooLong: "This field is too long",
+        },
       },
       toast: {
         success: "Message sent!",
@@ -430,6 +435,11 @@ export const translations = {
         messagePlaceholder: "Parlez-moi de votre projet...",
         send: "Envoyer le message",
         sending: "Envoi en cours...",
+        validation: {
+          required: "Ce champ est obligatoire",
+          invalidEmail: "Veuillez entrer une adresse email valide",
+          tooLong: "Ce champ est trop long",
+        },
       },
       toast: {
         success: "Message envoyé !",
