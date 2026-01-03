@@ -127,19 +127,10 @@ const RichTextEditor = forwardRef<HTMLDivElement, RichTextEditorProps>(
       },
     });
 
-  // Only sync content from props when it's a completely different value (e.g., switching items)
-  // NOT on every keystroke, which would reset formatting
-  const lastExternalContent = useRef(normalizedContent);
-  
-  useEffect(() => {
-    if (editor && normalizedContent !== lastExternalContent.current) {
-      // Content changed externally (e.g., switching between items)
-      lastExternalContent.current = normalizedContent;
-      if (normalizedContent !== editor.getHTML()) {
-        editor.commands.setContent(normalizedContent);
-      }
-    }
-  }, [normalizedContent, editor]);
+  // NOTE: We intentionally do NOT sync `content` prop back into the editor on every change.
+  // The parent updates `content` on every keystroke; re-setting editor content would reset selection
+  // and make toolbar formatting feel broken. We instead remount the editor when switching items
+  // (see `key` usage in the admin pages).
 
   const imageInputRef = useRef<HTMLInputElement>(null);
   const [isUploadingImage, setIsUploadingImage] = useState(false);
@@ -149,6 +140,10 @@ const RichTextEditor = forwardRef<HTMLDivElement, RichTextEditorProps>(
     if (!editor) return;
 
     const updateSelection = () => {
+      // When the toolbar/dropdowns steal focus, TipTap may emit a selection update that collapses
+      // the selection; we don't want to overwrite the user's last real selection.
+      if (!editor.view.hasFocus()) return;
+
       const { from, to } = editor.state.selection;
       lastSelection.current = { from, to };
     };
@@ -252,6 +247,7 @@ const RichTextEditor = forwardRef<HTMLDivElement, RichTextEditorProps>(
       size="icon"
       className={`h-8 w-8 ${isActive ? 'bg-muted' : ''}`}
       onMouseDown={(e) => e.preventDefault()}
+      onPointerDown={(e) => e.preventDefault()}
       onClick={onClick}
       title={title}
     >
@@ -272,7 +268,7 @@ const RichTextEditor = forwardRef<HTMLDivElement, RichTextEditorProps>(
       {/* Toolbar */}
       <div className="flex flex-wrap items-center gap-0.5 p-2 border-b border-border bg-muted/30">
         {/* Block Type */}
-        <DropdownMenu>
+        <DropdownMenu modal={false}>
           <DropdownMenuTrigger asChild>
             <Button
               type="button"
@@ -291,7 +287,10 @@ const RichTextEditor = forwardRef<HTMLDivElement, RichTextEditorProps>(
               <ChevronDown className="h-4 w-4" />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="start">
+          <DropdownMenuContent
+            align="start"
+            onCloseAutoFocus={(e) => e.preventDefault()}
+          >
             <DropdownMenuItem
               onSelect={(e) => {
                 e.preventDefault();
@@ -380,6 +379,7 @@ const RichTextEditor = forwardRef<HTMLDivElement, RichTextEditorProps>(
                 className="w-6 h-6 rounded border border-border hover:scale-110 transition-transform"
                 style={{ backgroundColor: color.value || 'transparent' }}
                 onMouseDown={(e) => e.preventDefault()}
+                onPointerDown={(e) => e.preventDefault()}
                 onClick={() => {
                   const chain = chainWithSelection();
                   if (color.value) {
@@ -407,6 +407,7 @@ const RichTextEditor = forwardRef<HTMLDivElement, RichTextEditorProps>(
                 className="w-6 h-6 rounded border border-border hover:scale-110 transition-transform"
                 style={{ backgroundColor: color.value || 'transparent' }}
                 onMouseDown={(e) => e.preventDefault()}
+                onPointerDown={(e) => e.preventDefault()}
                 onClick={() => {
                   const chain = chainWithSelection();
                   if (color.value) {
