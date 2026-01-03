@@ -278,24 +278,13 @@ const AdminProjects = () => {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="content_en">Content (English) - Markdown supported</Label>
+                <Label htmlFor="content_en">Content - Markdown supported</Label>
                 <Textarea
                   id="content_en"
                   value={formData.content_en || ""}
                   onChange={(e) => setFormData({ ...formData, content_en: e.target.value })}
                   className="min-h-[200px]"
                   placeholder="### Objectives&#10;&#10;- Primary Goal: ...&#10;&#10;### Approach&#10;&#10;..."
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="content_fr">Content (French) - Markdown supported</Label>
-                <Textarea
-                  id="content_fr"
-                  value={formData.content_fr || ""}
-                  onChange={(e) => setFormData({ ...formData, content_fr: e.target.value })}
-                  className="min-h-[200px]"
-                  placeholder="### Objectifs&#10;&#10;- Objectif principal : ...&#10;&#10;### Approche&#10;&#10;..."
                 />
               </div>
 
