@@ -15,10 +15,11 @@ const loginSchema = z.object({
 
 const AdminLogin = () => {
   const navigate = useNavigate();
-  const { user, isAdmin, isLoading, signIn } = useAuth();
+  const { user, isAdmin, isLoading, signIn, signUp } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSignUp, setIsSignUp] = useState(false);
 
   useEffect(() => {
     if (!isLoading && user && isAdmin) {
@@ -36,16 +37,25 @@ const AdminLogin = () => {
     }
 
     setIsSubmitting(true);
-    const { error } = await signIn(email, password);
-    setIsSubmitting(false);
-
-    if (error) {
-      toast.error(error.message);
-      return;
+    
+    if (isSignUp) {
+      const { error } = await signUp(email, password);
+      setIsSubmitting(false);
+      if (error) {
+        toast.error(error.message);
+        return;
+      }
+      toast.success("Account created! Please ask the admin to grant you access.");
+      setIsSignUp(false);
+    } else {
+      const { error } = await signIn(email, password);
+      setIsSubmitting(false);
+      if (error) {
+        toast.error(error.message);
+        return;
+      }
+      toast.success("Logged in successfully!");
     }
-
-    // Will redirect via useEffect when isAdmin becomes true
-    toast.success("Logged in successfully!");
   };
 
   if (isLoading) {
@@ -60,8 +70,12 @@ const AdminLogin = () => {
     <div className="min-h-screen flex items-center justify-center bg-background p-6">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
-          <CardTitle className="font-serif text-2xl">Admin Login</CardTitle>
-          <CardDescription>Sign in to manage your content</CardDescription>
+          <CardTitle className="font-serif text-2xl">
+            {isSignUp ? "Create Account" : "Admin Login"}
+          </CardTitle>
+          <CardDescription>
+            {isSignUp ? "Create your admin account" : "Sign in to manage your content"}
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -88,9 +102,18 @@ const AdminLogin = () => {
               />
             </div>
             <Button type="submit" className="w-full" disabled={isSubmitting}>
-              {isSubmitting ? "Signing in..." : "Sign In"}
+              {isSubmitting ? (isSignUp ? "Creating account..." : "Signing in...") : (isSignUp ? "Create Account" : "Sign In")}
             </Button>
           </form>
+          <div className="mt-4 text-center">
+            <button
+              type="button"
+              onClick={() => setIsSignUp(!isSignUp)}
+              className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+            >
+              {isSignUp ? "Already have an account? Sign in" : "Need an account? Sign up"}
+            </button>
+          </div>
         </CardContent>
       </Card>
     </div>
