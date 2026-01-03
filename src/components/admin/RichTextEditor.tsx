@@ -30,13 +30,40 @@ import {
   Palette,
   Youtube as YoutubeIcon
 } from 'iconoir-react';
-import { useEffect, forwardRef } from 'react';
+import { useEffect, forwardRef, useMemo } from 'react';
 
 interface RichTextEditorProps {
   content: string;
   onChange: (content: string) => void;
   placeholder?: string;
 }
+
+const normalizeHtmlColors = (html: string) => {
+  // Remove hardcoded black/white text colors that become unreadable depending on theme.
+  // This keeps other colors (red/blue/etc.) intact.
+  try {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html || "", "text/html");
+
+    doc.querySelectorAll<HTMLElement>("[style]").forEach((el) => {
+      const style = el.getAttribute("style") || "";
+      const next = style
+        // color: white
+        .replace(/color\s*:\s*(#fff(?:fff)?|rgb\(\s*255\s*,\s*255\s*,\s*255\s*\))\s*;?/gi, "")
+        // color: black
+        .replace(/color\s*:\s*(#000(?:000)?|rgb\(\s*0\s*,\s*0\s*,\s*0\s*\))\s*;?/gi, "")
+        .replace(/;;+/g, ";")
+        .trim();
+
+      if (!next) el.removeAttribute("style");
+      else el.setAttribute("style", next);
+    });
+
+    return doc.body.innerHTML;
+  } catch {
+    return html;
+  }
+};
 
 const TEXT_COLORS = [
   { name: 'Default', value: '' },
@@ -63,57 +90,63 @@ const HIGHLIGHT_COLORS = [
 
 const RichTextEditor = forwardRef<HTMLDivElement, RichTextEditorProps>(
   ({ content, onChange, placeholder }, ref) => {
-  const editor = useEditor({
-    extensions: [
-      StarterKit.configure({
-        heading: {
-          levels: [1, 2, 3],
-        },
-      }),
-      Underline,
-      TextStyle,
-      Color,
-      Highlight.configure({
-        multicolor: true,
-      }),
-      Link.configure({
-        openOnClick: false,
-        HTMLAttributes: {
-          class: 'text-primary underline',
-        },
-      }),
-      Image.configure({
-        HTMLAttributes: {
-          class: 'rounded-lg max-w-full',
-        },
-      }),
-      TextAlign.configure({
-        types: ['heading', 'paragraph'],
-      }),
-      Youtube.configure({
-        width: 640,
-        height: 360,
-        HTMLAttributes: {
-          class: 'rounded-lg max-w-full aspect-video',
-        },
-      }),
-    ],
-    content,
-    onUpdate: ({ editor }) => {
-      onChange(editor.getHTML());
-    },
-    editorProps: {
-      attributes: {
-        class: 'prose prose-sm max-w-none min-h-[200px] p-4 focus:outline-none text-foreground [&_h1]:text-foreground [&_h2]:text-foreground [&_h3]:text-foreground [&_p]:text-foreground [&_li]:text-foreground [&_blockquote]:text-foreground/80',
-      },
-    },
-  });
+    const normalizedContent = useMemo(() => normalizeHtmlColors(content), [content]);
 
-  useEffect(() => {
-    if (editor && content !== editor.getHTML()) {
-      editor.commands.setContent(content);
-    }
-  }, [content, editor]);
+    const editor = useEditor({
+      extensions: [
+        StarterKit.configure({
+          heading: {
+            levels: [1, 2, 3],
+          },
+        }),
+        Underline,
+        TextStyle,
+        Color,
+        Highlight.configure({
+          multicolor: true,
+        }),
+        Link.configure({
+          openOnClick: false,
+          HTMLAttributes: {
+            class: 'text-primary underline',
+          },
+        }),
+        Image.configure({
+          HTMLAttributes: {
+            class: 'rounded-lg max-w-full',
+          },
+        }),
+        TextAlign.configure({
+          types: ['heading', 'paragraph'],
+        }),
+        Youtube.configure({
+          width: 640,
+          height: 360,
+          HTMLAttributes: {
+            class: 'rounded-lg max-w-full aspect-video',
+          },
+        }),
+      ],
+      content: normalizedContent,
+      onUpdate: ({ editor }) => {
+        const html = editor.getHTML();
+        const normalized = normalizeHtmlColors(html);
+        onChange(normalized);
+      },
+      editorProps: {
+        attributes: {
+          class:
+            'max-w-none min-h-[200px] p-4 focus:outline-none text-foreground',
+          ...(placeholder ? { 'data-placeholder': placeholder } : {}),
+        },
+      },
+    });
+
+    useEffect(() => {
+      if (editor && normalizedContent !== editor.getHTML()) {
+        editor.commands.setContent(normalizedContent);
+      }
+    }, [normalizedContent, editor]);
 
   if (!editor) {
     return null;
@@ -169,7 +202,7 @@ const RichTextEditor = forwardRef<HTMLDivElement, RichTextEditorProps>(
       <div className="flex flex-wrap items-center gap-0.5 p-2 border-b border-border bg-muted/30">
         {/* Text Style Dropdown */}
         <select
-          className="h-8 px-2 text-sm bg-background border border-border rounded mr-2"
+          className="h-8 px-2 text-sm bg-background text-foreground border border-border rounded mr-2"
           value={
             editor.isActive('heading', { level: 1 }) ? 'h1' :
             editor.isActive('heading', { level: 2 }) ? 'h2' :
