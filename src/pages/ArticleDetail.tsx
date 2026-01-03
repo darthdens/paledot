@@ -96,7 +96,7 @@ const ArticleDetail = () => {
   }
 
   const title = language === "fr" ? article.title_fr : article.title_en;
-  const content = language === "fr" ? article.content_fr : article.content_en;
+  const content = (language === "fr" && article.content_fr) ? article.content_fr : article.content_en;
   const category = language === "fr" ? article.category_fr : article.category_en;
 
   return (
@@ -140,13 +140,10 @@ const ArticleDetail = () => {
             </div>
           )}
 
-          <div className="prose prose-lg dark:prose-invert max-w-none">
-            {content.split("\n\n").map((paragraph, index) => (
-              <p key={index} className="mb-4 text-muted-foreground leading-relaxed">
-                {paragraph}
-              </p>
-            ))}
-          </div>
+          <div 
+            className="prose prose-lg dark:prose-invert max-w-none"
+            dangerouslySetInnerHTML={{ __html: content }}
+          />
         </article>
       </main>
 

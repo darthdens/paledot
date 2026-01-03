@@ -24,60 +24,6 @@ interface Project {
   award_fr: string | null;
 }
 
-// Simple markdown renderer for project content
-const renderMarkdown = (content: string) => {
-  const lines = content.split('\n');
-  const elements: JSX.Element[] = [];
-  let currentList: string[] = [];
-  let listKey = 0;
-
-  const flushList = () => {
-    if (currentList.length > 0) {
-      elements.push(
-        <ul key={`list-${listKey++}`} className="list-disc list-inside space-y-1 mb-4 text-muted-foreground">
-          {currentList.map((item, i) => (
-            <li key={i}>{item}</li>
-          ))}
-        </ul>
-      );
-      currentList = [];
-    }
-  };
-
-  lines.forEach((line, index) => {
-    const trimmed = line.trim();
-    
-    if (trimmed.startsWith('### ')) {
-      flushList();
-      elements.push(
-        <h3 key={index} className="font-serif text-xl font-bold mt-8 mb-4">
-          {trimmed.slice(4)}
-        </h3>
-      );
-    } else if (trimmed.startsWith('## ')) {
-      flushList();
-      elements.push(
-        <h2 key={index} className="font-serif text-2xl font-bold mt-10 mb-4">
-          {trimmed.slice(3)}
-        </h2>
-      );
-    } else if (trimmed.startsWith('- ')) {
-      currentList.push(trimmed.slice(2));
-    } else if (trimmed === '') {
-      flushList();
-    } else if (trimmed) {
-      flushList();
-      elements.push(
-        <p key={index} className="text-muted-foreground leading-relaxed mb-4">
-          {trimmed}
-        </p>
-      );
-    }
-  });
-
-  flushList();
-  return elements;
-};
 
 const ProjectDetail = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -202,9 +148,10 @@ const ProjectDetail = () => {
           )}
 
           {content && (
-            <div className="prose prose-lg dark:prose-invert max-w-none">
-              {renderMarkdown(content)}
-            </div>
+            <div 
+              className="prose prose-lg dark:prose-invert max-w-none"
+              dangerouslySetInnerHTML={{ __html: content }}
+            />
           )}
         </div>
       </main>
