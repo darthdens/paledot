@@ -33,7 +33,7 @@ export const ChatWidget = () => {
 
       <iframe 
         id="echo-chat-iframe"
-        src="https://echo-ai-chat.lovable.app/?theme=dark"
+        src="https://chat.echoai.so/chat/cm4sih8xr0001js04yiff5c0s?theme=dark"
         style="
           position: fixed;
           bottom: 20px;
