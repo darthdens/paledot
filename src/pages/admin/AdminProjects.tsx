@@ -6,7 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Plus, Edit, Trash } from "iconoir-react";
@@ -145,24 +145,62 @@ const AdminProjects = () => {
     }
   };
 
+  const translateToFrench = async (texts: { key: string; value: string }[]) => {
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/translate-content`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ texts }),
+        }
+      );
+      
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || "Translation failed");
+      }
+      
+      const data = await response.json();
+      return data.translations as Record<string, string>;
+    } catch (error) {
+      console.error("Translation error:", error);
+      toast.error("Auto-translation failed. Using English as fallback.");
+      return null;
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     const tags = tagsInput.split(",").map(t => t.trim()).filter(Boolean);
     
+    // Auto-translate English content to French
+    const textsToTranslate: { key: string; value: string }[] = [];
+    if (formData.title_en) textsToTranslate.push({ key: "title_fr", value: formData.title_en });
+    if (formData.description_en) textsToTranslate.push({ key: "description_fr", value: formData.description_en });
+    if (formData.content_en) textsToTranslate.push({ key: "content_fr", value: formData.content_en });
+    if (formData.award_en) textsToTranslate.push({ key: "award_fr", value: formData.award_en });
+    
+    let frenchTranslations: Record<string, string> | null = null;
+    if (textsToTranslate.length > 0) {
+      toast.info("Translating to French...");
+      frenchTranslations = await translateToFrench(textsToTranslate);
+    }
+    
     const projectData = {
       slug: formData.slug,
       title_en: formData.title_en,
-      title_fr: formData.title_fr,
+      title_fr: frenchTranslations?.title_fr || formData.title_en,
       description_en: formData.description_en,
-      description_fr: formData.description_fr,
+      description_fr: frenchTranslations?.description_fr || formData.description_en,
       content_en: formData.content_en || null,
-      content_fr: formData.content_fr || null,
+      content_fr: frenchTranslations?.content_fr || formData.content_en || null,
       image_url: formData.image_url || null,
       tags,
       external_url: formData.external_url || null,
       award_en: formData.award_en || null,
-      award_fr: formData.award_fr || null,
+      award_fr: frenchTranslations?.award_fr || formData.award_en || null,
       is_featured: formData.is_featured,
       display_order: formData.display_order,
     };
@@ -246,100 +284,53 @@ const AdminProjects = () => {
                 </div>
               </div>
 
-              <Tabs defaultValue="en" className="w-full">
-                <TabsList className="grid w-full grid-cols-2">
-                  <TabsTrigger value="en">English</TabsTrigger>
-                  <TabsTrigger value="fr">Français</TabsTrigger>
-                </TabsList>
+              <div className="space-y-4">
+                <p className="text-sm text-muted-foreground">
+                  Enter content in English. French translations are generated automatically.
+                </p>
                 
-                <TabsContent value="en" className="space-y-4 mt-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="title_en">Title (EN) <span className="text-destructive">*</span></Label>
-                    <Input
-                      id="title_en"
-                      value={formData.title_en}
-                      onChange={(e) => handleTitleChange(e.target.value, 'en')}
-                      placeholder="Enter title in English"
-                      required
-                    />
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="description_en">Description (EN) <span className="text-destructive">*</span></Label>
-                    <Textarea
-                      id="description_en"
-                      value={formData.description_en}
-                      onChange={(e) => setFormData({ ...formData, description_en: e.target.value })}
-                      placeholder="Brief description in English"
-                      required
-                      className="text-base"
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="award_en">Award (EN)</Label>
-                    <Input
-                      id="award_en"
-                      value={formData.award_en}
-                      onChange={(e) => setFormData({ ...formData, award_en: e.target.value })}
-                      placeholder="🏆 Award Winner"
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label>Content (EN)</Label>
-                    <RichTextEditor
-                      content={formData.content_en}
-                      onChange={(content) => setFormData({ ...formData, content_en: content })}
-                      placeholder="Write your content in English..."
-                    />
-                  </div>
-                </TabsContent>
+                <div className="space-y-2">
+                  <Label htmlFor="title_en">Title <span className="text-destructive">*</span></Label>
+                  <Input
+                    id="title_en"
+                    value={formData.title_en}
+                    onChange={(e) => handleTitleChange(e.target.value, 'en')}
+                    placeholder="Enter title"
+                    required
+                  />
+                </div>
                 
-                <TabsContent value="fr" className="space-y-4 mt-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="title_fr">Titre (FR) <span className="text-destructive">*</span></Label>
-                    <Input
-                      id="title_fr"
-                      value={formData.title_fr}
-                      onChange={(e) => handleTitleChange(e.target.value, 'fr')}
-                      placeholder="Entrez le titre en français"
-                      required
-                    />
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="description_fr">Description (FR) <span className="text-destructive">*</span></Label>
-                    <Textarea
-                      id="description_fr"
-                      value={formData.description_fr}
-                      onChange={(e) => setFormData({ ...formData, description_fr: e.target.value })}
-                      placeholder="Brève description en français"
-                      required
-                      className="text-base"
-                    />
-                  </div>
+                <div className="space-y-2">
+                  <Label htmlFor="description_en">Description <span className="text-destructive">*</span></Label>
+                  <Textarea
+                    id="description_en"
+                    value={formData.description_en}
+                    onChange={(e) => setFormData({ ...formData, description_en: e.target.value })}
+                    placeholder="Brief description"
+                    required
+                    className="text-base"
+                  />
+                </div>
 
-                  <div className="space-y-2">
-                    <Label htmlFor="award_fr">Récompense (FR)</Label>
-                    <Input
-                      id="award_fr"
-                      value={formData.award_fr}
-                      onChange={(e) => setFormData({ ...formData, award_fr: e.target.value })}
-                      placeholder="🏆 Lauréat"
-                    />
-                  </div>
+                <div className="space-y-2">
+                  <Label htmlFor="award_en">Award</Label>
+                  <Input
+                    id="award_en"
+                    value={formData.award_en}
+                    onChange={(e) => setFormData({ ...formData, award_en: e.target.value })}
+                    placeholder="🏆 Award Winner"
+                  />
+                </div>
 
-                  <div className="space-y-2">
-                    <Label>Contenu (FR)</Label>
-                    <RichTextEditor
-                      content={formData.content_fr}
-                      onChange={(content) => setFormData({ ...formData, content_fr: content })}
-                      placeholder="Rédigez votre contenu en français..."
-                    />
-                  </div>
-                </TabsContent>
-              </Tabs>
+                <div className="space-y-2">
+                  <Label>Content</Label>
+                  <RichTextEditor
+                    content={formData.content_en}
+                    onChange={(content) => setFormData({ ...formData, content_en: content })}
+                    placeholder="Write your content..."
+                  />
+                </div>
+              </div>
 
               <div className="space-y-2">
                 <Label htmlFor="tags">Tags (comma separated)</Label>
