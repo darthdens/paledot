@@ -128,8 +128,9 @@ const RichTextEditor = forwardRef<HTMLDivElement, RichTextEditorProps>(
         editorProps: {
           attributes: {
             // Match the same typography + theme-aware colors used on the public Project/Article pages.
+            // Explicit list/blockquote styling helps when global CSS resets remove default markers.
             class:
-              'prose prose-lg max-w-none text-muted-foreground prose-headings:text-foreground prose-p:text-muted-foreground prose-li:text-muted-foreground prose-strong:text-foreground prose-a:text-primary prose-blockquote:text-muted-foreground prose-code:text-foreground min-h-[200px] p-4 focus:outline-none',
+              'prose prose-lg max-w-none text-muted-foreground prose-headings:text-foreground prose-p:text-muted-foreground prose-li:text-muted-foreground prose-strong:text-foreground prose-a:text-primary prose-blockquote:text-muted-foreground prose-code:text-foreground prose-ul:list-disc prose-ol:list-decimal prose-li:marker:text-muted-foreground prose-blockquote:border-l-border prose-blockquote:border-l-2 prose-blockquote:pl-4 min-h-[200px] p-4 focus:outline-none',
             ...(placeholder ? { 'data-placeholder': placeholder } : {}),
           },
         },
@@ -144,6 +145,22 @@ const RichTextEditor = forwardRef<HTMLDivElement, RichTextEditorProps>(
 
   const imageInputRef = useRef<HTMLInputElement>(null);
   const [isUploadingImage, setIsUploadingImage] = useState(false);
+
+  // Force React re-render on selection changes so toolbar + block-type label stays in sync.
+  // (TipTap only triggers `onUpdate` when the document changes, not when selection changes.)
+  const [, forceToolbarRerender] = useState(0);
+  useEffect(() => {
+    if (!editor) return;
+
+    const rerender = () => forceToolbarRerender((v) => v + 1);
+    editor.on('selectionUpdate', rerender);
+    editor.on('transaction', rerender);
+
+    return () => {
+      editor.off('selectionUpdate', rerender);
+      editor.off('transaction', rerender);
+    };
+  }, [editor]);
 
   if (!editor) {
     return null;
