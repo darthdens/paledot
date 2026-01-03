@@ -9,6 +9,28 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Plus, Edit, Trash } from "iconoir-react";
+import { z } from "zod";
+
+// Validation schema for article data
+const articleSchema = z.object({
+  slug: z.string()
+    .trim()
+    .min(1, "Slug is required")
+    .max(100, "Slug must be less than 100 characters")
+    .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, "Slug must be lowercase alphanumeric with hyphens only"),
+  title_en: z.string().trim().min(1, "English title is required").max(200, "Title must be less than 200 characters"),
+  title_fr: z.string().trim().min(1, "French title is required").max(200, "Title must be less than 200 characters"),
+  excerpt_en: z.string().trim().min(1, "English excerpt is required").max(500, "Excerpt must be less than 500 characters"),
+  excerpt_fr: z.string().trim().min(1, "French excerpt is required").max(500, "Excerpt must be less than 500 characters"),
+  content_en: z.string().trim().min(1, "English content is required").max(50000, "Content must be less than 50,000 characters"),
+  content_fr: z.string().trim().min(1, "French content is required").max(50000, "Content must be less than 50,000 characters"),
+  image_url: z.string().trim().url("Invalid image URL").max(500, "Image URL must be less than 500 characters").optional().or(z.literal("")),
+  category_en: z.string().trim().max(50, "Category must be less than 50 characters").optional().or(z.literal("")),
+  category_fr: z.string().trim().max(50, "Category must be less than 50 characters").optional().or(z.literal("")),
+  read_time: z.number().int().min(1, "Read time must be at least 1 minute").max(120, "Read time must be less than 120 minutes"),
+  is_published: z.boolean(),
+  published_at: z.string().nullable(),
+});
 
 interface Article {
   id: string;
@@ -82,6 +104,14 @@ const AdminArticles = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    // Validate form data
+    const validation = articleSchema.safeParse(formData);
+    if (!validation.success) {
+      const firstError = validation.error.errors[0];
+      toast.error(firstError.message);
+      return;
+    }
+
     const articleData = {
       ...formData,
       image_url: formData.image_url || null,
