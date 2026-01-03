@@ -1,18 +1,22 @@
 import { useEffect, useRef } from "react";
 
-interface Star {
+interface Particle {
   x: number;
   y: number;
+  baseX: number;
+  baseY: number;
   size: number;
   opacity: number;
-  speed: number;
+  phase: number;
+  driftSpeed: number;
+  twinkleSpeed: number;
 }
 
 export const Starfield = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const starsRef = useRef<Star[]>([]);
-  const mouseRef = useRef({ x: 0, y: 0 });
+  const particlesRef = useRef<Particle[]>([]);
   const animationRef = useRef<number>();
+  const timeRef = useRef(0);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -23,66 +27,75 @@ export const Starfield = () => {
 
     const resizeCanvas = () => {
       canvas.width = window.innerWidth;
-      canvas.height = document.documentElement.scrollHeight;
-      initStars();
+      canvas.height = window.innerHeight;
+      initParticles();
     };
 
-    const initStars = () => {
-      const starCount = Math.floor((canvas.width * canvas.height) / 15000);
-      starsRef.current = [];
+    const initParticles = () => {
+      // Create a grid-based distribution for evenness
+      const cols = Math.ceil(canvas.width / 80);
+      const rows = Math.ceil(canvas.height / 80);
+      const cellWidth = canvas.width / cols;
+      const cellHeight = canvas.height / rows;
       
-      for (let i = 0; i < starCount; i++) {
-        starsRef.current.push({
-          x: Math.random() * canvas.width,
-          y: Math.random() * canvas.height,
-          size: Math.random() * 1.5 + 0.5,
-          opacity: Math.random() * 0.5 + 0.1,
-          speed: Math.random() * 0.5 + 0.1,
-        });
+      particlesRef.current = [];
+      
+      for (let i = 0; i < cols; i++) {
+        for (let j = 0; j < rows; j++) {
+          // Add some randomness within each cell
+          const x = i * cellWidth + Math.random() * cellWidth;
+          const y = j * cellHeight + Math.random() * cellHeight;
+          
+          particlesRef.current.push({
+            x,
+            y,
+            baseX: x,
+            baseY: y,
+            size: Math.random() * 1.2 + 0.3,
+            opacity: Math.random() * 0.4 + 0.1,
+            phase: Math.random() * Math.PI * 2,
+            driftSpeed: Math.random() * 0.0003 + 0.0001,
+            twinkleSpeed: Math.random() * 0.002 + 0.001,
+          });
+        }
       }
     };
 
-    const handleMouseMove = (e: MouseEvent) => {
-      mouseRef.current = { x: e.clientX, y: e.clientY + window.scrollY };
-    };
-
-    const animate = () => {
+    const animate = (timestamp: number) => {
       if (!ctx || !canvas) return;
       
+      timeRef.current = timestamp;
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       
-      // Get computed styles to check theme
       const isDark = document.documentElement.classList.contains("dark");
       const starColor = isDark ? "255, 255, 255" : "0, 0, 0";
       
-      starsRef.current.forEach((star) => {
-        // Subtle twinkle effect
-        const twinkle = Math.sin(Date.now() * 0.001 * star.speed + star.x) * 0.3 + 0.7;
+      particlesRef.current.forEach((particle) => {
+        // Smooth sinusoidal drift
+        const driftX = Math.sin(timestamp * particle.driftSpeed + particle.phase) * 15;
+        const driftY = Math.cos(timestamp * particle.driftSpeed * 0.7 + particle.phase) * 10;
         
-        // Very subtle mouse interaction
-        const dx = mouseRef.current.x - star.x;
-        const dy = mouseRef.current.y - star.y;
-        const distance = Math.sqrt(dx * dx + dy * dy);
-        const maxDistance = 150;
+        // Smooth twinkle
+        const twinkle = (Math.sin(timestamp * particle.twinkleSpeed + particle.phase) + 1) / 2;
+        const currentOpacity = particle.opacity * (0.3 + twinkle * 0.7);
         
-        let offsetX = 0;
-        let offsetY = 0;
+        const x = particle.baseX + driftX;
+        const y = particle.baseY + driftY;
         
-        if (distance < maxDistance) {
-          const force = (1 - distance / maxDistance) * 0.3;
-          offsetX = -dx * force * 0.02;
-          offsetY = -dy * force * 0.02;
-        }
+        // Draw soft glow
+        const gradient = ctx.createRadialGradient(x, y, 0, x, y, particle.size * 2);
+        gradient.addColorStop(0, `rgba(${starColor}, ${currentOpacity})`);
+        gradient.addColorStop(1, `rgba(${starColor}, 0)`);
         
         ctx.beginPath();
-        ctx.arc(
-          star.x + offsetX,
-          star.y + offsetY,
-          star.size,
-          0,
-          Math.PI * 2
-        );
-        ctx.fillStyle = `rgba(${starColor}, ${star.opacity * twinkle})`;
+        ctx.arc(x, y, particle.size * 2, 0, Math.PI * 2);
+        ctx.fillStyle = gradient;
+        ctx.fill();
+        
+        // Draw core
+        ctx.beginPath();
+        ctx.arc(x, y, particle.size * 0.5, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(${starColor}, ${currentOpacity * 1.5})`;
         ctx.fill();
       });
       
@@ -91,22 +104,10 @@ export const Starfield = () => {
 
     resizeCanvas();
     window.addEventListener("resize", resizeCanvas);
-    window.addEventListener("mousemove", handleMouseMove);
-    
-    // Re-init on scroll height change (for dynamic content)
-    const resizeObserver = new ResizeObserver(() => {
-      if (canvas.height !== document.documentElement.scrollHeight) {
-        resizeCanvas();
-      }
-    });
-    resizeObserver.observe(document.body);
-    
-    animate();
+    animationRef.current = requestAnimationFrame(animate);
 
     return () => {
       window.removeEventListener("resize", resizeCanvas);
-      window.removeEventListener("mousemove", handleMouseMove);
-      resizeObserver.disconnect();
       if (animationRef.current) {
         cancelAnimationFrame(animationRef.current);
       }
@@ -117,7 +118,7 @@ export const Starfield = () => {
     <canvas
       ref={canvasRef}
       className="fixed inset-0 pointer-events-none z-0"
-      style={{ opacity: 0.6 }}
+      style={{ opacity: 0.5 }}
     />
   );
 };
