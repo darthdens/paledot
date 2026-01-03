@@ -4,18 +4,19 @@ import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { Logo } from "@/components/Logo";
-
-
-const navItems = [
-  { label: "About", href: "#about" },
-  { label: "Projects", href: "#projects" },
-  { label: "Services", href: "#services" },
-  { label: "Articles", href: "#articles" },
-  { label: "Contact", href: "#contact" },
-];
+import { useLanguage } from "@/i18n/LanguageContext";
 
 export const Navigation = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const { t } = useLanguage();
+
+  const navItems = [
+    { label: t.nav.about, href: "#about" },
+    { label: t.nav.projects, href: "#projects" },
+    { label: t.nav.services, href: "#services" },
+    { label: t.nav.articles, href: "#articles" },
+    { label: t.nav.contact, href: "#contact" },
+  ];
 
   const scrollToSection = (href: string) => {
     const element = document.querySelector(href);
@@ -57,7 +58,7 @@ export const Navigation = () => {
               size="sm"
               onClick={() => scrollToSection("#contact")}
             >
-              Hire Me
+              {t.nav.hireMe}
             </Button>
           </div>
 
@@ -117,7 +118,7 @@ export const Navigation = () => {
               className="flex-1"
               onClick={() => scrollToSection("#contact")}
             >
-              Hire Me
+              {t.nav.hireMe}
             </Button>
           </div>
         </div>

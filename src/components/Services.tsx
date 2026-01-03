@@ -1,48 +1,51 @@
 import { Globe, ColorPicker, Megaphone, ViewGrid, Group, Brain } from "iconoir-react";
-
-const services = [
-  {
-    Icon: Globe,
-    title: "Website Design & Development",
-    description: "Beautiful, responsive websites built with modern technologies. From landing pages to complex web applications.",
-  },
-  {
-    Icon: ColorPicker,
-    title: "Graphic & Brand Design",
-    description: "Complete brand identities including logos, color palettes, typography, and brand guidelines.",
-  },
-  {
-    Icon: Megaphone,
-    title: "Social Media & Marketing",
-    description: "Strategic content creation, community management, and marketing campaigns that drive engagement.",
-  },
-  {
-    Icon: ViewGrid,
-    title: "Product Management",
-    description: "End-to-end product strategy, roadmap planning, and execution for digital products.",
-  },
-  {
-    Icon: Group,
-    title: "Account Management",
-    description: "Client relationship management, project coordination, and stakeholder communication.",
-  },
-  {
-    Icon: Brain,
-    title: "AI Assistant Implementation",
-    description: "Custom AI solutions including chatbots, digital twins, and automation tools for your business.",
-  },
-];
+import { useLanguage } from "@/i18n/LanguageContext";
 
 export const Services = () => {
+  const { t } = useLanguage();
+
+  const services = [
+    {
+      Icon: Globe,
+      title: t.services.items.webDesign.title,
+      description: t.services.items.webDesign.description,
+    },
+    {
+      Icon: ColorPicker,
+      title: t.services.items.branding.title,
+      description: t.services.items.branding.description,
+    },
+    {
+      Icon: Megaphone,
+      title: t.services.items.marketing.title,
+      description: t.services.items.marketing.description,
+    },
+    {
+      Icon: ViewGrid,
+      title: t.services.items.product.title,
+      description: t.services.items.product.description,
+    },
+    {
+      Icon: Group,
+      title: t.services.items.account.title,
+      description: t.services.items.account.description,
+    },
+    {
+      Icon: Brain,
+      title: t.services.items.ai.title,
+      description: t.services.items.ai.description,
+    },
+  ];
+
   return (
     <section id="services" className="py-24">
       <div className="container mx-auto px-6">
         <div className="text-left md:text-center mb-16">
           <h2 className="font-serif text-4xl md:text-5xl font-bold mb-4">
-            What I Do
+            {t.services.title}
           </h2>
           <p className="text-muted-foreground text-lg max-w-2xl md:mx-auto">
-            I'm available for freelance remote work in UK, EU, and US timezones.
+            {t.services.subtitle}
           </p>
         </div>
 
