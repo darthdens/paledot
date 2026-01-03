@@ -159,11 +159,11 @@ const ProjectDetail = () => {
             {language === "fr" ? "Tous les projets" : "All Projects"}
           </Link>
 
-          {/* Mobile: Carousel + content */}
-          <div className="flex flex-col md:hidden gap-6">
-            {/* Image Carousel */}
+          {/* Mobile: Sticky Carousel + scrollable content */}
+          <div className="md:hidden -mx-6">
+            {/* Sticky Image Carousel */}
             {allImages.length > 0 && (
-              <div className="relative -mx-6">
+              <div className="sticky top-16 z-10 bg-background pb-3">
                 <Carousel 
                   className="w-full"
                   opts={{
@@ -212,7 +212,7 @@ const ProjectDetail = () => {
             )}
 
             {/* Text content */}
-            <div className="space-y-5 px-0">
+            <div className="space-y-5 px-6 pt-4">
               {award && (
                 <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-accent/20 text-sm font-medium">
                   {award}
