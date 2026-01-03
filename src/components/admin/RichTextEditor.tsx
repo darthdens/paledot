@@ -4,6 +4,9 @@ import Link from '@tiptap/extension-link';
 import Image from '@tiptap/extension-image';
 import TextAlign from '@tiptap/extension-text-align';
 import Underline from '@tiptap/extension-underline';
+import { TextStyle } from '@tiptap/extension-text-style';
+import { Color } from '@tiptap/extension-color';
+import Highlight from '@tiptap/extension-highlight';
 import { Button } from '@/components/ui/button';
 import { 
   Bold, 
@@ -21,9 +24,11 @@ import {
   Link as LinkIcon,
   MediaImage,
   Undo,
-  Redo
+  Redo,
+  ColorFilter,
+  Palette
 } from 'iconoir-react';
-import { useEffect } from 'react';
+import { useEffect, forwardRef } from 'react';
 
 interface RichTextEditorProps {
   content: string;
@@ -31,15 +36,44 @@ interface RichTextEditorProps {
   placeholder?: string;
 }
 
-const RichTextEditor = ({ content, onChange, placeholder }: RichTextEditorProps) => {
+const TEXT_COLORS = [
+  { name: 'Default', value: '' },
+  { name: 'Black', value: '#000000' },
+  { name: 'White', value: '#ffffff' },
+  { name: 'Red', value: '#ef4444' },
+  { name: 'Orange', value: '#f97316' },
+  { name: 'Yellow', value: '#eab308' },
+  { name: 'Green', value: '#22c55e' },
+  { name: 'Blue', value: '#3b82f6' },
+  { name: 'Purple', value: '#a855f7' },
+  { name: 'Pink', value: '#ec4899' },
+];
+
+const HIGHLIGHT_COLORS = [
+  { name: 'None', value: '' },
+  { name: 'Yellow', value: '#fef08a' },
+  { name: 'Green', value: '#bbf7d0' },
+  { name: 'Blue', value: '#bfdbfe' },
+  { name: 'Pink', value: '#fbcfe8' },
+  { name: 'Purple', value: '#e9d5ff' },
+  { name: 'Orange', value: '#fed7aa' },
+];
+
+const RichTextEditor = forwardRef<HTMLDivElement, RichTextEditorProps>(
+  ({ content, onChange, placeholder }, ref) => {
   const editor = useEditor({
     extensions: [
       StarterKit.configure({
         heading: {
-          levels: [2, 3],
+          levels: [1, 2, 3],
         },
       }),
       Underline,
+      TextStyle,
+      Color,
+      Highlight.configure({
+        multicolor: true,
+      }),
       Link.configure({
         openOnClick: false,
         HTMLAttributes: {
@@ -114,13 +148,14 @@ const RichTextEditor = ({ content, onChange, placeholder }: RichTextEditorProps)
   );
 
   return (
-    <div className="border border-border rounded-lg overflow-hidden bg-background">
+    <div ref={ref} className="border border-border rounded-lg overflow-hidden bg-background">
       {/* Toolbar */}
       <div className="flex flex-wrap items-center gap-0.5 p-2 border-b border-border bg-muted/30">
         {/* Text Style Dropdown */}
         <select
-          className="h-8 px-2 text-sm bg-transparent border border-border rounded mr-2"
+          className="h-8 px-2 text-sm bg-background border border-border rounded mr-2"
           value={
+            editor.isActive('heading', { level: 1 }) ? 'h1' :
             editor.isActive('heading', { level: 2 }) ? 'h2' :
             editor.isActive('heading', { level: 3 }) ? 'h3' : 'p'
           }
@@ -128,6 +163,8 @@ const RichTextEditor = ({ content, onChange, placeholder }: RichTextEditorProps)
             const value = e.target.value;
             if (value === 'p') {
               editor.chain().focus().setParagraph().run();
+            } else if (value === 'h1') {
+              editor.chain().focus().toggleHeading({ level: 1 }).run();
             } else if (value === 'h2') {
               editor.chain().focus().toggleHeading({ level: 2 }).run();
             } else if (value === 'h3') {
@@ -136,6 +173,7 @@ const RichTextEditor = ({ content, onChange, placeholder }: RichTextEditorProps)
           }}
         >
           <option value="p">Paragraph</option>
+          <option value="h1">Heading 1</option>
           <option value="h2">Heading 2</option>
           <option value="h3">Heading 3</option>
         </select>
@@ -177,6 +215,64 @@ const RichTextEditor = ({ content, onChange, placeholder }: RichTextEditorProps)
         >
           <Code className="h-4 w-4" />
         </ToolbarButton>
+
+        <div className="w-px h-6 bg-border mx-1" />
+
+        {/* Text Color */}
+        <div className="relative group">
+          <ToolbarButton
+            onClick={() => {}}
+            title="Text Color"
+          >
+            <ColorFilter className="h-4 w-4" />
+          </ToolbarButton>
+          <div className="absolute top-full left-0 mt-1 hidden group-hover:flex flex-wrap gap-1 p-2 bg-popover border border-border rounded-lg shadow-lg z-50 w-32">
+            {TEXT_COLORS.map((color) => (
+              <button
+                key={color.value || 'default'}
+                type="button"
+                className="w-6 h-6 rounded border border-border hover:scale-110 transition-transform"
+                style={{ backgroundColor: color.value || 'transparent' }}
+                onClick={() => {
+                  if (color.value) {
+                    editor.chain().focus().setColor(color.value).run();
+                  } else {
+                    editor.chain().focus().unsetColor().run();
+                  }
+                }}
+                title={color.name}
+              />
+            ))}
+          </div>
+        </div>
+
+        {/* Highlight Color */}
+        <div className="relative group">
+          <ToolbarButton
+            onClick={() => {}}
+            title="Highlight"
+          >
+            <Palette className="h-4 w-4" />
+          </ToolbarButton>
+          <div className="absolute top-full left-0 mt-1 hidden group-hover:flex flex-wrap gap-1 p-2 bg-popover border border-border rounded-lg shadow-lg z-50 w-32">
+            {HIGHLIGHT_COLORS.map((color) => (
+              <button
+                key={color.value || 'none'}
+                type="button"
+                className="w-6 h-6 rounded border border-border hover:scale-110 transition-transform"
+                style={{ backgroundColor: color.value || 'transparent' }}
+                onClick={() => {
+                  if (color.value) {
+                    editor.chain().focus().toggleHighlight({ color: color.value }).run();
+                  } else {
+                    editor.chain().focus().unsetHighlight().run();
+                  }
+                }}
+                title={color.name}
+              />
+            ))}
+          </div>
+        </div>
 
         <div className="w-px h-6 bg-border mx-1" />
 
@@ -268,6 +364,8 @@ const RichTextEditor = ({ content, onChange, placeholder }: RichTextEditorProps)
       <EditorContent editor={editor} />
     </div>
   );
-};
+});
+
+RichTextEditor.displayName = 'RichTextEditor';
 
 export default RichTextEditor;
