@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { Logo } from "@/components/Logo";
 
 
@@ -33,7 +34,7 @@ export const Navigation = () => {
           </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center gap-8">
+          <div className="hidden md:flex items-center gap-6">
             {navItems.map((item) => (
               <button
                 key={item.href}
@@ -43,7 +44,14 @@ export const Navigation = () => {
                 {item.label}
               </button>
             ))}
+            
+            <div className="w-px h-4 bg-border" />
+            
             <ThemeToggle />
+            <LanguageSwitcher />
+            
+            <div className="w-px h-4 bg-border" />
+            
             <Button
               variant="secondary"
               size="sm"
@@ -101,6 +109,8 @@ export const Navigation = () => {
           </div>
           <div className="flex items-center gap-4 pb-8">
             <ThemeToggle />
+            <LanguageSwitcher />
+            <div className="w-px h-4 bg-border" />
             <Button
               variant="secondary"
               size="lg"
