@@ -6,31 +6,11 @@ import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Plus, Edit, Trash } from "iconoir-react";
-import { z } from "zod";
-
-// Validation schema for article data
-const articleSchema = z.object({
-  slug: z.string()
-    .trim()
-    .min(1, "Slug is required")
-    .max(100, "Slug must be less than 100 characters")
-    .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, "Slug must be lowercase alphanumeric with hyphens only"),
-  title_en: z.string().trim().min(1, "English title is required").max(200, "Title must be less than 200 characters"),
-  title_fr: z.string().trim().min(1, "French title is required").max(200, "Title must be less than 200 characters"),
-  excerpt_en: z.string().trim().min(1, "English excerpt is required").max(500, "Excerpt must be less than 500 characters"),
-  excerpt_fr: z.string().trim().min(1, "French excerpt is required").max(500, "Excerpt must be less than 500 characters"),
-  content_en: z.string().trim().min(1, "English content is required").max(50000, "Content must be less than 50,000 characters"),
-  content_fr: z.string().trim().min(1, "French content is required").max(50000, "Content must be less than 50,000 characters"),
-  image_url: z.string().trim().url("Invalid image URL").max(500, "Image URL must be less than 500 characters").optional().or(z.literal("")),
-  category_en: z.string().trim().max(50, "Category must be less than 50 characters").optional().or(z.literal("")),
-  category_fr: z.string().trim().max(50, "Category must be less than 50 characters").optional().or(z.literal("")),
-  read_time: z.number().int().min(1, "Read time must be at least 1 minute").max(120, "Read time must be less than 120 minutes"),
-  is_published: z.boolean(),
-  published_at: z.string().nullable(),
-});
+import RichTextEditor from "@/components/admin/RichTextEditor";
 
 interface Article {
   id: string;
@@ -49,20 +29,35 @@ interface Article {
   published_at: string | null;
 }
 
-const emptyArticle: Omit<Article, "id"> = {
+interface FormData {
+  slug: string;
+  title: string;
+  category: string;
+  read_time: number;
+  description: string;
+  content: string;
+  image_url: string;
+  is_published: boolean;
+}
+
+const categories = [
+  "Getting Started",
+  "Tutorials",
+  "Case Studies",
+  "Industry Insights",
+  "Technology",
+  "Design",
+];
+
+const emptyFormData: FormData = {
   slug: "",
-  title_en: "",
-  title_fr: "",
-  excerpt_en: "",
-  excerpt_fr: "",
-  content_en: "",
-  content_fr: "",
+  title: "",
+  category: "Getting Started",
+  read_time: 3,
+  description: "",
+  content: "",
   image_url: "",
-  category_en: "",
-  category_fr: "",
-  read_time: 5,
   is_published: false,
-  published_at: null,
 };
 
 const AdminArticles = () => {
@@ -70,7 +65,7 @@ const AdminArticles = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingArticle, setEditingArticle] = useState<Article | null>(null);
-  const [formData, setFormData] = useState<Omit<Article, "id">>(emptyArticle);
+  const [formData, setFormData] = useState<FormData>(emptyFormData);
 
   const fetchArticles = async () => {
     const { data, error } = await supabase
@@ -97,31 +92,56 @@ const AdminArticles = () => {
   const handleOpenDialog = (article?: Article) => {
     if (article) {
       setEditingArticle(article);
-      setFormData(article);
+      setFormData({
+        slug: article.slug,
+        title: article.title_en,
+        category: article.category_en || "Getting Started",
+        read_time: article.read_time,
+        description: article.excerpt_en,
+        content: article.content_en,
+        image_url: article.image_url || "",
+        is_published: article.is_published,
+      });
     } else {
       setEditingArticle(null);
-      setFormData(emptyArticle);
+      setFormData(emptyFormData);
     }
     setIsDialogOpen(true);
+  };
+
+  const generateSlug = (title: string) => {
+    return title
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-|-$/g, '');
+  };
+
+  const handleTitleChange = (title: string) => {
+    setFormData(prev => ({
+      ...prev,
+      title,
+      slug: prev.slug || generateSlug(title),
+    }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Validate form data
-    const validation = articleSchema.safeParse(formData);
-    if (!validation.success) {
-      const firstError = validation.error.errors[0];
-      toast.error(firstError.message);
-      return;
-    }
-
+    // Map to database fields (EN/FR both get same value for now)
     const articleData = {
-      ...formData,
+      slug: formData.slug,
+      title_en: formData.title,
+      title_fr: formData.title, // Same as EN, auto-translated later
+      excerpt_en: formData.description,
+      excerpt_fr: formData.description, // Same as EN
+      content_en: formData.content,
+      content_fr: formData.content, // Same as EN
       image_url: formData.image_url || null,
-      category_en: formData.category_en || null,
-      category_fr: formData.category_fr || null,
-      published_at: formData.is_published ? (formData.published_at || new Date().toISOString()) : null,
+      category_en: formData.category || null,
+      category_fr: formData.category || null, // Same as EN
+      read_time: formData.read_time,
+      is_published: formData.is_published,
+      published_at: formData.is_published ? new Date().toISOString() : null,
     };
 
     if (editingArticle) {
@@ -179,19 +199,52 @@ const AdminArticles = () => {
           </DialogTrigger>
           <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto mx-4">
             <DialogHeader>
-              <DialogTitle>{editingArticle ? "Edit Article" : "Add Article"}</DialogTitle>
+              <DialogTitle>{editingArticle ? "Edit Article" : "Create Article"}</DialogTitle>
+              <p className="text-sm text-muted-foreground">
+                Content will be automatically translated to French when saved.
+              </p>
             </DialogHeader>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="title">Title <span className="text-destructive">*</span></Label>
+                  <Input
+                    id="title"
+                    value={formData.title}
+                    onChange={(e) => handleTitleChange(e.target.value)}
+                    placeholder="Enter title"
+                    required
+                  />
+                </div>
                 <div className="space-y-2">
                   <Label htmlFor="slug">Slug</Label>
                   <Input
                     id="slug"
                     value={formData.slug}
                     onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
-                    placeholder="my-article"
-                    required
+                    placeholder="auto-generated"
                   />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="category">Category</Label>
+                  <Select
+                    value={formData.category}
+                    onValueChange={(value) => setFormData({ ...formData, category: value })}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select category" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {categories.map((cat) => (
+                        <SelectItem key={cat} value={cat}>
+                          {cat}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="read_time">Read Time (minutes)</Label>
@@ -199,103 +252,39 @@ const AdminArticles = () => {
                     id="read_time"
                     type="number"
                     value={formData.read_time}
-                    onChange={(e) => setFormData({ ...formData, read_time: parseInt(e.target.value) || 5 })}
+                    onChange={(e) => setFormData({ ...formData, read_time: parseInt(e.target.value) || 3 })}
                   />
                 </div>
               </div>
               
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="title_en">Title (English)</Label>
-                  <Input
-                    id="title_en"
-                    value={formData.title_en}
-                    onChange={(e) => setFormData({ ...formData, title_en: e.target.value })}
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="title_fr">Title (French)</Label>
-                  <Input
-                    id="title_fr"
-                    value={formData.title_fr}
-                    onChange={(e) => setFormData({ ...formData, title_fr: e.target.value })}
-                    required
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="category_en">Category (English)</Label>
-                  <Input
-                    id="category_en"
-                    value={formData.category_en || ""}
-                    onChange={(e) => setFormData({ ...formData, category_en: e.target.value })}
-                    placeholder="Technology"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="category_fr">Category (French)</Label>
-                  <Input
-                    id="category_fr"
-                    value={formData.category_fr || ""}
-                    onChange={(e) => setFormData({ ...formData, category_fr: e.target.value })}
-                    placeholder="Technologie"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="excerpt_en">Excerpt (English)</Label>
-                  <Textarea
-                    id="excerpt_en"
-                    value={formData.excerpt_en}
-                    onChange={(e) => setFormData({ ...formData, excerpt_en: e.target.value })}
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="excerpt_fr">Excerpt (French)</Label>
-                  <Textarea
-                    id="excerpt_fr"
-                    value={formData.excerpt_fr}
-                    onChange={(e) => setFormData({ ...formData, excerpt_fr: e.target.value })}
-                    required
-                  />
-                </div>
-              </div>
-
               <div className="space-y-2">
-                <Label htmlFor="content_en">Content (English) - Markdown supported</Label>
+                <Label htmlFor="description">Description</Label>
                 <Textarea
-                  id="content_en"
-                  value={formData.content_en}
-                  onChange={(e) => setFormData({ ...formData, content_en: e.target.value })}
-                  className="min-h-[200px]"
+                  id="description"
+                  value={formData.description}
+                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                  placeholder="Brief description"
                   required
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="content_fr">Content (French) - Markdown supported</Label>
-                <Textarea
-                  id="content_fr"
-                  value={formData.content_fr}
-                  onChange={(e) => setFormData({ ...formData, content_fr: e.target.value })}
-                  className="min-h-[200px]"
-                  required
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="image_url">Featured Image URL</Label>
+                <Label htmlFor="image_url">Thumbnail</Label>
+                <p className="text-xs text-muted-foreground">16:9 aspect ratio required, max 2MB (JPG, PNG, WebP)</p>
                 <Input
                   id="image_url"
-                  value={formData.image_url || ""}
+                  value={formData.image_url}
                   onChange={(e) => setFormData({ ...formData, image_url: e.target.value })}
                   placeholder="https://..."
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label>Content</Label>
+                <RichTextEditor
+                  content={formData.content}
+                  onChange={(content) => setFormData({ ...formData, content })}
+                  placeholder="Write your content here..."
                 />
               </div>
 
@@ -308,9 +297,14 @@ const AdminArticles = () => {
                 <Label htmlFor="is_published">Published</Label>
               </div>
 
-              <Button type="submit" className="w-full">
-                {editingArticle ? "Update Article" : "Create Article"}
-              </Button>
+              <div className="flex gap-3 pt-2">
+                <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)} className="flex-1">
+                  Cancel
+                </Button>
+                <Button type="submit" className="flex-1">
+                  {editingArticle ? "Update Article" : "Create Article"}
+                </Button>
+              </div>
             </form>
           </DialogContent>
         </Dialog>

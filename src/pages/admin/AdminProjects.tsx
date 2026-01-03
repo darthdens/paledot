@@ -9,6 +9,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Plus, Edit, Trash } from "iconoir-react";
+import RichTextEditor from "@/components/admin/RichTextEditor";
 
 interface Project {
   id: string;
@@ -28,19 +29,28 @@ interface Project {
   display_order: number;
 }
 
-const emptyProject: Omit<Project, "id"> = {
+interface FormData {
+  slug: string;
+  title: string;
+  description: string;
+  content: string;
+  image_url: string;
+  tags: string[];
+  external_url: string;
+  award: string;
+  is_featured: boolean;
+  display_order: number;
+}
+
+const emptyFormData: FormData = {
   slug: "",
-  title_en: "",
-  title_fr: "",
-  description_en: "",
-  description_fr: "",
-  content_en: "",
-  content_fr: "",
+  title: "",
+  description: "",
+  content: "",
   image_url: "",
   tags: [],
   external_url: "",
-  award_en: "",
-  award_fr: "",
+  award: "",
   is_featured: false,
   display_order: 0,
 };
@@ -50,7 +60,7 @@ const AdminProjects = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingProject, setEditingProject] = useState<Project | null>(null);
-  const [formData, setFormData] = useState<Omit<Project, "id">>(emptyProject);
+  const [formData, setFormData] = useState<FormData>(emptyFormData);
   const [tagsInput, setTagsInput] = useState("");
 
   const fetchProjects = async () => {
@@ -78,28 +88,63 @@ const AdminProjects = () => {
   const handleOpenDialog = (project?: Project) => {
     if (project) {
       setEditingProject(project);
-      setFormData(project);
+      setFormData({
+        slug: project.slug,
+        title: project.title_en,
+        description: project.description_en,
+        content: project.content_en || "",
+        image_url: project.image_url || "",
+        tags: project.tags,
+        external_url: project.external_url || "",
+        award: project.award_en || "",
+        is_featured: project.is_featured,
+        display_order: project.display_order,
+      });
       setTagsInput(project.tags.join(", "));
     } else {
       setEditingProject(null);
-      setFormData(emptyProject);
+      setFormData(emptyFormData);
       setTagsInput("");
     }
     setIsDialogOpen(true);
   };
 
+  const generateSlug = (title: string) => {
+    return title
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-|-$/g, '');
+  };
+
+  const handleTitleChange = (title: string) => {
+    setFormData(prev => ({
+      ...prev,
+      title,
+      slug: prev.slug || generateSlug(title),
+    }));
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    const tags = tagsInput.split(",").map(t => t.trim()).filter(Boolean);
+    
+    // Map to database fields (EN/FR both get same value for now)
     const projectData = {
-      ...formData,
-      tags: tagsInput.split(",").map(t => t.trim()).filter(Boolean),
+      slug: formData.slug,
+      title_en: formData.title,
+      title_fr: formData.title, // Same as EN, auto-translated later
+      description_en: formData.description,
+      description_fr: formData.description, // Same as EN
+      content_en: formData.content || null,
+      content_fr: formData.content || null, // Same as EN
       image_url: formData.image_url || null,
+      tags,
       external_url: formData.external_url || null,
-      award_en: formData.award_en || null,
-      award_fr: formData.award_fr || null,
-      content_en: formData.content_en || null,
-      content_fr: formData.content_fr || null,
+      award_en: formData.award || null,
+      award_fr: formData.award || null, // Same as EN
+      is_featured: formData.is_featured,
+      display_order: formData.display_order,
     };
 
     if (editingProject) {
@@ -155,20 +200,44 @@ const AdminProjects = () => {
               Add Project
             </Button>
           </DialogTrigger>
-          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto mx-4">
+          <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto mx-4">
             <DialogHeader>
-              <DialogTitle>{editingProject ? "Edit Project" : "Add Project"}</DialogTitle>
+              <DialogTitle>{editingProject ? "Edit Project" : "Create Project"}</DialogTitle>
+              <p className="text-sm text-muted-foreground">
+                Content will be automatically translated to French when saved.
+              </p>
             </DialogHeader>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="title">Title <span className="text-destructive">*</span></Label>
+                  <Input
+                    id="title"
+                    value={formData.title}
+                    onChange={(e) => handleTitleChange(e.target.value)}
+                    placeholder="Enter title"
+                    required
+                  />
+                </div>
                 <div className="space-y-2">
                   <Label htmlFor="slug">Slug</Label>
                   <Input
                     id="slug"
                     value={formData.slug}
                     onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
-                    placeholder="my-project"
-                    required
+                    placeholder="auto-generated"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="tags">Tags (comma separated)</Label>
+                  <Input
+                    id="tags"
+                    value={tagsInput}
+                    onChange={(e) => setTagsInput(e.target.value)}
+                    placeholder="Branding, Website, Graphics"
                   />
                 </div>
                 <div className="space-y-2">
@@ -182,110 +251,56 @@ const AdminProjects = () => {
                 </div>
               </div>
               
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="title_en">Title (English)</Label>
-                  <Input
-                    id="title_en"
-                    value={formData.title_en}
-                    onChange={(e) => setFormData({ ...formData, title_en: e.target.value })}
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="title_fr">Title (French)</Label>
-                  <Input
-                    id="title_fr"
-                    value={formData.title_fr}
-                    onChange={(e) => setFormData({ ...formData, title_fr: e.target.value })}
-                    required
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="description_en">Description (English)</Label>
-                  <Textarea
-                    id="description_en"
-                    value={formData.description_en}
-                    onChange={(e) => setFormData({ ...formData, description_en: e.target.value })}
-                    placeholder="Brief description for project cards"
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="description_fr">Description (French)</Label>
-                  <Textarea
-                    id="description_fr"
-                    value={formData.description_fr}
-                    onChange={(e) => setFormData({ ...formData, description_fr: e.target.value })}
-                    placeholder="Brève description pour les cartes de projet"
-                    required
-                  />
-                </div>
+              <div className="space-y-2">
+                <Label htmlFor="description">Description</Label>
+                <Textarea
+                  id="description"
+                  value={formData.description}
+                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                  placeholder="Brief description"
+                  required
+                />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="image_url">Featured Image URL</Label>
+                <Label htmlFor="image_url">Thumbnail</Label>
+                <p className="text-xs text-muted-foreground">16:9 aspect ratio required, max 2MB (JPG, PNG, WebP)</p>
                 <Input
                   id="image_url"
-                  value={formData.image_url || ""}
+                  value={formData.image_url}
                   onChange={(e) => setFormData({ ...formData, image_url: e.target.value })}
                   placeholder="https://..."
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="tags">Tags (comma separated)</Label>
-                <Input
-                  id="tags"
-                  value={tagsInput}
-                  onChange={(e) => setTagsInput(e.target.value)}
-                  placeholder="Branding, Website, Graphics"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="external_url">External URL</Label>
-                <Input
-                  id="external_url"
-                  value={formData.external_url || ""}
-                  onChange={(e) => setFormData({ ...formData, external_url: e.target.value })}
-                  placeholder="https://..."
+                <Label>Content</Label>
+                <RichTextEditor
+                  content={formData.content}
+                  onChange={(content) => setFormData({ ...formData, content })}
+                  placeholder="Write your content here..."
                 />
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="award_en">Award (English)</Label>
+                  <Label htmlFor="external_url">External URL</Label>
                   <Input
-                    id="award_en"
-                    value={formData.award_en || ""}
-                    onChange={(e) => setFormData({ ...formData, award_en: e.target.value })}
-                    placeholder="🏆 Award Winner"
+                    id="external_url"
+                    value={formData.external_url}
+                    onChange={(e) => setFormData({ ...formData, external_url: e.target.value })}
+                    placeholder="https://..."
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="award_fr">Award (French)</Label>
+                  <Label htmlFor="award">Award</Label>
                   <Input
-                    id="award_fr"
-                    value={formData.award_fr || ""}
-                    onChange={(e) => setFormData({ ...formData, award_fr: e.target.value })}
-                    placeholder="🏆 Lauréat"
+                    id="award"
+                    value={formData.award}
+                    onChange={(e) => setFormData({ ...formData, award: e.target.value })}
+                    placeholder="🏆 Award Winner"
                   />
                 </div>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="content_en">Content - Markdown supported</Label>
-                <Textarea
-                  id="content_en"
-                  value={formData.content_en || ""}
-                  onChange={(e) => setFormData({ ...formData, content_en: e.target.value })}
-                  className="min-h-[200px]"
-                  placeholder="### Objectives&#10;&#10;- Primary Goal: ...&#10;&#10;### Approach&#10;&#10;..."
-                />
               </div>
 
               <div className="flex items-center gap-2">
@@ -297,9 +312,14 @@ const AdminProjects = () => {
                 <Label htmlFor="is_featured">Featured on homepage</Label>
               </div>
 
-              <Button type="submit" className="w-full">
-                {editingProject ? "Update Project" : "Create Project"}
-              </Button>
+              <div className="flex gap-3 pt-2">
+                <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)} className="flex-1">
+                  Cancel
+                </Button>
+                <Button type="submit" className="flex-1">
+                  {editingProject ? "Update Project" : "Create Project"}
+                </Button>
+              </div>
             </form>
           </DialogContent>
         </Dialog>
