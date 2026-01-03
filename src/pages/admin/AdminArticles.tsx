@@ -7,6 +7,7 @@ import { Switch } from "@/components/ui/switch";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Plus, Edit, Trash } from "iconoir-react";
@@ -32,16 +33,20 @@ interface Article {
 
 interface FormData {
   slug: string;
-  title: string;
-  category: string;
+  title_en: string;
+  title_fr: string;
+  category_en: string;
+  category_fr: string;
   read_time: number;
-  description: string;
-  content: string;
+  excerpt_en: string;
+  excerpt_fr: string;
+  content_en: string;
+  content_fr: string;
   image_url: string;
   is_published: boolean;
 }
 
-const categories = [
+const categoriesEn = [
   "Getting Started",
   "Tutorials",
   "Case Studies",
@@ -50,13 +55,26 @@ const categories = [
   "Design",
 ];
 
+const categoriesFr = [
+  "Pour commencer",
+  "Tutoriels",
+  "Études de cas",
+  "Perspectives de l'industrie",
+  "Technologie",
+  "Design",
+];
+
 const emptyFormData: FormData = {
   slug: "",
-  title: "",
-  category: "Getting Started",
+  title_en: "",
+  title_fr: "",
+  category_en: "Getting Started",
+  category_fr: "Pour commencer",
   read_time: 3,
-  description: "",
-  content: "",
+  excerpt_en: "",
+  excerpt_fr: "",
+  content_en: "",
+  content_fr: "",
   image_url: "",
   is_published: false,
 };
@@ -95,11 +113,15 @@ const AdminArticles = () => {
       setEditingArticle(article);
       setFormData({
         slug: article.slug,
-        title: article.title_en,
-        category: article.category_en || "Getting Started",
+        title_en: article.title_en,
+        title_fr: article.title_fr,
+        category_en: article.category_en || "Getting Started",
+        category_fr: article.category_fr || "Pour commencer",
         read_time: article.read_time,
-        description: article.excerpt_en,
-        content: article.content_en,
+        excerpt_en: article.excerpt_en,
+        excerpt_fr: article.excerpt_fr,
+        content_en: article.content_en,
+        content_fr: article.content_fr,
         image_url: article.image_url || "",
         is_published: article.is_published,
       });
@@ -117,73 +139,35 @@ const AdminArticles = () => {
       .replace(/^-|-$/g, '');
   };
 
-  const handleTitleChange = (title: string) => {
-    setFormData(prev => ({
-      ...prev,
-      title,
-      slug: prev.slug || generateSlug(title),
-    }));
+  const handleTitleChange = (title: string, lang: 'en' | 'fr') => {
+    if (lang === 'en') {
+      setFormData(prev => ({
+        ...prev,
+        title_en: title,
+        slug: prev.slug || generateSlug(title),
+      }));
+    } else {
+      setFormData(prev => ({
+        ...prev,
+        title_fr: title,
+      }));
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Translate content to French
-    let titleFr = formData.title;
-    let excerptFr = formData.description;
-    let contentFr = formData.content;
-    let categoryFr = formData.category || null;
-
-    // Category translations mapping
-    const categoryTranslations: Record<string, string> = {
-      "Getting Started": "Pour commencer",
-      "Tutorials": "Tutoriels",
-      "Case Studies": "Études de cas",
-      "Industry Insights": "Perspectives de l'industrie",
-      "Technology": "Technologie",
-      "Design": "Design",
-    };
-
-    try {
-      toast.info("Translating content to French...");
-      
-      const textsToTranslate = [
-        { key: "title", value: formData.title },
-        { key: "excerpt", value: formData.description },
-        { key: "content", value: formData.content },
-      ];
-
-      const { data, error } = await supabase.functions.invoke("translate-content", {
-        body: { texts: textsToTranslate, targetLanguage: "fr" },
-      });
-
-      if (error) {
-        console.error("Translation error:", error);
-        toast.warning("Translation failed, saving with English content for French fields");
-      } else if (data?.translations) {
-        titleFr = data.translations.title || formData.title;
-        excerptFr = data.translations.excerpt || formData.description;
-        contentFr = data.translations.content || formData.content;
-      }
-      
-      // Use predefined category translation
-      categoryFr = categoryTranslations[formData.category] || formData.category;
-    } catch (err) {
-      console.error("Translation error:", err);
-      toast.warning("Translation failed, saving with English content for French fields");
-    }
-    
     const articleData = {
       slug: formData.slug,
-      title_en: formData.title,
-      title_fr: titleFr,
-      excerpt_en: formData.description,
-      excerpt_fr: excerptFr,
-      content_en: formData.content,
-      content_fr: contentFr,
+      title_en: formData.title_en,
+      title_fr: formData.title_fr,
+      excerpt_en: formData.excerpt_en,
+      excerpt_fr: formData.excerpt_fr,
+      content_en: formData.content_en,
+      content_fr: formData.content_fr,
       image_url: formData.image_url || null,
-      category_en: formData.category || null,
-      category_fr: categoryFr,
+      category_en: formData.category_en || null,
+      category_fr: formData.category_fr || null,
       read_time: formData.read_time,
       is_published: formData.is_published,
       published_at: formData.is_published ? new Date().toISOString() : null,
@@ -245,22 +229,9 @@ const AdminArticles = () => {
           <DialogContent className="w-[calc(100vw-2rem)] max-w-3xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>{editingArticle ? "Edit Article" : "Create Article"}</DialogTitle>
-              <p className="text-sm text-muted-foreground">
-                Content will be automatically translated to French when saved.
-              </p>
             </DialogHeader>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="title">Title <span className="text-destructive">*</span></Label>
-                  <Input
-                    id="title"
-                    value={formData.title}
-                    onChange={(e) => handleTitleChange(e.target.value)}
-                    placeholder="Enter title"
-                    required
-                  />
-                </div>
                 <div className="space-y-2">
                   <Label htmlFor="slug">Slug</Label>
                   <Input
@@ -269,27 +240,6 @@ const AdminArticles = () => {
                     onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
                     placeholder="auto-generated"
                   />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="category">Category</Label>
-                  <Select
-                    value={formData.category}
-                    onValueChange={(value) => setFormData({ ...formData, category: value })}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select category" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {categories.map((cat) => (
-                        <SelectItem key={cat} value={cat}>
-                          {cat}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="read_time">Read Time (minutes)</Label>
@@ -301,18 +251,119 @@ const AdminArticles = () => {
                   />
                 </div>
               </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="description">Description</Label>
-                <Textarea
-                  id="description"
-                  value={formData.description}
-                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  placeholder="Brief description"
-                  required
-                  className="text-base"
-                />
-              </div>
+
+              <Tabs defaultValue="en" className="w-full">
+                <TabsList className="grid w-full grid-cols-2">
+                  <TabsTrigger value="en">English</TabsTrigger>
+                  <TabsTrigger value="fr">Français</TabsTrigger>
+                </TabsList>
+                
+                <TabsContent value="en" className="space-y-4 mt-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="title_en">Title (EN) <span className="text-destructive">*</span></Label>
+                    <Input
+                      id="title_en"
+                      value={formData.title_en}
+                      onChange={(e) => handleTitleChange(e.target.value, 'en')}
+                      placeholder="Enter title in English"
+                      required
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="category_en">Category (EN)</Label>
+                    <Select
+                      value={formData.category_en}
+                      onValueChange={(value) => setFormData({ ...formData, category_en: value })}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select category" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {categoriesEn.map((cat) => (
+                          <SelectItem key={cat} value={cat}>
+                            {cat}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="excerpt_en">Excerpt (EN) <span className="text-destructive">*</span></Label>
+                    <Textarea
+                      id="excerpt_en"
+                      value={formData.excerpt_en}
+                      onChange={(e) => setFormData({ ...formData, excerpt_en: e.target.value })}
+                      placeholder="Brief excerpt in English"
+                      required
+                      className="text-base"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label>Content (EN) <span className="text-destructive">*</span></Label>
+                    <RichTextEditor
+                      content={formData.content_en}
+                      onChange={(content) => setFormData({ ...formData, content_en: content })}
+                      placeholder="Write your content in English..."
+                    />
+                  </div>
+                </TabsContent>
+                
+                <TabsContent value="fr" className="space-y-4 mt-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="title_fr">Titre (FR) <span className="text-destructive">*</span></Label>
+                    <Input
+                      id="title_fr"
+                      value={formData.title_fr}
+                      onChange={(e) => handleTitleChange(e.target.value, 'fr')}
+                      placeholder="Entrez le titre en français"
+                      required
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="category_fr">Catégorie (FR)</Label>
+                    <Select
+                      value={formData.category_fr}
+                      onValueChange={(value) => setFormData({ ...formData, category_fr: value })}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Sélectionner la catégorie" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {categoriesFr.map((cat) => (
+                          <SelectItem key={cat} value={cat}>
+                            {cat}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="excerpt_fr">Extrait (FR) <span className="text-destructive">*</span></Label>
+                    <Textarea
+                      id="excerpt_fr"
+                      value={formData.excerpt_fr}
+                      onChange={(e) => setFormData({ ...formData, excerpt_fr: e.target.value })}
+                      placeholder="Bref extrait en français"
+                      required
+                      className="text-base"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label>Contenu (FR) <span className="text-destructive">*</span></Label>
+                    <RichTextEditor
+                      content={formData.content_fr}
+                      onChange={(content) => setFormData({ ...formData, content_fr: content })}
+                      placeholder="Rédigez votre contenu en français..."
+                    />
+                  </div>
+                </TabsContent>
+              </Tabs>
 
               <div className="space-y-2">
                 <Label>Thumbnail</Label>
@@ -321,15 +372,6 @@ const AdminArticles = () => {
                   value={formData.image_url}
                   onChange={(url) => setFormData({ ...formData, image_url: url })}
                   folder="articles"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label>Content</Label>
-                <RichTextEditor
-                  content={formData.content}
-                  onChange={(content) => setFormData({ ...formData, content })}
-                  placeholder="Write your content here..."
                 />
               </div>
 
