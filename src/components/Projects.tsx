@@ -1,8 +1,8 @@
+import { Link } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ArrowUpRight } from "iconoir-react";
 import { useLanguage } from "@/i18n/LanguageContext";
-
 export const Projects = () => {
   const { t } = useLanguage();
 
@@ -92,10 +92,12 @@ export const Projects = () => {
         </div>
 
         <div className="text-center mt-12">
-          <Button variant="outline" size="lg">
-            {t.projects.viewAll}
-            <ArrowUpRight className="ml-2 w-4 h-4" strokeWidth={2} />
-          </Button>
+          <Link to="/projects">
+            <Button variant="outline" size="lg">
+              {t.projects.viewAll}
+              <ArrowUpRight className="ml-2 w-4 h-4" strokeWidth={2} />
+            </Button>
+          </Link>
         </div>
       </div>
     </section>
