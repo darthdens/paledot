@@ -350,6 +350,7 @@ const AdminArticles = () => {
                 <div className="space-y-2">
                   <Label>Content <span className="text-destructive">*</span></Label>
                   <RichTextEditor
+                    key={editingArticle?.id ?? "new-article"}
                     content={formData.content_en}
                     onChange={(content) => setFormData({ ...formData, content_en: content })}
                     placeholder="Write your content..."

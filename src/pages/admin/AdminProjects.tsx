@@ -339,6 +339,7 @@ const AdminProjects = () => {
                 <div className="space-y-2">
                   <Label>Content</Label>
                   <RichTextEditor
+                    key={editingProject?.id ?? "new-project"}
                     content={formData.content_en}
                     onChange={(content) => setFormData({ ...formData, content_en: content })}
                     placeholder="Write your content..."
