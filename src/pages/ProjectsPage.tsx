@@ -88,21 +88,23 @@ const ProjectsPage = () => {
                   to={`/projects/${project.slug}`}
                   className="group block"
                 >
-                  <div className="rounded-2xl overflow-hidden bg-card border border-border hover:border-primary/50 transition-all duration-300">
+                  <div className="rounded-2xl overflow-hidden bg-card/70 backdrop-blur-md border border-border hover:border-accent/50 transition-all duration-300">
                     {project.image_url && (
                       <div className="aspect-video overflow-hidden">
                         <img
                           src={project.image_url}
                           alt={getTitle(project)}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                         />
                       </div>
                     )}
                     <div className="p-6">
                       {getAward(project) && (
-                        <p className="text-sm text-primary mb-2">{getAward(project)}</p>
+                        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-accent/20 text-sm font-medium mb-2">
+                          {getAward(project)}
+                        </div>
                       )}
-                      <h3 className="font-serif text-xl font-bold mb-2 group-hover:text-primary transition-colors flex items-center gap-2">
+                      <h3 className="font-serif text-xl font-bold mb-2 group-hover:text-accent transition-colors flex items-center gap-2">
                         {getTitle(project)}
                         <ArrowUpRight className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity" />
                       </h3>
