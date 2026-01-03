@@ -225,7 +225,7 @@ const ProjectDetail = () => {
 
               <div className="flex flex-wrap gap-2">
                 {project.tags.map((tag) => (
-                  <Badge key={tag} variant="secondary">
+                  <Badge key={tag} variant="secondary" className="pointer-events-none">
                     {tag}
                   </Badge>
                 ))}
@@ -269,7 +269,7 @@ const ProjectDetail = () => {
 
               <div className="flex flex-wrap gap-2">
                 {project.tags.map((tag) => (
-                  <Badge key={tag} variant="secondary">
+                  <Badge key={tag} variant="secondary" className="pointer-events-none">
                     {tag}
                   </Badge>
                 ))}
