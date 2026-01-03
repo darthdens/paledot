@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { useToast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 import { Mail, Calendar } from "iconoir-react";
 import { supabase } from "@/integrations/supabase/client";
 import { 
@@ -26,7 +26,6 @@ const socialLinks = [
 ];
 
 export const Contact = () => {
-  const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
@@ -59,18 +58,13 @@ export const Contact = () => {
         },
       });
 
-      toast({
-        title: "Message sent!",
+      toast.success("Message sent!", {
         description: "Thanks for reaching out. I'll get back to you soon.",
       });
       setFormData({ name: "", email: "", message: "" });
     } catch (error) {
       console.error("Error submitting form:", error);
-      toast({
-        title: "Error",
-        description: "Failed to send message. Please try again.",
-        variant: "destructive",
-      });
+      toast.error("Failed to send message. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
