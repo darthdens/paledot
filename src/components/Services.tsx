@@ -1,4 +1,4 @@
-import { Globe, ColorPicker, Megaphone, ViewGrid, Group, Brain } from "iconoir-react";
+import { DesignPencil, Code, ColorPicker, Megaphone, ViewGrid, Brain } from "iconoir-react";
 import { useLanguage } from "@/i18n/LanguageContext";
 
 export const Services = () => {
@@ -6,9 +6,14 @@ export const Services = () => {
 
   const services = [
     {
-      Icon: Globe,
-      title: t.services.items.webDesign.title,
-      description: t.services.items.webDesign.description,
+      Icon: DesignPencil,
+      title: t.services.items.appDesign.title,
+      description: t.services.items.appDesign.description,
+    },
+    {
+      Icon: Code,
+      title: t.services.items.appDev.title,
+      description: t.services.items.appDev.description,
     },
     {
       Icon: ColorPicker,
@@ -24,11 +29,6 @@ export const Services = () => {
       Icon: ViewGrid,
       title: t.services.items.product.title,
       description: t.services.items.product.description,
-    },
-    {
-      Icon: Group,
-      title: t.services.items.account.title,
-      description: t.services.items.account.description,
     },
     {
       Icon: Brain,
