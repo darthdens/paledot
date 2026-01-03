@@ -120,6 +120,8 @@ export type Database = {
         Row: {
           award_en: string | null
           award_fr: string | null
+          content_en: string | null
+          content_fr: string | null
           created_at: string
           description_en: string
           description_fr: string
@@ -137,6 +139,8 @@ export type Database = {
         Insert: {
           award_en?: string | null
           award_fr?: string | null
+          content_en?: string | null
+          content_fr?: string | null
           created_at?: string
           description_en: string
           description_fr: string
@@ -154,6 +158,8 @@ export type Database = {
         Update: {
           award_en?: string | null
           award_fr?: string | null
+          content_en?: string | null
+          content_fr?: string | null
           created_at?: string
           description_en?: string
           description_fr?: string

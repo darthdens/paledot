@@ -17,6 +17,8 @@ interface Project {
   title_fr: string;
   description_en: string;
   description_fr: string;
+  content_en: string | null;
+  content_fr: string | null;
   image_url: string | null;
   tags: string[];
   external_url: string | null;
@@ -32,6 +34,8 @@ const emptyProject: Omit<Project, "id"> = {
   title_fr: "",
   description_en: "",
   description_fr: "",
+  content_en: "",
+  content_fr: "",
   image_url: "",
   tags: [],
   external_url: "",
@@ -94,6 +98,8 @@ const AdminProjects = () => {
       external_url: formData.external_url || null,
       award_en: formData.award_en || null,
       award_fr: formData.award_fr || null,
+      content_en: formData.content_en || null,
+      content_fr: formData.content_fr || null,
     };
 
     if (editingProject) {
@@ -204,6 +210,7 @@ const AdminProjects = () => {
                     id="description_en"
                     value={formData.description_en}
                     onChange={(e) => setFormData({ ...formData, description_en: e.target.value })}
+                    placeholder="Brief description for project cards"
                     required
                   />
                 </div>
@@ -213,13 +220,14 @@ const AdminProjects = () => {
                     id="description_fr"
                     value={formData.description_fr}
                     onChange={(e) => setFormData({ ...formData, description_fr: e.target.value })}
+                    placeholder="Brève description pour les cartes de projet"
                     required
                   />
                 </div>
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="image_url">Image URL</Label>
+                <Label htmlFor="image_url">Featured Image URL</Label>
                 <Input
                   id="image_url"
                   value={formData.image_url || ""}
@@ -234,7 +242,7 @@ const AdminProjects = () => {
                   id="tags"
                   value={tagsInput}
                   onChange={(e) => setTagsInput(e.target.value)}
-                  placeholder="Web3, Blockchain, React"
+                  placeholder="Branding, Website, Graphics"
                 />
               </div>
 
@@ -267,6 +275,28 @@ const AdminProjects = () => {
                     placeholder="🏆 Lauréat"
                   />
                 </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="content_en">Content (English) - Markdown supported</Label>
+                <Textarea
+                  id="content_en"
+                  value={formData.content_en || ""}
+                  onChange={(e) => setFormData({ ...formData, content_en: e.target.value })}
+                  className="min-h-[200px]"
+                  placeholder="### Objectives&#10;&#10;- Primary Goal: ...&#10;&#10;### Approach&#10;&#10;..."
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="content_fr">Content (French) - Markdown supported</Label>
+                <Textarea
+                  id="content_fr"
+                  value={formData.content_fr || ""}
+                  onChange={(e) => setFormData({ ...formData, content_fr: e.target.value })}
+                  className="min-h-[200px]"
+                  placeholder="### Objectifs&#10;&#10;- Objectif principal : ...&#10;&#10;### Approche&#10;&#10;..."
+                />
               </div>
 
               <div className="flex items-center gap-2">
