@@ -104,7 +104,7 @@ const RichTextEditor = forwardRef<HTMLDivElement, RichTextEditorProps>(
     },
     editorProps: {
       attributes: {
-        class: 'prose prose-sm dark:prose-invert max-w-none min-h-[200px] p-4 focus:outline-none',
+        class: 'prose prose-sm max-w-none min-h-[200px] p-4 focus:outline-none text-foreground [&_h1]:text-foreground [&_h2]:text-foreground [&_h3]:text-foreground [&_p]:text-foreground [&_li]:text-foreground [&_blockquote]:text-foreground/80',
       },
     },
   });
