@@ -298,9 +298,9 @@ const ProjectDetail = () => {
 
             {/* Right Column - Images Carousel */}
             {allImages.length > 0 && (
-              <div className="md:sticky md:top-24 md:h-[calc(100vh-12rem)]">
+              <div className="md:sticky md:top-24">
                 <Carousel 
-                  className="w-full h-full"
+                  className="w-full"
                   opts={{
                     loop: true,
                   }}
@@ -311,16 +311,15 @@ const ProjectDetail = () => {
                       stopOnMouseEnter: true,
                     }),
                   ]}
-                  orientation="vertical"
                 >
-                  <CarouselContent className="-mt-4 h-[calc(100vh-12rem)]">
+                  <CarouselContent>
                     {allImages.map((imageUrl, index) => (
-                      <CarouselItem key={index} className="pt-4 basis-full">
-                        <div className="rounded-2xl overflow-hidden h-full">
+                      <CarouselItem key={index}>
+                        <div className="rounded-2xl overflow-hidden">
                           <img
                             src={imageUrl}
                             alt={`${title} - ${language === "fr" ? "Image" : "Image"} ${index + 1}`}
-                            className="w-full h-full object-cover"
+                            className="w-full"
                           />
                         </div>
                       </CarouselItem>
