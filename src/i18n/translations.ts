@@ -78,9 +78,13 @@ export const translations = {
       title: "What I Do",
       subtitle: "I'm available for freelance remote work in UK, EU, and US timezones.",
       items: {
-        webDesign: {
-          title: "Website Design & Development",
-          description: "Beautiful, responsive websites built with modern technologies. From landing pages to complex web applications.",
+        appDesign: {
+          title: "Website & App Design",
+          description: "Beautiful, user-centered designs for websites and applications. From wireframes to polished interfaces.",
+        },
+        appDev: {
+          title: "Website & App Development",
+          description: "Responsive websites and applications built with modern technologies. From landing pages to complex web apps.",
         },
         branding: {
           title: "Graphic & Brand Design",
@@ -93,10 +97,6 @@ export const translations = {
         product: {
           title: "Product Management",
           description: "End-to-end product strategy, roadmap planning, and execution for digital products.",
-        },
-        account: {
-          title: "Account Management",
-          description: "Client relationship management, project coordination, and stakeholder communication.",
         },
         ai: {
           title: "AI Assistant Implementation",
@@ -305,9 +305,13 @@ export const translations = {
       title: "Ce que je fais",
       subtitle: "Je suis disponible pour du travail freelance à distance dans les fuseaux horaires UK, EU et US.",
       items: {
-        webDesign: {
-          title: "Design & Développement Web",
-          description: "Des sites web beaux et responsives construits avec des technologies modernes. Des landing pages aux applications web complexes.",
+        appDesign: {
+          title: "Design de Sites Web & Apps",
+          description: "Des designs beaux et centrés sur l'utilisateur pour sites web et applications. Des wireframes aux interfaces finalisées.",
+        },
+        appDev: {
+          title: "Développement de Sites Web & Apps",
+          description: "Sites web et applications responsives construits avec des technologies modernes. Des landing pages aux applications web complexes.",
         },
         branding: {
           title: "Design Graphique & Identité de Marque",
@@ -320,10 +324,6 @@ export const translations = {
         product: {
           title: "Gestion de Produit",
           description: "Stratégie produit de bout en bout, planification de roadmap et exécution pour les produits numériques.",
-        },
-        account: {
-          title: "Gestion de Compte",
-          description: "Gestion des relations clients, coordination de projets et communication avec les parties prenantes.",
         },
         ai: {
           title: "Implémentation d'Assistants IA",
