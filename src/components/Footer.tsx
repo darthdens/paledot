@@ -1,5 +1,4 @@
 import { Heart } from "iconoir-react";
-import { Logo } from "@/components/Logo";
 
 export const Footer = () => {
   const currentYear = new Date().getFullYear();
@@ -8,16 +7,12 @@ export const Footer = () => {
     <footer className="py-8 border-t border-border">
       <div className="container mx-auto px-6">
         <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-          <Logo className="w-6 h-6" />
-          
           <div className="flex items-center gap-1.5 text-muted-foreground text-sm">
             <span>Made with</span>
             <Heart className="w-4 h-4 text-accent" strokeWidth={2} fill="currentColor" />
             <span>by</span>
             <a 
               href="/" 
-              target="_blank" 
-              rel="noopener noreferrer"
               className="font-medium text-foreground hover:text-accent transition-colors"
             >
               Dens Akoka
