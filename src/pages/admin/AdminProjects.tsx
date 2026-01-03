@@ -6,6 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Plus, Edit, Trash } from "iconoir-react";
@@ -32,26 +33,34 @@ interface Project {
 
 interface FormData {
   slug: string;
-  title: string;
-  description: string;
-  content: string;
+  title_en: string;
+  title_fr: string;
+  description_en: string;
+  description_fr: string;
+  content_en: string;
+  content_fr: string;
   image_url: string;
   tags: string[];
   external_url: string;
-  award: string;
+  award_en: string;
+  award_fr: string;
   is_featured: boolean;
   display_order: number;
 }
 
 const emptyFormData: FormData = {
   slug: "",
-  title: "",
-  description: "",
-  content: "",
+  title_en: "",
+  title_fr: "",
+  description_en: "",
+  description_fr: "",
+  content_en: "",
+  content_fr: "",
   image_url: "",
   tags: [],
   external_url: "",
-  award: "",
+  award_en: "",
+  award_fr: "",
   is_featured: false,
   display_order: 0,
 };
@@ -91,13 +100,17 @@ const AdminProjects = () => {
       setEditingProject(project);
       setFormData({
         slug: project.slug,
-        title: project.title_en,
-        description: project.description_en,
-        content: project.content_en || "",
+        title_en: project.title_en,
+        title_fr: project.title_fr,
+        description_en: project.description_en,
+        description_fr: project.description_fr,
+        content_en: project.content_en || "",
+        content_fr: project.content_fr || "",
         image_url: project.image_url || "",
         tags: project.tags,
         external_url: project.external_url || "",
-        award: project.award_en || "",
+        award_en: project.award_en || "",
+        award_fr: project.award_fr || "",
         is_featured: project.is_featured,
         display_order: project.display_order,
       });
@@ -117,12 +130,19 @@ const AdminProjects = () => {
       .replace(/^-|-$/g, '');
   };
 
-  const handleTitleChange = (title: string) => {
-    setFormData(prev => ({
-      ...prev,
-      title,
-      slug: prev.slug || generateSlug(title),
-    }));
+  const handleTitleChange = (title: string, lang: 'en' | 'fr') => {
+    if (lang === 'en') {
+      setFormData(prev => ({
+        ...prev,
+        title_en: title,
+        slug: prev.slug || generateSlug(title),
+      }));
+    } else {
+      setFormData(prev => ({
+        ...prev,
+        title_fr: title,
+      }));
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -130,53 +150,19 @@ const AdminProjects = () => {
     
     const tags = tagsInput.split(",").map(t => t.trim()).filter(Boolean);
     
-    // Translate content to French
-    let titleFr = formData.title;
-    let descriptionFr = formData.description;
-    let contentFr = formData.content || null;
-    let awardFr = formData.award || null;
-
-    try {
-      toast.info("Translating content to French...");
-      
-      const textsToTranslate = [
-        { key: "title", value: formData.title },
-        { key: "description", value: formData.description },
-        ...(formData.content ? [{ key: "content", value: formData.content }] : []),
-        ...(formData.award ? [{ key: "award", value: formData.award }] : []),
-      ];
-
-      const { data, error } = await supabase.functions.invoke("translate-content", {
-        body: { texts: textsToTranslate, targetLanguage: "fr" },
-      });
-
-      if (error) {
-        console.error("Translation error:", error);
-        toast.warning("Translation failed, saving with English content for French fields");
-      } else if (data?.translations) {
-        titleFr = data.translations.title || formData.title;
-        descriptionFr = data.translations.description || formData.description;
-        contentFr = data.translations.content || formData.content || null;
-        awardFr = data.translations.award || formData.award || null;
-      }
-    } catch (err) {
-      console.error("Translation error:", err);
-      toast.warning("Translation failed, saving with English content for French fields");
-    }
-    
     const projectData = {
       slug: formData.slug,
-      title_en: formData.title,
-      title_fr: titleFr,
-      description_en: formData.description,
-      description_fr: descriptionFr,
-      content_en: formData.content || null,
-      content_fr: contentFr,
+      title_en: formData.title_en,
+      title_fr: formData.title_fr,
+      description_en: formData.description_en,
+      description_fr: formData.description_fr,
+      content_en: formData.content_en || null,
+      content_fr: formData.content_fr || null,
       image_url: formData.image_url || null,
       tags,
       external_url: formData.external_url || null,
-      award_en: formData.award || null,
-      award_fr: awardFr,
+      award_en: formData.award_en || null,
+      award_fr: formData.award_fr || null,
       is_featured: formData.is_featured,
       display_order: formData.display_order,
     };
@@ -237,22 +223,9 @@ const AdminProjects = () => {
           <DialogContent className="w-[calc(100vw-2rem)] max-w-3xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>{editingProject ? "Edit Project" : "Create Project"}</DialogTitle>
-              <p className="text-sm text-muted-foreground">
-                Content will be automatically translated to French when saved.
-              </p>
             </DialogHeader>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="title">Title <span className="text-destructive">*</span></Label>
-                  <Input
-                    id="title"
-                    value={formData.title}
-                    onChange={(e) => handleTitleChange(e.target.value)}
-                    placeholder="Enter title"
-                    required
-                  />
-                </div>
                 <div className="space-y-2">
                   <Label htmlFor="slug">Slug</Label>
                   <Input
@@ -260,18 +233,6 @@ const AdminProjects = () => {
                     value={formData.slug}
                     onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
                     placeholder="auto-generated"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="tags">Tags (comma separated)</Label>
-                  <Input
-                    id="tags"
-                    value={tagsInput}
-                    onChange={(e) => setTagsInput(e.target.value)}
-                    placeholder="Branding, Website, Graphics"
                   />
                 </div>
                 <div className="space-y-2">
@@ -284,16 +245,109 @@ const AdminProjects = () => {
                   />
                 </div>
               </div>
-              
+
+              <Tabs defaultValue="en" className="w-full">
+                <TabsList className="grid w-full grid-cols-2">
+                  <TabsTrigger value="en">English</TabsTrigger>
+                  <TabsTrigger value="fr">Français</TabsTrigger>
+                </TabsList>
+                
+                <TabsContent value="en" className="space-y-4 mt-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="title_en">Title (EN) <span className="text-destructive">*</span></Label>
+                    <Input
+                      id="title_en"
+                      value={formData.title_en}
+                      onChange={(e) => handleTitleChange(e.target.value, 'en')}
+                      placeholder="Enter title in English"
+                      required
+                    />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="description_en">Description (EN) <span className="text-destructive">*</span></Label>
+                    <Textarea
+                      id="description_en"
+                      value={formData.description_en}
+                      onChange={(e) => setFormData({ ...formData, description_en: e.target.value })}
+                      placeholder="Brief description in English"
+                      required
+                      className="text-base"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="award_en">Award (EN)</Label>
+                    <Input
+                      id="award_en"
+                      value={formData.award_en}
+                      onChange={(e) => setFormData({ ...formData, award_en: e.target.value })}
+                      placeholder="🏆 Award Winner"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label>Content (EN)</Label>
+                    <RichTextEditor
+                      content={formData.content_en}
+                      onChange={(content) => setFormData({ ...formData, content_en: content })}
+                      placeholder="Write your content in English..."
+                    />
+                  </div>
+                </TabsContent>
+                
+                <TabsContent value="fr" className="space-y-4 mt-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="title_fr">Titre (FR) <span className="text-destructive">*</span></Label>
+                    <Input
+                      id="title_fr"
+                      value={formData.title_fr}
+                      onChange={(e) => handleTitleChange(e.target.value, 'fr')}
+                      placeholder="Entrez le titre en français"
+                      required
+                    />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="description_fr">Description (FR) <span className="text-destructive">*</span></Label>
+                    <Textarea
+                      id="description_fr"
+                      value={formData.description_fr}
+                      onChange={(e) => setFormData({ ...formData, description_fr: e.target.value })}
+                      placeholder="Brève description en français"
+                      required
+                      className="text-base"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="award_fr">Récompense (FR)</Label>
+                    <Input
+                      id="award_fr"
+                      value={formData.award_fr}
+                      onChange={(e) => setFormData({ ...formData, award_fr: e.target.value })}
+                      placeholder="🏆 Lauréat"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label>Contenu (FR)</Label>
+                    <RichTextEditor
+                      content={formData.content_fr}
+                      onChange={(content) => setFormData({ ...formData, content_fr: content })}
+                      placeholder="Rédigez votre contenu en français..."
+                    />
+                  </div>
+                </TabsContent>
+              </Tabs>
+
               <div className="space-y-2">
-                <Label htmlFor="description">Description</Label>
-                <Textarea
-                  id="description"
-                  value={formData.description}
-                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  placeholder="Brief description"
-                  required
-                  className="text-base"
+                <Label htmlFor="tags">Tags (comma separated)</Label>
+                <Input
+                  id="tags"
+                  value={tagsInput}
+                  onChange={(e) => setTagsInput(e.target.value)}
+                  placeholder="Branding, Website, Graphics"
                 />
               </div>
 
@@ -308,33 +362,13 @@ const AdminProjects = () => {
               </div>
 
               <div className="space-y-2">
-                <Label>Content</Label>
-                <RichTextEditor
-                  content={formData.content}
-                  onChange={(content) => setFormData({ ...formData, content })}
-                  placeholder="Write your content here..."
+                <Label htmlFor="external_url">External URL</Label>
+                <Input
+                  id="external_url"
+                  value={formData.external_url}
+                  onChange={(e) => setFormData({ ...formData, external_url: e.target.value })}
+                  placeholder="https://..."
                 />
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="external_url">External URL</Label>
-                  <Input
-                    id="external_url"
-                    value={formData.external_url}
-                    onChange={(e) => setFormData({ ...formData, external_url: e.target.value })}
-                    placeholder="https://..."
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="award">Award</Label>
-                  <Input
-                    id="award"
-                    value={formData.award}
-                    onChange={(e) => setFormData({ ...formData, award: e.target.value })}
-                    placeholder="🏆 Award Winner"
-                  />
-                </div>
               </div>
 
               <div className="flex items-center gap-2">
