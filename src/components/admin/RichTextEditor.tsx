@@ -134,19 +134,44 @@ const RichTextEditor = forwardRef<HTMLDivElement, RichTextEditorProps>(
     }
   }, [normalizedContent, editor]);
 
+  const imageInputRef = useRef<HTMLInputElement>(null);
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
+  const lastSelection = useRef<{ from: number; to: number } | null>(null);
+
+  useEffect(() => {
+    if (!editor) return;
+
+    const updateSelection = () => {
+      const { from, to } = editor.state.selection;
+      lastSelection.current = { from, to };
+    };
+
+    updateSelection();
+    editor.on('selectionUpdate', updateSelection);
+
+    return () => {
+      editor.off('selectionUpdate', updateSelection);
+    };
+  }, [editor]);
+
   if (!editor) {
     return null;
   }
 
+  const chainWithSelection = () => {
+    let chain = editor.chain().focus();
+    if (lastSelection.current) {
+      chain = chain.setTextSelection(lastSelection.current);
+    }
+    return chain;
+  };
+
   const addLink = () => {
     const url = window.prompt('Enter URL:');
     if (url) {
-      editor.chain().focus().setLink({ href: url }).run();
+      chainWithSelection().extendMarkRange('link').setLink({ href: url }).run();
     }
   };
-
-  const imageInputRef = useRef<HTMLInputElement>(null);
-  const [isUploadingImage, setIsUploadingImage] = useState(false);
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -219,6 +244,7 @@ const RichTextEditor = forwardRef<HTMLDivElement, RichTextEditorProps>(
       variant="ghost"
       size="icon"
       className={`h-8 w-8 ${isActive ? 'bg-muted' : ''}`}
+      onMouseDown={(e) => e.preventDefault()}
       onClick={onClick}
       title={title}
     >
@@ -248,14 +274,16 @@ const RichTextEditor = forwardRef<HTMLDivElement, RichTextEditorProps>(
           }
           onChange={(e) => {
             const value = e.target.value;
+            const chain = chainWithSelection();
+
             if (value === 'p') {
-              editor.chain().focus().setParagraph().run();
+              chain.setParagraph().run();
             } else if (value === 'h1') {
-              editor.chain().focus().setHeading({ level: 1 }).run();
+              chain.setHeading({ level: 1 }).run();
             } else if (value === 'h2') {
-              editor.chain().focus().setHeading({ level: 2 }).run();
+              chain.setHeading({ level: 2 }).run();
             } else if (value === 'h3') {
-              editor.chain().focus().setHeading({ level: 3 }).run();
+              chain.setHeading({ level: 3 }).run();
             }
           }}
         >
@@ -320,11 +348,13 @@ const RichTextEditor = forwardRef<HTMLDivElement, RichTextEditorProps>(
                 type="button"
                 className="w-6 h-6 rounded border border-border hover:scale-110 transition-transform"
                 style={{ backgroundColor: color.value || 'transparent' }}
+                onMouseDown={(e) => e.preventDefault()}
                 onClick={() => {
+                  const chain = chainWithSelection();
                   if (color.value) {
-                    editor.chain().focus().setColor(color.value).run();
+                    chain.setColor(color.value).run();
                   } else {
-                    editor.chain().focus().unsetColor().run();
+                    chain.unsetColor().run();
                   }
                 }}
                 title={color.name}
@@ -348,11 +378,13 @@ const RichTextEditor = forwardRef<HTMLDivElement, RichTextEditorProps>(
                 type="button"
                 className="w-6 h-6 rounded border border-border hover:scale-110 transition-transform"
                 style={{ backgroundColor: color.value || 'transparent' }}
+                onMouseDown={(e) => e.preventDefault()}
                 onClick={() => {
+                  const chain = chainWithSelection();
                   if (color.value) {
-                    editor.chain().focus().toggleHighlight({ color: color.value }).run();
+                    chain.toggleHighlight({ color: color.value }).run();
                   } else {
-                    editor.chain().focus().unsetHighlight().run();
+                    chain.unsetHighlight().run();
                   }
                 }}
                 title={color.name}
