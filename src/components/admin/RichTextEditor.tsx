@@ -130,7 +130,7 @@ const RichTextEditor = forwardRef<HTMLDivElement, RichTextEditorProps>(
             // Match the same typography + theme-aware colors used on the public Project/Article pages.
             // Explicit list/blockquote styling helps when global CSS resets remove default markers.
             class:
-              'prose prose-lg max-w-none text-muted-foreground prose-headings:text-foreground prose-p:text-muted-foreground prose-li:text-muted-foreground prose-strong:text-foreground prose-a:text-primary prose-blockquote:text-muted-foreground prose-code:text-foreground prose-ul:list-disc prose-ol:list-decimal prose-li:marker:text-muted-foreground prose-blockquote:border-l-border prose-blockquote:border-l-2 prose-blockquote:pl-4 min-h-[200px] p-4 focus:outline-none',
+              'prose prose-lg max-w-none text-muted-foreground prose-headings:text-foreground prose-p:text-muted-foreground prose-li:text-muted-foreground prose-strong:text-foreground prose-a:text-primary prose-blockquote:text-muted-foreground prose-code:text-foreground prose-ul:list-disc prose-ol:list-decimal prose-li:marker:text-muted-foreground prose-blockquote:border-l-border prose-blockquote:border-l-2 prose-blockquote:pl-4 min-h-[200px] p-4 focus:outline-none [&_h1]:text-3xl [&_h1]:font-semibold [&_h1]:text-foreground [&_h2]:text-2xl [&_h2]:font-semibold [&_h2]:text-foreground [&_h3]:text-xl [&_h3]:font-semibold [&_h3]:text-foreground [&_ul]:list-disc [&_ul]:pl-6 [&_ol]:list-decimal [&_ol]:pl-6 [&_li]:my-1 [&_blockquote]:border-l-2 [&_blockquote]:border-border [&_blockquote]:pl-4 [&_blockquote]:italic',
             ...(placeholder ? { 'data-placeholder': placeholder } : {}),
           },
         },
