@@ -190,12 +190,7 @@ const ProjectDetail = () => {
                       </CarouselItem>
                     ))}
                   </CarouselContent>
-                  {allImages.length > 1 && (
-                    <>
-                      <CarouselPrevious className="left-2 h-8 w-8" />
-                      <CarouselNext className="right-2 h-8 w-8" />
-                    </>
-                  )}
+                  {/* Arrows hidden on mobile - swipe to navigate */}
                 </Carousel>
                 {/* Dots indicator */}
                 {allImages.length > 1 && (
