@@ -120,11 +120,19 @@ const RichTextEditor = forwardRef<HTMLDivElement, RichTextEditorProps>(
       },
     });
 
-    useEffect(() => {
-      if (editor && normalizedContent !== editor.getHTML()) {
+  // Only sync content from props when it's a completely different value (e.g., switching items)
+  // NOT on every keystroke, which would reset formatting
+  const lastExternalContent = useRef(normalizedContent);
+  
+  useEffect(() => {
+    if (editor && normalizedContent !== lastExternalContent.current) {
+      // Content changed externally (e.g., switching between items)
+      lastExternalContent.current = normalizedContent;
+      if (normalizedContent !== editor.getHTML()) {
         editor.commands.setContent(normalizedContent);
       }
-    }, [normalizedContent, editor]);
+    }
+  }, [normalizedContent, editor]);
 
   if (!editor) {
     return null;
