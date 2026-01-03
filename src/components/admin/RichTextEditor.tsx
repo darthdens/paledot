@@ -9,6 +9,13 @@ import { Color } from '@tiptap/extension-color';
 import Highlight from '@tiptap/extension-highlight';
 import Youtube from '@tiptap/extension-youtube';
 import { Button } from '@/components/ui/button';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { ChevronDown } from 'lucide-react';
 import { 
   Bold, 
   Italic, 
@@ -264,67 +271,94 @@ const RichTextEditor = forwardRef<HTMLDivElement, RichTextEditorProps>(
       />
       {/* Toolbar */}
       <div className="flex flex-wrap items-center gap-0.5 p-2 border-b border-border bg-muted/30">
-        {/* Text Style Dropdown */}
-        <select
-          className="h-8 px-2 text-sm bg-background text-foreground border border-border rounded mr-2"
-          value={
-            editor.isActive('heading', { level: 1 }) ? 'h1' :
-            editor.isActive('heading', { level: 2 }) ? 'h2' :
-            editor.isActive('heading', { level: 3 }) ? 'h3' : 'p'
-          }
-          onChange={(e) => {
-            const value = e.target.value;
-            const chain = chainWithSelection();
-
-            if (value === 'p') {
-              chain.setParagraph().run();
-            } else if (value === 'h1') {
-              chain.setHeading({ level: 1 }).run();
-            } else if (value === 'h2') {
-              chain.setHeading({ level: 2 }).run();
-            } else if (value === 'h3') {
-              chain.setHeading({ level: 3 }).run();
-            }
-          }}
-        >
-          <option value="p">Paragraph</option>
-          <option value="h1">Heading 1</option>
-          <option value="h2">Heading 2</option>
-          <option value="h3">Heading 3</option>
-        </select>
+        {/* Block Type */}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              className="h-8 mr-2 gap-2"
+              onMouseDown={(e) => e.preventDefault()}
+            >
+              {editor.isActive('heading', { level: 1 })
+                ? 'Heading 1'
+                : editor.isActive('heading', { level: 2 })
+                ? 'Heading 2'
+                : editor.isActive('heading', { level: 3 })
+                ? 'Heading 3'
+                : 'Paragraph'}
+              <ChevronDown className="h-4 w-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="start">
+            <DropdownMenuItem
+              onSelect={(e) => {
+                e.preventDefault();
+                chainWithSelection().setParagraph().run();
+              }}
+            >
+              Paragraph
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onSelect={(e) => {
+                e.preventDefault();
+                chainWithSelection().setHeading({ level: 1 }).run();
+              }}
+            >
+              Heading 1
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onSelect={(e) => {
+                e.preventDefault();
+                chainWithSelection().setHeading({ level: 2 }).run();
+              }}
+            >
+              Heading 2
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onSelect={(e) => {
+                e.preventDefault();
+                chainWithSelection().setHeading({ level: 3 }).run();
+              }}
+            >
+              Heading 3
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
 
         <div className="w-px h-6 bg-border mx-1" />
 
         <ToolbarButton
-          onClick={() => editor.chain().focus().toggleBold().run()}
+          onClick={() => chainWithSelection().toggleBold().run()}
           isActive={editor.isActive('bold')}
           title="Bold"
         >
           <Bold className="h-4 w-4" />
         </ToolbarButton>
         <ToolbarButton
-          onClick={() => editor.chain().focus().toggleItalic().run()}
+          onClick={() => chainWithSelection().toggleItalic().run()}
           isActive={editor.isActive('italic')}
           title="Italic"
         >
           <Italic className="h-4 w-4" />
         </ToolbarButton>
         <ToolbarButton
-          onClick={() => editor.chain().focus().toggleUnderline().run()}
+          onClick={() => chainWithSelection().toggleUnderline().run()}
           isActive={editor.isActive('underline')}
           title="Underline"
         >
           <UnderlineIcon className="h-4 w-4" />
         </ToolbarButton>
         <ToolbarButton
-          onClick={() => editor.chain().focus().toggleStrike().run()}
+          onClick={() => chainWithSelection().toggleStrike().run()}
           isActive={editor.isActive('strike')}
           title="Strikethrough"
         >
           <Strikethrough className="h-4 w-4" />
         </ToolbarButton>
         <ToolbarButton
-          onClick={() => editor.chain().focus().toggleCode().run()}
+          onClick={() => chainWithSelection().toggleCode().run()}
           isActive={editor.isActive('code')}
           title="Code"
         >
@@ -335,10 +369,7 @@ const RichTextEditor = forwardRef<HTMLDivElement, RichTextEditorProps>(
 
         {/* Text Color */}
         <div className="relative group">
-          <ToolbarButton
-            onClick={() => {}}
-            title="Text Color"
-          >
+          <ToolbarButton onClick={() => {}} title="Text Color">
             <ColorFilter className="h-4 w-4" />
           </ToolbarButton>
           <div className="absolute top-full left-0 mt-1 hidden group-hover:flex flex-wrap gap-1 p-2 bg-popover border border-border rounded-lg shadow-lg z-50 w-32">
@@ -365,10 +396,7 @@ const RichTextEditor = forwardRef<HTMLDivElement, RichTextEditorProps>(
 
         {/* Highlight Color */}
         <div className="relative group">
-          <ToolbarButton
-            onClick={() => {}}
-            title="Highlight"
-          >
+          <ToolbarButton onClick={() => {}} title="Highlight">
             <Palette className="h-4 w-4" />
           </ToolbarButton>
           <div className="absolute top-full left-0 mt-1 hidden group-hover:flex flex-wrap gap-1 p-2 bg-popover border border-border rounded-lg shadow-lg z-50 w-32">
@@ -396,21 +424,21 @@ const RichTextEditor = forwardRef<HTMLDivElement, RichTextEditorProps>(
         <div className="w-px h-6 bg-border mx-1" />
 
         <ToolbarButton
-          onClick={() => editor.chain().focus().setTextAlign('left').run()}
+          onClick={() => chainWithSelection().setTextAlign('left').run()}
           isActive={editor.isActive({ textAlign: 'left' })}
           title="Align Left"
         >
           <AlignLeft className="h-4 w-4" />
         </ToolbarButton>
         <ToolbarButton
-          onClick={() => editor.chain().focus().setTextAlign('center').run()}
+          onClick={() => chainWithSelection().setTextAlign('center').run()}
           isActive={editor.isActive({ textAlign: 'center' })}
           title="Align Center"
         >
           <AlignCenter className="h-4 w-4" />
         </ToolbarButton>
         <ToolbarButton
-          onClick={() => editor.chain().focus().setTextAlign('right').run()}
+          onClick={() => chainWithSelection().setTextAlign('right').run()}
           isActive={editor.isActive({ textAlign: 'right' })}
           title="Align Right"
         >
@@ -420,28 +448,28 @@ const RichTextEditor = forwardRef<HTMLDivElement, RichTextEditorProps>(
         <div className="w-px h-6 bg-border mx-1" />
 
         <ToolbarButton
-          onClick={() => editor.chain().focus().toggleBulletList().run()}
+          onClick={() => chainWithSelection().toggleBulletList().run()}
           isActive={editor.isActive('bulletList')}
           title="Bullet List"
         >
           <List className="h-4 w-4" />
         </ToolbarButton>
         <ToolbarButton
-          onClick={() => editor.chain().focus().toggleOrderedList().run()}
+          onClick={() => chainWithSelection().toggleOrderedList().run()}
           isActive={editor.isActive('orderedList')}
           title="Numbered List"
         >
           <NumberedListLeft className="h-4 w-4" />
         </ToolbarButton>
         <ToolbarButton
-          onClick={() => editor.chain().focus().toggleBlockquote().run()}
+          onClick={() => chainWithSelection().toggleBlockquote().run()}
           isActive={editor.isActive('blockquote')}
           title="Quote"
         >
           <Quote className="h-4 w-4" />
         </ToolbarButton>
         <ToolbarButton
-          onClick={() => editor.chain().focus().setHorizontalRule().run()}
+          onClick={() => chainWithSelection().setHorizontalRule().run()}
           title="Horizontal Rule"
         >
           <Minus className="h-4 w-4" />
@@ -449,42 +477,26 @@ const RichTextEditor = forwardRef<HTMLDivElement, RichTextEditorProps>(
 
         <div className="w-px h-6 bg-border mx-1" />
 
-        <ToolbarButton
-          onClick={addLink}
-          isActive={editor.isActive('link')}
-          title="Add Link"
-        >
+        <ToolbarButton onClick={addLink} isActive={editor.isActive('link')} title="Add Link">
           <LinkIcon className="h-4 w-4" />
         </ToolbarButton>
-        <ToolbarButton
-          onClick={addImage}
-          title="Upload Image"
-        >
+        <ToolbarButton onClick={addImage} title="Upload Image">
           {isUploadingImage ? (
             <div className="h-4 w-4 border-2 border-primary border-t-transparent rounded-full animate-spin" />
           ) : (
             <MediaImage className="h-4 w-4" />
           )}
         </ToolbarButton>
-        <ToolbarButton
-          onClick={addYoutubeVideo}
-          title="Add YouTube Video"
-        >
+        <ToolbarButton onClick={addYoutubeVideo} title="Add YouTube Video">
           <YoutubeIcon className="h-4 w-4" />
         </ToolbarButton>
 
         <div className="w-px h-6 bg-border mx-1" />
 
-        <ToolbarButton
-          onClick={() => editor.chain().focus().undo().run()}
-          title="Undo"
-        >
+        <ToolbarButton onClick={() => chainWithSelection().undo().run()} title="Undo">
           <Undo className="h-4 w-4" />
         </ToolbarButton>
-        <ToolbarButton
-          onClick={() => editor.chain().focus().redo().run()}
-          title="Redo"
-        >
+        <ToolbarButton onClick={() => chainWithSelection().redo().run()} title="Redo">
           <Redo className="h-4 w-4" />
         </ToolbarButton>
       </div>
