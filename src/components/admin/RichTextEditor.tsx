@@ -277,8 +277,7 @@ const RichTextEditor = forwardRef<HTMLDivElement, RichTextEditorProps>(
       variant="ghost"
       size="icon"
       className={`h-8 w-8 ${isActive ? 'bg-muted' : ''}`}
-      onMouseDown={(e) => e.preventDefault()}
-      onPointerDown={(e) => {
+      onMouseDown={(e) => {
         e.preventDefault();
         onClick();
       }}
@@ -411,8 +410,7 @@ const RichTextEditor = forwardRef<HTMLDivElement, RichTextEditorProps>(
                 type="button"
                 className="w-6 h-6 rounded border border-border hover:scale-110 transition-transform"
                 style={{ backgroundColor: color.value || 'transparent' }}
-                onMouseDown={(e) => e.preventDefault()}
-                onPointerDown={(e) => {
+                onMouseDown={(e) => {
                   e.preventDefault();
                   const chain = chainWithSelection();
                   if (color.value) {
@@ -439,8 +437,7 @@ const RichTextEditor = forwardRef<HTMLDivElement, RichTextEditorProps>(
                 type="button"
                 className="w-6 h-6 rounded border border-border hover:scale-110 transition-transform"
                 style={{ backgroundColor: color.value || 'transparent' }}
-                onMouseDown={(e) => e.preventDefault()}
-                onPointerDown={(e) => {
+                onMouseDown={(e) => {
                   e.preventDefault();
                   const chain = chainWithSelection();
                   if (color.value) {
