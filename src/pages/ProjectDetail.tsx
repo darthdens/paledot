@@ -143,7 +143,7 @@ const ProjectDetail = () => {
 
   const title = language === "fr" ? project.title_fr : project.title_en;
   const description = language === "fr" ? project.description_fr : project.description_en;
-  const content = language === "fr" ? project.content_fr : project.content_en;
+  const content = (language === "fr" && project.content_fr) ? project.content_fr : project.content_en;
   const award = language === "fr" ? project.award_fr : project.award_en;
 
   return (
