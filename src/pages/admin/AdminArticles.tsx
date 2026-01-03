@@ -7,7 +7,7 @@ import { Switch } from "@/components/ui/switch";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Plus, Edit, Trash } from "iconoir-react";
@@ -55,14 +55,6 @@ const categoriesEn = [
   "Design",
 ];
 
-const categoriesFr = [
-  "Pour commencer",
-  "Tutoriels",
-  "Études de cas",
-  "Perspectives de l'industrie",
-  "Technologie",
-  "Design",
-];
 
 const emptyFormData: FormData = {
   slug: "",
@@ -154,20 +146,67 @@ const AdminArticles = () => {
     }
   };
 
+  const translateToFrench = async (texts: { key: string; value: string }[]) => {
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/translate-content`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ texts }),
+        }
+      );
+      
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || "Translation failed");
+      }
+      
+      const data = await response.json();
+      return data.translations as Record<string, string>;
+    } catch (error) {
+      console.error("Translation error:", error);
+      toast.error("Auto-translation failed. Using English as fallback.");
+      return null;
+    }
+  };
+
+  // Map English categories to French
+  const categoryMap: Record<string, string> = {
+    "Getting Started": "Pour commencer",
+    "Tutorials": "Tutoriels",
+    "Case Studies": "Études de cas",
+    "Industry Insights": "Perspectives de l'industrie",
+    "Technology": "Technologie",
+    "Design": "Design",
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Auto-translate English content to French
+    const textsToTranslate: { key: string; value: string }[] = [];
+    if (formData.title_en) textsToTranslate.push({ key: "title_fr", value: formData.title_en });
+    if (formData.excerpt_en) textsToTranslate.push({ key: "excerpt_fr", value: formData.excerpt_en });
+    if (formData.content_en) textsToTranslate.push({ key: "content_fr", value: formData.content_en });
+    
+    let frenchTranslations: Record<string, string> | null = null;
+    if (textsToTranslate.length > 0) {
+      toast.info("Translating to French...");
+      frenchTranslations = await translateToFrench(textsToTranslate);
+    }
     
     const articleData = {
       slug: formData.slug,
       title_en: formData.title_en,
-      title_fr: formData.title_fr,
+      title_fr: frenchTranslations?.title_fr || formData.title_en,
       excerpt_en: formData.excerpt_en,
-      excerpt_fr: formData.excerpt_fr,
+      excerpt_fr: frenchTranslations?.excerpt_fr || formData.excerpt_en,
       content_en: formData.content_en,
-      content_fr: formData.content_fr,
+      content_fr: frenchTranslations?.content_fr || formData.content_en,
       image_url: formData.image_url || null,
       category_en: formData.category_en || null,
-      category_fr: formData.category_fr || null,
+      category_fr: categoryMap[formData.category_en] || formData.category_en || null,
       read_time: formData.read_time,
       is_published: formData.is_published,
       published_at: formData.is_published ? new Date().toISOString() : null,
@@ -252,118 +291,62 @@ const AdminArticles = () => {
                 </div>
               </div>
 
-              <Tabs defaultValue="en" className="w-full">
-                <TabsList className="grid w-full grid-cols-2">
-                  <TabsTrigger value="en">English</TabsTrigger>
-                  <TabsTrigger value="fr">Français</TabsTrigger>
-                </TabsList>
+              <div className="space-y-4">
+                <p className="text-sm text-muted-foreground">
+                  Enter content in English. French translations are generated automatically.
+                </p>
                 
-                <TabsContent value="en" className="space-y-4 mt-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="title_en">Title (EN) <span className="text-destructive">*</span></Label>
-                    <Input
-                      id="title_en"
-                      value={formData.title_en}
-                      onChange={(e) => handleTitleChange(e.target.value, 'en')}
-                      placeholder="Enter title in English"
-                      required
-                    />
-                  </div>
+                <div className="space-y-2">
+                  <Label htmlFor="title_en">Title <span className="text-destructive">*</span></Label>
+                  <Input
+                    id="title_en"
+                    value={formData.title_en}
+                    onChange={(e) => handleTitleChange(e.target.value, 'en')}
+                    placeholder="Enter title"
+                    required
+                  />
+                </div>
 
-                  <div className="space-y-2">
-                    <Label htmlFor="category_en">Category (EN)</Label>
-                    <Select
-                      value={formData.category_en}
-                      onValueChange={(value) => setFormData({ ...formData, category_en: value })}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select category" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {categoriesEn.map((cat) => (
-                          <SelectItem key={cat} value={cat}>
-                            {cat}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="excerpt_en">Excerpt (EN) <span className="text-destructive">*</span></Label>
-                    <Textarea
-                      id="excerpt_en"
-                      value={formData.excerpt_en}
-                      onChange={(e) => setFormData({ ...formData, excerpt_en: e.target.value })}
-                      placeholder="Brief excerpt in English"
-                      required
-                      className="text-base"
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label>Content (EN) <span className="text-destructive">*</span></Label>
-                    <RichTextEditor
-                      content={formData.content_en}
-                      onChange={(content) => setFormData({ ...formData, content_en: content })}
-                      placeholder="Write your content in English..."
-                    />
-                  </div>
-                </TabsContent>
+                <div className="space-y-2">
+                  <Label htmlFor="category_en">Category</Label>
+                  <Select
+                    value={formData.category_en}
+                    onValueChange={(value) => setFormData({ ...formData, category_en: value })}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select category" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {categoriesEn.map((cat) => (
+                        <SelectItem key={cat} value={cat}>
+                          {cat}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
                 
-                <TabsContent value="fr" className="space-y-4 mt-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="title_fr">Titre (FR) <span className="text-destructive">*</span></Label>
-                    <Input
-                      id="title_fr"
-                      value={formData.title_fr}
-                      onChange={(e) => handleTitleChange(e.target.value, 'fr')}
-                      placeholder="Entrez le titre en français"
-                      required
-                    />
-                  </div>
+                <div className="space-y-2">
+                  <Label htmlFor="excerpt_en">Excerpt <span className="text-destructive">*</span></Label>
+                  <Textarea
+                    id="excerpt_en"
+                    value={formData.excerpt_en}
+                    onChange={(e) => setFormData({ ...formData, excerpt_en: e.target.value })}
+                    placeholder="Brief excerpt"
+                    required
+                    className="text-base"
+                  />
+                </div>
 
-                  <div className="space-y-2">
-                    <Label htmlFor="category_fr">Catégorie (FR)</Label>
-                    <Select
-                      value={formData.category_fr}
-                      onValueChange={(value) => setFormData({ ...formData, category_fr: value })}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Sélectionner la catégorie" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {categoriesFr.map((cat) => (
-                          <SelectItem key={cat} value={cat}>
-                            {cat}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="excerpt_fr">Extrait (FR) <span className="text-destructive">*</span></Label>
-                    <Textarea
-                      id="excerpt_fr"
-                      value={formData.excerpt_fr}
-                      onChange={(e) => setFormData({ ...formData, excerpt_fr: e.target.value })}
-                      placeholder="Bref extrait en français"
-                      required
-                      className="text-base"
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label>Contenu (FR) <span className="text-destructive">*</span></Label>
-                    <RichTextEditor
-                      content={formData.content_fr}
-                      onChange={(content) => setFormData({ ...formData, content_fr: content })}
-                      placeholder="Rédigez votre contenu en français..."
-                    />
-                  </div>
-                </TabsContent>
-              </Tabs>
+                <div className="space-y-2">
+                  <Label>Content <span className="text-destructive">*</span></Label>
+                  <RichTextEditor
+                    content={formData.content_en}
+                    onChange={(content) => setFormData({ ...formData, content_en: content })}
+                    placeholder="Write your content..."
+                  />
+                </div>
+              </div>
 
               <div className="space-y-2">
                 <Label>Thumbnail</Label>
