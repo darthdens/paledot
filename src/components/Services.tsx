@@ -50,7 +50,7 @@ export const Services = () => {
           {services.map((service) => (
             <div
               key={service.title}
-              className="p-8 rounded-2xl bg-card border border-border"
+              className="p-8 rounded-2xl bg-card/70 backdrop-blur-md border border-border relative z-10"
             >
               <div className="mb-6">
                 <div className="inline-flex items-center justify-center w-14 h-14 rounded-xl bg-muted">

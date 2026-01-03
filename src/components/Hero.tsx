@@ -16,7 +16,7 @@ export const Hero = () => {
           {/* Text Content */}
           <div className="space-y-5 md:space-y-6 lg:space-y-8 order-2 lg:order-1">
             <div className="space-y-4">
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-muted text-muted-foreground text-sm">
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-muted/70 backdrop-blur-md text-muted-foreground text-sm relative z-10">
                 <MapPin className="w-3.5 h-3.5" strokeWidth={2} />
                 <span>Dundee, Scotland</span>
               </div>
@@ -97,14 +97,14 @@ export const Hero = () => {
           {/* Profile Image */}
           <div className="order-1 lg:order-2 flex justify-start lg:justify-end mb-4 md:mb-2 lg:mb-0">
             <div className="relative">
-              <div className="w-40 h-40 md:w-56 md:h-56 lg:w-96 lg:h-96 rounded-3xl bg-muted overflow-hidden shadow-xl">
+              <div className="w-40 h-40 md:w-56 md:h-56 lg:w-96 lg:h-96 rounded-3xl bg-muted/70 backdrop-blur-md overflow-hidden shadow-xl relative z-10">
                 <img
                   src="https://images.spr.so/cdn-cgi/imagedelivery/j42No7y-dcokJuNgXeA0ig/6364ed24-d073-426f-9f7a-5f679c6b957f/dens-new-pfp/w=512,quality=90,fit=scale-down"
                   alt="Dens Akoka"
                   className="w-full h-full object-cover"
                 />
               </div>
-              <div className="absolute -bottom-4 -right-4 md:-right-4 lg:-left-4 lg:right-auto bg-card rounded-2xl p-3 lg:p-4 shadow-lg border border-border">
+              <div className="absolute -bottom-4 -right-4 md:-right-4 lg:-left-4 lg:right-auto bg-card/70 backdrop-blur-md rounded-2xl p-3 lg:p-4 shadow-lg border border-border z-20">
                 <div className="flex items-center gap-2 lg:gap-3">
                   <div className="w-2.5 h-2.5 lg:w-3 lg:h-3 bg-green-500 rounded-full animate-pulse" />
                   <span className="text-xs lg:text-sm font-medium">Available for work</span>

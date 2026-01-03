@@ -78,7 +78,7 @@ export const About = () => {
           </div>
 
           <div className="space-y-8 min-w-0">
-            <div className="bg-card rounded-2xl p-5 sm:p-8 border border-border">
+            <div className="bg-card/70 backdrop-blur-md rounded-2xl p-5 sm:p-8 border border-border relative z-10">
               <h3 className="font-serif text-xl font-bold mb-6">Languages</h3>
               <div className="space-y-4">
                 {languages.map((lang) => (
@@ -93,7 +93,7 @@ export const About = () => {
               </div>
             </div>
 
-            <div className="bg-card rounded-2xl p-5 sm:p-8 border border-border">
+            <div className="bg-card/70 backdrop-blur-md rounded-2xl p-5 sm:p-8 border border-border relative z-10">
               <h3 className="font-serif text-xl font-bold mb-4">Recognition</h3>
               <div className="flex items-start gap-4">
                 <div className="text-3xl">🏆</div>
@@ -106,7 +106,7 @@ export const About = () => {
               </div>
             </div>
 
-            <div className="bg-card rounded-2xl p-5 sm:p-8 border border-border">
+            <div className="bg-card/70 backdrop-blur-md rounded-2xl p-5 sm:p-8 border border-border relative z-10">
               <h3 className="font-serif text-xl font-bold mb-6">What People Say</h3>
               <Carousel className="w-full">
                 <CarouselContent>

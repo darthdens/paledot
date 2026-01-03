@@ -49,7 +49,7 @@ export const Projects = () => {
           {projects.map((project) => (
             <div
               key={project.title}
-              className={`bg-card rounded-2xl overflow-hidden border border-border ${
+              className={`bg-card/70 backdrop-blur-md rounded-2xl overflow-hidden border border-border relative z-10 ${
                 project.featured ? "md:col-span-1" : ""
               }`}
             >
