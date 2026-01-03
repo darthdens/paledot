@@ -1,7 +1,8 @@
+import { Link } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Clock, ArrowUpRight } from "iconoir-react";
 import { useLanguage } from "@/i18n/LanguageContext";
-
 export const Articles = () => {
   const { t } = useLanguage();
 
@@ -52,6 +53,15 @@ export const Articles = () => {
               </div>
             </article>
           ))}
+        </div>
+
+        <div className="text-center mt-12">
+          <Link to="/articles">
+            <Button variant="outline" size="lg">
+              {t.articles.readMore}
+              <ArrowUpRight className="ml-2 w-4 h-4" strokeWidth={2} />
+            </Button>
+          </Link>
         </div>
       </div>
     </section>
