@@ -1,19 +1,20 @@
+import CustomCursor from "@/components/CustomCursor";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { LanguageProvider } from "@/i18n/LanguageContext";
 import { AuthProvider } from "@/hooks/useAuth";
+import { LanguageProvider } from "@/i18n/LanguageContext";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
+import AdminDashboard from "./pages/AdminDashboard";
+import AdminLogin from "./pages/AdminLogin";
+import ArticleDetail from "./pages/ArticleDetail";
+import ArticlesPage from "./pages/ArticlesPage";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
-import ProjectsPage from "./pages/ProjectsPage";
 import ProjectDetail from "./pages/ProjectDetail";
-import ArticlesPage from "./pages/ArticlesPage";
-import ArticleDetail from "./pages/ArticleDetail";
-import AdminLogin from "./pages/AdminLogin";
-import AdminDashboard from "./pages/AdminDashboard";
-import AdminProjects from "./pages/admin/AdminProjects";
+import ProjectsPage from "./pages/ProjectsPage";
 import AdminArticles from "./pages/admin/AdminArticles";
+import AdminProjects from "./pages/admin/AdminProjects";
 import AdminTestimonials from "./pages/admin/AdminTestimonials";
 
 const queryClient = new QueryClient();
@@ -23,6 +24,7 @@ const App = () => (
     <LanguageProvider>
       <AuthProvider>
         <TooltipProvider>
+          <CustomCursor />
           <Toaster richColors position="bottom-left" />
           <BrowserRouter>
             <Routes>
