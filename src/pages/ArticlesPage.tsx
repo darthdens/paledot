@@ -108,7 +108,7 @@ const ArticlesPage = () => {
                     <div className="p-6 flex-1 flex flex-col">
                       <div className="flex items-center gap-3 mb-3">
                         {getCategory(article) && (
-                          <Badge variant="secondary">{getCategory(article)}</Badge>
+                          <Badge variant="static">{getCategory(article)}</Badge>
                         )}
                         <span className="flex items-center gap-1 text-sm text-muted-foreground">
                           <Clock className="w-3 h-3" />

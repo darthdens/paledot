@@ -116,7 +116,7 @@ const ArticleDetail = () => {
           </Link>
 
           <div className="flex items-center gap-4 mb-6">
-            {category && <Badge variant="secondary">{category}</Badge>}
+            {category && <Badge variant="static">{category}</Badge>}
             <span className="flex items-center gap-1 text-sm text-muted-foreground">
               <Clock className="w-4 h-4" />
               {article.read_time} {t.articles.minRead}
@@ -144,7 +144,7 @@ const ArticleDetail = () => {
 
           {sanitizedContent && (
             <div
-              className="prose prose-lg max-w-none text-muted-foreground prose-headings:text-foreground prose-p:text-muted-foreground prose-li:text-muted-foreground prose-strong:text-foreground prose-a:text-primary prose-blockquote:text-muted-foreground prose-code:text-foreground"
+              className="prose prose-lg max-w-none text-muted-foreground prose-headings:text-foreground prose-headings:font-serif prose-h1:text-4xl prose-h1:font-bold prose-h2:text-3xl prose-h2:font-bold prose-h3:text-2xl prose-h3:font-semibold prose-h4:text-xl prose-h4:font-semibold prose-p:text-muted-foreground prose-li:text-muted-foreground prose-strong:text-foreground prose-a:text-primary prose-blockquote:text-muted-foreground prose-blockquote:border-l-primary prose-code:text-foreground"
               dangerouslySetInnerHTML={{ __html: sanitizedContent }}
             />
           )}
