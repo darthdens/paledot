@@ -92,19 +92,12 @@ const ProjectsPage = () => {
 
     // Sort
     switch (sortBy) {
-      case "alphabetical-asc":
-        result.sort((a, b) => getTitle(a).localeCompare(getTitle(b)));
-        break;
       case "alphabetical-desc":
         result.sort((a, b) => getTitle(b).localeCompare(getTitle(a)));
         break;
       default:
-        // Sort by display_order first, then by created_at (newest first) as secondary
-        result.sort((a, b) => {
-          const orderDiff = (a.display_order ?? 0) - (b.display_order ?? 0);
-          if (orderDiff !== 0) return orderDiff;
-          return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
-        });
+        // Default and alphabetical-asc both sort A to Z
+        result.sort((a, b) => getTitle(a).localeCompare(getTitle(b)));
     }
 
     return result;
