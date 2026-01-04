@@ -230,6 +230,13 @@ export const translations = {
       message: "Oops! The page you're looking for doesn't exist.",
       backHome: "Return to Home",
     },
+
+    // Cookies
+    cookies: {
+      message: "We use cookies to enhance your browsing experience. By continuing to use this site, you agree to our use of cookies.",
+      accept: "Accept",
+      decline: "Decline",
+    },
   },
 
   fr: {
@@ -462,6 +469,13 @@ export const translations = {
       title: "Page Non Trouvée",
       message: "Oups ! La page que vous recherchez n'existe pas.",
       backHome: "Retour à l'accueil",
+    },
+
+    // Cookies
+    cookies: {
+      message: "Nous utilisons des cookies pour améliorer votre expérience de navigation. En continuant à utiliser ce site, vous acceptez notre utilisation des cookies.",
+      accept: "Accepter",
+      decline: "Refuser",
     },
   },
 } as const;
