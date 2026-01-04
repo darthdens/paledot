@@ -14,6 +14,7 @@ import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import ProjectDetail from "./pages/ProjectDetail";
 import ProjectsPage from "./pages/ProjectsPage";
+import Resume from "./pages/Resume";
 import AdminArticles from "./pages/admin/AdminArticles";
 import AdminProjects from "./pages/admin/AdminProjects";
 import AdminTestimonials from "./pages/admin/AdminTestimonials";
@@ -31,6 +32,7 @@ const App = () => (
           <BrowserRouter>
             <Routes>
               <Route path="/" element={<Index />} />
+              <Route path="/resume" element={<Resume />} />
               <Route path="/projects" element={<ProjectsPage />} />
               <Route path="/projects/:slug" element={<ProjectDetail />} />
               <Route path="/articles" element={<ArticlesPage />} />
