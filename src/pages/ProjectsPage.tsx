@@ -29,6 +29,7 @@ interface Project {
   award_en: string | null;
   award_fr: string | null;
   display_order: number | null;
+  created_at: string;
 }
 
 type SortOption = "default" | "alphabetical-asc" | "alphabetical-desc";
@@ -98,7 +99,12 @@ const ProjectsPage = () => {
         result.sort((a, b) => getTitle(b).localeCompare(getTitle(a)));
         break;
       default:
-        result.sort((a, b) => (a.display_order ?? 0) - (b.display_order ?? 0));
+        // Sort by display_order first, then by created_at (newest first) as secondary
+        result.sort((a, b) => {
+          const orderDiff = (a.display_order ?? 0) - (b.display_order ?? 0);
+          if (orderDiff !== 0) return orderDiff;
+          return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+        });
     }
 
     return result;
