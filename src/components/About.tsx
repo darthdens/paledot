@@ -126,13 +126,8 @@ export const About = () => {
 
             <div className="bg-card/70 backdrop-blur-md rounded-2xl p-5 sm:p-8 border border-border relative z-10">
               <h3 className="font-serif text-xl font-bold mb-6">{t.about.testimonials}</h3>
-              <div className="relative">
-                {/* Left fade gradient */}
-                <div className="absolute top-0 left-0 bottom-0 w-8 bg-gradient-to-r from-background/70 to-transparent z-10 pointer-events-none" />
-                {/* Right fade gradient */}
-                <div className="absolute top-0 right-0 bottom-0 w-8 bg-gradient-to-l from-background/70 to-transparent z-10 pointer-events-none" />
-                <Carousel className="w-full">
-                  <CarouselContent>
+              <Carousel className="w-full">
+                <CarouselContent>
                     {testimonials.map((testimonial, index) => (
                       <CarouselItem key={index}>
                         <blockquote className="break-words px-4">
@@ -151,7 +146,6 @@ export const About = () => {
                     <CarouselNext className="static translate-y-0" />
                   </div>
                 </Carousel>
-              </div>
             </div>
           </div>
         </div>
