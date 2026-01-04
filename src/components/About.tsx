@@ -128,9 +128,9 @@ export const About = () => {
               <h3 className="font-serif text-xl font-bold mb-6">{t.about.testimonials}</h3>
               <div className="relative">
                 {/* Left fade gradient */}
-                <div className="absolute top-0 left-0 bottom-0 w-8 bg-gradient-to-r from-card to-transparent z-10 pointer-events-none" />
+                <div className="absolute top-0 left-0 bottom-0 w-8 bg-gradient-to-r from-background/70 to-transparent z-10 pointer-events-none" />
                 {/* Right fade gradient */}
-                <div className="absolute top-0 right-0 bottom-0 w-8 bg-gradient-to-l from-card to-transparent z-10 pointer-events-none" />
+                <div className="absolute top-0 right-0 bottom-0 w-8 bg-gradient-to-l from-background/70 to-transparent z-10 pointer-events-none" />
                 <Carousel className="w-full">
                   <CarouselContent>
                     {testimonials.map((testimonial, index) => (
