@@ -43,9 +43,8 @@ export default function CustomCursor() {
     document.addEventListener("mouseleave", onLeave);
 
     const animate = () => {
-      const lerp = 0.22;
-      current.current.x += (target.current.x - current.current.x) * lerp;
-      current.current.y += (target.current.y - current.current.y) * lerp;
+      current.current.x = target.current.x;
+      current.current.y = target.current.y;
 
       const node = cursorRef.current;
       if (node) {

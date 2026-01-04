@@ -189,8 +189,8 @@ All colors MUST be HSL.
 }
 
 .custom-cursor__ring {
-  width: 56px;
-  height: 56px;
+  width: 32px;
+  height: 32px;
   border: none;
   border-radius: 50%;
   position: absolute;
@@ -202,7 +202,7 @@ All colors MUST be HSL.
   justify-content: center;
   backdrop-filter: blur(12px);
   background: hsl(var(--foreground) / 0.08);
-  transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+  transition: width 0.2s ease, height 0.2s ease, background 0.2s ease;
 }
 
 .custom-cursor__icon {
@@ -215,7 +215,8 @@ All colors MUST be HSL.
 }
 
 .custom-cursor.is-pointer .custom-cursor__ring {
-  transform: translate(-50%, -50%) scale(1.2);
+  width: 56px;
+  height: 56px;
   background: hsl(var(--foreground) / 0.12);
 }
 
