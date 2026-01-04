@@ -241,7 +241,7 @@ const ProjectDetail = () => {
 
               {textContent && (
                 <div
-                  className="prose prose-base max-w-none text-muted-foreground prose-headings:text-foreground prose-p:text-muted-foreground prose-li:text-muted-foreground prose-strong:text-foreground prose-a:text-foreground prose-a:underline hover:prose-a:text-accent-foreground prose-blockquote:text-muted-foreground prose-code:text-foreground [&_ul]:list-disc [&_ol]:list-decimal [&_ul]:list-outside [&_ol]:list-outside [&_li]:list-item [&_li]:marker:text-muted-foreground prose-blockquote:border-l-border prose-blockquote:border-l-2 prose-blockquote:pl-4 [&_h1]:text-3xl [&_h1]:font-semibold [&_h1]:mt-8 [&_h1]:mb-4 [&_h2]:text-2xl [&_h2]:font-semibold [&_h2]:mt-6 [&_h2]:mb-3 [&_h3]:text-xl [&_h3]:font-semibold [&_h3]:mt-5 [&_h3]:mb-2 [&_ul]:pl-6 [&_ol]:pl-6 [&_blockquote]:italic"
+                  className="prose prose-base max-w-none text-muted-foreground prose-headings:text-foreground prose-p:text-muted-foreground prose-li:text-muted-foreground prose-strong:text-foreground prose-blockquote:text-muted-foreground prose-code:text-foreground [&_a]:text-secondary [&_a]:underline [&_a]:underline-offset-2 hover:[&_a]:opacity-80 [&_ul]:list-disc [&_ol]:list-decimal [&_ul]:list-outside [&_ol]:list-outside [&_li]:list-item [&_li]:marker:text-muted-foreground prose-blockquote:border-l-border prose-blockquote:border-l-2 prose-blockquote:pl-4 [&_h1]:text-3xl [&_h1]:font-semibold [&_h1]:mt-8 [&_h1]:mb-4 [&_h2]:text-2xl [&_h2]:font-semibold [&_h2]:mt-6 [&_h2]:mb-3 [&_h3]:text-xl [&_h3]:font-semibold [&_h3]:mt-5 [&_h3]:mb-2 [&_ul]:pl-6 [&_ol]:pl-6 [&_blockquote]:italic"
                   dangerouslySetInnerHTML={{ __html: textContent }}
                 />
               )}
@@ -285,7 +285,7 @@ const ProjectDetail = () => {
 
               {textContent && (
                 <div
-                  className="prose prose-lg max-w-none text-muted-foreground prose-headings:text-foreground prose-p:text-muted-foreground prose-li:text-muted-foreground prose-strong:text-foreground prose-a:text-foreground prose-a:underline hover:prose-a:text-accent-foreground prose-blockquote:text-muted-foreground prose-code:text-foreground [&_ul]:list-disc [&_ol]:list-decimal [&_ul]:list-outside [&_ol]:list-outside [&_li]:list-item [&_li]:marker:text-muted-foreground prose-blockquote:border-l-border prose-blockquote:border-l-2 prose-blockquote:pl-4 [&_h1]:text-4xl [&_h1]:font-semibold [&_h1]:mt-10 [&_h1]:mb-4 [&_h2]:text-3xl [&_h2]:font-semibold [&_h2]:mt-8 [&_h2]:mb-3 [&_h3]:text-2xl [&_h3]:font-semibold [&_h3]:mt-6 [&_h3]:mb-2 [&_ul]:pl-6 [&_ol]:pl-6 [&_blockquote]:italic"
+                  className="prose prose-lg max-w-none text-muted-foreground prose-headings:text-foreground prose-p:text-muted-foreground prose-li:text-muted-foreground prose-strong:text-foreground prose-blockquote:text-muted-foreground prose-code:text-foreground [&_a]:text-secondary [&_a]:underline [&_a]:underline-offset-2 hover:[&_a]:opacity-80 [&_ul]:list-disc [&_ol]:list-decimal [&_ul]:list-outside [&_ol]:list-outside [&_li]:list-item [&_li]:marker:text-muted-foreground prose-blockquote:border-l-border prose-blockquote:border-l-2 prose-blockquote:pl-4 [&_h1]:text-4xl [&_h1]:font-semibold [&_h1]:mt-10 [&_h1]:mb-4 [&_h2]:text-3xl [&_h2]:font-semibold [&_h2]:mt-8 [&_h2]:mb-3 [&_h3]:text-2xl [&_h3]:font-semibold [&_h3]:mt-6 [&_h3]:mb-2 [&_ul]:pl-6 [&_ol]:pl-6 [&_blockquote]:italic"
                   dangerouslySetInnerHTML={{ __html: textContent }}
                 />
               )}
