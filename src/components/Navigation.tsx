@@ -17,6 +17,7 @@ export const Navigation = () => {
     { label: t.nav.projects, href: "#projects" },
     { label: t.nav.services, href: "#services" },
     { label: t.nav.articles, href: "#articles" },
+    { label: t.nav.resume, href: "/resume", isPage: true },
     { label: t.nav.contact, href: "#contact" },
   ];
 
@@ -51,13 +52,23 @@ export const Navigation = () => {
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-6">
             {navItems.map((item) => (
-              <button
-                key={item.href}
-                onClick={() => scrollToSection(item.href)}
-                className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
-              >
-                {item.label}
-              </button>
+              item.isPage ? (
+                <Link
+                  key={item.href}
+                  to={item.href}
+                  className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  {item.label}
+                </Link>
+              ) : (
+                <button
+                  key={item.href}
+                  onClick={() => scrollToSection(item.href)}
+                  className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  {item.label}
+                </button>
+              )
             ))}
             
             <div className="w-px h-4 bg-border" />
@@ -107,19 +118,33 @@ export const Navigation = () => {
           isOpen ? "opacity-100 visible" : "opacity-0 invisible"
         }`}
       >
-        <div className="container mx-auto px-6 py-8 flex flex-col h-full">
+          <div className="container mx-auto px-6 py-8 flex flex-col h-full">
           <div className="space-y-6 flex-1">
             {navItems.map((item, index) => (
-              <button
-                key={item.href}
-                onClick={() => scrollToSection(item.href)}
-                className={`block w-full text-left text-2xl font-medium text-foreground hover:text-accent transition-all duration-300 ${
-                  isOpen ? "translate-x-0 opacity-100" : "-translate-x-4 opacity-0"
-                }`}
-                style={{ transitionDelay: `${index * 50}ms` }}
-              >
-                {item.label}
-              </button>
+              item.isPage ? (
+                <Link
+                  key={item.href}
+                  to={item.href}
+                  onClick={() => setIsOpen(false)}
+                  className={`block w-full text-left text-2xl font-medium text-foreground hover:text-accent transition-all duration-300 ${
+                    isOpen ? "translate-x-0 opacity-100" : "-translate-x-4 opacity-0"
+                  }`}
+                  style={{ transitionDelay: `${index * 50}ms` }}
+                >
+                  {item.label}
+                </Link>
+              ) : (
+                <button
+                  key={item.href}
+                  onClick={() => scrollToSection(item.href)}
+                  className={`block w-full text-left text-2xl font-medium text-foreground hover:text-accent transition-all duration-300 ${
+                    isOpen ? "translate-x-0 opacity-100" : "-translate-x-4 opacity-0"
+                  }`}
+                  style={{ transitionDelay: `${index * 50}ms` }}
+                >
+                  {item.label}
+                </button>
+              )
             ))}
           </div>
           <div className="flex items-center gap-4 pb-8">
