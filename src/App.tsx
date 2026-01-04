@@ -12,6 +12,7 @@ import ArticleDetail from "./pages/ArticleDetail";
 import ArticlesPage from "./pages/ArticlesPage";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
+import Privacy from "./pages/Privacy";
 import ProjectDetail from "./pages/ProjectDetail";
 import ProjectsPage from "./pages/ProjectsPage";
 import Resume from "./pages/Resume";
@@ -33,6 +34,7 @@ const App = () => (
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/resume" element={<Resume />} />
+              <Route path="/privacy" element={<Privacy />} />
               <Route path="/projects" element={<ProjectsPage />} />
               <Route path="/projects/:slug" element={<ProjectDetail />} />
               <Route path="/articles" element={<ArticlesPage />} />
