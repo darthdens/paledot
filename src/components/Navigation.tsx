@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
@@ -9,6 +9,8 @@ import { useLanguage } from "@/i18n/LanguageContext";
 export const Navigation = () => {
   const [isOpen, setIsOpen] = useState(false);
   const { t } = useLanguage();
+  const location = useLocation();
+  const navigate = useNavigate();
 
   const navItems = [
     { label: t.nav.about, href: "#about" },
@@ -19,11 +21,23 @@ export const Navigation = () => {
   ];
 
   const scrollToSection = (href: string) => {
-    const element = document.querySelector(href);
-    if (element) {
-      element.scrollIntoView({ behavior: "smooth" });
-    }
     setIsOpen(false);
+    
+    if (location.pathname !== "/") {
+      // Navigate to homepage first, then scroll after a short delay
+      navigate("/");
+      setTimeout(() => {
+        const element = document.querySelector(href);
+        if (element) {
+          element.scrollIntoView({ behavior: "smooth" });
+        }
+      }, 100);
+    } else {
+      const element = document.querySelector(href);
+      if (element) {
+        element.scrollIntoView({ behavior: "smooth" });
+      }
+    }
   };
 
   return (
