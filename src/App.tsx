@@ -1,3 +1,4 @@
+import { CookieBanner } from "@/components/CookieBanner";
 import CustomCursor from "@/components/CustomCursor";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -26,6 +27,7 @@ const App = () => (
         <TooltipProvider>
           <CustomCursor />
           <Toaster richColors position="bottom-left" />
+          <CookieBanner />
           <BrowserRouter>
             <Routes>
               <Route path="/" element={<Index />} />
