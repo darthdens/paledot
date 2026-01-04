@@ -106,7 +106,7 @@ const ArticleDetail = () => {
       <Navigation />
       
       <main className="flex-1 pt-24 pb-16">
-        <article className="container mx-auto px-6 max-w-3xl">
+        <article className="container mx-auto px-6 max-w-4xl">
           <Link 
             to="/articles" 
             className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors mb-8"
@@ -115,8 +115,8 @@ const ArticleDetail = () => {
             {language === "fr" ? "Tous les articles" : "All Articles"}
           </Link>
 
-          <div className="flex items-center gap-4 mb-6">
-            {category && <Badge variant="static">{category}</Badge>}
+          <div className="flex flex-wrap items-center gap-3 mb-6">
+            {category && <Badge variant="secondary" className="pointer-events-none">{category}</Badge>}
             <span className="flex items-center gap-1 text-sm text-muted-foreground">
               <Clock className="w-4 h-4" />
               {article.read_time} {t.articles.minRead}
@@ -128,7 +128,7 @@ const ArticleDetail = () => {
             )}
           </div>
 
-          <h1 className="font-serif text-4xl md:text-5xl font-bold mb-8 leading-tight">
+          <h1 className="font-serif text-3xl md:text-4xl lg:text-5xl font-bold mb-8 leading-tight">
             {title}
           </h1>
 
@@ -144,7 +144,7 @@ const ArticleDetail = () => {
 
           {sanitizedContent && (
             <div
-              className="prose prose-lg max-w-none text-muted-foreground prose-headings:text-foreground prose-headings:font-serif prose-h1:text-4xl prose-h1:font-bold prose-h2:text-3xl prose-h2:font-bold prose-h3:text-2xl prose-h3:font-semibold prose-h4:text-xl prose-h4:font-semibold prose-p:text-muted-foreground prose-li:text-muted-foreground prose-strong:text-foreground prose-a:text-primary prose-blockquote:text-muted-foreground prose-blockquote:border-l-primary prose-code:text-foreground"
+              className="prose prose-lg max-w-none text-muted-foreground prose-headings:text-foreground prose-p:text-muted-foreground prose-li:text-muted-foreground prose-strong:text-foreground prose-blockquote:text-muted-foreground prose-code:text-foreground [&_a]:text-foreground [&_a]:font-medium [&_a]:underline [&_a]:underline-offset-2 hover:[&_a]:opacity-70 [&_ul]:list-disc [&_ol]:list-decimal [&_ul]:list-outside [&_ol]:list-outside [&_li]:list-item [&_li]:marker:text-muted-foreground prose-blockquote:border-l-border prose-blockquote:border-l-2 prose-blockquote:pl-4 [&_h1]:text-4xl [&_h1]:font-semibold [&_h1]:mt-10 [&_h1]:mb-4 [&_h2]:text-3xl [&_h2]:font-semibold [&_h2]:mt-8 [&_h2]:mb-3 [&_h3]:text-2xl [&_h3]:font-semibold [&_h3]:mt-6 [&_h3]:mb-2 [&_ul]:pl-6 [&_ol]:pl-6 [&_blockquote]:italic [&_p]:mb-5"
               dangerouslySetInnerHTML={{ __html: sanitizedContent }}
             />
           )}
