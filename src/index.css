@@ -208,7 +208,7 @@ All colors MUST be HSL.
 .custom-cursor__icon {
   width: 16px;
   height: 16px;
-  color: hsl(var(--foreground));
+  color: hsl(0 0% 95%);
   opacity: 0;
   transform: scale(0.5);
   transition: opacity 0.15s ease, transform 0.15s ease;
@@ -226,7 +226,7 @@ All colors MUST be HSL.
 .custom-cursor.is-pointer .custom-cursor__icon {
   opacity: 1;
   transform: scale(1);
-  color: hsl(var(--background));
+  color: hsl(0 0% 95%);
 }
 
 .custom-cursor.is-down .custom-cursor__ring {
