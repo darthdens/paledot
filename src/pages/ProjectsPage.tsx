@@ -192,32 +192,38 @@ const ProjectsPage = () => {
                 <Link
                   key={project.id}
                   to={`/projects/${project.slug}`}
-                  className="group block"
+                  className="group block h-full"
                 >
-                  <div className="rounded-2xl overflow-hidden bg-card/70 backdrop-blur-md border border-border hover:border-accent/50 transition-all duration-300">
-                    {project.image_url && (
-                      <div className="aspect-video overflow-hidden">
+                  <div className="h-full rounded-2xl overflow-hidden bg-card/70 backdrop-blur-md border border-border hover:border-accent/50 transition-all duration-300 flex flex-col">
+                    <div className="aspect-video overflow-hidden bg-muted">
+                      {project.image_url ? (
                         <img
                           src={project.image_url}
                           alt={getTitle(project)}
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                         />
-                      </div>
-                    )}
-                    <div className="p-6">
-                      {getAward(project) && (
-                        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-accent/20 text-sm font-medium mb-2">
-                          {getAward(project)}
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center text-muted-foreground">
+                          <span className="text-4xl">📁</span>
                         </div>
                       )}
+                    </div>
+                    <div className="p-6 flex flex-col flex-1">
+                      <div className="min-h-[28px] mb-2">
+                        {getAward(project) && (
+                          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-accent/20 text-sm font-medium">
+                            {getAward(project)}
+                          </div>
+                        )}
+                      </div>
                       <h3 className="font-serif text-xl font-bold mb-2 group-hover:text-accent transition-colors flex items-center gap-2">
                         {getTitle(project)}
                         <ArrowUpRight className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity" />
                       </h3>
-                      <p className="text-muted-foreground mb-4 line-clamp-2">
+                      <p className="text-muted-foreground mb-4 line-clamp-2 flex-1">
                         {getDescription(project)}
                       </p>
-                      <div className="flex flex-wrap gap-2">
+                      <div className="flex flex-wrap gap-2 min-h-[32px]">
                         {project.tags.slice(0, 4).map((tag) => (
                           <Badge key={tag} variant="secondary" className="pointer-events-none">
                             {tag}
