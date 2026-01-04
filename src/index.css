@@ -152,24 +152,25 @@ All colors MUST be HSL.
 @layer base {
   * {
     @apply border-border;
-    cursor: url('/cursors/cursor-default.svg') 0 0, auto !important;
+  }
+
+  html {
+    cursor: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIj48cGF0aCBkPSJNNS41IDMuMjFWMjAuOGMwIC40NS41NC42Ny44NS4zNWw0Ljg2LTQuODZhLjUuNSAwIDAgMSAuMzUtLjE1aDYuODdhLjUuNSAwIDAgMCAuMzUtLjg1TDYuMzUgMi44NWEuNS41IDAgMCAwLS44NS4zNloiIGZpbGw9IiMxZjFmMjEiIHN0cm9rZT0iI2ViZThlMiIgc3Ryb2tlLXdpZHRoPSIxLjUiLz48L3N2Zz4=") 0 0, auto;
   }
 
   body {
     @apply bg-background text-foreground;
   }
 
-  a, button, [role="button"], input[type="submit"], input[type="button"], .cursor-pointer,
-  a *, button *, [role="button"] * {
-    cursor: url('/cursors/cursor-pointer.svg') 6 0, pointer !important;
+  a, button, [role="button"], input[type="submit"], input[type="button"], .cursor-pointer {
+    cursor: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIj48cGF0aCBkPSJNMTIgNC41TDggMTAuNUgxMFYxNS41SDE0VjEwLjVIMTZMMTIgNC41WiIgZmlsbD0iIzFmMWYyMSIgc3Ryb2tlPSIjZWJlOGUyIiBzdHJva2Utd2lkdGg9IjEuMiIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPjxjaXJjbGUgY3g9IjEyIiBjeT0iMTgiIHI9IjEuNSIgZmlsbD0iIzFmMWYyMSIgc3Ryb2tlPSIjZWJlOGUyIiBzdHJva2Utd2lkdGg9IjEiLz48L3N2Zz4=") 12 0, pointer;
   }
 }
 
-.dark * {
-  cursor: url('/cursors/cursor-default-dark.svg') 0 0, auto !important;
+.dark html {
+  cursor: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIj48cGF0aCBkPSJNNS41IDMuMjFWMjAuOGMwIC40NS41NC42Ny44NS4zNWw0Ljg2LTQuODZhLjUuNSAwIDAgMSAuMzUtLjE1aDYuODdhLjUuNSAwIDAgMCAuMzUtLjg1TDYuMzUgMi44NWEuNS41IDAgMCAwLS44NS4zNloiIGZpbGw9IiNlYmU4ZTIiIHN0cm9rZT0iIzFmMWYyMSIgc3Ryb2tlLXdpZHRoPSIxLjUiLz48L3N2Zz4=") 0 0, auto;
 }
 
-.dark a, .dark button, .dark [role="button"], .dark input[type="submit"], .dark input[type="button"], .dark .cursor-pointer,
-.dark a *, .dark button *, .dark [role="button"] * {
-  cursor: url('/cursors/cursor-pointer-dark.svg') 6 0, pointer !important;
+.dark a, .dark button, .dark [role="button"], .dark input[type="submit"], .dark input[type="button"], .dark .cursor-pointer {
+  cursor: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIj48cGF0aCBkPSJNMTIgNC41TDggMTAuNUgxMFYxNS41SDE0VjEwLjVIMTZMMTIgNC41WiIgZmlsbD0iI2ViZThlMiIgc3Ryb2tlPSIjMWYxZjIxIiBzdHJva2Utd2lkdGg9IjEuMiIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPjxjaXJjbGUgY3g9IjEyIiBjeT0iMTgiIHI9IjEuNSIgZmlsbD0iI2ViZThlMiIgc3Ryb2tlPSIjMWYxZjIxIiBzdHJva2Utd2lkdGg9IjEiLz48L3N2Zz4=") 12 0, pointer;
 }
