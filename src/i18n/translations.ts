@@ -234,9 +234,117 @@ export const translations = {
 
     // Cookies
     cookies: {
-      message: "We use cookies to enhance your browsing experience. By continuing to use this site, you agree to our use of cookies.",
+      message: "We use cookies to enhance your browsing experience.",
       accept: "Accept",
       decline: "Decline",
+      privacyLink: "Learn more",
+    },
+
+    // Privacy
+    privacy: {
+      title: "Privacy Policy",
+      effectiveDate: "Effective Date",
+      intro: "I, Dens Akoka, respect your privacy and am committed to protecting your personal data. This Privacy Policy outlines how I collect, use, store, and safeguard your information when you visit my website, dens.so, or interact with the services I offer.",
+      sections: {
+        infoCollect: {
+          title: "Information I Collect",
+          intro: "I collect the following types of information:",
+          personal: {
+            title: "Personal Information",
+            content: "This includes your first name, last name, phone number, email address, and other information you provide when you fill out contact forms, subscribe to newsletters, or make inquiries through the website.",
+          },
+          technical: {
+            title: "Technical Data",
+            content: "Information about your device, IP address, browser type, and browsing actions. This is collected automatically using cookies or similar technologies.",
+          },
+          communication: {
+            title: "Communication Data",
+            content: "Information you provide when contacting me, including through email, phone, or social media.",
+          },
+        },
+        howUse: {
+          title: "How I Use Your Information",
+          intro: "The information I collect is used for the following purposes:",
+          items: {
+            respond: "To respond to your inquiries and provide services.",
+            improve: "To improve my website and services based on user feedback.",
+            communicate: "To communicate with you regarding your requests, projects, or other relevant updates.",
+          },
+        },
+        cookies: {
+          title: "Cookies",
+          content: "I use cookies to enhance your browsing experience on my website. These cookies may track browsing activity, and their usage helps me improve website performance. By using my website, you consent to my use of cookies.",
+          optOut: "You can opt-out of cookie usage through your browser settings.",
+        },
+        sharing: {
+          title: "Data Sharing and Disclosure",
+          content: "I do not share your personal information with third parties except when necessary to fulfill services, comply with legal obligations, or protect my rights.",
+        },
+        security: {
+          title: "Data Security",
+          content: "I take reasonable precautions to protect your personal information from unauthorized access, alteration, or destruction. However, no data transmission over the internet can be guaranteed to be 100% secure, and I cannot ensure the absolute security of your information.",
+        },
+        gdpr: {
+          title: "Your Data Protection Rights (GDPR Compliance)",
+          intro: "As a data subject under the General Data Protection Regulation (GDPR), you have the following rights regarding your personal data:",
+          rights: {
+            access: {
+              title: "Right to Access",
+              content: "You have the right to request a copy of the personal data I hold about you.",
+            },
+            rectification: {
+              title: "Right to Rectification",
+              content: "You can request corrections to any inaccurate or incomplete personal data.",
+            },
+            erasure: {
+              title: "Right to Erasure",
+              content: "You can request that I delete your personal data under certain conditions.",
+            },
+            restrict: {
+              title: "Right to Restrict Processing",
+              content: "You can request restrictions on how I process your data in certain circumstances.",
+            },
+            portability: {
+              title: "Right to Data Portability",
+              content: "You can request that I provide your data in a commonly used format to transfer it to another service provider.",
+            },
+            object: {
+              title: "Right to Object",
+              content: "You have the right to object to how I process your personal data, particularly for direct marketing purposes.",
+            },
+            withdraw: {
+              title: "Right to Withdraw Consent",
+              content: "You can withdraw any consent you have previously provided at any time, without affecting the lawfulness of processing based on consent before its withdrawal.",
+            },
+          },
+          contact: "If you wish to exercise any of these rights, please contact me at dens.akoka@icloud.com.",
+        },
+        retention: {
+          title: "Data Retention",
+          content: "I will retain your personal data for as long as necessary to fulfill the purposes outlined in this Privacy Policy or as required by law.",
+        },
+        international: {
+          title: "International Transfers",
+          content: "I do not transfer your personal data outside the European Economic Area (EEA). If I do, I will ensure that appropriate safeguards are in place to protect your data.",
+        },
+        thirdParty: {
+          title: "Third-Party Links",
+          content: "My website may contain links to third-party websites. I am not responsible for the privacy practices of these external sites. Please review their privacy policies before providing them with your personal information.",
+        },
+        children: {
+          title: "Children's Privacy",
+          content: "My website is not intended for children under the age of 16. I do not knowingly collect or process personal data of individuals under 16. If I learn that I have collected personal data from a child under 16, I will take steps to delete that information as soon as possible.",
+        },
+        changes: {
+          title: "Changes to This Privacy Policy",
+          content: "I may update this Privacy Policy from time to time. Any changes will be posted on this page, and the updated policy will be effective immediately upon posting. Please check this page periodically for updates.",
+        },
+        contactInfo: {
+          title: "Contact Information",
+          intro: "If you have any questions or concerns about this Privacy Policy or my data practices, please contact me:",
+          address: "Address",
+        },
+      },
     },
 
     // Resume
@@ -681,9 +789,117 @@ export const translations = {
 
     // Cookies
     cookies: {
-      message: "Nous utilisons des cookies pour améliorer votre expérience de navigation. En continuant à utiliser ce site, vous acceptez notre utilisation des cookies.",
+      message: "Nous utilisons des cookies pour améliorer votre expérience de navigation.",
       accept: "Accepter",
       decline: "Refuser",
+      privacyLink: "En savoir plus",
+    },
+
+    // Privacy
+    privacy: {
+      title: "Politique de Confidentialité",
+      effectiveDate: "Date d'entrée en vigueur",
+      intro: "Moi, Dens Akoka, respecte votre vie privée et m'engage à protéger vos données personnelles. Cette Politique de Confidentialité décrit comment je collecte, utilise, stocke et protège vos informations lorsque vous visitez mon site web, dens.so, ou interagissez avec les services que je propose.",
+      sections: {
+        infoCollect: {
+          title: "Informations que je collecte",
+          intro: "Je collecte les types d'informations suivants :",
+          personal: {
+            title: "Informations personnelles",
+            content: "Cela inclut votre prénom, nom, numéro de téléphone, adresse e-mail et autres informations que vous fournissez lorsque vous remplissez des formulaires de contact, vous abonnez à des newsletters ou faites des demandes via le site.",
+          },
+          technical: {
+            title: "Données techniques",
+            content: "Informations sur votre appareil, adresse IP, type de navigateur et actions de navigation. Ces données sont collectées automatiquement à l'aide de cookies ou de technologies similaires.",
+          },
+          communication: {
+            title: "Données de communication",
+            content: "Informations que vous fournissez lorsque vous me contactez, notamment par e-mail, téléphone ou réseaux sociaux.",
+          },
+        },
+        howUse: {
+          title: "Comment j'utilise vos informations",
+          intro: "Les informations que je collecte sont utilisées aux fins suivantes :",
+          items: {
+            respond: "Pour répondre à vos demandes et fournir des services.",
+            improve: "Pour améliorer mon site web et mes services en fonction des retours utilisateurs.",
+            communicate: "Pour communiquer avec vous concernant vos demandes, projets ou autres mises à jour pertinentes.",
+          },
+        },
+        cookies: {
+          title: "Cookies",
+          content: "J'utilise des cookies pour améliorer votre expérience de navigation sur mon site. Ces cookies peuvent suivre l'activité de navigation, et leur utilisation m'aide à améliorer les performances du site. En utilisant mon site, vous consentez à mon utilisation des cookies.",
+          optOut: "Vous pouvez désactiver l'utilisation des cookies via les paramètres de votre navigateur.",
+        },
+        sharing: {
+          title: "Partage et divulgation des données",
+          content: "Je ne partage pas vos informations personnelles avec des tiers, sauf lorsque cela est nécessaire pour fournir des services, respecter des obligations légales ou protéger mes droits.",
+        },
+        security: {
+          title: "Sécurité des données",
+          content: "Je prends des précautions raisonnables pour protéger vos informations personnelles contre l'accès non autorisé, l'altération ou la destruction. Cependant, aucune transmission de données sur Internet ne peut être garantie à 100% sécurisée, et je ne peux pas assurer la sécurité absolue de vos informations.",
+        },
+        gdpr: {
+          title: "Vos droits en matière de protection des données (Conformité RGPD)",
+          intro: "En tant que personne concernée au titre du Règlement Général sur la Protection des Données (RGPD), vous disposez des droits suivants concernant vos données personnelles :",
+          rights: {
+            access: {
+              title: "Droit d'accès",
+              content: "Vous avez le droit de demander une copie des données personnelles que je détiens à votre sujet.",
+            },
+            rectification: {
+              title: "Droit de rectification",
+              content: "Vous pouvez demander la correction de toute donnée personnelle inexacte ou incomplète.",
+            },
+            erasure: {
+              title: "Droit à l'effacement",
+              content: "Vous pouvez demander la suppression de vos données personnelles sous certaines conditions.",
+            },
+            restrict: {
+              title: "Droit à la limitation du traitement",
+              content: "Vous pouvez demander des restrictions sur la façon dont je traite vos données dans certaines circonstances.",
+            },
+            portability: {
+              title: "Droit à la portabilité des données",
+              content: "Vous pouvez demander que je fournisse vos données dans un format couramment utilisé pour les transférer à un autre fournisseur de services.",
+            },
+            object: {
+              title: "Droit d'opposition",
+              content: "Vous avez le droit de vous opposer à la façon dont je traite vos données personnelles, notamment à des fins de marketing direct.",
+            },
+            withdraw: {
+              title: "Droit de retirer son consentement",
+              content: "Vous pouvez retirer tout consentement que vous avez précédemment donné à tout moment, sans affecter la licéité du traitement basé sur le consentement avant son retrait.",
+            },
+          },
+          contact: "Si vous souhaitez exercer l'un de ces droits, veuillez me contacter à dens.akoka@icloud.com.",
+        },
+        retention: {
+          title: "Conservation des données",
+          content: "Je conserverai vos données personnelles aussi longtemps que nécessaire pour atteindre les objectifs décrits dans cette Politique de Confidentialité ou conformément aux exigences légales.",
+        },
+        international: {
+          title: "Transferts internationaux",
+          content: "Je ne transfère pas vos données personnelles en dehors de l'Espace Économique Européen (EEE). Si je le fais, je m'assurerai que des garanties appropriées sont en place pour protéger vos données.",
+        },
+        thirdParty: {
+          title: "Liens vers des tiers",
+          content: "Mon site web peut contenir des liens vers des sites tiers. Je ne suis pas responsable des pratiques de confidentialité de ces sites externes. Veuillez consulter leurs politiques de confidentialité avant de leur fournir vos informations personnelles.",
+        },
+        children: {
+          title: "Vie privée des enfants",
+          content: "Mon site web n'est pas destiné aux enfants de moins de 16 ans. Je ne collecte ni ne traite sciemment les données personnelles de personnes de moins de 16 ans. Si j'apprends que j'ai collecté des données personnelles d'un enfant de moins de 16 ans, je prendrai des mesures pour supprimer ces informations dès que possible.",
+        },
+        changes: {
+          title: "Modifications de cette Politique de Confidentialité",
+          content: "Je peux mettre à jour cette Politique de Confidentialité de temps à autre. Toute modification sera publiée sur cette page, et la politique mise à jour sera effective immédiatement après publication. Veuillez consulter cette page périodiquement pour les mises à jour.",
+        },
+        contactInfo: {
+          title: "Informations de contact",
+          intro: "Si vous avez des questions ou des préoccupations concernant cette Politique de Confidentialité ou mes pratiques en matière de données, veuillez me contacter :",
+          address: "Adresse",
+        },
+      },
     },
 
     // Resume
