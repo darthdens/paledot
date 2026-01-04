@@ -11,12 +11,9 @@ export default function Resume() {
   const r = t.resume;
 
   const handleDownloadPDF = () => {
-    // TODO: Replace with actual PDF URL when available
-    const pdfUrl = "https://dens.so/resume.pdf";
     const link = document.createElement('a');
-    link.href = pdfUrl;
+    link.href = '/Denis_Akoka_Resume.pdf';
     link.download = 'Denis_Akoka_Resume.pdf';
-    link.target = '_blank';
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
