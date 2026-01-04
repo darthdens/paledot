@@ -115,7 +115,7 @@ const ArticlesPage = () => {
                           {article.read_time} {t.articles.minRead}
                         </span>
                       </div>
-                      <h3 className="font-serif text-xl font-bold mb-2 group-hover:text-primary transition-colors flex items-center gap-2">
+                      <h3 className="font-serif text-xl font-bold mb-2 group-hover:text-accent transition-colors flex items-center gap-2">
                         {getTitle(article)}
                         <ArrowUpRight className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity" />
                       </h3>
