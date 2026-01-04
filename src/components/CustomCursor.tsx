@@ -27,16 +27,7 @@ export default function CustomCursor() {
 
     const onMouseOver = (e: MouseEvent) => {
       const el = (e.target as HTMLElement | null)?.closest(
-        [
-          "a",
-          "button",
-          "[role='button']",
-          "input",
-          "select",
-          "textarea",
-          "label",
-          ".cursor-pointer",
-        ].join(",")
+        "a[href], button[type='submit'], .nav-link, [data-external]"
       );
       setIsPointer(Boolean(el));
     };
