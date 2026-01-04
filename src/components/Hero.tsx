@@ -30,7 +30,7 @@ export const Hero = () => {
               </h1>
               
               <p className="text-xl md:text-2xl text-muted-foreground leading-relaxed">
-                {t.hero.tagline} <em className="font-serif">{t.hero.thinker}</em>, <em className="font-serif">{t.hero.doer}</em>, and <em className="font-serif">{t.hero.leader}</em>
+                {t.hero.tagline} <em className="font-serif">{t.hero.thinker}</em>, <em className="font-serif">{t.hero.doer}</em>, {t.hero.and} <em className="font-serif">{t.hero.leader}</em>
               </p>
             </div>
 
