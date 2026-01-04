@@ -227,6 +227,7 @@ All colors MUST be HSL.
 .custom-cursor.is-pointer .custom-cursor__icon {
   opacity: 1;
   transform: scale(1);
+  color: hsl(var(--primary));
 }
 
 .custom-cursor.is-down .custom-cursor__ring {
