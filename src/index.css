@@ -152,22 +152,24 @@ All colors MUST be HSL.
 @layer base {
   * {
     @apply border-border;
+    cursor: url('/cursors/cursor-default.svg') 0 0, auto !important;
   }
 
   body {
     @apply bg-background text-foreground;
-    cursor: url('/cursors/cursor-default.svg') 0 0, auto;
   }
 
-  a, button, [role="button"], input[type="submit"], input[type="button"], .cursor-pointer {
-    cursor: url('/cursors/cursor-pointer.svg') 6 0, pointer;
+  a, button, [role="button"], input[type="submit"], input[type="button"], .cursor-pointer,
+  a *, button *, [role="button"] * {
+    cursor: url('/cursors/cursor-pointer.svg') 6 0, pointer !important;
   }
 }
 
-.dark body {
-  cursor: url('/cursors/cursor-default-dark.svg') 0 0, auto;
+.dark * {
+  cursor: url('/cursors/cursor-default-dark.svg') 0 0, auto !important;
 }
 
-.dark a, .dark button, .dark [role="button"], .dark input[type="submit"], .dark input[type="button"], .dark .cursor-pointer {
-  cursor: url('/cursors/cursor-pointer-dark.svg') 6 0, pointer;
+.dark a, .dark button, .dark [role="button"], .dark input[type="submit"], .dark input[type="button"], .dark .cursor-pointer,
+.dark a *, .dark button *, .dark [role="button"] * {
+  cursor: url('/cursors/cursor-pointer-dark.svg') 6 0, pointer !important;
 }
