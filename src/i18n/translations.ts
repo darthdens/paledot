@@ -326,7 +326,7 @@ export const translations = {
           },
           {
             company: "Focus7 International",
-            location: "Wakefield, UK",
+            location: "London, UK",
             period: "March 2022 – March 2024",
             description: "A marketing agency with a focus on brand-led growth. Focus7 helps businesses develop more effective marketing strategies.",
             role: "Senior Marketing Account Manager (Full-time)",
@@ -373,6 +373,42 @@ export const translations = {
               "Developed and maintained client websites, optimising for performance, SEO, and user experience.",
               "Led marketing projects, including social media campaigns, content creation, and brand strategy development.",
               "Built lasting client relationships through exceptional service and results, driving repeat business and referrals.",
+            ],
+          },
+          {
+            company: "Fliptin",
+            location: "Dundee, UK",
+            period: "January 2020 – December 2020",
+            description: "A platform connecting local businesses with customers through digital loyalty programmes.",
+            role: "Marketing Lead (Project)",
+            responsibilities: [
+              "Developed and executed marketing strategies to grow the platform's user base and merchant partnerships.",
+              "Created brand identity and marketing materials for the startup.",
+              "Managed social media presence and community engagement.",
+            ],
+          },
+          {
+            company: "French Red Cross",
+            location: "Nice, France",
+            period: "September 2017 – June 2018",
+            description: "The French branch of the International Red Cross, providing humanitarian aid and emergency response.",
+            role: "Communication Officer (Volunteer)",
+            responsibilities: [
+              "Managed social media accounts and created content to promote events and fundraising campaigns.",
+              "Designed marketing materials for local initiatives and awareness campaigns.",
+              "Coordinated with volunteers and staff to ensure consistent messaging.",
+            ],
+          },
+          {
+            company: "CrossFit Nice",
+            location: "Nice, France",
+            period: "January 2017 – August 2018",
+            description: "A CrossFit gym offering functional fitness training and community-focused workouts.",
+            role: "Marketing & Community Manager (Part-time)",
+            responsibilities: [
+              "Managed social media presence and created engaging content to grow the gym's community.",
+              "Designed promotional materials and coordinated local marketing efforts.",
+              "Organised community events and member engagement initiatives.",
             ],
           },
           {
@@ -752,7 +788,7 @@ export const translations = {
           },
           {
             company: "Focus7 International",
-            location: "Wakefield, UK",
+            location: "Londres, UK",
             period: "Mars 2022 – Mars 2024",
             description: "Agence marketing focalisée sur la croissance par la marque, aidant les entreprises à développer des stratégies marketing plus efficaces.",
             role: "Responsable Senior Compte Marketing (Temps plein)",
@@ -799,6 +835,42 @@ export const translations = {
               "Développement et maintenance de sites web clients, optimisant performance, SEO et expérience utilisateur.",
               "Direction de projets marketing incluant campagnes réseaux sociaux, création de contenu et développement stratégie de marque.",
               "Construction de relations clients durables via un service et des résultats exceptionnels.",
+            ],
+          },
+          {
+            company: "Fliptin",
+            location: "Dundee, UK",
+            period: "Janvier 2020 – Décembre 2020",
+            description: "Plateforme connectant entreprises locales et clients via des programmes de fidélité digitaux.",
+            role: "Responsable Marketing (Projet)",
+            responsibilities: [
+              "Développement et exécution de stratégies marketing pour développer la base utilisateurs et les partenariats.",
+              "Création de l'identité de marque et des supports marketing pour la startup.",
+              "Gestion de la présence sur les réseaux sociaux et de l'engagement communautaire.",
+            ],
+          },
+          {
+            company: "Croix-Rouge Française",
+            location: "Nice, France",
+            period: "Septembre 2017 – Juin 2018",
+            description: "Branche française de la Croix-Rouge internationale, fournissant aide humanitaire et intervention d'urgence.",
+            role: "Chargé de Communication (Bénévole)",
+            responsibilities: [
+              "Gestion des comptes réseaux sociaux et création de contenu pour promouvoir événements et collectes de fonds.",
+              "Design de supports marketing pour initiatives locales et campagnes de sensibilisation.",
+              "Coordination avec bénévoles et personnel pour assurer cohérence des messages.",
+            ],
+          },
+          {
+            company: "CrossFit Nice",
+            location: "Nice, France",
+            period: "Janvier 2017 – Août 2018",
+            description: "Salle de CrossFit offrant entraînement fonctionnel et séances axées sur la communauté.",
+            role: "Marketing & Community Manager (Temps partiel)",
+            responsibilities: [
+              "Gestion de la présence sur les réseaux sociaux et création de contenu engageant pour développer la communauté.",
+              "Design de supports promotionnels et coordination des efforts marketing locaux.",
+              "Organisation d'événements communautaires et initiatives d'engagement des membres.",
             ],
           },
           {

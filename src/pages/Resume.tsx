@@ -11,8 +11,15 @@ export default function Resume() {
   const r = t.resume;
 
   const handleDownloadPDF = () => {
-    // Opens PDF in new tab - can be updated to actual PDF URL
-    window.open("https://www.densakoka.com/resume", "_blank");
+    // TODO: Replace with actual PDF URL when available
+    const pdfUrl = "https://dens.so/resume.pdf";
+    const link = document.createElement('a');
+    link.href = pdfUrl;
+    link.download = 'Denis_Akoka_Resume.pdf';
+    link.target = '_blank';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   return (
@@ -32,19 +39,19 @@ export default function Resume() {
                 <MapPin className="w-4 h-4" />
                 {r.location}
               </span>
-              <a href="mailto:denis.akoka@gmail.com" className="flex items-center gap-1 hover:text-accent transition-colors">
+              <a href="mailto:denis.akoka@gmail.com" className="flex items-center gap-1 text-accent hover:underline transition-colors">
                 <Mail className="w-4 h-4" />
                 {r.email}
               </a>
-              <a href="tel:+447552800685" className="flex items-center gap-1 hover:text-accent transition-colors">
+              <a href="tel:+447552800685" className="flex items-center gap-1 text-accent hover:underline transition-colors">
                 <Phone className="w-4 h-4" />
                 {r.phone}
               </a>
-              <a href="https://www.linkedin.com/in/denisakoka/" target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 hover:text-accent transition-colors">
+              <a href="https://www.linkedin.com/in/denisakoka/" target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-accent hover:underline transition-colors">
                 <Linkedin className="w-4 h-4" />
                 LinkedIn
               </a>
-              <a href="https://www.densakoka.com/" target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 hover:text-accent transition-colors">
+              <a href="https://dens.so" target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-accent hover:underline transition-colors">
                 <Globe className="w-4 h-4" />
                 {r.website}
               </a>
