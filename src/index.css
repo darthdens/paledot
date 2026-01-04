@@ -200,7 +200,7 @@ All colors MUST be HSL.
   display: flex;
   align-items: center;
   justify-content: center;
-  backdrop-filter: blur(4px);
+  backdrop-filter: blur(12px);
   background: hsl(var(--foreground) / 0.08);
   transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
 }
@@ -226,7 +226,7 @@ All colors MUST be HSL.
 .custom-cursor.is-pointer .custom-cursor__icon {
   opacity: 1;
   transform: scale(1);
-  color: hsl(var(--foreground));
+  color: hsl(var(--background));
 }
 
 .custom-cursor.is-down .custom-cursor__ring {
