@@ -147,13 +147,19 @@ const Invoice = () => {
           {/* Mobile/Tablet Preview (dialog) */}
           {!isXlUp && (
             <Dialog open={showPreview} onOpenChange={setShowPreview}>
-              <DialogContent className="w-[calc(100vw-1.5rem)] max-w-none h-[calc(100vh-1.5rem)] overflow-hidden p-4">
-                <DialogHeader className="pr-8">
+              <DialogContent className="w-[calc(100vw-1.5rem)] max-w-none h-[calc(100vh-1.5rem)] overflow-hidden p-4 flex flex-col">
+                <DialogHeader className="pr-8 flex-shrink-0">
                   <DialogTitle>{t.invoice.previewLabel}</DialogTitle>
                 </DialogHeader>
 
-                <div className="overflow-auto">
-                  <div className="w-full overflow-x-auto">
+                <div className="flex-1 overflow-auto">
+                  <div 
+                    className="origin-top-left"
+                    style={{
+                      width: '600px',
+                      transform: `scale(${Math.min((window.innerWidth - 56) / 600, 1)})`,
+                    }}
+                  >
                     <InvoicePreview data={invoiceData} />
                   </div>
                 </div>
