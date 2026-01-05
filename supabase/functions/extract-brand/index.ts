@@ -127,16 +127,57 @@ serve(async (req) => {
           required: ["colors"],
         };
 
+        const extractColorsFromString = (value: string): string[] => {
+          const v = value.toLowerCase();
+          const matches: string[] = [];
+
+          const hex = v.match(/#(?:[0-9a-f]{3,4}|[0-9a-f]{6}|[0-9a-f]{8})\b/g);
+          if (hex) matches.push(...hex);
+
+          const rgb = v.match(/rgba?\(\s*[\d.]+\s*,\s*[\d.]+\s*,\s*[\d.]+(?:\s*,\s*[\d.]+)?\s*\)/g);
+          if (rgb) matches.push(...rgb);
+
+          const hsl = v.match(/hsla?\(\s*[\d.]+(?:deg|rad|turn)?\s*,\s*[\d.]+%\s*,\s*[\d.]+%(?:\s*,\s*[\d.]+)?\s*\)/g);
+          if (hsl) matches.push(...hsl);
+
+          return matches;
+        };
+
+        const extractColorsFromObject = (node: unknown): string[] => {
+          const out: string[] = [];
+          const visit = (n: unknown) => {
+            if (!n) return;
+            if (typeof n === "string") {
+              out.push(...extractColorsFromString(n));
+              return;
+            }
+            if (Array.isArray(n)) {
+              n.forEach(visit);
+              return;
+            }
+            if (typeof n === "object") {
+              Object.values(n as Record<string, unknown>).forEach(visit);
+            }
+          };
+          visit(node);
+          return out;
+        };
+
         const addExtraColors = (colorList: unknown) => {
-          if (!Array.isArray(colorList)) return;
+          const list = Array.isArray(colorList)
+            ? colorList
+            : typeof colorList === "string"
+              ? [colorList]
+              : [];
+
           const unique = Array.from(
             new Set(
-              colorList
+              list
                 .filter((c) => typeof c === "string")
-                .map((c) => c.trim())
+                .map((c) => c.trim().toLowerCase())
                 .filter(Boolean)
             )
-          ).slice(0, 50);
+          ).slice(0, 80);
 
           if (unique.length === 0) return;
 
@@ -147,6 +188,9 @@ serve(async (req) => {
 
           branding.colors = mergeColors(branding.colors || {}, extra);
         };
+
+        // Always pull any additional colors already present in branding output (components, borders, etc.)
+        addExtraColors(extractColorsFromObject(branding));
 
         // Extract additional colors from the homepage (beyond the small "branding" palette)
         try {
@@ -320,12 +364,13 @@ serve(async (req) => {
 
               const pageData = await pageResponse.json();
 
-              const pageJson = pageData.data?.json || pageData.json;
-              addExtraColors(pageJson?.colors);
+               const pageJson = pageData.data?.json || pageData.json;
+               addExtraColors(pageJson?.colors);
 
-              const pageBranding = pageData.data?.branding || pageData.branding;
+               const pageBranding = pageData.data?.branding || pageData.branding;
+               addExtraColors(extractColorsFromObject(pageBranding));
 
-              if (pageBranding) {
+               if (pageBranding) {
                 if (pageBranding.colors) {
                   branding.colors = mergeColors(branding.colors || {}, pageBranding.colors);
                 }
