@@ -18,7 +18,7 @@ interface SeoResult {
   images?: { total: number; withAlt: number; withoutAlt: number };
   links?: { total: number; internal: number; external: number };
   openGraph?: { title?: string; description?: string; image?: string; type?: string };
-  performance?: Array<{ label: string; description: string; status: "pass" | "warning" | "fail" }>;
+  performance?: Array<{ key: string; status: "pass" | "warning" | "fail" }>;
   recommendations?: string[];
 }
 
@@ -194,47 +194,47 @@ function generateRecommendations(result: Partial<SeoResult>): string[] {
   const recommendations: string[] = [];
 
   if (!result.meta?.title?.content) {
-    recommendations.push("Add a title tag to improve search engine visibility");
+    recommendations.push("addTitle");
   } else if (result.meta.title.length < 30) {
-    recommendations.push("Consider making your title tag longer (30-60 characters recommended)");
+    recommendations.push("titleTooShort");
   } else if (result.meta.title.length > 60) {
-    recommendations.push("Your title tag may be truncated in search results (keep under 60 characters)");
+    recommendations.push("titleTooLong");
   }
 
   if (!result.meta?.description?.content) {
-    recommendations.push("Add a meta description to improve click-through rates from search results");
+    recommendations.push("addDescription");
   } else if (result.meta.description.length < 70) {
-    recommendations.push("Consider making your meta description longer (70-160 characters recommended)");
+    recommendations.push("descriptionTooShort");
   } else if (result.meta.description.length > 160) {
-    recommendations.push("Your meta description may be truncated (keep under 160 characters)");
+    recommendations.push("descriptionTooLong");
   }
 
   if (!result.meta?.viewport?.content) {
-    recommendations.push("Add a viewport meta tag for proper mobile responsiveness");
+    recommendations.push("addViewport");
   }
 
   if (!result.meta?.canonical?.content) {
-    recommendations.push("Add a canonical URL to prevent duplicate content issues");
+    recommendations.push("addCanonical");
   }
 
   if (result.headings?.h1 === 0) {
-    recommendations.push("Add an H1 heading to define your page's main topic");
+    recommendations.push("addH1");
   } else if (result.headings && result.headings.h1 > 1) {
-    recommendations.push("Use only one H1 heading per page for better SEO structure");
+    recommendations.push("singleH1");
   }
 
   if (result.images && result.images.withoutAlt > 0) {
-    recommendations.push(`Add alt text to ${result.images.withoutAlt} image(s) for accessibility and SEO`);
+    recommendations.push("addAltText");
   }
 
   if (!result.openGraph?.title) {
-    recommendations.push("Add og:title for better social media sharing");
+    recommendations.push("addOgTitle");
   }
   if (!result.openGraph?.description) {
-    recommendations.push("Add og:description for better social media previews");
+    recommendations.push("addOgDescription");
   }
   if (!result.openGraph?.image) {
-    recommendations.push("Add og:image for visual social media sharing");
+    recommendations.push("addOgImage");
   }
 
   return recommendations;
@@ -339,23 +339,19 @@ Deno.serve(async (req) => {
       },
       performance: [
         {
-          label: "HTTPS",
-          description: formattedUrl.startsWith("https://") ? "Site uses HTTPS" : "Site should use HTTPS",
+          key: "https",
           status: formattedUrl.startsWith("https://") ? "pass" : "fail",
         },
         {
-          label: "Mobile Viewport",
-          description: viewport ? "Viewport meta tag is set" : "Missing viewport meta tag",
+          key: "viewport",
           status: viewport ? "pass" : "fail",
         },
         {
-          label: "Doctype",
-          description: html.toLowerCase().includes("<!doctype html>") ? "HTML5 doctype declared" : "Missing or invalid doctype",
+          key: "doctype",
           status: html.toLowerCase().includes("<!doctype html>") ? "pass" : "warning",
         },
         {
-          label: "Language",
-          description: html.match(/<html[^>]+lang=["'][^"']+["']/i) ? "Language attribute set" : "Missing language attribute",
+          key: "language",
           status: html.match(/<html[^>]+lang=["'][^"']+["']/i) ? "pass" : "warning",
         },
       ],
