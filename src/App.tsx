@@ -7,6 +7,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import NotFound from "./pages/NotFound";
 import Invoice from "./pages/Invoice";
+import SeoChecker from "./pages/SeoChecker";
 
 const queryClient = new QueryClient();
 
@@ -19,7 +20,8 @@ const App = () => (
           <Toaster richColors position="bottom-left" />
           <CookieBanner />
           <Routes>
-            <Route path="/" element={<Invoice />} />
+            <Route path="/" element={<SeoChecker />} />
+            <Route path="/invoice" element={<Invoice />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </TooltipProvider>
