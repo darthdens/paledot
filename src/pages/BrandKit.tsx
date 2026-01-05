@@ -15,7 +15,7 @@ const BrandKit = () => {
   const [result, setResult] = useState<BrandExtractionResult | null>(null);
 
   useEffect(() => {
-    document.title = "Brand Kit Extractor | Dens";
+    document.title = "Brand Kit | Dens";
   }, []);
 
   const handleExtract = async (url: string) => {

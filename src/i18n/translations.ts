@@ -557,8 +557,8 @@ export const translations = {
     // Brand Kit Extractor
     brandKit: {
       badge: "Free Brand Extraction Tool",
-      title: "Extract any brand's identity in seconds",
-      subtitle: "Paste any website URL and instantly get colors, fonts, logos, and design tokens. Perfect for designers, developers, and marketers.",
+      title: "Brand Kit",
+      subtitle: "Paste any website URL and instantly get colors, fonts, logos, and design tokens.",
       placeholder: "Enter a website URL (e.g., stripe.com)",
       extract: "Extract Brand",
       extracting: "Extracting...",
@@ -1146,8 +1146,8 @@ export const translations = {
     // Brand Kit Extractor
     brandKit: {
       badge: "Outil d'extraction de marque gratuit",
-      title: "Extrayez l'identité d'une marque en quelques secondes",
-      subtitle: "Collez l'URL d'un site web et obtenez instantanément les couleurs, polices, logos et tokens de design. Parfait pour les designers, développeurs et marketeurs.",
+      title: "Brand Kit",
+      subtitle: "Collez l'URL d'un site web et obtenez instantanément les couleurs, polices, logos et tokens de design.",
       placeholder: "Entrez l'URL d'un site (ex: stripe.com)",
       extract: "Extraire la marque",
       extracting: "Extraction...",
