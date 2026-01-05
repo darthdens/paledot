@@ -172,7 +172,7 @@ const Invoice = () => {
             <Dialog open={showPreview} onOpenChange={setShowPreview}>
               <DialogContent className="w-[calc(100vw-1.5rem)] max-w-none h-[calc(100vh-1.5rem)] overflow-hidden p-4 sm:p-6 flex flex-col gap-4 sm:gap-6 rounded-xl">
                 <DialogHeader className="pr-10 flex-shrink-0">
-                  <DialogTitle>{t.invoice.previewLabel}</DialogTitle>
+                  <DialogTitle className="text-left">{t.invoice.previewLabel}</DialogTitle>
                 </DialogHeader>
 
                 <div ref={dialogPreviewViewportRef} className="flex-1 min-h-0 overflow-auto">
