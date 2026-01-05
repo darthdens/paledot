@@ -14,12 +14,17 @@ import { toast } from "sonner";
 const Invoice = () => {
   const { t, language } = useLanguage();
   const [invoiceData, setInvoiceData] = useState<InvoiceData>(defaultInvoiceData);
+  // "Wide" layout = side-by-side form + sticky preview
   const [isXlUp, setIsXlUp] = useState(() =>
-    typeof window !== "undefined" ? window.matchMedia("(min-width: 1280px)").matches : true,
+    typeof window !== "undefined" ? window.matchMedia("(min-width: 1536px)").matches : true,
   );
   const [showPreview, setShowPreview] = useState<boolean>(() =>
-    typeof window !== "undefined" ? window.matchMedia("(min-width: 1280px)").matches : true,
+    typeof window !== "undefined" ? window.matchMedia("(min-width: 1536px)").matches : true,
   );
+
+  const dialogPreviewViewportRef = useRef<HTMLDivElement>(null);
+  const [dialogPreviewScale, setDialogPreviewScale] = useState(1);
+
   const pdfPreviewRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -29,7 +34,7 @@ const Invoice = () => {
   useEffect(() => {
     if (typeof window === "undefined") return;
 
-    const mql = window.matchMedia("(min-width: 1280px)");
+    const mql = window.matchMedia("(min-width: 1536px)");
 
     const sync = (matches: boolean) => {
       setIsXlUp(matches);
@@ -44,6 +49,24 @@ const Invoice = () => {
     mql.addEventListener("change", onChange);
     return () => mql.removeEventListener("change", onChange);
   }, []);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (isXlUp) return;
+    if (!showPreview) return;
+
+    const el = dialogPreviewViewportRef.current;
+    if (!el) return;
+
+    const ro = new ResizeObserver((entries) => {
+      const width = entries[0]?.contentRect?.width ?? 0;
+      if (!width) return;
+      setDialogPreviewScale(Math.min(width / 600, 1));
+    });
+
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [isXlUp, showPreview]);
 
   const handleDownloadPDF = async () => {
     if (!pdfPreviewRef.current) return;
@@ -95,7 +118,7 @@ const Invoice = () => {
       <Starfield />
       <Navigation />
       <main className="flex-1 pt-24 md:pt-28 pb-12">
-        <div className="w-full px-4 md:px-6 xl:container xl:mx-auto">
+        <div className="w-full px-0 lg:px-8">
           {/* Hero Section */}
           <div className="text-center mb-8 md:mb-12">
             <h1 className="text-3xl md:text-4xl lg:text-5xl font-serif font-bold mb-3 md:mb-4">
@@ -123,15 +146,15 @@ const Invoice = () => {
           </div>
 
           {/* Main Content */}
-          <div className="grid gap-6 md:gap-8 xl:grid-cols-2">
+          <div className="grid gap-6 md:gap-8 2xl:grid-cols-2">
             {/* Form */}
-            <div className={isXlUp && showPreview ? "" : "xl:col-span-2 xl:max-w-3xl xl:mx-auto"}>
+            <div className={isXlUp && showPreview ? "" : "2xl:col-span-2 2xl:max-w-3xl 2xl:mx-auto"}>
               <InvoiceForm data={invoiceData} onChange={setInvoiceData} />
             </div>
 
-            {/* Desktop Preview (xl+) */}
+            {/* Desktop Preview (2xl+) */}
             {isXlUp && showPreview && (
-              <div className="xl:sticky xl:top-24 xl:self-start">
+              <div className="2xl:sticky 2xl:top-24 2xl:self-start">
                 <div className="bg-card rounded-xl border border-border p-5 md:p-6 shadow-lg">
                   <h3 className="text-sm font-medium text-muted-foreground mb-4">
                     {t.invoice.previewLabel}
@@ -152,12 +175,13 @@ const Invoice = () => {
                   <DialogTitle>{t.invoice.previewLabel}</DialogTitle>
                 </DialogHeader>
 
-                <div className="flex-1 overflow-auto">
-                  <div 
-                    className="origin-top-left"
+                <div ref={dialogPreviewViewportRef} className="flex-1 min-h-0 overflow-auto">
+                  <div
+                    className="mx-auto"
                     style={{
-                      width: '600px',
-                      transform: `scale(${Math.min((window.innerWidth - 56) / 600, 1)})`,
+                      width: 600,
+                      transform: `scale(${dialogPreviewScale})`,
+                      transformOrigin: "top center",
                     }}
                   >
                     <InvoicePreview data={invoiceData} />
