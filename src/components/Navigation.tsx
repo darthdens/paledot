@@ -29,8 +29,8 @@ export const Navigation = () => {
               size="sm"
               asChild
             >
-              <a href="https://dens.so" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2">
-                <span className="hidden sm:inline">{t.nav.visitDens}</span>
+            <a href="https://dens.so" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2">
+                {t.nav.visitDens}
                 <ExternalLink className="w-3.5 h-3.5" />
               </a>
             </Button>
