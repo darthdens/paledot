@@ -6,8 +6,6 @@ import { LanguageProvider } from "@/i18n/LanguageContext";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import NotFound from "./pages/NotFound";
-import Invoice from "./pages/Invoice";
-import SeoChecker from "./pages/SeoChecker";
 import ColorPalette from "./pages/ColorPalette";
 
 const queryClient = new QueryClient();
@@ -22,8 +20,6 @@ const App = () => (
           <CookieBanner />
           <Routes>
             <Route path="/" element={<ColorPalette />} />
-            <Route path="/seo" element={<SeoChecker />} />
-            <Route path="/invoice" element={<Invoice />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </TooltipProvider>
