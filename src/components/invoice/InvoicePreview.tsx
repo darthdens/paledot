@@ -8,18 +8,21 @@ interface InvoicePreviewProps {
 
 export const InvoicePreview = forwardRef<HTMLDivElement, InvoicePreviewProps>(
   ({ data }, ref) => {
-    const { t } = useLanguage();
+    const { t, language } = useLanguage();
     const totals = calculateTotal(data);
 
     const formatDate = (dateStr: string) => {
       if (!dateStr) return '';
       const date = new Date(dateStr);
-      return date.toLocaleDateString('en-US', {
+      const locale = language === 'fr' ? 'fr-FR' : 'en-US';
+      return date.toLocaleDateString(locale, {
         year: 'numeric',
         month: 'long',
         day: 'numeric',
       });
     };
+
+    const formatAmount = (amount: number) => formatCurrency(amount, data.currency, language);
 
     return (
       <div
@@ -134,10 +137,10 @@ export const InvoicePreview = forwardRef<HTMLDivElement, InvoicePreviewProps>(
                   </td>
                   <td className="py-3 text-center text-gray-600">{item.quantity}</td>
                   <td className="py-3 text-right text-gray-600">
-                    {formatCurrency(item.unitPrice, data.currency)}
+                    {formatAmount(item.unitPrice)}
                   </td>
                   <td className="py-3 text-right font-medium text-gray-900">
-                    {formatCurrency(item.quantity * item.unitPrice, data.currency)}
+                    {formatAmount(item.quantity * item.unitPrice)}
                   </td>
                 </tr>
               ))}
@@ -150,7 +153,7 @@ export const InvoicePreview = forwardRef<HTMLDivElement, InvoicePreviewProps>(
           <div className="w-64 space-y-2">
             <div className="flex justify-between text-gray-600">
               <span>{t.invoice.preview.subtotal}</span>
-              <span>{formatCurrency(totals.subtotal, data.currency)}</span>
+              <span>{formatAmount(totals.subtotal)}</span>
             </div>
             {data.discount > 0 && (
               <div className="flex justify-between text-gray-600">
@@ -158,13 +161,13 @@ export const InvoicePreview = forwardRef<HTMLDivElement, InvoicePreviewProps>(
                   {t.invoice.preview.discount}
                   {data.discountType === 'percentage' && ` (${data.discount}%)`}
                 </span>
-                <span>-{formatCurrency(totals.discountAmount, data.currency)}</span>
+                <span>-{formatAmount(totals.discountAmount)}</span>
               </div>
             )}
             {data.taxRate > 0 && (
               <div className="flex justify-between text-gray-600">
                 <span>{t.invoice.preview.tax} ({data.taxRate}%)</span>
-                <span>{formatCurrency(totals.taxAmount, data.currency)}</span>
+                <span>{formatAmount(totals.taxAmount)}</span>
               </div>
             )}
             <div 
@@ -175,7 +178,7 @@ export const InvoicePreview = forwardRef<HTMLDivElement, InvoicePreviewProps>(
               }}
             >
               <span>{t.invoice.preview.total}</span>
-              <span>{formatCurrency(totals.total, data.currency)}</span>
+              <span>{formatAmount(totals.total)}</span>
             </div>
           </div>
         </div>
