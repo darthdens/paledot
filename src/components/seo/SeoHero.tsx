@@ -41,7 +41,7 @@ export const SeoHero = ({ onAnalyze, isLoading }: SeoHeroProps) => {
               className="flex-1 h-12 text-base"
               required
             />
-            <Button type="submit" disabled={isLoading || !url.trim()} className="h-12 px-8 gap-2 bg-primary text-primary-foreground hover:bg-primary/90">
+            <Button type="submit" disabled={isLoading || !url.trim()} className="h-12 px-8 gap-2 bg-secondary text-secondary-foreground hover:bg-secondary/90">
               <Search className="w-4 h-4" />
               {isLoading ? t.seo.analyzing : t.seo.analyzeButton}
             </Button>
