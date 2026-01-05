@@ -1,4 +1,4 @@
-import { ExternalLink, Globe } from "lucide-react";
+import { ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { ColorPalette } from "./ColorPalette";
@@ -23,22 +23,17 @@ export const BrandResult = ({ result, onReset }: BrandResultProps) => {
         <div className="max-w-5xl mx-auto space-y-12">
           {/* Header */}
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-xl bg-muted/50 flex items-center justify-center">
-                <Globe className="w-6 h-6 text-muted-foreground" />
-              </div>
-              <div>
-                <h2 className="text-2xl font-serif font-bold">{siteName}</h2>
-                <a
-                  href={sourceUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-sm text-muted-foreground hover:text-accent transition-colors flex items-center gap-1"
-                >
-                  {sourceUrl}
-                  <ExternalLink className="w-3 h-3" />
-                </a>
-              </div>
+            <div>
+              <h2 className="text-2xl font-serif font-bold">{siteName}</h2>
+              <a
+                href={sourceUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-sm text-muted-foreground hover:text-accent transition-colors flex items-center gap-1"
+              >
+                {sourceUrl}
+                <ExternalLink className="w-3 h-3" />
+              </a>
             </div>
             <Button variant="outline" onClick={onReset}>
               {t.brandKit.extractAnother}
