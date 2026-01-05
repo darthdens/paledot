@@ -188,12 +188,12 @@ serve(async (req) => {
         const mapData = await mapResponse.json();
         console.log("Map response status:", mapResponse.status);
         console.log("Map data keys:", Object.keys(mapData));
-        
+
         // Firecrawl map returns links in mapData.links array
         const siteLinks = mapData.links || mapData.data?.links || [];
         console.log("Found links from map:", siteLinks.length, "Sample:", siteLinks.slice(0, 3));
-        
-        if (mapResponse.ok && siteLinks.length > 0) {
+
+        if (mapResponse.ok) {
           // Get base domain for comparison
           const mainUrl = new URL(formattedUrl);
           const mainHostname = mainUrl.hostname.replace(/^www\./, "");
@@ -241,6 +241,10 @@ serve(async (req) => {
 
           console.log(`Found ${internalLinks.length} additional pages to scrape`);
 
+          if (internalLinks.length === 0) {
+            console.log("No additional pages discovered (map may be limited by site structure/robots). Using homepage only.");
+          }
+
           // Scrape each additional page for branding
           for (const pageUrl of internalLinks) {
             try {
@@ -263,29 +267,77 @@ serve(async (req) => {
                 }),
               });
 
-              if (pageResponse.ok) {
-                const pageData = await pageResponse.json();
-
-                const pageJson = pageData.data?.json || pageData.json;
-                addExtraColors(pageJson?.colors);
-
-                const pageBranding = pageData.data?.branding || pageData.branding;
-
-                if (pageBranding) {
-                  // Merge colors
-                  if (pageBranding.colors) {
-                    branding.colors = mergeColors(branding.colors || {}, pageBranding.colors);
-                  }
-
-                  // Merge fonts
-                  if (pageBranding.fonts) {
-                    branding.fonts = mergeFonts(branding.fonts || [], pageBranding.fonts);
-                  }
+              if (!pageResponse.ok) {
+                let errorBody: unknown = null;
+                try {
+                  errorBody = await pageResponse.json();
+                } catch {
+                  // ignore
                 }
 
-                pagesScraped++;
-                console.log(`Merged branding from ${pageUrl}`);
+                console.error("Additional page scrape failed", {
+                  url: pageUrl,
+                  status: pageResponse.status,
+                  errorBody,
+                });
+
+                // Fallback: try a simple branding-only scrape (some pages reject json extraction)
+                const fallbackResponse = await fetch("https://api.firecrawl.dev/v1/scrape", {
+                  method: "POST",
+                  headers: {
+                    Authorization: `Bearer ${apiKey}`,
+                    "Content-Type": "application/json",
+                  },
+                  body: JSON.stringify({
+                    url: pageUrl,
+                    formats: ["branding"],
+                    onlyMainContent: false,
+                    waitFor: 2000,
+                  }),
+                });
+
+                if (fallbackResponse.ok) {
+                  const fallbackData = await fallbackResponse.json();
+                  const pageBranding = fallbackData.data?.branding || fallbackData.branding;
+
+                  if (pageBranding?.colors) {
+                    branding.colors = mergeColors(branding.colors || {}, pageBranding.colors);
+                  }
+                  if (pageBranding?.fonts) {
+                    branding.fonts = mergeFonts(branding.fonts || [], pageBranding.fonts);
+                  }
+
+                  pagesScraped++;
+                  console.log(`Merged branding (fallback) from ${pageUrl}`);
+                } else {
+                  console.error("Fallback branding scrape also failed", {
+                    url: pageUrl,
+                    status: fallbackResponse.status,
+                  });
+                }
+
+                continue;
               }
+
+              const pageData = await pageResponse.json();
+
+              const pageJson = pageData.data?.json || pageData.json;
+              addExtraColors(pageJson?.colors);
+
+              const pageBranding = pageData.data?.branding || pageData.branding;
+
+              if (pageBranding) {
+                if (pageBranding.colors) {
+                  branding.colors = mergeColors(branding.colors || {}, pageBranding.colors);
+                }
+
+                if (pageBranding.fonts) {
+                  branding.fonts = mergeFonts(branding.fonts || [], pageBranding.fonts);
+                }
+              }
+
+              pagesScraped++;
+              console.log(`Merged branding from ${pageUrl}`);
             } catch (pageError) {
               console.error(`Error scraping ${pageUrl}:`, pageError);
               // Continue with other pages
