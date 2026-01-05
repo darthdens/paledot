@@ -132,18 +132,37 @@ serve(async (req) => {
         });
 
         const mapData = await mapResponse.json();
+        console.log("Map response status:", mapResponse.status);
+        console.log("Map data keys:", Object.keys(mapData));
         
-        if (mapResponse.ok && mapData.links) {
+        // Firecrawl map returns links in mapData.links array
+        const siteLinks = mapData.links || mapData.data?.links || [];
+        console.log("Found links from map:", siteLinks.length, "Sample:", siteLinks.slice(0, 3));
+        
+        if (mapResponse.ok && siteLinks.length > 0) {
+          // Get base domain for comparison
+          const mainUrl = new URL(formattedUrl);
+          const mainHostname = mainUrl.hostname.replace(/^www\./, '');
+          const mainPath = mainUrl.pathname;
+          
           // Filter to get unique internal pages (excluding homepage and assets)
-          const internalLinks = mapData.links
+          const internalLinks = siteLinks
             .filter((link: string) => {
-              const linkUrl = new URL(link);
-              const mainUrl = new URL(formattedUrl);
-              return (
-                linkUrl.hostname === mainUrl.hostname &&
-                link !== formattedUrl &&
-                !link.match(/\.(jpg|jpeg|png|gif|svg|css|js|woff|woff2|ttf|eot|pdf|zip)$/i)
-              );
+              try {
+                const linkUrl = new URL(link);
+                const linkHostname = linkUrl.hostname.replace(/^www\./, '');
+                const linkPath = linkUrl.pathname;
+                
+                // Same domain, different path, not an asset
+                const isSameDomain = linkHostname === mainHostname;
+                const isDifferentPath = linkPath !== mainPath && linkPath !== '/';
+                const isNotAsset = !link.match(/\.(jpg|jpeg|png|gif|svg|css|js|woff|woff2|ttf|eot|pdf|zip|ico|webp)(\?.*)?$/i);
+                const isNotAnchor = !link.includes('#');
+                
+                return isSameDomain && isDifferentPath && isNotAsset && isNotAnchor;
+              } catch {
+                return false;
+              }
             })
             .slice(0, maxPages - 1); // Already scraped homepage
 
