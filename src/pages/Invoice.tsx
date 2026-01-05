@@ -176,16 +176,7 @@ const Invoice = () => {
                 </DialogHeader>
 
                 <div ref={dialogPreviewViewportRef} className="flex-1 min-h-0 overflow-auto">
-                  <div
-                    className="mx-auto"
-                    style={{
-                      width: 600,
-                      transform: `scale(${dialogPreviewScale})`,
-                      transformOrigin: "top center",
-                    }}
-                  >
-                    <InvoicePreview data={invoiceData} />
-                  </div>
+                  <InvoicePreview data={invoiceData} />
                 </div>
               </DialogContent>
             </Dialog>
