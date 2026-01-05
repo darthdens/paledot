@@ -94,7 +94,7 @@ const Invoice = () => {
     <div className="min-h-screen bg-background relative flex flex-col">
       <Starfield />
       <Navigation />
-      <main className="flex-1 pt-20 md:pt-24 pb-12">
+      <main className="flex-1 pt-24 md:pt-28 pb-12">
         <div className="container mx-auto px-4 md:px-6">
           {/* Hero Section */}
           <div className="text-center mb-8 md:mb-12">
