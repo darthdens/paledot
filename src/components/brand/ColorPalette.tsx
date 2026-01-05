@@ -54,14 +54,14 @@ export const ColorPalette = ({ colors }: ColorPaletteProps) => {
             />
             <div className="text-center w-full">
               <p className="text-xs font-medium truncate">{formatColorName(name)}</p>
-              <p className="text-xs text-muted-foreground font-mono truncate">{value}</p>
-            </div>
-            <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
-              {copiedColor === name ? (
-                <Check className="w-4 h-4 text-green-500" />
-              ) : (
-                <Copy className="w-4 h-4 text-muted-foreground" />
-              )}
+              <p className="text-xs text-muted-foreground font-mono truncate flex items-center justify-center gap-1">
+                {value}
+                {copiedColor === name ? (
+                  <Check className="w-3 h-3 text-green-500" />
+                ) : (
+                  <Copy className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
+                )}
+              </p>
             </div>
           </button>
         ))}
