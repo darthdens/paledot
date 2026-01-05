@@ -115,8 +115,7 @@ export const SeoResults = ({ result, onReset }: SeoResultsProps) => {
           {/* Meta Tags */}
           <Card className="bg-card border-border">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <FileText className="w-5 h-5" />
+              <CardTitle>
                 {t.seo.sections.metaTags}
               </CardTitle>
             </CardHeader>
@@ -180,8 +179,7 @@ export const SeoResults = ({ result, onReset }: SeoResultsProps) => {
           {/* Headings */}
           <Card className="bg-card border-border">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Code className="w-5 h-5" />
+              <CardTitle>
                 {t.seo.sections.headings}
               </CardTitle>
             </CardHeader>
@@ -210,8 +208,7 @@ export const SeoResults = ({ result, onReset }: SeoResultsProps) => {
           {/* Images */}
           <Card className="bg-card border-border">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Image className="w-5 h-5" />
+              <CardTitle>
                 {t.seo.sections.images}
               </CardTitle>
             </CardHeader>
@@ -244,8 +241,7 @@ export const SeoResults = ({ result, onReset }: SeoResultsProps) => {
           {/* Links */}
           <Card className="bg-card border-border">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Link2 className="w-5 h-5" />
+              <CardTitle>
                 {t.seo.sections.links}
               </CardTitle>
             </CardHeader>
@@ -270,8 +266,7 @@ export const SeoResults = ({ result, onReset }: SeoResultsProps) => {
           {/* Open Graph */}
           <Card className="bg-card border-border">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Share2 className="w-5 h-5" />
+              <CardTitle>
                 {t.seo.sections.openGraph}
               </CardTitle>
             </CardHeader>
@@ -312,8 +307,7 @@ export const SeoResults = ({ result, onReset }: SeoResultsProps) => {
           {/* Performance Hints */}
           <Card className="bg-card border-border">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Zap className="w-5 h-5" />
+              <CardTitle>
                 {t.seo.sections.performance}
               </CardTitle>
             </CardHeader>
