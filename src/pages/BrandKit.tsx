@@ -18,12 +18,12 @@ const BrandKit = () => {
     document.title = "Brand Kit Extractor | By Dens";
   }, []);
 
-  const handleExtract = async (url: string) => {
+  const handleExtract = async (url: string, deep: boolean = false) => {
     setIsLoading(true);
     setResult(null);
 
     try {
-      const data = await extractBrand(url);
+      const data = await extractBrand(url, { deep, maxPages: 5 });
 
       if (!data.success) {
         toast.error(data.error || t.brandKit.extractionFailed);

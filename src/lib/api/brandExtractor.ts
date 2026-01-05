@@ -74,11 +74,25 @@ export interface BrandExtractionResult {
   };
   links?: string[];
   sourceUrl?: string;
+  pagesScraped?: number;
+  deep?: boolean;
 }
 
-export async function extractBrand(url: string): Promise<BrandExtractionResult> {
+export interface ExtractBrandOptions {
+  deep?: boolean;
+  maxPages?: number;
+}
+
+export async function extractBrand(
+  url: string,
+  options: ExtractBrandOptions = {}
+): Promise<BrandExtractionResult> {
   const { data, error } = await supabase.functions.invoke("extract-brand", {
-    body: { url },
+    body: { 
+      url,
+      deep: options.deep || false,
+      maxPages: options.maxPages || 5,
+    },
   });
 
   if (error) {
