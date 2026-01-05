@@ -27,7 +27,7 @@ export const InvoicePreview = forwardRef<HTMLDivElement, InvoicePreviewProps>(
     return (
       <div
         ref={ref}
-        className="bg-white text-gray-900 p-8 min-w-[600px] font-sans text-sm"
+        className="bg-white text-gray-900 p-4 sm:p-8 w-full font-sans text-sm"
         style={{ fontFamily: 'Inter, system-ui, sans-serif' }}
       >
         {/* Header */}
