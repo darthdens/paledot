@@ -239,7 +239,7 @@ export function InvoiceForm({ data, onChange }: InvoiceFormProps) {
                 type="date"
                 value={data.invoiceDate}
                 onChange={(e) => updateField('invoiceDate', e.target.value)}
-                className="w-full"
+                className="w-full text-left"
               />
             </div>
             <div className="min-w-0">
@@ -249,7 +249,7 @@ export function InvoiceForm({ data, onChange }: InvoiceFormProps) {
                 type="date"
                 value={data.dueDate}
                 onChange={(e) => updateField('dueDate', e.target.value)}
-                className="w-full"
+                className="w-full text-left"
               />
             </div>
           </div>
