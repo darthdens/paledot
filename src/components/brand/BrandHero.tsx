@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Search, Sparkles } from "lucide-react";
+import { Search } from "lucide-react";
 import { useLanguage } from "@/i18n/LanguageContext";
 
 interface BrandHeroProps {
@@ -24,11 +24,6 @@ export const BrandHero = ({ onExtract, isLoading }: BrandHeroProps) => {
     <section className="min-h-[60vh] flex items-center justify-center pt-24 pb-16">
       <div className="container mx-auto px-6">
         <div className="max-w-3xl mx-auto text-center space-y-8">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-muted/70 backdrop-blur-md text-muted-foreground text-sm">
-            <Sparkles className="w-4 h-4" />
-            <span>{t.brandKit.badge}</span>
-          </div>
-
           <h1 className="font-serif text-4xl md:text-6xl font-bold leading-tight">
             {t.brandKit.title}
           </h1>
