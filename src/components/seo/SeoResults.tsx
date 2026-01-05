@@ -37,9 +37,9 @@ const getScoreBg = (score: number) => {
 };
 
 const StatusIcon = ({ status }: { status: "pass" | "warning" | "fail" }) => {
-  if (status === "pass") return <CheckCircle2 className="w-5 h-5 text-green-500" />;
-  if (status === "warning") return <AlertTriangle className="w-5 h-5 text-yellow-500" />;
-  return <XCircle className="w-5 h-5 text-red-500" />;
+  if (status === "pass") return <CheckCircle2 className="w-5 h-5 text-green-500 flex-shrink-0" />;
+  if (status === "warning") return <AlertTriangle className="w-5 h-5 text-yellow-500 flex-shrink-0" />;
+  return <XCircle className="w-5 h-5 text-red-500 flex-shrink-0" />;
 };
 
 export const SeoResults = ({ result, onReset }: SeoResultsProps) => {
@@ -121,54 +121,54 @@ export const SeoResults = ({ result, onReset }: SeoResultsProps) => {
             </CardHeader>
             <CardContent className="space-y-4">
               {/* Title */}
-              <div className="flex items-start gap-3 p-4 rounded-lg bg-muted/50">
+              <div className="flex items-center gap-3 p-4 rounded-lg bg-muted/50">
                 <StatusIcon status={result.meta?.title?.status || "fail"} />
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-1">
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 mb-1 flex-wrap">
                     <span className="font-medium">{t.seo.checks.title}</span>
                     <Badge variant="outline" className="text-xs">
                       {result.meta?.title?.length || 0} {t.seo.characters}
                     </Badge>
                   </div>
-                  <p className="text-sm text-muted-foreground break-all">
+                  <p className="text-sm text-muted-foreground break-words">
                     {result.meta?.title?.content || t.seo.notFound}
                   </p>
                 </div>
               </div>
 
               {/* Description */}
-              <div className="flex items-start gap-3 p-4 rounded-lg bg-muted/50">
+              <div className="flex items-center gap-3 p-4 rounded-lg bg-muted/50">
                 <StatusIcon status={result.meta?.description?.status || "fail"} />
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-1">
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 mb-1 flex-wrap">
                     <span className="font-medium">{t.seo.checks.description}</span>
                     <Badge variant="outline" className="text-xs">
                       {result.meta?.description?.length || 0} {t.seo.characters}
                     </Badge>
                   </div>
-                  <p className="text-sm text-muted-foreground break-all">
+                  <p className="text-sm text-muted-foreground break-words">
                     {result.meta?.description?.content || t.seo.notFound}
                   </p>
                 </div>
               </div>
 
               {/* Canonical */}
-              <div className="flex items-start gap-3 p-4 rounded-lg bg-muted/50">
+              <div className="flex items-center gap-3 p-4 rounded-lg bg-muted/50">
                 <StatusIcon status={result.meta?.canonical?.status || "fail"} />
-                <div className="flex-1">
+                <div className="flex-1 min-w-0">
                   <span className="font-medium">{t.seo.checks.canonical}</span>
-                  <p className="text-sm text-muted-foreground break-all">
+                  <p className="text-sm text-muted-foreground break-words">
                     {result.meta?.canonical?.content || t.seo.notFound}
                   </p>
                 </div>
               </div>
 
               {/* Viewport */}
-              <div className="flex items-start gap-3 p-4 rounded-lg bg-muted/50">
+              <div className="flex items-center gap-3 p-4 rounded-lg bg-muted/50">
                 <StatusIcon status={result.meta?.viewport?.status || "fail"} />
-                <div className="flex-1">
+                <div className="flex-1 min-w-0">
                   <span className="font-medium">{t.seo.checks.viewport}</span>
-                  <p className="text-sm text-muted-foreground">
+                  <p className="text-sm text-muted-foreground break-words">
                     {result.meta?.viewport?.content || t.seo.notFound}
                   </p>
                 </div>
@@ -290,11 +290,11 @@ export const SeoResults = ({ result, onReset }: SeoResultsProps) => {
                   { label: "og:type", value: result.openGraph?.type },
                   { label: "og:image", value: result.openGraph?.image },
                 ].map((item) => (
-                  <div key={item.label} className="flex items-start gap-3 p-3 rounded-lg bg-muted/50">
+                  <div key={item.label} className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
                     <StatusIcon status={item.value ? "pass" : "fail"} />
-                    <div className="flex-1 min-w-0">
+                    <div className="flex-1 min-w-0 overflow-hidden">
                       <span className="font-medium text-sm">{item.label}</span>
-                      <p className="text-sm text-muted-foreground truncate">
+                      <p className="text-sm text-muted-foreground break-words">
                         {item.value || t.seo.notFound}
                       </p>
                     </div>
@@ -313,11 +313,11 @@ export const SeoResults = ({ result, onReset }: SeoResultsProps) => {
             </CardHeader>
             <CardContent className="space-y-4">
               {result.performance?.map((item, index) => (
-                <div key={index} className="flex items-start gap-3 p-4 rounded-lg bg-muted/50">
+                <div key={index} className="flex items-center gap-3 p-4 rounded-lg bg-muted/50">
                   <StatusIcon status={item.status} />
-                  <div className="flex-1">
+                  <div className="flex-1 min-w-0">
                     <span className="font-medium">{item.label}</span>
-                    <p className="text-sm text-muted-foreground">{item.description}</p>
+                    <p className="text-sm text-muted-foreground break-words">{item.description}</p>
                   </div>
                 </div>
               ))}
@@ -333,9 +333,9 @@ export const SeoResults = ({ result, onReset }: SeoResultsProps) => {
               <CardContent>
                 <ul className="space-y-3">
                   {result.recommendations.map((rec, index) => (
-                    <li key={index} className="flex items-start gap-3 p-3 rounded-lg bg-muted/50">
-                      <AlertTriangle className="w-5 h-5 text-yellow-500 flex-shrink-0 mt-0.5" />
-                      <span className="text-sm">{rec}</span>
+                    <li key={index} className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
+                      <AlertTriangle className="w-5 h-5 text-yellow-500 flex-shrink-0" />
+                      <span className="text-sm break-words">{rec}</span>
                     </li>
                   ))}
                 </ul>
