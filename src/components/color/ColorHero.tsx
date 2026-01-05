@@ -121,23 +121,6 @@ export const ColorHero = ({ onGenerate, isLoading }: ColorHeroProps) => {
               {isLoading ? t.colorPalette.generating : t.colorPalette.generate}
             </Button>
           </form>
-
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-8">
-            {[
-              { icon: "🎨", label: t.colorPalette.features.harmonies },
-              { icon: "📋", label: t.colorPalette.features.copyPaste },
-              { icon: "🔄", label: t.colorPalette.features.export },
-              { icon: "⚡", label: t.colorPalette.features.instant },
-            ].map((feature) => (
-              <div
-                key={feature.label}
-                className="flex flex-col items-center gap-2 p-4 rounded-lg bg-card/50 border border-border/50"
-              >
-                <span className="text-2xl">{feature.icon}</span>
-                <span className="text-sm text-muted-foreground text-center">{feature.label}</span>
-              </div>
-            ))}
-          </div>
         </div>
       </div>
     </section>
