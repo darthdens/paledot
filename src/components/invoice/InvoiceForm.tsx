@@ -1,18 +1,18 @@
 import { useLanguage } from "@/i18n/LanguageContext";
-import { InvoiceData, currencies, InvoiceItem } from "./types";
+import { InvoiceData, currencies, InvoiceItem, getCurrencySymbol } from "./types";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { MobileSelect } from "./MobileSelect";
 import { cn } from "@/lib/utils";
 import { format, parseISO } from "date-fns";
 import { enUS, fr } from "date-fns/locale";
 import { CalendarIcon, Plus, Trash2, Upload, X } from "lucide-react";
-import { useRef } from "react";
+import { useRef, useMemo } from "react";
 
 interface InvoiceFormProps {
   data: InvoiceData;
@@ -23,6 +23,11 @@ export function InvoiceForm({ data, onChange }: InvoiceFormProps) {
   const { t, language } = useLanguage();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const dateFnsLocale = language === "fr" ? fr : enUS;
+
+  const currencyOptions = useMemo(
+    () => currencies.map((c) => ({ value: c.code, label: `${c.symbol} - ${c.name}` })),
+    []
+  );
 
   const updateField = <K extends keyof InvoiceData>(field: K, value: InvoiceData[K]) => {
     onChange({ ...data, [field]: value });
@@ -301,18 +306,13 @@ export function InvoiceForm({ data, onChange }: InvoiceFormProps) {
           </div>
           <div>
             <Label htmlFor="currency">{t.invoice.form.currency}</Label>
-            <Select value={data.currency} onValueChange={(v) => updateField('currency', v)}>
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {currencies.map((c) => (
-                  <SelectItem key={c.code} value={c.code}>
-                    {c.symbol} - {c.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <MobileSelect
+              value={data.currency}
+              onValueChange={(v) => updateField('currency', v)}
+              options={currencyOptions}
+              placeholder={t.invoice.form.currency}
+              title={t.invoice.form.currency}
+            />
           </div>
         </CardContent>
       </Card>
@@ -408,18 +408,17 @@ export function InvoiceForm({ data, onChange }: InvoiceFormProps) {
                   value={data.discount}
                   onChange={(e) => updateField('discount', parseFloat(e.target.value) || 0)}
                 />
-                <Select 
-                  value={data.discountType} 
-                  onValueChange={(v: 'percentage' | 'fixed') => updateField('discountType', v)}
-                >
-                  <SelectTrigger className="w-24">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="percentage">%</SelectItem>
-                    <SelectItem value="fixed">{data.currency}</SelectItem>
-                  </SelectContent>
-                </Select>
+                <MobileSelect
+                  value={data.discountType}
+                  onValueChange={(v: string) => updateField('discountType', v as 'percentage' | 'fixed')}
+                  options={[
+                    { value: 'percentage', label: '%' },
+                    { value: 'fixed', label: getCurrencySymbol(data.currency) },
+                  ]}
+                  placeholder="%"
+                  title={t.invoice.form.discount}
+                  triggerClassName="w-24"
+                />
               </div>
             </div>
           </div>

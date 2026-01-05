@@ -68,6 +68,7 @@ export const defaultInvoiceData: InvoiceData = {
 };
 
 export const currencies = [
+  // Fiat Currencies
   { code: 'USD', symbol: '$', name: 'US Dollar' },
   { code: 'EUR', symbol: '€', name: 'Euro' },
   { code: 'GBP', symbol: '£', name: 'British Pound' },
@@ -96,6 +97,19 @@ export const currencies = [
   { code: 'EGP', symbol: 'E£', name: 'Egyptian Pound' },
   { code: 'MAD', symbol: 'د.م.', name: 'Moroccan Dirham' },
   { code: 'XOF', symbol: 'CFA', name: 'West African CFA Franc' },
+  // Cryptocurrencies
+  { code: 'BTC', symbol: '₿', name: 'Bitcoin' },
+  { code: 'ETH', symbol: 'Ξ', name: 'Ethereum' },
+  { code: 'USDT', symbol: '₮', name: 'Tether (USDT)' },
+  { code: 'USDC', symbol: 'USDC', name: 'USD Coin' },
+  { code: 'DAI', symbol: 'DAI', name: 'Dai' },
+  { code: 'BNB', symbol: 'BNB', name: 'BNB' },
+  { code: 'SOL', symbol: 'SOL', name: 'Solana' },
+  { code: 'XRP', symbol: 'XRP', name: 'XRP' },
+  { code: 'DOGE', symbol: 'Ð', name: 'Dogecoin' },
+  { code: 'LTC', symbol: 'Ł', name: 'Litecoin' },
+  { code: 'MATIC', symbol: 'MATIC', name: 'Polygon' },
+  { code: 'AVAX', symbol: 'AVAX', name: 'Avalanche' },
 ];
 
 export function getCurrencySymbol(code: string): string {
