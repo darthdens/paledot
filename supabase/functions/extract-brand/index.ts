@@ -142,24 +142,43 @@ serve(async (req) => {
         if (mapResponse.ok && siteLinks.length > 0) {
           // Get base domain for comparison
           const mainUrl = new URL(formattedUrl);
-          const mainHostname = mainUrl.hostname.replace(/^www\./, '');
+          const mainHostname = mainUrl.hostname.replace(/^www\./, "");
           const mainPath = mainUrl.pathname;
-          
+          const mainHash = mainUrl.hash;
+
+          // Merge map links + homepage scraped links (helps SPAs / hash-routing)
+          const combinedLinks = Array.from(new Set<string>([...siteLinks, ...links]));
+
           // Filter to get unique internal pages (excluding homepage and assets)
-          const internalLinks = siteLinks
+          const internalLinks = combinedLinks
             .filter((link: string) => {
               try {
                 const linkUrl = new URL(link);
-                const linkHostname = linkUrl.hostname.replace(/^www\./, '');
-                const linkPath = linkUrl.pathname;
-                
-                // Same domain, different path, not an asset
+                const linkHostname = linkUrl.hostname.replace(/^www\./, "");
+
                 const isSameDomain = linkHostname === mainHostname;
-                const isDifferentPath = linkPath !== mainPath && linkPath !== '/';
-                const isNotAsset = !link.match(/\.(jpg|jpeg|png|gif|svg|css|js|woff|woff2|ttf|eot|pdf|zip|ico|webp)(\?.*)?$/i);
-                const isNotAnchor = !link.includes('#');
-                
-                return isSameDomain && isDifferentPath && isNotAsset && isNotAnchor;
+                if (!isSameDomain) return false;
+
+                const isNotAsset = !link.match(
+                  /\.(jpg|jpeg|png|gif|svg|css|js|woff|woff2|ttf|eot|pdf|zip|ico|webp)(\?.*)?$/i
+                );
+                if (!isNotAsset) return false;
+
+                // Consider "different" either by path (classic routing) or by hash (SPA routing)
+                const hashIsRoute = !!linkUrl.hash && linkUrl.hash.startsWith("#/");
+                const isDifferentPath = linkUrl.pathname !== mainPath && linkUrl.pathname !== "/";
+                const isDifferentHashRoute = hashIsRoute && linkUrl.hash !== mainHash;
+
+                // Exclude pure anchors (like #section) but allow hash routes (like #/en/about)
+                const isPureAnchor = !!linkUrl.hash && !hashIsRoute;
+
+                // Exclude exact homepage without any route
+                const isExactHome =
+                  linkUrl.origin === mainUrl.origin &&
+                  linkUrl.pathname === mainPath &&
+                  (linkUrl.hash === "" || linkUrl.hash === mainHash);
+
+                return !isExactHome && !isPureAnchor && (isDifferentPath || isDifferentHashRoute);
               } catch {
                 return false;
               }
