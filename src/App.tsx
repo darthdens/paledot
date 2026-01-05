@@ -16,6 +16,7 @@ import Privacy from "./pages/Privacy";
 import ProjectDetail from "./pages/ProjectDetail";
 import ProjectsPage from "./pages/ProjectsPage";
 import Resume from "./pages/Resume";
+import BrandKit from "./pages/BrandKit";
 import AdminArticles from "./pages/admin/AdminArticles";
 import AdminProjects from "./pages/admin/AdminProjects";
 import AdminTestimonials from "./pages/admin/AdminTestimonials";
@@ -32,7 +33,8 @@ const App = () => (
             <Toaster richColors position="bottom-left" />
             <CookieBanner />
             <Routes>
-              <Route path="/" element={<Index />} />
+              <Route path="/" element={<BrandKit />} />
+              <Route path="/brand" element={<BrandKit />} />
               <Route path="/resume" element={<Resume />} />
               <Route path="/privacy" element={<Privacy />} />
               <Route path="/projects" element={<ProjectsPage />} />
