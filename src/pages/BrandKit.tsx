@@ -61,16 +61,16 @@ const BrandKit = () => {
       <Starfield />
       <Navigation />
       <main className="flex-1 flex flex-col items-center justify-center pt-16">
-        {!result && <BrandHero onExtract={handleExtract} isLoading={isLoading} />}
-
-        {isLoading && (
+        {isLoading ? (
           <div className="flex flex-col items-center justify-center py-20 gap-4">
             <Loader2 className="w-10 h-10 animate-spin text-accent" />
             <p className="text-muted-foreground">{t.brandKit.analyzing}</p>
           </div>
+        ) : !result ? (
+          <BrandHero onExtract={handleExtract} isLoading={isLoading} />
+        ) : (
+          <BrandResult result={result} onReset={handleReset} />
         )}
-
-        {result && <BrandResult result={result} onReset={handleReset} />}
       </main>
       <Footer />
     </div>
