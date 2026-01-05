@@ -285,54 +285,74 @@ serve(async (req) => {
           const mainPath = mainUrl.pathname;
           const mainHash = mainUrl.hash;
 
+          const isAssetUrl = (u: string) =>
+            /\.(jpg|jpeg|png|gif|svg|css|js|woff|woff2|ttf|eot|pdf|zip|ico|webp)(\?.*)?$/i.test(
+              u
+            );
+
+          const isHashRoute = (u: URL) => u.hash?.startsWith("#/");
+
+          const routeKey = (u: URL) => {
+            // Treat SPA hash routes as distinct "pages" (e.g. #/en/services)
+            const hashPart = isHashRoute(u) ? u.hash : "";
+            return `${u.origin}${u.pathname}${hashPart}`;
+          };
+
+          const isPureAnchor = (u: URL) => !!u.hash && !isHashRoute(u);
+
+          const isExactHome = (u: URL) =>
+            u.origin === mainUrl.origin &&
+            u.pathname === mainPath &&
+            (u.hash === "" || u.hash === mainHash);
+
+          const normalizeCandidate = (link: string): { url: string; key: string } | null => {
+            try {
+              const u = new URL(link, formattedUrl);
+              const linkHostname = u.hostname.replace(/^www\./, "");
+
+              if (linkHostname !== mainHostname) return null;
+              if (isAssetUrl(u.toString())) return null;
+              if (isPureAnchor(u)) return null;
+              if (isExactHome(u)) return null;
+
+              // Reduce duplicates caused by query strings
+              u.search = "";
+
+              return { url: u.toString(), key: routeKey(u) };
+            } catch {
+              return null;
+            }
+          };
+
           // Merge map links + homepage scraped links (helps SPAs / hash-routing)
           const combinedLinks = Array.from(new Set<string>([...siteLinks, ...links]));
 
-          // Filter to get unique internal pages (excluding homepage and assets)
-          const internalLinks = combinedLinks
-            .filter((link: string) => {
-              try {
-                const linkUrl = new URL(link);
-                const linkHostname = linkUrl.hostname.replace(/^www\./, "");
+          // Seed queue with all discovered internal routes (not just the first N)
+          const queue: string[] = [];
+          const queuedKeys = new Set<string>();
+          const scrapedKeys = new Set<string>();
+          scrapedKeys.add(routeKey(mainUrl));
 
-                const isSameDomain = linkHostname === mainHostname;
-                if (!isSameDomain) return false;
+          const enqueue = (candidate: { url: string; key: string } | null) => {
+            if (!candidate) return;
+            if (queuedKeys.has(candidate.key)) return;
+            if (scrapedKeys.has(candidate.key)) return;
+            if (queue.length >= 400) return;
+            queuedKeys.add(candidate.key);
+            queue.push(candidate.url);
+          };
 
-                const isNotAsset = !link.match(
-                  /\.(jpg|jpeg|png|gif|svg|css|js|woff|woff2|ttf|eot|pdf|zip|ico|webp)(\?.*)?$/i
-                );
-                if (!isNotAsset) return false;
-
-                // Consider "different" either by path (classic routing) or by hash (SPA routing)
-                const hashIsRoute = !!linkUrl.hash && linkUrl.hash.startsWith("#/");
-                const isDifferentPath = linkUrl.pathname !== mainPath && linkUrl.pathname !== "/";
-                const isDifferentHashRoute = hashIsRoute && linkUrl.hash !== mainHash;
-
-                // Exclude pure anchors (like #section) but allow hash routes (like #/en/about)
-                const isPureAnchor = !!linkUrl.hash && !hashIsRoute;
-
-                // Exclude exact homepage without any route
-                const isExactHome =
-                  linkUrl.origin === mainUrl.origin &&
-                  linkUrl.pathname === mainPath &&
-                  (linkUrl.hash === "" || linkUrl.hash === mainHash);
-
-                return !isExactHome && !isPureAnchor && (isDifferentPath || isDifferentHashRoute);
-              } catch {
-                return false;
-              }
-            })
-            .slice(0, maxPages - 1); // Already scraped homepage
-
-          console.log(`Found ${internalLinks.length} additional pages to scrape`);
-
-          if (internalLinks.length === 0) {
-            console.log("No additional pages discovered (map may be limited by site structure/robots). Using homepage only.");
+          for (const link of combinedLinks) {
+            enqueue(normalizeCandidate(link));
           }
 
-          // Scrape each additional page for branding/rawHtml
-          for (const pageUrl of internalLinks) {
-            if (scrapedUrls.size >= maxPages) break;
+          console.log(
+            `Discovered ${queue.length} candidate pages (map + links). Target: ${maxPages}`
+          );
+
+          // Breadth-first scrape: each page can discover more links to follow
+          while (queue.length > 0 && scrapedUrls.size < maxPages) {
+            const pageUrl = queue.shift()!;
             if (scrapedUrls.has(pageUrl)) continue;
 
             try {
@@ -386,6 +406,7 @@ serve(async (req) => {
                   const fallbackData = await fallbackResponse.json();
                   const pageBranding = fallbackData.data?.branding || fallbackData.branding;
                   const pageRawHtml = fallbackData.data?.rawHtml || fallbackData.rawHtml;
+                  const pageLinks = fallbackData.data?.links || fallbackData.links || [];
 
                   addExtraColors(extractColorsFromObject(pageBranding));
                   if (typeof pageRawHtml === "string") {
@@ -399,7 +420,13 @@ serve(async (req) => {
                     branding.fonts = mergeFonts(branding.fonts || [], pageBranding.fonts);
                   }
 
+                  // enqueue newly discovered links
+                  for (const l of pageLinks) {
+                    enqueue(normalizeCandidate(l));
+                  }
+
                   scrapedUrls.add(pageUrl);
+                  scrapedKeys.add(routeKey(new URL(pageUrl)));
                   pagesScraped = scrapedUrls.size;
                   console.log(`Merged branding (fallback) from ${pageUrl}`);
                 } else {
@@ -419,6 +446,7 @@ serve(async (req) => {
 
               const pageBranding = pageData.data?.branding || pageData.branding;
               const pageRawHtml = pageData.data?.rawHtml || pageData.rawHtml;
+              const pageLinks = pageData.data?.links || pageData.links || [];
 
               addExtraColors(extractColorsFromObject(pageBranding));
               if (typeof pageRawHtml === "string") {
@@ -433,18 +461,23 @@ serve(async (req) => {
                 branding.fonts = mergeFonts(branding.fonts || [], pageBranding.fonts);
               }
 
+              // enqueue newly discovered links
+              for (const l of pageLinks) {
+                enqueue(normalizeCandidate(l));
+              }
+
               scrapedUrls.add(pageUrl);
+              scrapedKeys.add(routeKey(new URL(pageUrl)));
               pagesScraped = scrapedUrls.size;
               console.log(`Merged branding from ${pageUrl}`);
             } catch (pageError) {
               console.error(`Error scraping ${pageUrl}:`, pageError);
-              // Continue with other pages
             }
           }
 
-          // If map/links didn't discover enough pages (common for SPAs), fallback to a crawl.
-          if (internalLinks.length < maxPages - 1 && scrapedUrls.size < maxPages) {
-            console.log("Map/links limited; crawling site to discover more pages...");
+          // If map/links still didn't reach maxPages (common for SPAs), fallback to a crawl.
+          if (scrapedUrls.size < maxPages) {
+            console.log("Discovery still limited; crawling site to discover more pages...");
 
             try {
               const crawlResponse = await fetch("https://api.firecrawl.dev/v1/crawl", {
