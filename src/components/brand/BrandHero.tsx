@@ -65,6 +65,7 @@ export const BrandHero = ({ onExtract, isLoading }: BrandHeroProps) => {
                 checked={deepExtract}
                 onCheckedChange={setDeepExtract}
                 disabled={isLoading}
+                className="border border-border data-[state=unchecked]:bg-muted data-[state=checked]:bg-accent"
               />
               <Label 
                 htmlFor="deep-extract" 
