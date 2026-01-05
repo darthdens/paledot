@@ -158,7 +158,8 @@ serve(async (req) => {
             },
             body: JSON.stringify({
               url: formattedUrl,
-              formats: [{ type: "json", schema: colorSchema, prompt: colorPrompt }],
+              formats: ["json"],
+              jsonOptions: { schema: colorSchema, prompt: colorPrompt },
               onlyMainContent: false,
               waitFor: 2000,
             }),
@@ -256,15 +257,13 @@ serve(async (req) => {
                   Authorization: `Bearer ${apiKey}`,
                   "Content-Type": "application/json",
                 },
-                body: JSON.stringify({
-                  url: pageUrl,
-                  formats: [
-                    "branding",
-                    { type: "json", schema: colorSchema, prompt: colorPrompt },
-                  ],
-                  onlyMainContent: false,
-                  waitFor: 2000,
-                }),
+                 body: JSON.stringify({
+                   url: pageUrl,
+                   formats: ["branding", "json"],
+                   jsonOptions: { schema: colorSchema, prompt: colorPrompt },
+                   onlyMainContent: false,
+                   waitFor: 2000,
+                 }),
               });
 
               if (!pageResponse.ok) {
