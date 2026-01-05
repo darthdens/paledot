@@ -130,6 +130,16 @@ serve(async (req) => {
           required: ["colors"],
         };
 
+        const routePrompt =
+          "Extract internal navigation routes used by this website/app. Include hash routes (like #/en/services/axon-pay) and path routes (like /en/services/axon-pay) that the site can navigate to. Return JSON with a single key routes as an array of strings. Do not include external URLs.";
+        const routeSchema = {
+          type: "object",
+          properties: {
+            routes: { type: "array", items: { type: "string" } },
+          },
+          required: ["routes"],
+        };
+
         const extractColorsFromString = (value: string): string[] => {
           const v = value.toLowerCase();
           const matches: string[] = [];
@@ -294,11 +304,23 @@ serve(async (req) => {
           // Grab a couple of same-origin scripts and scan for hash routes.
           try {
             const baseHostname = new URL(formattedUrl).hostname.replace(/^www\./, "");
-            const scriptSrcs = Array.from(mainRawHtml.matchAll(/<script[^>]+src=["']([^"']+)["'][^>]*>/gi))
+
+            const scriptSrcs = Array.from(
+              mainRawHtml.matchAll(/<script[^>]+src=["']([^"']+)["'][^>]*>/gi)
+            )
               .map((m) => m[1])
               .filter((s): s is string => typeof s === "string" && s.length > 0);
 
-            const uniqueScripts = Array.from(new Set(scriptSrcs)).slice(0, 2);
+            const preloadSrcs = Array.from(
+              mainRawHtml.matchAll(
+                /<link[^>]+rel=["']modulepreload["'][^>]+href=["']([^"']+)["'][^>]*>/gi
+              )
+            )
+              .map((m) => m[1])
+              .filter((s): s is string => typeof s === "string" && s.length > 0);
+
+            const assetCandidates = [...scriptSrcs, ...preloadSrcs];
+            const uniqueScripts = Array.from(new Set(assetCandidates)).slice(0, 6);
 
             for (const src of uniqueScripts) {
               const scriptUrl = new URL(src, baseOrigin).toString();
@@ -308,7 +330,7 @@ serve(async (req) => {
               const res = await fetch(scriptUrl);
               if (!res.ok) continue;
               const js = await res.text();
-              addRoutesFromText(js.slice(0, 500_000));
+              addRoutesFromText(js.slice(0, 2_000_000));
             }
           } catch (routeErr) {
             console.log("Route discovery from scripts failed:", routeErr);
@@ -337,6 +359,39 @@ serve(async (req) => {
           addExtraColors(extracted?.colors);
         } catch (extraColorError) {
           console.error("Error extracting extra homepage colors:", extraColorError);
+        }
+
+        // Ask the LLM to list internal SPA routes (useful when the site doesn't expose anchors)
+        try {
+          const routeResponse = await fetch("https://api.firecrawl.dev/v1/scrape", {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${apiKey}`,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              url: formattedUrl,
+              formats: ["json"],
+              jsonOptions: { schema: routeSchema, prompt: routePrompt },
+              onlyMainContent: false,
+              waitFor: 2000,
+            }),
+          });
+
+          const routeData = await routeResponse.json();
+          const extractedRoutes = routeData.data?.json || routeData.json;
+          const routes = Array.isArray(extractedRoutes?.routes) ? extractedRoutes.routes : [];
+
+          routes
+            .filter((r: unknown) => typeof r === "string")
+            .slice(0, 80)
+            .forEach((r: string) => addRouteUrl(r));
+
+          if (discoveredRouteUrls.length > 0) {
+            console.log("Discovered SPA routes via LLM:", discoveredRouteUrls.slice(0, 10));
+          }
+        } catch (routeExtractError) {
+          console.error("Error extracting SPA routes:", routeExtractError);
         }
 
         // Get sitemap
