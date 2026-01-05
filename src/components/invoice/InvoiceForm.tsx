@@ -6,7 +6,12 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Plus, Trash2, Upload, X } from "lucide-react";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { cn } from "@/lib/utils";
+import { format, parseISO } from "date-fns";
+import { enUS, fr } from "date-fns/locale";
+import { CalendarIcon, Plus, Trash2, Upload, X } from "lucide-react";
 import { useRef } from "react";
 
 interface InvoiceFormProps {
@@ -15,11 +20,60 @@ interface InvoiceFormProps {
 }
 
 export function InvoiceForm({ data, onChange }: InvoiceFormProps) {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const dateFnsLocale = language === "fr" ? fr : enUS;
 
   const updateField = <K extends keyof InvoiceData>(field: K, value: InvoiceData[K]) => {
     onChange({ ...data, [field]: value });
+  };
+
+  const DatePickerField = ({
+    id,
+    label,
+    value,
+    onValueChange,
+  }: {
+    id: string;
+    label: string;
+    value: string;
+    onValueChange: (value: string) => void;
+  }) => {
+    const selected = value ? parseISO(value) : undefined;
+
+    return (
+      <div className="min-w-0">
+        <Label htmlFor={id}>{label}</Label>
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button
+              id={id}
+              type="button"
+              variant="outline"
+              className={cn(
+                "w-full justify-start text-left font-normal",
+                !selected && "text-muted-foreground",
+              )}
+            >
+              <CalendarIcon className="mr-2 h-4 w-4 shrink-0 opacity-50" />
+              <span className="truncate">
+                {selected ? format(selected, "PPP", { locale: dateFnsLocale }) : t.invoice.form.pickDate}
+              </span>
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-auto p-0" align="start">
+            <Calendar
+              mode="single"
+              selected={selected}
+              onSelect={(d) => onValueChange(d ? format(d, "yyyy-MM-dd") : "")}
+              initialFocus
+              locale={dateFnsLocale}
+              className={cn("p-3 pointer-events-auto")}
+            />
+          </PopoverContent>
+        </Popover>
+      </div>
+    );
   };
 
   const updateItem = (id: string, field: keyof InvoiceItem, value: string | number) => {
@@ -232,26 +286,18 @@ export function InvoiceForm({ data, onChange }: InvoiceFormProps) {
             />
           </div>
           <div className="grid grid-cols-2 gap-4">
-            <div className="min-w-0">
-              <Label htmlFor="invoiceDate">{t.invoice.form.invoiceDate}</Label>
-              <Input
-                id="invoiceDate"
-                type="date"
-                value={data.invoiceDate}
-                onChange={(e) => updateField('invoiceDate', e.target.value)}
-                className="w-full text-left"
-              />
-            </div>
-            <div className="min-w-0">
-              <Label htmlFor="dueDate">{t.invoice.form.dueDate}</Label>
-              <Input
-                id="dueDate"
-                type="date"
-                value={data.dueDate}
-                onChange={(e) => updateField('dueDate', e.target.value)}
-                className="w-full text-left"
-              />
-            </div>
+            <DatePickerField
+              id="invoiceDate"
+              label={t.invoice.form.invoiceDate}
+              value={data.invoiceDate}
+              onValueChange={(v) => updateField("invoiceDate", v)}
+            />
+            <DatePickerField
+              id="dueDate"
+              label={t.invoice.form.dueDate}
+              value={data.dueDate}
+              onValueChange={(v) => updateField("dueDate", v)}
+            />
           </div>
           <div>
             <Label htmlFor="currency">{t.invoice.form.currency}</Label>
