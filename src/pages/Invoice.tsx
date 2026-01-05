@@ -69,53 +69,55 @@ const Invoice = () => {
     <div className="min-h-screen bg-background relative flex flex-col">
       <Starfield />
       <Navigation />
-      <main className="flex-1 pt-24 pb-12">
-        <div className="container mx-auto px-6">
+      <main className="flex-1 pt-20 md:pt-24 pb-12">
+        <div className="container mx-auto px-4 md:px-6">
           {/* Hero Section */}
-          <div className="text-center mb-12">
-            <h1 className="text-4xl md:text-5xl font-serif font-bold mb-4">
+          <div className="text-center mb-8 md:mb-12">
+            <h1 className="text-3xl md:text-4xl lg:text-5xl font-serif font-bold mb-3 md:mb-4">
               {t.invoice.title}
             </h1>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+            <p className="text-base md:text-lg text-muted-foreground max-w-2xl mx-auto px-2">
               {t.invoice.subtitle}
             </p>
           </div>
 
           {/* Actions Bar */}
-          <div className="flex flex-wrap items-center justify-center gap-4 mb-8">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3 sm:gap-4 mb-6 md:mb-8">
             <Button
               variant="outline"
               onClick={() => setShowPreview(!showPreview)}
-              className="gap-2"
+              className="gap-2 w-full sm:w-auto"
             >
               {showPreview ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
               {showPreview ? t.invoice.hidePreview : t.invoice.showPreview}
             </Button>
-            <Button onClick={handleDownloadPDF} className="gap-2">
+            <Button onClick={handleDownloadPDF} className="gap-2 w-full sm:w-auto">
               <Download className="w-4 h-4" />
               {t.invoice.downloadPdf}
             </Button>
           </div>
 
           {/* Main Content */}
-          <div className={`grid gap-8 ${showPreview ? 'lg:grid-cols-2' : 'max-w-2xl mx-auto'}`}>
+          <div className={`grid gap-6 md:gap-8 ${showPreview ? 'xl:grid-cols-2' : 'max-w-2xl mx-auto'}`}>
             {/* Form */}
-            <div className="order-2 lg:order-1">
+            <div className="order-2 xl:order-1">
               <InvoiceForm 
                 data={invoiceData} 
                 onChange={setInvoiceData} 
               />
             </div>
 
-            {/* Preview */}
+            {/* Preview - Hidden on mobile by default, shown when toggled */}
             {showPreview && (
-              <div className="order-1 lg:order-2 lg:sticky lg:top-24 lg:self-start">
-              <div className="bg-card rounded-xl border border-border p-4 shadow-lg">
-                  <h3 className="text-sm font-medium text-muted-foreground mb-4">
+              <div className="order-1 xl:order-2 xl:sticky xl:top-24 xl:self-start">
+                <div className="bg-card rounded-xl border border-border p-3 md:p-4 shadow-lg">
+                  <h3 className="text-sm font-medium text-muted-foreground mb-3 md:mb-4">
                     {t.invoice.previewLabel}
                   </h3>
-                  <div className="overflow-auto max-h-[80vh]">
-                    <InvoicePreview ref={previewRef} data={invoiceData} />
+                  <div className="overflow-x-auto overflow-y-auto max-h-[60vh] xl:max-h-[80vh] -mx-3 md:mx-0">
+                    <div className="min-w-[320px] md:min-w-0 scale-[0.6] sm:scale-75 md:scale-90 xl:scale-100 origin-top-left md:origin-top">
+                      <InvoicePreview ref={previewRef} data={invoiceData} />
+                    </div>
                   </div>
                 </div>
               </div>
