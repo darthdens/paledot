@@ -50,10 +50,10 @@ const BrandKit = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background relative">
+    <div className="min-h-screen bg-background relative flex flex-col">
       <Starfield />
       <Navigation />
-      <main>
+      <main className="flex-1 flex flex-col items-center justify-center pt-16">
         {!result && <BrandHero onExtract={handleExtract} isLoading={isLoading} />}
         
         {isLoading && (
