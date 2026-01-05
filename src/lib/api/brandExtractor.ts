@@ -75,6 +75,8 @@ export interface BrandExtractionResult {
   links?: string[];
   sourceUrl?: string;
   pagesScraped?: number;
+  scrapedUrls?: string[];
+  screenshotColors?: string[];
   deep?: boolean;
 }
 
