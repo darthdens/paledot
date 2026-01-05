@@ -4,6 +4,8 @@ import { useLanguage } from "@/i18n/LanguageContext";
 import { ColorPalette } from "./ColorPalette";
 import { FontList } from "./FontList";
 import { LogoDisplay } from "./LogoDisplay";
+import { ScrapedPagesDebug } from "./ScrapedPagesDebug";
+import { ScreenshotColorsPalette } from "./ScreenshotColorsPalette";
 import type { BrandExtractionResult } from "@/lib/api/brandExtractor";
 
 interface BrandResultProps {
@@ -38,6 +40,9 @@ export const BrandResult = ({ result, onReset }: BrandResultProps) => {
                 <p className="text-xs text-muted-foreground mt-1">
                   {result.pagesScraped} {t.brandKit.pagesScraped}
                 </p>
+              )}
+              {result.deep && result.scrapedUrls && (
+                <ScrapedPagesDebug scrapedUrls={result.scrapedUrls} />
               )}
             </div>
             <Button variant="outline" onClick={onReset}>
@@ -77,6 +82,11 @@ export const BrandResult = ({ result, onReset }: BrandResultProps) => {
 
           {/* Colors */}
           {branding?.colors && <ColorPalette colors={branding.colors} />}
+
+          {/* Screenshot Colors */}
+          {result.screenshotColors && result.screenshotColors.length > 0 && (
+            <ScreenshotColorsPalette colors={result.screenshotColors} />
+          )}
 
           {/* Fonts */}
           <FontList fonts={branding?.fonts} typography={branding?.typography} />

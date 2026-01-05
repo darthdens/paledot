@@ -588,6 +588,8 @@ export const translations = {
       downloadStarted: "Download started",
       downloadFailed: "Failed to download",
       imageLoadError: "Could not load image",
+      scrapedPages: "Scraped Pages",
+      screenshotColors: "Colors from Screenshot",
     },
   },
 
@@ -1180,6 +1182,8 @@ export const translations = {
       downloadStarted: "Téléchargement lancé",
       downloadFailed: "Échec du téléchargement",
       imageLoadError: "Impossible de charger l'image",
+      scrapedPages: "Pages analysées",
+      screenshotColors: "Couleurs de la capture d'écran",
     },
   },
 } as const;

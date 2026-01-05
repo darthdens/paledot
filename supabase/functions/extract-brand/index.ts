@@ -525,6 +525,76 @@ serve(async (req) => {
 
     console.log(`Brand extraction complete. Pages scraped: ${pagesScraped}`);
 
+    // Extract colors from screenshot using Lovable AI
+    let screenshotColors: string[] = [];
+    if (screenshot && deep) {
+      try {
+        console.log("Extracting dominant colors from screenshot via AI...");
+        const aiKey = Deno.env.get("LOVABLE_API_KEY");
+        if (aiKey) {
+          const aiResponse = await fetch(
+            "https://ai.gateway.lovable.dev/v1/chat/completions",
+            {
+              method: "POST",
+              headers: {
+                Authorization: `Bearer ${aiKey}`,
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                model: "google/gemini-2.5-flash",
+                messages: [
+                  {
+                    role: "user",
+                    content: [
+                      {
+                        type: "text",
+                        text: 'Analyze this screenshot and extract the 8-12 most dominant/visible colors used for backgrounds, text, buttons, and accents. Return ONLY a valid JSON array of hex color strings, e.g. ["#FF6B35","#004E89"]. No explanation, just JSON.',
+                      },
+                      {
+                        type: "image_url",
+                        image_url: { url: screenshot },
+                      },
+                    ],
+                  },
+                ],
+              }),
+            }
+          );
+
+          if (aiResponse.ok) {
+            const aiData = await aiResponse.json();
+            const content = aiData.choices?.[0]?.message?.content || "";
+            // Parse JSON array from content (may have markdown or extra text)
+            const match = content.match(/\[[\s\S]*?\]/);
+            if (match) {
+              try {
+                const parsed = JSON.parse(match[0]);
+                if (Array.isArray(parsed)) {
+                  screenshotColors = parsed
+                    .filter((c: unknown) => typeof c === "string" && c.startsWith("#"))
+                    .slice(0, 12);
+                  console.log("Screenshot colors extracted:", screenshotColors);
+
+                  // Merge into branding.colors
+                  const extra: { [key: string]: string } = {};
+                  screenshotColors.forEach((c, idx) => {
+                    extra[`screenshot${idx + 1}`] = c;
+                  });
+                  branding.colors = mergeColors(branding.colors || {}, extra);
+                }
+              } catch {
+                console.error("Failed to parse AI color JSON");
+              }
+            }
+          } else {
+            console.error("AI screenshot color extraction failed", aiResponse.status);
+          }
+        }
+      } catch (aiError) {
+        console.error("Error extracting screenshot colors:", aiError);
+      }
+    }
+
     return new Response(
       JSON.stringify({
         success: true,
@@ -534,6 +604,8 @@ serve(async (req) => {
         links,
         sourceUrl: formattedUrl,
         pagesScraped,
+        scrapedUrls: Array.from(scrapedUrls),
+        screenshotColors,
         deep,
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
