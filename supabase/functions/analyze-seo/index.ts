@@ -54,36 +54,40 @@ function extractMetaContent(html: string, name: string): string | null {
 }
 
 function countHeadings(html: string): { h1: number; h2: number; h3: number; h4: number; h5: number; h6: number } {
-  // Remove script and style tags to avoid false positives
+  // Remove script, style, noscript, and comments to avoid false positives
   const cleanHtml = html
-    .replace(/<script[\s\S]*?<\/script>/gi, "")
-    .replace(/<style[\s\S]*?<\/style>/gi, "")
+    .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, "")
+    .replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, "")
+    .replace(/<noscript\b[^<]*(?:(?!<\/noscript>)<[^<]*)*<\/noscript>/gi, "")
     .replace(/<!--[\s\S]*?-->/g, "");
   
+  // Match opening h tags more precisely - handles attributes and whitespace
   return {
-    h1: (cleanHtml.match(/<h1[\s>]/gi) || []).length,
-    h2: (cleanHtml.match(/<h2[\s>]/gi) || []).length,
-    h3: (cleanHtml.match(/<h3[\s>]/gi) || []).length,
-    h4: (cleanHtml.match(/<h4[\s>]/gi) || []).length,
-    h5: (cleanHtml.match(/<h5[\s>]/gi) || []).length,
-    h6: (cleanHtml.match(/<h6[\s>]/gi) || []).length,
+    h1: (cleanHtml.match(/<h1\b[^>]*>/gi) || []).length,
+    h2: (cleanHtml.match(/<h2\b[^>]*>/gi) || []).length,
+    h3: (cleanHtml.match(/<h3\b[^>]*>/gi) || []).length,
+    h4: (cleanHtml.match(/<h4\b[^>]*>/gi) || []).length,
+    h5: (cleanHtml.match(/<h5\b[^>]*>/gi) || []).length,
+    h6: (cleanHtml.match(/<h6\b[^>]*>/gi) || []).length,
   };
 }
 
 function analyzeImages(html: string): { total: number; withAlt: number; withoutAlt: number } {
-  // Remove script and style tags
+  // Remove script, style, noscript, and comments
   const cleanHtml = html
-    .replace(/<script[\s\S]*?<\/script>/gi, "")
-    .replace(/<style[\s\S]*?<\/style>/gi, "")
+    .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, "")
+    .replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, "")
+    .replace(/<noscript\b[^<]*(?:(?!<\/noscript>)<[^<]*)*<\/noscript>/gi, "")
     .replace(/<!--[\s\S]*?-->/g, "");
   
-  const imgTags = cleanHtml.match(/<img[^>]*>/gi) || [];
+  // Match img tags - handles self-closing and regular
+  const imgTags = cleanHtml.match(/<img\b[^>]*\/?>/gi) || [];
   const total = imgTags.length;
   let withAlt = 0;
 
   for (const img of imgTags) {
-    // Check for non-empty alt attribute
-    if (/alt=["'][^"']+["']/i.test(img)) {
+    // Check for non-empty alt attribute (handles various quote styles)
+    if (/\balt\s*=\s*["'][^"']+["']/i.test(img) || /\balt\s*=\s*[^\s>]+/i.test(img)) {
       withAlt++;
     }
   }
@@ -92,34 +96,39 @@ function analyzeImages(html: string): { total: number; withAlt: number; withoutA
 }
 
 function analyzeLinks(html: string, baseUrl: string): { total: number; internal: number; external: number } {
-  // Remove script and style tags
+  // Remove script, style, noscript, and comments
   const cleanHtml = html
-    .replace(/<script[\s\S]*?<\/script>/gi, "")
-    .replace(/<style[\s\S]*?<\/style>/gi, "")
+    .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, "")
+    .replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, "")
+    .replace(/<noscript\b[^<]*(?:(?!<\/noscript>)<[^<]*)*<\/noscript>/gi, "")
     .replace(/<!--[\s\S]*?-->/g, "");
   
-  // Match anchor tags with href
-  const linkTags = cleanHtml.match(/<a\s[^>]*href=["'][^"']*["'][^>]*>/gi) || [];
-  const total = linkTags.length;
+  // Match all anchor tags (not just those with href first)
+  const linkTags = cleanHtml.match(/<a\b[^>]*>/gi) || [];
   let internal = 0;
   let external = 0;
+  let validLinks = 0;
 
   const baseHost = new URL(baseUrl).hostname;
 
   for (const link of linkTags) {
-    const hrefMatch = link.match(/href=["']([^"']*)["']/i);
+    // Extract href from anywhere in the tag
+    const hrefMatch = link.match(/\bhref\s*=\s*["']([^"']*)["']/i) || link.match(/\bhref\s*=\s*([^\s>]+)/i);
     if (hrefMatch) {
       const href = hrefMatch[1].trim();
-      // Skip empty hrefs, javascript:, mailto:, tel:
-      if (!href || href.startsWith("javascript:") || href.startsWith("mailto:") || href.startsWith("tel:")) {
+      // Skip empty hrefs, javascript:, mailto:, tel:, #
+      if (!href || href === "#" || href.startsWith("javascript:") || href.startsWith("mailto:") || href.startsWith("tel:")) {
         continue;
       }
-      if (href.startsWith("/") || href.startsWith("#") || href.startsWith("./") || href.startsWith("../")) {
+      validLinks++;
+      if (href.startsWith("/") || href.startsWith("./") || href.startsWith("../")) {
         internal++;
+      } else if (href.startsWith("#")) {
+        internal++; // Anchor links are internal
       } else if (href.startsWith("http://") || href.startsWith("https://")) {
         try {
           const linkHost = new URL(href).hostname;
-          if (linkHost === baseHost || linkHost.endsWith("." + baseHost)) {
+          if (linkHost === baseHost || linkHost.endsWith("." + baseHost) || baseHost.endsWith("." + linkHost)) {
             internal++;
           } else {
             external++;
@@ -133,7 +142,7 @@ function analyzeLinks(html: string, baseUrl: string): { total: number; internal:
     }
   }
 
-  return { total, internal, external };
+  return { total: validLinks, internal, external };
 }
 
 function calculateScore(result: Partial<SeoResult>): number {
