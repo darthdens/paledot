@@ -163,13 +163,17 @@ export function formatCurrency(amount: number, currency: string, language: strin
       maximumFractionDigits: 2,
     }).format(amount);
   } catch {
-    // Fallback for unsupported currency codes
+    // Fallback for unsupported currency codes (mainly crypto)
     const symbol = getCurrencySymbol(currency);
     const formattedNumber = new Intl.NumberFormat(locale, {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
     }).format(amount);
-    return language === 'fr' ? `${formattedNumber} ${symbol}` : `${symbol}${formattedNumber}`;
+    // Add space after symbol if it's more than 1 character (for readability with crypto symbols like USDC, MATIC, etc.)
+    const needsSpace = symbol.length > 1;
+    return language === 'fr' 
+      ? `${formattedNumber} ${symbol}` 
+      : `${symbol}${needsSpace ? ' ' : ''}${formattedNumber}`;
   }
 }
 
