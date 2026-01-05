@@ -33,9 +33,9 @@ export const CookieBanner = () => {
       <div className="container mx-auto max-w-4xl flex flex-col sm:flex-row items-center justify-between gap-4">
         <p className="text-sm text-muted-foreground text-center sm:text-left">
           {t.cookies.message}{" "}
-          <Link to="/privacy" className="underline hover:text-foreground transition-colors">
+          <a href="https://dens.so/privacy" target="_blank" rel="noopener noreferrer" className="underline hover:text-foreground transition-colors">
             {t.cookies.privacyLink}
-          </Link>
+          </a>
         </p>
         <div className="flex gap-3 shrink-0">
           <Button variant="outline" size="sm" onClick={handleDecline}>
