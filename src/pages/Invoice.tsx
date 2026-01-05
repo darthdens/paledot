@@ -132,8 +132,8 @@ const Invoice = () => {
             {/* Desktop Preview (xl+) */}
             {isXlUp && showPreview && (
               <div className="xl:sticky xl:top-24 xl:self-start">
-                <div className="bg-card rounded-xl border border-border p-3 md:p-4 shadow-lg">
-                  <h3 className="text-sm font-medium text-muted-foreground mb-3 md:mb-4">
+                <div className="bg-card rounded-xl border border-border p-5 md:p-6 shadow-lg">
+                  <h3 className="text-sm font-medium text-muted-foreground mb-4">
                     {t.invoice.previewLabel}
                   </h3>
                   <div className="overflow-auto max-h-[80vh]">
@@ -147,7 +147,7 @@ const Invoice = () => {
           {/* Mobile/Tablet Preview (dialog) */}
           {!isXlUp && (
             <Dialog open={showPreview} onOpenChange={setShowPreview}>
-              <DialogContent className="w-[calc(100vw-1.5rem)] max-w-none h-[calc(100vh-1.5rem)] overflow-hidden pt-10 px-6 pb-6 flex flex-col gap-6">
+              <DialogContent className="w-[calc(100vw-1.5rem)] max-w-none h-[calc(100vh-1.5rem)] overflow-hidden pt-14 px-6 pb-6 flex flex-col gap-8">
                 <DialogHeader className="pr-8 flex-shrink-0">
                   <DialogTitle>{t.invoice.previewLabel}</DialogTitle>
                 </DialogHeader>
