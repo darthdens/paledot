@@ -3,11 +3,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
+import { Slider } from "@/components/ui/slider";
 import { Search, Layers } from "lucide-react";
 import { useLanguage } from "@/i18n/LanguageContext";
 
 interface BrandHeroProps {
-  onExtract: (url: string, deep: boolean) => void;
+  onExtract: (url: string, deep: boolean, maxPages?: number) => void;
   isLoading: boolean;
 }
 
@@ -15,11 +16,12 @@ export const BrandHero = ({ onExtract, isLoading }: BrandHeroProps) => {
   const { t } = useLanguage();
   const [url, setUrl] = useState("");
   const [deepExtract, setDeepExtract] = useState(false);
+  const [maxPages, setMaxPages] = useState(12);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (url.trim()) {
-      onExtract(url.trim(), deepExtract);
+      onExtract(url.trim(), deepExtract, deepExtract ? maxPages : undefined);
     }
   };
 
@@ -59,27 +61,44 @@ export const BrandHero = ({ onExtract, isLoading }: BrandHeroProps) => {
               </Button>
             </div>
 
-            <div className="flex items-center justify-center gap-3 py-2">
-              <Switch
-                id="deep-extract"
-                checked={deepExtract}
-                onCheckedChange={setDeepExtract}
-                disabled={isLoading}
-                className="border border-border data-[state=unchecked]:bg-muted data-[state=checked]:bg-accent data-[state=checked]:border-accent"
-              />
-              <Label
-                htmlFor="deep-extract"
-                className="flex items-center gap-2 text-sm text-muted-foreground cursor-pointer"
-              >
-                <Layers className="w-4 h-4" />
-                {t.brandKit.deepExtract}
-              </Label>
+            <div className="space-y-3">
+              <div className="flex items-center justify-center gap-3 py-2">
+                <Switch
+                  id="deep-extract"
+                  checked={deepExtract}
+                  onCheckedChange={setDeepExtract}
+                  disabled={isLoading}
+                  className="border border-border data-[state=unchecked]:bg-muted data-[state=checked]:bg-accent data-[state=checked]:border-accent"
+                />
+                <Label
+                  htmlFor="deep-extract"
+                  className="flex items-center gap-2 text-sm text-muted-foreground cursor-pointer"
+                >
+                  <Layers className="w-4 h-4" />
+                  {t.brandKit.deepExtract}
+                </Label>
+              </div>
+
+              {deepExtract && (
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between text-sm text-muted-foreground">
+                    <span>{t.brandKit.maxPages}</span>
+                    <span className="tabular-nums">{maxPages}</span>
+                  </div>
+                  <Slider
+                    value={[maxPages]}
+                    min={3}
+                    max={30}
+                    step={1}
+                    onValueChange={(v) => setMaxPages(v[0] ?? 12)}
+                    disabled={isLoading}
+                  />
+                </div>
+              )}
             </div>
           </form>
 
-          <p className="text-sm text-muted-foreground">
-            {t.brandKit.example}
-          </p>
+          <p className="text-sm text-muted-foreground">{t.brandKit.example}</p>
         </div>
       </div>
     </section>

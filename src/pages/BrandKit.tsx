@@ -18,12 +18,19 @@ const BrandKit = () => {
     document.title = "Brand Kit Extractor | By Dens";
   }, []);
 
-  const handleExtract = async (url: string, deep: boolean = false) => {
+  const handleExtract = async (
+    url: string,
+    deep: boolean = false,
+    maxPages?: number
+  ) => {
     setIsLoading(true);
     setResult(null);
 
     try {
-      const data = await extractBrand(url, { deep, maxPages: 5 });
+      const data = await extractBrand(url, {
+        deep,
+        maxPages: deep ? maxPages ?? 12 : 5,
+      });
 
       if (!data.success) {
         toast.error(data.error || t.brandKit.extractionFailed);
@@ -55,14 +62,14 @@ const BrandKit = () => {
       <Navigation />
       <main className="flex-1 flex flex-col items-center justify-center pt-16">
         {!result && <BrandHero onExtract={handleExtract} isLoading={isLoading} />}
-        
+
         {isLoading && (
           <div className="flex flex-col items-center justify-center py-20 gap-4">
             <Loader2 className="w-10 h-10 animate-spin text-accent" />
             <p className="text-muted-foreground">{t.brandKit.analyzing}</p>
           </div>
         )}
-        
+
         {result && <BrandResult result={result} onReset={handleReset} />}
       </main>
       <Footer />
