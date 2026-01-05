@@ -24,10 +24,27 @@ export function InvoiceForm({ data, onChange }: InvoiceFormProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const dateFnsLocale = language === "fr" ? fr : enUS;
 
-  const currencyOptions = useMemo(
-    () => currencies.map((c) => ({ value: c.code, label: `${c.symbol} - ${c.name}` })),
-    []
-  );
+  const currencyOptions = useMemo(() => {
+    const options: { value: string; label: string; isSeparator?: boolean }[] = [];
+    let addedCryptoSeparator = false;
+    let addedStablecoinSeparator = false;
+
+    currencies.forEach((c) => {
+      // Add separator before first crypto (BTC)
+      if (c.code === 'BTC' && !addedCryptoSeparator) {
+        options.push({ value: '__crypto_sep', label: 'Cryptocurrencies', isSeparator: true });
+        addedCryptoSeparator = true;
+      }
+      // Add separator before first stablecoin (USDT)
+      if (c.code === 'USDT' && !addedStablecoinSeparator) {
+        options.push({ value: '__stable_sep', label: 'Stablecoins', isSeparator: true });
+        addedStablecoinSeparator = true;
+      }
+      options.push({ value: c.code, label: `${c.symbol} - ${c.name}` });
+    });
+
+    return options;
+  }, []);
 
   const updateField = <K extends keyof InvoiceData>(field: K, value: InvoiceData[K]) => {
     onChange({ ...data, [field]: value });
