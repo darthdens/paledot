@@ -222,32 +222,34 @@ export function InvoiceForm({ data, onChange }: InvoiceFormProps) {
           <CardTitle className="text-lg">{t.invoice.form.invoiceDetails}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div>
-              <Label htmlFor="invoiceNumber">{t.invoice.form.invoiceNumber}</Label>
-              <Input
-                id="invoiceNumber"
-                value={data.invoiceNumber}
-                onChange={(e) => updateField('invoiceNumber', e.target.value)}
-                placeholder="INV-001"
-              />
-            </div>
-            <div>
+          <div>
+            <Label htmlFor="invoiceNumber">{t.invoice.form.invoiceNumber}</Label>
+            <Input
+              id="invoiceNumber"
+              value={data.invoiceNumber}
+              onChange={(e) => updateField('invoiceNumber', e.target.value)}
+              placeholder="INV-001"
+            />
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="min-w-0">
               <Label htmlFor="invoiceDate">{t.invoice.form.invoiceDate}</Label>
               <Input
                 id="invoiceDate"
                 type="date"
                 value={data.invoiceDate}
                 onChange={(e) => updateField('invoiceDate', e.target.value)}
+                className="w-full"
               />
             </div>
-            <div>
+            <div className="min-w-0">
               <Label htmlFor="dueDate">{t.invoice.form.dueDate}</Label>
               <Input
                 id="dueDate"
                 type="date"
                 value={data.dueDate}
                 onChange={(e) => updateField('dueDate', e.target.value)}
+                className="w-full"
               />
             </div>
           </div>
