@@ -54,10 +54,10 @@ export const About = () => {
 
   // Use database testimonials if available, otherwise fall back to translations
   const testimonials = dbTestimonials && dbTestimonials.length > 0
-    ? dbTestimonials.map(t => ({
-        quote: language === "fr" ? t.quote_fr : t.quote_en,
-        author: t.author,
-        company: t.company,
+    ? dbTestimonials.map(item => ({
+        quote: language === "fr" ? item.quote_fr : item.quote_en,
+        author: item.author,
+        company: item.company,
       }))
     : t.about.testimonialsList;
 
