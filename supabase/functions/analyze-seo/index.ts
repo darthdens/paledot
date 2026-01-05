@@ -54,22 +54,35 @@ function extractMetaContent(html: string, name: string): string | null {
 }
 
 function countHeadings(html: string): { h1: number; h2: number; h3: number; h4: number; h5: number; h6: number } {
+  // Remove script and style tags to avoid false positives
+  const cleanHtml = html
+    .replace(/<script[\s\S]*?<\/script>/gi, "")
+    .replace(/<style[\s\S]*?<\/style>/gi, "")
+    .replace(/<!--[\s\S]*?-->/g, "");
+  
   return {
-    h1: (html.match(/<h1[^>]*>/gi) || []).length,
-    h2: (html.match(/<h2[^>]*>/gi) || []).length,
-    h3: (html.match(/<h3[^>]*>/gi) || []).length,
-    h4: (html.match(/<h4[^>]*>/gi) || []).length,
-    h5: (html.match(/<h5[^>]*>/gi) || []).length,
-    h6: (html.match(/<h6[^>]*>/gi) || []).length,
+    h1: (cleanHtml.match(/<h1[\s>]/gi) || []).length,
+    h2: (cleanHtml.match(/<h2[\s>]/gi) || []).length,
+    h3: (cleanHtml.match(/<h3[\s>]/gi) || []).length,
+    h4: (cleanHtml.match(/<h4[\s>]/gi) || []).length,
+    h5: (cleanHtml.match(/<h5[\s>]/gi) || []).length,
+    h6: (cleanHtml.match(/<h6[\s>]/gi) || []).length,
   };
 }
 
 function analyzeImages(html: string): { total: number; withAlt: number; withoutAlt: number } {
-  const imgTags = html.match(/<img[^>]*>/gi) || [];
+  // Remove script and style tags
+  const cleanHtml = html
+    .replace(/<script[\s\S]*?<\/script>/gi, "")
+    .replace(/<style[\s\S]*?<\/style>/gi, "")
+    .replace(/<!--[\s\S]*?-->/g, "");
+  
+  const imgTags = cleanHtml.match(/<img[^>]*>/gi) || [];
   const total = imgTags.length;
   let withAlt = 0;
 
   for (const img of imgTags) {
+    // Check for non-empty alt attribute
     if (/alt=["'][^"']+["']/i.test(img)) {
       withAlt++;
     }
@@ -79,7 +92,14 @@ function analyzeImages(html: string): { total: number; withAlt: number; withoutA
 }
 
 function analyzeLinks(html: string, baseUrl: string): { total: number; internal: number; external: number } {
-  const linkTags = html.match(/<a[^>]+href=["']([^"']+)["'][^>]*>/gi) || [];
+  // Remove script and style tags
+  const cleanHtml = html
+    .replace(/<script[\s\S]*?<\/script>/gi, "")
+    .replace(/<style[\s\S]*?<\/style>/gi, "")
+    .replace(/<!--[\s\S]*?-->/g, "");
+  
+  // Match anchor tags with href
+  const linkTags = cleanHtml.match(/<a\s[^>]*href=["'][^"']*["'][^>]*>/gi) || [];
   const total = linkTags.length;
   let internal = 0;
   let external = 0;
@@ -87,22 +107,28 @@ function analyzeLinks(html: string, baseUrl: string): { total: number; internal:
   const baseHost = new URL(baseUrl).hostname;
 
   for (const link of linkTags) {
-    const hrefMatch = link.match(/href=["']([^"']+)["']/i);
+    const hrefMatch = link.match(/href=["']([^"']*)["']/i);
     if (hrefMatch) {
-      const href = hrefMatch[1];
-      if (href.startsWith("/") || href.startsWith("#")) {
+      const href = hrefMatch[1].trim();
+      // Skip empty hrefs, javascript:, mailto:, tel:
+      if (!href || href.startsWith("javascript:") || href.startsWith("mailto:") || href.startsWith("tel:")) {
+        continue;
+      }
+      if (href.startsWith("/") || href.startsWith("#") || href.startsWith("./") || href.startsWith("../")) {
         internal++;
-      } else {
+      } else if (href.startsWith("http://") || href.startsWith("https://")) {
         try {
           const linkHost = new URL(href).hostname;
-          if (linkHost === baseHost) {
+          if (linkHost === baseHost || linkHost.endsWith("." + baseHost)) {
             internal++;
           } else {
             external++;
           }
         } catch {
-          internal++; // Relative or malformed URL
+          internal++;
         }
+      } else {
+        internal++; // Relative URL without leading slash
       }
     }
   }
