@@ -16,10 +16,10 @@ const Invoice = () => {
   const [invoiceData, setInvoiceData] = useState<InvoiceData>(defaultInvoiceData);
   // "Wide" layout = side-by-side form + sticky preview
   const [isXlUp, setIsXlUp] = useState(() =>
-    typeof window !== "undefined" ? window.matchMedia("(min-width: 1536px)").matches : true,
+    typeof window !== "undefined" ? window.matchMedia("(min-width: 1280px)").matches : true,
   );
   const [showPreview, setShowPreview] = useState<boolean>(() =>
-    typeof window !== "undefined" ? window.matchMedia("(min-width: 1536px)").matches : true,
+    typeof window !== "undefined" ? window.matchMedia("(min-width: 1280px)").matches : true,
   );
 
   const dialogPreviewViewportRef = useRef<HTMLDivElement>(null);
@@ -34,7 +34,7 @@ const Invoice = () => {
   useEffect(() => {
     if (typeof window === "undefined") return;
 
-    const mql = window.matchMedia("(min-width: 1536px)");
+    const mql = window.matchMedia("(min-width: 1280px)");
 
     const sync = (matches: boolean) => {
       setIsXlUp(matches);
@@ -118,7 +118,7 @@ const Invoice = () => {
       <Starfield />
       <Navigation />
       <main className="flex-1 pt-24 md:pt-28 pb-12">
-        <div className="w-full px-0 lg:px-8">
+        <div className="w-full px-4 md:px-6 xl:container xl:mx-auto">
           {/* Hero Section */}
           <div className="text-center mb-8 md:mb-12">
             <h1 className="text-3xl md:text-4xl lg:text-5xl font-serif font-bold mb-3 md:mb-4">
@@ -146,15 +146,15 @@ const Invoice = () => {
           </div>
 
           {/* Main Content */}
-          <div className="grid gap-6 md:gap-8 2xl:grid-cols-2">
+          <div className="grid gap-6 md:gap-8 xl:grid-cols-2">
             {/* Form */}
-            <div className={isXlUp && showPreview ? "" : "2xl:col-span-2 2xl:max-w-3xl 2xl:mx-auto"}>
+            <div className={isXlUp && showPreview ? "" : "xl:col-span-2 xl:max-w-3xl xl:mx-auto"}>
               <InvoiceForm data={invoiceData} onChange={setInvoiceData} />
             </div>
 
-            {/* Desktop Preview (2xl+) */}
+            {/* Desktop Preview (xl+) */}
             {isXlUp && showPreview && (
-              <div className="2xl:sticky 2xl:top-24 2xl:self-start">
+              <div className="xl:sticky xl:top-24 xl:self-start">
                 <div className="bg-card rounded-xl border border-border p-5 md:p-6 shadow-lg">
                   <h3 className="text-sm font-medium text-muted-foreground mb-4">
                     {t.invoice.previewLabel}
@@ -170,7 +170,7 @@ const Invoice = () => {
           {/* Mobile/Tablet Preview (dialog) */}
           {!isXlUp && (
             <Dialog open={showPreview} onOpenChange={setShowPreview}>
-              <DialogContent className="w-[calc(100vw-1.5rem)] max-w-none h-[calc(100vh-1.5rem)] overflow-hidden p-6 flex flex-col gap-6">
+              <DialogContent className="w-[calc(100vw-1.5rem)] max-w-none h-[calc(100vh-1.5rem)] overflow-hidden p-4 sm:p-6 flex flex-col gap-4 sm:gap-6 rounded-xl">
                 <DialogHeader className="pr-10 flex-shrink-0">
                   <DialogTitle>{t.invoice.previewLabel}</DialogTitle>
                 </DialogHeader>
