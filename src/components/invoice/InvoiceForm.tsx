@@ -222,7 +222,7 @@ export function InvoiceForm({ data, onChange }: InvoiceFormProps) {
           <CardTitle className="text-lg">{t.invoice.form.invoiceDetails}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="grid sm:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div>
               <Label htmlFor="invoiceNumber">{t.invoice.form.invoiceNumber}</Label>
               <Input
@@ -271,19 +271,20 @@ export function InvoiceForm({ data, onChange }: InvoiceFormProps) {
 
       {/* Line Items */}
       <Card>
-        <CardHeader className="flex flex-row items-center justify-between">
+        <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
           <CardTitle className="text-lg">{t.invoice.form.items}</CardTitle>
-          <Button variant="outline" size="sm" onClick={addItem} className="gap-1">
+          <Button variant="outline" size="sm" onClick={addItem} className="gap-1 w-full sm:w-auto">
             <Plus className="w-4 h-4" />
             {t.invoice.form.addItem}
           </Button>
         </CardHeader>
         <CardContent className="space-y-4">
           {data.items.map((item, index) => (
-            <div key={item.id} className="flex gap-3 items-start">
-              <div className="flex-1 grid sm:grid-cols-[1fr_80px_100px] gap-3">
-                <div>
-                  {index === 0 && <Label className="text-xs text-muted-foreground mb-1 block">{t.invoice.form.description}</Label>}
+            <div key={item.id} className="flex flex-col sm:flex-row gap-3 items-start p-3 sm:p-0 bg-muted/30 sm:bg-transparent rounded-lg sm:rounded-none">
+              <div className="flex-1 w-full grid grid-cols-2 sm:grid-cols-[1fr_80px_100px] gap-3">
+                <div className="col-span-2 sm:col-span-1">
+                  <Label className="text-xs text-muted-foreground mb-1 block sm:hidden">{t.invoice.form.description}</Label>
+                  {index === 0 && <Label className="text-xs text-muted-foreground mb-1 hidden sm:block">{t.invoice.form.description}</Label>}
                   <Input
                     value={item.description}
                     onChange={(e) => updateItem(item.id, 'description', e.target.value)}
@@ -291,7 +292,8 @@ export function InvoiceForm({ data, onChange }: InvoiceFormProps) {
                   />
                 </div>
                 <div>
-                  {index === 0 && <Label className="text-xs text-muted-foreground mb-1 block">{t.invoice.form.qty}</Label>}
+                  <Label className="text-xs text-muted-foreground mb-1 block sm:hidden">{t.invoice.form.qty}</Label>
+                  {index === 0 && <Label className="text-xs text-muted-foreground mb-1 hidden sm:block">{t.invoice.form.qty}</Label>}
                   <Input
                     type="number"
                     min="1"
@@ -300,7 +302,8 @@ export function InvoiceForm({ data, onChange }: InvoiceFormProps) {
                   />
                 </div>
                 <div>
-                  {index === 0 && <Label className="text-xs text-muted-foreground mb-1 block">{t.invoice.form.price}</Label>}
+                  <Label className="text-xs text-muted-foreground mb-1 block sm:hidden">{t.invoice.form.price}</Label>
+                  {index === 0 && <Label className="text-xs text-muted-foreground mb-1 hidden sm:block">{t.invoice.form.price}</Label>}
                   <Input
                     type="number"
                     min="0"
@@ -315,7 +318,7 @@ export function InvoiceForm({ data, onChange }: InvoiceFormProps) {
                 size="icon"
                 onClick={() => removeItem(item.id)}
                 disabled={data.items.length <= 1}
-                className={`mt-${index === 0 ? '6' : '0'}`}
+                className="self-end sm:self-auto sm:mt-0"
               >
                 <Trash2 className="w-4 h-4 text-muted-foreground" />
               </Button>
