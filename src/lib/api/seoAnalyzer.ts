@@ -50,8 +50,7 @@ export interface SeoAnalysisResult {
     type?: string;
   };
   performance?: Array<{
-    label: string;
-    description: string;
+    key: string;
     status: "pass" | "warning" | "fail";
   }>;
   recommendations?: string[];

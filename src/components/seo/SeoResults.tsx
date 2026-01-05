@@ -312,15 +312,20 @@ export const SeoResults = ({ result, onReset }: SeoResultsProps) => {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              {result.performance?.map((item, index) => (
-                <div key={index} className="flex items-center gap-3 p-4 rounded-lg bg-muted/50">
-                  <StatusIcon status={item.status} />
-                  <div className="flex-1 min-w-0">
-                    <span className="font-medium">{item.label}</span>
-                    <p className="text-sm text-muted-foreground break-words">{item.description}</p>
+              {result.performance?.map((item, index) => {
+                const perfItem = t.seo.performanceItems[item.key as keyof typeof t.seo.performanceItems];
+                return (
+                  <div key={index} className="flex items-center gap-3 p-4 rounded-lg bg-muted/50">
+                    <StatusIcon status={item.status} />
+                    <div className="flex-1 min-w-0">
+                      <span className="font-medium">{perfItem?.label}</span>
+                      <p className="text-sm text-muted-foreground break-words">
+                        {item.status === "pass" ? perfItem?.pass : perfItem?.fail}
+                      </p>
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </CardContent>
           </Card>
 
@@ -332,12 +337,15 @@ export const SeoResults = ({ result, onReset }: SeoResultsProps) => {
               </CardHeader>
               <CardContent>
                 <ul className="space-y-3">
-                  {result.recommendations.map((rec, index) => (
-                    <li key={index} className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
-                      <AlertTriangle className="w-5 h-5 text-yellow-500 flex-shrink-0" />
-                      <span className="text-sm break-words">{rec}</span>
-                    </li>
-                  ))}
+                  {result.recommendations.map((recKey, index) => {
+                    const rec = t.seo.recommendationItems[recKey as keyof typeof t.seo.recommendationItems] || recKey;
+                    return (
+                      <li key={index} className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
+                        <AlertTriangle className="w-5 h-5 text-yellow-500 flex-shrink-0" />
+                        <span className="text-sm break-words">{rec}</span>
+                      </li>
+                    );
+                  })}
                 </ul>
               </CardContent>
             </Card>
