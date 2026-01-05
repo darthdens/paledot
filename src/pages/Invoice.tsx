@@ -107,17 +107,15 @@ const Invoice = () => {
               />
             </div>
 
-            {/* Preview - Hidden on mobile by default, shown when toggled */}
+            {/* Preview */}
             {showPreview && (
               <div className="order-1 xl:order-2 xl:sticky xl:top-24 xl:self-start">
                 <div className="bg-card rounded-xl border border-border p-3 md:p-4 shadow-lg">
                   <h3 className="text-sm font-medium text-muted-foreground mb-3 md:mb-4">
                     {t.invoice.previewLabel}
                   </h3>
-                  <div className="overflow-x-auto overflow-y-auto max-h-[60vh] xl:max-h-[80vh] -mx-3 md:mx-0">
-                    <div className="min-w-[320px] md:min-w-0 scale-[0.6] sm:scale-75 md:scale-90 xl:scale-100 origin-top-left md:origin-top">
-                      <InvoicePreview ref={previewRef} data={invoiceData} />
-                    </div>
+                  <div className="overflow-auto max-h-[50vh] md:max-h-[60vh] xl:max-h-[80vh]">
+                    <InvoicePreview ref={previewRef} data={invoiceData} />
                   </div>
                 </div>
               </div>
