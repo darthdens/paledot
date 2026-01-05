@@ -117,6 +117,60 @@ serve(async (req) => {
       console.log("Deep extraction mode enabled, mapping site...");
       
       try {
+        const colorPrompt =
+          "Extract all unique color values used or defined on this page (including CSS variables, inline styles, and style tags). Return JSON with a single key colors as an array of strings.";
+        const colorSchema = {
+          type: "object",
+          properties: {
+            colors: { type: "array", items: { type: "string" } },
+          },
+          required: ["colors"],
+        };
+
+        const addExtraColors = (colorList: unknown) => {
+          if (!Array.isArray(colorList)) return;
+          const unique = Array.from(
+            new Set(
+              colorList
+                .filter((c) => typeof c === "string")
+                .map((c) => c.trim())
+                .filter(Boolean)
+            )
+          ).slice(0, 50);
+
+          if (unique.length === 0) return;
+
+          const extra: BrandColors = {};
+          unique.forEach((c, idx) => {
+            extra[`extra${idx + 1}`] = c;
+          });
+
+          branding.colors = mergeColors(branding.colors || {}, extra);
+        };
+
+        // Extract additional colors from the homepage (beyond the small "branding" palette)
+        try {
+          const extraColorResponse = await fetch("https://api.firecrawl.dev/v1/scrape", {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${apiKey}`,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              url: formattedUrl,
+              formats: [{ type: "json", schema: colorSchema, prompt: colorPrompt }],
+              onlyMainContent: false,
+              waitFor: 2000,
+            }),
+          });
+
+          const extraColorData = await extraColorResponse.json();
+          const extracted = extraColorData.data?.json || extraColorData.json;
+          addExtraColors(extracted?.colors);
+        } catch (extraColorError) {
+          console.error("Error extracting extra homepage colors:", extraColorError);
+        }
+
         // Get sitemap
         const mapResponse = await fetch("https://api.firecrawl.dev/v1/map", {
           method: "POST",
@@ -200,7 +254,10 @@ serve(async (req) => {
                 },
                 body: JSON.stringify({
                   url: pageUrl,
-                  formats: ["branding"],
+                  formats: [
+                    "branding",
+                    { type: "json", schema: colorSchema, prompt: colorPrompt },
+                  ],
                   onlyMainContent: false,
                   waitFor: 2000,
                 }),
@@ -208,22 +265,26 @@ serve(async (req) => {
 
               if (pageResponse.ok) {
                 const pageData = await pageResponse.json();
+
+                const pageJson = pageData.data?.json || pageData.json;
+                addExtraColors(pageJson?.colors);
+
                 const pageBranding = pageData.data?.branding || pageData.branding;
-                
+
                 if (pageBranding) {
                   // Merge colors
                   if (pageBranding.colors) {
                     branding.colors = mergeColors(branding.colors || {}, pageBranding.colors);
                   }
-                  
+
                   // Merge fonts
                   if (pageBranding.fonts) {
                     branding.fonts = mergeFonts(branding.fonts || [], pageBranding.fonts);
                   }
-                  
-                  pagesScraped++;
-                  console.log(`Merged branding from ${pageUrl}`);
                 }
+
+                pagesScraped++;
+                console.log(`Merged branding from ${pageUrl}`);
               }
             } catch (pageError) {
               console.error(`Error scraping ${pageUrl}:`, pageError);

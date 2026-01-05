@@ -34,6 +34,11 @@ export const BrandResult = ({ result, onReset }: BrandResultProps) => {
                 {sourceUrl}
                 <ExternalLink className="w-3 h-3" />
               </a>
+              {result.deep && typeof result.pagesScraped === "number" && (
+                <p className="text-xs text-muted-foreground mt-1">
+                  {result.pagesScraped} {t.brandKit.pagesScraped}
+                </p>
+              )}
             </div>
             <Button variant="outline" onClick={onReset}>
               {t.brandKit.extractAnother}
