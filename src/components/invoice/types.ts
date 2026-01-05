@@ -102,9 +102,25 @@ export function getCurrencySymbol(code: string): string {
   return currencies.find(c => c.code === code)?.symbol || code;
 }
 
-export function formatCurrency(amount: number, currency: string): string {
-  const symbol = getCurrencySymbol(currency);
-  return `${symbol}${amount.toFixed(2)}`;
+export function formatCurrency(amount: number, currency: string, language: string = 'en'): string {
+  const locale = language === 'fr' ? 'fr-FR' : 'en-US';
+  
+  try {
+    return new Intl.NumberFormat(locale, {
+      style: 'currency',
+      currency: currency,
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(amount);
+  } catch {
+    // Fallback for unsupported currency codes
+    const symbol = getCurrencySymbol(currency);
+    const formattedNumber = new Intl.NumberFormat(locale, {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(amount);
+    return language === 'fr' ? `${formattedNumber} ${symbol}` : `${symbol}${formattedNumber}`;
+  }
 }
 
 export function calculateSubtotal(items: InvoiceItem[]): number {
