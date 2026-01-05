@@ -9,6 +9,7 @@ export const translations = {
       resume: "Resume",
       contact: "Contact",
       hireMe: "Hire Me",
+      visitDens: "Visit Dens",
     },
 
     // Hero
@@ -597,6 +598,7 @@ export const translations = {
       resume: "CV",
       contact: "Contact",
       hireMe: "Me contacter",
+      visitDens: "Visiter Dens",
     },
 
     // Hero
