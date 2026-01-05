@@ -9,6 +9,90 @@ interface BrandColors {
   [key: string]: string | undefined;
 }
 
+// Convert any color format to hex
+function colorToHex(color: string): string | null {
+  const c = color.trim().toLowerCase();
+
+  // Already hex
+  if (/^#([0-9a-f]{3}|[0-9a-f]{4}|[0-9a-f]{6}|[0-9a-f]{8})$/i.test(c)) {
+    // Expand 3-digit to 6-digit, 4-digit to 8-digit
+    if (c.length === 4) {
+      return `#${c[1]}${c[1]}${c[2]}${c[2]}${c[3]}${c[3]}`;
+    }
+    if (c.length === 5) {
+      return `#${c[1]}${c[1]}${c[2]}${c[2]}${c[3]}${c[3]}${c[4]}${c[4]}`;
+    }
+    return c;
+  }
+
+  // rgb(r, g, b) or rgb(r g b) or rgba(...)
+  const rgbMatch = c.match(/rgba?\(\s*([\d.]+)%?\s*[,\s]\s*([\d.]+)%?\s*[,\s]\s*([\d.]+)%?(?:\s*[,\/]\s*([\d.]+))?\s*\)/);
+  if (rgbMatch) {
+    let r = parseFloat(rgbMatch[1]);
+    let g = parseFloat(rgbMatch[2]);
+    let b = parseFloat(rgbMatch[3]);
+    // Handle percentage values
+    if (c.includes('%')) {
+      r = Math.round((r / 100) * 255);
+      g = Math.round((g / 100) * 255);
+      b = Math.round((b / 100) * 255);
+    } else {
+      r = Math.round(Math.min(255, Math.max(0, r)));
+      g = Math.round(Math.min(255, Math.max(0, g)));
+      b = Math.round(Math.min(255, Math.max(0, b)));
+    }
+    const toHexPart = (n: number) => n.toString(16).padStart(2, '0');
+    return `#${toHexPart(r)}${toHexPart(g)}${toHexPart(b)}`;
+  }
+
+  // hsl(h, s%, l%) or hsl(h s% l%) or hsla(...)
+  const hslMatch = c.match(/hsla?\(\s*([\d.]+)(?:deg|rad|turn)?\s*[,\s]\s*([\d.]+)%\s*[,\s]\s*([\d.]+)%(?:\s*[,\/]\s*([\d.]+))?\s*\)/);
+  if (hslMatch) {
+    let h = parseFloat(hslMatch[1]);
+    const s = parseFloat(hslMatch[2]) / 100;
+    const l = parseFloat(hslMatch[3]) / 100;
+    h = ((h % 360) + 360) % 360;
+    
+    const hueToRgb = (p: number, q: number, t: number) => {
+      if (t < 0) t += 1;
+      if (t > 1) t -= 1;
+      if (t < 1/6) return p + (q - p) * 6 * t;
+      if (t < 1/2) return q;
+      if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+      return p;
+    };
+
+    let r: number, g: number, b: number;
+    if (s === 0) {
+      r = g = b = l;
+    } else {
+      const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+      const p = 2 * l - q;
+      r = hueToRgb(p, q, h / 360 + 1/3);
+      g = hueToRgb(p, q, h / 360);
+      b = hueToRgb(p, q, h / 360 - 1/3);
+    }
+
+    const toHexPart = (n: number) => Math.round(n * 255).toString(16).padStart(2, '0');
+    return `#${toHexPart(r)}${toHexPart(g)}${toHexPart(b)}`;
+  }
+
+  // Can't convert (oklch, oklab, color(), named colors, etc.) - return null
+  return null;
+}
+
+// Normalize all colors in a BrandColors object to hex
+function normalizeColors(colors: BrandColors): BrandColors {
+  const normalized: BrandColors = {};
+  for (const [key, value] of Object.entries(colors)) {
+    if (value) {
+      const hex = colorToHex(value);
+      normalized[key] = hex || value;
+    }
+  }
+  return normalized;
+}
+
 // Merge colors from multiple pages, deduplicating by value
 function mergeColors(existingColors: BrandColors, newColors: BrandColors): BrandColors {
   const merged = { ...existingColors };
@@ -205,6 +289,12 @@ serve(async (req) => {
           return out;
         };
 
+        // Normalize color to hex, or return original if can't convert
+        const normalizeColor = (color: string): string => {
+          const hex = colorToHex(color);
+          return hex || color;
+        };
+
         const addExtraColors = (colorList: unknown) => {
           const list = Array.isArray(colorList)
             ? colorList
@@ -216,7 +306,7 @@ serve(async (req) => {
             new Set(
               list
                 .filter((c) => typeof c === "string")
-                .map((c) => c.trim().toLowerCase())
+                .map((c) => normalizeColor(c.trim().toLowerCase()))
                 .filter(Boolean)
             )
           ).slice(0, 80);
@@ -768,6 +858,14 @@ serve(async (req) => {
       }
     }
 
+    // Normalize all colors to hex before returning
+    if (branding.colors) {
+      branding.colors = normalizeColors(branding.colors);
+    }
+
+    // Also normalize screenshotColors array
+    const normalizedScreenshotColors = screenshotColors.map((c) => colorToHex(c) || c);
+
     return new Response(
       JSON.stringify({
         success: true,
@@ -778,7 +876,7 @@ serve(async (req) => {
         sourceUrl: formattedUrl,
         pagesScraped,
         scrapedUrls: Array.from(scrapedUrls),
-        screenshotColors,
+        screenshotColors: normalizedScreenshotColors,
         deep,
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
