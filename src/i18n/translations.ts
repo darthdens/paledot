@@ -1440,10 +1440,10 @@ export const translations = {
         performance: "Performance",
       },
       checks: {
-        title: "Balise Title",
-        description: "Meta Description",
+        title: "Balise Titre",
+        description: "Description Meta",
         canonical: "URL canonique",
-        viewport: "Viewport",
+        viewport: "Fenêtre d'affichage",
         totalImages: "Total images",
         withAlt: "Avec Alt",
         withoutAlt: "Sans Alt",
