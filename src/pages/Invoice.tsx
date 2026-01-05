@@ -11,7 +11,7 @@ import { Download, Eye, EyeOff } from "lucide-react";
 import { toast } from "sonner";
 
 const Invoice = () => {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [invoiceData, setInvoiceData] = useState<InvoiceData>(defaultInvoiceData);
   const [showPreview, setShowPreview] = useState(true);
   const previewRef = useRef<HTMLDivElement>(null);
@@ -53,7 +53,9 @@ const Invoice = () => {
       
       pdf.addImage(imgData, 'PNG', imgX, imgY, imgWidth * ratio, imgHeight * ratio);
       
-      const fileName = `invoice-${invoiceData.invoiceNumber || 'draft'}.pdf`;
+      const filePrefix = language === 'fr' ? 'facture' : 'invoice';
+      const draftLabel = language === 'fr' ? 'brouillon' : 'draft';
+      const fileName = `${filePrefix}-${invoiceData.invoiceNumber || draftLabel}.pdf`;
       pdf.save(fileName);
       
       toast.success(t.invoice.pdfDownloaded);
