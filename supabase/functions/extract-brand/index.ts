@@ -228,8 +228,91 @@ serve(async (req) => {
         addExtraColors(extractColorsFromObject(metadata));
 
         const mainRawHtml = mainData.data?.rawHtml || mainData.rawHtml;
+        const discoveredRouteUrls: string[] = [];
+
+        const routeUrlSet = new Set<string>();
+        const baseOrigin = (() => {
+          const metaUrl = (metadata as Record<string, unknown> | undefined)?.url;
+          const metaUrlStr = typeof metaUrl === "string" ? metaUrl : formattedUrl;
+          try {
+            return new URL(metaUrlStr).origin;
+          } catch {
+            return new URL(formattedUrl).origin;
+          }
+        })();
+
+        const addRouteUrl = (route: string) => {
+          const r = route.trim();
+          if (!r) return;
+
+          if (r.startsWith("#/")) {
+            const full = `${baseOrigin}/${r}`;
+            if (!routeUrlSet.has(full)) {
+              routeUrlSet.add(full);
+              discoveredRouteUrls.push(full);
+            }
+            return;
+          }
+
+          if (r.startsWith("/")) {
+            const full = `${baseOrigin}/#${r}`;
+            if (!routeUrlSet.has(full)) {
+              routeUrlSet.add(full);
+              discoveredRouteUrls.push(full);
+            }
+          }
+        };
+
+        const extractRouteCandidatesFromText = (text: string) => {
+          const candidates = new Set<string>();
+
+          for (const m of text.matchAll(/#\/[a-z0-9][a-z0-9/_-]{2,}/gi)) {
+            if (m[0]) candidates.add(m[0]);
+          }
+
+          // Also catch router strings that appear without the hash
+          for (const m of text.matchAll(/\/(en|fr)\/[a-z0-9][a-z0-9/_-]{2,}/gi)) {
+            const s = m[0];
+            if (!s) continue;
+            if (/\.(js|css|svg|png|jpg|jpeg|webp|woff2?|ttf|eot)(\?|$)/i.test(s)) continue;
+            candidates.add(s);
+          }
+
+          return Array.from(candidates).slice(0, 200);
+        };
+
+        const addRoutesFromText = (text: string) => {
+          const candidates = extractRouteCandidatesFromText(text);
+          candidates.forEach(addRouteUrl);
+        };
+
         if (typeof mainRawHtml === "string") {
           addExtraColors(extractColorsFromString(mainRawHtml));
+          addRoutesFromText(mainRawHtml);
+
+          // For SPAs, routes are often only present inside JS bundles.
+          // Grab a couple of same-origin scripts and scan for hash routes.
+          try {
+            const baseHostname = new URL(formattedUrl).hostname.replace(/^www\./, "");
+            const scriptSrcs = Array.from(mainRawHtml.matchAll(/<script[^>]+src=["']([^"']+)["'][^>]*>/gi))
+              .map((m) => m[1])
+              .filter((s): s is string => typeof s === "string" && s.length > 0);
+
+            const uniqueScripts = Array.from(new Set(scriptSrcs)).slice(0, 2);
+
+            for (const src of uniqueScripts) {
+              const scriptUrl = new URL(src, baseOrigin).toString();
+              const host = new URL(scriptUrl).hostname.replace(/^www\./, "");
+              if (host !== baseHostname) continue;
+
+              const res = await fetch(scriptUrl);
+              if (!res.ok) continue;
+              const js = await res.text();
+              addRoutesFromText(js.slice(0, 500_000));
+            }
+          } catch (routeErr) {
+            console.log("Route discovery from scripts failed:", routeErr);
+          }
         }
 
         // Extract additional colors from the homepage (beyond the small "branding" palette)
@@ -324,8 +407,10 @@ serve(async (req) => {
             }
           };
 
-          // Merge map links + homepage scraped links (helps SPAs / hash-routing)
-          const combinedLinks = Array.from(new Set<string>([...siteLinks, ...links]));
+          // Merge map links + homepage scraped links + discovered SPA routes
+          const combinedLinks = Array.from(
+            new Set<string>([...siteLinks, ...links, ...discoveredRouteUrls])
+          );
 
           // Seed queue with all discovered internal routes (not just the first N)
           const queue: string[] = [];
