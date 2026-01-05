@@ -196,8 +196,8 @@ export const SeoResults = ({ result, onReset }: SeoResultsProps) => {
               </div>
               {result.headings?.h1 !== 1 && (
                 <div className="mt-4 p-3 rounded-lg bg-yellow-500/10 border border-yellow-500/20">
-                  <p className="text-sm text-yellow-600 dark:text-yellow-400 flex items-start gap-2">
-                    <AlertTriangle className="w-4 h-4 flex-shrink-0 mt-0.5" />
+                  <p className="text-sm text-yellow-600 dark:text-yellow-400 flex items-center gap-2">
+                    <AlertTriangle className="w-4 h-4 flex-shrink-0" />
                     <span>{result.headings?.h1 === 0 ? t.seo.warnings.noH1 : t.seo.warnings.multipleH1}</span>
                   </p>
                 </div>
