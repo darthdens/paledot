@@ -134,14 +134,43 @@ serve(async (req) => {
           const v = value.toLowerCase();
           const matches: string[] = [];
 
+          // Hex
           const hex = v.match(/#(?:[0-9a-f]{3,4}|[0-9a-f]{6}|[0-9a-f]{8})\b/g);
           if (hex) matches.push(...hex);
 
-          const rgb = v.match(/rgba?\(\s*[\d.]+\s*,\s*[\d.]+\s*,\s*[\d.]+(?:\s*,\s*[\d.]+)?\s*\)/g);
-          if (rgb) matches.push(...rgb);
+          // rgb()/rgba() - comma-separated
+          const rgbComma = v.match(
+            /rgba?\(\s*[\d.]+%?\s*,\s*[\d.]+%?\s*,\s*[\d.]+%?(?:\s*,\s*[\d.]+)?\s*\)/g
+          );
+          if (rgbComma) matches.push(...rgbComma);
 
-          const hsl = v.match(/hsla?\(\s*[\d.]+(?:deg|rad|turn)?\s*,\s*[\d.]+%\s*,\s*[\d.]+%(?:\s*,\s*[\d.]+)?\s*\)/g);
-          if (hsl) matches.push(...hsl);
+          // rgb()/rgba() - space-separated (CSS Color Level 4)
+          // Examples: rgb(7 161 130) / rgb(7 161 130 / 0.5)
+          const rgbSpace = v.match(
+            /rgba?\(\s*[\d.]+%?\s+[\d.]+%?\s+[\d.]+%?(?:\s*\/\s*[\d.]+)?\s*\)/g
+          );
+          if (rgbSpace) matches.push(...rgbSpace);
+
+          // hsl()/hsla() - comma-separated
+          const hslComma = v.match(
+            /hsla?\(\s*[\d.]+(?:deg|rad|turn)?\s*,\s*[\d.]+%\s*,\s*[\d.]+%(?:\s*,\s*[\d.]+)?\s*\)/g
+          );
+          if (hslComma) matches.push(...hslComma);
+
+          // hsl()/hsla() - space-separated (CSS Color Level 4)
+          // Examples: hsl(210 40% 98%) / hsl(210 40% 98% / 0.7)
+          const hslSpace = v.match(
+            /hsla?\(\s*[\d.]+(?:deg|rad|turn)?\s+[\d.]+%\s+[\d.]+%(?:\s*\/\s*[\d.]+)?\s*\)/g
+          );
+          if (hslSpace) matches.push(...hslSpace);
+
+          // Modern CSS colors (keep raw strings)
+          const oklch = v.match(/oklch\([^\)]*\)/g);
+          if (oklch) matches.push(...oklch);
+          const oklab = v.match(/oklab\([^\)]*\)/g);
+          if (oklab) matches.push(...oklab);
+          const colorFn = v.match(/color\([^\)]*\)/g);
+          if (colorFn) matches.push(...colorFn);
 
           return matches;
         };
@@ -194,6 +223,9 @@ serve(async (req) => {
 
         // Always pull any additional colors already present in branding output (components, borders, etc.)
         addExtraColors(extractColorsFromObject(branding));
+
+        // Also pull from any metadata fields (e.g., theme-color)
+        addExtraColors(extractColorsFromObject(metadata));
 
         const mainRawHtml = mainData.data?.rawHtml || mainData.rawHtml;
         if (typeof mainRawHtml === "string") {
