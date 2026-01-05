@@ -8,6 +8,7 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import NotFound from "./pages/NotFound";
 import Invoice from "./pages/Invoice";
 import SeoChecker from "./pages/SeoChecker";
+import ColorPalette from "./pages/ColorPalette";
 
 const queryClient = new QueryClient();
 
@@ -20,7 +21,8 @@ const App = () => (
           <Toaster richColors position="bottom-left" />
           <CookieBanner />
           <Routes>
-            <Route path="/" element={<SeoChecker />} />
+            <Route path="/" element={<ColorPalette />} />
+            <Route path="/seo" element={<SeoChecker />} />
             <Route path="/invoice" element={<Invoice />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
