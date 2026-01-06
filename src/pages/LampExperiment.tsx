@@ -4,7 +4,6 @@ import { Navigation } from "@/components/Navigation";
 import { Footer } from "@/components/Footer";
 import { Starfield } from "@/components/Starfield";
 import { DensSwitch } from "@/components/ui/dens-switch";
-import { Label } from "@/components/ui/label";
 import { LightBulb, LightBulbOff, SunLight, HalfMoon } from "iconoir-react";
 
 // Import lamp images
@@ -143,7 +142,13 @@ const LampCard = ({
 const LampExperiment = () => {
   const { language, t } = useLanguage();
   const [lampOn, setLampOn] = useState(false);
-  const [isDark, setIsDark] = useState(false);
+  const [isDark, setIsDark] = useState(() => {
+    // Initialize from current theme state
+    if (typeof window !== 'undefined') {
+      return document.documentElement.classList.contains('dark');
+    }
+    return false;
+  });
 
   useEffect(() => {
     document.title = language === 'fr' 
@@ -151,14 +156,12 @@ const LampExperiment = () => {
       : "Interactive Lamp Showcase | Dens";
   }, [language]);
 
-  // Apply dark class to document when isDark changes
-  useEffect(() => {
-    if (isDark) {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
-  }, [isDark]);
+  // Sync with theme changes and apply dark class
+  const handleThemeChange = (newIsDark: boolean) => {
+    setIsDark(newIsDark);
+    document.documentElement.classList.toggle('dark', newIsDark);
+    localStorage.setItem('theme', newIsDark ? 'dark' : 'light');
+  };
 
   return (
     <div className="min-h-screen bg-background text-foreground relative flex flex-col">
@@ -183,8 +186,8 @@ const LampExperiment = () => {
 
         {/* Controls Section */}
         <div className="container mx-auto px-4 sm:px-6 max-w-5xl">
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-6 sm:gap-12 mb-8">
-            {/* Lamp toggle */}
+          <div className="flex items-center justify-between mb-8">
+            {/* Lamp toggle (left) */}
             <div className="flex items-center gap-3">
               <LightBulbOff className="w-5 h-5 text-muted-foreground" strokeWidth={2} />
               <DensSwitch
@@ -193,23 +196,17 @@ const LampExperiment = () => {
                 aria-label={lampOn ? t.lampExperiment.lampOn : t.lampExperiment.lampOff}
               />
               <LightBulb className="w-5 h-5 text-muted-foreground" strokeWidth={2} />
-              <Label className="text-sm text-muted-foreground ml-1">
-                {lampOn ? t.lampExperiment.lampOn : t.lampExperiment.lampOff}
-              </Label>
             </div>
             
-            {/* Day/Night toggle */}
+            {/* Day/Night toggle (right) */}
             <div className="flex items-center gap-3">
               <SunLight className="w-5 h-5 text-muted-foreground" strokeWidth={2} />
               <DensSwitch
                 checked={isDark}
-                onCheckedChange={setIsDark}
+                onCheckedChange={handleThemeChange}
                 aria-label={isDark ? t.lampExperiment.nightMode : t.lampExperiment.dayMode}
               />
               <HalfMoon className="w-5 h-5 text-muted-foreground" strokeWidth={2} />
-              <Label className="text-sm text-muted-foreground ml-1">
-                {isDark ? t.lampExperiment.nightMode : t.lampExperiment.dayMode}
-              </Label>
             </div>
           </div>
 
