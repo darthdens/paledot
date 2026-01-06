@@ -948,6 +948,23 @@ export const translations = {
         H: "High (30%)",
       },
     },
+
+    // Lamp Experiment
+    lampExperiment: {
+      title: "Interactive Lamp Showcase",
+      subtitle: "Explore our collection of designer lamps. Toggle the light switch or change the time of day to see how each lamp transforms your space.",
+      lampOn: "Lamp On",
+      lampOff: "Lamp Off",
+      dayMode: "Day",
+      nightMode: "Night",
+      from: "From",
+      lamps: {
+        couch: "The Couch Lamp",
+        dining: "The Dining Lamp",
+        desk: "The Desk Lamp",
+        lounge: "The Lounge Lamp",
+      },
+    },
   },
 
   fr: {
@@ -1897,6 +1914,23 @@ export const translations = {
         M: "Moyen (15%)",
         Q: "Quartile (25%)",
         H: "Élevé (30%)",
+      },
+    },
+
+    // Lamp Experiment
+    lampExperiment: {
+      title: "Vitrine Interactive de Lampes",
+      subtitle: "Découvrez notre collection de lampes design. Actionnez l'interrupteur ou changez l'heure de la journée pour voir comment chaque lampe transforme votre espace.",
+      lampOn: "Lampe Allumée",
+      lampOff: "Lampe Éteinte",
+      dayMode: "Jour",
+      nightMode: "Nuit",
+      from: "À partir de",
+      lamps: {
+        couch: "La Lampe Salon",
+        dining: "La Lampe Salle à Manger",
+        desk: "La Lampe de Bureau",
+        lounge: "La Lampe de Chambre",
       },
     },
   },
