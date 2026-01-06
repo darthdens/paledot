@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { Navigation } from "@/components/Navigation";
 import { Footer } from "@/components/Footer";
@@ -96,42 +96,37 @@ const LampCard = ({
   lampName: string;
   fromText: string;
 }) => {
-  // Select image based on both theme and lamp state
-  const getImage = () => {
+  // Get the current active image key
+  const activeKey = useMemo(() => {
     if (isDark) {
-      return lampOn ? lamp.images.nightOn : lamp.images.nightOff;
+      return lampOn ? "nightOn" : "nightOff";
     }
-    return lampOn ? lamp.images.dayOn : lamp.images.dayOff;
-  };
+    return lampOn ? "dayOn" : "dayOff";
+  }, [isDark, lampOn]);
 
-  // Get all possible images for preloading
-  const allImages = [
-    lamp.images.dayOn,
-    lamp.images.dayOff,
-    lamp.images.nightOn,
-    lamp.images.nightOff,
+  // All image variants with their keys
+  const imageVariants = [
+    { key: "dayOn", src: lamp.images.dayOn },
+    { key: "dayOff", src: lamp.images.dayOff },
+    { key: "nightOn", src: lamp.images.nightOn },
+    { key: "nightOff", src: lamp.images.nightOff },
   ];
 
   return (
     <div className="group">
       <div className="relative aspect-square overflow-hidden rounded-lg mb-3 bg-muted">
-        {/* Preload all images */}
-        {allImages.map((src) => (
+        {/* Stack all images, crossfade by opacity */}
+        {imageVariants.map(({ key, src }) => (
           <img
-            key={src}
+            key={key}
             src={src}
-            alt=""
-            className="absolute inset-0 w-full h-full object-cover opacity-0"
-            aria-hidden="true"
+            alt={key === activeKey ? lampName : ""}
+            className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-500 ease-in-out ${
+              key === activeKey ? "opacity-100" : "opacity-0"
+            }`}
+            aria-hidden={key !== activeKey}
           />
         ))}
-
-        {/* Visible image with transition */}
-        <img
-          src={getImage()}
-          alt={lampName}
-          className="absolute inset-0 w-full h-full object-cover transition-opacity duration-700"
-        />
       </div>
       <h3 className="font-medium text-foreground">{lampName}</h3>
       <p className="text-sm text-muted-foreground">
