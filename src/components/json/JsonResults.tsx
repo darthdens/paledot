@@ -51,15 +51,15 @@ export const JsonResults = ({ result, onReset, onReformat }: JsonResultsProps) =
     return (
       <section className="min-h-[60vh] flex items-center justify-center pt-20 md:pt-24 pb-12 md:pb-16">
         <div className="container mx-auto px-4 sm:px-6">
-          <div className="max-w-3xl mx-auto space-y-6 md:space-y-8">
+          <div className="w-full max-w-3xl mx-auto space-y-6 md:space-y-8">
             <div className="bg-destructive/10 border border-destructive/30 rounded-lg p-4 sm:p-6">
               <div className="flex items-start gap-3 sm:gap-4">
                 <AlertCircle className="w-5 h-5 sm:w-6 sm:h-6 text-destructive shrink-0 mt-0.5" />
-                <div className="space-y-2 min-w-0 flex-1">
+                <div className="space-y-2 min-w-0 flex-1 overflow-hidden">
                   <h2 className="text-lg sm:text-xl font-semibold text-destructive">
                     {t.jsonFormatter.invalidJson}
                   </h2>
-                  <p className="text-muted-foreground font-mono text-xs sm:text-sm break-words">
+                  <p className="text-muted-foreground font-mono text-xs sm:text-sm break-all whitespace-pre-wrap">
                     {translateError(result.error || "")}
                   </p>
                 </div>
@@ -68,7 +68,7 @@ export const JsonResults = ({ result, onReset, onReformat }: JsonResultsProps) =
 
             <div className="space-y-2">
               <p className="text-sm text-muted-foreground">{t.jsonFormatter.originalInput}</p>
-              <pre className="bg-card border border-border rounded-lg p-3 sm:p-4 overflow-x-auto text-xs sm:text-sm font-mono max-h-[250px] sm:max-h-[300px] overflow-y-auto">
+              <pre className="bg-card border border-border rounded-lg p-3 sm:p-4 text-xs sm:text-sm font-mono max-h-[250px] sm:max-h-[300px] overflow-auto break-all whitespace-pre-wrap">
                 {result.original}
               </pre>
             </div>
