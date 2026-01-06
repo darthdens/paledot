@@ -66,7 +66,7 @@ export const ColorHero = ({ onGenerate, isLoading }: ColorHeroProps) => {
                       id="baseColor"
                       value={baseColor}
                       onChange={(e) => setBaseColor(e.target.value)}
-                      className="h-14 w-16 p-1 cursor-pointer bg-card border-border"
+                      className="h-14 w-16 p-1 cursor-pointer bg-card border-border text-base"
                     />
                   </div>
                   <Input
@@ -79,7 +79,7 @@ export const ColorHero = ({ onGenerate, isLoading }: ColorHeroProps) => {
                       }
                     }}
                     placeholder="#6366F1"
-                    className="flex-1 h-14 text-lg font-mono uppercase bg-card border-border"
+                    className="flex-1 h-14 text-base font-mono uppercase bg-card border-border"
                   />
                   <Button
                     type="button"
@@ -99,7 +99,7 @@ export const ColorHero = ({ onGenerate, isLoading }: ColorHeroProps) => {
                 {t.colorPalette.harmonyType}
               </Label>
               <Select value={harmony} onValueChange={setHarmony}>
-                <SelectTrigger className="h-14 text-lg bg-card border-border">
+                <SelectTrigger className="h-14 text-base bg-card border-border">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
