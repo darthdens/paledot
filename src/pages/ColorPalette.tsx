@@ -35,7 +35,7 @@ const ColorPalette = () => {
     // Simulate a brief loading state for UX
     await new Promise(resolve => setTimeout(resolve, 300));
     
-    const generatedColors = generatePalette(baseColor, harmony);
+    const generatedColors = generatePalette(baseColor, harmony, t.colorPalette.colorNames);
     setPalette({
       baseColor,
       colors: generatedColors,
@@ -129,35 +129,35 @@ function hslToHex(h: number, s: number, l: number): string {
   return `#${f(0)}${f(8)}${f(4)}`;
 }
 
-function getColorName(hsl: { h: number; s: number; l: number }): string {
+function getColorName(hsl: { h: number; s: number; l: number }, colorNames: typeof import("@/i18n/translations").translations.en.colorPalette.colorNames): string {
   const { h, s, l } = hsl;
   
   if (s < 10) {
-    if (l < 20) return "Black";
-    if (l < 40) return "Dark Gray";
-    if (l < 60) return "Gray";
-    if (l < 80) return "Light Gray";
-    return "White";
+    if (l < 20) return colorNames.black;
+    if (l < 40) return colorNames.darkGray;
+    if (l < 60) return colorNames.gray;
+    if (l < 80) return colorNames.lightGray;
+    return colorNames.white;
   }
   
   let hue = "";
-  if (h < 15 || h >= 345) hue = "Red";
-  else if (h < 45) hue = "Orange";
-  else if (h < 75) hue = "Yellow";
-  else if (h < 150) hue = "Green";
-  else if (h < 210) hue = "Cyan";
-  else if (h < 270) hue = "Blue";
-  else if (h < 315) hue = "Purple";
-  else hue = "Pink";
+  if (h < 15 || h >= 345) hue = colorNames.red;
+  else if (h < 45) hue = colorNames.orange;
+  else if (h < 75) hue = colorNames.yellow;
+  else if (h < 150) hue = colorNames.green;
+  else if (h < 210) hue = colorNames.cyan;
+  else if (h < 270) hue = colorNames.blue;
+  else if (h < 315) hue = colorNames.purple;
+  else hue = colorNames.pink;
   
   let prefix = "";
-  if (l < 30) prefix = "Dark ";
-  else if (l > 70) prefix = "Light ";
+  if (l < 30) prefix = colorNames.dark + " ";
+  else if (l > 70) prefix = colorNames.light + " ";
   
   return prefix + hue;
 }
 
-function generatePalette(baseColor: string, harmony: string): PaletteColor[] {
+function generatePalette(baseColor: string, harmony: string, colorNames: typeof import("@/i18n/translations").translations.en.colorPalette.colorNames): PaletteColor[] {
   const rgb = hexToRgb(baseColor);
   const hsl = rgbToHsl(rgb.r, rgb.g, rgb.b);
   
@@ -197,7 +197,7 @@ function generatePalette(baseColor: string, harmony: string): PaletteColor[] {
         hex,
         rgb: newRgb,
         hsl: newHsl,
-        name: getColorName(newHsl),
+        name: getColorName(newHsl, colorNames),
       });
     }
   } else {
@@ -210,7 +210,7 @@ function generatePalette(baseColor: string, harmony: string): PaletteColor[] {
         hex,
         rgb: newRgb,
         hsl: newHsl,
-        name: getColorName(newHsl),
+        name: getColorName(newHsl, colorNames),
       });
     }
   }
