@@ -14,7 +14,9 @@ export const Footer = () => {
             <Heart className="w-4 h-4 text-accent" strokeWidth={2} fill="currentColor" />
             <span>{t.footer.by}</span>
             <a 
-              href="/" 
+              href="https://dens.so" 
+              target="_blank"
+              rel="noopener noreferrer"
               className="font-medium text-foreground hover:text-accent transition-colors"
             >
               Dens Akoka
