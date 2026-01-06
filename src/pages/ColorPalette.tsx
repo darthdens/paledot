@@ -29,13 +29,13 @@ const ColorPalette = () => {
     document.title = t.colorPalette.pageTitle;
   }, [t]);
 
-  const handleGenerate = async (baseColor: string, harmony: string) => {
+  const handleGenerate = async (baseColor: string, harmony: string, colorCount: number) => {
     setIsLoading(true);
     
     // Simulate a brief loading state for UX
     await new Promise(resolve => setTimeout(resolve, 300));
     
-    const generatedColors = generatePalette(baseColor, harmony, t.colorPalette.colorNames);
+    const generatedColors = generatePalette(baseColor, harmony, colorCount, t.colorPalette.colorNames);
     setPalette({
       baseColor,
       colors: generatedColors,
@@ -157,42 +157,20 @@ function getColorName(hsl: { h: number; s: number; l: number }, colorNames: type
   return prefix + hue;
 }
 
-function generatePalette(baseColor: string, harmony: string, colorNames: typeof import("@/i18n/translations").translations.en.colorPalette.colorNames): PaletteColor[] {
+function generatePalette(baseColor: string, harmony: string, colorCount: number, colorNames: typeof import("@/i18n/translations").translations.en.colorPalette.colorNames): PaletteColor[] {
   const rgb = hexToRgb(baseColor);
   const hsl = rgbToHsl(rgb.r, rgb.g, rgb.b);
   
   const colors: PaletteColor[] = [];
-  let hues: number[] = [];
-  
-  switch (harmony) {
-    case "complementary":
-      hues = [hsl.h, (hsl.h + 180) % 360];
-      break;
-    case "analogous":
-      hues = [(hsl.h - 30 + 360) % 360, hsl.h, (hsl.h + 30) % 360];
-      break;
-    case "triadic":
-      hues = [hsl.h, (hsl.h + 120) % 360, (hsl.h + 240) % 360];
-      break;
-    case "split-complementary":
-      hues = [hsl.h, (hsl.h + 150) % 360, (hsl.h + 210) % 360];
-      break;
-    case "tetradic":
-      hues = [hsl.h, (hsl.h + 90) % 360, (hsl.h + 180) % 360, (hsl.h + 270) % 360];
-      break;
-    case "monochromatic":
-    default:
-      hues = [hsl.h];
-      break;
-  }
   
   // For monochromatic, generate different lightness values
   if (harmony === "monochromatic") {
-    const lightnesses = [20, 35, 50, 65, 80];
-    for (const l of lightnesses) {
+    const step = 60 / (colorCount - 1);
+    for (let i = 0; i < colorCount; i++) {
+      const l = 20 + (step * i);
       const hex = hslToHex(hsl.h, hsl.s, l);
       const newRgb = hexToRgb(hex);
-      const newHsl = { h: hsl.h, s: hsl.s, l };
+      const newHsl = { h: hsl.h, s: hsl.s, l: Math.round(l) };
       colors.push({
         hex,
         rgb: newRgb,
@@ -201,17 +179,54 @@ function generatePalette(baseColor: string, harmony: string, colorNames: typeof 
       });
     }
   } else {
-    // For other harmonies, generate colors with the base saturation and lightness
-    for (const h of hues) {
-      const hex = hslToHex(h, hsl.s, hsl.l);
+    // For other harmonies, generate base hues first then fill with variations
+    let baseHues: number[] = [];
+    
+    switch (harmony) {
+      case "complementary":
+        baseHues = [hsl.h, (hsl.h + 180) % 360];
+        break;
+      case "analogous":
+        baseHues = [(hsl.h - 30 + 360) % 360, hsl.h, (hsl.h + 30) % 360];
+        break;
+      case "triadic":
+        baseHues = [hsl.h, (hsl.h + 120) % 360, (hsl.h + 240) % 360];
+        break;
+      case "split-complementary":
+        baseHues = [hsl.h, (hsl.h + 150) % 360, (hsl.h + 210) % 360];
+        break;
+      case "tetradic":
+        baseHues = [hsl.h, (hsl.h + 90) % 360, (hsl.h + 180) % 360, (hsl.h + 270) % 360];
+        break;
+      default:
+        baseHues = [hsl.h];
+    }
+    
+    // Generate colors by cycling through hues and adding lightness variations
+    let hueIndex = 0;
+    const lightnessVariations = [hsl.l, hsl.l - 15, hsl.l + 15, hsl.l - 30, hsl.l + 30];
+    let variationIndex = 0;
+    
+    for (let i = 0; i < colorCount; i++) {
+      const h = baseHues[hueIndex % baseHues.length];
+      let l = lightnessVariations[variationIndex];
+      l = Math.max(15, Math.min(85, l)); // Clamp lightness
+      
+      const hex = hslToHex(h, hsl.s, l);
       const newRgb = hexToRgb(hex);
-      const newHsl = { h, s: hsl.s, l: hsl.l };
+      const newHsl = { h, s: hsl.s, l: Math.round(l) };
       colors.push({
         hex,
         rgb: newRgb,
         hsl: newHsl,
         name: getColorName(newHsl, colorNames),
       });
+      
+      hueIndex++;
+      if (hueIndex >= baseHues.length) {
+        hueIndex = 0;
+        variationIndex++;
+      }
     }
   }
   
