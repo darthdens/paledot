@@ -195,7 +195,7 @@ const LampExperiment = () => {
 
             {/* Day/Night toggle (right) */}
             <div className="flex items-center gap-3">
-              <SunLight
+              <HalfMoon
                 className="w-5 h-5 text-muted-foreground"
                 strokeWidth={2}
               />
@@ -204,7 +204,7 @@ const LampExperiment = () => {
                 onCheckedChange={setTheme}
                 aria-label={isDark ? t.lampExperiment.nightMode : t.lampExperiment.dayMode}
               />
-              <HalfMoon
+              <SunLight
                 className="w-5 h-5 text-muted-foreground"
                 strokeWidth={2}
               />
