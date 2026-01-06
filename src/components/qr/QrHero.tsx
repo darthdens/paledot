@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { ChevronDown } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { Switch } from "@/components/ui/switch";
+import { DensSwitch } from "@/components/ui/dens-switch";
 import {
   Select,
   SelectContent,
@@ -256,11 +256,10 @@ export const QrHero = ({ onGenerate }: QrHeroProps) => {
               <Label htmlFor="include-margin" className="cursor-pointer">
                 {t.qrCode.includeMargin}
               </Label>
-              <Switch
+              <DensSwitch
                 id="include-margin"
                 checked={includeMargin}
                 onCheckedChange={setIncludeMargin}
-                className="border border-border data-[state=unchecked]:bg-muted data-[state=checked]:bg-accent data-[state=checked]:border-accent"
               />
             </div>
 
