@@ -5,20 +5,33 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+const platformGuidelines: Record<string, string> = {
+  general: "Write versatile copy suitable for any context.",
+  linkedin: "Write professional, enterprise-grade copy suitable for LinkedIn. Use business language, focus on value propositions, thought leadership, and professional credibility. Avoid overly casual language.",
+  twitter: "Write concise, punchy copy for Twitter/X. Keep it short, use hooks, be conversational. Consider character limits. Use engaging language that encourages shares and replies.",
+  instagram: "Write visually-oriented, lifestyle-focused copy for Instagram. Be authentic, use emojis sparingly, focus on storytelling and emotion. Consider that this will pair with visual content.",
+  facebook: "Write community-focused, shareable copy for Facebook. Balance professional and personal tones, encourage engagement and discussion. Can be slightly longer than Twitter.",
+  email: "Write compelling email copy. Focus on subject lines that drive opens, body copy that converts. Be personal, clear, and action-oriented.",
+  website: "Write conversion-focused web copy. Clear value propositions, scannable format, strong CTAs. Focus on benefits and user outcomes.",
+  blog: "Write engaging blog content. Informative, well-structured, SEO-friendly. Balance education with entertainment. Use headers and clear formatting.",
+};
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const { prompt, copyType, tone, language } = await req.json();
+    const { prompt, copyType, tone, platform, language } = await req.json();
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     
     if (!LOVABLE_API_KEY) {
       throw new Error("LOVABLE_API_KEY is not configured");
     }
 
-    const systemPrompt = `You are an expert copywriter who creates compelling, conversion-focused copy. You adapt your writing style based on the requested tone and purpose.
+    const platformGuide = platformGuidelines[platform] || platformGuidelines.general;
+
+    const systemPrompt = `You are an expert copywriter who creates compelling, conversion-focused copy. You adapt your writing style based on the requested tone, purpose, and platform.
 
 IMPORTANT INSTRUCTIONS:
 - Write in ${language === 'fr' ? 'French' : 'English'}
@@ -30,7 +43,13 @@ IMPORTANT INSTRUCTIONS:
 - Return ONLY the copy, no explanations or meta-commentary
 
 Copy Type: ${copyType}
-Tone: ${tone}`;
+Tone: ${tone}
+Platform: ${platform}
+
+PLATFORM GUIDELINES:
+${platformGuide}`;
+
+    console.log(`Generating copy - Type: ${copyType}, Tone: ${tone}, Platform: ${platform}, Language: ${language}`);
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",

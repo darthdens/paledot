@@ -12,6 +12,7 @@ export interface GeneratedCopy {
   content: string;
   copyType: string;
   tone: string;
+  platform: string;
   prompt: string;
 }
 
@@ -25,7 +26,7 @@ const AICopywriter = () => {
     document.title = t.copywriter.pageTitle;
   }, [t]);
 
-  const handleGenerate = async (prompt: string, copyType: string, tone: string) => {
+  const handleGenerate = async (prompt: string, copyType: string, tone: string, platform: string) => {
     setIsLoading(true);
     setStreamingContent("");
     setGeneratedCopy(null);
@@ -39,7 +40,7 @@ const AICopywriter = () => {
             "Content-Type": "application/json",
             Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
           },
-          body: JSON.stringify({ prompt, copyType, tone, language }),
+          body: JSON.stringify({ prompt, copyType, tone, platform, language }),
         }
       );
 
@@ -93,6 +94,7 @@ const AICopywriter = () => {
         content: fullContent,
         copyType,
         tone,
+        platform,
         prompt,
       });
     } catch (error) {
