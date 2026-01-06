@@ -200,8 +200,8 @@ const LampExperiment = () => {
                 strokeWidth={2}
               />
               <DensSwitch
-                checked={isDark}
-                onCheckedChange={setTheme}
+                checked={!isDark}
+                onCheckedChange={(nextIsLight) => setTheme(!nextIsLight)}
                 aria-label={isDark ? t.lampExperiment.nightMode : t.lampExperiment.dayMode}
               />
               <SunLight
