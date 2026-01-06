@@ -92,12 +92,12 @@ export const JsonResults = ({ result, onReset, onReformat }: JsonResultsProps) =
           <h2 className="text-xl sm:text-2xl font-semibold">{t.jsonFormatter.validJson}</h2>
 
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="grid w-full grid-cols-2 mb-3 sm:mb-4">
-              <TabsTrigger value="formatted" className="gap-1 sm:gap-2 text-sm sm:text-base">
+            <TabsList className="grid w-full grid-cols-2 mb-3 sm:mb-4 h-12">
+              <TabsTrigger value="formatted" className="gap-1 sm:gap-2 text-sm sm:text-base flex items-center justify-center">
                 <Maximize2 className="w-3 h-3 sm:w-4 sm:h-4" />
                 {t.jsonFormatter.formatted}
               </TabsTrigger>
-              <TabsTrigger value="minified" className="gap-1 sm:gap-2 text-sm sm:text-base">
+              <TabsTrigger value="minified" className="gap-1 sm:gap-2 text-sm sm:text-base flex items-center justify-center">
                 <Minimize2 className="w-3 h-3 sm:w-4 sm:h-4" />
                 {t.jsonFormatter.minified}
               </TabsTrigger>
