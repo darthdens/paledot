@@ -4,6 +4,7 @@ import { Navigation } from "@/components/Navigation";
 import { Footer } from "@/components/Footer";
 import { Starfield } from "@/components/Starfield";
 import { DensSwitch } from "@/components/ui/dens-switch";
+import { useThemePreference } from "@/hooks/use-theme-preference";
 import { LightBulb, LightBulbOff, SunLight, HalfMoon } from "iconoir-react";
 
 // Import lamp images
@@ -82,14 +83,14 @@ const lamps: LampProduct[] = [
 ];
 
 // Product card with image crossfade
-const LampCard = ({ 
-  lamp, 
-  lampOn, 
+const LampCard = ({
+  lamp,
+  lampOn,
   isDark,
   lampName,
   fromText,
-}: { 
-  lamp: LampProduct; 
+}: {
+  lamp: LampProduct;
   lampOn: boolean;
   isDark: boolean;
   lampName: string;
@@ -123,7 +124,7 @@ const LampCard = ({
             aria-hidden="true"
           />
         ))}
-        
+
         {/* Visible image with transition */}
         <img
           src={getImage()}
@@ -131,10 +132,10 @@ const LampCard = ({
           className="absolute inset-0 w-full h-full object-cover transition-opacity duration-700"
         />
       </div>
-      <h3 className="font-medium text-foreground">
-        {lampName}
-      </h3>
-      <p className="text-sm text-muted-foreground">{fromText} {lamp.price}</p>
+      <h3 className="font-medium text-foreground">{lampName}</h3>
+      <p className="text-sm text-muted-foreground">
+        {fromText} {lamp.price}
+      </p>
     </div>
   );
 };
@@ -142,32 +143,20 @@ const LampCard = ({
 const LampExperiment = () => {
   const { language, t } = useLanguage();
   const [lampOn, setLampOn] = useState(false);
-  const [isDark, setIsDark] = useState(() => {
-    // Initialize from current theme state
-    if (typeof window !== 'undefined') {
-      return document.documentElement.classList.contains('dark');
-    }
-    return false;
-  });
+  const { isDark, setTheme } = useThemePreference();
 
   useEffect(() => {
-    document.title = language === 'fr' 
-      ? "Vitrine Interactive de Lampes | Dens" 
-      : "Interactive Lamp Showcase | Dens";
+    document.title =
+      language === "fr"
+        ? "Vitrine Interactive de Lampes | Dens"
+        : "Interactive Lamp Showcase | Dens";
   }, [language]);
-
-  // Sync with theme changes and apply dark class
-  const handleThemeChange = (newIsDark: boolean) => {
-    setIsDark(newIsDark);
-    document.documentElement.classList.toggle('dark', newIsDark);
-    localStorage.setItem('theme', newIsDark ? 'dark' : 'light');
-  };
 
   return (
     <div className="min-h-screen bg-background text-foreground relative flex flex-col">
       <Starfield />
       <Navigation />
-      
+
       <main className="flex-1 relative z-10 pt-16">
         {/* Hero Section */}
         <section className="min-h-[40vh] flex items-center justify-center pt-20 md:pt-24 pb-12 md:pb-16">
@@ -189,24 +178,36 @@ const LampExperiment = () => {
           <div className="flex items-center justify-between mb-8">
             {/* Lamp toggle (left) */}
             <div className="flex items-center gap-3">
-              <LightBulbOff className="w-5 h-5 text-muted-foreground" strokeWidth={2} />
+              <LightBulbOff
+                className="w-5 h-5 text-muted-foreground"
+                strokeWidth={2}
+              />
               <DensSwitch
                 checked={lampOn}
                 onCheckedChange={setLampOn}
                 aria-label={lampOn ? t.lampExperiment.lampOn : t.lampExperiment.lampOff}
               />
-              <LightBulb className="w-5 h-5 text-muted-foreground" strokeWidth={2} />
+              <LightBulb
+                className="w-5 h-5 text-muted-foreground"
+                strokeWidth={2}
+              />
             </div>
-            
+
             {/* Day/Night toggle (right) */}
             <div className="flex items-center gap-3">
-              <SunLight className="w-5 h-5 text-muted-foreground" strokeWidth={2} />
+              <SunLight
+                className="w-5 h-5 text-muted-foreground"
+                strokeWidth={2}
+              />
               <DensSwitch
                 checked={isDark}
-                onCheckedChange={handleThemeChange}
+                onCheckedChange={setTheme}
                 aria-label={isDark ? t.lampExperiment.nightMode : t.lampExperiment.dayMode}
               />
-              <HalfMoon className="w-5 h-5 text-muted-foreground" strokeWidth={2} />
+              <HalfMoon
+                className="w-5 h-5 text-muted-foreground"
+                strokeWidth={2}
+              />
             </div>
           </div>
 
@@ -235,3 +236,4 @@ const LampExperiment = () => {
 };
 
 export default LampExperiment;
+
