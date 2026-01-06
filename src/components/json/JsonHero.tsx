@@ -140,7 +140,7 @@ export const JsonHero = ({ onFormat }: JsonHeroProps) => {
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 placeholder={t.jsonFormatter.inputPlaceholder}
-                className="min-h-[180px] sm:min-h-[200px] bg-card border-border resize-none font-mono text-sm"
+                className="min-h-[180px] sm:min-h-[200px] bg-card border-border resize-none font-mono text-[16px] sm:text-sm"
               />
             </div>
 
