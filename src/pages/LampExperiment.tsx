@@ -7,25 +7,35 @@ import { DensSwitch } from "@/components/ui/dens-switch";
 import { useThemePreference } from "@/hooks/use-theme-preference";
 import { LightBulb, LightBulbOff, SunLight, HalfMoon } from "iconoir-react";
 
-// Import lamp images (reused for both day/night to guarantee scene consistency)
-import couchOn from "@/assets/lamps/couch-lamp-day-on.jpg";
-import couchOff from "@/assets/lamps/couch-lamp-day-off.jpg";
+// Import lamp images
+import couchDayOn from "@/assets/lamps/couch-lamp-day-on.jpg";
+import couchDayOff from "@/assets/lamps/couch-lamp-day-off.jpg";
+import couchNightOn from "@/assets/lamps/couch-lamp-night-on.jpg";
+import couchNightOff from "@/assets/lamps/couch-lamp-night-off.jpg";
 
-import diningOn from "@/assets/lamps/dining-lamp-day-on.jpg";
-import diningOff from "@/assets/lamps/dining-lamp-day-off.jpg";
+import diningDayOn from "@/assets/lamps/dining-lamp-day-on.jpg";
+import diningDayOff from "@/assets/lamps/dining-lamp-day-off.jpg";
+import diningNightOn from "@/assets/lamps/dining-lamp-night-on.jpg";
+import diningNightOff from "@/assets/lamps/dining-lamp-night-off.jpg";
 
-import deskOn from "@/assets/lamps/desk-lamp-day-on.jpg";
-import deskOff from "@/assets/lamps/desk-lamp-day-off.jpg";
+import deskDayOn from "@/assets/lamps/desk-lamp-day-on.jpg";
+import deskDayOff from "@/assets/lamps/desk-lamp-day-off.jpg";
+import deskNightOn from "@/assets/lamps/desk-lamp-night-on.jpg";
+import deskNightOff from "@/assets/lamps/desk-lamp-night-off.jpg";
 
-import loungeOn from "@/assets/lamps/lounge-lamp-day-on.jpg";
-import loungeOff from "@/assets/lamps/lounge-lamp-day-off.jpg";
+import loungeDayOn from "@/assets/lamps/lounge-lamp-day-on.jpg";
+import loungeDayOff from "@/assets/lamps/lounge-lamp-day-off.jpg";
+import loungeNightOn from "@/assets/lamps/lounge-lamp-night-on.jpg";
+import loungeNightOff from "@/assets/lamps/lounge-lamp-night-off.jpg";
 
 interface LampProduct {
   id: "couch" | "dining" | "desk" | "lounge";
   price: string;
   images: {
-    on: string;
-    off: string;
+    dayOn: string;
+    dayOff: string;
+    nightOn: string;
+    nightOff: string;
   };
 }
 
@@ -34,32 +44,40 @@ const lamps: LampProduct[] = [
     id: "couch",
     price: "$1,200.00",
     images: {
-      on: couchOn,
-      off: couchOff,
+      dayOn: couchDayOn,
+      dayOff: couchDayOff,
+      nightOn: couchNightOn,
+      nightOff: couchNightOff,
     },
   },
   {
     id: "dining",
     price: "$3,800.00",
     images: {
-      on: diningOn,
-      off: diningOff,
+      dayOn: diningDayOn,
+      dayOff: diningDayOff,
+      nightOn: diningNightOn,
+      nightOff: diningNightOff,
     },
   },
   {
     id: "desk",
     price: "$800.00",
     images: {
-      on: deskOn,
-      off: deskOff,
+      dayOn: deskDayOn,
+      dayOff: deskDayOff,
+      nightOn: deskNightOn,
+      nightOff: deskNightOff,
     },
   },
   {
     id: "lounge",
     price: "$2,350.00",
     images: {
-      on: loungeOn,
-      off: loungeOff,
+      dayOn: loungeDayOn,
+      dayOff: loungeDayOff,
+      nightOn: loungeNightOn,
+      nightOff: loungeNightOff,
     },
   },
 ];
@@ -78,12 +96,20 @@ const LampCard = ({
   lampName: string;
   fromText: string;
 }) => {
-  const activeKey = useMemo(() => (lampOn ? "on" : "off"), [lampOn]);
-  const nightFilterClass = isDark ? "brightness-75 contrast-110 saturate-75" : "";
+  // Get the current active image key
+  const activeKey = useMemo(() => {
+    if (isDark) {
+      return lampOn ? "nightOn" : "nightOff";
+    }
+    return lampOn ? "dayOn" : "dayOff";
+  }, [isDark, lampOn]);
 
+  // All image variants with their keys
   const imageVariants = [
-    { key: "on", src: lamp.images.on },
-    { key: "off", src: lamp.images.off },
+    { key: "dayOn", src: lamp.images.dayOn },
+    { key: "dayOff", src: lamp.images.dayOff },
+    { key: "nightOn", src: lamp.images.nightOn },
+    { key: "nightOff", src: lamp.images.nightOff },
   ];
 
   return (
@@ -95,9 +121,9 @@ const LampCard = ({
             key={key}
             src={src}
             alt={key === activeKey ? lampName : ""}
-            className={`absolute inset-0 w-full h-full object-cover transition-all duration-500 ease-in-out ${
+            className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-500 ease-in-out ${
               key === activeKey ? "opacity-100" : "opacity-0"
-            } ${nightFilterClass}`}
+            }`}
             aria-hidden={key !== activeKey}
           />
         ))}
