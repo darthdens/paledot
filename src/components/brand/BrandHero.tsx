@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Switch } from "@/components/ui/switch";
+import { DensSwitch } from "@/components/ui/dens-switch";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { Search, Layers } from "lucide-react";
@@ -63,12 +63,11 @@ export const BrandHero = ({ onExtract, isLoading }: BrandHeroProps) => {
 
             <div className="space-y-3">
               <div className="flex items-center justify-center gap-3 py-2">
-                <Switch
+                <DensSwitch
                   id="deep-extract"
                   checked={deepExtract}
                   onCheckedChange={setDeepExtract}
                   disabled={isLoading}
-                  className="border border-border data-[state=unchecked]:bg-muted data-[state=checked]:bg-accent data-[state=checked]:border-accent"
                 />
                 <Label
                   htmlFor="deep-extract"
