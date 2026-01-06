@@ -6,7 +6,7 @@ import { LanguageProvider } from "@/i18n/LanguageContext";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import NotFound from "./pages/NotFound";
-import AICopywriter from "./pages/AICopywriter";
+import JsonFormatter from "./pages/JsonFormatter";
 
 const queryClient = new QueryClient();
 
@@ -19,7 +19,7 @@ const App = () => (
           <Toaster richColors position="bottom-left" />
           <CookieBanner />
           <Routes>
-            <Route path="/" element={<AICopywriter />} />
+            <Route path="/" element={<JsonFormatter />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </TooltipProvider>
