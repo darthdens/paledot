@@ -260,6 +260,7 @@ export const QrHero = ({ onGenerate }: QrHeroProps) => {
                 id="include-margin"
                 checked={includeMargin}
                 onCheckedChange={setIncludeMargin}
+                className="border border-border data-[state=unchecked]:bg-muted data-[state=checked]:bg-accent data-[state=checked]:border-accent"
               />
             </div>
 
