@@ -30,7 +30,7 @@ import loungeNightOff from "@/assets/lamps/lounge-lamp-night-off.jpg";
 
 interface LampProduct {
   id: "couch" | "dining" | "desk" | "lounge";
-  price: string;
+  price: number;
   images: {
     dayOn: string;
     dayOff: string;
@@ -39,10 +39,25 @@ interface LampProduct {
   };
 }
 
+const formatPrice = (price: number, language: string): string => {
+  if (language === "fr") {
+    // French: Euro with French formatting (1 200,00 €)
+    return new Intl.NumberFormat("fr-FR", {
+      style: "currency",
+      currency: "EUR",
+    }).format(price);
+  }
+  // English: British Pound (£1,200.00)
+  return new Intl.NumberFormat("en-GB", {
+    style: "currency",
+    currency: "GBP",
+  }).format(price);
+};
+
 const lamps: LampProduct[] = [
   {
     id: "couch",
-    price: "$1,200.00",
+    price: 1200,
     images: {
       dayOn: couchDayOn,
       dayOff: couchDayOff,
@@ -52,7 +67,7 @@ const lamps: LampProduct[] = [
   },
   {
     id: "dining",
-    price: "$3,800.00",
+    price: 3800,
     images: {
       dayOn: diningDayOn,
       dayOff: diningDayOff,
@@ -62,7 +77,7 @@ const lamps: LampProduct[] = [
   },
   {
     id: "desk",
-    price: "$800.00",
+    price: 800,
     images: {
       dayOn: deskDayOn,
       dayOff: deskDayOff,
@@ -72,7 +87,7 @@ const lamps: LampProduct[] = [
   },
   {
     id: "lounge",
-    price: "$2,350.00",
+    price: 2350,
     images: {
       dayOn: loungeDayOn,
       dayOff: loungeDayOff,
@@ -89,12 +104,14 @@ const LampCard = ({
   isDark,
   lampName,
   fromText,
+  language,
 }: {
   lamp: LampProduct;
   lampOn: boolean;
   isDark: boolean;
   lampName: string;
   fromText: string;
+  language: string;
 }) => {
   // Get the current active image key
   const activeKey = useMemo(() => {
@@ -130,7 +147,7 @@ const LampCard = ({
       </div>
       <h3 className="font-medium text-foreground">{lampName}</h3>
       <p className="text-sm text-muted-foreground">
-        {fromText} {lamp.price}
+        {fromText} {formatPrice(lamp.price, language)}
       </p>
     </div>
   );
@@ -250,6 +267,7 @@ const LampExperiment = () => {
                 isDark={isDark}
                 lampName={t.lampExperiment.lamps[lamp.id]}
                 fromText={t.lampExperiment.from}
+                language={language}
               />
             ))}
           </div>
