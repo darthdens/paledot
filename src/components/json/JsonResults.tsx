@@ -49,17 +49,17 @@ export const JsonResults = ({ result, onReset, onReformat }: JsonResultsProps) =
 
   if (!result.isValid) {
     return (
-      <section className="min-h-[60vh] flex items-center justify-center pt-24 pb-16">
-        <div className="container mx-auto px-6">
-          <div className="max-w-3xl mx-auto space-y-8">
-            <div className="bg-destructive/10 border border-destructive/30 rounded-lg p-6">
-              <div className="flex items-start gap-4">
-                <AlertCircle className="w-6 h-6 text-destructive shrink-0 mt-0.5" />
-                <div className="space-y-2">
-                  <h2 className="text-xl font-semibold text-destructive">
+      <section className="min-h-[60vh] flex items-center justify-center pt-20 md:pt-24 pb-12 md:pb-16">
+        <div className="container mx-auto px-4 sm:px-6">
+          <div className="max-w-3xl mx-auto space-y-6 md:space-y-8">
+            <div className="bg-destructive/10 border border-destructive/30 rounded-lg p-4 sm:p-6">
+              <div className="flex items-start gap-3 sm:gap-4">
+                <AlertCircle className="w-5 h-5 sm:w-6 sm:h-6 text-destructive shrink-0 mt-0.5" />
+                <div className="space-y-2 min-w-0 flex-1">
+                  <h2 className="text-lg sm:text-xl font-semibold text-destructive">
                     {t.jsonFormatter.invalidJson}
                   </h2>
-                  <p className="text-muted-foreground font-mono text-sm">
+                  <p className="text-muted-foreground font-mono text-xs sm:text-sm break-words">
                     {translateError(result.error || "")}
                   </p>
                 </div>
@@ -68,12 +68,12 @@ export const JsonResults = ({ result, onReset, onReformat }: JsonResultsProps) =
 
             <div className="space-y-2">
               <p className="text-sm text-muted-foreground">{t.jsonFormatter.originalInput}</p>
-              <pre className="bg-card border border-border rounded-lg p-4 overflow-x-auto text-sm font-mono max-h-[300px] overflow-y-auto">
+              <pre className="bg-card border border-border rounded-lg p-3 sm:p-4 overflow-x-auto text-xs sm:text-sm font-mono max-h-[250px] sm:max-h-[300px] overflow-y-auto">
                 {result.original}
               </pre>
             </div>
 
-            <div className="flex gap-4">
+            <div className="flex gap-3 sm:gap-4">
               <Button variant="outline" onClick={onReset} className="gap-2">
                 <ArrowLeft className="w-4 h-4" />
                 {t.jsonFormatter.tryAgain}
@@ -86,70 +86,70 @@ export const JsonResults = ({ result, onReset, onReformat }: JsonResultsProps) =
   }
 
   return (
-    <section className="min-h-[60vh] flex items-center justify-center pt-24 pb-16">
-      <div className="container mx-auto px-6">
-        <div className="max-w-4xl mx-auto space-y-8">
-          <div className="flex items-center gap-3">
-            <Check className="w-6 h-6 text-green-500" />
-            <h2 className="text-2xl font-semibold">{t.jsonFormatter.validJson}</h2>
+    <section className="min-h-[60vh] flex items-center justify-center pt-20 md:pt-24 pb-12 md:pb-16">
+      <div className="container mx-auto px-4 sm:px-6">
+        <div className="max-w-4xl mx-auto space-y-6 md:space-y-8">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <Check className="w-5 h-5 sm:w-6 sm:h-6 text-green-500" />
+            <h2 className="text-xl sm:text-2xl font-semibold">{t.jsonFormatter.validJson}</h2>
           </div>
 
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="grid w-full grid-cols-2 mb-4">
-              <TabsTrigger value="formatted" className="gap-2">
-                <Maximize2 className="w-4 h-4" />
+            <TabsList className="grid w-full grid-cols-2 mb-3 sm:mb-4">
+              <TabsTrigger value="formatted" className="gap-1 sm:gap-2 text-sm sm:text-base">
+                <Maximize2 className="w-3 h-3 sm:w-4 sm:h-4" />
                 {t.jsonFormatter.formatted}
               </TabsTrigger>
-              <TabsTrigger value="minified" className="gap-2">
-                <Minimize2 className="w-4 h-4" />
+              <TabsTrigger value="minified" className="gap-1 sm:gap-2 text-sm sm:text-base">
+                <Minimize2 className="w-3 h-3 sm:w-4 sm:h-4" />
                 {t.jsonFormatter.minified}
               </TabsTrigger>
             </TabsList>
 
             <TabsContent value="formatted" className="space-y-4">
               <div className="relative">
-                <pre className="bg-card border border-border rounded-lg p-4 overflow-x-auto text-sm font-mono max-h-[400px] overflow-y-auto">
+                <pre className="bg-card border border-border rounded-lg p-3 sm:p-4 overflow-x-auto text-xs sm:text-sm font-mono max-h-[300px] sm:max-h-[400px] overflow-y-auto">
                   {result.formatted}
                 </pre>
                 <Button
                   variant="outline"
                   size="sm"
-                  className="absolute top-2 right-2 gap-2"
+                  className="absolute top-2 right-2 gap-1 sm:gap-2 text-xs sm:text-sm"
                   onClick={() => handleCopy(result.formatted, "formatted")}
                 >
                   {copied === "formatted" ? (
-                    <Check className="w-4 h-4" />
+                    <Check className="w-3 h-3 sm:w-4 sm:h-4" />
                   ) : (
-                    <Copy className="w-4 h-4" />
+                    <Copy className="w-3 h-3 sm:w-4 sm:h-4" />
                   )}
-                  {t.jsonFormatter.copy}
+                  <span className="hidden sm:inline">{t.jsonFormatter.copy}</span>
                 </Button>
               </div>
             </TabsContent>
 
             <TabsContent value="minified" className="space-y-4">
               <div className="relative">
-                <pre className="bg-card border border-border rounded-lg p-4 overflow-x-auto text-sm font-mono max-h-[400px] overflow-y-auto break-all whitespace-pre-wrap">
+                <pre className="bg-card border border-border rounded-lg p-3 sm:p-4 overflow-x-auto text-xs sm:text-sm font-mono max-h-[300px] sm:max-h-[400px] overflow-y-auto break-all whitespace-pre-wrap">
                   {result.minified}
                 </pre>
                 <Button
                   variant="outline"
                   size="sm"
-                  className="absolute top-2 right-2 gap-2"
+                  className="absolute top-2 right-2 gap-1 sm:gap-2 text-xs sm:text-sm"
                   onClick={() => handleCopy(result.minified, "minified")}
                 >
                   {copied === "minified" ? (
-                    <Check className="w-4 h-4" />
+                    <Check className="w-3 h-3 sm:w-4 sm:h-4" />
                   ) : (
-                    <Copy className="w-4 h-4" />
+                    <Copy className="w-3 h-3 sm:w-4 sm:h-4" />
                   )}
-                  {t.jsonFormatter.copy}
+                  <span className="hidden sm:inline">{t.jsonFormatter.copy}</span>
                 </Button>
               </div>
             </TabsContent>
           </Tabs>
 
-          <div className="flex flex-wrap gap-4">
+          <div className="flex flex-wrap gap-3 sm:gap-4">
             <Button variant="outline" onClick={onReset} className="gap-2">
               <ArrowLeft className="w-4 h-4" />
               {t.jsonFormatter.startOver}

@@ -110,27 +110,27 @@ export const JsonHero = ({ onFormat }: JsonHeroProps) => {
   };
 
   return (
-    <section className="min-h-[60vh] flex items-center justify-center pt-24 pb-16">
-      <div className="container mx-auto px-6">
-        <div className="max-w-3xl mx-auto text-center space-y-8">
-          <h1 className="font-serif text-4xl md:text-6xl font-bold leading-tight">
+    <section className="min-h-[60vh] flex items-center justify-center pt-20 md:pt-24 pb-12 md:pb-16">
+      <div className="container mx-auto px-4 sm:px-6">
+        <div className="max-w-3xl mx-auto text-center space-y-6 md:space-y-8">
+          <h1 className="font-serif text-3xl sm:text-4xl md:text-6xl font-bold leading-tight">
             {t.jsonFormatter.title}
           </h1>
 
-          <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+          <p className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed px-2">
             {t.jsonFormatter.subtitle}
           </p>
 
-          <form onSubmit={handleSubmit} className="space-y-6 max-w-xl mx-auto text-left">
+          <form onSubmit={handleSubmit} className="space-y-4 md:space-y-6 max-w-xl mx-auto text-left">
             <div className="space-y-2">
-              <div className="flex items-center justify-between">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 sm:gap-0">
                 <Label htmlFor="json-input">{t.jsonFormatter.inputLabel}</Label>
                 <Button
                   type="button"
                   variant="ghost"
                   size="sm"
                   onClick={handlePaste}
-                  className="text-muted-foreground hover:text-foreground"
+                  className="text-muted-foreground hover:text-foreground self-start sm:self-auto -ml-2 sm:ml-0"
                 >
                   {t.jsonFormatter.pasteFromClipboard}
                 </Button>
@@ -140,11 +140,11 @@ export const JsonHero = ({ onFormat }: JsonHeroProps) => {
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 placeholder={t.jsonFormatter.inputPlaceholder}
-                className="min-h-[200px] bg-card border-border resize-none font-mono text-sm"
+                className="min-h-[180px] sm:min-h-[200px] bg-card border-border resize-none font-mono text-sm"
               />
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
               <div className="space-y-2">
                 <Label>{t.jsonFormatter.indentation}</Label>
                 {renderIndentSelect()}
@@ -155,7 +155,7 @@ export const JsonHero = ({ onFormat }: JsonHeroProps) => {
                   size="lg"
                   variant="secondary"
                   disabled={!input.trim()}
-                  className="h-14 px-8 w-full"
+                  className="h-12 sm:h-14 px-6 sm:px-8 w-full"
                 >
                   {t.jsonFormatter.format}
                 </Button>
