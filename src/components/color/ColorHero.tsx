@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useLanguage } from "@/i18n/LanguageContext";
-import { Palette, Shuffle } from "lucide-react";
+import { Shuffle } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -66,7 +66,7 @@ export const ColorHero = ({ onGenerate, isLoading }: ColorHeroProps) => {
                       id="baseColor"
                       value={baseColor}
                       onChange={(e) => setBaseColor(e.target.value)}
-                      className="h-12 w-16 p-1 cursor-pointer"
+                      className="h-14 w-16 p-1 cursor-pointer bg-card border-border"
                     />
                   </div>
                   <Input
@@ -79,13 +79,13 @@ export const ColorHero = ({ onGenerate, isLoading }: ColorHeroProps) => {
                       }
                     }}
                     placeholder="#6366F1"
-                    className="flex-1 h-12 text-base font-mono uppercase"
+                    className="flex-1 h-14 text-lg font-mono uppercase bg-card border-border"
                   />
                   <Button
                     type="button"
                     variant="outline"
                     size="icon"
-                    className="h-12 w-12"
+                    className="h-14 w-14 border-border"
                     onClick={generateRandomColor}
                   >
                     <Shuffle className="w-4 h-4" />
@@ -99,7 +99,7 @@ export const ColorHero = ({ onGenerate, isLoading }: ColorHeroProps) => {
                 {t.colorPalette.harmonyType}
               </Label>
               <Select value={harmony} onValueChange={setHarmony}>
-                <SelectTrigger className="h-12">
+                <SelectTrigger className="h-14 text-lg bg-card border-border">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -114,10 +114,11 @@ export const ColorHero = ({ onGenerate, isLoading }: ColorHeroProps) => {
 
             <Button
               type="submit"
+              size="lg"
+              variant="secondary"
               disabled={isLoading || !baseColor}
-              className="w-full h-12 px-8 gap-2 bg-secondary text-secondary-foreground hover:bg-secondary/90"
+              className="h-14 px-8"
             >
-              <Palette className="w-4 h-4" />
               {isLoading ? t.colorPalette.generating : t.colorPalette.generate}
             </Button>
           </form>
