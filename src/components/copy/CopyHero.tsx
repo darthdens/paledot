@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useLanguage } from "@/i18n/LanguageContext";
-import { Sparkles, ChevronDown } from "lucide-react";
+import { ChevronDown } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import {
   Select,
@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/drawer";
 
 interface CopyHeroProps {
-  onGenerate: (prompt: string, copyType: string, tone: string) => void;
+  onGenerate: (prompt: string, copyType: string, tone: string, platform: string) => void;
   isLoading: boolean;
 }
 
@@ -30,14 +30,16 @@ export const CopyHero = ({ onGenerate, isLoading }: CopyHeroProps) => {
   const [prompt, setPrompt] = useState("");
   const [copyType, setCopyType] = useState("headline");
   const [tone, setTone] = useState("professional");
+  const [platform, setPlatform] = useState("general");
   const [typeDrawerOpen, setTypeDrawerOpen] = useState(false);
   const [toneDrawerOpen, setToneDrawerOpen] = useState(false);
+  const [platformDrawerOpen, setPlatformDrawerOpen] = useState(false);
   const isMobile = useIsMobile();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!prompt.trim()) return;
-    onGenerate(prompt, copyType, tone);
+    onGenerate(prompt, copyType, tone, platform);
   };
 
   const copyTypes = [
@@ -60,8 +62,20 @@ export const CopyHero = ({ onGenerate, isLoading }: CopyHeroProps) => {
     { value: "minimalist", label: t.copywriter.tones.minimalist },
   ];
 
+  const platforms = [
+    { value: "general", label: t.copywriter.platforms.general },
+    { value: "linkedin", label: t.copywriter.platforms.linkedin },
+    { value: "twitter", label: t.copywriter.platforms.twitter },
+    { value: "instagram", label: t.copywriter.platforms.instagram },
+    { value: "facebook", label: t.copywriter.platforms.facebook },
+    { value: "email", label: t.copywriter.platforms.email },
+    { value: "website", label: t.copywriter.platforms.website },
+    { value: "blog", label: t.copywriter.platforms.blog },
+  ];
+
   const selectedTypeLabel = copyTypes.find(o => o.value === copyType)?.label || "";
   const selectedToneLabel = tones.find(o => o.value === tone)?.label || "";
+  const selectedPlatformLabel = platforms.find(o => o.value === platform)?.label || "";
 
   const renderSelect = (
     value: string,
@@ -151,7 +165,7 @@ export const CopyHero = ({ onGenerate, isLoading }: CopyHeroProps) => {
               />
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div className="space-y-2">
                 <Label>{t.copywriter.copyType}</Label>
                 {renderSelect(
@@ -162,6 +176,19 @@ export const CopyHero = ({ onGenerate, isLoading }: CopyHeroProps) => {
                   typeDrawerOpen,
                   setTypeDrawerOpen,
                   selectedTypeLabel
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <Label>{t.copywriter.platform}</Label>
+                {renderSelect(
+                  platform,
+                  platforms,
+                  setPlatform,
+                  t.copywriter.platform,
+                  platformDrawerOpen,
+                  setPlatformDrawerOpen,
+                  selectedPlatformLabel
                 )}
               </div>
 
@@ -186,7 +213,6 @@ export const CopyHero = ({ onGenerate, isLoading }: CopyHeroProps) => {
               disabled={isLoading || !prompt.trim()}
               className="h-14 px-8 w-full sm:w-auto"
             >
-              <Sparkles className="w-4 h-4 mr-2" />
               {isLoading ? t.copywriter.generating : t.copywriter.generate}
             </Button>
           </form>

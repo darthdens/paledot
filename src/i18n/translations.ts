@@ -830,6 +830,17 @@ export const translations = {
         luxurious: "Luxurious",
         minimalist: "Minimalist",
       },
+      platform: "Platform",
+      platforms: {
+        general: "General",
+        linkedin: "LinkedIn",
+        twitter: "Twitter / X",
+        instagram: "Instagram",
+        facebook: "Facebook",
+        email: "Email",
+        website: "Website",
+        blog: "Blog",
+      },
     },
 
     // Font Pairing Generator
@@ -1701,6 +1712,17 @@ export const translations = {
         urgent: "Urgent",
         luxurious: "Luxueux",
         minimalist: "Minimaliste",
+      },
+      platform: "Plateforme",
+      platforms: {
+        general: "Général",
+        linkedin: "LinkedIn",
+        twitter: "Twitter / X",
+        instagram: "Instagram",
+        facebook: "Facebook",
+        email: "Email",
+        website: "Site web",
+        blog: "Blog",
       },
     },
 

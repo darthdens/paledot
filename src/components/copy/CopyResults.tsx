@@ -8,7 +8,7 @@ import { GeneratedCopy } from "@/pages/AICopywriter";
 interface CopyResultsProps {
   copy: GeneratedCopy;
   onReset: () => void;
-  onRegenerate: (prompt: string, copyType: string, tone: string) => void;
+  onRegenerate: (prompt: string, copyType: string, tone: string, platform: string) => void;
 }
 
 export const CopyResults = ({ copy, onReset, onRegenerate }: CopyResultsProps) => {
@@ -27,7 +27,7 @@ export const CopyResults = ({ copy, onReset, onRegenerate }: CopyResultsProps) =
   };
 
   const handleRegenerate = () => {
-    onRegenerate(copy.prompt, copy.copyType, copy.tone);
+    onRegenerate(copy.prompt, copy.copyType, copy.tone, copy.platform);
   };
 
   const getTypeLabel = (type: string) => {
@@ -56,6 +56,20 @@ export const CopyResults = ({ copy, onReset, onRegenerate }: CopyResultsProps) =
     return tones[tone] || tone;
   };
 
+  const getPlatformLabel = (platform: string) => {
+    const platforms: Record<string, string> = {
+      general: t.copywriter.platforms.general,
+      linkedin: t.copywriter.platforms.linkedin,
+      twitter: t.copywriter.platforms.twitter,
+      instagram: t.copywriter.platforms.instagram,
+      facebook: t.copywriter.platforms.facebook,
+      email: t.copywriter.platforms.email,
+      website: t.copywriter.platforms.website,
+      blog: t.copywriter.platforms.blog,
+    };
+    return platforms[platform] || platform;
+  };
+
   return (
     <section className="py-24">
       <div className="container mx-auto px-6">
@@ -68,8 +82,10 @@ export const CopyResults = ({ copy, onReset, onRegenerate }: CopyResultsProps) =
           </div>
 
           <div className="space-y-4">
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+            <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
               <span className="px-2 py-1 bg-accent/10 rounded-md">{getTypeLabel(copy.copyType)}</span>
+              <span>•</span>
+              <span className="px-2 py-1 bg-accent/10 rounded-md">{getPlatformLabel(copy.platform)}</span>
               <span>•</span>
               <span className="px-2 py-1 bg-accent/10 rounded-md">{getToneLabel(copy.tone)}</span>
             </div>
