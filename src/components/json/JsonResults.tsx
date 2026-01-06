@@ -28,6 +28,25 @@ export const JsonResults = ({ result, onReset, onReformat }: JsonResultsProps) =
     }
   };
 
+  const translateError = (error: string): string => {
+    const errors = t.jsonFormatter.errors;
+    
+    // Replace common JSON error patterns with translated versions
+    let translatedError = error
+      .replace(/Unterminated string/gi, errors.unterminatedString)
+      .replace(/Unexpected token/gi, errors.unexpectedToken)
+      .replace(/Unexpected end of JSON input/gi, errors.unexpectedEnd)
+      .replace(/Invalid character/gi, errors.invalidCharacter)
+      .replace(/Expected property name or '\}'/gi, errors.expectedProperty)
+      .replace(/Expected ':'/gi, errors.expectedColon)
+      .replace(/Expected ',' or '\}'/gi, errors.expectedComma)
+      .replace(/at position/gi, errors.atPosition)
+      .replace(/\(line (\d+)/gi, `(${errors.line} $1`)
+      .replace(/column (\d+)\)/gi, `${errors.column} $1)`);
+    
+    return translatedError;
+  };
+
   if (!result.isValid) {
     return (
       <section className="min-h-[60vh] flex items-center justify-center pt-24 pb-16">
@@ -41,7 +60,7 @@ export const JsonResults = ({ result, onReset, onReformat }: JsonResultsProps) =
                     {t.jsonFormatter.invalidJson}
                   </h2>
                   <p className="text-muted-foreground font-mono text-sm">
-                    {result.error}
+                    {translateError(result.error || "")}
                   </p>
                 </div>
               </div>
