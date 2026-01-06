@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Slider } from "@/components/ui/slider";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { Shuffle, ChevronDown } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -21,7 +22,7 @@ import {
 } from "@/components/ui/drawer";
 
 interface ColorHeroProps {
-  onGenerate: (baseColor: string, harmony: string) => void;
+  onGenerate: (baseColor: string, harmony: string, colorCount: number) => void;
   isLoading: boolean;
 }
 
@@ -29,12 +30,13 @@ export const ColorHero = ({ onGenerate, isLoading }: ColorHeroProps) => {
   const { t } = useLanguage();
   const [baseColor, setBaseColor] = useState("#6366f1");
   const [harmony, setHarmony] = useState("complementary");
+  const [colorCount, setColorCount] = useState(5);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const isMobile = useIsMobile();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onGenerate(baseColor, harmony);
+    onGenerate(baseColor, harmony, colorCount);
   };
 
   const generateRandomColor = () => {
@@ -161,6 +163,21 @@ export const ColorHero = ({ onGenerate, isLoading }: ColorHeroProps) => {
                   </SelectContent>
                 </Select>
               )}
+            </div>
+
+            <div className="space-y-2">
+              <div className="flex items-center justify-between text-sm text-muted-foreground">
+                <span>{t.colorPalette.colorCount}</span>
+                <span className="tabular-nums">{colorCount}</span>
+              </div>
+              <Slider
+                value={[colorCount]}
+                min={3}
+                max={10}
+                step={1}
+                onValueChange={(v) => setColorCount(v[0] ?? 5)}
+                disabled={isLoading}
+              />
             </div>
 
             <Button

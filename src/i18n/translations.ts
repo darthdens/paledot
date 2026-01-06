@@ -760,6 +760,7 @@ export const translations = {
       hex: "HEX",
       rgb: "RGB",
       hsl: "HSL",
+      colorCount: "Number of Colors",
       harmonies: {
         monochromatic: "Monochromatic",
         complementary: "Complementary",
@@ -1555,6 +1556,7 @@ export const translations = {
       hex: "HEX",
       rgb: "RVB",
       hsl: "TSL",
+      colorCount: "Nombre de couleurs",
       harmonies: {
         monochromatic: "Monochromatique",
         complementary: "Complémentaire",
