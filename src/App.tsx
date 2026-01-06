@@ -20,8 +20,7 @@ const App = () => (
           <Toaster richColors position="bottom-left" />
           <CookieBanner />
           <Routes>
-            <Route path="/" element={<QrCodeGenerator />} />
-            <Route path="/experiment/lamp" element={<LampExperiment />} />
+            <Route path="/" element={<LampExperiment />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </TooltipProvider>
