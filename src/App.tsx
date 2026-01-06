@@ -7,6 +7,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import NotFound from "./pages/NotFound";
 import QrCodeGenerator from "./pages/QrCodeGenerator";
+import LampExperiment from "./pages/LampExperiment";
 
 const queryClient = new QueryClient();
 
@@ -20,6 +21,7 @@ const App = () => (
           <CookieBanner />
           <Routes>
             <Route path="/" element={<QrCodeGenerator />} />
+            <Route path="/experiment/lamp" element={<LampExperiment />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </TooltipProvider>
