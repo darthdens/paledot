@@ -89,10 +89,7 @@ export const JsonResults = ({ result, onReset, onReformat }: JsonResultsProps) =
     <section className="min-h-[60vh] flex items-center justify-center pt-20 md:pt-24 pb-12 md:pb-16">
       <div className="container mx-auto px-4 sm:px-6">
         <div className="max-w-4xl mx-auto space-y-6 md:space-y-8">
-          <div className="flex items-center gap-2 sm:gap-3">
-            <Check className="w-5 h-5 sm:w-6 sm:h-6 text-green-500" />
-            <h2 className="text-xl sm:text-2xl font-semibold">{t.jsonFormatter.validJson}</h2>
-          </div>
+          <h2 className="text-xl sm:text-2xl font-semibold">{t.jsonFormatter.validJson}</h2>
 
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
             <TabsList className="grid w-full grid-cols-2 mb-3 sm:mb-4">
