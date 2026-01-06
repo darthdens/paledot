@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { useLanguage } from "@/i18n/LanguageContext";
-
+import { Navigation } from "@/components/Navigation";
+import { Footer } from "@/components/Footer";
+import { Starfield } from "@/components/Starfield";
 // Import lamp images
 import couchDayOn from "@/assets/lamps/couch-lamp-day-on.jpg";
 import couchDayOff from "@/assets/lamps/couch-lamp-day-off.jpg";
@@ -242,94 +244,83 @@ const LampExperiment = () => {
   }, [isDark]);
 
   return (
-    <div className="min-h-screen bg-background text-foreground transition-colors duration-500">
-      <div className="container mx-auto px-4 sm:px-6 py-8 max-w-5xl">
-        {/* Header */}
-        <header className="flex items-center justify-between mb-6">
-          <h1 className="font-serif text-2xl sm:text-3xl italic">
-            you love lamp©
-          </h1>
-          <div className="flex items-center gap-4 text-sm">
-            <a 
-              href="https://x.com/densandco" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="text-muted-foreground hover:text-foreground transition-colors"
-            >
-              follow
-            </a>
-            <a 
-              href="https://dens.so" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="text-muted-foreground hover:text-foreground transition-colors"
-            >
-              course
-            </a>
-          </div>
-        </header>
+    <div className="min-h-screen bg-background text-foreground transition-colors duration-500 relative">
+      <Starfield />
+      <Navigation />
+      
+      <main className="relative z-10 pt-24">
+        <div className="container mx-auto px-4 sm:px-6 py-8 max-w-5xl">
+          {/* Lamp Page Header */}
+          <header className="flex items-center justify-between mb-6">
+            <h1 className="font-serif text-2xl sm:text-3xl italic">
+              you love lamp©
+            </h1>
+            <div className="flex items-center gap-4 text-sm">
+              <a 
+                href="https://x.com/densandco" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-muted-foreground hover:text-foreground transition-colors"
+              >
+                follow
+              </a>
+              <a 
+                href="https://dens.so" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-muted-foreground hover:text-foreground transition-colors"
+              >
+                course
+              </a>
+            </div>
+          </header>
 
-        {/* Subtitle */}
-        <p className="mb-8 text-muted-foreground">
-          {language === 'fr' 
-            ? "des lampes pour toutes occasions et pour un usage quotidien."
-            : "lamps for all occasions and every day use."
-          }
-        </p>
-
-        {/* Toggle controls */}
-        <div className="flex items-center justify-between mb-6">
-          {/* Lamp toggle (left) */}
-          <LampToggle
-            checked={lampOn}
-            onChange={setLampOn}
-            leftIcon={<LightbulbOff />}
-            rightIcon={<LightbulbOn />}
-          />
-          
-          {/* Theme toggle (right) */}
-          <LampToggle
-            checked={isDark}
-            onChange={setIsDark}
-            leftIcon={<Moon />}
-            rightIcon={<Sun />}
-          />
-        </div>
-
-        {/* Separator line */}
-        <div className="h-px mb-8 bg-border transition-colors duration-500" />
-
-        {/* Product grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8">
-          {lamps.map((lamp) => (
-            <LampCard
-              key={lamp.id}
-              lamp={lamp}
-              lampOn={lampOn}
-              isDark={isDark}
-              language={language}
-            />
-          ))}
-        </div>
-
-        {/* Footer */}
-        <footer className="mt-16 pt-8 border-t border-border text-center text-sm text-muted-foreground">
-          <p>
+          {/* Subtitle */}
+          <p className="mb-8 text-muted-foreground">
             {language === 'fr' 
-              ? "Une expérience interactive par"
-              : "An interactive experiment by"
-            }{" "}
-            <a 
-              href="https://dens.so" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="underline hover:text-foreground transition-colors"
-            >
-              Dens
-            </a>
+              ? "des lampes pour toutes occasions et pour un usage quotidien."
+              : "lamps for all occasions and every day use."
+            }
           </p>
-        </footer>
-      </div>
+
+          {/* Toggle controls */}
+          <div className="flex items-center justify-between mb-6">
+            {/* Lamp toggle (left) */}
+            <LampToggle
+              checked={lampOn}
+              onChange={setLampOn}
+              leftIcon={<LightbulbOff />}
+              rightIcon={<LightbulbOn />}
+            />
+            
+            {/* Theme toggle (right) */}
+            <LampToggle
+              checked={isDark}
+              onChange={setIsDark}
+              leftIcon={<Moon />}
+              rightIcon={<Sun />}
+            />
+          </div>
+
+          {/* Separator line */}
+          <div className="h-px mb-8 bg-border transition-colors duration-500" />
+
+          {/* Product grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8">
+            {lamps.map((lamp) => (
+              <LampCard
+                key={lamp.id}
+                lamp={lamp}
+                lampOn={lampOn}
+                isDark={isDark}
+                language={language}
+              />
+            ))}
+          </div>
+        </div>
+      </main>
+
+      <Footer />
     </div>
   );
 };
