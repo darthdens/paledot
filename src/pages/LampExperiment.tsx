@@ -96,8 +96,11 @@ const LampCard = ({
   lampName: string;
   fromText: string;
 }) => {
-  // Use day images only for consistency - dayOff is the clean "completely off" state
+  // Select image based on both theme and lamp state
   const getImage = () => {
+    if (isDark) {
+      return lampOn ? lamp.images.nightOn : lamp.images.nightOff;
+    }
     return lampOn ? lamp.images.dayOn : lamp.images.dayOff;
   };
 
