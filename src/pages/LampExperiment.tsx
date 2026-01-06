@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { Navigation } from "@/components/Navigation";
 import { Footer } from "@/components/Footer";
@@ -139,7 +139,26 @@ const LampCard = ({
 const LampExperiment = () => {
   const { language, t } = useLanguage();
   const [lampOn, setLampOn] = useState(false);
+  const [isSticky, setIsSticky] = useState(false);
+  const stickyRef = useRef<HTMLDivElement>(null);
+  const sentinelRef = useRef<HTMLDivElement>(null);
   const { isDark, setTheme } = useThemePreference();
+
+  // Detect when sticky element becomes stuck
+  useEffect(() => {
+    const sentinel = sentinelRef.current;
+    if (!sentinel) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsSticky(!entry.isIntersecting);
+      },
+      { threshold: 0, rootMargin: "-64px 0px 0px 0px" }
+    );
+
+    observer.observe(sentinel);
+    return () => observer.disconnect();
+  }, []);
 
   useEffect(() => {
     document.title =
@@ -169,8 +188,16 @@ const LampExperiment = () => {
           </div>
         </section>
 
+        {/* Sentinel for sticky detection */}
+        <div ref={sentinelRef} className="h-0" />
+
         {/* Sticky Controls Section */}
-        <div className="sticky top-16 z-20 backdrop-blur-md">
+        <div
+          ref={stickyRef}
+          className={`sticky top-16 z-20 transition-all duration-200 ${
+            isSticky ? "backdrop-blur-md" : ""
+          }`}
+        >
           <div className="container mx-auto px-4 sm:px-6 max-w-5xl py-4">
             <div className="flex items-center justify-between">
               {/* Lamp toggle (left) */}
