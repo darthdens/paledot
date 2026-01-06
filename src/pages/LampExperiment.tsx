@@ -170,7 +170,7 @@ const LampExperiment = () => {
         </section>
 
         {/* Sticky Controls Section */}
-        <div className="sticky top-16 z-20 bg-background/95 backdrop-blur-sm border-b border-border">
+        <div className="sticky top-16 z-20 backdrop-blur-md">
           <div className="container mx-auto px-4 sm:px-6 max-w-5xl py-4">
             <div className="flex items-center justify-between">
               {/* Lamp toggle (left) */}
