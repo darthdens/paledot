@@ -169,46 +169,49 @@ const LampExperiment = () => {
           </div>
         </section>
 
-        {/* Controls Section */}
-        <div className="container mx-auto px-4 sm:px-6 max-w-5xl">
-          <div className="flex items-center justify-between mb-8">
-            {/* Lamp toggle (left) */}
-            <div className="flex items-center gap-3">
-              <LightBulbOff
-                className="w-5 h-5 text-muted-foreground"
-                strokeWidth={2}
-              />
-              <DensSwitch
-                checked={lampOn}
-                onCheckedChange={setLampOn}
-                aria-label={lampOn ? t.lampExperiment.lampOn : t.lampExperiment.lampOff}
-              />
-              <LightBulb
-                className="w-5 h-5 text-muted-foreground"
-                strokeWidth={2}
-              />
-            </div>
+        {/* Sticky Controls Section */}
+        <div className="sticky top-16 z-20 bg-background/95 backdrop-blur-sm border-b border-border">
+          <div className="container mx-auto px-4 sm:px-6 max-w-5xl py-4">
+            <div className="flex items-center justify-between">
+              {/* Lamp toggle (left) */}
+              <div className="flex items-center gap-3">
+                <LightBulbOff
+                  className="w-5 h-5 text-muted-foreground"
+                  strokeWidth={2}
+                />
+                <DensSwitch
+                  checked={lampOn}
+                  onCheckedChange={setLampOn}
+                  aria-label={lampOn ? t.lampExperiment.lampOn : t.lampExperiment.lampOff}
+                />
+                <LightBulb
+                  className="w-5 h-5 text-muted-foreground"
+                  strokeWidth={2}
+                />
+              </div>
 
-            {/* Day/Night toggle (right) */}
-            <div className="flex items-center gap-3">
-              <HalfMoon
-                className="w-5 h-5 text-muted-foreground"
-                strokeWidth={2}
-              />
-              <DensSwitch
-                checked={!isDark}
-                onCheckedChange={(nextIsLight) => setTheme(!nextIsLight)}
-                aria-label={isDark ? t.lampExperiment.nightMode : t.lampExperiment.dayMode}
-              />
-              <SunLight
-                className="w-5 h-5 text-muted-foreground"
-                strokeWidth={2}
-              />
+              {/* Day/Night toggle (right) */}
+              <div className="flex items-center gap-3">
+                <HalfMoon
+                  className="w-5 h-5 text-muted-foreground"
+                  strokeWidth={2}
+                />
+                <DensSwitch
+                  checked={!isDark}
+                  onCheckedChange={(nextIsLight) => setTheme(!nextIsLight)}
+                  aria-label={isDark ? t.lampExperiment.nightMode : t.lampExperiment.dayMode}
+                />
+                <SunLight
+                  className="w-5 h-5 text-muted-foreground"
+                  strokeWidth={2}
+                />
+              </div>
             </div>
           </div>
+        </div>
 
-          {/* Separator line */}
-          <div className="h-px mb-8 bg-border" />
+        {/* Product grid */}
+        <div className="container mx-auto px-4 sm:px-6 max-w-5xl pt-8">
 
           {/* Product grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8 pb-16">
