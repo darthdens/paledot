@@ -3,7 +3,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useLanguage } from "@/i18n/LanguageContext";
-import { Shuffle } from "lucide-react";
+import { Shuffle, ChevronDown } from "lucide-react";
+import { useIsMobile } from "@/hooks/use-mobile";
 import {
   Select,
   SelectContent,
@@ -11,6 +12,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Drawer,
+  DrawerContent,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+} from "@/components/ui/drawer";
 
 interface ColorHeroProps {
   onGenerate: (baseColor: string, harmony: string) => void;
@@ -21,6 +29,8 @@ export const ColorHero = ({ onGenerate, isLoading }: ColorHeroProps) => {
   const { t } = useLanguage();
   const [baseColor, setBaseColor] = useState("#6366f1");
   const [harmony, setHarmony] = useState("complementary");
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const isMobile = useIsMobile();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -40,6 +50,13 @@ export const ColorHero = ({ onGenerate, isLoading }: ColorHeroProps) => {
     { value: "split-complementary", label: t.colorPalette.harmonies.splitComplementary },
     { value: "tetradic", label: t.colorPalette.harmonies.tetradic },
   ];
+
+  const selectedHarmonyLabel = harmonyOptions.find(o => o.value === harmony)?.label || "";
+
+  const handleHarmonySelect = (value: string) => {
+    setHarmony(value);
+    setDrawerOpen(false);
+  };
 
   return (
     <section className="min-h-[60vh] flex items-center justify-center pt-24 pb-16">
@@ -98,18 +115,52 @@ export const ColorHero = ({ onGenerate, isLoading }: ColorHeroProps) => {
               <Label htmlFor="harmony" className="text-left block">
                 {t.colorPalette.harmonyType}
               </Label>
-              <Select value={harmony} onValueChange={setHarmony}>
-                <SelectTrigger className="h-14 text-base bg-card border-border">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {harmonyOptions.map((option) => (
-                    <SelectItem key={option.value} value={option.value}>
-                      {option.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              
+              {isMobile ? (
+                <Drawer open={drawerOpen} onOpenChange={setDrawerOpen}>
+                  <DrawerTrigger asChild>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="w-full h-14 text-base bg-card border-border justify-between font-normal"
+                    >
+                      {selectedHarmonyLabel}
+                      <ChevronDown className="h-4 w-4 opacity-50" />
+                    </Button>
+                  </DrawerTrigger>
+                  <DrawerContent>
+                    <DrawerHeader>
+                      <DrawerTitle>{t.colorPalette.harmonyType}</DrawerTitle>
+                    </DrawerHeader>
+                    <div className="p-4 pb-8 space-y-2">
+                      {harmonyOptions.map((option) => (
+                        <Button
+                          key={option.value}
+                          type="button"
+                          variant={harmony === option.value ? "secondary" : "ghost"}
+                          className="w-full h-12 justify-start text-base"
+                          onClick={() => handleHarmonySelect(option.value)}
+                        >
+                          {option.label}
+                        </Button>
+                      ))}
+                    </div>
+                  </DrawerContent>
+                </Drawer>
+              ) : (
+                <Select value={harmony} onValueChange={setHarmony}>
+                  <SelectTrigger className="h-14 text-base bg-card border-border">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {harmonyOptions.map((option) => (
+                      <SelectItem key={option.value} value={option.value}>
+                        {option.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
             </div>
 
             <Button
