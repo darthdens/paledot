@@ -57,7 +57,7 @@ const formatPrice = (price: number, language: string): string => {
 const lamps: LampProduct[] = [
   {
     id: "couch",
-    price: 1200,
+    price: 189,
     images: {
       dayOn: couchDayOn,
       dayOff: couchDayOff,
@@ -67,7 +67,7 @@ const lamps: LampProduct[] = [
   },
   {
     id: "dining",
-    price: 3800,
+    price: 349,
     images: {
       dayOn: diningDayOn,
       dayOff: diningDayOff,
@@ -77,7 +77,7 @@ const lamps: LampProduct[] = [
   },
   {
     id: "desk",
-    price: 800,
+    price: 129,
     images: {
       dayOn: deskDayOn,
       dayOff: deskDayOff,
@@ -87,7 +87,7 @@ const lamps: LampProduct[] = [
   },
   {
     id: "lounge",
-    price: 2350,
+    price: 259,
     images: {
       dayOn: loungeDayOn,
       dayOff: loungeDayOff,
