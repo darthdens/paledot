@@ -213,10 +213,10 @@ const LampCard = ({
           className="absolute inset-0 w-full h-full object-cover transition-opacity duration-700"
         />
       </div>
-      <h3 className="font-medium">
+      <h3 className="font-medium text-foreground">
         {language === 'fr' ? lamp.nameFr : lamp.nameEn}
       </h3>
-      <p className="text-sm opacity-70">From {lamp.price}</p>
+      <p className="text-sm text-muted-foreground">From {lamp.price}</p>
     </div>
   );
 };
@@ -232,12 +232,17 @@ const LampExperiment = () => {
       : "Lamp Experiment | Dens";
   }, [language]);
 
+  // Apply dark class to document when isDark changes
+  useEffect(() => {
+    if (isDark) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  }, [isDark]);
+
   return (
-    <div 
-      className={`min-h-screen transition-colors duration-500 ${
-        isDark ? 'bg-[#0a0a0a] text-[#f5f5f5]' : 'bg-[#fafafa] text-[#0a0a0a]'
-      }`}
-    >
+    <div className="min-h-screen bg-background text-foreground transition-colors duration-500">
       <div className="container mx-auto px-4 sm:px-6 py-8 max-w-5xl">
         {/* Header */}
         <header className="flex items-center justify-between mb-6">
@@ -249,7 +254,7 @@ const LampExperiment = () => {
               href="https://x.com/densandco" 
               target="_blank" 
               rel="noopener noreferrer"
-              className="opacity-70 hover:opacity-100 transition-opacity"
+              className="text-muted-foreground hover:text-foreground transition-colors"
             >
               follow
             </a>
@@ -257,7 +262,7 @@ const LampExperiment = () => {
               href="https://dens.so" 
               target="_blank" 
               rel="noopener noreferrer"
-              className="opacity-70 hover:opacity-100 transition-opacity"
+              className="text-muted-foreground hover:text-foreground transition-colors"
             >
               course
             </a>
@@ -265,7 +270,7 @@ const LampExperiment = () => {
         </header>
 
         {/* Subtitle */}
-        <p className="mb-8 opacity-80">
+        <p className="mb-8 text-muted-foreground">
           {language === 'fr' 
             ? "des lampes pour toutes occasions et pour un usage quotidien."
             : "lamps for all occasions and every day use."
@@ -292,9 +297,7 @@ const LampExperiment = () => {
         </div>
 
         {/* Separator line */}
-        <div className={`h-px mb-8 transition-colors duration-500 ${
-          isDark ? 'bg-[#333]' : 'bg-[#e0e0e0]'
-        }`} />
+        <div className="h-px mb-8 bg-border transition-colors duration-500" />
 
         {/* Product grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8">
@@ -310,7 +313,7 @@ const LampExperiment = () => {
         </div>
 
         {/* Footer */}
-        <footer className="mt-16 pt-8 border-t border-current/10 text-center text-sm opacity-60">
+        <footer className="mt-16 pt-8 border-t border-border text-center text-sm text-muted-foreground">
           <p>
             {language === 'fr' 
               ? "Une expérience interactive par"
@@ -320,7 +323,7 @@ const LampExperiment = () => {
               href="https://dens.so" 
               target="_blank" 
               rel="noopener noreferrer"
-              className="underline hover:opacity-80 transition-opacity"
+              className="underline hover:text-foreground transition-colors"
             >
               Dens
             </a>
