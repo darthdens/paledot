@@ -227,7 +227,7 @@ export const VinylDisc = ({
       <ProgressArc progress={progress} />
 
       {/* Center label */}
-      <div className="absolute inset-[28%] rounded-full overflow-hidden border border-border/50 flex items-center justify-center shadow-inner pointer-events-none">
+      <div className="absolute inset-[28%] rounded-full overflow-hidden border border-border/50 shadow-inner pointer-events-none">
         {record.labelImage ? (
           <img 
             src={record.labelImage} 
@@ -237,15 +237,9 @@ export const VinylDisc = ({
         ) : (
           <div className="absolute inset-0 bg-card" />
         )}
-        {/* Text overlay on artwork */}
-        <div className="relative z-10 text-center px-2 flex flex-col items-center justify-center gap-0.5 bg-background/60 rounded-full w-full h-full">
-          <p className="text-[0.4rem] sm:text-[0.55rem] font-medium text-foreground truncate max-w-full leading-tight drop-shadow-sm">
-            {record.trackName || record.album}
-          </p>
-          <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-secondary/80 flex-shrink-0" />
-          <p className="text-[0.35rem] sm:text-[0.5rem] text-muted-foreground truncate max-w-full drop-shadow-sm">
-            {record.artist}
-          </p>
+        {/* Center spindle hole */}
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div className="w-2 h-2 sm:w-3 sm:h-3 rounded-full bg-background/80 border border-border/30" />
         </div>
       </div>
       </div>
