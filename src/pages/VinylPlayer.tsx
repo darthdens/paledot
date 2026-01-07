@@ -9,7 +9,19 @@ import { VinylControls } from "@/components/vinyl/VinylControls";
 import { useVinylAudio } from "@/hooks/use-vinyl-audio";
 import type { VinylRecord, RPMSpeed } from "@/components/vinyl/types";
 
-// Sample vinyl collection
+// Free music tracks from Pixabay (royalty-free)
+const FREE_TRACKS = {
+  lofi: "https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3",
+  chill: "https://cdn.pixabay.com/download/audio/2022/10/25/audio_946bd498b5.mp3",
+  ambient: "https://cdn.pixabay.com/download/audio/2022/03/15/audio_942034dc69.mp3",
+  jazz: "https://cdn.pixabay.com/download/audio/2022/08/02/audio_884fe92c21.mp3",
+  electronic: "https://cdn.pixabay.com/download/audio/2023/07/14/audio_eb629e8c23.mp3",
+  cinematic: "https://cdn.pixabay.com/download/audio/2022/01/18/audio_d0c6ff1bab.mp3",
+  acoustic: "https://cdn.pixabay.com/download/audio/2022/02/22/audio_d1718ab41b.mp3",
+  piano: "https://cdn.pixabay.com/download/audio/2021/11/25/audio_91b32e02f9.mp3",
+};
+
+// Sample vinyl collection with tracks
 const vinylCollection: VinylRecord[] = [
   {
     id: "midnight-drive",
@@ -17,6 +29,7 @@ const vinylCollection: VinylRecord[] = [
     album: "Midnight Drive",
     year: 2023,
     color: "transparent-purple",
+    trackUrl: FREE_TRACKS.lofi,
   },
   {
     id: "ocean-waves",
@@ -24,6 +37,7 @@ const vinylCollection: VinylRecord[] = [
     album: "Ocean Waves",
     year: 2021,
     color: "ocean-blue-marble",
+    trackUrl: FREE_TRACKS.ambient,
   },
   {
     id: "golden-hour",
@@ -31,6 +45,7 @@ const vinylCollection: VinylRecord[] = [
     album: "Golden Hour",
     year: 2022,
     color: "gold-orange-swirl",
+    trackUrl: FREE_TRACKS.chill,
   },
   {
     id: "noir",
@@ -38,6 +53,7 @@ const vinylCollection: VinylRecord[] = [
     album: "Noir",
     year: 2020,
     color: "classic-black",
+    trackUrl: FREE_TRACKS.jazz,
   },
   {
     id: "electric-dreams",
@@ -45,6 +61,7 @@ const vinylCollection: VinylRecord[] = [
     album: "Electric Dreams",
     year: 2024,
     color: "hot-pink",
+    trackUrl: FREE_TRACKS.electronic,
   },
   {
     id: "forest-echo",
@@ -52,6 +69,7 @@ const vinylCollection: VinylRecord[] = [
     album: "Forest Echo",
     year: 2019,
     color: "forest-green",
+    trackUrl: FREE_TRACKS.ambient,
   },
   {
     id: "crimson-heart",
@@ -59,6 +77,7 @@ const vinylCollection: VinylRecord[] = [
     album: "Crimson Heart",
     year: 2022,
     color: "blood-red",
+    trackUrl: FREE_TRACKS.piano,
   },
   {
     id: "summer-haze",
@@ -66,6 +85,7 @@ const vinylCollection: VinylRecord[] = [
     album: "Summer Haze",
     year: 2021,
     color: "sunset-gradient",
+    trackUrl: FREE_TRACKS.acoustic,
   },
   {
     id: "arctic-silence",
@@ -73,6 +93,7 @@ const vinylCollection: VinylRecord[] = [
     album: "Arctic Silence",
     year: 2024,
     color: "ice-white",
+    trackUrl: FREE_TRACKS.cinematic,
   },
   {
     id: "honey-drip",
@@ -80,6 +101,7 @@ const vinylCollection: VinylRecord[] = [
     album: "Honey Drip",
     year: 2020,
     color: "amber-honey",
+    trackUrl: FREE_TRACKS.lofi,
   },
   {
     id: "deep-space",
@@ -87,6 +109,7 @@ const vinylCollection: VinylRecord[] = [
     album: "Deep Space",
     year: 2023,
     color: "midnight-blue",
+    trackUrl: FREE_TRACKS.cinematic,
   },
   {
     id: "tropical-sunrise",
@@ -94,6 +117,7 @@ const vinylCollection: VinylRecord[] = [
     album: "Tropical Sunrise",
     year: 2022,
     color: "coral-peach",
+    trackUrl: FREE_TRACKS.chill,
   },
   {
     id: "velvet-nights",
@@ -101,6 +125,7 @@ const vinylCollection: VinylRecord[] = [
     album: "Velvet Nights",
     year: 2022,
     color: "classic-black",
+    trackUrl: FREE_TRACKS.jazz,
   },
   {
     id: "cyber-city",
@@ -108,6 +133,7 @@ const vinylCollection: VinylRecord[] = [
     album: "Cyber City 2099",
     year: 2024,
     color: "transparent-purple",
+    trackUrl: FREE_TRACKS.electronic,
   },
   {
     id: "wilderness",
@@ -115,6 +141,7 @@ const vinylCollection: VinylRecord[] = [
     album: "Wilderness",
     year: 2018,
     color: "forest-green",
+    trackUrl: FREE_TRACKS.acoustic,
   },
   {
     id: "retro-wave",
@@ -122,6 +149,7 @@ const vinylCollection: VinylRecord[] = [
     album: "Retro Wave",
     year: 2021,
     color: "hot-pink",
+    trackUrl: FREE_TRACKS.electronic,
   },
 ];
 
@@ -137,10 +165,11 @@ const VinylPlayer = () => {
   const [turntableHeight, setTurntableHeight] = useState<number>(0);
   const turntableRef = useRef<HTMLDivElement>(null);
 
-  // Vinyl crackle audio
+  // Vinyl crackle and music audio
   const { initAudio } = useVinylAudio({ 
     isPlaying: isPlaying && isPoweredOn, 
-    volume 
+    volume,
+    trackUrl: selectedRecord?.trackUrl,
   });
 
   // Sync turntable height for side panels

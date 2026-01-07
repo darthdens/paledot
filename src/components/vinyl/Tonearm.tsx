@@ -12,10 +12,10 @@ export const Tonearm = ({ position, isPoweredOn, onPositionChange }: TonearmProp
   const [dragRotation, setDragRotation] = useState<number | null>(null);
   const dragStartRef = useRef({ x: 0, y: 0, rotation: 0 });
 
-  // Target rotations: rest = 5deg, playing = 45deg (fully on the record)
-  const REST_ROTATION = 5;
-  const PLAYING_ROTATION = 45;
-  const THRESHOLD = 25; // If rotation > 25, consider it "playing"
+  // Target rotations: rest = 0deg, playing = 38deg (reaches inner grooves)
+  const REST_ROTATION = 0;
+  const PLAYING_ROTATION = 38;
+  const THRESHOLD = 20; // If rotation > 20, consider it "playing"
 
   const currentRotation = isDragging && dragRotation !== null 
     ? dragRotation 
@@ -93,9 +93,9 @@ export const Tonearm = ({ position, isPoweredOn, onPositionChange }: TonearmProp
           <div className="w-3 h-3 rounded-full bg-foreground/30" />
         </div>
 
-        {/* Arm */}
+        {/* Arm - Extended length to reach inner grooves */}
         <div
-          className="absolute top-3 right-3 w-2 h-32 bg-gradient-to-b from-muted-foreground/60 to-muted-foreground/40 rounded-full origin-top shadow-md"
+          className="absolute top-3 right-3 w-2 h-44 bg-gradient-to-b from-muted-foreground/60 to-muted-foreground/40 rounded-full origin-top shadow-md"
           style={{ transform: "rotate(-15deg)" }}
         >
           {/* Counterweight */}
