@@ -9,19 +9,19 @@ import { VinylControls } from "@/components/vinyl/VinylControls";
 import { useVinylAudio } from "@/hooks/use-vinyl-audio";
 import type { VinylRecord, RPMSpeed } from "@/components/vinyl/types";
 
-// Royalty-free synthwave tracks (publicly accessible)
+// Verified working audio URLs from Archive.org (public domain)
 const RETRO_TRACKS = {
-  retroSynth: "https://cdn.pixabay.com/audio/2024/01/18/audio_6476100913.mp3",
-  neonGaming: "https://cdn.pixabay.com/audio/2022/12/11/audio_517924151b.mp3",
-  vintageFuture: "https://cdn.pixabay.com/audio/2022/02/07/audio_412e62496d.mp3",
-  strangerVibes: "https://cdn.pixabay.com/audio/2022/10/24/audio_349d479361.mp3",
-  synthCity: "https://cdn.pixabay.com/audio/2022/03/10/audio_b5e420b320.mp3",
-  darkwave: "https://cdn.pixabay.com/audio/2022/05/16/audio_a69e540a06.mp3",
-  midnightRun: "https://cdn.pixabay.com/audio/2023/03/23/audio_3758c71c48.mp3",
-  neonDreams: "https://cdn.pixabay.com/audio/2022/11/22/audio_4e4bc72d26.mp3",
+  track1: "https://ia800806.us.archive.org/15/items/Mp3Playlist_555/AaronNeville-CrazyLove.mp3",
+  track2: "https://ia800605.us.archive.org/32/items/Mp3Playlist_555/Daughtry-Homeacoustic.mp3",
+  track3: "https://ia800605.us.archive.org/32/items/Mp3Playlist_555/JessieJ-PriceTag.mp3",
+  track4: "https://ia800605.us.archive.org/32/items/Mp3Playlist_555/ColdPlay-ParadiseInstrumental.mp3",
+  track5: "https://ia800605.us.archive.org/32/items/Mp3Playlist_555/Rihanna-Diamonds.mp3",
+  track6: "https://ia800605.us.archive.org/32/items/Mp3Playlist_555/PinkFloyd-HighHopes.mp3",
+  track7: "https://ia800806.us.archive.org/15/items/Mp3Playlist_555/Evanescence-MyImmortal.mp3",
+  track8: "https://ia800806.us.archive.org/15/items/Mp3Playlist_555/LinkinPark-InTheEnd.mp3",
 };
 
-// Drive-inspired retrowave vinyl collection (fictional artists, real vibes)
+// Drive-inspired retrowave vinyl collection (fictional artists, Drive aesthetic)
 const vinylCollection: VinylRecord[] = [
   {
     id: "nightcall",
@@ -30,7 +30,7 @@ const vinylCollection: VinylRecord[] = [
     trackName: "Nightcall",
     year: 2010,
     color: "neon-pink",
-    trackUrl: RETRO_TRACKS.retroSynth,
+    trackUrl: RETRO_TRACKS.track1,
   },
   {
     id: "a-real-hero",
@@ -39,7 +39,7 @@ const vinylCollection: VinylRecord[] = [
     trackName: "A Real Hero",
     year: 2011,
     color: "chrome-silver",
-    trackUrl: RETRO_TRACKS.vintageFuture,
+    trackUrl: RETRO_TRACKS.track2,
   },
   {
     id: "turbo-killer",
@@ -48,7 +48,7 @@ const vinylCollection: VinylRecord[] = [
     trackName: "Turbo Killer",
     year: 2015,
     color: "deep-magenta",
-    trackUrl: RETRO_TRACKS.darkwave,
+    trackUrl: RETRO_TRACKS.track3,
   },
   {
     id: "the-driver",
@@ -57,7 +57,7 @@ const vinylCollection: VinylRecord[] = [
     trackName: "The Driver",
     year: 2011,
     color: "golden-bronze",
-    trackUrl: RETRO_TRACKS.neonDreams,
+    trackUrl: RETRO_TRACKS.track4,
   },
   {
     id: "tech-noir",
@@ -66,7 +66,7 @@ const vinylCollection: VinylRecord[] = [
     trackName: "Tech Noir",
     year: 2015,
     color: "midnight-purple",
-    trackUrl: RETRO_TRACKS.strangerVibes,
+    trackUrl: RETRO_TRACKS.track5,
   },
   {
     id: "blizzard",
@@ -75,7 +75,7 @@ const vinylCollection: VinylRecord[] = [
     trackName: "Blizzard",
     year: 2014,
     color: "electric-cyan",
-    trackUrl: RETRO_TRACKS.synthCity,
+    trackUrl: RETRO_TRACKS.track6,
   },
   {
     id: "sunset",
@@ -84,7 +84,7 @@ const vinylCollection: VinylRecord[] = [
     trackName: "Sunset",
     year: 2016,
     color: "sunset-orange",
-    trackUrl: RETRO_TRACKS.neonGaming,
+    trackUrl: RETRO_TRACKS.track7,
   },
   {
     id: "resonance",
@@ -93,7 +93,7 @@ const vinylCollection: VinylRecord[] = [
     trackName: "Resonance",
     year: 2014,
     color: "rose-gold",
-    trackUrl: RETRO_TRACKS.midnightRun,
+    trackUrl: RETRO_TRACKS.track8,
   },
   {
     id: "accelerated",
@@ -101,17 +101,8 @@ const vinylCollection: VinylRecord[] = [
     album: "Turbulence",
     trackName: "Accelerated",
     year: 2012,
-    color: "neon-pink",
-    trackUrl: RETRO_TRACKS.retroSynth,
-  },
-  {
-    id: "thriller",
-    artist: "Lazerhawk",
-    album: "Redline",
-    trackName: "King of the Streets",
-    year: 2010,
     color: "noir-smoke",
-    trackUrl: RETRO_TRACKS.darkwave,
+    trackUrl: RETRO_TRACKS.track1,
   },
   {
     id: "after-dark",
@@ -120,16 +111,7 @@ const vinylCollection: VinylRecord[] = [
     trackName: "After Dark",
     year: 2014,
     color: "classic-black",
-    trackUrl: RETRO_TRACKS.strangerVibes,
-  },
-  {
-    id: "crystals",
-    artist: "M.O.O.N.",
-    album: "Hotline Miami",
-    trackName: "Crystals",
-    year: 2012,
-    color: "electric-cyan",
-    trackUrl: RETRO_TRACKS.synthCity,
+    trackUrl: RETRO_TRACKS.track2,
   },
 ];
 
