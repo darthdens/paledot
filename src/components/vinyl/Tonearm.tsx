@@ -74,7 +74,7 @@ export const Tonearm = ({ position, isPoweredOn, onPositionChange }: TonearmProp
   return (
     <div
       ref={armRef}
-      className={`absolute top-4 right-4 select-none ${
+      className={`absolute top-2 right-2 sm:top-4 sm:right-4 select-none ${
         isPoweredOn ? "cursor-grab" : "cursor-not-allowed opacity-50"
       } ${isDragging ? "cursor-grabbing" : ""}`}
       onPointerDown={handlePointerDown}
@@ -85,35 +85,35 @@ export const Tonearm = ({ position, isPoweredOn, onPositionChange }: TonearmProp
     >
       {/* Fixed pivot base - does NOT rotate */}
       <div className="relative">
-        {/* Pivot point (fixed) */}
-        <div className="w-8 h-8 rounded-full bg-gradient-to-b from-muted to-muted-foreground/20 border border-border/50 shadow-md flex items-center justify-center">
-          <div className="w-3 h-3 rounded-full bg-foreground/30" />
+        {/* Pivot point (fixed) - smaller on mobile */}
+        <div className="w-5 h-5 sm:w-8 sm:h-8 rounded-full bg-gradient-to-b from-muted to-muted-foreground/20 border border-border/50 shadow-md flex items-center justify-center">
+          <div className="w-2 h-2 sm:w-3 sm:h-3 rounded-full bg-foreground/30" />
         </div>
 
         {/* Rotating arm container - pivots from center of the base */}
         <div
-          className={`absolute top-4 right-4 origin-top ${
+          className={`absolute top-2.5 right-2.5 sm:top-4 sm:right-4 origin-top ${
             isDragging ? "" : "transition-transform duration-700 ease-in-out"
           }`}
           style={{ transform: `rotate(${currentRotation}deg)` }}
         >
-          {/* Arm - reaches first inner circle */}
+          {/* Arm - responsive height */}
           <div
-            className="w-2 h-36 bg-gradient-to-b from-muted-foreground/60 to-muted-foreground/40 rounded-full shadow-md"
+            className="w-1.5 h-20 sm:w-2 sm:h-36 bg-gradient-to-b from-muted-foreground/60 to-muted-foreground/40 rounded-full shadow-md"
             style={{ transform: "rotate(-15deg)", transformOrigin: "top center" }}
           >
             {/* Counterweight */}
-            <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-4 h-4 rounded-full bg-gradient-to-b from-foreground/30 to-foreground/20" />
+            <div className="absolute -top-0.5 sm:-top-1 left-1/2 -translate-x-1/2 w-2.5 h-2.5 sm:w-4 sm:h-4 rounded-full bg-gradient-to-b from-foreground/30 to-foreground/20" />
 
             {/* Headshell */}
-            <div className="absolute -bottom-2 left-1/2 -translate-x-1/2">
+            <div className="absolute -bottom-1.5 sm:-bottom-2 left-1/2 -translate-x-1/2">
               {/* Headshell body */}
-              <div className="w-6 h-3 bg-gradient-to-b from-muted-foreground/50 to-muted-foreground/30 rounded-sm" />
+              <div className="w-4 h-2 sm:w-6 sm:h-3 bg-gradient-to-b from-muted-foreground/50 to-muted-foreground/30 rounded-sm" />
               {/* Cartridge */}
-              <div className="w-4 h-2 mx-auto bg-foreground/40 rounded-sm mt-0.5" />
+              <div className="w-2.5 h-1 sm:w-4 sm:h-2 mx-auto bg-foreground/40 rounded-sm mt-0.5" />
               {/* Stylus */}
               <div
-                className={`w-0.5 h-1 mx-auto bg-foreground/60 transition-opacity duration-300 ${
+                className={`w-0.5 h-0.5 sm:h-1 mx-auto bg-foreground/60 transition-opacity duration-300 ${
                   isPoweredOn && position === "playing" ? "opacity-100" : "opacity-50"
                 }`}
               />
@@ -121,8 +121,8 @@ export const Tonearm = ({ position, isPoweredOn, onPositionChange }: TonearmProp
           </div>
         </div>
 
-        {/* Arm lift/cue lever (fixed with base) */}
-        <div className="absolute top-10 -left-2 w-3 h-1.5 bg-muted-foreground/40 rounded-full" />
+        {/* Arm lift/cue lever (fixed with base) - smaller on mobile */}
+        <div className="absolute top-6 sm:top-10 -left-1 sm:-left-2 w-2 h-1 sm:w-3 sm:h-1.5 bg-muted-foreground/40 rounded-full" />
       </div>
     </div>
   );
