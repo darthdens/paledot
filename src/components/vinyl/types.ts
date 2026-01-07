@@ -6,7 +6,13 @@ export type VinylColor =
   | "ocean-blue-marble"
   | "gold-orange-swirl"
   | "hot-pink"
-  | "forest-green";
+  | "forest-green"
+  | "blood-red"
+  | "sunset-gradient"
+  | "ice-white"
+  | "amber-honey"
+  | "midnight-blue"
+  | "coral-peach";
 
 export interface VinylRecord {
   id: string;
