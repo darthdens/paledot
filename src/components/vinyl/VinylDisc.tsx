@@ -23,6 +23,18 @@ const getVinylGradient = (color: VinylRecord["color"]): string => {
       return "linear-gradient(135deg, hsl(330 85% 55%) 0%, hsl(340 90% 60%) 50%, hsl(320 80% 50%) 100%)";
     case "forest-green":
       return "linear-gradient(135deg, hsla(140 50% 30% / 0.85) 0%, hsla(150 60% 35% / 0.75) 50%, hsla(130 45% 28% / 0.85) 100%)";
+    case "blood-red":
+      return "linear-gradient(135deg, hsl(0 70% 35%) 0%, hsl(350 80% 40%) 50%, hsl(5 65% 30%) 100%)";
+    case "sunset-gradient":
+      return "linear-gradient(135deg, hsl(340 75% 55%) 0%, hsl(20 90% 55%) 50%, hsl(45 95% 55%) 100%)";
+    case "ice-white":
+      return "linear-gradient(135deg, hsla(200 20% 95% / 0.9) 0%, hsla(210 30% 85% / 0.85) 50%, hsla(195 25% 90% / 0.9) 100%)";
+    case "amber-honey":
+      return "linear-gradient(135deg, hsl(35 85% 45%) 0%, hsl(40 90% 55%) 50%, hsl(30 80% 40%) 100%)";
+    case "midnight-blue":
+      return "linear-gradient(135deg, hsl(230 60% 25%) 0%, hsl(240 70% 35%) 50%, hsl(220 55% 20%) 100%)";
+    case "coral-peach":
+      return "linear-gradient(135deg, hsl(15 80% 65%) 0%, hsl(25 85% 70%) 50%, hsl(10 75% 60%) 100%)";
     default:
       return "linear-gradient(135deg, hsl(0 0% 8%) 0%, hsl(0 0% 15%) 50%, hsl(0 0% 8%) 100%)";
   }
@@ -105,12 +117,12 @@ export const VinylDisc = ({
       </div>
 
       {/* Center label */}
-      <div className="absolute inset-[30%] rounded-full bg-card border border-border/50 flex items-center justify-center p-2 shadow-inner">
-        <div className="text-center">
-          <p className="text-[0.5rem] sm:text-xs font-medium text-foreground truncate max-w-full">
+      <div className="absolute inset-[28%] rounded-full bg-card border border-border/50 flex items-center justify-center shadow-inner">
+        <div className="text-center px-2 pb-3">
+          <p className="text-[0.5rem] sm:text-xs font-medium text-foreground truncate max-w-full leading-tight">
             {record.album}
           </p>
-          <p className="text-[0.4rem] sm:text-[0.6rem] text-muted-foreground truncate max-w-full">
+          <p className="text-[0.4rem] sm:text-[0.6rem] text-muted-foreground truncate max-w-full mt-0.5">
             {record.artist}
           </p>
         </div>

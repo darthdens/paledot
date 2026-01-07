@@ -53,18 +53,53 @@ const vinylCollection: VinylRecord[] = [
     color: "forest-green",
   },
   {
-    id: "velvet-nights",
-    artist: "Luna Noir",
-    album: "Velvet Nights",
+    id: "crimson-heart",
+    artist: "The Romantics",
+    album: "Crimson Heart",
     year: 2022,
-    color: "classic-black",
+    color: "blood-red",
   },
   {
     id: "summer-haze",
     artist: "The Beach Collective",
     album: "Summer Haze",
     year: 2021,
-    color: "gold-orange-swirl",
+    color: "sunset-gradient",
+  },
+  {
+    id: "arctic-silence",
+    artist: "Frozen Echoes",
+    album: "Arctic Silence",
+    year: 2024,
+    color: "ice-white",
+  },
+  {
+    id: "honey-drip",
+    artist: "Mellow Groove",
+    album: "Honey Drip",
+    year: 2020,
+    color: "amber-honey",
+  },
+  {
+    id: "deep-space",
+    artist: "Cosmic Voyagers",
+    album: "Deep Space",
+    year: 2023,
+    color: "midnight-blue",
+  },
+  {
+    id: "tropical-sunrise",
+    artist: "Island Breeze",
+    album: "Tropical Sunrise",
+    year: 2022,
+    color: "coral-peach",
+  },
+  {
+    id: "velvet-nights",
+    artist: "Luna Noir",
+    album: "Velvet Nights",
+    year: 2022,
+    color: "classic-black",
   },
   {
     id: "cyber-city",
@@ -74,46 +109,11 @@ const vinylCollection: VinylRecord[] = [
     color: "transparent-purple",
   },
   {
-    id: "deep-blue",
-    artist: "Aquatic Soul",
-    album: "Deep Blue",
-    year: 2020,
-    color: "ocean-blue-marble",
-  },
-  {
-    id: "neon-paradise",
-    artist: "Miami Vice",
-    album: "Neon Paradise",
-    year: 2023,
-    color: "hot-pink",
-  },
-  {
     id: "wilderness",
     artist: "Mountain Echo",
     album: "Wilderness",
     year: 2018,
     color: "forest-green",
-  },
-  {
-    id: "starlight-sonata",
-    artist: "Celestial Orchestra",
-    album: "Starlight Sonata",
-    year: 2023,
-    color: "transparent-purple",
-  },
-  {
-    id: "urban-jungle",
-    artist: "City Beats",
-    album: "Urban Jungle",
-    year: 2022,
-    color: "classic-black",
-  },
-  {
-    id: "aurora-dreams",
-    artist: "Northern Lights",
-    album: "Aurora Dreams",
-    year: 2024,
-    color: "ocean-blue-marble",
   },
   {
     id: "retro-wave",
@@ -211,17 +211,19 @@ const VinylPlayer = () => {
 
         {/* Turntable Section */}
         <section className="container mx-auto px-4 sm:px-6 max-w-6xl pb-8">
-          <div className="flex flex-col lg:flex-row gap-8 items-stretch">
+          <div className="flex flex-col lg:flex-row gap-8 items-start">
             {/* Main Turntable */}
             <div className="flex-1 w-full flex flex-col">
-              <Turntable
-                record={selectedRecord}
-                isPlaying={isPlaying && isPoweredOn}
-                isPoweredOn={isPoweredOn}
-                speed={speed}
-                tonearmPosition={tonearmPosition}
-                isSwapping={isSwapping}
-              />
+              <div className="turntable-wrapper">
+                <Turntable
+                  record={selectedRecord}
+                  isPlaying={isPlaying && isPoweredOn}
+                  isPoweredOn={isPoweredOn}
+                  speed={speed}
+                  tonearmPosition={tonearmPosition}
+                  isSwapping={isSwapping}
+                />
+              </div>
               
               {/* Controls below turntable */}
               <VinylControls
@@ -237,8 +239,8 @@ const VinylPlayer = () => {
               />
             </div>
 
-            {/* Record Collection Sidebar */}
-            <div className="w-full lg:w-80 lg:max-h-[600px]">
+            {/* Record Collection Sidebar - matches turntable height only */}
+            <div className="w-full lg:w-80 lg:self-start" style={{ maxHeight: 'calc(100vw * 0.4)' }}>
               <RecordCollection
                 records={vinylCollection}
                 selectedRecord={selectedRecord}

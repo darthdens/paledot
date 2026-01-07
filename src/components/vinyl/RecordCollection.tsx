@@ -22,6 +22,18 @@ const getVinylPreviewColor = (color: VinylRecord["color"]): string => {
       return "bg-gradient-to-br from-pink-500 to-pink-700";
     case "forest-green":
       return "bg-gradient-to-br from-emerald-600/80 to-green-800/80";
+    case "blood-red":
+      return "bg-gradient-to-br from-red-700 to-red-900";
+    case "sunset-gradient":
+      return "bg-gradient-to-br from-pink-500 via-orange-500 to-yellow-400";
+    case "ice-white":
+      return "bg-gradient-to-br from-slate-100 to-slate-300";
+    case "amber-honey":
+      return "bg-gradient-to-br from-amber-500 to-amber-700";
+    case "midnight-blue":
+      return "bg-gradient-to-br from-indigo-800 to-indigo-950";
+    case "coral-peach":
+      return "bg-gradient-to-br from-orange-300 to-rose-400";
     default:
       return "bg-gradient-to-br from-neutral-800 to-neutral-900";
   }
