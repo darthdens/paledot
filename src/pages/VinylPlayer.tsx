@@ -133,7 +133,21 @@ const VinylPlayer = () => {
   const [selectedRecord, setSelectedRecord] = useState<VinylRecord | null>(vinylCollection[0]);
   const [tonearmPosition, setTonearmPosition] = useState<"rest" | "playing">("rest");
   const [isSwapping, setIsSwapping] = useState(false);
+  const [turntableHeight, setTurntableHeight] = useState<number>(0);
+  const turntableRef = useRef<HTMLDivElement>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  // Sync turntable height for side panels
+  useEffect(() => {
+    const updateHeight = () => {
+      if (turntableRef.current) {
+        setTurntableHeight(turntableRef.current.offsetHeight);
+      }
+    };
+    updateHeight();
+    window.addEventListener('resize', updateHeight);
+    return () => window.removeEventListener('resize', updateHeight);
+  }, []);
 
   useEffect(() => {
     document.title =
@@ -211,64 +225,79 @@ const VinylPlayer = () => {
 
         {/* Turntable Section */}
         <section className="container mx-auto px-4 sm:px-6 max-w-7xl pb-8">
-          <div className="flex flex-col lg:flex-row gap-8 items-start">
-            {/* Controls - Left side on desktop */}
-            <div className="hidden lg:block lg:w-80">
-              <div className="h-auto lg:h-[min(576px,calc((100vw-6rem)*0.55))]">
-                <VinylControls
-                  isPlaying={isPlaying}
-                  isPoweredOn={isPoweredOn}
-                  speed={speed}
-                  volume={volume}
-                  onPlayPause={handlePlayPause}
-                  onPowerToggle={handlePowerToggle}
-                  onSpeedChange={setSpeed}
-                  onVolumeChange={setVolume}
-                  hasRecord={!!selectedRecord}
-                  vertical
-                />
-              </div>
+          {/* Desktop Layout - Grid with 3 columns */}
+          <div className="hidden lg:grid lg:grid-cols-[280px_1fr_280px] xl:grid-cols-[320px_1fr_320px] gap-8 items-start">
+            {/* Controls - Left side */}
+            <div style={{ height: turntableHeight > 0 ? `${turntableHeight}px` : undefined }}>
+              <VinylControls
+                isPlaying={isPlaying}
+                isPoweredOn={isPoweredOn}
+                speed={speed}
+                volume={volume}
+                onPlayPause={handlePlayPause}
+                onPowerToggle={handlePowerToggle}
+                onSpeedChange={setSpeed}
+                onVolumeChange={setVolume}
+                hasRecord={!!selectedRecord}
+                vertical
+              />
             </div>
 
-            {/* Main Turntable - Centered */}
-            <div className="flex-1 w-full flex flex-col items-center">
-              <div className="relative w-full max-w-xl mx-auto aspect-square">
-                <Turntable
-                  record={selectedRecord}
-                  isPlaying={isPlaying && isPoweredOn}
-                  isPoweredOn={isPoweredOn}
-                  speed={speed}
-                  tonearmPosition={tonearmPosition}
-                  isSwapping={isSwapping}
-                />
-              </div>
-              
-              {/* Controls below turntable - Mobile/Tablet only */}
-              <div className="lg:hidden w-full">
-                <VinylControls
-                  isPlaying={isPlaying}
-                  isPoweredOn={isPoweredOn}
-                  speed={speed}
-                  volume={volume}
-                  onPlayPause={handlePlayPause}
-                  onPowerToggle={handlePowerToggle}
-                  onSpeedChange={setSpeed}
-                  onVolumeChange={setVolume}
-                  hasRecord={!!selectedRecord}
-                />
-              </div>
+            {/* Main Turntable - Center */}
+            <div ref={turntableRef} className="w-full max-w-xl mx-auto aspect-square justify-self-center">
+              <Turntable
+                record={selectedRecord}
+                isPlaying={isPlaying && isPoweredOn}
+                isPoweredOn={isPoweredOn}
+                speed={speed}
+                tonearmPosition={tonearmPosition}
+                isSwapping={isSwapping}
+              />
             </div>
 
-            {/* Record Collection Sidebar - Right side */}
-            <div className="w-full lg:w-80">
-              <div className="h-auto lg:h-[min(576px,calc((100vw-6rem)*0.55))]">
-                <RecordCollection
-                  records={vinylCollection}
-                  selectedRecord={selectedRecord}
-                  onSelectRecord={handleSelectRecord}
-                />
-              </div>
+            {/* Record Collection - Right side */}
+            <div style={{ height: turntableHeight > 0 ? `${turntableHeight}px` : undefined }}>
+              <RecordCollection
+                records={vinylCollection}
+                selectedRecord={selectedRecord}
+                onSelectRecord={handleSelectRecord}
+              />
             </div>
+          </div>
+
+          {/* Mobile/Tablet Layout */}
+          <div className="lg:hidden flex flex-col gap-8">
+            {/* Main Turntable */}
+            <div className="w-full max-w-xl mx-auto aspect-square">
+              <Turntable
+                record={selectedRecord}
+                isPlaying={isPlaying && isPoweredOn}
+                isPoweredOn={isPoweredOn}
+                speed={speed}
+                tonearmPosition={tonearmPosition}
+                isSwapping={isSwapping}
+              />
+            </div>
+            
+            {/* Controls */}
+            <VinylControls
+              isPlaying={isPlaying}
+              isPoweredOn={isPoweredOn}
+              speed={speed}
+              volume={volume}
+              onPlayPause={handlePlayPause}
+              onPowerToggle={handlePowerToggle}
+              onSpeedChange={setSpeed}
+              onVolumeChange={setVolume}
+              hasRecord={!!selectedRecord}
+            />
+
+            {/* Record Collection */}
+            <RecordCollection
+              records={vinylCollection}
+              selectedRecord={selectedRecord}
+              onSelectRecord={handleSelectRecord}
+            />
           </div>
         </section>
       </main>
