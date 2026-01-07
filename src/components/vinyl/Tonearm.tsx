@@ -74,49 +74,54 @@ export const Tonearm = ({ position, isPoweredOn, onPositionChange }: TonearmProp
   return (
     <div
       ref={armRef}
-      className={`absolute top-4 right-4 origin-top-right select-none ${
-        isDragging ? "" : "transition-transform duration-700 ease-in-out"
-      } ${isPoweredOn ? "cursor-grab" : "cursor-not-allowed opacity-50"} ${
-        isDragging ? "cursor-grabbing" : ""
-      }`}
-      style={{ transform: `rotate(${currentRotation}deg)` }}
+      className={`absolute top-4 right-4 select-none ${
+        isPoweredOn ? "cursor-grab" : "cursor-not-allowed opacity-50"
+      } ${isDragging ? "cursor-grabbing" : ""}`}
       onPointerDown={handlePointerDown}
       onPointerMove={handlePointerMove}
       onPointerUp={handlePointerUp}
       onPointerCancel={handlePointerUp}
       onClick={!isDragging ? handleClick : undefined}
     >
-      {/* Tonearm base/pivot */}
+      {/* Fixed pivot base - does NOT rotate */}
       <div className="relative">
-        {/* Pivot point */}
+        {/* Pivot point (fixed) */}
         <div className="w-8 h-8 rounded-full bg-gradient-to-b from-muted to-muted-foreground/20 border border-border/50 shadow-md flex items-center justify-center">
           <div className="w-3 h-3 rounded-full bg-foreground/30" />
         </div>
 
-        {/* Arm - Extended length to reach inner grooves */}
+        {/* Rotating arm container - pivots from center of the base */}
         <div
-          className="absolute top-3 right-3 w-2 h-44 bg-gradient-to-b from-muted-foreground/60 to-muted-foreground/40 rounded-full origin-top shadow-md"
-          style={{ transform: "rotate(-15deg)" }}
+          className={`absolute top-4 right-4 origin-top ${
+            isDragging ? "" : "transition-transform duration-700 ease-in-out"
+          }`}
+          style={{ transform: `rotate(${currentRotation}deg)` }}
         >
-          {/* Counterweight */}
-          <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-4 h-4 rounded-full bg-gradient-to-b from-foreground/30 to-foreground/20" />
+          {/* Arm - reaches first inner circle */}
+          <div
+            className="w-2 h-36 bg-gradient-to-b from-muted-foreground/60 to-muted-foreground/40 rounded-full shadow-md"
+            style={{ transform: "rotate(-15deg)", transformOrigin: "top center" }}
+          >
+            {/* Counterweight */}
+            <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-4 h-4 rounded-full bg-gradient-to-b from-foreground/30 to-foreground/20" />
 
-          {/* Headshell */}
-          <div className="absolute -bottom-2 left-1/2 -translate-x-1/2">
-            {/* Headshell body */}
-            <div className="w-6 h-3 bg-gradient-to-b from-muted-foreground/50 to-muted-foreground/30 rounded-sm" />
-            {/* Cartridge */}
-            <div className="w-4 h-2 mx-auto bg-foreground/40 rounded-sm mt-0.5" />
-            {/* Stylus */}
-            <div
-              className={`w-0.5 h-1 mx-auto bg-foreground/60 transition-opacity duration-300 ${
-                isPoweredOn && position === "playing" ? "opacity-100" : "opacity-50"
-              }`}
-            />
+            {/* Headshell */}
+            <div className="absolute -bottom-2 left-1/2 -translate-x-1/2">
+              {/* Headshell body */}
+              <div className="w-6 h-3 bg-gradient-to-b from-muted-foreground/50 to-muted-foreground/30 rounded-sm" />
+              {/* Cartridge */}
+              <div className="w-4 h-2 mx-auto bg-foreground/40 rounded-sm mt-0.5" />
+              {/* Stylus */}
+              <div
+                className={`w-0.5 h-1 mx-auto bg-foreground/60 transition-opacity duration-300 ${
+                  isPoweredOn && position === "playing" ? "opacity-100" : "opacity-50"
+                }`}
+              />
+            </div>
           </div>
         </div>
 
-        {/* Arm lift/cue lever */}
+        {/* Arm lift/cue lever (fixed with base) */}
         <div className="absolute top-10 -left-2 w-3 h-1.5 bg-muted-foreground/40 rounded-full" />
       </div>
     </div>

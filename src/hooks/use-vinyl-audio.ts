@@ -10,7 +10,6 @@ export const useVinylAudio = ({ isPlaying, volume, trackUrl }: VinylAudioOptions
   const audioContextRef = useRef<AudioContext | null>(null);
   const crackleIntervalRef = useRef<number | null>(null);
   const crackleGainRef = useRef<GainNode | null>(null);
-  const musicGainRef = useRef<GainNode | null>(null);
   const audioElementRef = useRef<HTMLAudioElement | null>(null);
   const isInitializedRef = useRef(false);
 
@@ -25,56 +24,58 @@ export const useVinylAudio = ({ isPlaying, volume, trackUrl }: VinylAudioOptions
       crackleGainRef.current = audioContextRef.current.createGain();
       crackleGainRef.current.connect(audioContextRef.current.destination);
       
-      // Music gain node
-      musicGainRef.current = audioContextRef.current.createGain();
-      musicGainRef.current.connect(audioContextRef.current.destination);
-      
       isInitializedRef.current = true;
     } catch (e) {
       console.warn("Web Audio API not supported:", e);
     }
   }, []);
 
-  // Play a single crackle/pop sound
-  const playCrackle = useCallback(() => {
+  // Play a soft, smooth crackle
+  const playSoftCrackle = useCallback(() => {
     const ctx = audioContextRef.current;
     const gain = crackleGainRef.current;
     if (!ctx || !gain || ctx.state !== "running") return;
 
-    const bufferSize = ctx.sampleRate * 0.02;
+    // Longer, softer crackle
+    const bufferSize = ctx.sampleRate * 0.008; // 8ms - shorter burst
     const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
     const data = buffer.getChannelData(0);
 
+    // Softer noise with smooth envelope
     for (let i = 0; i < bufferSize; i++) {
-      const envelope = 1 - i / bufferSize;
-      data[i] = (Math.random() * 2 - 1) * envelope * envelope;
+      const t = i / bufferSize;
+      // Smooth fade in and out
+      const envelope = Math.sin(t * Math.PI) * 0.3;
+      data[i] = (Math.random() * 2 - 1) * envelope;
     }
 
     const source = ctx.createBufferSource();
     source.buffer = buffer;
 
+    // Softer high-pass filter for subtle hiss
     const filter = ctx.createBiquadFilter();
-    filter.type = "bandpass";
-    filter.frequency.value = 2000 + Math.random() * 3000;
-    filter.Q.value = 1;
+    filter.type = "highpass";
+    filter.frequency.value = 3000 + Math.random() * 2000;
+    filter.Q.value = 0.5;
 
     source.connect(filter);
     filter.connect(gain);
     source.start();
   }, []);
 
-  const playPop = useCallback(() => {
+  // Occasional subtle pop
+  const playSoftPop = useCallback(() => {
     const ctx = audioContextRef.current;
     const gain = crackleGainRef.current;
     if (!ctx || !gain || ctx.state !== "running") return;
 
-    const bufferSize = ctx.sampleRate * 0.05;
+    const bufferSize = ctx.sampleRate * 0.015; // 15ms
     const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
     const data = buffer.getChannelData(0);
 
     for (let i = 0; i < bufferSize; i++) {
       const t = i / ctx.sampleRate;
-      const envelope = Math.exp(-t * 50);
+      const envelope = Math.exp(-t * 80) * 0.4; // Softer, faster decay
       data[i] = (Math.random() * 2 - 1) * envelope;
     }
 
@@ -83,7 +84,7 @@ export const useVinylAudio = ({ isPlaying, volume, trackUrl }: VinylAudioOptions
 
     const filter = ctx.createBiquadFilter();
     filter.type = "lowpass";
-    filter.frequency.value = 800;
+    filter.frequency.value = 600;
 
     source.connect(filter);
     filter.connect(gain);
@@ -94,13 +95,15 @@ export const useVinylAudio = ({ isPlaying, volume, trackUrl }: VinylAudioOptions
     if (crackleIntervalRef.current) return;
 
     const scheduleCrackle = () => {
-      const interval = 50 + Math.random() * 150;
+      // Much longer intervals for subtle ambient feel (200-600ms)
+      const interval = 200 + Math.random() * 400;
       
       crackleIntervalRef.current = window.setTimeout(() => {
-        if (Math.random() < 0.8) {
-          playCrackle();
+        // 90% chance of soft crackle, 10% chance of subtle pop
+        if (Math.random() < 0.9) {
+          playSoftCrackle();
         } else {
-          playPop();
+          playSoftPop();
         }
         
         if (crackleIntervalRef.current) {
@@ -110,7 +113,7 @@ export const useVinylAudio = ({ isPlaying, volume, trackUrl }: VinylAudioOptions
     };
 
     scheduleCrackle();
-  }, [playCrackle, playPop]);
+  }, [playSoftCrackle, playSoftPop]);
 
   const stopCrackle = useCallback(() => {
     if (crackleIntervalRef.current) {
@@ -146,7 +149,8 @@ export const useVinylAudio = ({ isPlaying, volume, trackUrl }: VinylAudioOptions
   // Update volume
   useEffect(() => {
     if (crackleGainRef.current) {
-      crackleGainRef.current.gain.value = (volume / 100) * 0.12;
+      // Very subtle crackle volume (0-0.06)
+      crackleGainRef.current.gain.value = (volume / 100) * 0.06;
     }
     if (audioElementRef.current) {
       audioElementRef.current.volume = volume / 100;
