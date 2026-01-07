@@ -34,7 +34,7 @@ export const VinylControls = ({
 
   if (vertical) {
     return (
-      <div className="h-full p-4 bg-card/50 backdrop-blur-sm rounded-xl border border-border/50 flex flex-col">
+      <div className="relative z-20 h-full p-4 bg-card/50 backdrop-blur-sm rounded-xl border border-border/50 flex flex-col">
         {/* Power & Play Buttons - grouped at top */}
         <div className="flex flex-col items-center gap-4">
           <div className="flex flex-col items-center gap-1">
