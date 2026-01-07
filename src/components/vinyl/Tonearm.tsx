@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect, useCallback } from "react";
+import { useRef, useState, useCallback } from "react";
 
 interface TonearmProps {
   position: "rest" | "playing";
@@ -10,8 +10,7 @@ export const Tonearm = ({ position, isPoweredOn, onPositionChange }: TonearmProp
   const armRef = useRef<HTMLDivElement>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [dragRotation, setDragRotation] = useState<number | null>(null);
-  const startAngleRef = useRef(0);
-  const startRotationRef = useRef(0);
+  const dragStartRef = useRef({ x: 0, y: 0, rotation: 0 });
 
   // Target rotations: rest = 5deg, playing = -25deg
   const REST_ROTATION = 5;
@@ -22,40 +21,32 @@ export const Tonearm = ({ position, isPoweredOn, onPositionChange }: TonearmProp
     ? dragRotation 
     : (position === "playing" ? PLAYING_ROTATION : REST_ROTATION);
 
-  const getAngleFromCenter = useCallback((clientX: number, clientY: number) => {
-    if (!armRef.current) return 0;
-    const rect = armRef.current.getBoundingClientRect();
-    // Pivot is at top-right
-    const pivotX = rect.right;
-    const pivotY = rect.top;
-    const angle = Math.atan2(clientY - pivotY, clientX - pivotX) * (180 / Math.PI);
-    return angle;
-  }, []);
-
   const handlePointerDown = useCallback((e: React.PointerEvent) => {
     if (!isPoweredOn) return;
     e.preventDefault();
     e.stopPropagation();
     
+    const startRotation = position === "playing" ? PLAYING_ROTATION : REST_ROTATION;
+    dragStartRef.current = { x: e.clientX, y: e.clientY, rotation: startRotation };
+    setDragRotation(startRotation);
     setIsDragging(true);
-    startAngleRef.current = getAngleFromCenter(e.clientX, e.clientY);
-    startRotationRef.current = position === "playing" ? PLAYING_ROTATION : REST_ROTATION;
-    setDragRotation(startRotationRef.current);
     
     (e.target as HTMLElement).setPointerCapture(e.pointerId);
-  }, [isPoweredOn, position, getAngleFromCenter]);
+  }, [isPoweredOn, position]);
 
   const handlePointerMove = useCallback((e: React.PointerEvent) => {
     if (!isDragging) return;
     
-    const currentAngle = getAngleFromCenter(e.clientX, e.clientY);
-    const angleDelta = currentAngle - startAngleRef.current;
-    let newRotation = startRotationRef.current + angleDelta;
+    // Use horizontal movement as the primary drag input (left = toward record, right = away)
+    const deltaX = e.clientX - dragStartRef.current.x;
+    // Negative deltaX (moving left) should decrease rotation (move toward playing position)
+    const rotationChange = deltaX * 0.3;
+    let newRotation = dragStartRef.current.rotation - rotationChange;
     
-    // Clamp rotation between playing and rest positions
-    newRotation = Math.max(PLAYING_ROTATION - 5, Math.min(REST_ROTATION + 5, newRotation));
+    // Clamp rotation between playing and rest positions (with small buffer)
+    newRotation = Math.max(PLAYING_ROTATION, Math.min(REST_ROTATION, newRotation));
     setDragRotation(newRotation);
-  }, [isDragging, getAngleFromCenter]);
+  }, [isDragging]);
 
   const handlePointerUp = useCallback((e: React.PointerEvent) => {
     if (!isDragging) return;
