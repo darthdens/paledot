@@ -129,11 +129,16 @@ const VinylPlayer = () => {
   const turntableRef = useRef<HTMLDivElement>(null);
 
   // Vinyl crackle and music audio
-  const { initAudio, playMusicNow, stopMusicNow } = useVinylAudio({ 
+  const { initAudio, playMusicNow, stopMusicNow, seekBy } = useVinylAudio({ 
     isPlaying: isPlaying && isPoweredOn, 
     volume,
     trackUrl: selectedRecord?.trackUrl,
   });
+
+  // Handle disc scrubbing (rotate vinyl to seek)
+  const handleScrub = (deltaSeconds: number) => {
+    seekBy(deltaSeconds);
+  };
 
   // Sync turntable height for side panels
   useEffect(() => {
@@ -275,6 +280,7 @@ const VinylPlayer = () => {
                 tonearmPosition={tonearmPosition}
                 isSwapping={isSwapping}
                 onTonearmPositionChange={handleTonearmPositionChange}
+                onScrub={handleScrub}
               />
             </div>
 
@@ -305,6 +311,7 @@ const VinylPlayer = () => {
                     tonearmPosition={tonearmPosition}
                     isSwapping={isSwapping}
                     onTonearmPositionChange={handleTonearmPositionChange}
+                    onScrub={handleScrub}
                   />
                 </div>
               </div>
