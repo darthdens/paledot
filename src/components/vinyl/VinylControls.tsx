@@ -95,14 +95,13 @@ export const VinylControls = ({
           <span className="text-xs text-muted-foreground">{t.vinylPlayer.volume}</span>
           <div className="flex-1 flex items-center justify-center py-2">
             <Slider
-              value={[100 - volume]}
-              onValueChange={([v]) => onVolumeChange(100 - v)}
+              value={[volume]}
+              onValueChange={([v]) => onVolumeChange(v)}
               max={100}
               step={1}
               disabled={!isPoweredOn}
               orientation="vertical"
-              inverted
-              className="h-full"
+              className="h-full [&_[data-orientation=vertical]]:flex-col-reverse"
             />
           </div>
         </div>
