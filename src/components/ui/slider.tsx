@@ -40,7 +40,7 @@ const Slider = React.forwardRef<
       <SliderPrimitive.Track
         className={cn(
           "relative grow overflow-hidden rounded-full bg-border pointer-events-auto",
-          orientation === "horizontal" ? "h-2 w-full" : "w-2 h-full"
+          orientation === "horizontal" ? "h-2 w-full" : "w-4 sm:w-2 h-full"
         )}
       >
         <SliderPrimitive.Range
