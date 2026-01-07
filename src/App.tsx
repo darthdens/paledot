@@ -1,5 +1,6 @@
 import { CookieBanner } from "@/components/CookieBanner";
 import CustomCursor from "@/components/CustomCursor";
+import { GoogleAnalytics } from "@/components/GoogleAnalytics";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { LanguageProvider } from "@/i18n/LanguageContext";
@@ -18,6 +19,7 @@ const App = () => (
         <TooltipProvider>
           <CustomCursor />
           <Toaster richColors position="bottom-left" />
+          <GoogleAnalytics />
           <CookieBanner />
           <Routes>
             <Route path="/" element={<LampExperiment />} />
