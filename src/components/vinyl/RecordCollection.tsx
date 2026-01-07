@@ -1,5 +1,6 @@
 import { useLanguage } from "@/i18n/LanguageContext";
 import { VinylRecord } from "./types";
+import { getVinylGradient } from "./vinylGradients";
 
 interface RecordCollectionProps {
   records: VinylRecord[];
@@ -7,33 +8,6 @@ interface RecordCollectionProps {
   onSelectRecord: (record: VinylRecord) => void;
 }
 
-// Mini vinyl preview colors - Drive/Retrowave inspired
-const getVinylPreviewColor = (color: VinylRecord["color"]): string => {
-  switch (color) {
-    case "classic-black":
-      return "bg-gradient-to-br from-neutral-800 to-neutral-900";
-    case "neon-pink":
-      return "bg-gradient-to-br from-pink-500 to-pink-700";
-    case "chrome-silver":
-      return "bg-gradient-to-br from-slate-300 to-slate-500";
-    case "midnight-purple":
-      return "bg-gradient-to-br from-purple-800 to-purple-950";
-    case "sunset-orange":
-      return "bg-gradient-to-br from-orange-500 to-orange-700";
-    case "electric-cyan":
-      return "bg-gradient-to-br from-cyan-400 to-cyan-600";
-    case "deep-magenta":
-      return "bg-gradient-to-br from-fuchsia-600 to-fuchsia-800";
-    case "golden-bronze":
-      return "bg-gradient-to-br from-amber-600 to-amber-800";
-    case "noir-smoke":
-      return "bg-gradient-to-br from-slate-800 to-slate-950";
-    case "rose-gold":
-      return "bg-gradient-to-br from-rose-400 to-rose-600";
-    default:
-      return "bg-gradient-to-br from-neutral-800 to-neutral-900";
-  }
-};
 
 export const RecordCollection = ({
   records,
@@ -63,7 +37,8 @@ export const RecordCollection = ({
               {/* Mini vinyl preview */}
               <div className="relative w-10 h-10 flex-shrink-0">
                 <div
-                  className={`absolute inset-0 rounded-full ${getVinylPreviewColor(record.color)} shadow-md`}
+                  className="absolute inset-0 rounded-full shadow-md"
+                  style={{ background: getVinylGradient(record.color) }}
                 >
                   {/* Center label */}
                   <div className="absolute inset-[30%] rounded-full bg-card/80" />

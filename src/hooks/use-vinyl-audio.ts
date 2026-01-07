@@ -122,28 +122,39 @@ export const useVinylAudio = ({ isPlaying, volume, trackUrl }: VinylAudioOptions
     }
   }, []);
 
-  // Music playback
-  const startMusic = useCallback(() => {
+  // Music playback (exposed so VinylPlayer can call it inside a user gesture)
+  const playMusicNow = useCallback(() => {
     if (!trackUrl) return;
-    
+
     if (!audioElementRef.current) {
-      audioElementRef.current = new Audio();
-      audioElementRef.current.loop = true;
+      const el = new Audio();
+      el.loop = true;
+      el.preload = "auto";
+      el.addEventListener("error", () => {
+        // Helps pinpoint broken sources in the console
+        console.warn("Audio element error:", el.error);
+      });
+      audioElementRef.current = el;
     }
-    
-    if (audioElementRef.current.src !== trackUrl) {
-      audioElementRef.current.src = trackUrl;
+
+    const el = audioElementRef.current;
+
+    // Note: el.src becomes absolute after setting, so compare with endsWith
+    if (!el.src || !el.src.endsWith(trackUrl)) {
+      el.src = trackUrl;
+      el.currentTime = 0;
+      el.load();
     }
-    
-    audioElementRef.current.volume = volume / 100;
-    audioElementRef.current.play().catch(console.warn);
+
+    el.volume = volume / 100;
+    el.play().catch(console.warn);
   }, [trackUrl, volume]);
 
-  const stopMusic = useCallback(() => {
-    if (audioElementRef.current) {
-      audioElementRef.current.pause();
-      audioElementRef.current.currentTime = 0;
-    }
+  const stopMusicNow = useCallback(() => {
+    const el = audioElementRef.current;
+    if (!el) return;
+    el.pause();
+    el.currentTime = 0;
   }, []);
 
   // Update volume
@@ -163,6 +174,7 @@ export const useVinylAudio = ({ isPlaying, volume, trackUrl }: VinylAudioOptions
       const wasPlaying = !audioElementRef.current.paused;
       audioElementRef.current.src = trackUrl;
       if (wasPlaying && isPlaying) {
+        // may be blocked by autoplay rules, but once user started playback it will usually work
         audioElementRef.current.play().catch(console.warn);
       }
     }
@@ -172,33 +184,35 @@ export const useVinylAudio = ({ isPlaying, volume, trackUrl }: VinylAudioOptions
   useEffect(() => {
     if (isPlaying) {
       initAudio();
-      
+
       if (audioContextRef.current?.state === "suspended") {
         audioContextRef.current.resume();
       }
-      
+
       startCrackle();
-      startMusic();
+      // Music is primarily started via playMusicNow() from a user gesture.
+      // If already started, keep it going; if not, browser may block autoplay.
+      playMusicNow();
     } else {
       stopCrackle();
-      stopMusic();
+      stopMusicNow();
     }
 
     return () => {
       stopCrackle();
     };
-  }, [isPlaying, initAudio, startCrackle, stopCrackle, startMusic, stopMusic]);
+  }, [isPlaying, initAudio, startCrackle, stopCrackle, playMusicNow, stopMusicNow]);
 
   // Cleanup on unmount
   useEffect(() => {
     return () => {
       stopCrackle();
-      stopMusic();
+      stopMusicNow();
       if (audioContextRef.current) {
         audioContextRef.current.close();
       }
     };
-  }, [stopCrackle, stopMusic]);
+  }, [stopCrackle, stopMusicNow]);
 
-  return { initAudio };
+  return { initAudio, playMusicNow, stopMusicNow };
 };
