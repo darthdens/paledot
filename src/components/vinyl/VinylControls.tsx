@@ -34,44 +34,45 @@ export const VinylControls = ({
 
   if (vertical) {
     return (
-      <div className="h-full p-4 bg-card/50 backdrop-blur-sm rounded-xl border border-border/50 flex flex-col justify-between">
-        {/* Power Button */}
-        <div className="flex flex-col items-center gap-2">
-          <span className="text-xs text-muted-foreground">{t.vinylPlayer.power}</span>
-          <Button
-            variant={isPoweredOn ? "secondary" : "outline"}
-            size="icon"
-            onClick={onPowerToggle}
-            className="relative"
-            aria-label={t.vinylPlayer.power}
-          >
-            <Power className="h-4 w-4" />
-            <span
-              className={`absolute -top-1 -right-1 w-2 h-2 rounded-full transition-colors ${
-                isPoweredOn ? "bg-green-500" : "bg-muted-foreground/30"
-              }`}
-            />
-          </Button>
+      <div className="h-full p-4 bg-card/50 backdrop-blur-sm rounded-xl border border-border/50 flex flex-col">
+        {/* Power & Play Buttons - grouped at top */}
+        <div className="flex flex-col items-center gap-4">
+          <div className="flex flex-col items-center gap-1">
+            <span className="text-xs text-muted-foreground">{t.vinylPlayer.power}</span>
+            <Button
+              variant={isPoweredOn ? "secondary" : "outline"}
+              size="icon"
+              onClick={onPowerToggle}
+              className="relative"
+              aria-label={t.vinylPlayer.power}
+            >
+              <Power className="h-4 w-4" />
+              <span
+                className={`absolute -top-1 -right-1 w-2 h-2 rounded-full transition-colors ${
+                  isPoweredOn ? "bg-green-500" : "bg-muted-foreground/30"
+                }`}
+              />
+            </Button>
+          </div>
+
+          <div className="flex flex-col items-center gap-1">
+            <span className="text-xs text-muted-foreground">
+              {isPlaying ? t.vinylPlayer.pause : t.vinylPlayer.play}
+            </span>
+            <Button
+              variant="secondary"
+              size="icon"
+              onClick={onPlayPause}
+              disabled={!isPoweredOn || !hasRecord}
+              aria-label={isPlaying ? t.vinylPlayer.pause : t.vinylPlayer.play}
+            >
+              {isPlaying ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
+            </Button>
+          </div>
         </div>
 
-        {/* Play/Pause Button */}
-        <div className="flex flex-col items-center gap-2">
-          <span className="text-xs text-muted-foreground">
-            {isPlaying ? t.vinylPlayer.pause : t.vinylPlayer.play}
-          </span>
-          <Button
-            variant="secondary"
-            size="icon"
-            onClick={onPlayPause}
-            disabled={!isPoweredOn || !hasRecord}
-            aria-label={isPlaying ? t.vinylPlayer.pause : t.vinylPlayer.play}
-          >
-            {isPlaying ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
-          </Button>
-        </div>
-
-        {/* Speed Selector */}
-        <div className="flex flex-col items-center gap-2">
+        {/* Speed Selector - middle */}
+        <div className="flex flex-col items-center gap-2 mt-6">
           <span className="text-xs text-muted-foreground">{t.vinylPlayer.speed}</span>
           <div className="flex flex-col gap-1">
             {speeds.map((s) => (
@@ -89,18 +90,21 @@ export const VinylControls = ({
           </div>
         </div>
 
-        {/* Volume */}
-        <div className="flex flex-col items-center gap-2">
+        {/* Volume - takes remaining space, inverted so 0 is at bottom */}
+        <div className="flex-1 flex flex-col items-center gap-2 mt-6 min-h-0">
           <span className="text-xs text-muted-foreground">{t.vinylPlayer.volume}</span>
-          <Slider
-            value={[volume]}
-            onValueChange={([v]) => onVolumeChange(v)}
-            max={100}
-            step={1}
-            disabled={!isPoweredOn}
-            orientation="vertical"
-            className="h-20"
-          />
+          <div className="flex-1 flex items-center justify-center py-2">
+            <Slider
+              value={[volume]}
+              onValueChange={([v]) => onVolumeChange(v)}
+              max={100}
+              step={1}
+              disabled={!isPoweredOn}
+              orientation="vertical"
+              inverted
+              className="h-full"
+            />
+          </div>
         </div>
       </div>
     );
