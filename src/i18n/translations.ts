@@ -965,6 +965,18 @@ export const translations = {
         lounge: "The Lounge Lamp",
       },
     },
+
+    // Vinyl Player
+    vinylPlayer: {
+      title: "Interactive Vinyl Player",
+      subtitle: "Browse our collection of vinyl records, place them on the turntable, and watch them spin with realistic animations.",
+      play: "Play",
+      pause: "Pause",
+      power: "Power",
+      speed: "Speed",
+      volume: "Volume",
+      collection: "Record Collection",
+    },
   },
 
   fr: {
@@ -1932,6 +1944,18 @@ export const translations = {
         desk: "La Lampe de Bureau",
         lounge: "La Lampe de Chambre",
       },
+    },
+
+    // Vinyl Player
+    vinylPlayer: {
+      title: "Platine Vinyle Interactive",
+      subtitle: "Parcourez notre collection de disques vinyles, placez-les sur la platine et regardez-les tourner avec des animations réalistes.",
+      play: "Lecture",
+      pause: "Pause",
+      power: "Alimentation",
+      speed: "Vitesse",
+      volume: "Volume",
+      collection: "Collection de Disques",
     },
   },
 } as const;

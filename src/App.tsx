@@ -9,6 +9,7 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import NotFound from "./pages/NotFound";
 import QrCodeGenerator from "./pages/QrCodeGenerator";
 import LampExperiment from "./pages/LampExperiment";
+import VinylPlayer from "./pages/VinylPlayer";
 
 const queryClient = new QueryClient();
 
@@ -22,7 +23,7 @@ const App = () => (
           <GoogleAnalytics />
           <CookieBanner />
           <Routes>
-            <Route path="/" element={<LampExperiment />} />
+            <Route path="/" element={<VinylPlayer />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </TooltipProvider>
