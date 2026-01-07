@@ -157,6 +157,25 @@ export const useVinylAudio = ({ isPlaying, volume, trackUrl }: VinylAudioOptions
     el.currentTime = 0;
   }, []);
 
+  // Seek by delta seconds (positive = forward, negative = backward)
+  const seekBy = useCallback((deltaSeconds: number) => {
+    const el = audioElementRef.current;
+    if (!el || !el.duration || isNaN(el.duration)) return;
+    
+    const newTime = Math.max(0, Math.min(el.duration, el.currentTime + deltaSeconds));
+    el.currentTime = newTime;
+  }, []);
+
+  // Get current time and duration for external use
+  const getPlaybackInfo = useCallback(() => {
+    const el = audioElementRef.current;
+    if (!el) return { currentTime: 0, duration: 0 };
+    return { 
+      currentTime: el.currentTime || 0, 
+      duration: el.duration || 0 
+    };
+  }, []);
+
   // Update volume
   useEffect(() => {
     if (crackleGainRef.current) {
@@ -214,5 +233,5 @@ export const useVinylAudio = ({ isPlaying, volume, trackUrl }: VinylAudioOptions
     };
   }, [stopCrackle, stopMusicNow]);
 
-  return { initAudio, playMusicNow, stopMusicNow };
+  return { initAudio, playMusicNow, stopMusicNow, seekBy, getPlaybackInfo };
 };

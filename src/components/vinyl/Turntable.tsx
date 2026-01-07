@@ -10,6 +10,7 @@ interface TurntableProps {
   tonearmPosition: "rest" | "playing";
   isSwapping: boolean;
   onTonearmPositionChange?: (position: "rest" | "playing") => void;
+  onScrub?: (deltaSeconds: number) => void;
 }
 
 export const Turntable = ({
@@ -20,6 +21,7 @@ export const Turntable = ({
   tonearmPosition,
   isSwapping,
   onTonearmPositionChange,
+  onScrub,
 }: TurntableProps) => {
   // Calculate rotation duration based on RPM
   const getRotationDuration = () => {
@@ -57,6 +59,7 @@ export const Turntable = ({
               isSpinning={isPlaying && isPoweredOn}
               rotationDuration={getRotationDuration()}
               isSwapping={isSwapping}
+              onScrub={onScrub}
             />
 
             {/* Power indicator light */}
