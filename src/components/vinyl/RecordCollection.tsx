@@ -18,7 +18,7 @@ export const RecordCollection = ({
 
   return (
     <div className="relative z-0 bg-card/50 backdrop-blur-sm rounded-xl border border-border/50 p-4 h-full flex flex-col">
-      <h3 className="font-medium text-foreground mb-4 flex-shrink-0">{t.vinylPlayer.collection}</h3>
+      <h3 className="font-medium text-foreground mb-4 flex-shrink-0 px-2">{t.vinylPlayer.collection}</h3>
       
       <div className="flex-1 overflow-y-auto space-y-2 px-2">
         {records.map((record) => {
