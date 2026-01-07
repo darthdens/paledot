@@ -6,33 +6,57 @@ import { cn } from "@/lib/utils";
 const Slider = React.forwardRef<
   React.ElementRef<typeof SliderPrimitive.Root>,
   React.ComponentPropsWithoutRef<typeof SliderPrimitive.Root>
->(({ className, orientation = "horizontal", ...props }, ref) => (
-  <SliderPrimitive.Root
-    ref={ref}
-    orientation={orientation}
-    className={cn(
-      "relative flex touch-none select-none",
-      orientation === "horizontal" ? "w-full items-center" : "h-full flex-col items-center",
-      className
-    )}
-    {...props}
-  >
-    <SliderPrimitive.Track 
+>(
+  (
+    {
+      className,
+      orientation = "horizontal",
+      onPointerDown,
+      onPointerMove,
+      onPointerUp,
+      ...props
+    },
+    ref
+  ) => (
+    <SliderPrimitive.Root
+      ref={ref}
+      orientation={orientation}
+      {...props}
+      onPointerDown={(e) => {
+        // Prevent global listeners (e.g. custom cursor) from interfering with drag
+        e.stopPropagation();
+        onPointerDown?.(e);
+      }}
+      onPointerMove={(e) => {
+        onPointerMove?.(e);
+      }}
+      onPointerUp={(e) => {
+        e.stopPropagation();
+        onPointerUp?.(e);
+      }}
       className={cn(
-        "relative grow overflow-hidden rounded-full bg-border",
-        orientation === "horizontal" ? "h-2 w-full" : "w-2 h-full"
+        "relative flex touch-none select-none",
+        orientation === "horizontal" ? "w-full items-center" : "h-full flex-col items-center",
+        className
       )}
     >
-      <SliderPrimitive.Range 
+      <SliderPrimitive.Track
         className={cn(
-          "absolute bg-secondary",
-          orientation === "horizontal" ? "h-full" : "w-full"
-        )} 
-      />
-    </SliderPrimitive.Track>
-    <SliderPrimitive.Thumb className="block h-5 w-5 rounded-full border-2 border-secondary bg-background ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 cursor-grab active:cursor-grabbing relative z-50" />
-  </SliderPrimitive.Root>
-));
+          "relative grow overflow-hidden rounded-full bg-border pointer-events-auto",
+          orientation === "horizontal" ? "h-2 w-full" : "w-2 h-full"
+        )}
+      >
+        <SliderPrimitive.Range
+          className={cn(
+            "absolute bg-secondary",
+            orientation === "horizontal" ? "h-full" : "w-full"
+          )}
+        />
+      </SliderPrimitive.Track>
+      <SliderPrimitive.Thumb className="block h-5 w-5 rounded-full border-2 border-secondary bg-background ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 cursor-grab active:cursor-grabbing relative z-50 pointer-events-auto" />
+    </SliderPrimitive.Root>
+  )
+);
 Slider.displayName = SliderPrimitive.Root.displayName;
 
 export { Slider };

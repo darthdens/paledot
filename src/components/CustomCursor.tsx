@@ -35,10 +35,10 @@ export default function CustomCursor() {
     const onEnter = () => setIsVisible(true);
     const onLeave = () => setIsVisible(false);
 
-    window.addEventListener("pointermove", onPointerMove, { passive: true });
-    window.addEventListener("pointerdown", onPointerDown, { passive: true });
-    window.addEventListener("pointerup", onPointerUp, { passive: true });
-    window.addEventListener("mouseover", onMouseOver, { passive: true });
+    window.addEventListener("pointermove", onPointerMove);
+    window.addEventListener("pointerdown", onPointerDown);
+    window.addEventListener("pointerup", onPointerUp);
+    window.addEventListener("mouseover", onMouseOver);
     document.addEventListener("mouseenter", onEnter);
     document.addEventListener("mouseleave", onLeave);
 
