@@ -99,8 +99,8 @@ export const Tonearm = ({ position, isPoweredOn, onPositionChange }: TonearmProp
         >
           {/* Arm - responsive height, reaches inner circle on all sizes */}
           <div
-            className="w-1.5 h-24 sm:w-2 sm:h-36 bg-gradient-to-b from-muted-foreground/60 to-muted-foreground/40 rounded-full shadow-md"
-            style={{ transform: "rotate(-15deg)", transformOrigin: "top center" }}
+            className="w-1.5 h-32 sm:w-2 sm:h-36 bg-gradient-to-b from-muted-foreground/60 to-muted-foreground/40 rounded-full shadow-md"
+            style={{ transform: "rotate(-25deg)", transformOrigin: "top center" }}
           >
             {/* Counterweight */}
             <div className="absolute -top-0.5 sm:-top-1 left-1/2 -translate-x-1/2 w-2.5 h-2.5 sm:w-4 sm:h-4 rounded-full bg-gradient-to-b from-foreground/30 to-foreground/20" />
