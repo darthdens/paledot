@@ -16,7 +16,6 @@ const vinylCollection: VinylRecord[] = [
     album: "Midnight Drive",
     year: 2023,
     color: "transparent-purple",
-    labelImage: "/vinyl/midnight-drive-label.svg",
   },
   {
     id: "ocean-waves",
@@ -24,7 +23,6 @@ const vinylCollection: VinylRecord[] = [
     album: "Ocean Waves",
     year: 2021,
     color: "ocean-blue-marble",
-    labelImage: "/vinyl/ocean-waves-label.svg",
   },
   {
     id: "golden-hour",
@@ -32,7 +30,6 @@ const vinylCollection: VinylRecord[] = [
     album: "Golden Hour",
     year: 2022,
     color: "gold-orange-swirl",
-    labelImage: "/vinyl/golden-hour-label.svg",
   },
   {
     id: "noir",
@@ -40,7 +37,6 @@ const vinylCollection: VinylRecord[] = [
     album: "Noir",
     year: 2020,
     color: "classic-black",
-    labelImage: "/vinyl/noir-label.svg",
   },
   {
     id: "electric-dreams",
@@ -48,7 +44,6 @@ const vinylCollection: VinylRecord[] = [
     album: "Electric Dreams",
     year: 2024,
     color: "hot-pink",
-    labelImage: "/vinyl/electric-dreams-label.svg",
   },
   {
     id: "forest-echo",
@@ -56,7 +51,76 @@ const vinylCollection: VinylRecord[] = [
     album: "Forest Echo",
     year: 2019,
     color: "forest-green",
-    labelImage: "/vinyl/forest-echo-label.svg",
+  },
+  {
+    id: "velvet-nights",
+    artist: "Luna Noir",
+    album: "Velvet Nights",
+    year: 2022,
+    color: "classic-black",
+  },
+  {
+    id: "summer-haze",
+    artist: "The Beach Collective",
+    album: "Summer Haze",
+    year: 2021,
+    color: "gold-orange-swirl",
+  },
+  {
+    id: "cyber-city",
+    artist: "Digital Horizon",
+    album: "Cyber City 2099",
+    year: 2024,
+    color: "transparent-purple",
+  },
+  {
+    id: "deep-blue",
+    artist: "Aquatic Soul",
+    album: "Deep Blue",
+    year: 2020,
+    color: "ocean-blue-marble",
+  },
+  {
+    id: "neon-paradise",
+    artist: "Miami Vice",
+    album: "Neon Paradise",
+    year: 2023,
+    color: "hot-pink",
+  },
+  {
+    id: "wilderness",
+    artist: "Mountain Echo",
+    album: "Wilderness",
+    year: 2018,
+    color: "forest-green",
+  },
+  {
+    id: "starlight-sonata",
+    artist: "Celestial Orchestra",
+    album: "Starlight Sonata",
+    year: 2023,
+    color: "transparent-purple",
+  },
+  {
+    id: "urban-jungle",
+    artist: "City Beats",
+    album: "Urban Jungle",
+    year: 2022,
+    color: "classic-black",
+  },
+  {
+    id: "aurora-dreams",
+    artist: "Northern Lights",
+    album: "Aurora Dreams",
+    year: 2024,
+    color: "ocean-blue-marble",
+  },
+  {
+    id: "retro-wave",
+    artist: "80s Revival",
+    album: "Retro Wave",
+    year: 2021,
+    color: "hot-pink",
   },
 ];
 
