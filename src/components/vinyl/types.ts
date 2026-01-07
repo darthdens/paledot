@@ -2,22 +2,21 @@ export type RPMSpeed = 33 | 45 | 78;
 
 export type VinylColor =
   | "classic-black"
-  | "transparent-purple"
-  | "ocean-blue-marble"
-  | "gold-orange-swirl"
-  | "hot-pink"
-  | "forest-green"
-  | "blood-red"
-  | "sunset-gradient"
-  | "ice-white"
-  | "amber-honey"
-  | "midnight-blue"
-  | "coral-peach";
+  | "neon-pink"
+  | "chrome-silver"
+  | "midnight-purple"
+  | "sunset-orange"
+  | "electric-cyan"
+  | "deep-magenta"
+  | "golden-bronze"
+  | "noir-smoke"
+  | "rose-gold";
 
 export interface VinylRecord {
   id: string;
   artist: string;
   album: string;
+  trackName: string;
   year: number;
   color: VinylColor;
   labelImage?: string;
