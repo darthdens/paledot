@@ -180,7 +180,7 @@ const LampExperiment = () => {
   useEffect(() => {
     document.title =
       language === "fr"
-        ? "Vitrine Interactive de Lampes | By Dens"
+        ? "Vitrine Interactive de Lampes | Par Dens"
         : "Interactive Lamp Showcase | By Dens";
   }, [language]);
 
