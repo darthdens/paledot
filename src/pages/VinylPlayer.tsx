@@ -169,6 +169,18 @@ const VinylPlayer = () => {
     }
   };
 
+  // Handle tonearm position change (from dragging or clicking tonearm)
+  const handleTonearmPositionChange = (newPosition: "rest" | "playing") => {
+    if (!isPoweredOn || !selectedRecord) return;
+    
+    setTonearmPosition(newPosition);
+    if (newPosition === "playing") {
+      setIsPlaying(true);
+    } else {
+      setIsPlaying(false);
+    }
+  };
+
   // Handle power toggle
   const handlePowerToggle = () => {
     if (isPoweredOn) {
@@ -258,6 +270,7 @@ const VinylPlayer = () => {
                 speed={speed}
                 tonearmPosition={tonearmPosition}
                 isSwapping={isSwapping}
+                onTonearmPositionChange={handleTonearmPositionChange}
               />
             </div>
 
@@ -287,6 +300,7 @@ const VinylPlayer = () => {
                     speed={speed}
                     tonearmPosition={tonearmPosition}
                     isSwapping={isSwapping}
+                    onTonearmPositionChange={handleTonearmPositionChange}
                   />
                 </div>
               </div>

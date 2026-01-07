@@ -9,6 +9,7 @@ interface TurntableProps {
   speed: RPMSpeed;
   tonearmPosition: "rest" | "playing";
   isSwapping: boolean;
+  onTonearmPositionChange?: (position: "rest" | "playing") => void;
 }
 
 export const Turntable = ({
@@ -18,6 +19,7 @@ export const Turntable = ({
   speed,
   tonearmPosition,
   isSwapping,
+  onTonearmPositionChange,
 }: TurntableProps) => {
   // Calculate rotation duration based on RPM
   const getRotationDuration = () => {
@@ -67,7 +69,7 @@ export const Turntable = ({
         </div>
 
         {/* Tonearm */}
-        <Tonearm position={tonearmPosition} isPoweredOn={isPoweredOn} />
+        <Tonearm position={tonearmPosition} isPoweredOn={isPoweredOn} onPositionChange={onTonearmPositionChange} />
       </div>
     </div>
   );

@@ -1,15 +1,99 @@
+import { useRef, useState, useEffect, useCallback } from "react";
+
 interface TonearmProps {
   position: "rest" | "playing";
   isPoweredOn: boolean;
+  onPositionChange?: (position: "rest" | "playing") => void;
 }
 
-export const Tonearm = ({ position, isPoweredOn }: TonearmProps) => {
-  const rotation = position === "playing" ? -25 : 5;
+export const Tonearm = ({ position, isPoweredOn, onPositionChange }: TonearmProps) => {
+  const armRef = useRef<HTMLDivElement>(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragRotation, setDragRotation] = useState<number | null>(null);
+  const startAngleRef = useRef(0);
+  const startRotationRef = useRef(0);
+
+  // Target rotations: rest = 5deg, playing = -25deg
+  const REST_ROTATION = 5;
+  const PLAYING_ROTATION = -25;
+  const THRESHOLD = -10; // If rotation < -10, consider it "playing"
+
+  const currentRotation = isDragging && dragRotation !== null 
+    ? dragRotation 
+    : (position === "playing" ? PLAYING_ROTATION : REST_ROTATION);
+
+  const getAngleFromCenter = useCallback((clientX: number, clientY: number) => {
+    if (!armRef.current) return 0;
+    const rect = armRef.current.getBoundingClientRect();
+    // Pivot is at top-right
+    const pivotX = rect.right;
+    const pivotY = rect.top;
+    const angle = Math.atan2(clientY - pivotY, clientX - pivotX) * (180 / Math.PI);
+    return angle;
+  }, []);
+
+  const handlePointerDown = useCallback((e: React.PointerEvent) => {
+    if (!isPoweredOn) return;
+    e.preventDefault();
+    e.stopPropagation();
+    
+    setIsDragging(true);
+    startAngleRef.current = getAngleFromCenter(e.clientX, e.clientY);
+    startRotationRef.current = position === "playing" ? PLAYING_ROTATION : REST_ROTATION;
+    setDragRotation(startRotationRef.current);
+    
+    (e.target as HTMLElement).setPointerCapture(e.pointerId);
+  }, [isPoweredOn, position, getAngleFromCenter]);
+
+  const handlePointerMove = useCallback((e: React.PointerEvent) => {
+    if (!isDragging) return;
+    
+    const currentAngle = getAngleFromCenter(e.clientX, e.clientY);
+    const angleDelta = currentAngle - startAngleRef.current;
+    let newRotation = startRotationRef.current + angleDelta;
+    
+    // Clamp rotation between playing and rest positions
+    newRotation = Math.max(PLAYING_ROTATION - 5, Math.min(REST_ROTATION + 5, newRotation));
+    setDragRotation(newRotation);
+  }, [isDragging, getAngleFromCenter]);
+
+  const handlePointerUp = useCallback((e: React.PointerEvent) => {
+    if (!isDragging) return;
+    
+    (e.target as HTMLElement).releasePointerCapture(e.pointerId);
+    setIsDragging(false);
+    
+    // Determine final position based on drag rotation
+    if (dragRotation !== null && onPositionChange) {
+      const newPosition = dragRotation < THRESHOLD ? "playing" : "rest";
+      onPositionChange(newPosition);
+    }
+    setDragRotation(null);
+  }, [isDragging, dragRotation, onPositionChange]);
+
+  const handleClick = useCallback((e: React.MouseEvent) => {
+    // Only handle click if not dragging (drag didn't move much)
+    if (!isPoweredOn || !onPositionChange) return;
+    
+    // Toggle position
+    const newPosition = position === "playing" ? "rest" : "playing";
+    onPositionChange(newPosition);
+  }, [isPoweredOn, position, onPositionChange]);
 
   return (
     <div
-      className="absolute top-4 right-4 origin-top-right transition-transform duration-700 ease-in-out"
-      style={{ transform: `rotate(${rotation}deg)` }}
+      ref={armRef}
+      className={`absolute top-4 right-4 origin-top-right select-none ${
+        isDragging ? "" : "transition-transform duration-700 ease-in-out"
+      } ${isPoweredOn ? "cursor-grab" : "cursor-not-allowed opacity-50"} ${
+        isDragging ? "cursor-grabbing" : ""
+      }`}
+      style={{ transform: `rotate(${currentRotation}deg)` }}
+      onPointerDown={handlePointerDown}
+      onPointerMove={handlePointerMove}
+      onPointerUp={handlePointerUp}
+      onPointerCancel={handlePointerUp}
+      onClick={!isDragging ? handleClick : undefined}
     >
       {/* Tonearm base/pivot */}
       <div className="relative">
