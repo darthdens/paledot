@@ -358,8 +358,14 @@ const VinylPlayer = () => {
                 onScrub={handleScrub}
                 progress={progress}
               />
-              {/* Time Display */}
-              <div className="mt-4 text-center">
+              {/* Time & Track Info Display */}
+              <div className="mt-4 text-center space-y-1">
+                <p className="text-sm font-medium text-foreground truncate">
+                  {selectedRecord?.trackName || selectedRecord?.album}
+                </p>
+                <p className="text-xs text-muted-foreground truncate">
+                  {selectedRecord?.artist}
+                </p>
                 <span className="text-sm font-mono text-muted-foreground">
                   {formatTime(currentTime)} / {formatTime(duration)}
                 </span>
@@ -398,8 +404,14 @@ const VinylPlayer = () => {
                   />
                 </div>
               </div>
-              {/* Time Display */}
-              <div className="mt-4 text-center">
+              {/* Time & Track Info Display */}
+              <div className="mt-4 text-center space-y-1">
+                <p className="text-sm font-medium text-foreground truncate">
+                  {selectedRecord?.trackName || selectedRecord?.album}
+                </p>
+                <p className="text-xs text-muted-foreground truncate">
+                  {selectedRecord?.artist}
+                </p>
                 <span className="text-sm font-mono text-muted-foreground">
                   {formatTime(currentTime)} / {formatTime(duration)}
                 </span>
