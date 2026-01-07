@@ -7,33 +7,29 @@ interface RecordCollectionProps {
   onSelectRecord: (record: VinylRecord) => void;
 }
 
-// Mini vinyl preview colors
+// Mini vinyl preview colors - Drive/Retrowave inspired
 const getVinylPreviewColor = (color: VinylRecord["color"]): string => {
   switch (color) {
     case "classic-black":
       return "bg-gradient-to-br from-neutral-800 to-neutral-900";
-    case "transparent-purple":
-      return "bg-gradient-to-br from-purple-600/80 to-purple-900/80";
-    case "ocean-blue-marble":
-      return "bg-gradient-to-br from-cyan-500 to-blue-700";
-    case "gold-orange-swirl":
-      return "bg-gradient-to-br from-amber-400 to-orange-600";
-    case "hot-pink":
+    case "neon-pink":
       return "bg-gradient-to-br from-pink-500 to-pink-700";
-    case "forest-green":
-      return "bg-gradient-to-br from-emerald-600/80 to-green-800/80";
-    case "blood-red":
-      return "bg-gradient-to-br from-red-700 to-red-900";
-    case "sunset-gradient":
-      return "bg-gradient-to-br from-pink-500 via-orange-500 to-yellow-400";
-    case "ice-white":
-      return "bg-gradient-to-br from-slate-100 to-slate-300";
-    case "amber-honey":
-      return "bg-gradient-to-br from-amber-500 to-amber-700";
-    case "midnight-blue":
-      return "bg-gradient-to-br from-indigo-800 to-indigo-950";
-    case "coral-peach":
-      return "bg-gradient-to-br from-orange-300 to-rose-400";
+    case "chrome-silver":
+      return "bg-gradient-to-br from-slate-300 to-slate-500";
+    case "midnight-purple":
+      return "bg-gradient-to-br from-purple-800 to-purple-950";
+    case "sunset-orange":
+      return "bg-gradient-to-br from-orange-500 to-orange-700";
+    case "electric-cyan":
+      return "bg-gradient-to-br from-cyan-400 to-cyan-600";
+    case "deep-magenta":
+      return "bg-gradient-to-br from-fuchsia-600 to-fuchsia-800";
+    case "golden-bronze":
+      return "bg-gradient-to-br from-amber-600 to-amber-800";
+    case "noir-smoke":
+      return "bg-gradient-to-br from-slate-800 to-slate-950";
+    case "rose-gold":
+      return "bg-gradient-to-br from-rose-400 to-rose-600";
     default:
       return "bg-gradient-to-br from-neutral-800 to-neutral-900";
   }
@@ -78,10 +74,10 @@ export const RecordCollection = ({
                 </div>
               </div>
 
-              {/* Album info */}
+              {/* Track info */}
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium text-foreground truncate">
-                  {record.album}
+                  {record.trackName || record.album}
                 </p>
                 <p className="text-xs text-muted-foreground truncate">
                   {record.artist} · {record.year}
