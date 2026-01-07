@@ -228,7 +228,10 @@ const VinylPlayer = () => {
           {/* Desktop Layout - Grid with 3 columns */}
           <div className="hidden lg:grid lg:grid-cols-[280px_1fr_280px] xl:grid-cols-[320px_1fr_320px] gap-8 items-start">
             {/* Controls - Left side */}
-            <div style={{ height: turntableHeight > 0 ? `${turntableHeight}px` : undefined }}>
+            <div
+              className="relative z-30"
+              style={{ height: turntableHeight > 0 ? `${turntableHeight}px` : undefined }}
+            >
               <VinylControls
                 isPlaying={isPlaying}
                 isPoweredOn={isPoweredOn}
@@ -244,7 +247,10 @@ const VinylPlayer = () => {
             </div>
 
             {/* Main Turntable - Center */}
-            <div ref={turntableRef} className="w-full max-w-xl mx-auto aspect-square justify-self-center">
+            <div
+              ref={turntableRef}
+              className="relative z-20 w-full max-w-xl mx-auto aspect-square justify-self-center"
+            >
               <Turntable
                 record={selectedRecord}
                 isPlaying={isPlaying && isPoweredOn}
@@ -256,7 +262,10 @@ const VinylPlayer = () => {
             </div>
 
             {/* Record Collection - Right side */}
-            <div style={{ height: turntableHeight > 0 ? `${turntableHeight}px` : undefined }}>
+            <div
+              className="relative z-10"
+              style={{ height: turntableHeight > 0 ? `${turntableHeight}px` : undefined }}
+            >
               <RecordCollection
                 records={vinylCollection}
                 selectedRecord={selectedRecord}
