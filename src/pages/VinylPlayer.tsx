@@ -137,6 +137,13 @@ const vinylCollection: VinylRecord[] = [
     labelImage: albumSynthwaveSoundscape,
   },
 ];
+// Format seconds to mm:ss
+const formatTime = (seconds: number): string => {
+  if (!seconds || isNaN(seconds)) return "0:00";
+  const mins = Math.floor(seconds / 60);
+  const secs = Math.floor(seconds % 60);
+  return `${mins}:${secs.toString().padStart(2, "0")}`;
+};
 
 const VinylPlayer = () => {
   const { language, t } = useLanguage();
@@ -149,6 +156,8 @@ const VinylPlayer = () => {
   const [isSwapping, setIsSwapping] = useState(false);
   const [turntableHeight, setTurntableHeight] = useState<number>(0);
   const [progress, setProgress] = useState(0); // 0-1 playback progress
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0);
   const turntableRef = useRef<HTMLDivElement>(null);
 
   // Vinyl crackle and music audio
@@ -158,33 +167,39 @@ const VinylPlayer = () => {
     trackUrl: selectedRecord?.trackUrl,
   });
 
-  // Update progress periodically while playing
+  // Update progress and time periodically while playing
   useEffect(() => {
     if (!isPlaying || !isPoweredOn) return;
     
     const interval = setInterval(() => {
-      const { currentTime, duration } = getPlaybackInfo();
-      if (duration > 0) {
-        setProgress(currentTime / duration);
+      const info = getPlaybackInfo();
+      if (info.duration > 0) {
+        setProgress(info.currentTime / info.duration);
+        setCurrentTime(info.currentTime);
+        setDuration(info.duration);
       }
     }, 100);
     
     return () => clearInterval(interval);
   }, [isPlaying, isPoweredOn, getPlaybackInfo]);
 
-  // Reset progress when track changes
+  // Reset progress and time when track changes
   useEffect(() => {
     setProgress(0);
+    setCurrentTime(0);
+    setDuration(0);
   }, [selectedRecord?.id]);
 
   // Handle disc scrubbing (rotate vinyl to seek + scratch sound)
   const handleScrub = (deltaSeconds: number) => {
     seekBy(deltaSeconds);
     playScratchSound(deltaSeconds);
-    // Update progress immediately after scrub
-    const { currentTime, duration } = getPlaybackInfo();
-    if (duration > 0) {
-      setProgress(currentTime / duration);
+    // Update progress and time immediately after scrub
+    const info = getPlaybackInfo();
+    if (info.duration > 0) {
+      setProgress(info.currentTime / info.duration);
+      setCurrentTime(info.currentTime);
+      setDuration(info.duration);
     }
   };
 
@@ -331,6 +346,12 @@ const VinylPlayer = () => {
                 onScrub={handleScrub}
                 progress={progress}
               />
+              {/* Time Display */}
+              <div className="mt-4 text-center">
+                <span className="text-sm font-mono text-muted-foreground">
+                  {formatTime(currentTime)} / {formatTime(duration)}
+                </span>
+              </div>
             </div>
 
             {/* Record Collection - Right side */}
@@ -364,6 +385,12 @@ const VinylPlayer = () => {
                     progress={progress}
                   />
                 </div>
+              </div>
+              {/* Time Display */}
+              <div className="mt-4 text-center">
+                <span className="text-sm font-mono text-muted-foreground">
+                  {formatTime(currentTime)} / {formatTime(duration)}
+                </span>
               </div>
             </div>
             
