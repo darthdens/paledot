@@ -1,5 +1,5 @@
 import { VinylRecord } from "./types";
-import { getVinylGradient } from "./vinylGradients";
+import { getVinylGradient, getVinylGlow } from "./vinylGradients";
 import { useMemo, useEffect, useRef, useCallback } from "react";
 
 interface VinylDiscProps {
@@ -65,6 +65,11 @@ export const VinylDisc = ({
   
   const vinylGradient = useMemo(
     () => (record ? getVinylGradient(record.color) : getVinylGradient("classic-black")),
+    [record]
+  );
+
+  const vinylGlow = useMemo(
+    () => (record ? getVinylGlow(record.color) : getVinylGlow("classic-black")),
     [record]
   );
 
@@ -189,8 +194,11 @@ export const VinylDisc = ({
       >
       {/* Vinyl base */}
       <div
-        className="absolute inset-0 rounded-full shadow-lg pointer-events-none"
-        style={{ background: vinylGradient }}
+        className="absolute inset-0 rounded-full pointer-events-none transition-shadow duration-500"
+        style={{ 
+          background: vinylGradient,
+          boxShadow: vinylGlow,
+        }}
       >
         {/* Grooves effect */}
         <div className="absolute inset-0 rounded-full overflow-hidden">

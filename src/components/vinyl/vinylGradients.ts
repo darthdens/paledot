@@ -37,3 +37,31 @@ export const getVinylGradient = (color: VinylColor): string => {
       return "linear-gradient(135deg, hsl(0 0% 10%) 0%, hsl(0 0% 18%) 50%, hsl(0 0% 10%) 100%)";
   }
 };
+
+// Glow color for vinyl disc (matching the vinyl color)
+export const getVinylGlow = (color: VinylColor): string => {
+  switch (color) {
+    case "classic-black":
+      return "0 0 40px hsl(270 50% 20% / 0.5), 0 0 80px hsl(280 40% 15% / 0.3)";
+    case "noir-smoke":
+      return "0 0 40px hsl(200 50% 25% / 0.5), 0 0 80px hsl(195 45% 20% / 0.3)";
+    case "chrome-silver":
+      return "0 0 40px hsl(220 20% 70% / 0.4), 0 0 80px hsl(330 20% 60% / 0.2)";
+    case "midnight-purple":
+      return "0 0 40px hsl(320 70% 50% / 0.5), 0 0 80px hsl(300 60% 40% / 0.3)";
+    case "deep-magenta":
+      return "0 0 40px hsl(350 60% 40% / 0.5), 0 0 80px hsl(345 55% 30% / 0.3)";
+    case "neon-pink":
+      return "0 0 40px hsl(340 75% 55% / 0.5), 0 0 80px hsl(330 65% 45% / 0.3)";
+    case "electric-cyan":
+      return "0 0 40px hsl(195 80% 50% / 0.5), 0 0 80px hsl(210 70% 40% / 0.3)";
+    case "sunset-orange":
+      return "0 0 40px hsl(25 75% 55% / 0.5), 0 0 80px hsl(15 70% 45% / 0.3)";
+    case "golden-bronze":
+      return "0 0 40px hsl(40 80% 55% / 0.5), 0 0 80px hsl(35 70% 45% / 0.3)";
+    case "rose-gold":
+      return "0 0 40px hsl(355 55% 60% / 0.5), 0 0 80px hsl(345 50% 50% / 0.3)";
+    default:
+      return "0 0 40px hsl(0 0% 20% / 0.3)";
+  }
+};
