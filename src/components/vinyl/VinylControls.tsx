@@ -111,7 +111,7 @@ export const VinylControls = ({
   }
 
   return (
-    <div className="mt-6 p-4 bg-card/50 backdrop-blur-sm rounded-xl border border-border/50">
+    <div className="mt-6 p-4 bg-card/50 backdrop-blur-sm rounded-xl border border-border/50 space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-4">
         {/* Power Button */}
         <Button
@@ -159,19 +159,19 @@ export const VinylControls = ({
           </div>
           <span className="text-xs text-muted-foreground">RPM</span>
         </div>
+      </div>
 
-        {/* Volume Knob */}
-        <div className="flex items-center gap-3 min-w-[120px]">
-          <span className="text-xs text-muted-foreground">{t.vinylPlayer.volume}</span>
-          <Slider
-            value={[volume]}
-            onValueChange={([v]) => onVolumeChange(v)}
-            max={100}
-            step={1}
-            disabled={!isPoweredOn}
-            className="w-20"
-          />
-        </div>
+      {/* Volume - Full Width */}
+      <div className="flex items-center gap-3 w-full">
+        <span className="text-xs text-muted-foreground flex-shrink-0">{t.vinylPlayer.volume}</span>
+        <Slider
+          value={[volume]}
+          onValueChange={([v]) => onVolumeChange(v)}
+          max={100}
+          step={1}
+          disabled={!isPoweredOn}
+          className="flex-1"
+        />
       </div>
     </div>
   );
