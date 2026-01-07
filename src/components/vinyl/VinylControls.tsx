@@ -101,6 +101,7 @@ export const VinylControls = ({
               step={1}
               disabled={!isPoweredOn}
               orientation="vertical"
+              inverted
               className="h-full rotate-180"
             />
           </div>
