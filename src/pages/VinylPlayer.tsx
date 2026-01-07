@@ -277,15 +277,19 @@ const VinylPlayer = () => {
           {/* Mobile/Tablet Layout */}
           <div className="lg:hidden flex flex-col gap-8">
             {/* Main Turntable */}
-            <div className="w-full max-w-xl mx-auto aspect-square">
-              <Turntable
-                record={selectedRecord}
-                isPlaying={isPlaying && isPoweredOn}
-                isPoweredOn={isPoweredOn}
-                speed={speed}
-                tonearmPosition={tonearmPosition}
-                isSwapping={isSwapping}
-              />
+            <div className="w-full max-w-md sm:max-w-lg mx-auto">
+              <div className="relative w-full" style={{ paddingBottom: '100%' }}>
+                <div className="absolute inset-0">
+                  <Turntable
+                    record={selectedRecord}
+                    isPlaying={isPlaying && isPoweredOn}
+                    isPoweredOn={isPoweredOn}
+                    speed={speed}
+                    tonearmPosition={tonearmPosition}
+                    isSwapping={isSwapping}
+                  />
+                </div>
+              </div>
             </div>
             
             {/* Controls */}
