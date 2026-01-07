@@ -6,6 +6,7 @@ import { Starfield } from "@/components/Starfield";
 import { Turntable } from "@/components/vinyl/Turntable";
 import { RecordCollection } from "@/components/vinyl/RecordCollection";
 import { VinylControls } from "@/components/vinyl/VinylControls";
+import { useVinylAudio } from "@/hooks/use-vinyl-audio";
 import type { VinylRecord, RPMSpeed } from "@/components/vinyl/types";
 
 // Sample vinyl collection
@@ -135,7 +136,12 @@ const VinylPlayer = () => {
   const [isSwapping, setIsSwapping] = useState(false);
   const [turntableHeight, setTurntableHeight] = useState<number>(0);
   const turntableRef = useRef<HTMLDivElement>(null);
-  const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  // Vinyl crackle audio
+  const { initAudio } = useVinylAudio({ 
+    isPlaying: isPlaying && isPoweredOn, 
+    volume 
+  });
 
   // Sync turntable height for side panels
   useEffect(() => {
@@ -160,6 +166,9 @@ const VinylPlayer = () => {
   const handlePlayPause = () => {
     if (!isPoweredOn || !selectedRecord) return;
     
+    // Initialize audio on first interaction
+    initAudio();
+    
     if (isPlaying) {
       setTonearmPosition("rest");
       setTimeout(() => setIsPlaying(false), 500);
@@ -172,6 +181,9 @@ const VinylPlayer = () => {
   // Handle tonearm position change (from dragging or clicking tonearm)
   const handleTonearmPositionChange = (newPosition: "rest" | "playing") => {
     if (!isPoweredOn || !selectedRecord) return;
+    
+    // Initialize audio on first interaction
+    initAudio();
     
     setTonearmPosition(newPosition);
     if (newPosition === "playing") {
@@ -208,12 +220,6 @@ const VinylPlayer = () => {
     }, 300);
   };
 
-  // Vinyl crackle audio (optional ambient sound)
-  useEffect(() => {
-    if (isPlaying && isPoweredOn) {
-      // Could add ambient vinyl crackle here
-    }
-  }, [isPlaying, isPoweredOn]);
 
   return (
     <div className="min-h-screen bg-background text-foreground relative flex flex-col">
