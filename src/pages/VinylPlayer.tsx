@@ -9,6 +9,18 @@ import { VinylControls } from "@/components/vinyl/VinylControls";
 import { useVinylAudio } from "@/hooks/use-vinyl-audio";
 import type { VinylRecord, RPMSpeed } from "@/components/vinyl/types";
 
+// Album artwork imports
+import album80sRetro from "@/assets/albums/80s-retro-synthwave.png";
+import albumCatchSynth from "@/assets/albums/catch-the-synth.png";
+import albumCyberpunk from "@/assets/albums/cyberpunk-guitar.png";
+import albumDarkMatter from "@/assets/albums/dark-matter-canon.png";
+import albumDigitalSunrise from "@/assets/albums/digital-sunrise.png";
+import albumRetroSynthPop from "@/assets/albums/retro-synth-pop.png";
+import albumStrangerThings from "@/assets/albums/stranger-things.png";
+import albumSynthWaveLife from "@/assets/albums/synth-wave-life.png";
+import albumSynthwaveRetro from "@/assets/albums/synthwave-retro-80s.png";
+import albumSynthwaveSoundscape from "@/assets/albums/synthwave-soundscape.png";
+
 // Royalty-free synthwave tracks (bundled locally for reliable playback)
 const RETRO_TRACKS = {
   retro80s: "/audio/80s-retro-synthwave.mp3",
@@ -32,6 +44,7 @@ const vinylCollection: VinylRecord[] = [
     year: 2023,
     color: "midnight-purple",
     trackUrl: RETRO_TRACKS.retro80s,
+    labelImage: album80sRetro,
   },
   {
     id: "catch-the-synth",
@@ -41,6 +54,7 @@ const vinylCollection: VinylRecord[] = [
     year: 2022,
     color: "electric-cyan",
     trackUrl: RETRO_TRACKS.catchSynth,
+    labelImage: albumCatchSynth,
   },
   {
     id: "cyberpunk-guitar",
@@ -50,6 +64,7 @@ const vinylCollection: VinylRecord[] = [
     year: 2024,
     color: "neon-pink",
     trackUrl: RETRO_TRACKS.cyberpunkGuitar,
+    labelImage: albumCyberpunk,
   },
   {
     id: "dark-matter-canon",
@@ -59,6 +74,7 @@ const vinylCollection: VinylRecord[] = [
     year: 2024,
     color: "classic-black",
     trackUrl: RETRO_TRACKS.darkMatter,
+    labelImage: albumDarkMatter,
   },
   {
     id: "digital-sunrise",
@@ -68,6 +84,7 @@ const vinylCollection: VinylRecord[] = [
     year: 2023,
     color: "sunset-orange",
     trackUrl: RETRO_TRACKS.digitalSunrise,
+    labelImage: albumDigitalSunrise,
   },
   {
     id: "retro-synth-pop",
@@ -77,6 +94,7 @@ const vinylCollection: VinylRecord[] = [
     year: 2024,
     color: "rose-gold",
     trackUrl: RETRO_TRACKS.retroSynthPop,
+    labelImage: albumRetroSynthPop,
   },
   {
     id: "stranger-things",
@@ -86,6 +104,7 @@ const vinylCollection: VinylRecord[] = [
     year: 2022,
     color: "deep-magenta",
     trackUrl: RETRO_TRACKS.strangerThings,
+    labelImage: albumStrangerThings,
   },
   {
     id: "synth-wave-life",
@@ -95,6 +114,7 @@ const vinylCollection: VinylRecord[] = [
     year: 2022,
     color: "golden-bronze",
     trackUrl: RETRO_TRACKS.synthWaveLife,
+    labelImage: albumSynthWaveLife,
   },
   {
     id: "synthwave-retro-80s",
@@ -104,6 +124,7 @@ const vinylCollection: VinylRecord[] = [
     year: 2024,
     color: "chrome-silver",
     trackUrl: RETRO_TRACKS.synthwaveRetro,
+    labelImage: albumSynthwaveRetro,
   },
   {
     id: "synthwave-soundscape",
@@ -113,6 +134,7 @@ const vinylCollection: VinylRecord[] = [
     year: 2024,
     color: "noir-smoke",
     trackUrl: RETRO_TRACKS.synthwaveSoundscape,
+    labelImage: albumSynthwaveSoundscape,
   },
 ];
 
