@@ -23,15 +23,12 @@ const Slider = React.forwardRef<
       orientation={orientation}
       {...props}
       onPointerDown={(e) => {
-        // Prevent global listeners (e.g. custom cursor) from interfering with drag
-        e.stopPropagation();
         onPointerDown?.(e);
       }}
       onPointerMove={(e) => {
         onPointerMove?.(e);
       }}
       onPointerUp={(e) => {
-        e.stopPropagation();
         onPointerUp?.(e);
       }}
       className={cn(
