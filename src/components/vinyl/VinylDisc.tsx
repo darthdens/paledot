@@ -8,7 +8,47 @@ interface VinylDiscProps {
   rotationDuration: string;
   isSwapping: boolean;
   onScrub?: (deltaSeconds: number) => void;
+  progress?: number; // 0-1 playback progress
 }
+
+// Progress arc component
+const ProgressArc = ({ progress }: { progress: number }) => {
+  const radius = 46; // percentage of container
+  const strokeWidth = 2;
+  const circumference = 2 * Math.PI * radius;
+  const strokeDashoffset = circumference * (1 - progress);
+  
+  return (
+    <svg
+      className="absolute inset-0 w-full h-full pointer-events-none"
+      viewBox="0 0 100 100"
+      style={{ transform: "rotate(-90deg)" }}
+    >
+      {/* Background track */}
+      <circle
+        cx="50"
+        cy="50"
+        r={radius}
+        fill="none"
+        stroke="hsl(var(--foreground) / 0.1)"
+        strokeWidth={strokeWidth}
+      />
+      {/* Progress arc */}
+      <circle
+        cx="50"
+        cy="50"
+        r={radius}
+        fill="none"
+        stroke="hsl(var(--primary) / 0.8)"
+        strokeWidth={strokeWidth}
+        strokeLinecap="round"
+        strokeDasharray={circumference}
+        strokeDashoffset={strokeDashoffset}
+        className="transition-[stroke-dashoffset] duration-100"
+      />
+    </svg>
+  );
+};
 
 export const VinylDisc = ({
   record,
@@ -16,6 +56,7 @@ export const VinylDisc = ({
   rotationDuration,
   isSwapping,
   onScrub,
+  progress = 0,
 }: VinylDiscProps) => {
   const discRef = useRef<HTMLDivElement>(null);
   const isDraggingRef = useRef(false);
@@ -173,6 +214,9 @@ export const VinylDisc = ({
           }}
         />
       </div>
+
+      {/* Progress arc */}
+      <ProgressArc progress={progress} />
 
       {/* Center label */}
       <div className="absolute inset-[28%] rounded-full bg-card border border-border/50 flex items-center justify-center shadow-inner pointer-events-none">

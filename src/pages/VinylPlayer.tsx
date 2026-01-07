@@ -126,19 +126,44 @@ const VinylPlayer = () => {
   const [tonearmPosition, setTonearmPosition] = useState<"rest" | "playing">("rest");
   const [isSwapping, setIsSwapping] = useState(false);
   const [turntableHeight, setTurntableHeight] = useState<number>(0);
+  const [progress, setProgress] = useState(0); // 0-1 playback progress
   const turntableRef = useRef<HTMLDivElement>(null);
 
   // Vinyl crackle and music audio
-  const { initAudio, playMusicNow, stopMusicNow, seekBy, playScratchSound } = useVinylAudio({ 
+  const { initAudio, playMusicNow, stopMusicNow, seekBy, playScratchSound, getPlaybackInfo } = useVinylAudio({ 
     isPlaying: isPlaying && isPoweredOn, 
     volume,
     trackUrl: selectedRecord?.trackUrl,
   });
 
+  // Update progress periodically while playing
+  useEffect(() => {
+    if (!isPlaying || !isPoweredOn) return;
+    
+    const interval = setInterval(() => {
+      const { currentTime, duration } = getPlaybackInfo();
+      if (duration > 0) {
+        setProgress(currentTime / duration);
+      }
+    }, 100);
+    
+    return () => clearInterval(interval);
+  }, [isPlaying, isPoweredOn, getPlaybackInfo]);
+
+  // Reset progress when track changes
+  useEffect(() => {
+    setProgress(0);
+  }, [selectedRecord?.id]);
+
   // Handle disc scrubbing (rotate vinyl to seek + scratch sound)
   const handleScrub = (deltaSeconds: number) => {
     seekBy(deltaSeconds);
     playScratchSound(deltaSeconds);
+    // Update progress immediately after scrub
+    const { currentTime, duration } = getPlaybackInfo();
+    if (duration > 0) {
+      setProgress(currentTime / duration);
+    }
   };
 
   // Sync turntable height for side panels
@@ -282,6 +307,7 @@ const VinylPlayer = () => {
                 isSwapping={isSwapping}
                 onTonearmPositionChange={handleTonearmPositionChange}
                 onScrub={handleScrub}
+                progress={progress}
               />
             </div>
 
@@ -313,6 +339,7 @@ const VinylPlayer = () => {
                     isSwapping={isSwapping}
                     onTonearmPositionChange={handleTonearmPositionChange}
                     onScrub={handleScrub}
+                    progress={progress}
                   />
                 </div>
               </div>
