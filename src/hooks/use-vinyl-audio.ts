@@ -10,6 +10,7 @@ export const useVinylAudio = ({ isPlaying, volume, trackUrl }: VinylAudioOptions
   const audioContextRef = useRef<AudioContext | null>(null);
   const crackleIntervalRef = useRef<number | null>(null);
   const crackleGainRef = useRef<GainNode | null>(null);
+  const crackleFadeTimeoutRef = useRef<number | null>(null);
   const audioElementRef = useRef<HTMLAudioElement | null>(null);
   const isInitializedRef = useRef(false);
 
@@ -91,8 +92,24 @@ export const useVinylAudio = ({ isPlaying, volume, trackUrl }: VinylAudioOptions
     source.start();
   }, []);
 
+  const stopCrackle = useCallback(() => {
+    if (crackleIntervalRef.current) {
+      clearTimeout(crackleIntervalRef.current);
+      crackleIntervalRef.current = null;
+    }
+    if (crackleFadeTimeoutRef.current) {
+      clearTimeout(crackleFadeTimeoutRef.current);
+      crackleFadeTimeoutRef.current = null;
+    }
+  }, []);
+
   const startCrackle = useCallback(() => {
     if (crackleIntervalRef.current) return;
+
+    // Reset gain to full when starting
+    if (crackleGainRef.current) {
+      crackleGainRef.current.gain.value = 0.06;
+    }
 
     const scheduleCrackle = () => {
       // Much longer intervals for subtle ambient feel (200-600ms)
@@ -113,14 +130,15 @@ export const useVinylAudio = ({ isPlaying, volume, trackUrl }: VinylAudioOptions
     };
 
     scheduleCrackle();
-  }, [playSoftCrackle, playSoftPop]);
 
-  const stopCrackle = useCallback(() => {
-    if (crackleIntervalRef.current) {
-      clearTimeout(crackleIntervalRef.current);
-      crackleIntervalRef.current = null;
+    // Fade out crackle after 3 seconds
+    if (crackleFadeTimeoutRef.current) {
+      clearTimeout(crackleFadeTimeoutRef.current);
     }
-  }, []);
+    crackleFadeTimeoutRef.current = window.setTimeout(() => {
+      stopCrackle();
+    }, 3000);
+  }, [playSoftCrackle, playSoftPop, stopCrackle]);
 
   // Music playback (exposed so VinylPlayer can call it inside a user gesture)
   const playMusicNow = useCallback(() => {
