@@ -9,109 +9,110 @@ import { VinylControls } from "@/components/vinyl/VinylControls";
 import { useVinylAudio } from "@/hooks/use-vinyl-audio";
 import type { VinylRecord, RPMSpeed } from "@/components/vinyl/types";
 
-// Verified working audio URLs from Archive.org (public domain)
+// CC0 / Public Domain synthwave tracks (bundled locally for reliable playback)
 const RETRO_TRACKS = {
-  track1: "https://ia800806.us.archive.org/15/items/Mp3Playlist_555/AaronNeville-CrazyLove.mp3",
-  track2: "https://ia800605.us.archive.org/32/items/Mp3Playlist_555/Daughtry-Homeacoustic.mp3",
-  track3: "https://ia800605.us.archive.org/32/items/Mp3Playlist_555/JessieJ-PriceTag.mp3",
-  track4: "https://ia800605.us.archive.org/32/items/Mp3Playlist_555/ColdPlay-ParadiseInstrumental.mp3",
-  track5: "https://ia800605.us.archive.org/32/items/Mp3Playlist_555/Rihanna-Diamonds.mp3",
-  track6: "https://ia800605.us.archive.org/32/items/Mp3Playlist_555/PinkFloyd-HighHopes.mp3",
-  track7: "https://ia800806.us.archive.org/15/items/Mp3Playlist_555/Evanescence-MyImmortal.mp3",
-  track8: "https://ia800806.us.archive.org/15/items/Mp3Playlist_555/LinkinPark-InTheEnd.mp3",
+  purpleNight: "/audio/purple-night.mp3",
+  nightDrive: "/audio/night-drive.mp3",
+  outrun: "/audio/outrun.mp3",
+  neonHalo: "/audio/neon-halo.mp3",
+  theViceCity: "/audio/the-vice-city.mp3",
+  midnightCity: "/audio/midnight-city.mp3",
+  synthwaveDreams: "/audio/synthwave-dreams.mp3",
+  neonLights: "/audio/neon-lights.mp3",
+  driveNight: "/audio/drive-night.mp3",
+  cyberpunk: "/audio/cyberpunk.mp3",
 };
 
-// Drive-inspired retrowave vinyl collection (fictional artists, Drive aesthetic)
 const vinylCollection: VinylRecord[] = [
   {
-    id: "nightcall",
-    artist: "Neon Velocity",
-    album: "OutRun",
-    trackName: "Nightcall",
-    year: 2010,
-    color: "neon-pink",
-    trackUrl: RETRO_TRACKS.track1,
-  },
-  {
-    id: "a-real-hero",
-    artist: "Electric Youth",
-    album: "A Real Hero",
-    trackName: "A Real Hero",
-    year: 2011,
-    color: "chrome-silver",
-    trackUrl: RETRO_TRACKS.track2,
-  },
-  {
-    id: "turbo-killer",
-    artist: "Chrome Phantom",
-    album: "Trilogy",
-    trackName: "Turbo Killer",
-    year: 2015,
-    color: "deep-magenta",
-    trackUrl: RETRO_TRACKS.track3,
-  },
-  {
-    id: "the-driver",
-    artist: "Sunset Boulevard",
-    album: "Drive OST",
-    trackName: "The Driver",
-    year: 2011,
-    color: "golden-bronze",
-    trackUrl: RETRO_TRACKS.track4,
-  },
-  {
-    id: "tech-noir",
-    artist: "Gunship Echo",
-    album: "Neon Shadows",
-    trackName: "Tech Noir",
-    year: 2015,
+    id: "purple-night",
+    artist: "Synthwave Dreams",
+    album: "Synthwave Dreams Vol. 1",
+    trackName: "Purple Night",
+    year: 2019,
     color: "midnight-purple",
-    trackUrl: RETRO_TRACKS.track5,
+    trackUrl: RETRO_TRACKS.purpleNight,
   },
   {
-    id: "blizzard",
-    artist: "Dark Horizon",
-    album: "Dangerous Days",
-    trackName: "Blizzard",
-    year: 2014,
-    color: "electric-cyan",
-    trackUrl: RETRO_TRACKS.track6,
-  },
-  {
-    id: "sunset",
-    artist: "The Midnight Sun",
-    album: "Endless Summer",
-    trackName: "Sunset",
-    year: 2016,
-    color: "sunset-orange",
-    trackUrl: RETRO_TRACKS.track7,
-  },
-  {
-    id: "resonance",
-    artist: "Home Circuit",
-    album: "Odyssey",
-    trackName: "Resonance",
-    year: 2014,
-    color: "rose-gold",
-    trackUrl: RETRO_TRACKS.track8,
-  },
-  {
-    id: "accelerated",
-    artist: "Miami Nights",
-    album: "Turbulence",
-    trackName: "Accelerated",
-    year: 2012,
+    id: "night-drive",
+    artist: "Synthwave Dreams",
+    album: "Synthwave Dreams Vol. 1",
+    trackName: "Night Drive",
+    year: 2019,
     color: "noir-smoke",
-    trackUrl: RETRO_TRACKS.track1,
+    trackUrl: RETRO_TRACKS.nightDrive,
   },
   {
-    id: "after-dark",
-    artist: "Neon Kitty",
-    album: "Time",
-    trackName: "After Dark",
-    year: 2014,
+    id: "outrun",
+    artist: "Synthwave Dreams",
+    album: "Synthwave Dreams Vol. 1",
+    trackName: "Outrun",
+    year: 2019,
+    color: "golden-bronze",
+    trackUrl: RETRO_TRACKS.outrun,
+  },
+  {
+    id: "neon-halo",
+    artist: "Synthwave Dreams",
+    album: "Synthwave Dreams Vol. 1",
+    trackName: "Neon Halo",
+    year: 2019,
+    color: "electric-cyan",
+    trackUrl: RETRO_TRACKS.neonHalo,
+  },
+  {
+    id: "the-vice-city",
+    artist: "Synthwave Dreams",
+    album: "Synthwave Dreams Vol. 1",
+    trackName: "The Vice City",
+    year: 2019,
+    color: "chrome-silver",
+    trackUrl: RETRO_TRACKS.theViceCity,
+  },
+  {
+    id: "midnight-city",
+    artist: "Synthwave Dreams",
+    album: "Synthwave Dreams Vol. 9",
+    trackName: "Midnight City",
+    year: 2019,
     color: "classic-black",
-    trackUrl: RETRO_TRACKS.track2,
+    trackUrl: RETRO_TRACKS.midnightCity,
+  },
+  {
+    id: "synthwave-dreams",
+    artist: "Synthwave Dreams",
+    album: "Synthwave Dreams Vol. 9",
+    trackName: "Synthwave Dreams",
+    year: 2019,
+    color: "rose-gold",
+    trackUrl: RETRO_TRACKS.synthwaveDreams,
+  },
+  {
+    id: "neon-lights",
+    artist: "Synthwave Dreams",
+    album: "Synthwave Dreams Vol. 9",
+    trackName: "Neon Lights",
+    year: 2019,
+    color: "neon-pink",
+    trackUrl: RETRO_TRACKS.neonLights,
+  },
+  {
+    id: "drive-night",
+    artist: "Synthwave Dreams",
+    album: "Synthwave Dreams Vol. 9",
+    trackName: "Drive Night (Original Mix)",
+    year: 2019,
+    color: "sunset-orange",
+    trackUrl: RETRO_TRACKS.driveNight,
+  },
+  {
+    id: "cyberpunk",
+    artist: "Synthwave Dreams",
+    album: "Synthwave Dreams Vol. 9",
+    trackName: "Cyberpunk",
+    year: 2019,
+    color: "deep-magenta",
+    trackUrl: RETRO_TRACKS.cyberpunk,
   },
 ];
 
@@ -128,7 +129,7 @@ const VinylPlayer = () => {
   const turntableRef = useRef<HTMLDivElement>(null);
 
   // Vinyl crackle and music audio
-  const { initAudio } = useVinylAudio({ 
+  const { initAudio, playMusicNow, stopMusicNow } = useVinylAudio({ 
     isPlaying: isPlaying && isPoweredOn, 
     volume,
     trackUrl: selectedRecord?.trackUrl,
@@ -156,14 +157,16 @@ const VinylPlayer = () => {
   // Handle play/pause
   const handlePlayPause = () => {
     if (!isPoweredOn || !selectedRecord) return;
-    
-    // Initialize audio on first interaction
+
+    // Start/stop audio inside the user gesture to avoid autoplay blocking
     initAudio();
-    
+
     if (isPlaying) {
+      stopMusicNow();
       setTonearmPosition("rest");
       setTimeout(() => setIsPlaying(false), 500);
     } else {
+      playMusicNow();
       setIsPlaying(true);
       setTimeout(() => setTonearmPosition("playing"), 100);
     }
@@ -172,14 +175,16 @@ const VinylPlayer = () => {
   // Handle tonearm position change (from dragging or clicking tonearm)
   const handleTonearmPositionChange = (newPosition: "rest" | "playing") => {
     if (!isPoweredOn || !selectedRecord) return;
-    
-    // Initialize audio on first interaction
+
+    // Start/stop audio inside the user gesture to avoid autoplay blocking
     initAudio();
-    
+
     setTonearmPosition(newPosition);
     if (newPosition === "playing") {
+      playMusicNow();
       setIsPlaying(true);
     } else {
+      stopMusicNow();
       setIsPlaying(false);
     }
   };
@@ -187,6 +192,7 @@ const VinylPlayer = () => {
   // Handle power toggle
   const handlePowerToggle = () => {
     if (isPoweredOn) {
+      stopMusicNow();
       setIsPlaying(false);
       setTonearmPosition("rest");
     }
@@ -196,13 +202,14 @@ const VinylPlayer = () => {
   // Handle record selection
   const handleSelectRecord = (record: VinylRecord) => {
     if (record.id === selectedRecord?.id) return;
-    
+
     // Stop playing and animate tonearm away
     if (isPlaying) {
+      stopMusicNow();
       setTonearmPosition("rest");
       setIsPlaying(false);
     }
-    
+
     // Animate record swap
     setIsSwapping(true);
     setTimeout(() => {
