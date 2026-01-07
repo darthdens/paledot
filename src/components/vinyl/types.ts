@@ -10,7 +10,8 @@ export type VinylColor =
   | "deep-magenta"
   | "golden-bronze"
   | "noir-smoke"
-  | "rose-gold";
+  | "rose-gold"
+  | "retrowave-purple";
 
 export interface VinylRecord {
   id: string;
