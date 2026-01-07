@@ -20,6 +20,7 @@ import albumStrangerThings from "@/assets/albums/stranger-things.png";
 import albumSynthWaveLife from "@/assets/albums/synth-wave-life.png";
 import albumSynthwaveRetro from "@/assets/albums/synthwave-retro-80s.png";
 import albumSynthwaveSoundscape from "@/assets/albums/synthwave-soundscape.png";
+import albumRetrowaveBeat from "@/assets/albums/the-retrowave-beat.png";
 
 // Royalty-free synthwave tracks (bundled locally for reliable playback)
 const RETRO_TRACKS = {
@@ -33,6 +34,7 @@ const RETRO_TRACKS = {
   synthWaveLife: "/audio/synth-wave-life.mp3",
   synthwaveRetro: "/audio/synthwave-retro-80s.mp3",
   synthwaveSoundscape: "/audio/synthwave-soundscape.mp3",
+  retrowaveBeat: "/audio/the-retrowave-beat.mp3",
 };
 
 const vinylCollection: VinylRecord[] = [
@@ -135,6 +137,16 @@ const vinylCollection: VinylRecord[] = [
     color: "noir-smoke",
     trackUrl: RETRO_TRACKS.synthwaveSoundscape,
     labelImage: albumSynthwaveSoundscape,
+  },
+  {
+    id: "the-retrowave-beat",
+    artist: "Retrowave",
+    album: "The Retrowave Beat",
+    trackName: "The Retrowave Beat",
+    year: 2024,
+    color: "retrowave-purple",
+    trackUrl: RETRO_TRACKS.retrowaveBeat,
+    labelImage: albumRetrowaveBeat,
   },
 ];
 // Format seconds to mm:ss

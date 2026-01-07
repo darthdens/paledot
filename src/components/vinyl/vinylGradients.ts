@@ -33,6 +33,9 @@ export const getVinylGradient = (color: VinylColor): string => {
     case "rose-gold":
       // Retro Synth Pop - pink cassette tape glow
       return "linear-gradient(135deg, hsl(345 50% 45%) 0%, hsl(355 55% 55%) 50%, hsl(340 45% 40%) 100%)";
+    case "retrowave-purple":
+      // The Retrowave Beat - purple/pink/cyan equalizer
+      return "linear-gradient(135deg, hsl(270 65% 35%) 0%, hsl(290 70% 50%) 50%, hsl(260 60% 30%) 100%)";
     default:
       return "linear-gradient(135deg, hsl(0 0% 10%) 0%, hsl(0 0% 18%) 50%, hsl(0 0% 10%) 100%)";
   }
@@ -61,6 +64,8 @@ export const getVinylGlow = (color: VinylColor): string => {
       return "0 0 40px hsl(40 80% 55% / 0.5), 0 0 80px hsl(35 70% 45% / 0.3)";
     case "rose-gold":
       return "0 0 40px hsl(355 55% 60% / 0.5), 0 0 80px hsl(345 50% 50% / 0.3)";
+    case "retrowave-purple":
+      return "0 0 40px hsl(290 70% 55% / 0.5), 0 0 80px hsl(270 65% 45% / 0.3)";
     default:
       return "0 0 40px hsl(0 0% 20% / 0.3)";
   }
