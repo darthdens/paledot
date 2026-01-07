@@ -32,7 +32,7 @@ const Slider = React.forwardRef<
         onPointerUp?.(e);
       }}
       className={cn(
-        "relative flex touch-none select-none",
+        "relative flex select-none",
         orientation === "horizontal" ? "w-full items-center" : "h-full flex-col items-center",
         className
       )}
