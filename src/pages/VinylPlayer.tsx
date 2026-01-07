@@ -129,15 +129,16 @@ const VinylPlayer = () => {
   const turntableRef = useRef<HTMLDivElement>(null);
 
   // Vinyl crackle and music audio
-  const { initAudio, playMusicNow, stopMusicNow, seekBy } = useVinylAudio({ 
+  const { initAudio, playMusicNow, stopMusicNow, seekBy, playScratchSound } = useVinylAudio({ 
     isPlaying: isPlaying && isPoweredOn, 
     volume,
     trackUrl: selectedRecord?.trackUrl,
   });
 
-  // Handle disc scrubbing (rotate vinyl to seek)
+  // Handle disc scrubbing (rotate vinyl to seek + scratch sound)
   const handleScrub = (deltaSeconds: number) => {
     seekBy(deltaSeconds);
+    playScratchSound(deltaSeconds);
   };
 
   // Sync turntable height for side panels

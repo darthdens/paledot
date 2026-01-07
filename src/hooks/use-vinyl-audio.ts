@@ -166,6 +166,58 @@ export const useVinylAudio = ({ isPlaying, volume, trackUrl }: VinylAudioOptions
     el.currentTime = newTime;
   }, []);
 
+  // Scratch sound effect for manual scrubbing
+  const lastScratchTimeRef = useRef(0);
+  const playScratchSound = useCallback((intensity: number) => {
+    const ctx = audioContextRef.current;
+    if (!ctx) return;
+    
+    // Resume context if suspended
+    if (ctx.state === "suspended") {
+      ctx.resume();
+    }
+    
+    // Throttle scratch sounds (min 30ms between)
+    const now = Date.now();
+    if (now - lastScratchTimeRef.current < 30) return;
+    lastScratchTimeRef.current = now;
+    
+    // Create scratch noise buffer
+    const duration = 0.05 + Math.abs(intensity) * 0.05; // 50-100ms based on intensity
+    const bufferSize = Math.floor(ctx.sampleRate * duration);
+    const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+    const data = buffer.getChannelData(0);
+    
+    // Generate scratchy vinyl noise
+    for (let i = 0; i < bufferSize; i++) {
+      const t = i / bufferSize;
+      // Quick attack, medium decay envelope
+      const envelope = Math.exp(-t * 8) * Math.min(t * 20, 1);
+      // Mix of white noise and low frequency rumble
+      const noise = (Math.random() * 2 - 1) * 0.6;
+      const rumble = Math.sin(t * Math.PI * 80) * 0.4;
+      data[i] = (noise + rumble) * envelope;
+    }
+    
+    const source = ctx.createBufferSource();
+    source.buffer = buffer;
+    
+    // Bandpass filter for vinyl scratch character
+    const filter = ctx.createBiquadFilter();
+    filter.type = "bandpass";
+    filter.frequency.value = 800 + Math.abs(intensity) * 400;
+    filter.Q.value = 1.5;
+    
+    // Gain node for volume control
+    const gainNode = ctx.createGain();
+    gainNode.gain.value = Math.min(0.3, Math.abs(intensity) * 0.15) * (volume / 100);
+    
+    source.connect(filter);
+    filter.connect(gainNode);
+    gainNode.connect(ctx.destination);
+    source.start();
+  }, [volume]);
+
   // Get current time and duration for external use
   const getPlaybackInfo = useCallback(() => {
     const el = audioElementRef.current;
@@ -233,5 +285,5 @@ export const useVinylAudio = ({ isPlaying, volume, trackUrl }: VinylAudioOptions
     };
   }, [stopCrackle, stopMusicNow]);
 
-  return { initAudio, playMusicNow, stopMusicNow, seekBy, getPlaybackInfo };
+  return { initAudio, playMusicNow, stopMusicNow, seekBy, getPlaybackInfo, playScratchSound };
 };
