@@ -214,7 +214,7 @@ const VinylPlayer = () => {
           <div className="flex flex-col lg:flex-row gap-8 items-start">
             {/* Main Turntable */}
             <div className="flex-1 w-full flex flex-col">
-              <div className="turntable-wrapper">
+              <div className="relative w-full max-w-xl mx-auto aspect-square">
                 <Turntable
                   record={selectedRecord}
                   isPlaying={isPlaying && isPoweredOn}
@@ -239,13 +239,15 @@ const VinylPlayer = () => {
               />
             </div>
 
-            {/* Record Collection Sidebar - matches turntable height only */}
-            <div className="w-full lg:w-80 lg:self-start" style={{ maxHeight: 'calc(100vw * 0.4)' }}>
-              <RecordCollection
-                records={vinylCollection}
-                selectedRecord={selectedRecord}
-                onSelectRecord={handleSelectRecord}
-              />
+            {/* Record Collection Sidebar - height matches turntable */}
+            <div className="w-full lg:w-80">
+              <div className="h-auto lg:h-[min(576px,calc((100vw-6rem)*0.55))]">
+                <RecordCollection
+                  records={vinylCollection}
+                  selectedRecord={selectedRecord}
+                  onSelectRecord={handleSelectRecord}
+                />
+              </div>
             </div>
           </div>
         </section>

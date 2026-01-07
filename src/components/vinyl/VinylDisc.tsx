@@ -118,18 +118,16 @@ export const VinylDisc = ({
 
       {/* Center label */}
       <div className="absolute inset-[28%] rounded-full bg-card border border-border/50 flex items-center justify-center shadow-inner">
-        <div className="text-center px-2 pb-3">
+        <div className="text-center px-3 flex flex-col items-center justify-center gap-1">
           <p className="text-[0.5rem] sm:text-xs font-medium text-foreground truncate max-w-full leading-tight">
             {record.album}
           </p>
-          <p className="text-[0.4rem] sm:text-[0.6rem] text-muted-foreground truncate max-w-full mt-0.5">
+          <div className="w-2 h-2 rounded-full bg-secondary flex-shrink-0" />
+          <p className="text-[0.4rem] sm:text-[0.6rem] text-muted-foreground truncate max-w-full">
             {record.artist}
           </p>
         </div>
       </div>
-
-      {/* Center hole */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-secondary" />
       </div>
     </>
   );
