@@ -21,4 +21,5 @@ export interface VinylRecord {
   year: number;
   color: VinylColor;
   labelImage?: string;
+  trackUrl?: string;
 }
