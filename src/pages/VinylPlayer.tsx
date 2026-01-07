@@ -210,10 +210,28 @@ const VinylPlayer = () => {
         </section>
 
         {/* Turntable Section */}
-        <section className="container mx-auto px-4 sm:px-6 max-w-6xl pb-8">
+        <section className="container mx-auto px-4 sm:px-6 max-w-7xl pb-8">
           <div className="flex flex-col lg:flex-row gap-8 items-start">
-            {/* Main Turntable */}
-            <div className="flex-1 w-full flex flex-col">
+            {/* Controls - Left side on desktop */}
+            <div className="hidden lg:block lg:w-80">
+              <div className="h-auto lg:h-[min(576px,calc((100vw-6rem)*0.55))]">
+                <VinylControls
+                  isPlaying={isPlaying}
+                  isPoweredOn={isPoweredOn}
+                  speed={speed}
+                  volume={volume}
+                  onPlayPause={handlePlayPause}
+                  onPowerToggle={handlePowerToggle}
+                  onSpeedChange={setSpeed}
+                  onVolumeChange={setVolume}
+                  hasRecord={!!selectedRecord}
+                  vertical
+                />
+              </div>
+            </div>
+
+            {/* Main Turntable - Centered */}
+            <div className="flex-1 w-full flex flex-col items-center">
               <div className="relative w-full max-w-xl mx-auto aspect-square">
                 <Turntable
                   record={selectedRecord}
@@ -225,21 +243,23 @@ const VinylPlayer = () => {
                 />
               </div>
               
-              {/* Controls below turntable */}
-              <VinylControls
-                isPlaying={isPlaying}
-                isPoweredOn={isPoweredOn}
-                speed={speed}
-                volume={volume}
-                onPlayPause={handlePlayPause}
-                onPowerToggle={handlePowerToggle}
-                onSpeedChange={setSpeed}
-                onVolumeChange={setVolume}
-                hasRecord={!!selectedRecord}
-              />
+              {/* Controls below turntable - Mobile/Tablet only */}
+              <div className="lg:hidden w-full">
+                <VinylControls
+                  isPlaying={isPlaying}
+                  isPoweredOn={isPoweredOn}
+                  speed={speed}
+                  volume={volume}
+                  onPlayPause={handlePlayPause}
+                  onPowerToggle={handlePowerToggle}
+                  onSpeedChange={setSpeed}
+                  onVolumeChange={setVolume}
+                  hasRecord={!!selectedRecord}
+                />
+              </div>
             </div>
 
-            {/* Record Collection Sidebar - height matches turntable */}
+            {/* Record Collection Sidebar - Right side */}
             <div className="w-full lg:w-80">
               <div className="h-auto lg:h-[min(576px,calc((100vw-6rem)*0.55))]">
                 <RecordCollection
