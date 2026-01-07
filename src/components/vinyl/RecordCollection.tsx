@@ -28,7 +28,7 @@ export const RecordCollection = ({
             <button
               key={record.id}
               onClick={() => onSelectRecord(record)}
-              className={`w-full flex items-center gap-3 p-2 rounded-lg transition-all duration-200 text-left ${
+              className={`w-full flex items-center gap-3 p-2 pr-3 rounded-lg transition-all duration-200 text-left ${
                 isSelected
                   ? "bg-secondary/50 border border-border"
                   : "hover:bg-muted/50 border border-transparent"
