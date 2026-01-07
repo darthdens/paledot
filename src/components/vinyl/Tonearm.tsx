@@ -12,10 +12,10 @@ export const Tonearm = ({ position, isPoweredOn, onPositionChange }: TonearmProp
   const [dragRotation, setDragRotation] = useState<number | null>(null);
   const dragStartRef = useRef({ x: 0, y: 0, rotation: 0 });
 
-  // Target rotations: rest = 5deg, playing = -25deg
+  // Target rotations: rest = 5deg, playing = 25deg
   const REST_ROTATION = 5;
-  const PLAYING_ROTATION = -25;
-  const THRESHOLD = -10; // If rotation < -10, consider it "playing"
+  const PLAYING_ROTATION = 25;
+  const THRESHOLD = 15; // If rotation > 15, consider it "playing"
 
   const currentRotation = isDragging && dragRotation !== null 
     ? dragRotation 
@@ -39,12 +39,12 @@ export const Tonearm = ({ position, isPoweredOn, onPositionChange }: TonearmProp
     
     // Use horizontal movement as the primary drag input (left = toward record, right = away)
     const deltaX = e.clientX - dragStartRef.current.x;
-    // Negative deltaX (moving left) should decrease rotation (move toward playing position)
+    // Moving left should increase rotation (toward PLAYING_ROTATION)
     const rotationChange = deltaX * 0.3;
-    let newRotation = dragStartRef.current.rotation + rotationChange;
-    
-    // Clamp rotation between playing and rest positions (with small buffer)
-    newRotation = Math.max(PLAYING_ROTATION, Math.min(REST_ROTATION, newRotation));
+    let newRotation = dragStartRef.current.rotation - rotationChange;
+
+    // Clamp rotation between rest and playing
+    newRotation = Math.max(REST_ROTATION, Math.min(PLAYING_ROTATION, newRotation));
     setDragRotation(newRotation);
   }, [isDragging]);
 
@@ -56,7 +56,7 @@ export const Tonearm = ({ position, isPoweredOn, onPositionChange }: TonearmProp
     
     // Determine final position based on drag rotation
     if (dragRotation !== null && onPositionChange) {
-      const newPosition = dragRotation < THRESHOLD ? "playing" : "rest";
+      const newPosition = dragRotation > THRESHOLD ? "playing" : "rest";
       onPositionChange(newPosition);
     }
     setDragRotation(null);
