@@ -41,7 +41,7 @@ export const Tonearm = ({ position, isPoweredOn, onPositionChange }: TonearmProp
     const deltaX = e.clientX - dragStartRef.current.x;
     // Negative deltaX (moving left) should decrease rotation (move toward playing position)
     const rotationChange = deltaX * 0.3;
-    let newRotation = dragStartRef.current.rotation - rotationChange;
+    let newRotation = dragStartRef.current.rotation + rotationChange;
     
     // Clamp rotation between playing and rest positions (with small buffer)
     newRotation = Math.max(PLAYING_ROTATION, Math.min(REST_ROTATION, newRotation));
