@@ -550,7 +550,7 @@ export const TexturedPlanet = ({
                   return 1.0;
                 }
                 
-                // Check if point is in shadow of the rings
+                // Check if point is in shadow of the rings with soft penumbra
                 float calculateRingShadow(vec3 fragWorldPos, vec3 sunDir) {
                   if (hasRings < 0.5) return 1.0;
                   
@@ -558,7 +558,6 @@ export const TexturedPlanet = ({
                   vec3 relPos = fragWorldPos - objectCenter;
                   
                   // Build rotation matrix for planet tilt (rings are tilted with planet)
-                  // Tilt is around X axis
                   float cosT = cos(planetTilt);
                   float sinT = sin(planetTilt);
                   
@@ -574,39 +573,61 @@ export const TexturedPlanet = ({
                   ringFrameSunDir.y = sunDir.y * cosT + sunDir.z * sinT;
                   ringFrameSunDir.z = -sunDir.y * sinT + sunDir.z * cosT;
                   
-                  // Ring plane is Y=0 in ring frame
-                  // We need to trace a ray FROM the fragment TOWARD the sun
-                  // and see if it hits the ring plane within ring bounds
-                  if (abs(ringFrameSunDir.y) < 0.0001) return 1.0; // Ray parallel to plane
+                  if (abs(ringFrameSunDir.y) < 0.0001) return 1.0;
                   
-                  // t = how far along sunDir to reach y=0
                   float t = -ringFramePos.y / ringFrameSunDir.y;
-                  
-                  // t > 0 means ring plane is between fragment and sun
                   if (t <= 0.0) return 1.0;
                   
-                  // Intersection point on ring plane
                   vec3 hitPoint = ringFramePos + ringFrameSunDir * t;
                   float distFromCenter = length(vec2(hitPoint.x, hitPoint.z));
                   
-                  // Check if within ring bounds
-                  if (distFromCenter >= ringInnerRadius && distFromCenter <= ringOuterRadius) {
-                    // Ring shadow with density variation
-                    float ringPos = (distFromCenter - ringInnerRadius) / (ringOuterRadius - ringInnerRadius);
+                  // Check if within ring bounds with penumbra zones
+                  float ringWidth = ringOuterRadius - ringInnerRadius;
+                  
+                  // Calculate penumbra softness based on:
+                  // 1. Distance from planet to sun (further = softer shadows)
+                  // 2. Ring thickness creates natural blur
+                  float sunDist = length(objectCenter);
+                  float penumbraScale = 0.03 + (sunDist / 50000.0) * 0.02; // Softer shadows for distant planets
+                  float penumbraWidth = ringWidth * penumbraScale;
+                  
+                  // Soft inner edge
+                  float innerShadow = smoothstep(ringInnerRadius - penumbraWidth, ringInnerRadius + penumbraWidth * 0.5, distFromCenter);
+                  // Soft outer edge  
+                  float outerShadow = 1.0 - smoothstep(ringOuterRadius - penumbraWidth * 0.5, ringOuterRadius + penumbraWidth, distFromCenter);
+                  
+                  float inRing = innerShadow * outerShadow;
+                  
+                  if (inRing > 0.001) {
+                    float ringPos = (distFromCenter - ringInnerRadius) / ringWidth;
                     
-                    // Multiple ring bands with varying density
-                    float bands = 0.5 + 0.5 * sin(ringPos * 80.0);
+                    // Multi-layer ring density with soft transitions
+                    float mainBands = 0.5 + 0.5 * sin(ringPos * 80.0);
                     float fineBands = 0.7 + 0.3 * sin(ringPos * 200.0);
-                    float ringDensity = 0.4 + 0.35 * bands * fineBands;
+                    float microBands = 0.85 + 0.15 * sin(ringPos * 500.0);
                     
-                    // Cassini Division (gap at ~0.55-0.65 of ring width for Saturn)
-                    float cassiniGap = smoothstep(0.55, 0.58, ringPos) * (1.0 - smoothstep(0.62, 0.65, ringPos));
-                    ringDensity *= (1.0 - cassiniGap * 0.9);
+                    // Base density varies across ring
+                    float baseDensity = 0.3 + 0.4 * (1.0 - ringPos * 0.5);
+                    float ringDensity = baseDensity * mainBands * fineBands * microBands;
                     
-                    // Inner rings are denser
-                    ringDensity *= 1.2 - ringPos * 0.4;
+                    // Cassini Division - soft gap
+                    float cassiniCenter = 0.6;
+                    float cassiniWidth = 0.08;
+                    float cassiniGap = 1.0 - 0.85 * exp(-pow((ringPos - cassiniCenter) / cassiniWidth, 2.0));
+                    ringDensity *= cassiniGap;
                     
-                    return 1.0 - clamp(ringDensity * 0.75, 0.0, 0.8);
+                    // Encke Gap (thinner gap in A ring)
+                    float enckeGap = 1.0 - 0.5 * exp(-pow((ringPos - 0.82) / 0.02, 2.0));
+                    ringDensity *= enckeGap;
+                    
+                    // Apply penumbra softening - shadows get softer based on density variation
+                    float shadowStrength = ringDensity * inRing * 0.7;
+                    
+                    // Add subtle blur to shadow edges based on sun distance
+                    float blur = 1.0 + (sunDist / 30000.0) * 0.3;
+                    shadowStrength = pow(shadowStrength, 1.0 / blur);
+                    
+                    return 1.0 - clamp(shadowStrength, 0.0, 0.75);
                   }
                   return 1.0;
                 }
@@ -882,79 +903,157 @@ export const TexturedPlanet = ({
                   varying vec3 vLocalPosition;
                   varying vec3 vWorldCenter;
                   
+                  // Noise functions for ring detail
                   float hash(float n) { return fract(sin(n) * 43758.5453); }
+                  float hash2(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
                   
-                  // Check if ring fragment is in shadow of the planet (same logic as moons)
+                  float noise(float x) {
+                    float i = floor(x);
+                    float f = fract(x);
+                    f = f * f * (3.0 - 2.0 * f);
+                    return mix(hash(i), hash(i + 1.0), f);
+                  }
+                  
+                  float noise2D(vec2 p) {
+                    vec2 i = floor(p);
+                    vec2 f = fract(p);
+                    f = f * f * (3.0 - 2.0 * f);
+                    float a = hash2(i);
+                    float b = hash2(i + vec2(1.0, 0.0));
+                    float c = hash2(i + vec2(0.0, 1.0));
+                    float d = hash2(i + vec2(1.0, 1.0));
+                    return mix(mix(a, b, f.x), mix(c, d, f.x), f.y);
+                  }
+                  
+                  float fbm(float x) {
+                    float value = 0.0;
+                    float amplitude = 0.5;
+                    for (int i = 0; i < 4; i++) {
+                      value += amplitude * noise(x);
+                      x *= 2.0;
+                      amplitude *= 0.5;
+                    }
+                    return value;
+                  }
+                  
+                  // Check if ring fragment is in shadow of the planet
                   float calculatePlanetShadow(vec3 fragWorldPos, vec3 sunDir) {
-                    // Vector from fragment to planet center
                     vec3 toPlanet = vWorldCenter - fragWorldPos;
-                    
-                    // Project onto sun direction
                     float distAlongRay = dot(toPlanet, sunDir);
-                    
-                    // Only shadow if planet is between fragment and sun
                     if (distAlongRay < 0.0) return 1.0;
                     
-                    // Closest point on sun ray to planet center
                     vec3 closestPoint = fragWorldPos + sunDir * distAlongRay;
                     float distFromAxis = length(vWorldCenter - closestPoint);
                     
-                    // Check if within planet's shadow cylinder with smooth penumbra
-                    if (distFromAxis < planetRadius) {
-                      return smoothstep(planetRadius * 0.8, planetRadius, distFromAxis);
+                    // Soft penumbra based on distance from planet
+                    float penumbraSize = planetRadius * 0.15;
+                    if (distFromAxis < planetRadius + penumbraSize) {
+                      return smoothstep(planetRadius * 0.85, planetRadius + penumbraSize, distFromAxis);
                     }
                     return 1.0;
                   }
                   
                   void main() {
-                    // Sun is at origin - direction from fragment toward sun
                     vec3 sunDir = normalize(-vWorldPosition);
-
-                    // Planet shadow on rings (cylinder shadow behind planet)
                     float shadow = calculatePlanetShadow(vWorldPosition, sunDir);
 
-                    // Ring lighting follows the same logic as planets/moons:
-                    // ambient + max(N·L, 0) diffuse, with planet shadow applied.
-                    // IMPORTANT: opacity is NOT tied to lighting, so changing timeSpeed can't "fade" rings.
                     vec3 fragFromPlanet = vWorldPosition - vWorldCenter;
                     float distFromPlanet = length(fragFromPlanet);
                     vec3 pseudoNormal = distFromPlanet > 0.001 ? fragFromPlanet / distFromPlanet : vec3(0.0, 1.0, 0.0);
  
-                    // Keep the sun-facing side stable (prevent "dimming out" when timeSpeed changes)
                     float NdotLRaw = dot(pseudoNormal, sunDir);
-
-                    // Smoothly classify day/night so tiny numerical flips don't snap rings dark
                     float daylight = smoothstep(-0.05, 0.05, NdotLRaw);
-
-                    // Base diffuse term (like planets/moons)
                     float NdotL = max(NdotLRaw, 0.0);
-
-                    // Add a small daylight-weighted floor near the terminator (helps when positions update faster)
                     NdotL = max(NdotL, 0.25 * daylight);
 
                     float ambient = 0.012;
                     float diffuse = NdotL * 0.988 * shadow;
                     float totalLight = ambient + diffuse;
  
-                    // Ring density and bands
+                    // Ring geometry
                     float dist = length(vLocalPosition.xy);
-                    float normalizedDist = (dist - innerRadius) / (outerRadius - innerRadius);
-                    float bands = sin(normalizedDist * 60.0) * 0.5 + 0.5;
-                    bands = mix(0.75, 1.0, bands);
- 
-                    // Cassini division gap
-                    float gap = smoothstep(0.45, 0.5, normalizedDist) * (1.0 - smoothstep(0.5, 0.55, normalizedDist));
-                    float ringDensity = bands * (1.0 - gap * 0.7);
- 
+                    float ringWidth = outerRadius - innerRadius;
+                    float normalizedDist = (dist - innerRadius) / ringWidth;
+                    
+                    // Angular position for azimuthal variation
+                    float angle = atan(vLocalPosition.y, vLocalPosition.x);
+                    
+                    // === DETAILED RING STRUCTURE ===
+                    
+                    // Main ring divisions (A, B, C rings)
+                    float ringA = smoothstep(0.7, 0.72, normalizedDist) * smoothstep(1.0, 0.98, normalizedDist);
+                    float ringB = smoothstep(0.35, 0.38, normalizedDist) * smoothstep(0.68, 0.65, normalizedDist);
+                    float ringC = smoothstep(0.0, 0.03, normalizedDist) * smoothstep(0.33, 0.30, normalizedDist);
+                    
+                    // Density varies by ring
+                    float ringADensity = 0.85;
+                    float ringBDensity = 1.0;  // B ring is densest
+                    float ringCDensity = 0.4;  // C ring is faint
+                    
+                    // Fine radial structure - thousands of ringlets
+                    float fineStructure = 0.7 + 0.3 * sin(normalizedDist * 400.0 + fbm(normalizedDist * 50.0) * 2.0);
+                    float microStructure = 0.85 + 0.15 * sin(normalizedDist * 1500.0);
+                    float ultraFine = 0.92 + 0.08 * noise(normalizedDist * 3000.0);
+                    
+                    // Azimuthal variation (spokes and clumps)
+                    float azimuthalVar = 0.95 + 0.05 * sin(angle * 30.0 + normalizedDist * 10.0);
+                    float spokes = 0.97 + 0.03 * sin(angle * 8.0) * sin(normalizedDist * 20.0);
+                    
+                    // Combine ring sections with their densities
+                    float baseDensity = ringA * ringADensity + ringB * ringBDensity + ringC * ringCDensity;
+                    
+                    // Apply fine structure
+                    float ringDensity = baseDensity * fineStructure * microStructure * ultraFine * azimuthalVar * spokes;
+                    
+                    // === GAPS ===
+                    
+                    // Cassini Division (between A and B rings)
+                    float cassiniGap = 1.0 - 0.95 * exp(-pow((normalizedDist - 0.685) / 0.025, 2.0));
+                    
+                    // Encke Gap (in A ring)
+                    float enckeGap = 1.0 - 0.8 * exp(-pow((normalizedDist - 0.88) / 0.008, 2.0));
+                    
+                    // Keeler Gap (outer A ring)
+                    float keelerGap = 1.0 - 0.7 * exp(-pow((normalizedDist - 0.96) / 0.004, 2.0));
+                    
+                    // Colombo Gap (in C ring)
+                    float colomboGap = 1.0 - 0.6 * exp(-pow((normalizedDist - 0.15) / 0.01, 2.0));
+                    
+                    // Maxwell Gap (in C ring)
+                    float maxwellGap = 1.0 - 0.5 * exp(-pow((normalizedDist - 0.22) / 0.008, 2.0));
+                    
+                    ringDensity *= cassiniGap * enckeGap * keelerGap * colomboGap * maxwellGap;
+                    
+                    // === COLOR VARIATION ===
+                    
+                    // Rings have subtle color variation (redder inner, bluer outer)
+                    vec3 innerColor = ringColor * vec3(1.05, 0.98, 0.92);
+                    vec3 outerColor = ringColor * vec3(0.95, 0.98, 1.05);
+                    vec3 finalColor = mix(innerColor, outerColor, normalizedDist);
+                    
+                    // B ring has slightly different hue (more golden)
+                    vec3 bRingTint = vec3(1.02, 1.0, 0.95);
+                    finalColor = mix(finalColor, finalColor * bRingTint, ringB * 0.3);
+                    
+                    // C ring is darker/grayer
+                    vec3 cRingTint = vec3(0.85, 0.85, 0.88);
+                    finalColor = mix(finalColor, finalColor * cRingTint, ringC * 0.5);
+                    
+                    // Add subtle particle glitter on lit side
+                    float glitter = noise2D(vec2(normalizedDist * 500.0, angle * 50.0));
+                    glitter = pow(glitter, 8.0) * 0.3 * max(NdotL, 0.0);
+                    finalColor += vec3(glitter);
+                    
+                    // === OPACITY ===
+                    
                     float ringOpacity = opacity * ringDensity;
-                    float edgeFade = smoothstep(0.0, 0.08, normalizedDist) * smoothstep(1.0, 0.92, normalizedDist);
- 
-                    // Stable opacity (not affected by lighting)
-                    float alpha = ringOpacity * edgeFade;
- 
-                    // Keep ring visibility comparable to planet surface (same lighting model, slightly boosted output)
+                    float edgeFade = smoothstep(0.0, 0.05, normalizedDist) * smoothstep(1.0, 0.95, normalizedDist);
+                    float alpha = clamp(ringOpacity * edgeFade, 0.0, 0.95);
+                    
+                    // Lit ring with enhanced brightness
                     float ringBrightness = 1.8;
-                    vec3 litRing = ringColor * totalLight * ringBrightness;
+                    vec3 litRing = finalColor * totalLight * ringBrightness;
+                    
                     gl_FragColor = vec4(litRing, alpha);
                   }
                 `}
