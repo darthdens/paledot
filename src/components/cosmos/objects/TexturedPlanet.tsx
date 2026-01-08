@@ -1038,18 +1038,40 @@ export const TexturedPlanet = ({
                     float maxwellGap = 1.0 - 0.5 * exp(-pow((normalizedDist - 0.22) / 0.008, 2.0));
                     ringDensitySaturn *= cassiniGap * enckeGap * keelerGap * colomboGap * maxwellGap;
                     
-                    // Uranus-like narrow ringlets (few sharp bands, brightened for visibility)
+                    // Uranus rings based on Voyager 2 data (normalized to our ring geometry)
+                    // Uranus radius: 25,559 km, inner ring: 1.4x, outer: 2.1x
+                    // Positions calculated as (ringRadius - innerEdge) / ringWidth
                     float uranusBands = 0.0;
-                    // Wider bands so they're visible at our viewing scale
-                    uranusBands += 1.00 * exp(-pow((normalizedDist - 0.85) / 0.025, 2.0)); // epsilon-like ring (outermost, brightest)
-                    uranusBands += 0.70 * exp(-pow((normalizedDist - 0.68) / 0.022, 2.0));
-                    uranusBands += 0.55 * exp(-pow((normalizedDist - 0.52) / 0.020, 2.0));
-                    uranusBands += 0.45 * exp(-pow((normalizedDist - 0.35) / 0.022, 2.0));
-                    uranusBands += 0.35 * exp(-pow((normalizedDist - 0.20) / 0.018, 2.0));
+                    
+                    // Epsilon ring - brightest, widest (19.7-96.4 km width)
+                    uranusBands += 1.00 * exp(-pow((normalizedDist - 0.859) / 0.035, 2.0));
+                    
+                    // Lambda ring - narrow, dusty
+                    uranusBands += 0.25 * exp(-pow((normalizedDist - 0.796) / 0.012, 2.0));
+                    
+                    // Delta ring - narrow with shoulder
+                    uranusBands += 0.50 * exp(-pow((normalizedDist - 0.700) / 0.018, 2.0));
+                    
+                    // Gamma ring - narrow, optically dense
+                    uranusBands += 0.55 * exp(-pow((normalizedDist - 0.662) / 0.015, 2.0));
+                    
+                    // Eta ring - narrow core + wide outer component
+                    uranusBands += 0.40 * exp(-pow((normalizedDist - 0.636) / 0.020, 2.0));
+                    
+                    // Beta ring - eccentric, bright
+                    uranusBands += 0.65 * exp(-pow((normalizedDist - 0.552) / 0.018, 2.0));
+                    
+                    // Alpha ring - eccentric, bright
+                    uranusBands += 0.60 * exp(-pow((normalizedDist - 0.499) / 0.016, 2.0));
+                    
+                    // Inner rings 4, 5, 6 - very narrow
+                    uranusBands += 0.30 * exp(-pow((normalizedDist - 0.379) / 0.012, 2.0)); // Ring 4
+                    uranusBands += 0.28 * exp(-pow((normalizedDist - 0.360) / 0.012, 2.0)); // Ring 5
+                    uranusBands += 0.25 * exp(-pow((normalizedDist - 0.338) / 0.010, 2.0)); // Ring 6
                     
                     float ringDensityUranus = clamp(uranusBands, 0.0, 1.0);
-                    ringDensityUranus *= 0.92 + 0.08 * noise(normalizedDist * 600.0);
-                    ringDensityUranus *= 0.98 + 0.02 * sin(angle * 8.0);
+                    ringDensityUranus *= 0.94 + 0.06 * noise(normalizedDist * 400.0);
+                    ringDensityUranus *= 0.98 + 0.02 * sin(angle * 6.0);
                     
                     float ringDensity = mix(ringDensitySaturn, ringDensityUranus, ringStyle);
 
