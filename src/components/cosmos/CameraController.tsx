@@ -9,10 +9,13 @@ export const CameraController = () => {
   const { camera, controls } = useThree();
   const selectedObject = useCosmosStore((state) => state.selectedObject);
   const isFollowing = useCosmosStore((state) => state.isFollowing);
+  const tourCameraTarget = useCosmosStore((state) => state.tourCameraTarget);
+  const isTouring = useCosmosStore((state) => state.isTouring);
 
   const isAnimating = useRef(false);
   const animationProgress = useRef(0);
   const animationTriggerId = useRef<string | null>(null);
+  const isTourAnimation = useRef(false);
 
   const startPosition = useRef(new THREE.Vector3());
   const endPosition = useRef(new THREE.Vector3());
@@ -28,9 +31,43 @@ export const CameraController = () => {
   const tmpTarget = useRef(new THREE.Vector3());
   const tmpDelta = useRef(new THREE.Vector3());
 
-  // Trigger animation when selectedObject changes
+  // Handle tour camera target changes
   useEffect(() => {
-    if (!selectedObject || !controls) return;
+    if (!tourCameraTarget || !controls || !isTouring) return;
+
+    const orbitControls = controls as any;
+    if (!orbitControls.target) return;
+
+    // Start tour fly-to animation
+    isTourAnimation.current = true;
+    isAnimating.current = true;
+    animationProgress.current = 0;
+    animationTriggerId.current = `tour-${Date.now()}`;
+
+    // Store current camera position/target
+    startPosition.current.copy(camera.position);
+    startTarget.current.copy(orbitControls.target);
+
+    // Tour positions are in real km - scale them to scene units
+    endPosition.current.set(
+      tourCameraTarget.position[0] * UNIFIED_SCALE,
+      tourCameraTarget.position[1] * UNIFIED_SCALE,
+      tourCameraTarget.position[2] * UNIFIED_SCALE
+    );
+
+    endTarget.current.set(
+      tourCameraTarget.lookAt[0] * UNIFIED_SCALE,
+      tourCameraTarget.lookAt[1] * UNIFIED_SCALE,
+      tourCameraTarget.lookAt[2] * UNIFIED_SCALE
+    );
+
+    // Initialize follow smoothing
+    smoothedTarget.current.copy(orbitControls.target);
+  }, [tourCameraTarget, camera, controls, isTouring]);
+
+  // Handle object selection (non-tour)
+  useEffect(() => {
+    if (!selectedObject || !controls || isTouring) return;
 
     const orbitControls = controls as any;
     if (!orbitControls.target) return;
@@ -41,6 +78,7 @@ export const CameraController = () => {
       animationTriggerId.current = selectedObject.id;
 
       // Start fly-to animation
+      isTourAnimation.current = false;
       isAnimating.current = true;
       animationProgress.current = 0;
 
@@ -98,7 +136,7 @@ export const CameraController = () => {
     }
 
     startFlyTo(currentLivePos);
-  }, [selectedObject, camera, controls]);
+  }, [selectedObject, camera, controls, isTouring]);
 
   useFrame((_, delta) => {
     if (!controls) return;
@@ -106,8 +144,9 @@ export const CameraController = () => {
     if (!orbitControls.target) return;
 
     if (isAnimating.current) {
-      // Smooth easing animation
-      animationProgress.current += delta * 1.2;
+      // Slower animation speed for tour (more cinematic), faster for object selection
+      const animSpeed = isTourAnimation.current ? 0.4 : 1.2;
+      animationProgress.current += delta * animSpeed;
 
       if (animationProgress.current >= 1) {
         animationProgress.current = 1;
@@ -118,8 +157,8 @@ export const CameraController = () => {
       const t = animationProgress.current;
       const eased = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
 
-      // Get current live position during animation so camera tracks the moving object
-      if (selectedObject) {
+      // For non-tour animations, track moving objects during animation
+      if (!isTourAnimation.current && selectedObject) {
         const livePos = useCosmosStore.getState().objectWorldPositions[selectedObject.id];
         if (livePos) {
           endTarget.current.set(livePos[0], livePos[1], livePos[2]);
@@ -134,7 +173,8 @@ export const CameraController = () => {
     }
 
     // After fly-to: continuously follow the selected object (keep it centered)
-    if (selectedObject && isFollowing) {
+    // Don't follow during tour - let the user see the full scene
+    if (selectedObject && isFollowing && !isTouring) {
       const livePos = useCosmosStore.getState().objectWorldPositions[selectedObject.id];
       if (livePos) {
         const currentTarget = orbitControls.target as THREE.Vector3;
