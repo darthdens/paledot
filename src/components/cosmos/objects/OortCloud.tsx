@@ -39,11 +39,11 @@ export const OortCloud = ({ visualScale }: OortCloudProps) => {
   return (
     <points geometry={geometry}>
       <pointsMaterial
-        color="#8899aa"
-        size={50000 * visualScale}
-        sizeAttenuation={true}
+        color="#aabbcc"
+        size={500000 * visualScale}
+        sizeAttenuation={false}
         transparent
-        opacity={0.3}
+        opacity={0.4}
         blending={THREE.AdditiveBlending}
         depthWrite={false}
       />
