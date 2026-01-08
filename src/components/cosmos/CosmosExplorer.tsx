@@ -26,6 +26,10 @@ export const CosmosExplorer = () => {
   const selectedObject = useCosmosStore(state => state.selectedObject);
   const showOrbits = useCosmosStore(state => state.showOrbits);
   const showTrails = useCosmosStore(state => state.showTrails);
+  const isFollowing = useCosmosStore(state => state.isFollowing);
+  
+  // Hide orbits when actively following a moving object (they're distracting)
+  const shouldShowOrbits = showOrbits && (!selectedObject || !isFollowing);
   
   const planets = celestialObjects.filter(obj => 
     obj.type === 'planet' || obj.type === 'dwarf-planet'
@@ -41,7 +45,7 @@ export const CosmosExplorer = () => {
   // Pre-calculate moon orbit data for orbit visualization
   // Only show orbits for moons of the selected planet (or if a moon of that planet is selected)
   const moonOrbits = useMemo(() => {
-    if (!showOrbits || !selectedObject) return [];
+    if (!shouldShowOrbits || !selectedObject) return [];
 
     // Get the parent planet ID to show moon orbits for
     const focusedPlanetId = selectedObject.type === 'moon' 
@@ -58,7 +62,7 @@ export const CosmosExplorer = () => {
          orbitRadius: getMoonOrbitRadius(moon, UNIFIED_SCALE),
          color: moon.color,
        }));
-  }, [moons, selectedObject]);
+  }, [moons, selectedObject, shouldShowOrbits]);
 
   // Start camera looking at inner solar system - positioned to see Sun and inner planets
   const sunRadius = 1392700 * UNIFIED_SCALE / 2; // Sun's radius in scene units
@@ -116,7 +120,7 @@ export const CosmosExplorer = () => {
             <TexturedPlanet 
               key={planet.id} 
               object={planet} 
-              showOrbit={showOrbits} 
+              showOrbit={shouldShowOrbits} 
               visualScale={UNIFIED_SCALE}
               distanceScale={UNIFIED_SCALE}
             />
