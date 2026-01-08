@@ -86,7 +86,7 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
   const gasTexture = useMemo(() => createGasTexture(), []);
   
   // Generate detailed galaxy particle systems
-  const { bulgeGeo, barGeo, diskGeo, armCoreGeo, dustGeo, nebulaGeo, gasCloudGeo, haloGeo } = useMemo(() => {
+  const { bulgeGeo, barGeo, diskGeo, armCoreGeo, dustGeo, nebulaGeo, gasCloudGeo, starClusterGeo, haloGeo } = useMemo(() => {
     const color = new THREE.Color();
     
     // === CENTRAL BULGE (warm golden/orange core - spheroidal) ===
@@ -350,6 +350,61 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
       gasCloudCol[i3 + 2] = color.b;
     }
     
+    // === STAR CLUSTERS (bright concentrated groups along arms) ===
+    const starClusterCount = 25000;
+    const starClusterPos = new Float32Array(starClusterCount * 3);
+    const starClusterCol = new Float32Array(starClusterCount * 3);
+    
+    // Create ~150 cluster centers, then populate each with stars
+    const numClusters = 150;
+    const starsPerCluster = Math.floor(starClusterCount / numClusters);
+    
+    for (let c = 0; c < numClusters; c++) {
+      const armIdx = Math.floor(Math.random() * 4);
+      const arm = MILKY_WAY.arms[armIdx];
+      
+      // Cluster position along arm
+      const t = 0.1 + Math.random() * 0.8;
+      const r = (8000 + t * 38000) * gs;
+      const winding = 0.22;
+      const spiralAngle = arm.startAngle + Math.log(r / (6000 * gs) + 0.1) / winding;
+      const armSpread = (Math.random() - 0.5) * 1200 * gs;
+      
+      const clusterX = Math.cos(spiralAngle + armSpread / r) * r;
+      const clusterZ = Math.sin(spiralAngle + armSpread / r) * r;
+      const clusterY = (Math.random() - 0.5) * 80 * gs;
+      
+      // Cluster size varies
+      const clusterRadius = (100 + Math.random() * 300) * gs;
+      
+      // Cluster color - bright blue-white or yellow-white
+      const clusterHue = Math.random() < 0.7 ? 0.58 + Math.random() * 0.08 : 0.12 + Math.random() * 0.06;
+      const clusterSat = 0.5 + Math.random() * 0.3;
+      
+      for (let s = 0; s < starsPerCluster; s++) {
+        const i = c * starsPerCluster + s;
+        if (i >= starClusterCount) break;
+        const i3 = i * 3;
+        
+        // Gaussian distribution within cluster
+        const dx = (Math.random() + Math.random() + Math.random() - 1.5) * clusterRadius;
+        const dy = (Math.random() + Math.random() + Math.random() - 1.5) * clusterRadius * 0.3;
+        const dz = (Math.random() + Math.random() + Math.random() - 1.5) * clusterRadius;
+        
+        starClusterPos[i3] = clusterX + dx;
+        starClusterPos[i3 + 1] = clusterY + dy;
+        starClusterPos[i3 + 2] = clusterZ + dz;
+        
+        // Brighter toward cluster center
+        const dist = Math.sqrt(dx*dx + dy*dy + dz*dz) / clusterRadius;
+        const brightness = 0.85 + (1 - dist) * 0.15;
+        color.setHSL(clusterHue, clusterSat, brightness);
+        starClusterCol[i3] = color.r;
+        starClusterCol[i3 + 1] = color.g;
+        starClusterCol[i3 + 2] = color.b;
+      }
+    }
+    
     // === STELLAR HALO (faint outer stars and globular clusters) ===
     const haloCount = 10000;
     const haloPos = new Float32Array(haloCount * 3);
@@ -403,11 +458,15 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
     gasCloudGeo.setAttribute('position', new THREE.BufferAttribute(gasCloudPos, 3));
     gasCloudGeo.setAttribute('color', new THREE.BufferAttribute(gasCloudCol, 3));
     
+    const starClusterGeo = new THREE.BufferGeometry();
+    starClusterGeo.setAttribute('position', new THREE.BufferAttribute(starClusterPos, 3));
+    starClusterGeo.setAttribute('color', new THREE.BufferAttribute(starClusterCol, 3));
+    
     const haloGeo = new THREE.BufferGeometry();
     haloGeo.setAttribute('position', new THREE.BufferAttribute(haloPos, 3));
     haloGeo.setAttribute('color', new THREE.BufferAttribute(haloCol, 3));
     
-    return { bulgeGeo, barGeo, diskGeo, armCoreGeo, dustGeo, nebulaGeo, gasCloudGeo, haloGeo };
+    return { bulgeGeo, barGeo, diskGeo, armCoreGeo, dustGeo, nebulaGeo, gasCloudGeo, starClusterGeo, haloGeo };
   }, [gs]);
   
   const pulseRef2 = useRef<THREE.Mesh>(null);
@@ -537,6 +596,20 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
           sizeAttenuation
           transparent
           opacity={0.45}
+          blending={THREE.AdditiveBlending}
+          depthWrite={false}
+        />
+      </points>
+      
+      {/* Star clusters - bright concentrated groups */}
+      <points geometry={starClusterGeo}>
+        <pointsMaterial
+          size={gs * 90}
+          map={starTexture}
+          vertexColors
+          sizeAttenuation
+          transparent
+          opacity={1}
           blending={THREE.AdditiveBlending}
           depthWrite={false}
         />
