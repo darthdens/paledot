@@ -351,57 +351,112 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
     }
     
     // === STAR CLUSTERS (bright concentrated groups along arms) ===
-    const starClusterCount = 25000;
+    const starClusterCount = 35000;
     const starClusterPos = new Float32Array(starClusterCount * 3);
     const starClusterCol = new Float32Array(starClusterCount * 3);
+    const starClusterSizes = new Float32Array(starClusterCount);
     
-    // Create ~150 cluster centers, then populate each with stars
-    const numClusters = 150;
-    const starsPerCluster = Math.floor(starClusterCount / numClusters);
+    // Create ~200 cluster centers with varied sizes
+    const numClusters = 200;
+    let starIdx = 0;
     
-    for (let c = 0; c < numClusters; c++) {
+    for (let c = 0; c < numClusters && starIdx < starClusterCount; c++) {
       const armIdx = Math.floor(Math.random() * 4);
       const arm = MILKY_WAY.arms[armIdx];
       
       // Cluster position along arm
-      const t = 0.1 + Math.random() * 0.8;
-      const r = (8000 + t * 38000) * gs;
+      const t = 0.08 + Math.random() * 0.85;
+      const r = (7000 + t * 42000) * gs;
       const winding = 0.22;
       const spiralAngle = arm.startAngle + Math.log(r / (6000 * gs) + 0.1) / winding;
-      const armSpread = (Math.random() - 0.5) * 1200 * gs;
+      const armSpread = (Math.random() - 0.5) * 1500 * gs;
       
       const clusterX = Math.cos(spiralAngle + armSpread / r) * r;
       const clusterZ = Math.sin(spiralAngle + armSpread / r) * r;
-      const clusterY = (Math.random() - 0.5) * 80 * gs;
+      const clusterY = (Math.random() - 0.5) * 100 * gs;
       
-      // Cluster size varies
-      const clusterRadius = (100 + Math.random() * 300) * gs;
+      // Cluster size varies dramatically - some tiny, some large
+      const sizeRand = Math.random();
+      const clusterRadius = sizeRand < 0.3 
+        ? (50 + Math.random() * 100) * gs   // Small clusters
+        : sizeRand < 0.7 
+          ? (150 + Math.random() * 250) * gs  // Medium clusters
+          : (400 + Math.random() * 500) * gs; // Large clusters
       
-      // Cluster color - bright blue-white or yellow-white
-      const clusterHue = Math.random() < 0.7 ? 0.58 + Math.random() * 0.08 : 0.12 + Math.random() * 0.06;
-      const clusterSat = 0.5 + Math.random() * 0.3;
+      // Stars per cluster based on cluster size
+      const starsInCluster = Math.floor(80 + (clusterRadius / gs) * 0.4);
       
-      for (let s = 0; s < starsPerCluster; s++) {
-        const i = c * starsPerCluster + s;
-        if (i >= starClusterCount) break;
-        const i3 = i * 3;
+      // Cluster color type - more variety
+      const colorType = Math.random();
+      let baseHue: number, baseSat: number, baseLightness: number;
+      
+      if (colorType < 0.35) {
+        // Young blue clusters (O/B stars)
+        baseHue = 0.58 + Math.random() * 0.08;
+        baseSat = 0.6 + Math.random() * 0.35;
+        baseLightness = 0.8;
+      } else if (colorType < 0.55) {
+        // Blue-white clusters
+        baseHue = 0.55 + Math.random() * 0.1;
+        baseSat = 0.4 + Math.random() * 0.3;
+        baseLightness = 0.85;
+      } else if (colorType < 0.7) {
+        // White clusters
+        baseHue = 0.15 + Math.random() * 0.1;
+        baseSat = 0.1 + Math.random() * 0.2;
+        baseLightness = 0.9;
+      } else if (colorType < 0.85) {
+        // Yellow-white (older) clusters
+        baseHue = 0.12 + Math.random() * 0.08;
+        baseSat = 0.35 + Math.random() * 0.25;
+        baseLightness = 0.8;
+      } else if (colorType < 0.93) {
+        // Orange/gold clusters (globular-like)
+        baseHue = 0.08 + Math.random() * 0.06;
+        baseSat = 0.5 + Math.random() * 0.3;
+        baseLightness = 0.75;
+      } else {
+        // Rare pink/magenta clusters (young with emission)
+        baseHue = 0.9 + Math.random() * 0.1;
+        baseSat = 0.5 + Math.random() * 0.3;
+        baseLightness = 0.75;
+      }
+      
+      for (let s = 0; s < starsInCluster && starIdx < starClusterCount; s++) {
+        const i3 = starIdx * 3;
         
-        // Gaussian distribution within cluster
-        const dx = (Math.random() + Math.random() + Math.random() - 1.5) * clusterRadius;
-        const dy = (Math.random() + Math.random() + Math.random() - 1.5) * clusterRadius * 0.3;
-        const dz = (Math.random() + Math.random() + Math.random() - 1.5) * clusterRadius;
+        // Gaussian distribution within cluster - tighter core
+        const concentration = Math.pow(Math.random(), 0.6);
+        const theta = Math.random() * Math.PI * 2;
+        const phi = Math.acos(2 * Math.random() - 1);
+        const dist = concentration * clusterRadius;
+        
+        const dx = dist * Math.sin(phi) * Math.cos(theta);
+        const dy = dist * Math.cos(phi) * 0.4; // Flattened
+        const dz = dist * Math.sin(phi) * Math.sin(theta);
         
         starClusterPos[i3] = clusterX + dx;
         starClusterPos[i3 + 1] = clusterY + dy;
         starClusterPos[i3 + 2] = clusterZ + dz;
         
-        // Brighter toward cluster center
-        const dist = Math.sqrt(dx*dx + dy*dy + dz*dz) / clusterRadius;
-        const brightness = 0.85 + (1 - dist) * 0.15;
-        color.setHSL(clusterHue, clusterSat, brightness);
+        // Individual star variation
+        const starVariation = (Math.random() - 0.5) * 0.1;
+        const brightness = baseLightness + (1 - concentration) * 0.15 + starVariation;
+        const satVariation = baseSat + (Math.random() - 0.5) * 0.15;
+        
+        color.setHSL(
+          baseHue + (Math.random() - 0.5) * 0.05,
+          Math.max(0, Math.min(1, satVariation)),
+          Math.max(0.6, Math.min(1, brightness))
+        );
         starClusterCol[i3] = color.r;
         starClusterCol[i3 + 1] = color.g;
         starClusterCol[i3 + 2] = color.b;
+        
+        // Star size variation - brighter stars larger
+        starClusterSizes[starIdx] = 0.6 + Math.random() * 0.8 + (1 - concentration) * 0.4;
+        
+        starIdx++;
       }
     }
     
@@ -459,8 +514,9 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
     gasCloudGeo.setAttribute('color', new THREE.BufferAttribute(gasCloudCol, 3));
     
     const starClusterGeo = new THREE.BufferGeometry();
-    starClusterGeo.setAttribute('position', new THREE.BufferAttribute(starClusterPos, 3));
-    starClusterGeo.setAttribute('color', new THREE.BufferAttribute(starClusterCol, 3));
+    starClusterGeo.setAttribute('position', new THREE.BufferAttribute(starClusterPos.slice(0, starIdx * 3), 3));
+    starClusterGeo.setAttribute('color', new THREE.BufferAttribute(starClusterCol.slice(0, starIdx * 3), 3));
+    starClusterGeo.setAttribute('size', new THREE.BufferAttribute(starClusterSizes.slice(0, starIdx), 1));
     
     const haloGeo = new THREE.BufferGeometry();
     haloGeo.setAttribute('position', new THREE.BufferAttribute(haloPos, 3));
