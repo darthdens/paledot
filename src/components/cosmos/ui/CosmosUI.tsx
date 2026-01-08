@@ -101,6 +101,7 @@ export const CosmosUI = () => {
   const {
     startTour,
     isTouring,
+    showQuickJump,
     toggleQuickJump,
     setQuickJumpAnchorRect,
     showControlHints,
@@ -564,7 +565,7 @@ export const CosmosUI = () => {
             <Button size="icon" variant="ghost" onClick={toggleFullscreen} className="h-8 w-8 sm:h-9 sm:w-9 bg-white/10 hover:bg-white/20 text-white" title={isFullscreen ? t.exitFullscreen : t.fullscreen}>
               {isFullscreen ? <Minimize className="w-4 h-4 sm:w-5 sm:h-5" /> : <Maximize className="w-4 h-4 sm:w-5 sm:h-5" />}
             </Button>
-            <Button ref={quickJumpButtonRef} size="icon" variant="ghost" onClick={handleQuickJumpClick} className="h-8 w-8 sm:h-9 sm:w-9 bg-white/10 hover:bg-white/20 text-white" title={t.quickJump}>
+            <Button ref={quickJumpButtonRef} size="icon" variant="ghost" onClick={handleQuickJumpClick} className={`h-8 w-8 sm:h-9 sm:w-9 text-white ${showQuickJump ? 'bg-white/25' : 'bg-white/10 hover:bg-white/20'}`} title={t.quickJump}>
               <Compass className="w-4 h-4 sm:w-5 sm:h-5" />
             </Button>
             <Button size="icon" variant="ghost" onClick={goHome} className="h-8 w-8 sm:h-9 sm:w-9 bg-white/10 hover:bg-white/20 text-white" title={t.home}>
