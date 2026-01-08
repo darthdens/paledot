@@ -40,7 +40,7 @@ export const QuickJumpMenu = () => {
   };
 
   return (
-    <div className="absolute top-12 right-2 sm:top-14 sm:right-4 z-50 w-[calc(100vw-1rem)] max-w-56 sm:max-w-64 max-h-[calc(100vh-4rem)] sm:max-h-[calc(100vh-5rem)] bg-black/90 backdrop-blur-md rounded-lg border border-white/20 overflow-hidden flex flex-col">
+    <div className="absolute top-12 bottom-2 right-2 sm:top-16 sm:bottom-4 sm:right-4 z-50 w-[calc(100vw-1rem)] max-w-56 sm:max-w-64 bg-black/90 backdrop-blur-md rounded-lg border border-white/20 overflow-hidden flex flex-col">
       {/* Header */}
       <div className="flex items-center justify-between p-2 sm:p-3 border-b border-white/10 shrink-0">
         <h3 className="text-white font-semibold text-sm">{t.title}</h3>
@@ -55,7 +55,7 @@ export const QuickJumpMenu = () => {
       </div>
 
       {/* Scrollable content */}
-      <div className="overflow-y-auto flex-1">
+      <div className="overflow-y-auto flex-1 min-h-0">
         {/* Recent jumps */}
         {recentJumps.length > 0 && (
           <div className="p-2 border-b border-white/10">
