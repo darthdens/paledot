@@ -7,34 +7,41 @@ interface CosmosStore {
   cameraDistance: number;
   currentScale: ScaleLevel;
   targetPosition: [number, number, number];
-  
+
+  // Runtime positions (used for moving/orbiting bodies)
+  objectWorldPositions: Record<string, [number, number, number]>;
+
   // Selection
   selectedObject: CelestialObject | null;
   hoveredObject: CelestialObject | null;
-  
+
   // Tour
   isTouring: boolean;
   tourIndex: number;
   tourSpeed: number;
   isPaused: boolean;
-  
+
   // UI
   showControlHints: boolean;
   showQuickJump: boolean;
   showSizeComparison: boolean;
   recentJumps: string[];
-  
+
   // Audio
   isMuted: boolean;
   volume: number;
-  
+
   // Time travel
   timeOffset: number; // Years from present
-  
+
   // Actions
   setCameraDistance: (distance: number) => void;
   setCurrentScale: (scale: ScaleLevel) => void;
   setTargetPosition: (position: [number, number, number]) => void;
+
+  setObjectWorldPosition: (objectId: string, position: [number, number, number]) => void;
+  getObjectWorldPosition: (objectId: string) => [number, number, number] | null;
+
   setSelectedObject: (object: CelestialObject | null) => void;
   setHoveredObject: (object: CelestialObject | null) => void;
   startTour: () => void;
@@ -68,6 +75,8 @@ export const useCosmosStore = create<CosmosStore>()(
       cameraDistance: 50000,
       currentScale: 'earth',
       targetPosition: [0, 0, 50000],
+
+      objectWorldPositions: {},
       
       selectedObject: null,
       hoveredObject: null,
@@ -96,6 +105,16 @@ export const useCosmosStore = create<CosmosStore>()(
       setCurrentScale: (scale) => set({ currentScale: scale }),
       
       setTargetPosition: (position) => set({ targetPosition: position }),
+
+      setObjectWorldPosition: (objectId, position) =>
+        set((state) => ({
+          objectWorldPositions: {
+            ...state.objectWorldPositions,
+            [objectId]: position,
+          },
+        })),
+
+      getObjectWorldPosition: (objectId) => get().objectWorldPositions[objectId] ?? null,
       
       setSelectedObject: (object) => set({ selectedObject: object }),
       
