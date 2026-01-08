@@ -42,8 +42,8 @@ export const CosmosExplorer = () => {
   const isFollowing = useCosmosStore(state => state.isFollowing);
   const currentScale = useCosmosStore(state => state.currentScale);
   
-  // Show Milky Way when at solar system scale or larger (so "You Are Here" is visible when viewing Oort Cloud)
-  const showMilkyWay = currentScale === 'solarSystem' || currentScale === 'stellar' || currentScale === 'milkyWay' || currentScale === 'localGroup' || currentScale === 'universe';
+  // Show Milky Way only at stellar scale or larger (not visible in solar system view)
+  const showMilkyWay = currentScale === 'stellar' || currentScale === 'milkyWay' || currentScale === 'localGroup' || currentScale === 'universe';
   
   // Force cursor none on canvas - OrbitControls tries to set cursor styles
   useEffect(() => {
