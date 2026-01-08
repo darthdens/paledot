@@ -46,10 +46,18 @@ export const CameraController = () => {
     const visualSize = selectedObject.size * UNIFIED_SCALE;
     flyToDistance.current = Math.max(visualSize * 5, 50);
 
-    // Get live world position or fallback to static position
+    // Get live world position or fallback to scaled static position
     const livePos = objectWorldPositions[selectedObject.id];
-    const targetPos: [number, number, number] = livePos ?? selectedObject.position;
-    
+    const fallbackPos: [number, number, number] =
+      selectedObject.category === 'solarSystem'
+        ? [
+            selectedObject.position[0] * UNIFIED_SCALE,
+            selectedObject.position[1] * UNIFIED_SCALE,
+            selectedObject.position[2] * UNIFIED_SCALE,
+          ]
+        : selectedObject.position;
+    const targetPos: [number, number, number] = livePos ?? fallbackPos;
+
     // Set target to object center
     endTarget.current.set(targetPos[0], targetPos[1], targetPos[2]);
     
@@ -96,22 +104,19 @@ export const CameraController = () => {
       return;
     }
 
-    // After fly-to: continuously follow the selected object
+    // After fly-to: continuously follow the selected object (keep it perfectly centered)
     if (selectedObject) {
       const livePos = objectWorldPositions[selectedObject.id];
       if (livePos) {
         const targetVec = new THREE.Vector3(livePos[0], livePos[1], livePos[2]);
         const currentTarget = orbitControls.target as THREE.Vector3;
-        
-        // Calculate how much the object has moved
-        const delta = new THREE.Vector3().subVectors(targetVec, currentTarget);
-        
-        // Smoothly follow the object - move both camera and target together
-        const followSpeed = 0.1;
-        const movement = delta.multiplyScalar(followSpeed);
-        
-        orbitControls.target.add(movement);
-        camera.position.add(movement);
+
+        // Preserve user's current camera offset relative to target
+        const offset = new THREE.Vector3().subVectors(camera.position, currentTarget);
+
+        // Hard-center the target on the object, and keep the same offset
+        orbitControls.target.copy(targetVec);
+        camera.position.copy(targetVec).add(offset);
         orbitControls.update();
       }
     }
