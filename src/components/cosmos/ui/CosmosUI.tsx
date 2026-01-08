@@ -1,6 +1,6 @@
 import { useLanguage } from '@/i18n/LanguageContext';
 import { Button } from '@/components/ui/button';
-import { Rocket, HelpCircle, Compass } from 'lucide-react';
+import { HelpCircle, Compass } from 'lucide-react';
 import { useCosmosStore } from '../store/useCosmosStore';
 
 const translations = {
@@ -50,8 +50,7 @@ export const CosmosUI = () => {
             </div>
 
             <div className="flex gap-4 justify-center">
-              <Button onClick={() => { setShowControlHints(false); startTour(); }} className="gap-2">
-                <Rocket className="w-4 h-4" />
+              <Button onClick={() => { setShowControlHints(false); startTour(); }}>
                 {t.startTour}
               </Button>
               <Button variant="outline" onClick={() => setShowControlHints(false)}>
@@ -75,8 +74,7 @@ export const CosmosUI = () => {
       {/* Bottom tour button */}
       {!showControlHints && (
         <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-40">
-          <Button onClick={startTour} className="gap-2 animate-pulse">
-            <Rocket className="w-4 h-4" />
+          <Button onClick={startTour} className="animate-pulse">
             {t.startTour}
           </Button>
         </div>
