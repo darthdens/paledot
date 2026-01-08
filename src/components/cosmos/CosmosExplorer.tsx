@@ -5,6 +5,7 @@ import { Suspense, useMemo } from 'react';
 import { Sun } from './objects/Sun';
 import { TexturedPlanet } from './objects/TexturedPlanet';
 import { MoonOrbit } from './objects/MoonOrbit';
+import { OrbitalTrail } from './objects/OrbitalTrail';
 import { CosmosUI } from './ui/CosmosUI';
 import { InfoCard } from './ui/InfoCard';
 import { QuickJumpMenu } from './ui/QuickJumpMenu';
@@ -24,6 +25,7 @@ const getMoonOrbitRadius = (moon: typeof celestialObjects[0], distanceScale: num
 export const CosmosExplorer = () => {
   const selectedObject = useCosmosStore(state => state.selectedObject);
   const showOrbits = useCosmosStore(state => state.showOrbits);
+  const showTrails = useCosmosStore(state => state.showTrails);
   
   const planets = celestialObjects.filter(obj => 
     obj.type === 'planet' || obj.type === 'dwarf-planet'
@@ -117,6 +119,17 @@ export const CosmosExplorer = () => {
               showOrbit={showOrbits} 
               visualScale={UNIFIED_SCALE}
               distanceScale={UNIFIED_SCALE}
+            />
+          ))}
+
+          {/* Orbital trails for planets */}
+          {showTrails && planets.map(planet => (
+            <OrbitalTrail
+              key={`trail-${planet.id}`}
+              objectId={planet.id}
+              color={planet.color}
+              maxPoints={300}
+              opacity={0.5}
             />
           ))}
 
