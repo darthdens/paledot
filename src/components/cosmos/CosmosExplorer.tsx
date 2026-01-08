@@ -38,6 +38,7 @@ export const CosmosExplorer = () => {
             far={1e18} 
           />
           <OrbitControls
+            makeDefault
             enablePan={true}
             enableZoom={true}
             enableRotate={true}
