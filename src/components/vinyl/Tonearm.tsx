@@ -13,10 +13,10 @@ export const Tonearm = ({ position, isPoweredOn, onPositionChange }: TonearmProp
   const dragStartRef = useRef({ x: 0, y: 0, rotation: 0 });
 
 
-  // Target rotations: rest = 0deg, playing = -32deg (swings toward the record)
+  // Target rotations: rest = 0deg, playing = 25deg (swings toward the record - positive = clockwise)
   const REST_ROTATION = 0;
-  const PLAYING_ROTATION = -32;
-  const THRESHOLD = -16; // If rotation < -16, consider it "playing"
+  const PLAYING_ROTATION = 25;
+  const THRESHOLD = 12; // If rotation > 12, consider it "playing"
 
   const currentRotation = isDragging && dragRotation !== null 
     ? dragRotation 
@@ -40,12 +40,12 @@ export const Tonearm = ({ position, isPoweredOn, onPositionChange }: TonearmProp
     
     // Use horizontal movement as the primary drag input (left = toward record, right = away)
     const deltaX = e.clientX - dragStartRef.current.x;
-    // Moving left should move toward PLAYING_ROTATION (more negative)
-    const rotationChange = deltaX * 0.3;
+    // Moving left should increase rotation (toward PLAYING_ROTATION)
+    const rotationChange = deltaX * -0.3;
     let newRotation = dragStartRef.current.rotation + rotationChange;
 
-    // Clamp rotation between playing (min) and rest (max)
-    newRotation = Math.max(PLAYING_ROTATION, Math.min(REST_ROTATION, newRotation));
+    // Clamp rotation between rest (min) and playing (max)
+    newRotation = Math.max(REST_ROTATION, Math.min(PLAYING_ROTATION, newRotation));
     setDragRotation(newRotation);
   }, [isDragging]);
 
@@ -57,7 +57,7 @@ export const Tonearm = ({ position, isPoweredOn, onPositionChange }: TonearmProp
     
     // Determine final position based on drag rotation
     if (dragRotation !== null && onPositionChange) {
-      const newPosition = dragRotation < THRESHOLD ? "playing" : "rest";
+      const newPosition = dragRotation > THRESHOLD ? "playing" : "rest";
       onPositionChange(newPosition);
     }
     setDragRotation(null);
