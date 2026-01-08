@@ -166,21 +166,9 @@ export const TexturedPlanet = ({
   const tiltRadians = ((visuals.tilt || 0) * Math.PI) / 180;
   const isMoon = !!object.parentId;
 
-  // For moons, scale orbit radius to be visible relative to parent planet size
-  const getMoonOrbitRadius = () => {
-    if (!isMoon || !object.parentId) return 0;
-    // Get parent planet size and scale moon orbit to be ~2-4x parent visual size
-    const parentSize = object.parentId === 'earth' ? 12742 : 
-                       object.parentId === 'jupiter' ? 139820 :
-                       object.parentId === 'saturn' ? 116460 : 50000;
-    const parentVisualSize = parentSize * visualScale;
-    // Scale based on relative orbit distance (closer moons orbit closer)
-    const realOrbitRadius = object.orbitRadius || 0;
-    const baseOrbitMultiplier = 2 + (realOrbitRadius / 2000000);
-    return parentVisualSize * Math.min(baseOrbitMultiplier, 5);
-  };
+  // For moons, use the real orbit radius scaled into scene units (so orbit paths match motion).
+  const moonOrbitRadius = isMoon ? (object.orbitRadius || 0) * distanceScale : 0;
 
-  const moonOrbitRadius = getMoonOrbitRadius();
 
   useFrame((state) => {
     const time = state.clock.getElapsedTime();

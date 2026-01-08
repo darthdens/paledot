@@ -31,51 +31,67 @@ export const CameraController = () => {
     const orbitControls = controls as any;
     if (!orbitControls.target) return;
 
-    // If we don't yet have a live world position for solar-system bodies (especially moons),
-    // wait for the next position update so we don't fly to an incorrect static coordinate.
-    const livePos = objectWorldPositions[selectedObject.id];
-    if (selectedObject.category === 'solarSystem' && !livePos) return;
+    const startFlyTo = (liveTargetPos?: [number, number, number]) => {
+      // Skip if we already triggered for this object
+      if (animationTriggerId.current === selectedObject.id && isAnimating.current) return;
+      animationTriggerId.current = selectedObject.id;
 
-    // Skip if we already triggered for this object
-    if (animationTriggerId.current === selectedObject.id && isAnimating.current) return;
-    animationTriggerId.current = selectedObject.id;
+      // Start fly-to animation
+      isAnimating.current = true;
+      animationProgress.current = 0;
 
-    // Start fly-to animation
-    isAnimating.current = true;
-    animationProgress.current = 0;
+      // Store current camera position/target
+      startPosition.current.copy(camera.position);
+      startTarget.current.copy(orbitControls.target);
 
-    // Store current camera position/target
-    startPosition.current.copy(camera.position);
-    startTarget.current.copy(orbitControls.target);
+      // Desired distance based on visual size
+      const visualSize = selectedObject.size * UNIFIED_SCALE;
+      flyToDistance.current = Math.max(visualSize * 5, 50);
 
-    // Desired distance based on visual size
-    const visualSize = selectedObject.size * UNIFIED_SCALE;
-    flyToDistance.current = Math.max(visualSize * 5, 50);
+      // Use live world position when available (for moving solar-system bodies)
+      const fallbackPos: [number, number, number] =
+        selectedObject.category === 'solarSystem'
+          ? [
+              selectedObject.position[0] * UNIFIED_SCALE,
+              selectedObject.position[1] * UNIFIED_SCALE,
+              selectedObject.position[2] * UNIFIED_SCALE,
+            ]
+          : selectedObject.position;
 
-    // Use live world position (guaranteed above for solarSystem)
-    const fallbackPos: [number, number, number] =
-      selectedObject.category === 'solarSystem'
-        ? [
-            selectedObject.position[0] * UNIFIED_SCALE,
-            selectedObject.position[1] * UNIFIED_SCALE,
-            selectedObject.position[2] * UNIFIED_SCALE,
-          ]
-        : selectedObject.position;
+      const targetPos = liveTargetPos ?? fallbackPos;
 
-    const targetPos: [number, number, number] = livePos ?? fallbackPos;
+      // Set target to object center
+      endTarget.current.set(targetPos[0], targetPos[1], targetPos[2]);
 
-    // Set target to object center
-    endTarget.current.set(targetPos[0], targetPos[1], targetPos[2]);
+      // Calculate camera position - offset from target
+      cameraOffset.current.set(
+        flyToDistance.current * 0.5,
+        flyToDistance.current * 0.3,
+        flyToDistance.current
+      );
 
-    // Calculate camera position - offset from target
-    cameraOffset.current.set(
-      flyToDistance.current * 0.5,
-      flyToDistance.current * 0.3,
-      flyToDistance.current
-    );
+      endPosition.current.copy(endTarget.current).add(cameraOffset.current);
+    };
 
-    endPosition.current.copy(endTarget.current).add(cameraOffset.current);
-  }, [selectedObject, camera, controls, objectWorldPositions]);
+    const getLivePos = () => useCosmosStore.getState().objectWorldPositions[selectedObject.id];
+    const currentLivePos = getLivePos();
+
+    // For solar system bodies, wait until we have a runtime world position to avoid repeated re-fly.
+    if (selectedObject.category === 'solarSystem' && !currentLivePos) {
+      let done = false;
+      const unsubscribe = useCosmosStore.subscribe((state) => {
+        if (done) return;
+        const pos = state.objectWorldPositions[selectedObject.id];
+        if (!pos) return;
+        done = true;
+        startFlyTo(pos);
+      });
+
+      return () => unsubscribe();
+    }
+
+    startFlyTo(currentLivePos);
+  }, [selectedObject, camera, controls]);
 
   useFrame((_, delta) => {
     if (!controls) return;

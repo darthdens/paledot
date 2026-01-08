@@ -11,16 +11,16 @@ interface MoonOrbitProps {
 }
 
 export const MoonOrbit = ({ parentId, moonOrbitRadius, color = '#ffffff' }: MoonOrbitProps) => {
-  const objectWorldPositions = useCosmosStore(state => state.objectWorldPositions);
   const groupRef = useRef<THREE.Group>(null);
 
   // Update position to follow parent planet
   useFrame(() => {
-    const parentPos = objectWorldPositions[parentId];
+    const parentPos = useCosmosStore.getState().objectWorldPositions[parentId];
     if (groupRef.current && parentPos) {
       groupRef.current.position.set(parentPos[0], parentPos[1], parentPos[2]);
     }
   });
+
 
   // Create orbit circle points
   const orbitPoints = useMemo(() => {
