@@ -6,16 +6,23 @@ import { useCosmosStore } from '../store/useCosmosStore';
 import { useFullscreenStore } from '../store/useFullscreenStore';
 import { useCallback, useEffect, useState } from 'react';
 import { ObjectSearch } from './ObjectSearch';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 const translations = {
   en: {
     startTour: 'Start Guided Tour',
     quickJump: 'Quick Jump',
     controls: 'Controls',
+    // Desktop controls
     scrollZoom: 'Scroll to zoom in/out',
     dragRotate: 'Left-drag to rotate view',
     rightDragPan: 'Right-drag to pan',
     clickSelect: 'Click objects to select',
+    // Touch controls (mobile/tablet)
+    pinchZoom: 'Pinch to zoom in/out',
+    dragRotateTouch: 'Drag to rotate view',
+    twoFingerPan: 'Two-finger drag to pan',
+    tapSelect: 'Tap objects to select',
     distanceFromEarth: 'Distance from Earth',
     welcome: 'Welcome to Cosmos Explorer',
     subtitle: 'Journey through our solar system and beyond',
@@ -36,15 +43,23 @@ const translations = {
     sizeComparison: 'Size comparison',
     exaggeratedScale: 'Exaggerated scale',
     realisticScale: 'Realistic scale',
+    // Touch tip
+    useButtons: 'Use buttons to control',
   },
   fr: {
     startTour: 'Commencer la Visite',
     quickJump: 'Saut Rapide',
     controls: 'Contrôles',
+    // Desktop controls
     scrollZoom: 'Molette pour zoomer',
     dragRotate: 'Glisser pour tourner',
     rightDragPan: 'Clic droit pour déplacer',
     clickSelect: 'Cliquer pour sélectionner',
+    // Touch controls (mobile/tablet)
+    pinchZoom: 'Pincer pour zoomer',
+    dragRotateTouch: 'Glisser pour tourner',
+    twoFingerPan: 'Deux doigts pour déplacer',
+    tapSelect: 'Toucher pour sélectionner',
     distanceFromEarth: 'Distance de la Terre',
     welcome: 'Bienvenue dans Cosmos Explorer',
     subtitle: 'Voyagez à travers notre système solaire et au-delà',
@@ -65,12 +80,15 @@ const translations = {
     sizeComparison: 'Comparaison tailles',
     exaggeratedScale: 'Échelle exagérée',
     realisticScale: 'Échelle réaliste',
+    // Touch tip
+    useButtons: 'Utilisez les boutons',
   },
 };
 
 export const CosmosUI = () => {
   const { language } = useLanguage();
   const t = translations[language];
+  const isMobile = useIsMobile();
   const {
     startTour,
     isTouring,
@@ -437,25 +455,49 @@ export const CosmosUI = () => {
             <h1 className="text-xl sm:text-3xl md:text-4xl font-bold text-white leading-tight">{t.welcome}</h1>
             <p className="text-sm sm:text-base text-white/70">{t.subtitle}</p>
             
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-left">
+            <div className={`grid gap-3 text-left ${isMobile ? 'grid-cols-1' : 'grid-cols-1 sm:grid-cols-2'}`}>
               <div className="bg-white/10 rounded-lg p-3 sm:p-4 space-y-1.5">
                 <p className="text-white/90 font-medium text-sm sm:text-base">{t.controls}:</p>
-                <p className="text-white/70 text-xs sm:text-sm">• {t.scrollZoom}</p>
-                <p className="text-white/70 text-xs sm:text-sm">• {t.dragRotate}</p>
-                <p className="text-white/70 text-xs sm:text-sm">• {t.rightDragPan}</p>
-                <p className="text-white/70 text-xs sm:text-sm">• {t.clickSelect}</p>
+                {isMobile ? (
+                  <>
+                    <p className="text-white/70 text-xs sm:text-sm">• {t.pinchZoom}</p>
+                    <p className="text-white/70 text-xs sm:text-sm">• {t.dragRotateTouch}</p>
+                    <p className="text-white/70 text-xs sm:text-sm">• {t.twoFingerPan}</p>
+                    <p className="text-white/70 text-xs sm:text-sm">• {t.tapSelect}</p>
+                  </>
+                ) : (
+                  <>
+                    <p className="text-white/70 text-xs sm:text-sm">• {t.scrollZoom}</p>
+                    <p className="text-white/70 text-xs sm:text-sm">• {t.dragRotate}</p>
+                    <p className="text-white/70 text-xs sm:text-sm">• {t.rightDragPan}</p>
+                    <p className="text-white/70 text-xs sm:text-sm">• {t.clickSelect}</p>
+                  </>
+                )}
               </div>
               
-              <div className="bg-white/10 rounded-lg p-3 sm:p-4 space-y-1.5">
-                <p className="text-white/90 font-medium text-sm sm:text-base">
-                  {language === 'fr' ? 'Raccourcis:' : 'Shortcuts:'}
-                </p>
-                <p className="text-white/70 text-xs sm:text-sm">• 1-9: {language === 'fr' ? 'Planètes' : 'Planets'}</p>
-                <p className="text-white/70 text-xs sm:text-sm">• 0/S: {language === 'fr' ? 'Soleil' : 'Sun'}</p>
-                <p className="text-white/70 text-xs sm:text-sm">• ←/→: {language === 'fr' ? 'Naviguer' : 'Navigate'}</p>
-                <p className="text-white/70 text-xs sm:text-sm">• +/-: {language === 'fr' ? 'Vitesse' : 'Speed'}</p>
-                <p className="text-white/70 text-xs sm:text-sm">• {language === 'fr' ? 'Espace' : 'Space'}: {language === 'fr' ? 'Pause' : 'Pause'}</p>
-              </div>
+              {/* Keyboard shortcuts - only on desktop */}
+              {!isMobile && (
+                <div className="bg-white/10 rounded-lg p-3 sm:p-4 space-y-1.5">
+                  <p className="text-white/90 font-medium text-sm sm:text-base">
+                    {language === 'fr' ? 'Raccourcis:' : 'Shortcuts:'}
+                  </p>
+                  <p className="text-white/70 text-xs sm:text-sm">• 1-9: {language === 'fr' ? 'Planètes' : 'Planets'}</p>
+                  <p className="text-white/70 text-xs sm:text-sm">• 0/S: {language === 'fr' ? 'Soleil' : 'Sun'}</p>
+                  <p className="text-white/70 text-xs sm:text-sm">• ←/→: {language === 'fr' ? 'Naviguer' : 'Navigate'}</p>
+                  <p className="text-white/70 text-xs sm:text-sm">• +/-: {language === 'fr' ? 'Vitesse' : 'Speed'}</p>
+                  <p className="text-white/70 text-xs sm:text-sm">• {language === 'fr' ? 'Espace' : 'Space'}: {language === 'fr' ? 'Pause' : 'Pause'}</p>
+                </div>
+              )}
+              
+              {/* Mobile tip - use UI buttons */}
+              {isMobile && (
+                <div className="bg-white/10 rounded-lg p-3 sm:p-4 space-y-1.5">
+                  <p className="text-white/90 font-medium text-sm sm:text-base">
+                    {language === 'fr' ? 'Astuce:' : 'Tip:'}
+                  </p>
+                  <p className="text-white/70 text-xs sm:text-sm">• {t.useButtons}</p>
+                </div>
+              )}
             </div>
 
             <div className="flex gap-2 sm:gap-3 justify-center flex-wrap">
