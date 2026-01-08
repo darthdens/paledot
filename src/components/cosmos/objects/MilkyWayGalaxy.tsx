@@ -266,26 +266,38 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
     return { bulgeGeo, diskGeo, dustGeo, nebulaGeo, clusterGeo };
   }, [gs]);
   
-  const beaconRef = useRef<THREE.Mesh>(null);
+  const pulseRef2 = useRef<THREE.Mesh>(null);
+  const markerGroupRef = useRef<THREE.Group>(null);
   
-  // Animate You Are Here pulse and beacon
-  useFrame(({ clock }) => {
+  // Animate pulse and scale marker based on camera distance
+  useFrame(({ clock, camera }) => {
     const t = clock.getElapsedTime();
     
+    // Pulse animation
     if (pulseRef.current) {
-      const phase = (t * 0.6) % 1;
-      pulseRef.current.scale.setScalar(1 + phase * 4);
-      (pulseRef.current.material as THREE.MeshBasicMaterial).opacity = (1 - phase) * 0.8;
+      const phase = (t * 1.2) % 1;
+      pulseRef.current.scale.setScalar(1 + phase * 2);
+      (pulseRef.current.material as THREE.MeshBasicMaterial).opacity = (1 - phase) * 0.6;
     }
     
-    if (beaconRef.current) {
-      // Pulsing glow effect
-      const pulse = 0.6 + Math.sin(t * 2) * 0.4;
-      (beaconRef.current.material as THREE.MeshBasicMaterial).opacity = pulse * 0.5;
+    if (pulseRef2.current) {
+      const phase = ((t * 1.2) + 0.5) % 1;
+      pulseRef2.current.scale.setScalar(1 + phase * 2);
+      (pulseRef2.current.material as THREE.MeshBasicMaterial).opacity = (1 - phase) * 0.6;
+    }
+    
+    // Scale marker group based on camera distance so it's always visible
+    if (markerGroupRef.current) {
+      const markerWorldPos = new THREE.Vector3();
+      markerGroupRef.current.getWorldPosition(markerWorldPos);
+      const distance = camera.position.distanceTo(markerWorldPos);
+      // Scale proportionally to distance - keeps consistent screen size
+      const scale = Math.max(1, distance * 0.015);
+      markerGroupRef.current.scale.setScalar(scale);
     }
   });
   
-  const markerSize = gs * 800; // Much larger marker
+  const baseMarkerSize = gs * 150;
   
   return (
     <group ref={groupRef} position={galaxyOffset}>
@@ -395,71 +407,52 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
         />
       </mesh>
       
-      {/* "You Are Here" marker with vertical beacon */}
+      {/* "You Are Here" marker - clean pulsing dot */}
       {showYouAreHere && (
-        <group position={[
-          Math.cos(MILKY_WAY.sunAngle) * MILKY_WAY.sunDistance * gs,
-          0,
-          Math.sin(MILKY_WAY.sunAngle) * MILKY_WAY.sunDistance * gs
-        ]}>
-          {/* Core bright sphere */}
+        <group 
+          ref={markerGroupRef}
+          position={[
+            Math.cos(MILKY_WAY.sunAngle) * MILKY_WAY.sunDistance * gs,
+            0,
+            Math.sin(MILKY_WAY.sunAngle) * MILKY_WAY.sunDistance * gs
+          ]}
+        >
+          {/* Core dot */}
           <mesh>
-            <sphereGeometry args={[markerSize, 16, 16]} />
+            <sphereGeometry args={[baseMarkerSize, 16, 16]} />
             <meshBasicMaterial color="#00ff88" />
           </mesh>
           
-          {/* Inner glow */}
+          {/* Soft glow */}
           <mesh>
-            <sphereGeometry args={[markerSize * 2.5, 16, 16]} />
+            <sphereGeometry args={[baseMarkerSize * 2, 16, 16]} />
             <meshBasicMaterial
               color="#00ff88"
               transparent
-              opacity={0.4}
+              opacity={0.25}
               blending={THREE.AdditiveBlending}
             />
           </mesh>
           
-          {/* Outer glow */}
-          <mesh>
-            <sphereGeometry args={[markerSize * 5, 16, 16]} />
-            <meshBasicMaterial
-              color="#00ff88"
-              transparent
-              opacity={0.15}
-              blending={THREE.AdditiveBlending}
-            />
-          </mesh>
-          
-          {/* Pulsing ring */}
+          {/* Pulse ring 1 */}
           <mesh ref={pulseRef} rotation={[Math.PI / 2, 0, 0]}>
-            <ringGeometry args={[markerSize * 1.5, markerSize * 2.5, 32]} />
+            <ringGeometry args={[baseMarkerSize * 1.2, baseMarkerSize * 1.6, 32]} />
             <meshBasicMaterial
               color="#00ff88"
               transparent
-              opacity={0.8}
+              opacity={0.6}
               side={THREE.DoubleSide}
             />
           </mesh>
           
-          {/* Vertical beacon - tall glowing column */}
-          <mesh ref={beaconRef}>
-            <cylinderGeometry args={[markerSize * 0.3, markerSize * 0.3, markerSize * 40, 8]} />
+          {/* Pulse ring 2 (offset) */}
+          <mesh ref={pulseRef2} rotation={[Math.PI / 2, 0, 0]}>
+            <ringGeometry args={[baseMarkerSize * 1.2, baseMarkerSize * 1.6, 32]} />
             <meshBasicMaterial
               color="#00ff88"
               transparent
-              opacity={0.5}
-              blending={THREE.AdditiveBlending}
-            />
-          </mesh>
-          
-          {/* Beacon glow */}
-          <mesh>
-            <cylinderGeometry args={[markerSize * 1, markerSize * 1, markerSize * 40, 8]} />
-            <meshBasicMaterial
-              color="#00ff88"
-              transparent
-              opacity={0.1}
-              blending={THREE.AdditiveBlending}
+              opacity={0.6}
+              side={THREE.DoubleSide}
             />
           </mesh>
         </group>
