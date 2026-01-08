@@ -200,24 +200,22 @@ export const InfoCard = () => {
         left: 'calc(0.5rem + env(safe-area-inset-left))',
       } : undefined}
     >
-      {/* Header */}
-      <div className="flex items-center justify-between p-3 border-b border-white/10">
+      {/* Header - entire bar is clickable to toggle minimize */}
+      <div 
+        className="flex items-center justify-between p-3 border-b border-white/10 cursor-pointer hover:bg-white/5 transition-colors"
+        onClick={() => setIsMinimized(!isMinimized)}
+      >
         <h3 className="text-white font-semibold text-sm sm:text-base truncate flex-1 mr-2">
           {selectedObject.name[language]}
         </h3>
         <div className="flex items-center gap-1">
-          <Button
-            size="icon"
-            variant="ghost"
-            onClick={() => setIsMinimized(!isMinimized)}
-            className="h-6 w-6 text-white/70 hover:text-white hover:bg-white/10"
-          >
+          <div className="h-6 w-6 flex items-center justify-center text-white/70">
             {isMinimized ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-          </Button>
+          </div>
           <Button
             size="icon"
             variant="ghost"
-            onClick={handleClose}
+            onClick={(e) => { e.stopPropagation(); handleClose(); }}
             className="h-6 w-6 text-white/70 hover:text-white hover:bg-white/10"
           >
             <X className="w-4 h-4" />
