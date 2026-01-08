@@ -33,7 +33,7 @@ export const YouAreHereLabel = () => {
   if (!isGalacticScale) return null;
   
   return (
-    <div className="absolute bottom-4 left-4 sm:bottom-auto sm:top-4 z-20 animate-fade-in">
+    <div className="absolute top-[68px] right-4 sm:right-auto sm:left-4 sm:top-4 z-20 animate-fade-in">
       <div className="bg-black/70 backdrop-blur-sm rounded-lg border border-emerald-500/30 overflow-hidden max-w-[200px] sm:max-w-none">
         <button
           onClick={() => setIsMinimized(!isMinimized)}
