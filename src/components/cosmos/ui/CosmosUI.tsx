@@ -1,7 +1,7 @@
 import { useLanguage } from '@/i18n/LanguageContext';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
-import { HelpCircle, Compass, Maximize, Minimize, CircleDot, CircleOff, Clock } from 'lucide-react';
+import { HelpCircle, Compass, Maximize, Minimize, CircleDot, CircleOff, Clock, Timer, TimerOff } from 'lucide-react';
 import { useCosmosStore } from '../store/useCosmosStore';
 import { useFullscreenStore } from '../store/useFullscreenStore';
 import { useCallback, useEffect, useState } from 'react';
@@ -25,6 +25,8 @@ const translations = {
     paused: 'Paused',
     realTime: 'Real-time',
     fast: 'Fast',
+    showPeriods: 'Show periods',
+    hidePeriods: 'Hide periods',
   },
   fr: {
     startTour: 'Commencer la Visite',
@@ -44,6 +46,8 @@ const translations = {
     paused: 'Pause',
     realTime: 'Temps réel',
     fast: 'Rapide',
+    showPeriods: 'Afficher périodes',
+    hidePeriods: 'Masquer périodes',
   },
 };
 
@@ -57,6 +61,8 @@ export const CosmosUI = () => {
     setShowControlHints,
     showOrbits,
     toggleOrbits,
+    showRealPeriods,
+    toggleRealPeriods,
     timeSpeed,
     setTimeSpeed,
   } = useCosmosStore();
@@ -391,6 +397,19 @@ export const CosmosUI = () => {
           title={t.timeSpeed}
         >
           <Clock className="w-3.5 h-3.5 sm:w-5 sm:h-5" />
+        </Button>
+        <Button
+          size="icon"
+          variant="ghost"
+          onClick={toggleRealPeriods}
+          className="h-7 w-7 sm:h-9 sm:w-9 bg-white/10 hover:bg-white/20 text-white"
+          title={showRealPeriods ? t.hidePeriods : t.showPeriods}
+        >
+          {showRealPeriods ? (
+            <Timer className="w-3.5 h-3.5 sm:w-5 sm:h-5" />
+          ) : (
+            <TimerOff className="w-3.5 h-3.5 sm:w-5 sm:h-5" />
+          )}
         </Button>
         <Button
           size="icon"

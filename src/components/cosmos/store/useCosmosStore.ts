@@ -29,6 +29,7 @@ interface CosmosStore {
   showQuickJump: boolean;
   showSizeComparison: boolean;
   showOrbits: boolean;
+  showRealPeriods: boolean;
   recentJumps: string[];
 
   // Audio
@@ -60,6 +61,7 @@ interface CosmosStore {
   toggleQuickJump: () => void;
   toggleSizeComparison: () => void;
   toggleOrbits: () => void;
+  toggleRealPeriods: () => void;
   addRecentJump: (objectId: string) => void;
   jumpToObject: (object: CelestialObject) => void;
   setMuted: (muted: boolean) => void;
@@ -101,6 +103,7 @@ export const useCosmosStore = create<CosmosStore>()(
       showQuickJump: false,
       showSizeComparison: false,
       showOrbits: true,
+      showRealPeriods: false,
       recentJumps: [],
 
       isMuted: false,
@@ -154,6 +157,8 @@ export const useCosmosStore = create<CosmosStore>()(
       toggleSizeComparison: () => set((state) => ({ showSizeComparison: !state.showSizeComparison })),
 
       toggleOrbits: () => set((state) => ({ showOrbits: !state.showOrbits })),
+
+      toggleRealPeriods: () => set((state) => ({ showRealPeriods: !state.showRealPeriods })),
       
       addRecentJump: (objectId) => {
         const { recentJumps } = get();

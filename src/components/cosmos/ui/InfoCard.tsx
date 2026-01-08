@@ -4,7 +4,28 @@ import { X, Navigation, ChevronDown, ChevronUp, Eye, EyeOff } from 'lucide-react
 import { useCosmosStore } from '../store/useCosmosStore';
 import { useFullscreenStore } from '../store/useFullscreenStore';
 import { UNITS } from '../types';
+import { ORBITAL_PERIODS } from '../data/celestialObjects';
 import { useState } from 'react';
+
+// Rotation periods in hours (negative = retrograde)
+const ROTATION_PERIODS_HOURS: Record<string, number> = {
+  sun: 609.12,
+  mercury: 1407.6,
+  venus: -5832.5,
+  earth: 23.934,
+  moon: 655.7,
+  mars: 24.623,
+  jupiter: 9.925,
+  io: 42.46,
+  europa: 85.23,
+  ganymede: 171.71,
+  callisto: 400.54,
+  saturn: 10.656,
+  titan: 382.68,
+  uranus: -17.24,
+  neptune: 16.11,
+  pluto: -153.29,
+};
 
 const translations = {
   en: {
@@ -25,6 +46,11 @@ const translations = {
     galaxy: 'Galaxy',
     cluster: 'Galaxy Cluster',
     other: 'Deep Space Object',
+    orbitalPeriod: 'Orbital Period',
+    rotationPeriod: 'Rotation Period',
+    days: 'days',
+    hours: 'hours',
+    retrograde: 'retrograde',
   },
   fr: {
     distance: 'Distance de la Terre',
@@ -44,6 +70,11 @@ const translations = {
     galaxy: 'Galaxie',
     cluster: 'Amas de Galaxies',
     other: 'Objet de l\'Espace Profond',
+    orbitalPeriod: 'Période Orbitale',
+    rotationPeriod: 'Période de Rotation',
+    days: 'jours',
+    hours: 'heures',
+    retrograde: 'rétrograde',
   },
 };
 
@@ -94,6 +125,29 @@ const formatSize = (size: number, language: string): string => {
   return `${size.toLocaleString(locale)} km`;
 };
 
+const formatRotationPeriod = (hours: number, language: string, t: typeof translations['en']): string => {
+  const isRetrograde = hours < 0;
+  const absHours = Math.abs(hours);
+  const locale = language === 'fr' ? 'fr-FR' : 'en-US';
+  
+  if (absHours >= 24) {
+    const days = absHours / 24;
+    const suffix = isRetrograde ? ` (${t.retrograde})` : '';
+    return `${days.toLocaleString(locale, { maximumFractionDigits: 2 })} ${t.days}${suffix}`;
+  }
+  const suffix = isRetrograde ? ` (${t.retrograde})` : '';
+  return `${absHours.toLocaleString(locale, { maximumFractionDigits: 1 })} ${t.hours}${suffix}`;
+};
+
+const formatOrbitalPeriod = (days: number, language: string, t: typeof translations['en']): string => {
+  const locale = language === 'fr' ? 'fr-FR' : 'en-US';
+  if (days >= 365) {
+    const years = days / 365.25;
+    return `${years.toLocaleString(locale, { maximumFractionDigits: 2 })} ${language === 'fr' ? 'ans' : 'years'}`;
+  }
+  return `${days.toLocaleString(locale, { maximumFractionDigits: 1 })} ${t.days}`;
+};
+
 export const InfoCard = () => {
   const { language } = useLanguage();
   const t = translations[language];
@@ -102,6 +156,7 @@ export const InfoCard = () => {
   const jumpToObject = useCosmosStore(state => state.jumpToObject);
   const isFollowing = useCosmosStore(state => state.isFollowing);
   const toggleFollowing = useCosmosStore(state => state.toggleFollowing);
+  const showRealPeriods = useCosmosStore(state => state.showRealPeriods);
   const isFullscreen = useFullscreenStore(state => state.isFullscreen);
   const [isMinimized, setIsMinimized] = useState(false);
 
@@ -115,6 +170,10 @@ export const InfoCard = () => {
 
   const objectType = t[selectedObject.type as keyof typeof t] || selectedObject.type;
   const facts = selectedObject.facts?.[language] || [];
+  
+  // Get real periods for the selected object
+  const orbitalPeriodDays = ORBITAL_PERIODS[selectedObject.id];
+  const rotationPeriodHours = ROTATION_PERIODS_HOURS[selectedObject.id];
 
   const card = (
     <div 
@@ -181,6 +240,28 @@ export const InfoCard = () => {
             </div>
           </div>
         </div>
+
+        {/* Real Periods - only when toggle is on */}
+        {showRealPeriods && (orbitalPeriodDays || rotationPeriodHours) && (
+          <div className="grid grid-cols-2 gap-2 text-xs sm:text-sm">
+            {orbitalPeriodDays && (
+              <div className="bg-white/5 rounded p-2">
+                <div className="text-white/50 text-xs">{t.orbitalPeriod}</div>
+                <div className="text-white font-medium">
+                  {formatOrbitalPeriod(orbitalPeriodDays, language, t)}
+                </div>
+              </div>
+            )}
+            {rotationPeriodHours && (
+              <div className="bg-white/5 rounded p-2">
+                <div className="text-white/50 text-xs">{t.rotationPeriod}</div>
+                <div className="text-white font-medium">
+                  {formatRotationPeriod(rotationPeriodHours, language, t)}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Facts */}
         {facts.length > 0 && (
