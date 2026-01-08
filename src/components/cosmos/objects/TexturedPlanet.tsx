@@ -476,6 +476,7 @@ export const TexturedPlanet = ({
                 ringOuterRadius: { value: ringOuterRadius },
                 planetTilt: { value: tiltRadians },
                 ringOpacity: { value: visuals.ringOpacity ?? 0.8 },
+                ringStyle: { value: ringStyle },
               }}
               vertexShader={`
                 varying vec3 vNormal;
@@ -514,7 +515,7 @@ export const TexturedPlanet = ({
                 uniform float ringOuterRadius;
                 uniform float planetTilt;
                 uniform float ringOpacity;
-                
+                uniform float ringStyle;
                 varying vec3 vNormal;
                 varying vec3 vPosition;
                 varying vec2 vUv;
@@ -571,7 +572,8 @@ export const TexturedPlanet = ({
                 
               // Check if point is in shadow of the rings with soft penumbra
                 float calculateRingShadow(vec3 fragWorldPos, vec3 sunDir) {
-                  if (hasRings < 0.5) return 1.0;
+                  // ringStyle=1 (Uranus-like): no visible ring shadow due to extreme tilt + dark narrow rings
+                  if (hasRings < 0.5 || ringStyle > 0.5) return 1.0;
                   
                   // Get fragment position relative to planet center
                   vec3 relPos = fragWorldPos - vWorldCenter;
