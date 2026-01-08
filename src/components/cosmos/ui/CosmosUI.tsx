@@ -5,6 +5,7 @@ import { HelpCircle, Compass, Maximize, Minimize, CircleDot, CircleOff, Clock, T
 import { useCosmosStore } from '../store/useCosmosStore';
 import { useFullscreenStore } from '../store/useFullscreenStore';
 import { useCallback, useEffect, useState } from 'react';
+import { ObjectSearch } from './ObjectSearch';
 
 const translations = {
   en: {
@@ -344,6 +345,9 @@ export const CosmosUI = () => {
         </div>
       )}
 
+
+      {/* Search bar */}
+      <ObjectSearch isFullscreen={isFullscreen} />
 
       {/* Top controls - compact on mobile */}
       <div
