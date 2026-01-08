@@ -12,10 +12,11 @@ export const Tonearm = ({ position, isPoweredOn, onPositionChange }: TonearmProp
   const [dragRotation, setDragRotation] = useState<number | null>(null);
   const dragStartRef = useRef({ x: 0, y: 0, rotation: 0 });
 
-  // Target rotations: rest = 0deg, playing = 38deg (reaches inner grooves)
+
+  // Target rotations: rest = 0deg, playing = -38deg (swings toward the record)
   const REST_ROTATION = 0;
-  const PLAYING_ROTATION = 38;
-  const THRESHOLD = 20; // If rotation > 20, consider it "playing"
+  const PLAYING_ROTATION = -38;
+  const THRESHOLD = -20; // If rotation < -20, consider it "playing"
 
   const currentRotation = isDragging && dragRotation !== null 
     ? dragRotation 
@@ -39,12 +40,12 @@ export const Tonearm = ({ position, isPoweredOn, onPositionChange }: TonearmProp
     
     // Use horizontal movement as the primary drag input (left = toward record, right = away)
     const deltaX = e.clientX - dragStartRef.current.x;
-    // Moving left should increase rotation (toward PLAYING_ROTATION)
+    // Moving left should move toward PLAYING_ROTATION (more negative)
     const rotationChange = deltaX * 0.3;
-    let newRotation = dragStartRef.current.rotation - rotationChange;
+    let newRotation = dragStartRef.current.rotation + rotationChange;
 
-    // Clamp rotation between rest and playing
-    newRotation = Math.max(REST_ROTATION, Math.min(PLAYING_ROTATION, newRotation));
+    // Clamp rotation between playing (min) and rest (max)
+    newRotation = Math.max(PLAYING_ROTATION, Math.min(REST_ROTATION, newRotation));
     setDragRotation(newRotation);
   }, [isDragging]);
 
@@ -56,7 +57,7 @@ export const Tonearm = ({ position, isPoweredOn, onPositionChange }: TonearmProp
     
     // Determine final position based on drag rotation
     if (dragRotation !== null && onPositionChange) {
-      const newPosition = dragRotation > THRESHOLD ? "playing" : "rest";
+      const newPosition = dragRotation < THRESHOLD ? "playing" : "rest";
       onPositionChange(newPosition);
     }
     setDragRotation(null);
@@ -74,7 +75,7 @@ export const Tonearm = ({ position, isPoweredOn, onPositionChange }: TonearmProp
   return (
     <div
       ref={armRef}
-      className={`absolute top-2 right-2 sm:top-4 sm:right-4 select-none ${
+      className={`absolute top-2 right-8 sm:top-4 sm:right-4 select-none ${
         isPoweredOn ? "cursor-grab" : "cursor-not-allowed opacity-50"
       } ${isDragging ? "cursor-grabbing" : ""}`}
       onPointerDown={handlePointerDown}
@@ -99,7 +100,7 @@ export const Tonearm = ({ position, isPoweredOn, onPositionChange }: TonearmProp
         >
           {/* Arm - responsive height, reaches inner circle on all sizes */}
           <div
-            className="w-1.5 h-32 sm:w-2 sm:h-36 bg-gradient-to-b from-muted-foreground/60 to-muted-foreground/40 rounded-full shadow-md rotate-[-15deg] sm:rotate-[-15deg]"
+            className="w-1.5 h-32 sm:w-2 sm:h-36 bg-gradient-to-b from-muted-foreground/60 to-muted-foreground/40 rounded-full shadow-md"
             style={{ transformOrigin: "top center" }}
           >
             {/* Counterweight */}
@@ -124,6 +125,7 @@ export const Tonearm = ({ position, isPoweredOn, onPositionChange }: TonearmProp
         {/* Arm lift/cue lever (fixed with base) - smaller on mobile */}
         <div className="absolute top-6 sm:top-10 -left-1 sm:-left-2 w-2 h-1 sm:w-3 sm:h-1.5 bg-muted-foreground/40 rounded-full" />
       </div>
+
     </div>
   );
 };

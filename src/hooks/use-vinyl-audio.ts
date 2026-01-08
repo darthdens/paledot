@@ -101,14 +101,26 @@ export const useVinylAudio = ({ isPlaying, volume, trackUrl }: VinylAudioOptions
       clearTimeout(crackleFadeTimeoutRef.current);
       crackleFadeTimeoutRef.current = null;
     }
+
+    const ctx = audioContextRef.current;
+    const gainNode = crackleGainRef.current;
+    if (ctx && gainNode) {
+      gainNode.gain.cancelScheduledValues(ctx.currentTime);
+      gainNode.gain.setValueAtTime(gainNode.gain.value, ctx.currentTime);
+      gainNode.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.1);
+    }
   }, []);
 
   const startCrackle = useCallback(() => {
     if (crackleIntervalRef.current) return;
 
-    // Reset gain to full when starting
-    if (crackleGainRef.current) {
-      crackleGainRef.current.gain.value = 0.06;
+    const ctx = audioContextRef.current;
+    const gainNode = crackleGainRef.current;
+    if (ctx && gainNode) {
+      // Subtle by default, and respects the main volume.
+      const targetGain = (volume / 100) * 0.02;
+      gainNode.gain.cancelScheduledValues(ctx.currentTime);
+      gainNode.gain.setValueAtTime(targetGain, ctx.currentTime);
     }
 
     const scheduleCrackle = () => {
@@ -131,14 +143,28 @@ export const useVinylAudio = ({ isPlaying, volume, trackUrl }: VinylAudioOptions
 
     scheduleCrackle();
 
-    // Fade out crackle after 3 seconds
+    // Fade away a few seconds after pressing play (no sustained rumble)
     if (crackleFadeTimeoutRef.current) {
       clearTimeout(crackleFadeTimeoutRef.current);
     }
     crackleFadeTimeoutRef.current = window.setTimeout(() => {
-      stopCrackle();
-    }, 3000);
-  }, [playSoftCrackle, playSoftPop, stopCrackle]);
+      // Stop scheduling new crackles
+      if (crackleIntervalRef.current) {
+        clearTimeout(crackleIntervalRef.current);
+        crackleIntervalRef.current = null;
+      }
+
+      const ctx2 = audioContextRef.current;
+      const gainNode2 = crackleGainRef.current;
+      if (ctx2 && gainNode2) {
+        gainNode2.gain.cancelScheduledValues(ctx2.currentTime);
+        gainNode2.gain.setValueAtTime(gainNode2.gain.value, ctx2.currentTime);
+        gainNode2.gain.linearRampToValueAtTime(0, ctx2.currentTime + 1.5);
+      }
+
+      crackleFadeTimeoutRef.current = null;
+    }, 2500);
+  }, [playSoftCrackle, playSoftPop, volume]);
 
   // Music playback (exposed so VinylPlayer can call it inside a user gesture)
   const playMusicNow = useCallback(() => {
