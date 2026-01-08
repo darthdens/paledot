@@ -226,33 +226,34 @@ export const TexturedPlanet = ({
   // For moons, use the real orbit radius scaled into scene units (so orbit paths match motion).
   const moonOrbitRadius = isMoon ? (object.orbitRadius || 0) * distanceScale : 0;
 
-  // Real rotation speeds (radians per frame at 60fps, based on actual rotation periods)
-  // Scaled for visualization (real speeds would be too slow to see)
+  // Real rotation speeds based on actual sidereal rotation periods
+  // Scaled so 1 real Earth day = 1 second of simulation time for visibility
   const getRotationSpeed = () => {
-    const rotationPeriods: Record<string, number> = {
-      // Rotation period in Earth days (negative = retrograde)
-      sun: 25.38,
-      mercury: 58.65,
-      venus: -243.02, // retrograde
-      earth: 1.0,
-      moon: 27.32, // tidally locked
-      mars: 1.03,
-      jupiter: 0.41,
-      io: 1.77, // tidally locked
-      europa: 3.55, // tidally locked
-      ganymede: 7.15, // tidally locked
-      callisto: 16.69, // tidally locked
-      saturn: 0.44,
-      titan: 15.95, // tidally locked
-      uranus: -0.72, // retrograde
-      neptune: 0.67,
-      pluto: -6.39, // retrograde
+    // Rotation period in hours (negative = retrograde rotation)
+    const rotationPeriodsHours: Record<string, number> = {
+      sun: 609.12,        // 25.38 days (equatorial)
+      mercury: 1407.6,    // 58.65 days
+      venus: -5832.5,     // 243.02 days retrograde
+      earth: 23.934,      // 23h 56m 4s
+      moon: 655.7,        // 27.32 days (tidally locked)
+      mars: 24.623,       // 24h 37m 22s
+      jupiter: 9.925,     // 9h 55m 30s (fastest planet)
+      io: 42.46,          // 1.77 days (tidally locked)
+      europa: 85.23,      // 3.55 days (tidally locked)
+      ganymede: 171.71,   // 7.15 days (tidally locked)
+      callisto: 400.54,   // 16.69 days (tidally locked)
+      saturn: 10.656,     // 10h 39m 22s
+      titan: 382.68,      // 15.95 days (tidally locked)
+      uranus: -17.24,     // 17h 14m retrograde (tilted axis)
+      neptune: 16.11,     // 16h 6m 36s
+      pluto: -153.29,     // 6.39 days retrograde
     };
     
-    const period = rotationPeriods[object.id] || 1;
-    // Base speed scaled for visualization (1 Earth day = ~6 seconds in sim)
-    const baseSpeed = (2 * Math.PI) / (Math.abs(period) * 6 * 60); // 60fps
-    return period < 0 ? -baseSpeed : baseSpeed;
+    const periodHours = rotationPeriodsHours[object.id] || 24;
+    // Scale: 24 Earth hours = 1 second sim time, so Earth completes 1 rotation/sec
+    // radians per second = 2π / (period in hours / 24)
+    const radiansPerSecond = (2 * Math.PI) / (Math.abs(periodHours) / 24);
+    return periodHours < 0 ? -radiansPerSecond : radiansPerSecond;
   };
   
   const rotationSpeed = getRotationSpeed();
@@ -261,8 +262,8 @@ export const TexturedPlanet = ({
   useFrame((state, delta) => {
     const time = state.clock.getElapsedTime() * timeSpeed;
     
-    // Planet rotation with real rotation speeds
-    rotationAngle.current += rotationSpeed * timeSpeed;
+    // Planet rotation with accurate real rotation speeds (delta in seconds)
+    rotationAngle.current += rotationSpeed * delta * timeSpeed;
     if (planetRef.current) {
       planetRef.current.rotation.y = rotationAngle.current;
     }
