@@ -1,7 +1,7 @@
 // Cosmos Explorer - Solar System visualization with fly-to navigation
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls, Stars, PerspectiveCamera } from '@react-three/drei';
-import { Suspense, useMemo } from 'react';
+import { Suspense, useMemo, useEffect, useRef } from 'react';
 import { Sun } from './objects/Sun';
 import { TexturedPlanet } from './objects/TexturedPlanet';
 import { MoonOrbit } from './objects/MoonOrbit';
@@ -30,10 +30,38 @@ const getMoonOrbitRadius = (moon: typeof celestialObjects[0], distanceScale: num
 
 
 export const CosmosExplorer = () => {
+  const containerRef = useRef<HTMLDivElement>(null);
   const selectedObject = useCosmosStore(state => state.selectedObject);
   const showOrbits = useCosmosStore(state => state.showOrbits);
   const showTrails = useCosmosStore(state => state.showTrails);
   const isFollowing = useCosmosStore(state => state.isFollowing);
+  
+  // Force cursor none on canvas - OrbitControls tries to set cursor styles
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+    
+    const observer = new MutationObserver(() => {
+      const canvas = container.querySelector('canvas');
+      if (canvas && canvas.style.cursor !== 'none') {
+        canvas.style.setProperty('cursor', 'none', 'important');
+      }
+    });
+    
+    observer.observe(container, { 
+      attributes: true, 
+      subtree: true, 
+      attributeFilter: ['style'] 
+    });
+    
+    // Also set immediately
+    const canvas = container.querySelector('canvas');
+    if (canvas) {
+      canvas.style.setProperty('cursor', 'none', 'important');
+    }
+    
+    return () => observer.disconnect();
+  }, []);
   
   // Hide orbits when actively following a moving object (they're distracting)
   const shouldShowOrbits = showOrbits && (!selectedObject || !isFollowing);
@@ -81,7 +109,7 @@ export const CosmosExplorer = () => {
   ];
 
   return (
-    <div className="relative w-full h-full">
+    <div ref={containerRef} className="relative w-full h-full">
       <Canvas gl={{ alpha: false }}>
         <Suspense fallback={null}>
           <PerspectiveCamera 

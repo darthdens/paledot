@@ -150,8 +150,15 @@ All colors MUST be HSL.
 }
 
 @layer base {
-  * {
+  *,
+  *::before,
+  *::after {
     @apply border-border;
+    cursor: none !important;
+  }
+
+  /* Force cursor none on canvas elements (Three.js) */
+  canvas {
     cursor: none !important;
   }
 
