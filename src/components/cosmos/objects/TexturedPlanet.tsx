@@ -187,8 +187,13 @@ export const TexturedPlanet = ({
   const planetRef = useRef<THREE.Mesh>(null);
   const groupRef = useRef<THREE.Group>(null);
   const atmosphereRef = useRef<THREE.Mesh>(null);
+  const planetMaterialRef = useRef<THREE.ShaderMaterial>(null);
+  const cloudMaterialRef = useRef<THREE.ShaderMaterial>(null);
+  const atmosphereMaterialRef = useRef<THREE.ShaderMaterial>(null);
+  const ringMaterialRef = useRef<THREE.ShaderMaterial>(null);
   const worldPos = useRef(new THREE.Vector3());
   const lastWorldPosUpdate = useRef(0);
+  const rotationAngle = useRef(0);
   
   const setSelectedObject = useCosmosStore(state => state.setSelectedObject);
   const setHoveredObject = useCosmosStore(state => state.setHoveredObject);
@@ -220,13 +225,53 @@ export const TexturedPlanet = ({
   // For moons, use the real orbit radius scaled into scene units (so orbit paths match motion).
   const moonOrbitRadius = isMoon ? (object.orbitRadius || 0) * distanceScale : 0;
 
+  // Real rotation speeds (radians per frame at 60fps, based on actual rotation periods)
+  // Scaled for visualization (real speeds would be too slow to see)
+  const getRotationSpeed = () => {
+    const rotationPeriods: Record<string, number> = {
+      // Rotation period in Earth days (negative = retrograde)
+      sun: 25.38,
+      mercury: 58.65,
+      venus: -243.02, // retrograde
+      earth: 1.0,
+      moon: 27.32, // tidally locked
+      mars: 1.03,
+      jupiter: 0.41,
+      io: 1.77, // tidally locked
+      europa: 3.55, // tidally locked
+      ganymede: 7.15, // tidally locked
+      callisto: 16.69, // tidally locked
+      saturn: 0.44,
+      titan: 15.95, // tidally locked
+      uranus: -0.72, // retrograde
+      neptune: 0.67,
+      pluto: -6.39, // retrograde
+    };
+    
+    const period = rotationPeriods[object.id] || 1;
+    // Base speed scaled for visualization (1 Earth day = ~6 seconds in sim)
+    const baseSpeed = (2 * Math.PI) / (Math.abs(period) * 6 * 60); // 60fps
+    return period < 0 ? -baseSpeed : baseSpeed;
+  };
+  
+  const rotationSpeed = getRotationSpeed();
+
 
   useFrame((state) => {
     const time = state.clock.getElapsedTime();
     
-    // Planet rotation
+    // Planet rotation with real rotation speeds
+    rotationAngle.current += rotationSpeed;
     if (planetRef.current) {
-      planetRef.current.rotation.y += (object.rotationSpeed || 0.001) * 0.1;
+      planetRef.current.rotation.y = rotationAngle.current;
+    }
+
+    // Update shader uniforms for proper lighting
+    if (planetMaterialRef.current) {
+      planetMaterialRef.current.uniforms.time.value = time;
+    }
+    if (cloudMaterialRef.current) {
+      cloudMaterialRef.current.uniforms.time.value = time;
     }
 
     if (groupRef.current) {
@@ -336,6 +381,7 @@ export const TexturedPlanet = ({
           >
             <sphereGeometry args={[planetSize, 128, 128]} />
             <shaderMaterial
+              ref={planetMaterialRef}
               uniforms={{
                 baseColor: { value: new THREE.Color(visuals.baseColor) },
                 secondaryColor: { value: new THREE.Color(visuals.secondaryColor || visuals.baseColor) },
@@ -343,7 +389,6 @@ export const TexturedPlanet = ({
                 metalness: { value: visuals.metalness },
                 emissive: { value: new THREE.Color(visuals.emissive || '#000000') },
                 emissiveIntensity: { value: visuals.emissiveIntensity || 0 },
-                sunPosition: { value: new THREE.Vector3(0, 0, 0) },
                 time: { value: 0 },
                 surfaceType: { value: visuals.surfaceDetail === 'gaseous' ? 1.0 : visuals.surfaceDetail === 'icy' ? 2.0 : visuals.surfaceDetail === 'volcanic' ? 3.0 : 0.0 },
               }}
@@ -367,7 +412,6 @@ export const TexturedPlanet = ({
                 uniform float metalness;
                 uniform vec3 emissive;
                 uniform float emissiveIntensity;
-                uniform vec3 sunPosition;
                 uniform float time;
                 uniform float surfaceType;
                 
@@ -406,7 +450,8 @@ export const TexturedPlanet = ({
                 
                 void main() {
                   vec3 normal = normalize(vNormal);
-                  vec3 lightDir = normalize(sunPosition - vWorldPosition);
+                  // Sun is always at origin (0,0,0) - light direction points from planet toward sun
+                  vec3 lightDir = normalize(-vWorldPosition);
                   
                   // Calculate sun-facing illumination (realistic lighting)
                   float NdotL = max(dot(normal, lightDir), 0.0);
@@ -465,12 +510,12 @@ export const TexturedPlanet = ({
             <mesh>
               <sphereGeometry args={[planetSize * 1.02, 64, 64]} />
               <shaderMaterial
+                ref={cloudMaterialRef}
                 transparent
                 depthWrite={false}
                 uniforms={{
                   cloudColor: { value: new THREE.Color(visuals.cloudColor || '#ffffff') },
                   time: { value: 0 },
-                  sunPosition: { value: new THREE.Vector3(0, 0, 0) },
                 }}
                 vertexShader={`
                   varying vec3 vNormal;
@@ -488,7 +533,6 @@ export const TexturedPlanet = ({
                 fragmentShader={`
                   uniform vec3 cloudColor;
                   uniform float time;
-                  uniform vec3 sunPosition;
                   
                   varying vec3 vNormal;
                   varying vec3 vWorldPosition;
@@ -522,17 +566,18 @@ export const TexturedPlanet = ({
                   
                   void main() {
                     vec3 normal = normalize(vNormal);
-                    vec3 lightDir = normalize(sunPosition - vWorldPosition);
+                    // Sun at origin
+                    vec3 lightDir = normalize(-vWorldPosition);
                     float NdotL = max(dot(normal, lightDir), 0.0);
                     
-                    vec2 cloudCoord = vUv * 15.0;
+                    vec2 cloudCoord = vUv * 15.0 + time * 0.01;
                     float clouds = fbm(cloudCoord);
                     float cloudCoverage = smoothstep(0.35, 0.65, clouds);
                     
-                    float lighting = 0.3 + NdotL * 0.7;
+                    float lighting = 0.15 + NdotL * 0.85;
                     vec3 litCloud = cloudColor * lighting;
                     
-                    gl_FragColor = vec4(litCloud, cloudCoverage * 0.6);
+                    gl_FragColor = vec4(litCloud, cloudCoverage * 0.5 * NdotL);
                   }
                 `}
               />
@@ -544,13 +589,13 @@ export const TexturedPlanet = ({
             <mesh ref={atmosphereRef}>
               <sphereGeometry args={[planetSize * 1.08, 64, 64]} />
               <shaderMaterial
+                ref={atmosphereMaterialRef}
                 transparent
                 depthWrite={false}
                 side={THREE.BackSide}
                 uniforms={{
                   glowColor: { value: new THREE.Color(visuals.atmosphereColor || '#4da6ff') },
                   intensity: { value: visuals.atmosphereIntensity || 0.4 },
-                  sunPosition: { value: new THREE.Vector3(0, 0, 0) },
                 }}
                 vertexShader={`
                   varying vec3 vNormal;
@@ -567,18 +612,18 @@ export const TexturedPlanet = ({
                   varying vec3 vWorldPosition;
                   uniform vec3 glowColor;
                   uniform float intensity;
-                  uniform vec3 sunPosition;
                   
                   void main() {
                     vec3 normal = normalize(vNormal);
-                    vec3 lightDir = normalize(sunPosition - vWorldPosition);
+                    // Sun at origin
+                    vec3 lightDir = normalize(-vWorldPosition);
                     float NdotL = max(dot(normal, lightDir), 0.0);
                     
                     // Fresnel-like rim glow
                     float rim = pow(0.7 - dot(normal, vec3(0.0, 0.0, 1.0)), 2.0);
                     
                     // Brighter on sun-facing side
-                    float sunGlow = 0.3 + NdotL * 0.7;
+                    float sunGlow = 0.2 + NdotL * 0.8;
                     
                     gl_FragColor = vec4(glowColor, rim * intensity * sunGlow);
                   }
@@ -592,12 +637,12 @@ export const TexturedPlanet = ({
             <mesh rotation={[Math.PI / 2, 0, 0]}>
               <ringGeometry args={[planetSize * 1.3, planetSize * 2.2, 128]} />
               <shaderMaterial
+                ref={ringMaterialRef}
                 transparent
                 side={THREE.DoubleSide}
                 uniforms={{
                   ringColor: { value: new THREE.Color(visuals.ringColor || '#d4b896') },
                   opacity: { value: visuals.ringOpacity || 0.7 },
-                  sunPosition: { value: new THREE.Vector3(0, 0, 0) },
                   innerRadius: { value: planetSize * 1.3 },
                   outerRadius: { value: planetSize * 2.2 },
                 }}
@@ -617,7 +662,6 @@ export const TexturedPlanet = ({
                 fragmentShader={`
                   uniform vec3 ringColor;
                   uniform float opacity;
-                  uniform vec3 sunPosition;
                   uniform float innerRadius;
                   uniform float outerRadius;
                   
@@ -628,7 +672,8 @@ export const TexturedPlanet = ({
                   float hash(float n) { return fract(sin(n) * 43758.5453); }
                   
                   void main() {
-                    vec3 lightDir = normalize(sunPosition - vWorldPosition);
+                    // Sun at origin
+                    vec3 lightDir = normalize(-vWorldPosition);
                     float NdotL = abs(dot(normalize(vNormal), lightDir));
                     
                     // Create ring bands
@@ -642,7 +687,7 @@ export const TexturedPlanet = ({
                     float ringOpacity = opacity * bands * (1.0 - gap * 0.8);
                     
                     // Lighting
-                    float lighting = 0.4 + NdotL * 0.6;
+                    float lighting = 0.3 + NdotL * 0.7;
                     vec3 litRing = ringColor * lighting;
                     
                     // Fade edges
