@@ -96,7 +96,7 @@ export const CameraController = () => {
       const eased = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
 
       // Get current live position during animation
-      if (selectedObject) {
+      if (selectedObject && isFollowing) {
         const livePos = objectWorldPositions[selectedObject.id];
         if (livePos) {
           endTarget.current.set(livePos[0], livePos[1], livePos[2]);
@@ -110,19 +110,15 @@ export const CameraController = () => {
       return;
     }
 
-    // After fly-to: continuously follow the selected object (keep it perfectly centered)
+    // After fly-to: continuously follow the selected object (keep it centered)
     if (selectedObject && isFollowing) {
       const livePos = objectWorldPositions[selectedObject.id];
       if (livePos) {
         const targetVec = new THREE.Vector3(livePos[0], livePos[1], livePos[2]);
-        const currentTarget = orbitControls.target as THREE.Vector3;
 
-        // Preserve user's current camera offset relative to target
-        const offset = new THREE.Vector3().subVectors(camera.position, currentTarget);
-
-        // Smoothly lerp the target to avoid jarring jumps
-        currentTarget.lerp(targetVec, 0.1);
-        camera.position.copy(currentTarget).add(offset);
+        // Smooth, frame-rate independent follow
+        const alpha = 1 - Math.exp(-delta * 10);
+        orbitControls.target.lerp(targetVec, alpha);
         orbitControls.update();
       }
     }

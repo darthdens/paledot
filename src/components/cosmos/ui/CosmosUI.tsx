@@ -3,8 +3,7 @@ import { Button } from '@/components/ui/button';
 import { HelpCircle, Compass, Maximize, Minimize } from 'lucide-react';
 import { useCosmosStore } from '../store/useCosmosStore';
 import { useFullscreenStore } from '../store/useFullscreenStore';
-import { useState, useCallback, useEffect } from 'react';
-import { createPortal } from 'react-dom';
+import { useCallback, useEffect } from 'react';
 
 const translations = {
   en: {
@@ -259,49 +258,48 @@ export const CosmosUI = () => {
         </div>
       )}
 
-      {/* Top controls - compact on mobile */}
-      {(() => {
-        const controls = (
-          <div
-            className={`${isFullscreen ? 'fixed' : 'absolute'} top-2 sm:top-4 right-2 sm:right-4 flex gap-1 sm:gap-2 z-[10000]`}
-            style={
-              isFullscreen
-                ? {
-                    top: 'calc(0.5rem + env(safe-area-inset-top))',
-                    right: 'calc(0.5rem + env(safe-area-inset-right))',
-                  }
-                : undefined
-            }
-          >
-            <Button 
-              size="icon" 
-              variant="ghost" 
-              onClick={toggleFullscreen} 
-              className="h-7 w-7 sm:h-9 sm:w-9 bg-white/10 hover:bg-white/20 text-white"
-            >
-              {isFullscreen ? <Minimize className="w-3.5 h-3.5 sm:w-5 sm:h-5" /> : <Maximize className="w-3.5 h-3.5 sm:w-5 sm:h-5" />}
-            </Button>
-            <Button 
-              size="icon" 
-              variant="ghost" 
-              onClick={toggleQuickJump} 
-              className="h-7 w-7 sm:h-9 sm:w-9 bg-white/10 hover:bg-white/20 text-white"
-            >
-              <Compass className="w-3.5 h-3.5 sm:w-5 sm:h-5" />
-            </Button>
-            <Button 
-              size="icon" 
-              variant="ghost" 
-              onClick={() => setShowControlHints(true)} 
-              className="h-7 w-7 sm:h-9 sm:w-9 bg-white/10 hover:bg-white/20 text-white"
-            >
-              <HelpCircle className="w-3.5 h-3.5 sm:w-5 sm:h-5" />
-            </Button>
-          </div>
-        );
 
-        return isFullscreen ? createPortal(controls, document.body) : controls;
-      })()}
+      {/* Top controls - compact on mobile */}
+      <div
+        className={`${isFullscreen ? 'fixed' : 'absolute'} top-2 sm:top-4 right-2 sm:right-4 flex gap-1 sm:gap-2 z-[10000]`}
+        style={
+          isFullscreen
+            ? {
+                top: 'calc(0.5rem + env(safe-area-inset-top))',
+                right: 'calc(0.5rem + env(safe-area-inset-right))',
+              }
+            : undefined
+        }
+      >
+        <Button
+          size="icon"
+          variant="ghost"
+          onClick={toggleFullscreen}
+          className="h-7 w-7 sm:h-9 sm:w-9 bg-white/10 hover:bg-white/20 text-white"
+        >
+          {isFullscreen ? (
+            <Minimize className="w-3.5 h-3.5 sm:w-5 sm:h-5" />
+          ) : (
+            <Maximize className="w-3.5 h-3.5 sm:w-5 sm:h-5" />
+          )}
+        </Button>
+        <Button
+          size="icon"
+          variant="ghost"
+          onClick={toggleQuickJump}
+          className="h-7 w-7 sm:h-9 sm:w-9 bg-white/10 hover:bg-white/20 text-white"
+        >
+          <Compass className="w-3.5 h-3.5 sm:w-5 sm:h-5" />
+        </Button>
+        <Button
+          size="icon"
+          variant="ghost"
+          onClick={() => setShowControlHints(true)}
+          className="h-7 w-7 sm:h-9 sm:w-9 bg-white/10 hover:bg-white/20 text-white"
+        >
+          <HelpCircle className="w-3.5 h-3.5 sm:w-5 sm:h-5" />
+        </Button>
+      </div>
 
       {/* Bottom tour button - smaller on mobile */}
       {!showControlHints && (

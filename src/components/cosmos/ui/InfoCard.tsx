@@ -5,7 +5,6 @@ import { useCosmosStore } from '../store/useCosmosStore';
 import { useFullscreenStore } from '../store/useFullscreenStore';
 import { UNITS } from '../types';
 import { useState } from 'react';
-import { createPortal } from 'react-dom';
 
 const translations = {
   en: {
@@ -222,5 +221,6 @@ export const InfoCard = () => {
     </div>
   );
 
-  return isFullscreen ? createPortal(card, document.body) : card;
+  return card;
 };
+

@@ -5,7 +5,6 @@ import { useCosmosStore } from '../store/useCosmosStore';
 import { useFullscreenStore } from '../store/useFullscreenStore';
 import { quickJumpCategories, getObjectById } from '../data/celestialObjects';
 import { useState } from 'react';
-import { createPortal } from 'react-dom';
 
 const translations = {
   en: {
@@ -138,5 +137,6 @@ export const QuickJumpMenu = () => {
     </div>
   );
 
-  return isFullscreen ? createPortal(menu, document.body) : menu;
+  return menu;
 };
+
