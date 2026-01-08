@@ -117,8 +117,8 @@ export const AsteroidBelt = ({
   const geometry = useMemo(() => {
     const geo = new THREE.BufferGeometry();
     geo.setAttribute('position', new THREE.BufferAttribute(asteroidData.positions, 3));
-    geo.setAttribute('color', new THREE.BufferAttribute(asteroidData.colors, 3));
-    geo.setAttribute('size', new THREE.BufferAttribute(asteroidData.sizes, 1));
+    geo.setAttribute('aColor', new THREE.BufferAttribute(asteroidData.colors, 3));
+    geo.setAttribute('aSize', new THREE.BufferAttribute(asteroidData.sizes, 1));
     return geo;
   }, [asteroidData]);
   
@@ -128,19 +128,19 @@ export const AsteroidBelt = ({
       pointSize: { value: scale * 50 },
     },
     vertexShader: `
-      attribute float size;
-      attribute vec3 color;
+      attribute float aSize;
+      attribute vec3 aColor;
       varying vec3 vColor;
       varying float vDist;
       
       void main() {
-        vColor = color;
+        vColor = aColor;
         vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
         vDist = length(mvPosition.xyz);
         
         // Size attenuation - asteroids get smaller with distance
-        float attenuation = 300.0 / vDist;
-        gl_PointSize = size * attenuation;
+        float attenuation = 300.0 / max(vDist, 1.0);
+        gl_PointSize = aSize * attenuation;
         gl_PointSize = clamp(gl_PointSize, 1.0, 15.0);
         
         gl_Position = projectionMatrix * mvPosition;
@@ -166,7 +166,6 @@ export const AsteroidBelt = ({
       }
     `,
     transparent: false,
-    vertexColors: true,
   }), [scale]);
   
   // Animate orbital motion
