@@ -132,8 +132,8 @@ export const CosmosExplorer = () => {
               key={`trail-${planet.id}`}
               objectId={planet.id}
               color={planet.color}
-              maxPoints={300}
-              opacity={0.5}
+              maxPoints={120}
+              opacity={0.35}
             />
           ))}
 
