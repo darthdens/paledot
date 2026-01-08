@@ -894,10 +894,14 @@ export const TexturedPlanet = ({
                     // Fragments on the sun-facing hemisphere light up; opposite hemisphere is dark.
                     vec3 fragFromPlanet = vWorldPosition - objectCenter;
                     float distFromPlanet = length(fragFromPlanet);
-                    vec3 pseudoNormal = distFromPlanet > 0.001 ? fragFromPlanet / distFromPlanet : vec3(0.0, 1.0, 0.0);
                     
-                    float NdotL = dot(pseudoNormal, sunDir);
-                    float daylight = smoothstep(-0.05, 0.1, NdotL); // Soft terminator like planets
+                    // Fallback if objectCenter not set properly - use fragment position directly
+                    float daylight = 1.0;
+                    if (distFromPlanet > 0.1) {
+                      vec3 pseudoNormal = fragFromPlanet / distFromPlanet;
+                      float NdotL = dot(pseudoNormal, sunDir);
+                      daylight = smoothstep(-0.08, 0.15, NdotL);
+                    }
 
                     // Ring plane incidence (how perpendicular to sun rays)
                     vec3 ringNormal = normalize(vWorldNormal);
@@ -905,28 +909,32 @@ export const TexturedPlanet = ({
 
                     // Forward scattering when sun behind rings relative to camera
                     vec3 viewDir = normalize(cameraPosition - vWorldPosition);
-                    float forwardScatter = pow(max(dot(-viewDir, sunDir), 0.0), 3.0) * 0.2 * daylight;
+                    float forwardScatter = pow(max(dot(-viewDir, sunDir), 0.0), 2.5) * 0.25;
 
-                    // Combine lighting - match planet ambient (0.012)
-                    float ambient = 0.012;
-                    float diffuse = (planeIncidence * 0.85 + 0.1 + forwardScatter) * shadow * daylight;
-                    float totalLight = ambient + diffuse * 0.988;
+                    // Combine lighting - brighter base for visibility
+                    float ambient = 0.015;
+                    float baseDiffuse = planeIncidence * 0.9 + 0.15 + forwardScatter;
+                    float diffuse = baseDiffuse * shadow * daylight;
+                    float totalLight = ambient + diffuse;
 
                     // Ring density and bands
                     float dist = length(vLocalPosition.xy);
                     float normalizedDist = (dist - innerRadius) / (outerRadius - innerRadius);
                     float bands = sin(normalizedDist * 60.0) * 0.5 + 0.5;
-                    bands = mix(0.6, 1.0, bands);
+                    bands = mix(0.7, 1.0, bands);
 
                     // Cassini division gap
                     float gap = smoothstep(0.45, 0.5, normalizedDist) * (1.0 - smoothstep(0.5, 0.55, normalizedDist));
-                    float ringDensity = bands * (1.0 - gap * 0.8);
+                    float ringDensity = bands * (1.0 - gap * 0.7);
 
                     float ringOpacity = opacity * ringDensity;
-                    float edgeFade = smoothstep(0.0, 0.1, normalizedDist) * smoothstep(1.0, 0.9, normalizedDist);
+                    float edgeFade = smoothstep(0.0, 0.08, normalizedDist) * smoothstep(1.0, 0.92, normalizedDist);
 
-                    // Alpha: dark side nearly invisible, shadow areas very dim
-                    float visibility = mix(0.03, 1.0, daylight) * mix(0.05, 1.0, shadow);
+                    // Alpha: night side dim but not invisible, shadow areas dimmer
+                    // Ensure rings stay visible on lit side
+                    float nightFloor = 0.04;
+                    float shadowFloor = 0.08;
+                    float visibility = max(nightFloor, daylight) * max(shadowFloor, shadow);
                     float alpha = ringOpacity * edgeFade * visibility;
 
                     vec3 litRing = ringColor * totalLight;
