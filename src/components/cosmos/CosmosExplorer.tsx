@@ -1,7 +1,7 @@
 // Cosmos Explorer - Solar System visualization with fly-to navigation
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls, Stars, PerspectiveCamera } from '@react-three/drei';
-import { Suspense, useRef } from 'react';
+import { Suspense } from 'react';
 import { Sun } from './objects/Sun';
 import { TexturedPlanet } from './objects/TexturedPlanet';
 import { CosmosUI } from './ui/CosmosUI';
@@ -10,7 +10,6 @@ import { QuickJumpMenu } from './ui/QuickJumpMenu';
 import { CameraController } from './CameraController';
 import { celestialObjects } from './data/celestialObjects';
 import { UNITS } from './types';
-import * as THREE from 'three';
 
 export const CosmosExplorer = () => {
   const planets = celestialObjects.filter(obj => 
@@ -19,11 +18,19 @@ export const CosmosExplorer = () => {
   const moons = celestialObjects.filter(obj => obj.type === 'moon');
   const stars = celestialObjects.filter(obj => obj.type === 'star' && obj.id !== 'sun');
 
+  // Visual scale factor - applied consistently to all bodies
+  // This makes objects visible while maintaining relative proportions
+  const VISUAL_SCALE = 80;
+  
+  // Distance compression factor - compresses orbital distances to make navigation practical
+  // Real distances would make planets invisible specks
+  const DISTANCE_SCALE = 0.15;
+
   // Start camera looking at inner solar system
   const initialCameraPosition: [number, number, number] = [
-    UNITS.KM_PER_AU * 0.5,
-    UNITS.KM_PER_AU * 0.8,
-    UNITS.KM_PER_AU * 1.2
+    UNITS.KM_PER_AU * DISTANCE_SCALE * 2,
+    UNITS.KM_PER_AU * DISTANCE_SCALE * 1.5,
+    UNITS.KM_PER_AU * DISTANCE_SCALE * 2.5
   ];
 
   return (
@@ -59,8 +66,8 @@ export const CosmosExplorer = () => {
           {/* Star background */}
           <Stars radius={1e14} depth={1e13} count={15000} factor={1e11} saturation={0} fade speed={0.3} />
           
-          {/* The Sun at center */}
-          <Sun position={[0, 0, 0]} scale={0.5} />
+          {/* The Sun at center - same visual scale as planets */}
+          <Sun position={[0, 0, 0]} visualScale={VISUAL_SCALE} />
           
           {/* All planets */}
           {planets.map(planet => (
@@ -68,7 +75,8 @@ export const CosmosExplorer = () => {
               key={planet.id} 
               object={planet} 
               showOrbit={true} 
-              visualScale={300}
+              visualScale={VISUAL_SCALE}
+              distanceScale={DISTANCE_SCALE}
             />
           ))}
           
@@ -78,7 +86,8 @@ export const CosmosExplorer = () => {
               key={moon.id} 
               object={moon} 
               showOrbit={false} 
-              visualScale={400}
+              visualScale={VISUAL_SCALE * 1.5}
+              distanceScale={DISTANCE_SCALE}
             />
           ))}
           

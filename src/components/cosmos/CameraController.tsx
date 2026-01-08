@@ -44,9 +44,9 @@ export const CameraController = () => {
     // Calculate a nice viewing direction
     viewDirection.current.set(0.5, 0.3, 1).normalize();
 
-    // Desired distance based on visual size
-    const visualSize = selectedObject.size * 300; // matches TexturedPlanet visualScale
-    flyToDistance.current = Math.max(visualSize * 4, 1e7);
+    // Desired distance based on visual size (matches TexturedPlanet visualScale = 80)
+    const visualSize = selectedObject.size * 80;
+    flyToDistance.current = Math.max(visualSize * 4, 5e6);
 
     // Get live world position or fallback to static position
     const livePos = objectWorldPositions[selectedObject.id];

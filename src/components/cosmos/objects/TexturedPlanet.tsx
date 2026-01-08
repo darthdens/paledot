@@ -8,6 +8,7 @@ interface TexturedPlanetProps {
   object: CelestialObject;
   showOrbit?: boolean;
   visualScale?: number;
+  distanceScale?: number;
 }
 
 // Planet colors and visual properties
@@ -129,7 +130,12 @@ const PLANET_VISUALS: Record<string, {
   },
 };
 
-export const TexturedPlanet = ({ object, showOrbit = true, visualScale = 500 }: TexturedPlanetProps) => {
+export const TexturedPlanet = ({ 
+  object, 
+  showOrbit = true, 
+  visualScale = 80,
+  distanceScale = 0.15 
+}: TexturedPlanetProps) => {
   const planetRef = useRef<THREE.Mesh>(null);
   const groupRef = useRef<THREE.Group>(null);
   const atmosphereRef = useRef<THREE.Mesh>(null);
@@ -148,22 +154,21 @@ export const TexturedPlanet = ({ object, showOrbit = true, visualScale = 500 }: 
   };
   
   const planetSize = object.size * visualScale;
-  const orbitRadius = object.orbitRadius || 0;
+  const orbitRadius = (object.orbitRadius || 0) * distanceScale;
   const tiltRadians = ((visuals.tilt || 0) * Math.PI) / 180;
   const isMoon = !!object.parentId;
 
   // For moons, scale orbit radius to be visible relative to parent planet size
-  // Real moon orbits are too small compared to scaled planet sizes
   const getMoonOrbitRadius = () => {
     if (!isMoon || !object.parentId) return 0;
     // Get parent planet size and scale moon orbit to be ~2-4x parent visual size
-    // This makes moons visible while keeping relative distances
     const parentSize = object.parentId === 'earth' ? 12742 : 
                        object.parentId === 'jupiter' ? 139820 :
                        object.parentId === 'saturn' ? 116460 : 50000;
     const parentVisualSize = parentSize * visualScale;
     // Scale based on relative orbit distance (closer moons orbit closer)
-    const baseOrbitMultiplier = 2 + (orbitRadius / 2000000); // Io is closest, Callisto furthest
+    const realOrbitRadius = object.orbitRadius || 0;
+    const baseOrbitMultiplier = 2 + (realOrbitRadius / 2000000);
     return parentVisualSize * Math.min(baseOrbitMultiplier, 5);
   };
 
@@ -183,13 +188,13 @@ export const TexturedPlanet = ({ object, showOrbit = true, visualScale = 500 }: 
         const parentPos = objectWorldPositions[object.parentId!];
         if (parentPos) {
           const orbitSpeed = object.orbitSpeed || 0.0001;
-          const angle = time * orbitSpeed * 500; // Faster for moons
+          const angle = time * orbitSpeed * 500;
           groupRef.current.position.x = parentPos[0] + Math.cos(angle) * moonOrbitRadius;
           groupRef.current.position.y = parentPos[1];
           groupRef.current.position.z = parentPos[2] + Math.sin(angle) * moonOrbitRadius;
         }
       }
-      // Planets: orbit around the Sun (origin)
+      // Planets: orbit around the Sun (origin) with compressed distances
       else if (orbitRadius > 0 && !isMoon) {
         const orbitSpeed = object.orbitSpeed || 0.00001;
         const angle = time * orbitSpeed * 100;
@@ -212,7 +217,7 @@ export const TexturedPlanet = ({ object, showOrbit = true, visualScale = 500 }: 
     }
   });
 
-  // Create orbit line (only for planets orbiting sun, not moons)
+  // Create orbit line (only for planets orbiting sun, not moons) with compressed distances
   const orbitPoints = useMemo(() => {
     if (!showOrbit || orbitRadius === 0 || isMoon) return null;
     const points = [];
@@ -246,10 +251,10 @@ export const TexturedPlanet = ({ object, showOrbit = true, visualScale = 500 }: 
     document.body.style.cursor = 'default';
   };
 
-  // Initial position: for moons, start at parent position + offset; for planets, use static position
-  const initialPosition: [number, number, number] = isMoon 
-    ? [object.position[0], object.position[1], object.position[2]]
-    : object.position;
+  // Initial position with distance compression
+  const scaledPosition: [number, number, number] = isMoon 
+    ? [object.position[0] * distanceScale, object.position[1], object.position[2] * distanceScale]
+    : [object.position[0] * distanceScale, object.position[1], object.position[2] * distanceScale];
 
   return (
     <>
@@ -267,7 +272,7 @@ export const TexturedPlanet = ({ object, showOrbit = true, visualScale = 500 }: 
       )}
 
       {/* Planet group */}
-      <group ref={groupRef} position={initialPosition}>
+      <group ref={groupRef} position={scaledPosition}>
         <group rotation={[tiltRadians, 0, 0]}>
           {/* Main planet sphere */}
           <mesh 
