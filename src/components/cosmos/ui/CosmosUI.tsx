@@ -2,7 +2,7 @@ import { useLanguage } from '@/i18n/LanguageContext';
 import { Button } from '@/components/ui/button';
 import { HelpCircle, Compass, Maximize, Minimize } from 'lucide-react';
 import { useCosmosStore } from '../store/useCosmosStore';
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 
 const translations = {
   en: {
@@ -39,25 +39,51 @@ export const CosmosUI = () => {
   const { startTour, toggleQuickJump, showControlHints, setShowControlHints } = useCosmosStore();
   const [isFullscreen, setIsFullscreen] = useState(false);
 
+  // Listen for fullscreen changes (e.g., user presses Esc)
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      const doc = document as any;
+      const isFs = !!(doc.fullscreenElement || doc.webkitFullscreenElement || doc.mozFullScreenElement);
+      setIsFullscreen(isFs);
+      
+      // Also handle CSS fallback cleanup
+      const container = document.querySelector('[data-cosmos-container]');
+      if (!isFs && container) {
+        container.classList.remove('fixed', 'inset-0', 'z-[100]', 'h-screen', 'w-screen', 'rounded-none');
+      }
+    };
+
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
+    document.addEventListener('mozfullscreenchange', handleFullscreenChange);
+    
+    return () => {
+      document.removeEventListener('fullscreenchange', handleFullscreenChange);
+      document.removeEventListener('webkitfullscreenchange', handleFullscreenChange);
+      document.removeEventListener('mozfullscreenchange', handleFullscreenChange);
+    };
+  }, []);
+
   const toggleFullscreen = useCallback(() => {
     const container = document.querySelector('[data-cosmos-container]');
     if (!container) return;
 
-    // Check for fullscreen with webkit prefix for iOS Safari
     const doc = document as any;
     const elem = container as any;
     
     const isCurrentlyFullscreen = doc.fullscreenElement || doc.webkitFullscreenElement || doc.mozFullScreenElement;
 
     if (!isCurrentlyFullscreen) {
-      // Enter fullscreen
+      // Enter fullscreen - try native API first
       const requestFs = elem.requestFullscreen || elem.webkitRequestFullscreen || elem.mozRequestFullScreen || elem.msRequestFullscreen;
       if (requestFs) {
-        requestFs.call(elem).then(() => setIsFullscreen(true)).catch(() => {
-          // Fallback: expand the container to fill viewport
-          container.classList.add('fixed', 'inset-0', 'z-[100]', 'h-screen', 'w-screen', 'rounded-none');
-          setIsFullscreen(true);
-        });
+        requestFs.call(elem)
+          .then(() => setIsFullscreen(true))
+          .catch(() => {
+            // Fallback: use CSS to simulate fullscreen
+            container.classList.add('fixed', 'inset-0', 'z-[100]', 'h-screen', 'w-screen', 'rounded-none');
+            setIsFullscreen(true);
+          });
       } else {
         // No fullscreen API - use CSS fallback
         container.classList.add('fixed', 'inset-0', 'z-[100]', 'h-screen', 'w-screen', 'rounded-none');
@@ -67,10 +93,20 @@ export const CosmosUI = () => {
       // Exit fullscreen
       const exitFs = doc.exitFullscreen || doc.webkitExitFullscreen || doc.mozCancelFullScreen || doc.msExitFullscreen;
       if (exitFs) {
-        exitFs.call(doc).then(() => setIsFullscreen(false)).catch(() => {});
+        exitFs.call(doc)
+          .then(() => {
+            setIsFullscreen(false);
+            container.classList.remove('fixed', 'inset-0', 'z-[100]', 'h-screen', 'w-screen', 'rounded-none');
+          })
+          .catch(() => {
+            setIsFullscreen(false);
+            container.classList.remove('fixed', 'inset-0', 'z-[100]', 'h-screen', 'w-screen', 'rounded-none');
+          });
+      } else {
+        // CSS fallback exit
+        container.classList.remove('fixed', 'inset-0', 'z-[100]', 'h-screen', 'w-screen', 'rounded-none');
+        setIsFullscreen(false);
       }
-      container.classList.remove('fixed', 'inset-0', 'z-[100]', 'h-screen', 'w-screen', 'rounded-none');
-      setIsFullscreen(false);
     }
   }, []);
 

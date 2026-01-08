@@ -11,6 +11,7 @@ import { QuickJumpMenu } from './ui/QuickJumpMenu';
 import { CameraController } from './CameraController';
 import { celestialObjects } from './data/celestialObjects';
 import { UNITS } from './types';
+import { useCosmosStore } from './store/useCosmosStore';
 
 // Helper to calculate moon orbit radius (same logic as in TexturedPlanet)
 const getMoonOrbitRadius = (moon: typeof celestialObjects[0], visualScale: number) => {
@@ -25,6 +26,8 @@ const getMoonOrbitRadius = (moon: typeof celestialObjects[0], visualScale: numbe
 };
 
 export const CosmosExplorer = () => {
+  const selectedObject = useCosmosStore(state => state.selectedObject);
+  
   const planets = celestialObjects.filter(obj => 
     obj.type === 'planet' || obj.type === 'dwarf-planet'
   );
@@ -37,14 +40,26 @@ export const CosmosExplorer = () => {
   const UNIFIED_SCALE = 0.001; // Makes Sun radius = ~696 units, Mercury orbit = ~5,790 units
 
   // Pre-calculate moon orbit data for orbit visualization
+  // Only show orbits for moons of the selected planet (or if a moon of that planet is selected)
   const moonOrbits = useMemo(() => {
-    return moons.map(moon => ({
-      id: moon.id,
-      parentId: moon.parentId!,
-      orbitRadius: getMoonOrbitRadius(moon, UNIFIED_SCALE * 1.5),
-      color: moon.color,
-    }));
-  }, [moons]);
+    if (!selectedObject) return [];
+    
+    // Get the parent planet ID to show moon orbits for
+    const focusedPlanetId = selectedObject.type === 'moon' 
+      ? selectedObject.parentId 
+      : selectedObject.type === 'planet' ? selectedObject.id : null;
+    
+    if (!focusedPlanetId) return [];
+    
+    return moons
+      .filter(moon => moon.parentId === focusedPlanetId)
+      .map(moon => ({
+        id: moon.id,
+        parentId: moon.parentId!,
+        orbitRadius: getMoonOrbitRadius(moon, UNIFIED_SCALE * 1.5),
+        color: moon.color,
+      }));
+  }, [moons, selectedObject]);
 
   // Start camera looking at inner solar system - positioned to see Sun and inner planets
   const sunRadius = 1392700 * UNIFIED_SCALE / 2; // Sun's radius in scene units
