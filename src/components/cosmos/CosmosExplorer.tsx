@@ -1,6 +1,6 @@
 // Cosmos Explorer - Solar System visualization with fly-to navigation
 import { Canvas } from '@react-three/fiber';
-import { OrbitControls, PerspectiveCamera } from '@react-three/drei';
+import { OrbitControls, Stars, PerspectiveCamera } from '@react-three/drei';
 import { Suspense, useMemo, useEffect, useRef } from 'react';
 import { Sun } from './objects/Sun';
 import { TexturedPlanet } from './objects/TexturedPlanet';
@@ -11,7 +11,6 @@ import { KuiperBelt } from './objects/KuiperBelt';
 import { TrojanAsteroids } from './objects/TrojanAsteroids';
 import { Comets } from './objects/Comet';
 import { MilkyWayGalaxy } from './objects/MilkyWayGalaxy';
-import { MilkyWaySkybox } from './objects/MilkyWaySkybox';
 import { OortCloud } from './objects/OortCloud';
 import { CosmosUI } from './ui/CosmosUI';
 import { InfoCard } from './ui/InfoCard';
@@ -43,11 +42,8 @@ export const CosmosExplorer = () => {
   const isFollowing = useCosmosStore(state => state.isFollowing);
   const currentScale = useCosmosStore(state => state.currentScale);
   
-  // Show galaxy view when zoomed way out (past Oort Cloud distances)
-  const showGalaxyView = currentScale === 'milkyWay' || currentScale === 'localGroup' || currentScale === 'universe';
-  
-  // Always show the starry sky (Milky Way band visible from within solar system)
-  const showMilkyWaySky = true;
+  // Show Milky Way when at stellar or larger scales
+  const showMilkyWay = currentScale === 'stellar' || currentScale === 'milkyWay' || currentScale === 'localGroup' || currentScale === 'universe';
   
   // Force cursor none on canvas - OrbitControls tries to set cursor styles
   useEffect(() => {
@@ -161,15 +157,11 @@ export const CosmosExplorer = () => {
             color="#FFF8E7" 
           />
           
-          {/* Star background - the basic drei Stars replaced by our Milky Way skybox */}
+          {/* Star background - scaled down for new coordinate system */}
+          <Stars radius={1e8} depth={1e7} count={15000} factor={1e5} saturation={0} fade speed={0.3} />
           
-          {/* Milky Way starry sky - visible from within solar system */}
-          {showMilkyWaySky && (
-            <MilkyWaySkybox visualScale={UNIFIED_SCALE} />
-          )}
-          
-          {/* Milky Way Galaxy structure - visible when zoomed out past Oort Cloud */}
-          {showGalaxyView && (
+          {/* Milky Way Galaxy - visible at larger scales */}
+          {showMilkyWay && (
             <MilkyWayGalaxy visualScale={UNIFIED_SCALE} showYouAreHere={true} />
           )}
           
