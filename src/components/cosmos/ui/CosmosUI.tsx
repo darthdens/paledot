@@ -571,22 +571,8 @@ export const CosmosUI = () => {
             <Button size="icon" variant="ghost" onClick={() => setShowTimeSlider(!showTimeSlider)} className={`h-8 w-8 sm:h-9 sm:w-9 text-white ${showTimeSlider ? 'bg-white/25' : 'bg-white/10 hover:bg-white/20'}`} title={t.timeSpeed}>
               <Clock className="w-4 h-4 sm:w-5 sm:h-5" />
             </Button>
-            
-            {/* Divider */}
-            <div className="w-px h-6 bg-white/20 mx-0.5" />
-            
-            {/* Advanced options group */}
-            <Button size="icon" variant="ghost" onClick={toggleRealPeriods} className={`h-8 w-8 sm:h-9 sm:w-9 text-white ${showRealPeriods ? 'bg-white/25' : 'bg-white/10 hover:bg-white/20'}`} title={showRealPeriods ? t.hidePeriods : t.showPeriods}>
-              {showRealPeriods ? <Timer className="w-4 h-4 sm:w-5 sm:h-5" /> : <TimerOff className="w-4 h-4 sm:w-5 sm:h-5" />}
-            </Button>
-            <Button size="icon" variant="ghost" onClick={toggleExaggeratedScale} className={`h-8 w-8 sm:h-9 sm:w-9 text-white ${useExaggeratedScale ? 'bg-yellow-500/40' : 'bg-white/10 hover:bg-white/20'}`} title={useExaggeratedScale ? t.exaggeratedScale : t.realisticScale}>
-              <Scaling className="w-4 h-4 sm:w-5 sm:h-5" />
-            </Button>
             <Button size="icon" variant="ghost" onClick={toggleSizeComparison} className="h-8 w-8 sm:h-9 sm:w-9 bg-white/10 hover:bg-white/20 text-white" title={t.sizeComparison}>
               <BarChart3 className="w-4 h-4 sm:w-5 sm:h-5" />
-            </Button>
-            <Button size="icon" variant="ghost" onClick={togglePerformanceHUD} className={`h-8 w-8 sm:h-9 sm:w-9 text-white ${showPerformanceHUD ? 'bg-green-500/40' : 'bg-white/10 hover:bg-white/20'}`} title={showPerformanceHUD ? t.hideStats : t.showStats}>
-              <Activity className="w-4 h-4 sm:w-5 sm:h-5" />
             </Button>
             
             {/* Divider */}
