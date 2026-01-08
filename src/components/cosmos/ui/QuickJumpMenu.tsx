@@ -52,11 +52,11 @@ export const QuickJumpMenu = () => {
 
   const menu = (
     <div 
-      className={`${isFullscreen ? 'fixed' : 'absolute'} top-12 bottom-2 right-2 sm:top-16 sm:bottom-4 sm:right-4 z-[10001] w-[calc(100vw-1rem)] max-w-56 sm:max-w-64 bg-black/90 backdrop-blur-md rounded-lg border border-white/20 overflow-hidden flex flex-col`}
+      className={`${isFullscreen ? 'fixed' : 'absolute'} top-[60px] sm:top-[68px] bottom-4 right-4 z-[10001] w-[calc(100vw-2rem)] max-w-56 sm:max-w-64 bg-black/90 backdrop-blur-md rounded-lg border border-white/20 overflow-hidden flex flex-col`}
       style={isFullscreen ? {
-        top: 'calc(3rem + env(safe-area-inset-top))',
-        right: 'calc(0.5rem + env(safe-area-inset-right))',
-        bottom: 'calc(0.5rem + env(safe-area-inset-bottom))',
+        top: 'calc(68px + env(safe-area-inset-top))',
+        right: 'calc(1rem + env(safe-area-inset-right))',
+        bottom: 'calc(1rem + env(safe-area-inset-bottom))',
       } : undefined}
     >
       {/* Header */}
