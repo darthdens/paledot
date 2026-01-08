@@ -1,23 +1,30 @@
-// Cosmos Explorer - Solar System visualization
+// Cosmos Explorer - Solar System visualization with fly-to navigation
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls, Stars, PerspectiveCamera } from '@react-three/drei';
-import { Suspense } from 'react';
+import { Suspense, useRef } from 'react';
 import { Sun } from './objects/Sun';
-import { Planet } from './objects/Planet';
+import { TexturedPlanet } from './objects/TexturedPlanet';
 import { CosmosUI } from './ui/CosmosUI';
+import { InfoCard } from './ui/InfoCard';
+import { QuickJumpMenu } from './ui/QuickJumpMenu';
+import { CameraController } from './CameraController';
 import { celestialObjects } from './data/celestialObjects';
 import { UNITS } from './types';
-
-// Visual scale multiplier to make planets visible (real scale makes them too tiny)
-const PLANET_VISUAL_SCALE = 200;
-const MOON_VISUAL_SCALE = 300;
+import * as THREE from 'three';
 
 export const CosmosExplorer = () => {
-  const planets = celestialObjects.filter(obj => obj.type === 'planet' || obj.type === 'dwarf-planet');
+  const planets = celestialObjects.filter(obj => 
+    obj.type === 'planet' || obj.type === 'dwarf-planet'
+  );
   const moons = celestialObjects.filter(obj => obj.type === 'moon');
+  const stars = celestialObjects.filter(obj => obj.type === 'star' && obj.id !== 'sun');
 
-  // Camera starts near Earth, looking at the Sun
-  const earthDistance = UNITS.KM_PER_AU;
+  // Start camera looking at inner solar system
+  const initialCameraPosition: [number, number, number] = [
+    UNITS.KM_PER_AU * 0.5,
+    UNITS.KM_PER_AU * 0.8,
+    UNITS.KM_PER_AU * 1.2
+  ];
 
   return (
     <div className="relative w-full h-full cursor-default" style={{ cursor: 'default' }}>
@@ -25,43 +32,69 @@ export const CosmosExplorer = () => {
         <Suspense fallback={null}>
           <PerspectiveCamera 
             makeDefault 
-            position={[earthDistance, earthDistance * 0.3, earthDistance * 0.5]} 
+            position={initialCameraPosition} 
             fov={60} 
-            near={100} 
-            far={1e15} 
+            near={1000} 
+            far={1e18} 
           />
           <OrbitControls
             enablePan={true}
             enableZoom={true}
             enableRotate={true}
-            zoomSpeed={1.5}
-            panSpeed={0.8}
+            zoomSpeed={2}
+            panSpeed={1}
             rotateSpeed={0.5}
-            minDistance={1000}
-            maxDistance={1e14}
-            target={[earthDistance * 0.5, 0, 0]}
+            minDistance={10000}
+            maxDistance={1e16}
           />
           
-          <ambientLight intensity={0.15} />
+          {/* Camera fly-to controller */}
+          <CameraController />
           
-          <Stars radius={1e12} depth={1e11} count={10000} factor={1e9} saturation={0} fade speed={0.5} />
+          {/* Lighting */}
+          <ambientLight intensity={0.08} />
+          <pointLight position={[0, 0, 0]} intensity={3} distance={UNITS.KM_PER_AU * 50} decay={0.5} color="#FFF5E1" />
           
-          {/* Sun at center */}
-          <Sun position={[0, 0, 0]} scale={0.1} />
+          {/* Star background */}
+          <Stars radius={1e14} depth={1e13} count={15000} factor={1e11} saturation={0} fade speed={0.3} />
           
-          {/* All planets with visual scale boost */}
+          {/* The Sun at center */}
+          <Sun position={[0, 0, 0]} scale={0.5} />
+          
+          {/* All planets */}
           {planets.map(planet => (
-            <Planet key={planet.id} object={planet} showOrbit={true} scale={PLANET_VISUAL_SCALE} />
+            <TexturedPlanet 
+              key={planet.id} 
+              object={planet} 
+              showOrbit={true} 
+              visualScale={300}
+            />
           ))}
           
-          {/* All moons with visual scale boost */}
+          {/* All moons */}
           {moons.map(moon => (
-            <Planet key={moon.id} object={moon} showOrbit={false} scale={MOON_VISUAL_SCALE} />
+            <TexturedPlanet 
+              key={moon.id} 
+              object={moon} 
+              showOrbit={false} 
+              visualScale={400}
+            />
+          ))}
+          
+          {/* Distant stars (very simplified) */}
+          {stars.map(star => (
+            <mesh key={star.id} position={star.position}>
+              <sphereGeometry args={[star.size * 0.001, 16, 16]} />
+              <meshBasicMaterial color={star.color} />
+            </mesh>
           ))}
         </Suspense>
       </Canvas>
       
+      {/* UI Overlays */}
       <CosmosUI />
+      <InfoCard />
+      <QuickJumpMenu />
     </div>
   );
 };

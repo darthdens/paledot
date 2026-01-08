@@ -9,12 +9,14 @@ const translations = {
     startTour: 'Start Guided Tour',
     quickJump: 'Quick Jump',
     controls: 'Controls',
-    scrollZoom: 'Scroll to zoom',
-    dragRotate: 'Drag to rotate',
+    scrollZoom: 'Scroll to zoom in/out',
+    dragRotate: 'Left-drag to rotate view',
     rightDragPan: 'Right-drag to pan',
+    clickSelect: 'Click objects to select',
     distanceFromEarth: 'Distance from Earth',
     welcome: 'Welcome to Cosmos Explorer',
-    subtitle: 'Journey from Earth to the edge of the observable universe',
+    subtitle: 'Journey through our solar system and beyond',
+    explore: 'Explore',
   },
   fr: {
     startTour: 'Commencer la Visite',
@@ -23,9 +25,11 @@ const translations = {
     scrollZoom: 'Molette pour zoomer',
     dragRotate: 'Glisser pour tourner',
     rightDragPan: 'Clic droit pour déplacer',
+    clickSelect: 'Cliquer pour sélectionner',
     distanceFromEarth: 'Distance de la Terre',
     welcome: 'Bienvenue dans Cosmos Explorer',
-    subtitle: 'Voyage de la Terre aux confins de l\'univers observable',
+    subtitle: 'Voyagez à travers notre système solaire et au-delà',
+    explore: 'Explorer',
   },
 };
 
@@ -50,7 +54,7 @@ export const CosmosUI = () => {
     <>
       {/* Welcome overlay for first visit */}
       {showControlHints && (
-        <div className="absolute inset-0 flex items-center justify-center bg-black/80 z-50 p-3">
+        <div className="absolute inset-0 flex items-center justify-center bg-black/85 z-50 p-3">
           <div className="text-center space-y-3 sm:space-y-5 max-w-sm sm:max-w-md px-4">
             <h1 className="text-xl sm:text-3xl md:text-4xl font-bold text-white leading-tight">{t.welcome}</h1>
             <p className="text-sm sm:text-base text-white/70">{t.subtitle}</p>
@@ -60,6 +64,7 @@ export const CosmosUI = () => {
               <p className="text-white/70 text-xs sm:text-sm">• {t.scrollZoom}</p>
               <p className="text-white/70 text-xs sm:text-sm">• {t.dragRotate}</p>
               <p className="text-white/70 text-xs sm:text-sm">• {t.rightDragPan}</p>
+              <p className="text-white/70 text-xs sm:text-sm">• {t.clickSelect}</p>
             </div>
 
             <div className="flex gap-2 sm:gap-3 justify-center flex-wrap">
@@ -67,7 +72,7 @@ export const CosmosUI = () => {
                 {t.startTour}
               </Button>
               <Button size="sm" variant="outline" onClick={() => setShowControlHints(false)} className="text-xs sm:text-sm">
-                {language === 'fr' ? 'Explorer' : 'Explore'}
+                {t.explore}
               </Button>
             </div>
           </div>
