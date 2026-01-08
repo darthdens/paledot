@@ -25,7 +25,7 @@ export const YouAreHereLabel = () => {
   const t = translations[language];
   const currentScale = useCosmosStore(state => state.currentScale);
   
-  // Only show when zoomed out to galactic scale or beyond
+  // Show when zoomed out to stellar scale or beyond
   const isGalacticScale = currentScale === 'stellar' || currentScale === 'milkyWay' || currentScale === 'localGroup' || currentScale === 'universe';
   
   if (!isGalacticScale) return null;
