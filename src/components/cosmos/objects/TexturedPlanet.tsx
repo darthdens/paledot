@@ -227,7 +227,7 @@ export const TexturedPlanet = ({
   const moonOrbitRadius = isMoon ? (object.orbitRadius || 0) * distanceScale : 0;
 
   // Real rotation speeds based on actual sidereal rotation periods
-  // Scaled so 1 real Earth day = 1 second of simulation time for visibility
+  // Scaled so 1 Earth day = 60 seconds of simulation time at 1x speed for realistic visualization
   const getRotationSpeed = () => {
     // Rotation period in hours (negative = retrograde rotation)
     const rotationPeriodsHours: Record<string, number> = {
@@ -250,9 +250,9 @@ export const TexturedPlanet = ({
     };
     
     const periodHours = rotationPeriodsHours[object.id] || 24;
-    // Scale: 24 Earth hours = 1 second sim time, so Earth completes 1 rotation/sec
-    // radians per second = 2π / (period in hours / 24)
-    const radiansPerSecond = (2 * Math.PI) / (Math.abs(periodHours) / 24);
+    // Scale: 1 Earth day (24h) = 60 seconds at 1x speed
+    // radians per second = 2π / (periodHours * 2.5)
+    const radiansPerSecond = (2 * Math.PI) / (Math.abs(periodHours) * 2.5);
     return periodHours < 0 ? -radiansPerSecond : radiansPerSecond;
   };
   
