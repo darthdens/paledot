@@ -1,6 +1,7 @@
 import { cn } from "@/lib/utils";
 import { ArrowUpRight } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import { useCosmosStore } from "@/components/cosmos/store/useCosmosStore";
 
 export default function CustomCursor() {
   const cursorRef = useRef<HTMLDivElement | null>(null);
@@ -12,6 +13,9 @@ export default function CustomCursor() {
   const [isPointer, setIsPointer] = useState(false);
   const [isDown, setIsDown] = useState(false);
   const [isOnCosmos, setIsOnCosmos] = useState(false);
+  
+  // Get hovered object from cosmos store
+  const hoveredObject = useCosmosStore(state => state.hoveredObject);
 
   useEffect(() => {
     // Only enable on devices that actually have a precise pointer (mouse/trackpad)
@@ -73,6 +77,9 @@ export default function CustomCursor() {
     };
   }, []);
 
+  // Show pointer style when hovering a cosmos object
+  const showPointer = isPointer || (isOnCosmos && hoveredObject !== null);
+
   return (
     <div
       ref={cursorRef}
@@ -80,7 +87,7 @@ export default function CustomCursor() {
       className={cn(
         "custom-cursor",
         isVisible && "is-visible",
-        isPointer && "is-pointer",
+        showPointer && "is-pointer",
         isDown && "is-down",
         isOnCosmos && "is-cosmos"
       )}

@@ -81,7 +81,7 @@ export const CosmosExplorer = () => {
   ];
 
   return (
-    <div className="relative w-full h-full cursor-default" style={{ cursor: 'default' }}>
+    <div className="relative w-full h-full">
       <Canvas gl={{ alpha: false }}>
         <Suspense fallback={null}>
           <PerspectiveCamera 

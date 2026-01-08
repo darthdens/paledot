@@ -199,12 +199,10 @@ const Comet = ({ comet, scale }: CometProps) => {
   const handlePointerOver = (e: { stopPropagation: () => void }) => {
     e.stopPropagation();
     setHoveredObject(cometObject);
-    document.body.style.cursor = 'pointer';
   };
   
   const handlePointerOut = () => {
     setHoveredObject(null);
-    document.body.style.cursor = 'default';
   };
   
   const coreSize = Math.max(comet.coreSize * scale * 50, 2); // Exaggerated for visibility
