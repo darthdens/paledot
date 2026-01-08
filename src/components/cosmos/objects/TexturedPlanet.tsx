@@ -893,8 +893,19 @@ export const TexturedPlanet = ({
                     vec3 fragFromPlanet = vWorldPosition - objectCenter;
                     float distFromPlanet = length(fragFromPlanet);
                     vec3 pseudoNormal = distFromPlanet > 0.001 ? fragFromPlanet / distFromPlanet : vec3(0.0, 1.0, 0.0);
+ 
+                    // Keep the sun-facing side stable (prevent "dimming out" when timeSpeed changes)
+                    float NdotLRaw = dot(pseudoNormal, sunDir);
 
-                    float NdotL = max(dot(pseudoNormal, sunDir), 0.0);
+                    // Smoothly classify day/night so tiny numerical flips don't snap rings dark
+                    float daylight = smoothstep(-0.05, 0.05, NdotLRaw);
+
+                    // Base diffuse term (like planets/moons)
+                    float NdotL = max(NdotLRaw, 0.0);
+
+                    // Add a small daylight-weighted floor near the terminator (helps when positions update faster)
+                    NdotL = max(NdotL, 0.25 * daylight);
+
                     float ambient = 0.012;
                     float diffuse = NdotL * 0.988 * shadow;
                     float totalLight = ambient + diffuse;
