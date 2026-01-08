@@ -133,10 +133,12 @@ export const TexturedPlanet = ({ object, showOrbit = true, visualScale = 500 }: 
   const planetRef = useRef<THREE.Mesh>(null);
   const groupRef = useRef<THREE.Group>(null);
   const atmosphereRef = useRef<THREE.Mesh>(null);
+  const worldPos = useRef(new THREE.Vector3());
+  const lastWorldPosUpdate = useRef(0);
   
   const setSelectedObject = useCosmosStore(state => state.setSelectedObject);
   const setHoveredObject = useCosmosStore(state => state.setHoveredObject);
-  
+  const setObjectWorldPosition = useCosmosStore(state => state.setObjectWorldPosition);
   const visuals = PLANET_VISUALS[object.id] || {
     baseColor: object.color,
     roughness: 0.7,
@@ -161,6 +163,13 @@ export const TexturedPlanet = ({ object, showOrbit = true, visualScale = 500 }: 
       const angle = time * orbitSpeed * 100;
       groupRef.current.position.x = Math.cos(angle) * orbitRadius;
       groupRef.current.position.z = Math.sin(angle) * orbitRadius;
+    }
+
+    // Keep a live world-position for camera targeting (planets move)
+    if (groupRef.current && time - lastWorldPosUpdate.current > 0.05) {
+      lastWorldPosUpdate.current = time;
+      groupRef.current.getWorldPosition(worldPos.current);
+      setObjectWorldPosition(object.id, [worldPos.current.x, worldPos.current.y, worldPos.current.z]);
     }
     
     // Atmosphere pulse
