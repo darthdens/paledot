@@ -157,10 +157,12 @@ export const InfoCard = () => {
   const isFollowing = useCosmosStore(state => state.isFollowing);
   const toggleFollowing = useCosmosStore(state => state.toggleFollowing);
   const showRealPeriods = useCosmosStore(state => state.showRealPeriods);
+  const isTouring = useCosmosStore(state => state.isTouring);
   const isFullscreen = useFullscreenStore(state => state.isFullscreen);
   const [isMinimized, setIsMinimized] = useState(false);
 
-  if (!selectedObject) return null;
+  // Hide InfoCard when touring (TourOverlay shows the info instead)
+  if (!selectedObject || isTouring) return null;
 
   const handleClose = () => setSelectedObject(null);
   

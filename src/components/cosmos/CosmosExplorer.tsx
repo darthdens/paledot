@@ -8,6 +8,7 @@ import { MoonOrbit } from './objects/MoonOrbit';
 import { CosmosUI } from './ui/CosmosUI';
 import { InfoCard } from './ui/InfoCard';
 import { QuickJumpMenu } from './ui/QuickJumpMenu';
+import { TourOverlay } from './ui/TourOverlay';
 import { CameraController } from './CameraController';
 import { celestialObjects } from './data/celestialObjects';
 import { UNITS } from './types';
@@ -152,6 +153,7 @@ export const CosmosExplorer = () => {
       
       {/* UI Overlays */}
       <CosmosUI />
+      <TourOverlay />
       <InfoCard />
       <QuickJumpMenu />
     </div>

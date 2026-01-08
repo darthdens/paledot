@@ -56,6 +56,7 @@ export const CosmosUI = () => {
   const t = translations[language];
   const {
     startTour,
+    isTouring,
     toggleQuickJump,
     showControlHints,
     setShowControlHints,
@@ -457,8 +458,8 @@ export const CosmosUI = () => {
         </div>
       )}
 
-      {/* Bottom tour button - smaller on mobile */}
-      {!showControlHints && (
+      {/* Bottom tour button - hide when touring */}
+      {!showControlHints && !isTouring && (
         <div className="absolute bottom-3 sm:bottom-6 left-1/2 -translate-x-1/2 z-40">
           <Button size="sm" onClick={startTour} className="animate-pulse text-xs sm:text-sm">
             {t.startTour}

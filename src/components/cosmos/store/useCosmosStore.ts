@@ -2,6 +2,11 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { ScaleLevel, CelestialObject, SCALE_BOUNDARIES } from '../types';
 
+interface TourCameraTarget {
+  position: [number, number, number];
+  lookAt: [number, number, number];
+}
+
 interface CosmosStore {
   // Camera state
   cameraDistance: number;
@@ -23,6 +28,7 @@ interface CosmosStore {
   tourIndex: number;
   tourSpeed: number;
   isPaused: boolean;
+  tourCameraTarget: TourCameraTarget | null;
 
   // UI
   showControlHints: boolean;
@@ -56,6 +62,7 @@ interface CosmosStore {
   stopTour: () => void;
   setTourIndex: (index: number) => void;
   setTourSpeed: (speed: number) => void;
+  setTourCameraTarget: (target: TourCameraTarget | null) => void;
   togglePause: () => void;
   setShowControlHints: (show: boolean) => void;
   toggleQuickJump: () => void;
@@ -98,6 +105,7 @@ export const useCosmosStore = create<CosmosStore>()(
       tourIndex: 0,
       tourSpeed: 1,
       isPaused: false,
+      tourCameraTarget: null,
       
       showControlHints: true,
       showQuickJump: false,
@@ -140,13 +148,15 @@ export const useCosmosStore = create<CosmosStore>()(
 
       toggleFollowing: () => set((state) => ({ isFollowing: !state.isFollowing })),
       
-      startTour: () => set({ isTouring: true, tourIndex: 0, isPaused: false }),
+      startTour: () => set({ isTouring: true, tourIndex: 0, isPaused: false, tourCameraTarget: null }),
       
-      stopTour: () => set({ isTouring: false, tourIndex: 0 }),
+      stopTour: () => set({ isTouring: false, tourIndex: 0, tourCameraTarget: null }),
       
       setTourIndex: (index) => set({ tourIndex: index }),
       
       setTourSpeed: (speed) => set({ tourSpeed: speed }),
+      
+      setTourCameraTarget: (target) => set({ tourCameraTarget: target }),
       
       togglePause: () => set((state) => ({ isPaused: !state.isPaused })),
       
