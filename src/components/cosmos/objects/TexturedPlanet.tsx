@@ -580,6 +580,7 @@ export const TexturedPlanet = ({
                 emissiveIntensity: { value: visuals.emissiveIntensity || 0 },
                 time: { value: 0 },
                 surfaceType: { value: visuals.surfaceDetail === 'gaseous' ? 1.0 : visuals.surfaceDetail === 'icy' ? 2.0 : visuals.surfaceDetail === 'volcanic' ? 3.0 : 0.0 },
+                planetSeed: { value: object.id.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) * 0.1 },
                 objectCenter: { value: new THREE.Vector3(0, 0, 0) },
                 parentCenter: { value: new THREE.Vector3(0, 0, 0) },
                 parentRadius: { value: parentPlanetSize },
@@ -619,6 +620,7 @@ export const TexturedPlanet = ({
                 uniform float emissiveIntensity;
                 uniform float time;
                 uniform float surfaceType;
+                uniform float planetSeed;
                 uniform vec3 objectCenter;
                 uniform vec3 parentCenter;
                 uniform float parentRadius;
@@ -785,11 +787,12 @@ export const TexturedPlanet = ({
                   float ambient = 0.012;
                   float diffuse = max(NdotL, 0.0) * 0.988 * totalShadow;
                   
-                  // Multi-scale noise for rich surface detail
-                  vec2 noiseCoord = vUv * 12.0;
+                  // Multi-scale noise for rich surface detail - offset by planetSeed for unique patterns
+                  vec2 seedOffset = vec2(planetSeed * 7.31, planetSeed * 13.17);
+                  vec2 noiseCoord = vUv * 12.0 + seedOffset;
                   float surfaceNoise = fbm(noiseCoord);
-                  float fineNoise = fbm(noiseCoord * 4.0);
-                  float microNoise = noise(noiseCoord * 25.0);
+                  float fineNoise = fbm(noiseCoord * 4.0 + seedOffset * 2.0);
+                  float microNoise = noise(noiseCoord * 25.0 + seedOffset * 3.0);
                   
                   vec3 surfaceColor;
                   if (surfaceType > 2.5) {
