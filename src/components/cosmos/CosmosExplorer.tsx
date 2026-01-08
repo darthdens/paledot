@@ -1,7 +1,7 @@
 // Cosmos Explorer - Solar System visualization with fly-to navigation
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls, Stars, PerspectiveCamera } from '@react-three/drei';
-import { Suspense, useMemo } from 'react';
+import { Suspense, useMemo, useEffect, useRef } from 'react';
 import { Sun } from './objects/Sun';
 import { TexturedPlanet } from './objects/TexturedPlanet';
 import { MoonOrbit } from './objects/MoonOrbit';
@@ -29,9 +29,25 @@ const getMoonOrbitRadius = (moon: typeof celestialObjects[0], distanceScale: num
 
 export const CosmosExplorer = () => {
   const selectedObject = useCosmosStore(state => state.selectedObject);
+  const setSelectedObject = useCosmosStore(state => state.setSelectedObject);
   const showOrbits = useCosmosStore(state => state.showOrbits);
   const showTrails = useCosmosStore(state => state.showTrails);
   const isFollowing = useCosmosStore(state => state.isFollowing);
+  const hasInitialized = useRef(false);
+  
+  // Auto-select Earth on first load so camera flies to Earth
+  useEffect(() => {
+    if (hasInitialized.current) return;
+    hasInitialized.current = true;
+    
+    const earth = celestialObjects.find(obj => obj.id === 'earth');
+    if (earth && !selectedObject) {
+      // Small delay to let the scene initialize
+      setTimeout(() => {
+        setSelectedObject(earth);
+      }, 100);
+    }
+  }, [selectedObject, setSelectedObject]);
   
   // Hide orbits when actively following a moving object (they're distracting)
   const shouldShowOrbits = showOrbits && (!selectedObject || !isFollowing);
@@ -69,12 +85,13 @@ export const CosmosExplorer = () => {
        }));
   }, [moons, selectedObject, shouldShowOrbits]);
 
-  // Start camera looking at inner solar system - positioned to see Sun and inner planets
-  const sunRadius = 1392700 * UNIFIED_SCALE / 2; // Sun's radius in scene units
+  // Start camera looking at Earth - the natural starting point for exploration
+  const earthOrbitRadius = UNITS.KM_PER_AU * UNIFIED_SCALE; // Earth's distance from Sun in scene units
+  const earthVisualRadius = 12742 * UNIFIED_SCALE / 2; // Earth's radius in scene units
   const initialCameraPosition: [number, number, number] = [
-    sunRadius * 10,  // 10 sun radii away on X
-    sunRadius * 5,   // 5 sun radii up on Y
-    sunRadius * 15   // 15 sun radii away on Z
+    earthOrbitRadius + earthVisualRadius * 8,  // Slightly offset from Earth on X
+    earthVisualRadius * 4,                      // A bit above Earth
+    earthVisualRadius * 10                      // Far enough to see Earth nicely
   ];
 
   return (
