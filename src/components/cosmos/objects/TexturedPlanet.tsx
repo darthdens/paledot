@@ -161,11 +161,11 @@ const PLANET_VISUALS: Record<string, {
     atmosphereColor: '#c8f0f0',
     atmosphereIntensity: 0.4,
     hasRings: true,
-    // Uranus rings are narrow and very dark, but still need to be visible in our scale
-    ringColor: '#3a4046',
-    ringOpacity: 0.55,
-    ringInnerMult: 1.45,
-    ringOuterMult: 2.05,
+    // Uranus rings are narrow and dark, brightened for visibility
+    ringColor: '#5a6570',
+    ringOpacity: 0.7,
+    ringInnerMult: 1.4,
+    ringOuterMult: 2.1,
     ringStyle: 1,
     tilt: 97.8,
     surfaceDetail: 'gaseous',
@@ -1038,17 +1038,18 @@ export const TexturedPlanet = ({
                     float maxwellGap = 1.0 - 0.5 * exp(-pow((normalizedDist - 0.22) / 0.008, 2.0));
                     ringDensitySaturn *= cassiniGap * enckeGap * keelerGap * colomboGap * maxwellGap;
                     
-                    // Uranus-like narrow, dark ringlets (few sharp bands)
+                    // Uranus-like narrow ringlets (few sharp bands, brightened for visibility)
                     float uranusBands = 0.0;
-                    // Slightly wider than physical reality so they read at our viewing scale
-                    uranusBands += 1.00 * exp(-pow((normalizedDist - 0.82) / 0.018, 2.0)); // epsilon-like ring
-                    uranusBands += 0.55 * exp(-pow((normalizedDist - 0.62) / 0.020, 2.0));
-                    uranusBands += 0.40 * exp(-pow((normalizedDist - 0.46) / 0.016, 2.0));
-                    uranusBands += 0.30 * exp(-pow((normalizedDist - 0.28) / 0.020, 2.0));
+                    // Wider bands so they're visible at our viewing scale
+                    uranusBands += 1.00 * exp(-pow((normalizedDist - 0.85) / 0.025, 2.0)); // epsilon-like ring (outermost, brightest)
+                    uranusBands += 0.70 * exp(-pow((normalizedDist - 0.68) / 0.022, 2.0));
+                    uranusBands += 0.55 * exp(-pow((normalizedDist - 0.52) / 0.020, 2.0));
+                    uranusBands += 0.45 * exp(-pow((normalizedDist - 0.35) / 0.022, 2.0));
+                    uranusBands += 0.35 * exp(-pow((normalizedDist - 0.20) / 0.018, 2.0));
                     
                     float ringDensityUranus = clamp(uranusBands, 0.0, 1.0);
-                    ringDensityUranus *= 0.90 + 0.10 * noise(normalizedDist * 900.0);
-                    ringDensityUranus *= 0.97 + 0.03 * sin(angle * 12.0);
+                    ringDensityUranus *= 0.92 + 0.08 * noise(normalizedDist * 600.0);
+                    ringDensityUranus *= 0.98 + 0.02 * sin(angle * 8.0);
                     
                     float ringDensity = mix(ringDensitySaturn, ringDensityUranus, ringStyle);
 
@@ -1083,7 +1084,7 @@ export const TexturedPlanet = ({
                     float alpha = clamp(ringOpacity * edgeFade, 0.0, 0.95);
                     
                     // Lit ring with enhanced brightness
-                    float ringBrightness = mix(1.8, 1.35, ringStyle);
+                    float ringBrightness = mix(1.8, 1.8, ringStyle);
                     vec3 litRing = finalColor * totalLight * ringBrightness;
                     
                     gl_FragColor = vec4(litRing, alpha);
