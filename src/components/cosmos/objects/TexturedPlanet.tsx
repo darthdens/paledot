@@ -887,31 +887,16 @@ export const TexturedPlanet = ({
                     // Planet shadow on rings (cylinder shadow behind planet)
                     float shadow = calculatePlanetShadow(vWorldPosition, sunDir);
 
-                    // Day/night: treat ring fragments as if on an imaginary sphere around the planet.
-                    // Fragments on the sun-facing hemisphere light up; opposite hemisphere is dark.
+                    // Ring lighting follows the same logic as planets/moons:
+                    // ambient + max(N·L, 0) diffuse, with planet shadow applied.
+                    // IMPORTANT: opacity is NOT tied to lighting, so changing timeSpeed can't "fade" rings.
                     vec3 fragFromPlanet = vWorldPosition - objectCenter;
                     float distFromPlanet = length(fragFromPlanet);
-                    
-                    // Fallback if objectCenter not set properly - use fragment position directly
-                    float daylight = 1.0;
-                    if (distFromPlanet > 0.1) {
-                      vec3 pseudoNormal = fragFromPlanet / distFromPlanet;
-                      float NdotL = dot(pseudoNormal, sunDir);
-                      daylight = smoothstep(-0.08, 0.15, NdotL);
-                    }
+                    vec3 pseudoNormal = distFromPlanet > 0.001 ? fragFromPlanet / distFromPlanet : vec3(0.0, 1.0, 0.0);
 
-                    // Ring plane incidence (how perpendicular to sun rays)
-                    vec3 ringNormal = normalize(vWorldNormal);
-                    float planeIncidence = abs(dot(ringNormal, sunDir));
-
-                    // Forward scattering when sun behind rings relative to camera
-                    vec3 viewDir = normalize(cameraPosition - vWorldPosition);
-                    float forwardScatter = pow(max(dot(-viewDir, sunDir), 0.0), 2.2) * 0.35;
-
-                    // Combine lighting - boost lit-side visibility
-                    float ambient = 0.04;
-                    float baseDiffuse = planeIncidence * 1.25 + 0.4 + forwardScatter * 1.4;
-                    float diffuse = baseDiffuse * shadow * daylight;
+                    float NdotL = max(dot(pseudoNormal, sunDir), 0.0);
+                    float ambient = 0.012;
+                    float diffuse = NdotL * 0.988 * shadow;
                     float totalLight = ambient + diffuse;
 
                     // Ring density and bands
@@ -927,13 +912,10 @@ export const TexturedPlanet = ({
                     float ringOpacity = opacity * ringDensity;
                     float edgeFade = smoothstep(0.0, 0.08, normalizedDist) * smoothstep(1.0, 0.92, normalizedDist);
 
-                    // Alpha: keep night-side visible enough to never "disappear" when time speed changes.
-                    float nightFloor = 0.06;
-                    float shadowFloor = 0.12;
-                    float visibility = max(nightFloor, daylight) * max(shadowFloor, shadow);
-                    float alpha = ringOpacity * edgeFade * max(0.02, visibility);
+                    // Stable opacity (not affected by lighting)
+                    float alpha = ringOpacity * edgeFade;
 
-                    vec3 litRing = ringColor * totalLight * 1.6;
+                    vec3 litRing = ringColor * totalLight;
                     gl_FragColor = vec4(litRing, alpha);
                   }
                 `}
