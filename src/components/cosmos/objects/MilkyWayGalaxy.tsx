@@ -86,7 +86,7 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
   const gasTexture = useMemo(() => createGasTexture(), []);
   
   // Generate detailed galaxy particle systems
-  const { bulgeGeo, barGeo, diskGeo, armCoreGeo, dustGeo, nebulaGeo, gasCloudGeo, starClusterGeo, haloGeo } = useMemo(() => {
+  const { bulgeGeo, barGeo, diskGeo, armCoreGeo, dustGeo, nebulaGeo, gasCloudGeo, starClusterGeo, globularGeo, haloGeo } = useMemo(() => {
     const color = new THREE.Color();
     
     // === CENTRAL BULGE (warm golden/orange core - spheroidal) ===
@@ -460,7 +460,88 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
       }
     }
     
-    // === STELLAR HALO (faint outer stars and globular clusters) ===
+    // === GLOBULAR CLUSTERS (dense spherical clusters in halo) ===
+    const globularCount = 20000;
+    const globularPos = new Float32Array(globularCount * 3);
+    const globularCol = new Float32Array(globularCount * 3);
+    
+    // ~160 globular clusters (Milky Way has ~150-200)
+    const numGlobulars = 160;
+    let globIdx = 0;
+    
+    for (let g = 0; g < numGlobulars && globIdx < globularCount; g++) {
+      // Globular cluster position in halo - concentrated toward center
+      const distFromCenter = (3000 + Math.pow(Math.random(), 0.5) * 80000) * gs;
+      const theta = Math.random() * Math.PI * 2;
+      const phi = Math.acos(2 * Math.random() - 1);
+      
+      const clusterX = distFromCenter * Math.sin(phi) * Math.cos(theta);
+      const clusterY = distFromCenter * Math.cos(phi) * 0.8; // Slightly flattened
+      const clusterZ = distFromCenter * Math.sin(phi) * Math.sin(theta);
+      
+      // Globular cluster size - varies from small to large
+      const sizeRand = Math.random();
+      const clusterRadius = sizeRand < 0.4
+        ? (30 + Math.random() * 50) * gs    // Small globulars
+        : sizeRand < 0.8
+          ? (80 + Math.random() * 120) * gs   // Medium globulars
+          : (200 + Math.random() * 300) * gs; // Large globulars (like Omega Centauri)
+      
+      // Stars per globular based on size
+      const starsInGlobular = Math.floor(50 + (clusterRadius / gs) * 0.5);
+      
+      // Globular color - old yellow/orange/red giant dominated
+      const colorType = Math.random();
+      let baseHue: number, baseSat: number;
+      
+      if (colorType < 0.5) {
+        // Yellow-orange (most common)
+        baseHue = 0.10 + Math.random() * 0.05;
+        baseSat = 0.4 + Math.random() * 0.3;
+      } else if (colorType < 0.8) {
+        // Orange-gold
+        baseHue = 0.07 + Math.random() * 0.04;
+        baseSat = 0.5 + Math.random() * 0.35;
+      } else {
+        // Slightly reddish (metal-rich)
+        baseHue = 0.03 + Math.random() * 0.05;
+        baseSat = 0.45 + Math.random() * 0.3;
+      }
+      
+      for (let s = 0; s < starsInGlobular && globIdx < globularCount; s++) {
+        const i3 = globIdx * 3;
+        
+        // Very concentrated King profile - dense core
+        const concentration = Math.pow(Math.random(), 1.5);
+        const starTheta = Math.random() * Math.PI * 2;
+        const starPhi = Math.acos(2 * Math.random() - 1);
+        const dist = concentration * clusterRadius;
+        
+        globularPos[i3] = clusterX + dist * Math.sin(starPhi) * Math.cos(starTheta);
+        globularPos[i3 + 1] = clusterY + dist * Math.cos(starPhi);
+        globularPos[i3 + 2] = clusterZ + dist * Math.sin(starPhi) * Math.sin(starTheta);
+        
+        // Brighter toward center, with some blue stragglers
+        const isBlueStraggler = Math.random() < 0.03;
+        if (isBlueStraggler) {
+          color.setHSL(0.58 + Math.random() * 0.05, 0.6, 0.85 + Math.random() * 0.1);
+        } else {
+          const brightness = 0.7 + (1 - concentration) * 0.25;
+          color.setHSL(
+            baseHue + (Math.random() - 0.5) * 0.03,
+            baseSat + (Math.random() - 0.5) * 0.1,
+            brightness
+          );
+        }
+        globularCol[i3] = color.r;
+        globularCol[i3 + 1] = color.g;
+        globularCol[i3 + 2] = color.b;
+        
+        globIdx++;
+      }
+    }
+    
+    // === STELLAR HALO (faint outer field stars) ===
     const haloCount = 10000;
     const haloPos = new Float32Array(haloCount * 3);
     const haloCol = new Float32Array(haloCount * 3);
@@ -518,11 +599,15 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
     starClusterGeo.setAttribute('color', new THREE.BufferAttribute(starClusterCol.slice(0, starIdx * 3), 3));
     starClusterGeo.setAttribute('size', new THREE.BufferAttribute(starClusterSizes.slice(0, starIdx), 1));
     
+    const globularGeo = new THREE.BufferGeometry();
+    globularGeo.setAttribute('position', new THREE.BufferAttribute(globularPos.slice(0, globIdx * 3), 3));
+    globularGeo.setAttribute('color', new THREE.BufferAttribute(globularCol.slice(0, globIdx * 3), 3));
+    
     const haloGeo = new THREE.BufferGeometry();
     haloGeo.setAttribute('position', new THREE.BufferAttribute(haloPos, 3));
     haloGeo.setAttribute('color', new THREE.BufferAttribute(haloCol, 3));
     
-    return { bulgeGeo, barGeo, diskGeo, armCoreGeo, dustGeo, nebulaGeo, gasCloudGeo, starClusterGeo, haloGeo };
+    return { bulgeGeo, barGeo, diskGeo, armCoreGeo, dustGeo, nebulaGeo, gasCloudGeo, starClusterGeo, globularGeo, haloGeo };
   }, [gs]);
   
   const pulseRef2 = useRef<THREE.Mesh>(null);
@@ -666,6 +751,20 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
           sizeAttenuation
           transparent
           opacity={1}
+          blending={THREE.AdditiveBlending}
+          depthWrite={false}
+        />
+      </points>
+      
+      {/* Globular clusters - dense spherical clusters in halo */}
+      <points geometry={globularGeo}>
+        <pointsMaterial
+          size={gs * 70}
+          map={starTexture}
+          vertexColors
+          sizeAttenuation
+          transparent
+          opacity={0.95}
           blending={THREE.AdditiveBlending}
           depthWrite={false}
         />
