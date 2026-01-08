@@ -452,6 +452,10 @@ export const TexturedPlanet = ({
                 parentCenter: { value: new THREE.Vector3(0, 0, 0) },
                 parentRadius: { value: parentPlanetSize },
                 isMoon: { value: isMoon ? 1.0 : 0.0 },
+                hasRings: { value: visuals.hasRings ? 1.0 : 0.0 },
+                ringInnerRadius: { value: planetSize * 1.3 },
+                ringOuterRadius: { value: planetSize * 2.2 },
+                planetTilt: { value: tiltRadians },
               }}
               vertexShader={`
                 varying vec3 vNormal;
@@ -483,6 +487,10 @@ export const TexturedPlanet = ({
                 uniform vec3 parentCenter;
                 uniform float parentRadius;
                 uniform float isMoon;
+                uniform float hasRings;
+                uniform float ringInnerRadius;
+                uniform float ringOuterRadius;
+                uniform float planetTilt;
                 
                 varying vec3 vNormal;
                 varying vec3 vPosition;
@@ -523,79 +531,104 @@ export const TexturedPlanet = ({
                 float calculateShadow(vec3 fragWorldPos, vec3 sunDir) {
                   if (isMoon < 0.5) return 1.0; // Not a moon, no shadow
                   
-                  // Vector from fragment to parent planet center
                   vec3 toParent = parentCenter - fragWorldPos;
-                  
-                  // Project fragment position onto the sun-parent line
                   float distAlongRay = dot(toParent, sunDir);
-                  
-                  // Only shadow if parent is between fragment and sun
                   if (distAlongRay < 0.0) return 1.0;
                   
-                  // Closest point on sun ray to parent center
                   vec3 closestPoint = fragWorldPos + sunDir * distAlongRay;
                   float distFromAxis = length(parentCenter - closestPoint);
                   
-                  // Check if within shadow cone (simplified cylindrical shadow)
-                  float shadowRadius = parentRadius * 1.0; // Could add penumbra with * 1.1
+                  float shadowRadius = parentRadius;
                   if (distFromAxis < shadowRadius) {
-                    // Smooth shadow edge (penumbra)
                     return smoothstep(shadowRadius * 0.8, shadowRadius, distFromAxis);
+                  }
+                  return 1.0;
+                }
+                
+                // Check if point is in shadow of the rings
+                float calculateRingShadow(vec3 fragWorldPos, vec3 sunDir) {
+                  if (hasRings < 0.5) return 1.0;
+                  
+                  // Ring plane is in XZ plane of the planet (after tilt), passing through objectCenter
+                  // For simplicity, we'll use the world Y coordinate relative to planet center
+                  vec3 relPos = fragWorldPos - objectCenter;
+                  
+                  // Apply inverse tilt to get position in ring's reference frame
+                  float cosT = cos(-planetTilt);
+                  float sinT = sin(-planetTilt);
+                  vec3 ringFramePos;
+                  ringFramePos.x = relPos.x;
+                  ringFramePos.y = relPos.y * cosT - relPos.z * sinT;
+                  ringFramePos.z = relPos.y * sinT + relPos.z * cosT;
+                  
+                  // Transform sun direction to ring frame too
+                  vec3 ringFrameSunDir;
+                  ringFrameSunDir.x = sunDir.x;
+                  ringFrameSunDir.y = sunDir.y * cosT - sunDir.z * sinT;
+                  ringFrameSunDir.z = sunDir.y * sinT + sunDir.z * cosT;
+                  
+                  // Ray-plane intersection: ring plane is Y=0 in ring frame
+                  if (abs(ringFrameSunDir.y) < 0.001) return 1.0; // Ray parallel to plane
+                  
+                  float t = -ringFramePos.y / ringFrameSunDir.y;
+                  if (t < 0.0) return 1.0; // Ring plane is behind us relative to sun
+                  
+                  // Intersection point on ring plane
+                  vec3 hitPoint = ringFramePos + ringFrameSunDir * t;
+                  float distFromCenter = length(vec2(hitPoint.x, hitPoint.z));
+                  
+                  // Check if within ring bounds
+                  if (distFromCenter > ringInnerRadius && distFromCenter < ringOuterRadius) {
+                    // Create some variation in shadow (ring density)
+                    float ringPos = (distFromCenter - ringInnerRadius) / (ringOuterRadius - ringInnerRadius);
+                    float ringDensity = 0.3 + 0.4 * (sin(ringPos * 60.0) * 0.5 + 0.5);
+                    // Gap in the middle of rings
+                    float gap = smoothstep(0.45, 0.5, ringPos) * (1.0 - smoothstep(0.5, 0.55, ringPos));
+                    ringDensity *= (1.0 - gap * 0.8);
+                    return 1.0 - ringDensity * 0.7;
                   }
                   return 1.0;
                 }
                 
                 void main() {
                   vec3 worldNormal = normalize(vWorldNormal);
-                  // Sun is at origin - light direction from fragment toward sun
                   vec3 sunDir = normalize(-vWorldPosition);
                   
-                  // Calculate sun-facing illumination (realistic lighting)
                   float NdotL = dot(worldNormal, sunDir);
                   
-                  // Calculate shadow from parent planet (for moons)
-                  float shadow = calculateShadow(vWorldPosition, sunDir);
+                  // Calculate shadows
+                  float moonShadow = calculateShadow(vWorldPosition, sunDir);
+                  float ringShadow = calculateRingShadow(vWorldPosition, sunDir);
+                  float totalShadow = min(moonShadow, ringShadow);
                   
-                  // Very dark ambient for realistic space lighting
                   float ambient = 0.012;
-                  // Only apply diffuse on sun-facing side, multiplied by shadow
-                  float diffuse = max(NdotL, 0.0) * 0.988 * shadow;
+                  float diffuse = max(NdotL, 0.0) * 0.988 * totalShadow;
                   
-                  // Generate surface variation based on type
                   vec2 noiseCoord = vUv * 20.0;
                   float surfaceNoise = fbm(noiseCoord);
                   
-                  // Different noise patterns for different surface types
                   vec3 surfaceColor;
                   if (surfaceType > 2.5) {
-                    // Volcanic - hot spots
                     float lava = smoothstep(0.5, 0.7, surfaceNoise);
                     surfaceColor = mix(baseColor, secondaryColor, surfaceNoise * 0.6 + lava * 0.4);
                   } else if (surfaceType > 1.5) {
-                    // Icy - crack patterns
                     float cracks = smoothstep(0.4, 0.5, surfaceNoise);
                     surfaceColor = mix(baseColor, secondaryColor, cracks * 0.4);
                   } else if (surfaceType > 0.5) {
-                    // Gaseous - banded patterns
                     float bands = sin(vUv.y * 30.0 + surfaceNoise * 3.0) * 0.5 + 0.5;
                     surfaceColor = mix(baseColor, secondaryColor, bands * 0.5);
                   } else {
-                    // Rocky - craters and terrain
                     surfaceColor = mix(baseColor, secondaryColor, surfaceNoise * 0.5);
                   }
                   
-                  // Apply lighting
                   vec3 litColor = surfaceColor * (ambient + diffuse);
-                  
-                  // Add emissive (for Sun)
                   litColor += emissive * emissiveIntensity;
                   
-                  // Simple specular highlight - only on lit side and not in shadow
-                  if (NdotL > 0.0 && shadow > 0.5) {
+                  if (NdotL > 0.0 && totalShadow > 0.5) {
                     vec3 viewDir = normalize(cameraPosition - vWorldPosition);
                     vec3 halfDir = normalize(sunDir + viewDir);
                     float spec = pow(max(dot(worldNormal, halfDir), 0.0), 64.0 / max(roughness, 0.1));
-                    litColor += spec * (1.0 - roughness) * 0.3 * max(NdotL, 0.0) * shadow;
+                    litColor += spec * (1.0 - roughness) * 0.3 * max(NdotL, 0.0) * totalShadow;
                   }
                   
                   gl_FragColor = vec4(litColor, 1.0);
@@ -793,9 +826,11 @@ export const TexturedPlanet = ({
                   varying vec2 vUv;
                   varying vec3 vWorldPosition;
                   varying vec3 vWorldNormal;
+                  varying vec3 vLocalPosition;
                   
                   void main() {
                     vUv = uv;
+                    vLocalPosition = position;
                     vWorldNormal = normalize((modelMatrix * vec4(normal, 0.0)).xyz);
                     vec4 worldPos = modelMatrix * vec4(position, 1.0);
                     vWorldPosition = worldPos.xyz;
@@ -813,25 +848,19 @@ export const TexturedPlanet = ({
                   varying vec2 vUv;
                   varying vec3 vWorldPosition;
                   varying vec3 vWorldNormal;
+                  varying vec3 vLocalPosition;
                   
                   float hash(float n) { return fract(sin(n) * 43758.5453); }
                   
                   // Check if ring fragment is in shadow of the planet
                   float calculatePlanetShadow(vec3 fragWorldPos, vec3 sunDir) {
-                    // Vector from fragment to planet center
                     vec3 toPlanet = objectCenter - fragWorldPos;
-                    
-                    // Project onto sun direction
                     float distAlongRay = dot(toPlanet, sunDir);
-                    
-                    // Only shadow if planet is between fragment and sun
                     if (distAlongRay < 0.0) return 1.0;
                     
-                    // Closest point on sun ray to planet center
                     vec3 closestPoint = fragWorldPos + sunDir * distAlongRay;
                     float distFromAxis = length(objectCenter - closestPoint);
                     
-                    // Check if within planet's shadow cylinder
                     if (distFromAxis < planetRadius) {
                       return smoothstep(planetRadius * 0.85, planetRadius, distFromAxis);
                     }
@@ -839,26 +868,24 @@ export const TexturedPlanet = ({
                   }
                   
                   void main() {
-                    // Sun at origin - direction from ring fragment to sun
                     vec3 toSun = normalize(-vWorldPosition);
                     vec3 ringNormal = normalize(vWorldNormal);
                     
-                    // Calculate lighting based on which side of ring faces sun
                     float NdotL = dot(ringNormal, toSun);
-                    
-                    // Calculate shadow from planet
                     float shadow = calculatePlanetShadow(vWorldPosition, toSun);
                     
-                    // Rings are double-sided, use absolute but favor front-lit
+                    // Rings are double-sided
                     float lighting = (0.03 + max(abs(NdotL), 0.0) * 0.97) * shadow;
                     
-                    // Create ring bands
-                    float dist = length(vWorldPosition.xz);
+                    // Use local position for distance calculation (ring is in XY plane locally)
+                    float dist = length(vLocalPosition.xy);
                     float normalizedDist = (dist - innerRadius) / (outerRadius - innerRadius);
+                    
+                    // Create ring bands
                     float bands = sin(normalizedDist * 60.0) * 0.5 + 0.5;
                     bands = mix(0.6, 1.0, bands);
                     
-                    // Add gaps in rings
+                    // Add Cassini division-like gap
                     float gap = smoothstep(0.45, 0.5, normalizedDist) * (1.0 - smoothstep(0.5, 0.55, normalizedDist));
                     float ringOpacity = opacity * bands * (1.0 - gap * 0.8);
                     
