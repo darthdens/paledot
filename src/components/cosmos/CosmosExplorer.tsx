@@ -45,8 +45,6 @@ export const CosmosExplorer = () => {
   // Show Milky Way when at stellar or larger scales
   const showMilkyWay = currentScale === 'stellar' || currentScale === 'milkyWay' || currentScale === 'localGroup' || currentScale === 'universe';
   
-  // When the "You Are Here" UI is active, highlight the Oort Cloud too
-  const highlightOortCloud = currentScale === 'stellar' || currentScale === 'milkyWay' || currentScale === 'localGroup' || currentScale === 'universe';
   // Force cursor none on canvas - OrbitControls tries to set cursor styles
   useEffect(() => {
     const container = containerRef.current;
@@ -194,7 +192,7 @@ export const CosmosExplorer = () => {
           />
           
           {/* Oort Cloud - outermost boundary of Solar System */}
-          <OortCloud visualScale={UNIFIED_SCALE} highlight={highlightOortCloud} />
+          <OortCloud visualScale={UNIFIED_SCALE} />
           
           {/* Famous comets with tails */}
           <Comets scale={UNIFIED_SCALE} />
