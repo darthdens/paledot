@@ -31,29 +31,27 @@ export const CosmosExplorer = () => {
   const moons = celestialObjects.filter(obj => obj.type === 'moon');
   const stars = celestialObjects.filter(obj => obj.type === 'star' && obj.id !== 'sun');
 
-  // Visual scale factor - applied consistently to all bodies
-  // This makes objects visible while maintaining relative proportions
-  const VISUAL_SCALE = 80;
-  
-  // Distance compression factor - compresses orbital distances to make navigation practical
-  // Real distances would make planets invisible specks
-  const DISTANCE_SCALE = 0.15;
+  // Unified scale factor - same for objects AND distances to maintain true proportions
+  // Sun diameter: 1,392,700 km, Mercury orbit: 57.9M km (0.39 AU)
+  // Real ratio: Mercury orbits at ~83 Sun radii - we preserve this exactly
+  const UNIFIED_SCALE = 0.001; // Makes Sun radius = ~696 units, Mercury orbit = ~5,790 units
 
   // Pre-calculate moon orbit data for orbit visualization
   const moonOrbits = useMemo(() => {
     return moons.map(moon => ({
       id: moon.id,
       parentId: moon.parentId!,
-      orbitRadius: getMoonOrbitRadius(moon, VISUAL_SCALE * 1.5),
+      orbitRadius: getMoonOrbitRadius(moon, UNIFIED_SCALE * 1.5),
       color: moon.color,
     }));
   }, [moons]);
 
-  // Start camera looking at inner solar system
+  // Start camera looking at inner solar system - positioned to see Sun and inner planets
+  const sunRadius = 1392700 * UNIFIED_SCALE / 2; // Sun's radius in scene units
   const initialCameraPosition: [number, number, number] = [
-    UNITS.KM_PER_AU * DISTANCE_SCALE * 2,
-    UNITS.KM_PER_AU * DISTANCE_SCALE * 1.5,
-    UNITS.KM_PER_AU * DISTANCE_SCALE * 2.5
+    sunRadius * 10,  // 10 sun radii away on X
+    sunRadius * 5,   // 5 sun radii up on Y
+    sunRadius * 15   // 15 sun radii away on Z
   ];
 
   return (
@@ -64,8 +62,8 @@ export const CosmosExplorer = () => {
             makeDefault 
             position={initialCameraPosition} 
             fov={60} 
-            near={1000} 
-            far={1e18} 
+            near={0.1} 
+            far={1e12} 
           />
           <OrbitControls
             makeDefault
@@ -75,8 +73,8 @@ export const CosmosExplorer = () => {
             zoomSpeed={2}
             panSpeed={1}
             rotateSpeed={0.5}
-            minDistance={10000}
-            maxDistance={1e16}
+            minDistance={1}
+            maxDistance={1e10}
           />
           
           {/* Camera fly-to controller */}
@@ -84,22 +82,22 @@ export const CosmosExplorer = () => {
           
           {/* Lighting */}
           <ambientLight intensity={0.08} />
-          <pointLight position={[0, 0, 0]} intensity={3} distance={UNITS.KM_PER_AU * 50} decay={0.5} color="#FFF5E1" />
+          <pointLight position={[0, 0, 0]} intensity={3} distance={UNITS.KM_PER_AU * UNIFIED_SCALE * 50} decay={0.5} color="#FFF5E1" />
           
-          {/* Star background */}
-          <Stars radius={1e14} depth={1e13} count={15000} factor={1e11} saturation={0} fade speed={0.3} />
+          {/* Star background - scaled down for new coordinate system */}
+          <Stars radius={1e8} depth={1e7} count={15000} factor={1e5} saturation={0} fade speed={0.3} />
           
-          {/* The Sun at center - same visual scale as planets */}
-          <Sun position={[0, 0, 0]} visualScale={VISUAL_SCALE} />
+          {/* The Sun at center - same unified scale as planets */}
+          <Sun position={[0, 0, 0]} visualScale={UNIFIED_SCALE} />
           
-          {/* All planets */}
+          {/* All planets - using unified scale for both size and distance */}
           {planets.map(planet => (
             <TexturedPlanet 
               key={planet.id} 
               object={planet} 
               showOrbit={true} 
-              visualScale={VISUAL_SCALE}
-              distanceScale={DISTANCE_SCALE}
+              visualScale={UNIFIED_SCALE}
+              distanceScale={UNIFIED_SCALE}
             />
           ))}
           
@@ -119,8 +117,8 @@ export const CosmosExplorer = () => {
               key={moon.id} 
               object={moon} 
               showOrbit={false} 
-              visualScale={VISUAL_SCALE * 1.5}
-              distanceScale={DISTANCE_SCALE}
+              visualScale={UNIFIED_SCALE * 1.5}
+              distanceScale={UNIFIED_SCALE}
             />
           ))}
           
