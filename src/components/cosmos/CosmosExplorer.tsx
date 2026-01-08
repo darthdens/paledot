@@ -91,9 +91,16 @@ export const CosmosExplorer = () => {
           {/* Camera fly-to controller */}
           <CameraController />
           
-          {/* Lighting */}
-          <ambientLight intensity={0.08} />
-          <pointLight position={[0, 0, 0]} intensity={3} distance={UNITS.KM_PER_AU * UNIFIED_SCALE * 50} decay={0.5} color="#FFF5E1" />
+          {/* Lighting - Sun as primary light source */}
+          <ambientLight intensity={0.02} />
+          <hemisphereLight args={['#ffffff', '#444466', 0.15]} />
+          <pointLight 
+            position={[0, 0, 0]} 
+            intensity={5} 
+            distance={0} 
+            decay={1} 
+            color="#FFF8E7" 
+          />
           
           {/* Star background - scaled down for new coordinate system */}
           <Stars radius={1e8} depth={1e7} count={15000} factor={1e5} saturation={0} fade speed={0.3} />

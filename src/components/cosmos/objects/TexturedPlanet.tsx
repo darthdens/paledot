@@ -11,18 +11,24 @@ interface TexturedPlanetProps {
   distanceScale?: number;
 }
 
-// Planet colors and visual properties
+// Planet colors and visual properties - enhanced for realism
 const PLANET_VISUALS: Record<string, {
   baseColor: string;
+  secondaryColor?: string;
   emissive?: string;
   emissiveIntensity?: number;
   roughness: number;
   metalness: number;
   hasAtmosphere?: boolean;
   atmosphereColor?: string;
+  atmosphereIntensity?: number;
   hasRings?: boolean;
   ringColor?: string;
+  ringOpacity?: number;
   tilt?: number;
+  hasClouds?: boolean;
+  cloudColor?: string;
+  surfaceDetail?: 'rocky' | 'gaseous' | 'icy' | 'volcanic';
 }> = {
   sun: {
     baseColor: '#FDB813',
@@ -32,101 +38,143 @@ const PLANET_VISUALS: Record<string, {
     metalness: 0,
   },
   mercury: {
-    baseColor: '#8c7853',
-    roughness: 0.9,
-    metalness: 0.1,
+    baseColor: '#9d8b7a',
+    secondaryColor: '#6b5d4f',
+    roughness: 0.95,
+    metalness: 0.15,
+    surfaceDetail: 'rocky',
   },
   venus: {
-    baseColor: '#e6c35c',
-    roughness: 0.8,
+    baseColor: '#e8c86e',
+    secondaryColor: '#c9a94f',
+    roughness: 0.6,
     metalness: 0,
     hasAtmosphere: true,
-    atmosphereColor: '#e6c35c',
+    atmosphereColor: '#f5e0a0',
+    atmosphereIntensity: 0.7,
+    hasClouds: true,
+    cloudColor: '#fffbe8',
   },
   earth: {
     baseColor: '#6b93d6',
-    roughness: 0.5,
+    secondaryColor: '#4a7c59',
+    roughness: 0.4,
     metalness: 0.1,
     hasAtmosphere: true,
-    atmosphereColor: '#4da6ff',
+    atmosphereColor: '#88c0ff',
+    atmosphereIntensity: 0.5,
+    hasClouds: true,
+    cloudColor: '#ffffff',
+    tilt: 23.4,
   },
   moon: {
-    baseColor: '#c4c4c4',
-    roughness: 0.95,
+    baseColor: '#c8c8c8',
+    secondaryColor: '#8a8a8a',
+    roughness: 0.98,
     metalness: 0,
+    surfaceDetail: 'rocky',
   },
   mars: {
     baseColor: '#c1440e',
+    secondaryColor: '#8b3a0e',
     roughness: 0.85,
     metalness: 0.1,
     hasAtmosphere: true,
-    atmosphereColor: '#d4a574',
+    atmosphereColor: '#e8a87c',
+    atmosphereIntensity: 0.25,
+    surfaceDetail: 'rocky',
   },
   jupiter: {
     baseColor: '#d8ca9d',
-    roughness: 0.7,
+    secondaryColor: '#c4a574',
+    roughness: 0.5,
     metalness: 0,
     hasAtmosphere: true,
-    atmosphereColor: '#e8dcc8',
+    atmosphereColor: '#f0e6d2',
+    atmosphereIntensity: 0.4,
+    surfaceDetail: 'gaseous',
   },
   io: {
     baseColor: '#f5d742',
-    roughness: 0.8,
+    secondaryColor: '#e85d04',
+    roughness: 0.75,
     metalness: 0.1,
+    surfaceDetail: 'volcanic',
   },
   europa: {
-    baseColor: '#c9b896',
-    roughness: 0.6,
-    metalness: 0.2,
+    baseColor: '#d4cfc0',
+    secondaryColor: '#a89f90',
+    roughness: 0.4,
+    metalness: 0.25,
+    surfaceDetail: 'icy',
   },
   ganymede: {
-    baseColor: '#9e9e9e',
-    roughness: 0.85,
+    baseColor: '#a0a0a0',
+    secondaryColor: '#707070',
+    roughness: 0.8,
     metalness: 0.1,
+    surfaceDetail: 'icy',
   },
   callisto: {
-    baseColor: '#6b6b6b',
-    roughness: 0.9,
+    baseColor: '#5a5a5a',
+    secondaryColor: '#3a3a3a',
+    roughness: 0.92,
     metalness: 0.05,
+    surfaceDetail: 'rocky',
   },
   saturn: {
-    baseColor: '#ead6b8',
-    roughness: 0.7,
+    baseColor: '#f4d59e',
+    secondaryColor: '#d4b87a',
+    roughness: 0.5,
     metalness: 0,
     hasAtmosphere: true,
-    atmosphereColor: '#f5e6d3',
+    atmosphereColor: '#fff5e0',
+    atmosphereIntensity: 0.35,
     hasRings: true,
-    ringColor: '#d4b896',
+    ringColor: '#c9b896',
+    ringOpacity: 0.8,
     tilt: 26.7,
+    surfaceDetail: 'gaseous',
   },
   titan: {
     baseColor: '#e8a43c',
-    roughness: 0.8,
+    secondaryColor: '#c07830',
+    roughness: 0.7,
     metalness: 0,
     hasAtmosphere: true,
-    atmosphereColor: '#f5c366',
+    atmosphereColor: '#ffcc66',
+    atmosphereIntensity: 0.8,
   },
   uranus: {
-    baseColor: '#d1e7e7',
-    roughness: 0.6,
+    baseColor: '#b8e4e4',
+    secondaryColor: '#7ec8c8',
+    roughness: 0.5,
     metalness: 0.1,
     hasAtmosphere: true,
-    atmosphereColor: '#a8d8d8',
+    atmosphereColor: '#c8f0f0',
+    atmosphereIntensity: 0.4,
     hasRings: true,
-    ringColor: '#8cb8b8',
+    ringColor: '#a0c8c8',
+    ringOpacity: 0.5,
     tilt: 97.8,
+    surfaceDetail: 'gaseous',
   },
   neptune: {
     baseColor: '#5b5ddf',
-    roughness: 0.6,
+    secondaryColor: '#3d3faf',
+    roughness: 0.5,
     metalness: 0.1,
     hasAtmosphere: true,
-    atmosphereColor: '#7b7dff',
+    atmosphereColor: '#8888ff',
+    atmosphereIntensity: 0.5,
+    surfaceDetail: 'gaseous',
   },
   pluto: {
-    baseColor: '#b5a48a',
+    baseColor: '#c4b49a',
+    secondaryColor: '#8a7a6a',
     roughness: 0.9,
     metalness: 0,
+    surfaceDetail: 'icy',
   },
 };
 
@@ -279,62 +327,330 @@ export const TexturedPlanet = ({
       {/* Planet group */}
       <group ref={groupRef} position={scaledPosition}>
         <group rotation={[tiltRadians, 0, 0]}>
-          {/* Main planet sphere */}
+          {/* Main planet sphere with enhanced shader for surface detail */}
           <mesh 
             ref={planetRef}
             onClick={handleClick}
             onPointerOver={handlePointerOver}
             onPointerOut={handlePointerOut}
           >
-            <sphereGeometry args={[planetSize, 64, 64]} />
-            <meshStandardMaterial
-              color={visuals.baseColor}
-              roughness={visuals.roughness}
-              metalness={visuals.metalness}
-              emissive={visuals.emissive || '#000000'}
-              emissiveIntensity={visuals.emissiveIntensity || 0}
+            <sphereGeometry args={[planetSize, 128, 128]} />
+            <shaderMaterial
+              uniforms={{
+                baseColor: { value: new THREE.Color(visuals.baseColor) },
+                secondaryColor: { value: new THREE.Color(visuals.secondaryColor || visuals.baseColor) },
+                roughness: { value: visuals.roughness },
+                metalness: { value: visuals.metalness },
+                emissive: { value: new THREE.Color(visuals.emissive || '#000000') },
+                emissiveIntensity: { value: visuals.emissiveIntensity || 0 },
+                sunPosition: { value: new THREE.Vector3(0, 0, 0) },
+                time: { value: 0 },
+                surfaceType: { value: visuals.surfaceDetail === 'gaseous' ? 1.0 : visuals.surfaceDetail === 'icy' ? 2.0 : visuals.surfaceDetail === 'volcanic' ? 3.0 : 0.0 },
+              }}
+              vertexShader={`
+                varying vec3 vNormal;
+                varying vec3 vWorldPosition;
+                varying vec2 vUv;
+                
+                void main() {
+                  vUv = uv;
+                  vNormal = normalize(normalMatrix * normal);
+                  vec4 worldPos = modelMatrix * vec4(position, 1.0);
+                  vWorldPosition = worldPos.xyz;
+                  gl_Position = projectionMatrix * viewMatrix * worldPos;
+                }
+              `}
+              fragmentShader={`
+                uniform vec3 baseColor;
+                uniform vec3 secondaryColor;
+                uniform float roughness;
+                uniform float metalness;
+                uniform vec3 emissive;
+                uniform float emissiveIntensity;
+                uniform vec3 sunPosition;
+                uniform float time;
+                uniform float surfaceType;
+                
+                varying vec3 vNormal;
+                varying vec3 vWorldPosition;
+                varying vec2 vUv;
+                
+                // Simple noise function for surface detail
+                float hash(vec2 p) {
+                  return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453);
+                }
+                
+                float noise(vec2 p) {
+                  vec2 i = floor(p);
+                  vec2 f = fract(p);
+                  f = f * f * (3.0 - 2.0 * f);
+                  
+                  float a = hash(i);
+                  float b = hash(i + vec2(1.0, 0.0));
+                  float c = hash(i + vec2(0.0, 1.0));
+                  float d = hash(i + vec2(1.0, 1.0));
+                  
+                  return mix(mix(a, b, f.x), mix(c, d, f.x), f.y);
+                }
+                
+                float fbm(vec2 p) {
+                  float value = 0.0;
+                  float amplitude = 0.5;
+                  for (int i = 0; i < 5; i++) {
+                    value += amplitude * noise(p);
+                    p *= 2.0;
+                    amplitude *= 0.5;
+                  }
+                  return value;
+                }
+                
+                void main() {
+                  vec3 normal = normalize(vNormal);
+                  vec3 lightDir = normalize(sunPosition - vWorldPosition);
+                  
+                  // Calculate sun-facing illumination (realistic lighting)
+                  float NdotL = max(dot(normal, lightDir), 0.0);
+                  
+                  // Add subtle ambient to see dark side slightly
+                  float ambient = 0.08;
+                  float diffuse = NdotL * 0.92;
+                  
+                  // Generate surface variation based on type
+                  vec2 noiseCoord = vUv * 20.0;
+                  float surfaceNoise = fbm(noiseCoord);
+                  
+                  // Different noise patterns for different surface types
+                  vec3 surfaceColor;
+                  if (surfaceType > 2.5) {
+                    // Volcanic - hot spots
+                    float lava = smoothstep(0.5, 0.7, surfaceNoise);
+                    surfaceColor = mix(baseColor, secondaryColor, surfaceNoise * 0.6 + lava * 0.4);
+                  } else if (surfaceType > 1.5) {
+                    // Icy - crack patterns
+                    float cracks = smoothstep(0.4, 0.5, surfaceNoise);
+                    surfaceColor = mix(baseColor, secondaryColor, cracks * 0.4);
+                  } else if (surfaceType > 0.5) {
+                    // Gaseous - banded patterns
+                    float bands = sin(vUv.y * 30.0 + surfaceNoise * 3.0) * 0.5 + 0.5;
+                    surfaceColor = mix(baseColor, secondaryColor, bands * 0.5);
+                  } else {
+                    // Rocky - craters and terrain
+                    surfaceColor = mix(baseColor, secondaryColor, surfaceNoise * 0.5);
+                  }
+                  
+                  // Apply lighting
+                  vec3 litColor = surfaceColor * (ambient + diffuse);
+                  
+                  // Add rim lighting for atmosphere effect
+                  float rimLight = pow(1.0 - max(dot(normal, normalize(-vWorldPosition)), 0.0), 3.0);
+                  litColor += rimLight * 0.15 * surfaceColor;
+                  
+                  // Add emissive (for Sun)
+                  litColor += emissive * emissiveIntensity;
+                  
+                  // Simple specular highlight
+                  vec3 viewDir = normalize(-vWorldPosition);
+                  vec3 halfDir = normalize(lightDir + viewDir);
+                  float spec = pow(max(dot(normal, halfDir), 0.0), 32.0 / max(roughness, 0.1));
+                  litColor += spec * (1.0 - roughness) * 0.3;
+                  
+                  gl_FragColor = vec4(litColor, 1.0);
+                }
+              `}
             />
           </mesh>
 
-          {/* Atmosphere glow */}
-          {visuals.hasAtmosphere && (
-            <mesh ref={atmosphereRef}>
-              <sphereGeometry args={[planetSize * 1.05, 32, 32]} />
+          {/* Cloud layer for planets with clouds */}
+          {visuals.hasClouds && (
+            <mesh>
+              <sphereGeometry args={[planetSize * 1.02, 64, 64]} />
               <shaderMaterial
                 transparent
                 depthWrite={false}
-                side={THREE.BackSide}
                 uniforms={{
-                  glowColor: { value: new THREE.Color(visuals.atmosphereColor || '#4da6ff') },
+                  cloudColor: { value: new THREE.Color(visuals.cloudColor || '#ffffff') },
+                  time: { value: 0 },
+                  sunPosition: { value: new THREE.Vector3(0, 0, 0) },
                 }}
                 vertexShader={`
                   varying vec3 vNormal;
+                  varying vec3 vWorldPosition;
+                  varying vec2 vUv;
+                  
                   void main() {
+                    vUv = uv;
                     vNormal = normalize(normalMatrix * normal);
-                    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+                    vec4 worldPos = modelMatrix * vec4(position, 1.0);
+                    vWorldPosition = worldPos.xyz;
+                    gl_Position = projectionMatrix * viewMatrix * worldPos;
                   }
                 `}
                 fragmentShader={`
+                  uniform vec3 cloudColor;
+                  uniform float time;
+                  uniform vec3 sunPosition;
+                  
                   varying vec3 vNormal;
-                  uniform vec3 glowColor;
+                  varying vec3 vWorldPosition;
+                  varying vec2 vUv;
+                  
+                  float hash(vec2 p) {
+                    return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453);
+                  }
+                  
+                  float noise(vec2 p) {
+                    vec2 i = floor(p);
+                    vec2 f = fract(p);
+                    f = f * f * (3.0 - 2.0 * f);
+                    float a = hash(i);
+                    float b = hash(i + vec2(1.0, 0.0));
+                    float c = hash(i + vec2(0.0, 1.0));
+                    float d = hash(i + vec2(1.0, 1.0));
+                    return mix(mix(a, b, f.x), mix(c, d, f.x), f.y);
+                  }
+                  
+                  float fbm(vec2 p) {
+                    float value = 0.0;
+                    float amplitude = 0.5;
+                    for (int i = 0; i < 4; i++) {
+                      value += amplitude * noise(p);
+                      p *= 2.0;
+                      amplitude *= 0.5;
+                    }
+                    return value;
+                  }
+                  
                   void main() {
-                    float intensity = pow(0.7 - dot(vNormal, vec3(0.0, 0.0, 1.0)), 2.0);
-                    gl_FragColor = vec4(glowColor, intensity * 0.4);
+                    vec3 normal = normalize(vNormal);
+                    vec3 lightDir = normalize(sunPosition - vWorldPosition);
+                    float NdotL = max(dot(normal, lightDir), 0.0);
+                    
+                    vec2 cloudCoord = vUv * 15.0;
+                    float clouds = fbm(cloudCoord);
+                    float cloudCoverage = smoothstep(0.35, 0.65, clouds);
+                    
+                    float lighting = 0.3 + NdotL * 0.7;
+                    vec3 litCloud = cloudColor * lighting;
+                    
+                    gl_FragColor = vec4(litCloud, cloudCoverage * 0.6);
                   }
                 `}
               />
             </mesh>
           )}
 
-          {/* Rings (Saturn, Uranus) */}
+          {/* Atmosphere glow - enhanced with sun-facing intensity */}
+          {visuals.hasAtmosphere && (
+            <mesh ref={atmosphereRef}>
+              <sphereGeometry args={[planetSize * 1.08, 64, 64]} />
+              <shaderMaterial
+                transparent
+                depthWrite={false}
+                side={THREE.BackSide}
+                uniforms={{
+                  glowColor: { value: new THREE.Color(visuals.atmosphereColor || '#4da6ff') },
+                  intensity: { value: visuals.atmosphereIntensity || 0.4 },
+                  sunPosition: { value: new THREE.Vector3(0, 0, 0) },
+                }}
+                vertexShader={`
+                  varying vec3 vNormal;
+                  varying vec3 vWorldPosition;
+                  void main() {
+                    vNormal = normalize(normalMatrix * normal);
+                    vec4 worldPos = modelMatrix * vec4(position, 1.0);
+                    vWorldPosition = worldPos.xyz;
+                    gl_Position = projectionMatrix * viewMatrix * worldPos;
+                  }
+                `}
+                fragmentShader={`
+                  varying vec3 vNormal;
+                  varying vec3 vWorldPosition;
+                  uniform vec3 glowColor;
+                  uniform float intensity;
+                  uniform vec3 sunPosition;
+                  
+                  void main() {
+                    vec3 normal = normalize(vNormal);
+                    vec3 lightDir = normalize(sunPosition - vWorldPosition);
+                    float NdotL = max(dot(normal, lightDir), 0.0);
+                    
+                    // Fresnel-like rim glow
+                    float rim = pow(0.7 - dot(normal, vec3(0.0, 0.0, 1.0)), 2.0);
+                    
+                    // Brighter on sun-facing side
+                    float sunGlow = 0.3 + NdotL * 0.7;
+                    
+                    gl_FragColor = vec4(glowColor, rim * intensity * sunGlow);
+                  }
+                `}
+              />
+            </mesh>
+          )}
+
+          {/* Rings (Saturn, Uranus) - enhanced with lighting */}
           {visuals.hasRings && (
             <mesh rotation={[Math.PI / 2, 0, 0]}>
               <ringGeometry args={[planetSize * 1.3, planetSize * 2.2, 128]} />
-              <meshBasicMaterial
-                color={visuals.ringColor || '#d4b896'}
+              <shaderMaterial
                 transparent
-                opacity={0.7}
                 side={THREE.DoubleSide}
+                uniforms={{
+                  ringColor: { value: new THREE.Color(visuals.ringColor || '#d4b896') },
+                  opacity: { value: visuals.ringOpacity || 0.7 },
+                  sunPosition: { value: new THREE.Vector3(0, 0, 0) },
+                  innerRadius: { value: planetSize * 1.3 },
+                  outerRadius: { value: planetSize * 2.2 },
+                }}
+                vertexShader={`
+                  varying vec2 vUv;
+                  varying vec3 vWorldPosition;
+                  varying vec3 vNormal;
+                  
+                  void main() {
+                    vUv = uv;
+                    vNormal = normalize(normalMatrix * normal);
+                    vec4 worldPos = modelMatrix * vec4(position, 1.0);
+                    vWorldPosition = worldPos.xyz;
+                    gl_Position = projectionMatrix * viewMatrix * worldPos;
+                  }
+                `}
+                fragmentShader={`
+                  uniform vec3 ringColor;
+                  uniform float opacity;
+                  uniform vec3 sunPosition;
+                  uniform float innerRadius;
+                  uniform float outerRadius;
+                  
+                  varying vec2 vUv;
+                  varying vec3 vWorldPosition;
+                  varying vec3 vNormal;
+                  
+                  float hash(float n) { return fract(sin(n) * 43758.5453); }
+                  
+                  void main() {
+                    vec3 lightDir = normalize(sunPosition - vWorldPosition);
+                    float NdotL = abs(dot(normalize(vNormal), lightDir));
+                    
+                    // Create ring bands
+                    float dist = length(vWorldPosition.xz);
+                    float normalizedDist = (dist - innerRadius) / (outerRadius - innerRadius);
+                    float bands = sin(normalizedDist * 60.0) * 0.5 + 0.5;
+                    bands = mix(0.6, 1.0, bands);
+                    
+                    // Add gaps in rings
+                    float gap = smoothstep(0.45, 0.5, normalizedDist) * (1.0 - smoothstep(0.5, 0.55, normalizedDist));
+                    float ringOpacity = opacity * bands * (1.0 - gap * 0.8);
+                    
+                    // Lighting
+                    float lighting = 0.4 + NdotL * 0.6;
+                    vec3 litRing = ringColor * lighting;
+                    
+                    // Fade edges
+                    float edgeFade = smoothstep(0.0, 0.1, normalizedDist) * smoothstep(1.0, 0.9, normalizedDist);
+                    
+                    gl_FragColor = vec4(litRing, ringOpacity * edgeFade);
+                  }
+                `}
               />
             </mesh>
           )}
