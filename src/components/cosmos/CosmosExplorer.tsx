@@ -10,6 +10,7 @@ import { AsteroidBelt } from './objects/AsteroidBelt';
 import { KuiperBelt } from './objects/KuiperBelt';
 import { TrojanAsteroids } from './objects/TrojanAsteroids';
 import { Comets } from './objects/Comet';
+import { MilkyWayGalaxy } from './objects/MilkyWayGalaxy';
 import { CosmosUI } from './ui/CosmosUI';
 import { InfoCard } from './ui/InfoCard';
 import { QuickJumpMenu } from './ui/QuickJumpMenu';
@@ -17,7 +18,10 @@ import { TourOverlay } from './ui/TourOverlay';
 import { PerformanceHUD } from './ui/PerformanceHUD';
 import { KeyboardShortcuts } from './ui/KeyboardShortcuts';
 import { SizeComparison } from './ui/SizeComparison';
+import { ScaleBarUI } from './ui/ScaleBar';
+import { YouAreHereLabel } from './ui/YouAreHereLabel';
 import { CameraController } from './CameraController';
+import { ScaleTracker } from './ScaleTracker';
 import { celestialObjects } from './data/celestialObjects';
 import { UNITS } from './types';
 import { useCosmosStore } from './store/useCosmosStore';
@@ -35,6 +39,10 @@ export const CosmosExplorer = () => {
   const showOrbits = useCosmosStore(state => state.showOrbits);
   const showTrails = useCosmosStore(state => state.showTrails);
   const isFollowing = useCosmosStore(state => state.isFollowing);
+  const currentScale = useCosmosStore(state => state.currentScale);
+  
+  // Show Milky Way when at stellar or larger scales
+  const showMilkyWay = currentScale === 'stellar' || currentScale === 'milkyWay' || currentScale === 'localGroup' || currentScale === 'universe';
   
   // Force cursor none on canvas - OrbitControls tries to set cursor styles
   useEffect(() => {
@@ -134,6 +142,9 @@ export const CosmosExplorer = () => {
           {/* Camera fly-to controller */}
           <CameraController />
           
+          {/* Scale tracker - updates store with current scale level */}
+          <ScaleTracker />
+          
           {/* Lighting - Sun as primary light source */}
           <ambientLight intensity={0.02} />
           <hemisphereLight args={['#ffffff', '#444466', 0.15]} />
@@ -147,6 +158,11 @@ export const CosmosExplorer = () => {
           
           {/* Star background - scaled down for new coordinate system */}
           <Stars radius={1e8} depth={1e7} count={15000} factor={1e5} saturation={0} fade speed={0.3} />
+          
+          {/* Milky Way Galaxy - visible at larger scales */}
+          {showMilkyWay && (
+            <MilkyWayGalaxy visualScale={UNIFIED_SCALE} showYouAreHere={true} />
+          )}
           
           {/* The Sun at center - same unified scale as planets */}
           <Sun position={[0, 0, 0]} visualScale={UNIFIED_SCALE} />
@@ -240,6 +256,8 @@ export const CosmosExplorer = () => {
       <QuickJumpMenu />
       <KeyboardShortcuts />
       <SizeComparison />
+      <ScaleBarUI />
+      <YouAreHereLabel />
     </div>
   );
 };
