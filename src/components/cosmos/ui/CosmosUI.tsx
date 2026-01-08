@@ -59,48 +59,91 @@ export const CosmosUI = () => {
     setHidden(footer);
   }, []);
 
-  const applyFullscreenFallback = useCallback((containerEl: HTMLElement) => {
-    containerEl.setAttribute('data-cosmos-fullscreen-fallback', 'true');
+  const savePrevContainerStyles = useCallback((el: HTMLElement) => {
+    const keys = [
+      'position',
+      'inset',
+      'zIndex',
+      'width',
+      'height',
+      'borderRadius',
+      'border',
+      'maxWidth',
+      'backgroundColor',
+    ] as const;
 
-    // Force true viewport fill (Tailwind class ordering can't override h-[50vh] reliably)
-    containerEl.style.position = 'fixed';
-    containerEl.style.inset = '0';
-    containerEl.style.zIndex = '9999';
-    containerEl.style.width = '100vw';
-    // iOS Safari support: prefer 100vh fallback, then 100dvh when available
-    containerEl.style.height = '100vh';
-    containerEl.style.height = '100dvh';
-    containerEl.style.borderRadius = '0px';
-    containerEl.style.border = '0px';
-    containerEl.style.maxWidth = 'none';
-    containerEl.style.backgroundColor = '#000';
+    keys.forEach((key) => {
+      const datasetKey = `cosmosPrev${key[0].toUpperCase()}${key.slice(1)}`;
+      if ((el.dataset as any)[datasetKey] === undefined) {
+        (el.dataset as any)[datasetKey] = (el.style as any)[key] ?? '';
+      }
+    });
+  }, []);
 
-    setPageChromeHidden(true);
+  const restorePrevContainerStyles = useCallback((el: HTMLElement) => {
+    const keys = [
+      'position',
+      'inset',
+      'zIndex',
+      'width',
+      'height',
+      'borderRadius',
+      'border',
+      'maxWidth',
+      'backgroundColor',
+    ] as const;
 
-    // Prevent page scroll behind the fullscreen canvas
-    document.documentElement.style.overflow = 'hidden';
-    document.body.style.overflow = 'hidden';
-    window.scrollTo(0, 0);
-  }, [setPageChromeHidden]);
+    keys.forEach((key) => {
+      const datasetKey = `cosmosPrev${key[0].toUpperCase()}${key.slice(1)}`;
+      const prev = (el.dataset as any)[datasetKey];
+      (el.style as any)[key] = prev ?? '';
+      delete (el.dataset as any)[datasetKey];
+    });
+  }, []);
 
-  const clearFullscreenOverrides = useCallback((containerEl: HTMLElement) => {
-    containerEl.removeAttribute('data-cosmos-fullscreen-fallback');
+  const applyFullscreenFallback = useCallback(
+    (containerEl: HTMLElement) => {
+      savePrevContainerStyles(containerEl);
+      containerEl.setAttribute('data-cosmos-fullscreen-fallback', 'true');
 
-    containerEl.style.position = '';
-    containerEl.style.inset = '';
-    containerEl.style.zIndex = '';
-    containerEl.style.width = '';
-    containerEl.style.height = '';
-    containerEl.style.borderRadius = '';
-    containerEl.style.border = '';
-    containerEl.style.maxWidth = '';
-    containerEl.style.backgroundColor = '';
+      // Force true viewport fill (Tailwind class ordering can't override h-[50vh] reliably)
+      containerEl.style.position = 'fixed';
+      containerEl.style.inset = '0';
+      containerEl.style.zIndex = '9999';
+      containerEl.style.width = '100vw';
+      // iOS Safari support: prefer 100vh fallback, then 100dvh when available
+      containerEl.style.height = '100vh';
+      containerEl.style.height = '100dvh';
+      containerEl.style.borderRadius = '0px';
+      containerEl.style.border = '0px';
+      containerEl.style.maxWidth = 'none';
 
-    setPageChromeHidden(false);
+      // Ensure canvas area stays opaque even after we exit fullscreen.
+      containerEl.style.backgroundColor = '#000';
 
-    document.documentElement.style.overflow = '';
-    document.body.style.overflow = '';
-  }, [setPageChromeHidden]);
+      setPageChromeHidden(true);
+
+      // Prevent page scroll behind the fullscreen canvas
+      document.documentElement.style.overflow = 'hidden';
+      document.body.style.overflow = 'hidden';
+      window.scrollTo(0, 0);
+    },
+    [savePrevContainerStyles, setPageChromeHidden]
+  );
+
+  const clearFullscreenOverrides = useCallback(
+    (containerEl: HTMLElement) => {
+      containerEl.removeAttribute('data-cosmos-fullscreen-fallback');
+
+      restorePrevContainerStyles(containerEl);
+
+      setPageChromeHidden(false);
+      document.documentElement.style.overflow = '';
+      document.body.style.overflow = '';
+    },
+    [restorePrevContainerStyles, setPageChromeHidden]
+  );
+
 
   // Listen for native fullscreen changes (e.g., user presses Esc)
   useEffect(() => {
@@ -143,6 +186,9 @@ export const CosmosUI = () => {
     const isCurrentlyFullscreen = isNativeFs || isFallbackFs;
 
     if (!isCurrentlyFullscreen) {
+      // Save current inline styles so we can reliably restore after fullscreen.
+      savePrevContainerStyles(container);
+
       // Make it look like "real" fullscreen (no border / rounding)
       container.style.borderRadius = '0px';
       container.style.border = '0px';
@@ -227,7 +273,8 @@ export const CosmosUI = () => {
     // CSS fallback exit (or no exit API)
     clearFullscreenOverrides(container);
     setIsFullscreen(false);
-  }, [applyFullscreenFallback, clearFullscreenOverrides]);
+  }, [applyFullscreenFallback, clearFullscreenOverrides, savePrevContainerStyles]);
+
 
   return (
     <>

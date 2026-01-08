@@ -13,17 +13,12 @@ import { celestialObjects } from './data/celestialObjects';
 import { UNITS } from './types';
 import { useCosmosStore } from './store/useCosmosStore';
 
-// Helper to calculate moon orbit radius (same logic as in TexturedPlanet)
-const getMoonOrbitRadius = (moon: typeof celestialObjects[0], visualScale: number) => {
+// Helper to calculate moon orbit radius
+const getMoonOrbitRadius = (moon: typeof celestialObjects[0], distanceScale: number) => {
   if (!moon.parentId) return 0;
-  const parentSize = moon.parentId === 'earth' ? 12742 : 
-                     moon.parentId === 'jupiter' ? 139820 :
-                     moon.parentId === 'saturn' ? 116460 : 50000;
-  const parentVisualSize = parentSize * visualScale;
-  const realOrbitRadius = moon.orbitRadius || 0;
-  const baseOrbitMultiplier = 2 + (realOrbitRadius / 2000000);
-  return parentVisualSize * Math.min(baseOrbitMultiplier, 5);
+  return (moon.orbitRadius || 0) * distanceScale;
 };
+
 
 export const CosmosExplorer = () => {
   const selectedObject = useCosmosStore(state => state.selectedObject);
@@ -53,12 +48,12 @@ export const CosmosExplorer = () => {
     
     return moons
       .filter(moon => moon.parentId === focusedPlanetId)
-      .map(moon => ({
-        id: moon.id,
-        parentId: moon.parentId!,
-        orbitRadius: getMoonOrbitRadius(moon, UNIFIED_SCALE * 1.5),
-        color: moon.color,
-      }));
+       .map(moon => ({
+         id: moon.id,
+         parentId: moon.parentId!,
+         orbitRadius: getMoonOrbitRadius(moon, UNIFIED_SCALE),
+         color: moon.color,
+       }));
   }, [moons, selectedObject]);
 
   // Start camera looking at inner solar system - positioned to see Sun and inner planets
