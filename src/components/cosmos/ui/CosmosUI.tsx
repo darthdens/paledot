@@ -84,25 +84,38 @@ export const CosmosUI = () => {
   const [showTimeSlider, setShowTimeSlider] = useState(false);
 
   const setPageChromeHidden = useCallback((hidden: boolean) => {
-    const nav = document.querySelector('nav') as HTMLElement | null;
+    const nav = (document.querySelector('[data-app-nav]') || document.querySelector('nav')) as HTMLElement | null;
     const footer = document.querySelector('footer') as HTMLElement | null;
 
-    const setHidden = (el: HTMLElement | null) => {
+    const setHidden = (el: HTMLElement | null, datasetPrefix: string) => {
       if (!el) return;
 
-      const key = 'cosmosPrevDisplay';
+      const prevDisplayKey = `${datasetPrefix}PrevDisplay`;
+      const prevPriorityKey = `${datasetPrefix}PrevDisplayPriority`;
 
       if (hidden) {
-        if (el.dataset[key] === undefined) el.dataset[key] = el.style.display || '';
-        el.style.display = 'none';
+        if ((el.dataset as any)[prevDisplayKey] === undefined) {
+          (el.dataset as any)[prevDisplayKey] = el.style.display || '';
+          (el.dataset as any)[prevPriorityKey] = el.style.getPropertyPriority('display') || '';
+        }
+        el.style.setProperty('display', 'none', 'important');
       } else {
-        el.style.display = el.dataset[key] ?? '';
-        delete el.dataset[key];
+        const prevDisplay = (el.dataset as any)[prevDisplayKey] ?? '';
+        const prevPriority = (el.dataset as any)[prevPriorityKey] ?? '';
+
+        if (!prevDisplay) {
+          el.style.removeProperty('display');
+        } else {
+          el.style.setProperty('display', prevDisplay, prevPriority || undefined);
+        }
+
+        delete (el.dataset as any)[prevDisplayKey];
+        delete (el.dataset as any)[prevPriorityKey];
       }
     };
 
-    setHidden(nav);
-    setHidden(footer);
+    setHidden(nav, 'cosmosNav');
+    setHidden(footer, 'cosmosFooter');
   }, []);
 
   // Safety: always restore page chrome on unmount / when fullscreen is off.
@@ -159,27 +172,30 @@ export const CosmosUI = () => {
       containerEl.setAttribute('data-cosmos-fullscreen-fallback', 'true');
 
       // Force true viewport fill (Tailwind class ordering can't override h-[50vh] reliably)
-      containerEl.style.position = 'fixed';
-      containerEl.style.inset = '0';
-      containerEl.style.zIndex = '99999'; // Higher than Echo widget (typically 9999)
-      containerEl.style.width = '100vw';
+      containerEl.style.setProperty('position', 'fixed', 'important');
+      containerEl.style.setProperty('inset', '0', 'important');
+      containerEl.style.setProperty('z-index', '2147483647', 'important');
+      containerEl.style.setProperty('width', '100vw', 'important');
       // iOS Safari support: prefer 100vh fallback, then 100dvh when available
-      containerEl.style.height = '100vh';
-      containerEl.style.height = '100dvh';
+      containerEl.style.setProperty('height', '100vh', 'important');
+      containerEl.style.setProperty('height', '100dvh', 'important');
       containerEl.style.borderRadius = '0px';
       containerEl.style.border = '0px';
       containerEl.style.maxWidth = 'none';
 
-       // Ensure canvas area stays opaque even after we exit fullscreen.
-       containerEl.style.backgroundColor = 'hsl(var(--background))';
+      // Ensure canvas area stays opaque even after we exit fullscreen.
+      containerEl.style.backgroundColor = 'hsl(var(--background))';
 
       setPageChromeHidden(true);
-      
-      // Hide Echo widget in fullscreen
-      const echoWidget = document.querySelector('[data-echo-widget], .echo-widget, #echo-widget, [class*="EchoWidget"]') as HTMLElement | null;
-      if (echoWidget) {
-        echoWidget.dataset.cosmosPrevDisplay = echoWidget.style.display || '';
-        echoWidget.style.display = 'none';
+
+      // Hide Echo widget in fullscreen (we do not modify the widget itself; we only hide its container)
+      const echoContainer = document.getElementById('echo-chat-container') as HTMLElement | null;
+      if (echoContainer) {
+        if (echoContainer.dataset.cosmosPrevDisplay === undefined) {
+          echoContainer.dataset.cosmosPrevDisplay = echoContainer.style.display || '';
+          echoContainer.dataset.cosmosPrevDisplayPriority = echoContainer.style.getPropertyPriority('display') || '';
+        }
+        echoContainer.style.setProperty('display', 'none', 'important');
       }
 
       // Prevent page scroll behind the fullscreen canvas
@@ -197,14 +213,23 @@ export const CosmosUI = () => {
       restorePrevContainerStyles(containerEl);
 
       setPageChromeHidden(false);
-      
+
       // Restore Echo widget
-      const echoWidget = document.querySelector('[data-echo-widget], .echo-widget, #echo-widget, [class*="EchoWidget"]') as HTMLElement | null;
-      if (echoWidget && echoWidget.dataset.cosmosPrevDisplay !== undefined) {
-        echoWidget.style.display = echoWidget.dataset.cosmosPrevDisplay;
-        delete echoWidget.dataset.cosmosPrevDisplay;
+      const echoContainer = document.getElementById('echo-chat-container') as HTMLElement | null;
+      if (echoContainer && echoContainer.dataset.cosmosPrevDisplay !== undefined) {
+        const prevDisplay = echoContainer.dataset.cosmosPrevDisplay || '';
+        const prevPriority = echoContainer.dataset.cosmosPrevDisplayPriority || '';
+
+        if (!prevDisplay) {
+          echoContainer.style.removeProperty('display');
+        } else {
+          echoContainer.style.setProperty('display', prevDisplay, prevPriority || undefined);
+        }
+
+        delete echoContainer.dataset.cosmosPrevDisplay;
+        delete echoContainer.dataset.cosmosPrevDisplayPriority;
       }
-      
+
       document.documentElement.style.overflow = '';
       document.body.style.overflow = '';
     },
