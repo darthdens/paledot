@@ -107,7 +107,7 @@ export const InfoCard = () => {
   const facts = selectedObject.facts?.[language] || [];
 
   return (
-    <div className="absolute bottom-2 left-2 right-2 sm:bottom-4 sm:left-4 sm:right-auto z-50 w-auto sm:w-72 md:w-80 max-h-[45vh] overflow-y-auto bg-black/90 backdrop-blur-md rounded-lg border border-white/20">
+    <div className="absolute bottom-2 left-2 right-2 sm:bottom-4 sm:left-4 sm:right-auto z-50 w-auto sm:w-72 md:w-80 max-h-[40vh] sm:max-h-[45vh] overflow-y-auto bg-black/90 backdrop-blur-md rounded-lg border border-white/20">
       {/* Header */}
       <div className="flex items-center justify-between p-3 border-b border-white/10">
         <h3 className="text-white font-semibold text-sm sm:text-base">
