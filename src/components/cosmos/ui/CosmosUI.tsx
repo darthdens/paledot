@@ -2,6 +2,7 @@ import { useLanguage } from '@/i18n/LanguageContext';
 import { Button } from '@/components/ui/button';
 import { HelpCircle, Compass, Maximize, Minimize } from 'lucide-react';
 import { useCosmosStore } from '../store/useCosmosStore';
+import { useFullscreenStore } from '../store/useFullscreenStore';
 import { useState, useCallback, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 
@@ -38,7 +39,7 @@ export const CosmosUI = () => {
   const { language } = useLanguage();
   const t = translations[language];
   const { startTour, toggleQuickJump, showControlHints, setShowControlHints } = useCosmosStore();
-  const [isFullscreen, setIsFullscreen] = useState(false);
+  const { isFullscreen, setIsFullscreen } = useFullscreenStore();
 
   const setPageChromeHidden = useCallback((hidden: boolean) => {
     const nav = document.querySelector('nav') as HTMLElement | null;

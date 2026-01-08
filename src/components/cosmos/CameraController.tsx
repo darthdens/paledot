@@ -9,6 +9,7 @@ export const CameraController = () => {
   const { camera, controls } = useThree();
   const selectedObject = useCosmosStore((state) => state.selectedObject);
   const objectWorldPositions = useCosmosStore((state) => state.objectWorldPositions);
+  const isFollowing = useCosmosStore((state) => state.isFollowing);
 
   const isAnimating = useRef(false);
   const animationProgress = useRef(0);
@@ -110,7 +111,7 @@ export const CameraController = () => {
     }
 
     // After fly-to: continuously follow the selected object (keep it perfectly centered)
-    if (selectedObject) {
+    if (selectedObject && isFollowing) {
       const livePos = objectWorldPositions[selectedObject.id];
       if (livePos) {
         const targetVec = new THREE.Vector3(livePos[0], livePos[1], livePos[2]);
@@ -119,9 +120,9 @@ export const CameraController = () => {
         // Preserve user's current camera offset relative to target
         const offset = new THREE.Vector3().subVectors(camera.position, currentTarget);
 
-        // Hard-center the target on the object, and keep the same offset
-        orbitControls.target.copy(targetVec);
-        camera.position.copy(targetVec).add(offset);
+        // Smoothly lerp the target to avoid jarring jumps
+        currentTarget.lerp(targetVec, 0.1);
+        camera.position.copy(currentTarget).add(offset);
         orbitControls.update();
       }
     }
