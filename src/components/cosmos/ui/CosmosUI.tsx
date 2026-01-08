@@ -138,8 +138,8 @@ export const CosmosUI = () => {
       containerEl.style.border = '0px';
       containerEl.style.maxWidth = 'none';
 
-      // Ensure canvas area stays opaque even after we exit fullscreen.
-      containerEl.style.backgroundColor = '#000';
+       // Ensure canvas area stays opaque even after we exit fullscreen.
+       containerEl.style.backgroundColor = 'hsl(var(--background))';
 
       setPageChromeHidden(true);
 
