@@ -154,7 +154,7 @@ export const TourOverlay = () => {
       {/* Progress bar */}
       <div className="h-1 bg-white/10">
         <div 
-          className="h-full bg-primary transition-all duration-300"
+          className="h-full bg-blue-500 transition-all duration-300"
           style={{ width: `${((tourIndex + 1) / totalStops) * 100}%` }}
         />
       </div>

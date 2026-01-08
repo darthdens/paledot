@@ -218,8 +218,8 @@ export const CosmosUI = () => {
       containerEl.style.border = '0px';
       containerEl.style.maxWidth = 'none';
 
-      // Ensure canvas area stays opaque even after we exit fullscreen.
-      containerEl.style.backgroundColor = 'hsl(var(--background))';
+      // Ensure canvas area stays dark regardless of theme
+      containerEl.style.backgroundColor = '#0a0a0f';
 
       setPageChromeHidden(true);
 
@@ -420,24 +420,46 @@ export const CosmosUI = () => {
     <>
       {/* Welcome overlay for first visit */}
       {showControlHints && (
-        <div className="absolute inset-0 flex items-center justify-center bg-black/85 z-50 p-3">
-          <div className="text-center space-y-3 sm:space-y-5 max-w-sm sm:max-w-md px-4">
+        <div className="absolute inset-0 flex items-center justify-center bg-black/90 z-50 p-3">
+          <div className="text-center space-y-3 sm:space-y-5 max-w-sm sm:max-w-lg px-4">
             <h1 className="text-xl sm:text-3xl md:text-4xl font-bold text-white leading-tight">{t.welcome}</h1>
             <p className="text-sm sm:text-base text-white/70">{t.subtitle}</p>
             
-            <div className="space-y-1.5 text-left bg-white/10 rounded-lg p-3 sm:p-4">
-              <p className="text-white/90 font-medium text-sm sm:text-base">{t.controls}:</p>
-              <p className="text-white/70 text-xs sm:text-sm">• {t.scrollZoom}</p>
-              <p className="text-white/70 text-xs sm:text-sm">• {t.dragRotate}</p>
-              <p className="text-white/70 text-xs sm:text-sm">• {t.rightDragPan}</p>
-              <p className="text-white/70 text-xs sm:text-sm">• {t.clickSelect}</p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-left">
+              <div className="bg-white/10 rounded-lg p-3 sm:p-4 space-y-1.5">
+                <p className="text-white/90 font-medium text-sm sm:text-base">{t.controls}:</p>
+                <p className="text-white/70 text-xs sm:text-sm">• {t.scrollZoom}</p>
+                <p className="text-white/70 text-xs sm:text-sm">• {t.dragRotate}</p>
+                <p className="text-white/70 text-xs sm:text-sm">• {t.rightDragPan}</p>
+                <p className="text-white/70 text-xs sm:text-sm">• {t.clickSelect}</p>
+              </div>
+              
+              <div className="bg-white/10 rounded-lg p-3 sm:p-4 space-y-1.5">
+                <p className="text-white/90 font-medium text-sm sm:text-base">
+                  {language === 'fr' ? 'Raccourcis:' : 'Shortcuts:'}
+                </p>
+                <p className="text-white/70 text-xs sm:text-sm">• 1-9: {language === 'fr' ? 'Planètes' : 'Planets'}</p>
+                <p className="text-white/70 text-xs sm:text-sm">• 0/S: {language === 'fr' ? 'Soleil' : 'Sun'}</p>
+                <p className="text-white/70 text-xs sm:text-sm">• ←/→: {language === 'fr' ? 'Naviguer' : 'Navigate'}</p>
+                <p className="text-white/70 text-xs sm:text-sm">• +/-: {language === 'fr' ? 'Vitesse' : 'Speed'}</p>
+                <p className="text-white/70 text-xs sm:text-sm">• {language === 'fr' ? 'Espace' : 'Space'}: {language === 'fr' ? 'Pause' : 'Pause'}</p>
+              </div>
             </div>
 
             <div className="flex gap-2 sm:gap-3 justify-center flex-wrap">
-              <Button size="sm" onClick={() => { setShowControlHints(false); startTour(); }} className="text-xs sm:text-sm">
+              <Button 
+                size="sm" 
+                onClick={() => { setShowControlHints(false); startTour(); }} 
+                className="text-xs sm:text-sm bg-blue-600 hover:bg-blue-700 text-white border-0"
+              >
                 {t.startTour}
               </Button>
-              <Button size="sm" variant="outline" onClick={() => setShowControlHints(false)} className="text-xs sm:text-sm">
+              <Button 
+                size="sm" 
+                variant="outline" 
+                onClick={() => setShowControlHints(false)} 
+                className="text-xs sm:text-sm bg-transparent border-white/30 text-white hover:bg-white/10 hover:text-white"
+              >
                 {t.explore}
               </Button>
             </div>

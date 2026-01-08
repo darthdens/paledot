@@ -7,11 +7,14 @@ import { TexturedPlanet } from './objects/TexturedPlanet';
 import { MoonOrbit } from './objects/MoonOrbit';
 import { OrbitalTrail } from './objects/OrbitalTrail';
 import { AsteroidBelt } from './objects/AsteroidBelt';
+import { KuiperBelt } from './objects/KuiperBelt';
+import { TrojanAsteroids } from './objects/TrojanAsteroids';
 import { CosmosUI } from './ui/CosmosUI';
 import { InfoCard } from './ui/InfoCard';
 import { QuickJumpMenu } from './ui/QuickJumpMenu';
 import { TourOverlay } from './ui/TourOverlay';
 import { PerformanceHUD } from './ui/PerformanceHUD';
+import { KeyboardShortcuts } from './ui/KeyboardShortcuts';
 import { CameraController } from './CameraController';
 import { celestialObjects } from './data/celestialObjects';
 import { UNITS } from './types';
@@ -118,12 +121,25 @@ export const CosmosExplorer = () => {
           <Sun position={[0, 0, 0]} visualScale={UNIFIED_SCALE} />
           
           {/* Asteroid Belt between Mars and Jupiter */}
-          {/* Mars orbit: ~228M km, Jupiter orbit: ~778M km */}
-          {/* Belt is mainly between 2.2-3.2 AU (329M-479M km) */}
           <AsteroidBelt 
-            innerRadius={300000000 * UNIFIED_SCALE}  // ~300M km (2 AU)
-            outerRadius={500000000 * UNIFIED_SCALE}  // ~500M km (3.3 AU)
-            count={4000}
+            innerRadius={300000000 * UNIFIED_SCALE}
+            outerRadius={500000000 * UNIFIED_SCALE}
+            count={3500}
+            scale={UNIFIED_SCALE}
+          />
+          
+          {/* Jupiter Trojan Asteroids at L4 and L5 */}
+          <TrojanAsteroids
+            jupiterOrbitRadius={778500000 * UNIFIED_SCALE}
+            count={600}
+            scale={UNIFIED_SCALE}
+          />
+          
+          {/* Kuiper Belt beyond Neptune */}
+          <KuiperBelt
+            innerRadius={4500000000 * UNIFIED_SCALE}
+            outerRadius={7500000000 * UNIFIED_SCALE}
+            count={2000}
             scale={UNIFIED_SCALE}
           />
           
@@ -188,6 +204,7 @@ export const CosmosExplorer = () => {
       <TourOverlay />
       <InfoCard />
       <QuickJumpMenu />
+      <KeyboardShortcuts />
     </div>
   );
 };
