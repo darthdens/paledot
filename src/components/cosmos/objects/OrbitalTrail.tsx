@@ -6,6 +6,8 @@ import { useCosmosStore } from '../store/useCosmosStore';
 interface OrbitalTrailProps {
   objectId: string;
   color: string;
+  /** Keep the trail mounted; controls visibility only (prevents trail reset on toggle) */
+  enabled?: boolean;
   /** Number of points kept in the trail (lower = faster) */
   maxPoints?: number;
   opacity?: number;
@@ -21,6 +23,7 @@ interface OrbitalTrailProps {
 export const OrbitalTrail = ({
   objectId,
   color,
+  enabled = true,
   maxPoints = 120,
   opacity = 0.35,
 }: OrbitalTrailProps) => {
@@ -44,6 +47,8 @@ export const OrbitalTrail = ({
     });
 
     const ln = new THREE.Line(geo, mat);
+    // Trails can span huge distances; disable frustum culling to avoid "popping"/inconsistent visibility.
+    ln.frustumCulled = false;
 
     return {
       line: ln,
@@ -102,6 +107,6 @@ export const OrbitalTrail = ({
     positionAttr.needsUpdate = true;
   });
 
-  return <primitive object={line} />;
+  return <primitive object={line} visible={enabled} />;
 };
 

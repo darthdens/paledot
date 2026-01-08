@@ -205,12 +205,13 @@ export const CosmosExplorer = () => {
             />
           ))}
 
-          {/* Orbital trails for planets */}
-          {showTrails && planets.map(planet => (
+          {/* Orbital trails for planets (kept mounted; toggle only changes visibility for consistency) */}
+          {planets.map((planet) => (
             <OrbitalTrail
               key={`trail-${planet.id}`}
               objectId={planet.id}
               color={planet.color}
+              enabled={showTrails}
               maxPoints={120}
               opacity={0.35}
             />
