@@ -878,28 +878,27 @@ export const TexturedPlanet = ({
                   void main() {
                     // Sun is at origin - light direction from fragment toward sun (same as planets)
                     vec3 sunDir = normalize(-vWorldPosition);
-
-                    // IMPORTANT: with DoubleSide, we must flip normals for the back face
-                    // so that lighting behaves like standard materials (planets/moons).
                     vec3 ringNormal = normalize(vWorldNormal);
-                    vec3 faceNormal = gl_FrontFacing ? ringNormal : -ringNormal;
 
-                    // Planet shadow on rings
+                    // Planet shadow on rings (planet between ring fragment and sun)
                     float shadow = calculatePlanetShadow(vWorldPosition, sunDir);
 
-                    // Lighting model aligned with planets/moons:
-                    // - Strongly lit on sun-facing side
-                    // - Dimmer on the back side, but still slightly visible due to particle scattering
-                    float NdotL = dot(faceNormal, sunDir);
-                    float frontDiffuse = max(NdotL, 0.0);
-                    float backScatter = max(-NdotL, 0.0) * 0.25;
+                    // Day/night like planets: only the ring half on the sun-facing hemisphere should light up.
+                    // Hemispheres are determined by fragment position around the planet center.
+                    vec3 planetToSunDir = normalize(-objectCenter);
+                    vec3 planetToFragDir = normalize(vWorldPosition - objectCenter);
+                    float hemiDot = dot(planetToFragDir, planetToSunDir);
+                    float dayFactor = smoothstep(-0.02, 0.05, hemiDot);
 
-                    // Forward scattering: brighter when sun is behind the rings relative to the camera
+                    // Incidence on the ring plane (two-sided)
+                    float planeIncidence = abs(dot(ringNormal, sunDir));
+
+                    // Small forward-scatter so rings stay readable near the terminator
                     vec3 viewDir = normalize(cameraPosition - vWorldPosition);
-                    float forwardScatter = pow(max(dot(-viewDir, sunDir), 0.0), 3.0) * 0.35;
+                    float forwardScatter = pow(max(dot(-viewDir, sunDir), 0.0), 3.0) * 0.25;
 
                     float ambient = 0.012;
-                    float diffuse = (frontDiffuse * 0.85 + backScatter + 0.12 + forwardScatter) * shadow;
+                    float diffuse = (planeIncidence * 0.9 + 0.05 + forwardScatter) * shadow * dayFactor;
                     float totalLight = ambient + diffuse * 0.988;
 
                     // Use local position for distance calculation (ring is in XY plane locally)
@@ -914,17 +913,16 @@ export const TexturedPlanet = ({
                     float gap = smoothstep(0.45, 0.5, normalizedDist) * (1.0 - smoothstep(0.5, 0.55, normalizedDist));
                     float ringDensity = bands * (1.0 - gap * 0.8);
 
-                    // Ring opacity varies with density
                     float ringOpacity = opacity * ringDensity;
 
                     // Fade edges smoothly
                     float edgeFade = smoothstep(0.0, 0.1, normalizedDist) * smoothstep(1.0, 0.9, normalizedDist);
 
-                    // In full planet shadow, rings should be much dimmer + less visible
-                    float visibilityInShadow = mix(0.18, 1.0, shadow);
+                    // Visibility follows both planet-shadow and day/night
+                    float alpha = ringOpacity * edgeFade * mix(0.02, 1.0, shadow) * mix(0.03, 1.0, dayFactor);
 
                     vec3 litRing = ringColor * totalLight;
-                    gl_FragColor = vec4(litRing, ringOpacity * edgeFade * visibilityInShadow);
+                    gl_FragColor = vec4(litRing, alpha);
                   }
                 `}
               />
