@@ -78,7 +78,7 @@ export const Sun = ({ position = [0, 0, 0], visualScale = 80 }: SunProps) => {
 
   return (
     <group ref={groupRef} position={position}>
-      {/* Sun core */}
+      {/* Sun core - bright emissive */}
       <mesh 
         ref={sunRef}
         onClick={handleClick}
@@ -86,23 +86,111 @@ export const Sun = ({ position = [0, 0, 0], visualScale = 80 }: SunProps) => {
         onPointerOut={handlePointerOut}
       >
         <sphereGeometry args={[sunSize, 64, 64]} />
-        <meshBasicMaterial color="#FDB813" />
+        <shaderMaterial
+          uniforms={{
+            time: { value: 0 },
+          }}
+          vertexShader={`
+            varying vec2 vUv;
+            varying vec3 vNormal;
+            void main() {
+              vUv = uv;
+              vNormal = normalize(normalMatrix * normal);
+              gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+            }
+          `}
+          fragmentShader={`
+            uniform float time;
+            varying vec2 vUv;
+            varying vec3 vNormal;
+            
+            float hash(vec2 p) {
+              return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453);
+            }
+            
+            float noise(vec2 p) {
+              vec2 i = floor(p);
+              vec2 f = fract(p);
+              f = f * f * (3.0 - 2.0 * f);
+              float a = hash(i);
+              float b = hash(i + vec2(1.0, 0.0));
+              float c = hash(i + vec2(0.0, 1.0));
+              float d = hash(i + vec2(1.0, 1.0));
+              return mix(mix(a, b, f.x), mix(c, d, f.x), f.y);
+            }
+            
+            void main() {
+              // Animated solar surface
+              vec2 uv = vUv * 8.0;
+              float n = noise(uv) * 0.5 + noise(uv * 2.0) * 0.25 + noise(uv * 4.0) * 0.125;
+              
+              // Bright yellow-orange core
+              vec3 coreColor = vec3(1.0, 0.95, 0.7);
+              vec3 hotColor = vec3(1.0, 0.8, 0.3);
+              vec3 surfaceColor = mix(hotColor, coreColor, n);
+              
+              // Make it very bright (HDR-like)
+              surfaceColor *= 2.5;
+              
+              gl_FragColor = vec4(surfaceColor, 1.0);
+            }
+          `}
+        />
       </mesh>
 
-      {/* Corona effect */}
+      {/* Inner corona - bright yellow */}
       <mesh ref={coronaRef}>
-        <sphereGeometry args={[sunSize * 1.1, 32, 32]} />
+        <sphereGeometry args={[sunSize * 1.08, 64, 64]} />
         <meshBasicMaterial
-          color="#FF8C00"
+          color="#FFE566"
           transparent
-          opacity={0.3}
+          opacity={0.6}
           depthWrite={false}
         />
       </mesh>
 
-      {/* Outer glow */}
+      {/* Middle glow layer */}
+      <mesh>
+        <sphereGeometry args={[sunSize * 1.2, 48, 48]} />
+        <meshBasicMaterial
+          color="#FFCC00"
+          transparent
+          opacity={0.35}
+          depthWrite={false}
+        />
+      </mesh>
+
+      {/* Outer glow - large and soft */}
       <mesh ref={glowRef}>
-        <sphereGeometry args={[sunSize * 1.3, 32, 32]} />
+        <sphereGeometry args={[sunSize * 1.5, 32, 32]} />
+        <shaderMaterial
+          transparent
+          depthWrite={false}
+          side={THREE.BackSide}
+          uniforms={{
+            glowColor: { value: new THREE.Color('#FF8800') },
+          }}
+          vertexShader={`
+            varying vec3 vNormal;
+            void main() {
+              vNormal = normalize(normalMatrix * normal);
+              gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+            }
+          `}
+          fragmentShader={`
+            varying vec3 vNormal;
+            uniform vec3 glowColor;
+            void main() {
+              float intensity = pow(0.65 - dot(vNormal, vec3(0.0, 0.0, 1.0)), 1.5);
+              gl_FragColor = vec4(glowColor, intensity * 0.8);
+            }
+          `}
+        />
+      </mesh>
+
+      {/* Far outer glow - very soft and large */}
+      <mesh>
+        <sphereGeometry args={[sunSize * 2.0, 32, 32]} />
         <shaderMaterial
           transparent
           depthWrite={false}
@@ -121,19 +209,19 @@ export const Sun = ({ position = [0, 0, 0], visualScale = 80 }: SunProps) => {
             varying vec3 vNormal;
             uniform vec3 glowColor;
             void main() {
-              float intensity = pow(0.6 - dot(vNormal, vec3(0.0, 0.0, 1.0)), 2.0);
-              gl_FragColor = vec4(glowColor, intensity * 0.6);
+              float intensity = pow(0.5 - dot(vNormal, vec3(0.0, 0.0, 1.0)), 2.0);
+              gl_FragColor = vec4(glowColor, intensity * 0.4);
             }
           `}
         />
       </mesh>
 
-      {/* Point light from sun */}
+      {/* Strong point light from sun */}
       <pointLight
-        intensity={2}
-        distance={sunSize * 100}
-        decay={2}
-        color="#FFF5E1"
+        intensity={8}
+        distance={0}
+        decay={1}
+        color="#FFF8E7"
       />
     </group>
   );
