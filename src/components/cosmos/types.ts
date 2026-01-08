@@ -22,6 +22,7 @@ export interface CelestialObject {
   orbitRadius?: number;
   orbitSpeed?: number;
   rotationSpeed?: number;
+  parentId?: string; // For moons - the id of the parent planet
   category: 'solarSystem' | 'stars' | 'nebulae' | 'galaxies' | 'deepSpace';
 }
 
