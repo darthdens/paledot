@@ -118,10 +118,45 @@ export const CosmosUI = () => {
     setHidden(footer, 'cosmosFooter');
   }, []);
 
-  // Safety: always restore page chrome on unmount / when fullscreen is off.
+  // Keep page chrome (header/footer) and Echo widget hidden while fullscreen is active.
+  // This must run for BOTH native fullscreen and CSS fallback (iOS Safari is inconsistent).
   useEffect(() => {
-    if (!isFullscreen) setPageChromeHidden(false);
-    return () => setPageChromeHidden(false);
+    setPageChromeHidden(isFullscreen);
+
+    const echoContainer = document.getElementById('echo-chat-container') as HTMLElement | null;
+    if (echoContainer) {
+      if (isFullscreen) {
+        if (echoContainer.dataset.cosmosPrevDisplay === undefined) {
+          echoContainer.dataset.cosmosPrevDisplay = echoContainer.style.display || '';
+          echoContainer.dataset.cosmosPrevDisplayPriority = echoContainer.style.getPropertyPriority('display') || '';
+        }
+        echoContainer.style.setProperty('display', 'none', 'important');
+      } else if (echoContainer.dataset.cosmosPrevDisplay !== undefined) {
+        const prevDisplay = echoContainer.dataset.cosmosPrevDisplay || '';
+        const prevPriority = echoContainer.dataset.cosmosPrevDisplayPriority || '';
+
+        if (!prevDisplay) {
+          echoContainer.style.removeProperty('display');
+        } else {
+          echoContainer.style.setProperty('display', prevDisplay, prevPriority || undefined);
+        }
+
+        delete echoContainer.dataset.cosmosPrevDisplay;
+        delete echoContainer.dataset.cosmosPrevDisplayPriority;
+      }
+    }
+
+    return () => {
+      setPageChromeHidden(false);
+      if (echoContainer && echoContainer.dataset.cosmosPrevDisplay !== undefined) {
+        const prevDisplay = echoContainer.dataset.cosmosPrevDisplay || '';
+        const prevPriority = echoContainer.dataset.cosmosPrevDisplayPriority || '';
+        if (!prevDisplay) echoContainer.style.removeProperty('display');
+        else echoContainer.style.setProperty('display', prevDisplay, prevPriority || undefined);
+        delete echoContainer.dataset.cosmosPrevDisplay;
+        delete echoContainer.dataset.cosmosPrevDisplayPriority;
+      }
+    };
   }, [isFullscreen, setPageChromeHidden]);
 
   const savePrevContainerStyles = useCallback((el: HTMLElement) => {
@@ -295,15 +330,28 @@ export const CosmosUI = () => {
         try {
           const result = requestFs.call(elem);
 
-          // Some browsers (notably iOS webkit) don't return a Promise here.
-          if (result && typeof (result as any).then === 'function') {
-            (result as Promise<void>)
-              .then(() => setIsFullscreen(true))
-              .catch(() => {
-                applyFullscreenFallback(container);
-                setIsFullscreen(true);
-              });
-          } else {
+           // Some browsers (notably iOS webkit) don't return a Promise here.
+           if (result && typeof (result as any).then === 'function') {
+             (result as Promise<void>)
+               .then(() => {
+                 // Some mobile browsers resolve even if they didn't truly enter fullscreen.
+                 const isActuallyNative = !!(
+                   doc.fullscreenElement ||
+                   doc.webkitFullscreenElement ||
+                   doc.mozFullScreenElement
+                 );
+
+                 if (!isActuallyNative) {
+                   applyFullscreenFallback(container);
+                 }
+
+                 setIsFullscreen(true);
+               })
+               .catch(() => {
+                 applyFullscreenFallback(container);
+                 setIsFullscreen(true);
+               });
+           } else {
             // Optimistically set state, then verify and fallback if native fullscreen didn't happen.
             setIsFullscreen(true);
             window.setTimeout(() => {
