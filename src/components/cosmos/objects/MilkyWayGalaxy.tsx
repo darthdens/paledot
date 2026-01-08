@@ -86,7 +86,7 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
   const gasTexture = useMemo(() => createGasTexture(), []);
   
   // Generate detailed galaxy particle systems
-  const { bulgeGeo, barGeo, diskGeo, armCoreGeo, dustGeo, nebulaGeo, haloGeo } = useMemo(() => {
+  const { bulgeGeo, barGeo, diskGeo, armCoreGeo, dustGeo, nebulaGeo, gasCloudGeo, haloGeo } = useMemo(() => {
     const color = new THREE.Color();
     
     // === CENTRAL BULGE (warm golden/orange core - spheroidal) ===
@@ -273,7 +273,7 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
     }
     
     // === NEBULAE / HII REGIONS (pink/red emission in arms) ===
-    const nebulaCount = 10000;
+    const nebulaCount = 40000;
     const nebulaPos = new Float32Array(nebulaCount * 3);
     const nebulaCol = new Float32Array(nebulaCount * 3);
     
@@ -282,27 +282,72 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
       const armIdx = Math.floor(Math.random() * 4);
       const arm = MILKY_WAY.arms[armIdx];
       
-      const t = 0.05 + Math.random() * 0.75;
-      const r = (8000 + t * 35000) * gs;
+      const t = 0.05 + Math.random() * 0.85;
+      const r = (7000 + t * 40000) * gs;
       
       const winding = 0.22;
       const spiralAngle = arm.startAngle + Math.log(r / (6000 * gs) + 0.1) / winding;
-      const spread = (Math.random() - 0.5) * 1000 * gs;
+      const spread = (Math.random() - 0.5) * 1500 * gs;
       
       nebulaPos[i3] = Math.cos(spiralAngle + spread / r) * r;
-      nebulaPos[i3 + 1] = (Math.random() - 0.5) * 100 * gs;
+      nebulaPos[i3 + 1] = (Math.random() - 0.5) * 120 * gs;
       nebulaPos[i3 + 2] = Math.sin(spiralAngle + spread / r) * r;
       
-      // Pink/magenta HII regions
-      if (Math.random() < 0.8) {
-        color.setHSL(0.92 + Math.random() * 0.08, 0.8, 0.55 + Math.random() * 0.2);
+      // Pink/magenta HII regions with more variety
+      const rand = Math.random();
+      if (rand < 0.6) {
+        color.setHSL(0.92 + Math.random() * 0.08, 0.75 + Math.random() * 0.2, 0.5 + Math.random() * 0.25);
+      } else if (rand < 0.85) {
+        // Blue reflection nebulae
+        color.setHSL(0.58 + Math.random() * 0.05, 0.65, 0.55 + Math.random() * 0.2);
       } else {
-        // Some blue reflection nebulae
-        color.setHSL(0.6, 0.7, 0.6 + Math.random() * 0.15);
+        // Cyan/teal emission
+        color.setHSL(0.5 + Math.random() * 0.05, 0.7, 0.5 + Math.random() * 0.2);
       }
       nebulaCol[i3] = color.r;
       nebulaCol[i3 + 1] = color.g;
       nebulaCol[i3 + 2] = color.b;
+    }
+    
+    // === GAS CLOUDS (diffuse hydrogen gas along arms) ===
+    const gasCloudCount = 50000;
+    const gasCloudPos = new Float32Array(gasCloudCount * 3);
+    const gasCloudCol = new Float32Array(gasCloudCount * 3);
+    
+    for (let i = 0; i < gasCloudCount; i++) {
+      const i3 = i * 3;
+      const armIdx = Math.floor(Math.random() * 4);
+      const arm = MILKY_WAY.arms[armIdx];
+      
+      const t = Math.pow(Math.random(), 0.5);
+      const r = (6000 + t * 45000) * gs;
+      
+      const winding = 0.22;
+      const spiralAngle = arm.startAngle + Math.log(r / (6000 * gs) + 0.1) / winding;
+      
+      // Wider spread for diffuse gas
+      const spread = (Math.random() - 0.5) * 2500 * gs;
+      const finalAngle = spiralAngle + spread / (r + 1);
+      
+      gasCloudPos[i3] = Math.cos(finalAngle) * r;
+      gasCloudPos[i3 + 1] = (Math.random() - 0.5) * 180 * gs;
+      gasCloudPos[i3 + 2] = Math.sin(finalAngle) * r;
+      
+      // Mix of colors for gas - purple, blue, and subtle pink
+      const rand = Math.random();
+      if (rand < 0.4) {
+        // Purple/violet gas
+        color.setHSL(0.75 + Math.random() * 0.1, 0.5 + Math.random() * 0.3, 0.35 + Math.random() * 0.15);
+      } else if (rand < 0.7) {
+        // Blue gas
+        color.setHSL(0.6 + Math.random() * 0.05, 0.45 + Math.random() * 0.25, 0.35 + Math.random() * 0.2);
+      } else {
+        // Subtle pink/magenta
+        color.setHSL(0.88 + Math.random() * 0.1, 0.4 + Math.random() * 0.3, 0.3 + Math.random() * 0.15);
+      }
+      gasCloudCol[i3] = color.r;
+      gasCloudCol[i3 + 1] = color.g;
+      gasCloudCol[i3 + 2] = color.b;
     }
     
     // === STELLAR HALO (faint outer stars and globular clusters) ===
@@ -354,11 +399,15 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
     nebulaGeo.setAttribute('position', new THREE.BufferAttribute(nebulaPos, 3));
     nebulaGeo.setAttribute('color', new THREE.BufferAttribute(nebulaCol, 3));
     
+    const gasCloudGeo = new THREE.BufferGeometry();
+    gasCloudGeo.setAttribute('position', new THREE.BufferAttribute(gasCloudPos, 3));
+    gasCloudGeo.setAttribute('color', new THREE.BufferAttribute(gasCloudCol, 3));
+    
     const haloGeo = new THREE.BufferGeometry();
     haloGeo.setAttribute('position', new THREE.BufferAttribute(haloPos, 3));
     haloGeo.setAttribute('color', new THREE.BufferAttribute(haloCol, 3));
     
-    return { bulgeGeo, barGeo, diskGeo, armCoreGeo, dustGeo, nebulaGeo, haloGeo };
+    return { bulgeGeo, barGeo, diskGeo, armCoreGeo, dustGeo, nebulaGeo, gasCloudGeo, haloGeo };
   }, [gs]);
   
   const pulseRef2 = useRef<THREE.Mesh>(null);
@@ -468,12 +517,26 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
       {/* Nebulae - pink emission gas clouds */}
       <points geometry={nebulaGeo}>
         <pointsMaterial
-          size={gs * 300}
+          size={gs * 400}
           map={gasTexture}
           vertexColors
           sizeAttenuation
           transparent
-          opacity={0.7}
+          opacity={0.65}
+          blending={THREE.AdditiveBlending}
+          depthWrite={false}
+        />
+      </points>
+      
+      {/* Gas clouds - diffuse hydrogen along arms */}
+      <points geometry={gasCloudGeo}>
+        <pointsMaterial
+          size={gs * 500}
+          map={gasTexture}
+          vertexColors
+          sizeAttenuation
+          transparent
+          opacity={0.45}
           blending={THREE.AdditiveBlending}
           depthWrite={false}
         />
