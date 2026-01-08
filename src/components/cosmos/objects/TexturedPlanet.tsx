@@ -146,6 +146,7 @@ export const TexturedPlanet = ({
   const setHoveredObject = useCosmosStore(state => state.setHoveredObject);
   const setObjectWorldPosition = useCosmosStore(state => state.setObjectWorldPosition);
   const objectWorldPositions = useCosmosStore(state => state.objectWorldPositions);
+  const selectedObjectId = useCosmosStore(state => state.selectedObject?.id);
 
   // Ensure we have an initial world position early (helps camera fly-to be accurate immediately)
   useEffect(() => {
@@ -199,7 +200,9 @@ export const TexturedPlanet = ({
       }
 
       // Keep a live world-position for camera targeting (planets/moons move)
-      if (time - lastWorldPosUpdate.current > 0.03) {
+      // Update the selected object every frame for smoother camera tracking.
+      const shouldUpdateNow = object.id === selectedObjectId || time - lastWorldPosUpdate.current > 0.03;
+      if (shouldUpdateNow) {
         lastWorldPosUpdate.current = time;
         groupRef.current.getWorldPosition(worldPos.current);
         setObjectWorldPosition(object.id, [worldPos.current.x, worldPos.current.y, worldPos.current.z]);

@@ -37,8 +37,8 @@ export const CosmosExplorer = () => {
   // Pre-calculate moon orbit data for orbit visualization
   // Only show orbits for moons of the selected planet (or if a moon of that planet is selected)
   const moonOrbits = useMemo(() => {
-    if (!selectedObject) return [];
-    
+    if (!showOrbits || !selectedObject) return [];
+
     // Get the parent planet ID to show moon orbits for
     const focusedPlanetId = selectedObject.type === 'moon' 
       ? selectedObject.parentId 
@@ -105,14 +105,14 @@ export const CosmosExplorer = () => {
             <TexturedPlanet 
               key={planet.id} 
               object={planet} 
-              showOrbit={true} 
+              showOrbit={showOrbits} 
               visualScale={UNIFIED_SCALE}
               distanceScale={UNIFIED_SCALE}
             />
           ))}
-          
+
           {/* Moon orbit paths - faint circles around parent planets */}
-          {moonOrbits.map(orbit => (
+          {showOrbits && moonOrbits.map(orbit => (
             <MoonOrbit
               key={`orbit-${orbit.id}`}
               parentId={orbit.parentId}
@@ -120,7 +120,7 @@ export const CosmosExplorer = () => {
               color={orbit.color}
             />
           ))}
-          
+
           {/* All moons */}
           {moons.map(moon => (
             <TexturedPlanet 

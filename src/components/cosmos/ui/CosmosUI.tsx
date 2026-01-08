@@ -1,6 +1,6 @@
 import { useLanguage } from '@/i18n/LanguageContext';
 import { Button } from '@/components/ui/button';
-import { HelpCircle, Compass, Maximize, Minimize } from 'lucide-react';
+import { HelpCircle, Compass, Maximize, Minimize, CircleDot, CircleOff } from 'lucide-react';
 import { useCosmosStore } from '../store/useCosmosStore';
 import { useFullscreenStore } from '../store/useFullscreenStore';
 import { useCallback, useEffect } from 'react';
@@ -18,6 +18,8 @@ const translations = {
     welcome: 'Welcome to Cosmos Explorer',
     subtitle: 'Journey through our solar system and beyond',
     explore: 'Explore',
+    showOrbits: 'Show orbits',
+    hideOrbits: 'Hide orbits',
   },
   fr: {
     startTour: 'Commencer la Visite',
@@ -31,13 +33,22 @@ const translations = {
     welcome: 'Bienvenue dans Cosmos Explorer',
     subtitle: 'Voyagez à travers notre système solaire et au-delà',
     explore: 'Explorer',
+    showOrbits: 'Afficher les orbites',
+    hideOrbits: 'Masquer les orbites',
   },
 };
 
 export const CosmosUI = () => {
   const { language } = useLanguage();
   const t = translations[language];
-  const { startTour, toggleQuickJump, showControlHints, setShowControlHints } = useCosmosStore();
+  const {
+    startTour,
+    toggleQuickJump,
+    showControlHints,
+    setShowControlHints,
+    showOrbits,
+    toggleOrbits,
+  } = useCosmosStore();
   const { isFullscreen, setIsFullscreen } = useFullscreenStore();
 
   const setPageChromeHidden = useCallback((hidden: boolean) => {
@@ -46,18 +57,27 @@ export const CosmosUI = () => {
 
     const setHidden = (el: HTMLElement | null) => {
       if (!el) return;
+
+      const key = 'cosmosPrevDisplay';
+
       if (hidden) {
-        if (!el.dataset.prevDisplay) el.dataset.prevDisplay = el.style.display || '';
+        if (el.dataset[key] === undefined) el.dataset[key] = el.style.display || '';
         el.style.display = 'none';
       } else {
-        el.style.display = el.dataset.prevDisplay ?? '';
-        delete el.dataset.prevDisplay;
+        el.style.display = el.dataset[key] ?? '';
+        delete el.dataset[key];
       }
     };
 
     setHidden(nav);
     setHidden(footer);
   }, []);
+
+  // Safety: always restore page chrome on unmount / when fullscreen is off.
+  useEffect(() => {
+    if (!isFullscreen) setPageChromeHidden(false);
+    return () => setPageChromeHidden(false);
+  }, [isFullscreen, setPageChromeHidden]);
 
   const savePrevContainerStyles = useCallback((el: HTMLElement) => {
     const keys = [
