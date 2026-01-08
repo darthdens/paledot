@@ -833,13 +833,19 @@ export const TexturedPlanet = ({
                   varying vec3 vWorldPosition;
                   varying vec3 vWorldNormal;
                   varying vec3 vLocalPosition;
-                  
+                  varying vec3 vWorldCenter;
+
                   void main() {
                     vUv = uv;
                     vLocalPosition = position;
                     vWorldNormal = normalize((modelMatrix * vec4(normal, 0.0)).xyz);
+
                     vec4 worldPos = modelMatrix * vec4(position, 1.0);
                     vWorldPosition = worldPos.xyz;
+
+                    // Derive center from the mesh transform (prevents 1-frame uniform lag at high timeSpeed)
+                    vWorldCenter = (modelMatrix * vec4(0.0, 0.0, 0.0, 1.0)).xyz;
+
                     gl_Position = projectionMatrix * viewMatrix * worldPos;
                   }
                 `}
@@ -855,13 +861,14 @@ export const TexturedPlanet = ({
                   varying vec3 vWorldPosition;
                   varying vec3 vWorldNormal;
                   varying vec3 vLocalPosition;
+                  varying vec3 vWorldCenter;
                   
                   float hash(float n) { return fract(sin(n) * 43758.5453); }
                   
                   // Check if ring fragment is in shadow of the planet (same logic as moons)
                   float calculatePlanetShadow(vec3 fragWorldPos, vec3 sunDir) {
                     // Vector from fragment to planet center
-                    vec3 toPlanet = objectCenter - fragWorldPos;
+                    vec3 toPlanet = vWorldCenter - fragWorldPos;
                     
                     // Project onto sun direction
                     float distAlongRay = dot(toPlanet, sunDir);
@@ -871,7 +878,7 @@ export const TexturedPlanet = ({
                     
                     // Closest point on sun ray to planet center
                     vec3 closestPoint = fragWorldPos + sunDir * distAlongRay;
-                    float distFromAxis = length(objectCenter - closestPoint);
+                    float distFromAxis = length(vWorldCenter - closestPoint);
                     
                     // Check if within planet's shadow cylinder with smooth penumbra
                     if (distFromAxis < planetRadius) {
@@ -890,7 +897,7 @@ export const TexturedPlanet = ({
                     // Ring lighting follows the same logic as planets/moons:
                     // ambient + max(N·L, 0) diffuse, with planet shadow applied.
                     // IMPORTANT: opacity is NOT tied to lighting, so changing timeSpeed can't "fade" rings.
-                    vec3 fragFromPlanet = vWorldPosition - objectCenter;
+                    vec3 fragFromPlanet = vWorldPosition - vWorldCenter;
                     float distFromPlanet = length(fragFromPlanet);
                     vec3 pseudoNormal = distFromPlanet > 0.001 ? fragFromPlanet / distFromPlanet : vec3(0.0, 1.0, 0.0);
  
