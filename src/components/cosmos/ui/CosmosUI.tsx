@@ -45,7 +45,7 @@ export const CosmosUI = () => {
     // Force true viewport fill (Tailwind class ordering can't override h-[50vh] reliably)
     containerEl.style.position = 'fixed';
     containerEl.style.inset = '0';
-    containerEl.style.zIndex = '200';
+    containerEl.style.zIndex = '9999';
     containerEl.style.width = '100vw';
     containerEl.style.height = '100dvh';
     containerEl.style.borderRadius = '0px';
@@ -125,13 +125,36 @@ export const CosmosUI = () => {
         elem.msRequestFullscreen;
 
       if (requestFs) {
-        requestFs
-          .call(elem)
-          .then(() => setIsFullscreen(true))
-          .catch(() => {
-            applyFullscreenFallback(container);
+        try {
+          const result = requestFs.call(elem);
+
+          // Some browsers (notably iOS webkit) don't return a Promise here.
+          if (result && typeof (result as any).then === 'function') {
+            (result as Promise<void>)
+              .then(() => setIsFullscreen(true))
+              .catch(() => {
+                applyFullscreenFallback(container);
+                setIsFullscreen(true);
+              });
+          } else {
+            // Optimistically set state, then verify and fallback if native fullscreen didn't happen.
             setIsFullscreen(true);
-          });
+            window.setTimeout(() => {
+              const stillNotNative = !(
+                doc.fullscreenElement ||
+                doc.webkitFullscreenElement ||
+                doc.mozFullScreenElement
+              );
+              if (stillNotNative) {
+                applyFullscreenFallback(container);
+                setIsFullscreen(true);
+              }
+            }, 250);
+          }
+        } catch {
+          applyFullscreenFallback(container);
+          setIsFullscreen(true);
+        }
       } else {
         applyFullscreenFallback(container);
         setIsFullscreen(true);
@@ -142,18 +165,32 @@ export const CosmosUI = () => {
 
     // Exit fullscreen
     if (isNativeFs) {
-      const exitFs = doc.exitFullscreen || doc.webkitExitFullscreen || doc.mozCancelFullScreen || doc.msExitFullscreen;
+      const exitFs =
+        doc.exitFullscreen ||
+        doc.webkitExitFullscreen ||
+        doc.mozCancelFullScreen ||
+        doc.msExitFullscreen;
       if (exitFs) {
-        exitFs
-          .call(doc)
-          .then(() => {
+        try {
+          const result = exitFs.call(doc);
+          if (result && typeof (result as any).then === 'function') {
+            (result as Promise<void>)
+              .then(() => {
+                clearFullscreenOverrides(container);
+                setIsFullscreen(false);
+              })
+              .catch(() => {
+                clearFullscreenOverrides(container);
+                setIsFullscreen(false);
+              });
+          } else {
             clearFullscreenOverrides(container);
             setIsFullscreen(false);
-          })
-          .catch(() => {
-            clearFullscreenOverrides(container);
-            setIsFullscreen(false);
-          });
+          }
+        } catch {
+          clearFullscreenOverrides(container);
+          setIsFullscreen(false);
+        }
         return;
       }
     }
@@ -194,7 +231,7 @@ export const CosmosUI = () => {
 
       {/* Top controls - compact on mobile */}
       <div
-        className="absolute top-2 sm:top-4 right-2 sm:right-4 flex gap-1 sm:gap-2 z-[220]"
+        className="absolute top-2 sm:top-4 right-2 sm:right-4 flex gap-1 sm:gap-2 z-[10000]"
         style={
           isFullscreen
             ? {
