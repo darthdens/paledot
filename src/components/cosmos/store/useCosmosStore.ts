@@ -35,6 +35,7 @@ interface CosmosStore {
   showQuickJump: boolean;
   showSizeComparison: boolean;
   showOrbits: boolean;
+  showTrails: boolean;
   showRealPeriods: boolean;
   recentJumps: string[];
 
@@ -68,6 +69,7 @@ interface CosmosStore {
   toggleQuickJump: () => void;
   toggleSizeComparison: () => void;
   toggleOrbits: () => void;
+  toggleTrails: () => void;
   toggleRealPeriods: () => void;
   addRecentJump: (objectId: string) => void;
   jumpToObject: (object: CelestialObject) => void;
@@ -111,6 +113,7 @@ export const useCosmosStore = create<CosmosStore>()(
       showQuickJump: false,
       showSizeComparison: false,
       showOrbits: true,
+      showTrails: true,
       showRealPeriods: false,
       recentJumps: [],
 
@@ -167,6 +170,8 @@ export const useCosmosStore = create<CosmosStore>()(
       toggleSizeComparison: () => set((state) => ({ showSizeComparison: !state.showSizeComparison })),
 
       toggleOrbits: () => set((state) => ({ showOrbits: !state.showOrbits })),
+
+      toggleTrails: () => set((state) => ({ showTrails: !state.showTrails })),
 
       toggleRealPeriods: () => set((state) => ({ showRealPeriods: !state.showRealPeriods })),
       
