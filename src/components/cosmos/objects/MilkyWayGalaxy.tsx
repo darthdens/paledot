@@ -113,8 +113,8 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
   const { bulgeGeo, barGeo, diskGeo, armCoreGeo, dustGeo, nebulaGeo, gasCloudGeo, starClusterGeo, globularGeo, haloGeo } = useMemo(() => {
     const color = new THREE.Color();
     
-    // === CENTRAL BULGE (bright white/cream core - spheroidal) ===
-    const bulgeCount = 60000;
+    // === CENTRAL BULGE (YELLOW/GOLDEN core - spheroidal) ===
+    const bulgeCount = 70000;
     const bulgePos = new Float32Array(bulgeCount * 3);
     const bulgeCol = new Float32Array(bulgeCount * 3);
     
@@ -122,76 +122,76 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
       const i3 = i * 3;
       
       // Spheroidal bulge with strong concentration toward center
-      const r = Math.pow(Math.random(), 0.8) * MILKY_WAY.bulgeRadius * gs * 0.7;
+      const r = Math.pow(Math.random(), 0.8) * MILKY_WAY.bulgeRadius * gs * 0.8;
       const theta = Math.random() * Math.PI * 2;
       const phi = Math.acos(2 * Math.random() - 1);
       
       // Flattened spheroid
       bulgePos[i3] = r * Math.sin(phi) * Math.cos(theta);
-      bulgePos[i3 + 1] = r * Math.cos(phi) * 0.35; // Flatten vertically
+      bulgePos[i3 + 1] = r * Math.cos(phi) * 0.35;
       bulgePos[i3 + 2] = r * Math.sin(phi) * Math.sin(theta);
       
-      // Bright white/cream center transitioning to warm yellow outward
-      const dist = r / (MILKY_WAY.bulgeRadius * gs * 0.7);
-      const brightness = 0.92 + (1 - dist) * 0.08; // Very bright
+      // YELLOW/GOLDEN center - like the reference images
+      const dist = r / (MILKY_WAY.bulgeRadius * gs * 0.8);
+      const brightness = 0.85 + (1 - dist) * 0.15;
       
-      if (dist < 0.3) {
-        // Innermost core - bright white/cream
-        color.setHSL(0.12, 0.15 + dist * 0.2, brightness);
-      } else if (dist < 0.6) {
-        // Middle - warm yellow/cream
-        color.setHSL(0.11 + (dist - 0.3) * 0.05, 0.3 + dist * 0.2, brightness - dist * 0.05);
+      if (dist < 0.25) {
+        // Very center - bright yellow/gold
+        color.setHSL(0.12 + Math.random() * 0.02, 0.7 + Math.random() * 0.2, brightness);
+      } else if (dist < 0.5) {
+        // Inner - golden yellow
+        color.setHSL(0.10 + Math.random() * 0.03, 0.65 + Math.random() * 0.2, brightness - dist * 0.1);
+      } else if (dist < 0.75) {
+        // Middle - orange/gold transitioning
+        color.setHSL(0.08 + Math.random() * 0.04, 0.55 + Math.random() * 0.2, brightness - dist * 0.15);
       } else {
-        // Outer bulge - yellow/gold transitioning to pink
-        color.setHSL(0.08 + (dist - 0.6) * 0.8, 0.4 + dist * 0.2, brightness - dist * 0.1);
+        // Outer bulge - transition to pink/purple
+        color.setHSL(0.95 + Math.random() * 0.1, 0.5 + Math.random() * 0.2, brightness - dist * 0.2);
       }
       bulgeCol[i3] = color.r;
       bulgeCol[i3 + 1] = color.g;
       bulgeCol[i3 + 2] = color.b;
     }
     
-    // === CENTRAL BAR (warm cream/yellow bar structure) ===
-    const barCount = 40000;
+    // === CENTRAL BAR (YELLOW/GOLDEN bar structure) ===
+    const barCount = 50000;
     const barPos = new Float32Array(barCount * 3);
     const barCol = new Float32Array(barCount * 3);
-    const barAngle = 0.45; // Bar tilted ~25 degrees to line of sight
+    const barAngle = 0.45;
     
     for (let i = 0; i < barCount; i++) {
       const i3 = i * 3;
       
-      // Bar with tapered ends
-      const alongBar = (Math.random() - 0.5) * 2; // -1 to 1
+      const alongBar = (Math.random() - 0.5) * 2;
       const barLen = MILKY_WAY.barLength * gs * 0.5;
       const barW = MILKY_WAY.barWidth * gs;
       
-      // Gaussian profile for bar width
       const widthFactor = Math.exp(-alongBar * alongBar * 2);
       const perpOffset = (Math.random() - 0.5) * barW * widthFactor;
       
       const x = alongBar * barLen;
       const z = perpOffset;
       
-      // Rotate by bar angle
       barPos[i3] = x * Math.cos(barAngle) - z * Math.sin(barAngle);
       barPos[i3 + 1] = (Math.random() - 0.5) * 250 * gs * widthFactor;
       barPos[i3 + 2] = x * Math.sin(barAngle) + z * Math.cos(barAngle);
       
-      // Warm cream/yellow bar colors transitioning to pink at edges
+      // YELLOW/GOLDEN bar - matching the center
       const dist = Math.abs(alongBar);
-      if (dist < 0.5) {
-        // Inner bar - warm cream/yellow
-        color.setHSL(0.11, 0.35 - dist * 0.1, 0.85 + Math.random() * 0.1);
+      if (dist < 0.6) {
+        // Golden yellow bar
+        color.setHSL(0.11 + Math.random() * 0.03, 0.6 + Math.random() * 0.2, 0.75 + Math.random() * 0.15);
       } else {
-        // Outer bar - transition to pink/magenta
-        color.setHSL(0.92 + (dist - 0.5) * 0.1, 0.45 + dist * 0.2, 0.75 + Math.random() * 0.1);
+        // Transition to pink/purple at ends
+        color.setHSL(0.9 + Math.random() * 0.1, 0.5 + Math.random() * 0.2, 0.65 + Math.random() * 0.15);
       }
       barCol[i3] = color.r;
       barCol[i3 + 1] = color.g;
       barCol[i3 + 2] = color.b;
     }
     
-    // === SPIRAL ARMS (blue-purple stars with pink inner regions) ===
-    const diskCount = 180000;
+    // === SPIRAL ARMS (BLUE glow with stars) ===
+    const diskCount = 220000;
     const diskPos = new Float32Array(diskCount * 3);
     const diskCol = new Float32Array(diskCount * 3);
     
@@ -200,58 +200,49 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
       const armIdx = Math.floor(Math.random() * 4);
       const arm = MILKY_WAY.arms[armIdx];
       
-      // Radial position - exponential disk profile
-      const t = Math.pow(Math.random(), 0.45);
-      const minR = 6000; // Arms start after bar
+      const t = Math.pow(Math.random(), 0.4);
+      const minR = 6000;
       const r = (minR + t * (MILKY_WAY.diskRadius - minR)) * gs;
       const normalizedR = (r / gs - minR) / (MILKY_WAY.diskRadius - minR);
       
-      // Tighter logarithmic spiral
       const winding = 0.22;
       const spiralAngle = arm.startAngle + Math.log(r / (minR * gs) + 0.1) / winding;
       
-      // Arm width - narrower for more defined structure
-      const armWidth = (1800 + t * 1500) * gs;
+      const armWidth = (2000 + t * 1800) * gs;
       const spreadGaussian = (Math.random() + Math.random() + Math.random() - 1.5) / 1.5;
       const spread = spreadGaussian * armWidth;
       
-      // Inter-arm population (dimmer)
-      const interArm = Math.random() < 0.2;
-      const extraSpread = interArm ? (Math.random() - 0.5) * armWidth * 3 : 0;
+      // MORE inter-arm stars to FILL THE GAPS
+      const interArm = Math.random() < 0.35;
+      const extraSpread = interArm ? (Math.random() - 0.5) * armWidth * 4 : 0;
       
       const finalAngle = spiralAngle + (spread + extraSpread) / (r + 1);
       
       diskPos[i3] = Math.cos(finalAngle) * r;
-      diskPos[i3 + 1] = (Math.random() - 0.5) * 180 * gs * Math.exp(-t * 1.5);
+      diskPos[i3 + 1] = (Math.random() - 0.5) * 200 * gs * Math.exp(-t * 1.2);
       diskPos[i3 + 2] = Math.sin(finalAngle) * r;
       
-      // Color based on radius: pink inner → blue-purple outer
+      // BLUE SPIRAL ARMS with purple inner transition
       if (interArm) {
-        // Dimmer inter-arm stars - subtle blue-purple
-        color.setHSL(0.7 + Math.random() * 0.1, 0.2, 0.45 + Math.random() * 0.15);
+        // Inter-arm stars - dimmer blue/purple
+        color.setHSL(0.62 + Math.random() * 0.1, 0.3 + Math.random() * 0.2, 0.4 + Math.random() * 0.2);
       } else {
-        const inCore = Math.abs(spreadGaussian) < 0.4;
+        const inCore = Math.abs(spreadGaussian) < 0.35;
         
-        if (normalizedR < 0.25) {
-          // Inner disk - pink/magenta tones
-          if (inCore) {
-            color.setHSL(0.9 + Math.random() * 0.1, 0.5 + Math.random() * 0.3, 0.7 + Math.random() * 0.2);
-          } else {
-            color.setHSL(0.85 + Math.random() * 0.15, 0.4 + Math.random() * 0.2, 0.6 + Math.random() * 0.2);
-          }
-        } else if (normalizedR < 0.5) {
-          // Middle disk - transition pink to purple-blue
-          if (inCore) {
-            color.setHSL(0.75 + Math.random() * 0.15, 0.5 + Math.random() * 0.3, 0.7 + Math.random() * 0.2);
-          } else {
-            color.setHSL(0.7 + Math.random() * 0.2, 0.4 + Math.random() * 0.2, 0.6 + Math.random() * 0.15);
-          }
+        if (normalizedR < 0.2) {
+          // Inner - purple/magenta transition from yellow center
+          color.setHSL(0.82 + Math.random() * 0.1, 0.5 + Math.random() * 0.3, 0.6 + Math.random() * 0.25);
+        } else if (normalizedR < 0.4) {
+          // Inner-middle - purple-blue
+          color.setHSL(0.72 + Math.random() * 0.1, 0.5 + Math.random() * 0.3, 0.6 + Math.random() * 0.25);
         } else {
-          // Outer disk - blue-purple dominant
+          // Middle to outer - BLUE dominant
           if (inCore) {
-            color.setHSL(0.6 + Math.random() * 0.1, 0.55 + Math.random() * 0.3, 0.7 + Math.random() * 0.25);
+            // Bright blue arm cores
+            color.setHSL(0.58 + Math.random() * 0.08, 0.6 + Math.random() * 0.3, 0.7 + Math.random() * 0.25);
           } else {
-            color.setHSL(0.58 + Math.random() * 0.15, 0.35 + Math.random() * 0.25, 0.55 + Math.random() * 0.2);
+            // Blue arm edges
+            color.setHSL(0.6 + Math.random() * 0.1, 0.45 + Math.random() * 0.25, 0.55 + Math.random() * 0.2);
           }
         }
       }
@@ -260,8 +251,8 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
       diskCol[i3 + 2] = color.b;
     }
     
-    // === ARM CORES (bright blue-white star forming regions with some pink) ===
-    const armCoreCount = 35000;
+    // === ARM CORES (BRIGHT BLUE star forming regions) ===
+    const armCoreCount = 45000;
     const armCorePos = new Float32Array(armCoreCount * 3);
     const armCoreCol = new Float32Array(armCoreCount * 3);
     
@@ -270,32 +261,20 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
       const armIdx = Math.floor(Math.random() * 4);
       const arm = MILKY_WAY.arms[armIdx];
       
-      const t = Math.pow(Math.random(), 0.5);
-      const minR = 8000;
-      const r = (minR + t * 38000) * gs;
-      const normalizedR = t;
+      const t = Math.pow(Math.random(), 0.45);
+      const minR = 7000;
+      const r = (minR + t * 42000) * gs;
       
       const winding = 0.22;
       const spiralAngle = arm.startAngle + Math.log(r / (6000 * gs) + 0.1) / winding;
-      
-      // Very tight to arm core
-      const spread = (Math.random() - 0.5) * 700 * gs;
+      const spread = (Math.random() - 0.5) * 800 * gs;
       
       armCorePos[i3] = Math.cos(spiralAngle + spread / r) * r;
-      armCorePos[i3 + 1] = (Math.random() - 0.5) * 70 * gs;
+      armCorePos[i3 + 1] = (Math.random() - 0.5) * 80 * gs;
       armCorePos[i3 + 2] = Math.sin(spiralAngle + spread / r) * r;
       
-      // Color based on position - inner pink, outer blue
-      if (normalizedR < 0.3) {
-        // Inner - bright pink/magenta
-        color.setHSL(0.88 + Math.random() * 0.1, 0.6 + Math.random() * 0.3, 0.8 + Math.random() * 0.15);
-      } else if (normalizedR < 0.6) {
-        // Middle - purple/violet
-        color.setHSL(0.72 + Math.random() * 0.12, 0.55 + Math.random() * 0.3, 0.75 + Math.random() * 0.2);
-      } else {
-        // Outer - bright blue
-        color.setHSL(0.58 + Math.random() * 0.08, 0.6 + Math.random() * 0.3, 0.8 + Math.random() * 0.15);
-      }
+      // BRIGHT BLUE arm cores
+      color.setHSL(0.58 + Math.random() * 0.08, 0.65 + Math.random() * 0.3, 0.75 + Math.random() * 0.2);
       armCoreCol[i3] = color.r;
       armCoreCol[i3 + 1] = color.g;
       armCoreCol[i3 + 2] = color.b;
@@ -376,47 +355,58 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
       nebulaCol[i3 + 2] = color.b;
     }
     
-    // === GAS CLOUDS (large diffuse clouds for smooth nebula effect) ===
-    const gasCloudCount = 100000;
+    // === GAS CLOUDS (MASSIVE diffuse clouds for smooth nebula effect - FILL GAPS) ===
+    const gasCloudCount = 150000;
     const gasCloudPos = new Float32Array(gasCloudCount * 3);
     const gasCloudCol = new Float32Array(gasCloudCount * 3);
     
     for (let i = 0; i < gasCloudCount; i++) {
       const i3 = i * 3;
-      const armIdx = Math.floor(Math.random() * 4);
-      const arm = MILKY_WAY.arms[armIdx];
       
-      const t = Math.pow(Math.random(), 0.35);
-      const r = (2000 + t * 52000) * gs;
+      // FILL THE ENTIRE DISK - not just arms
+      const t = Math.pow(Math.random(), 0.3);
+      const r = (2000 + t * 55000) * gs;
       const normalizedR = t;
       
-      const winding = 0.22;
-      const spiralAngle = arm.startAngle + Math.log(r / (6000 * gs) + 0.1) / winding;
+      // Random angle to fill gaps between arms
+      const randomAngle = Math.random() * Math.PI * 2;
       
-      // Very wide spread for smooth overlapping
-      const spread = (Math.random() - 0.5) * 4000 * gs;
-      const finalAngle = spiralAngle + spread / (r + 1);
+      // Some follow arms, some fill gaps
+      const followArm = Math.random() < 0.6;
+      let finalAngle;
+      
+      if (followArm) {
+        const armIdx = Math.floor(Math.random() * 4);
+        const arm = MILKY_WAY.arms[armIdx];
+        const winding = 0.22;
+        const spiralAngle = arm.startAngle + Math.log(r / (6000 * gs) + 0.1) / winding;
+        const spread = (Math.random() - 0.5) * 5000 * gs;
+        finalAngle = spiralAngle + spread / (r + 1);
+      } else {
+        // Fill the gaps - random distribution
+        finalAngle = randomAngle;
+      }
       
       gasCloudPos[i3] = Math.cos(finalAngle) * r;
-      gasCloudPos[i3 + 1] = (Math.random() - 0.5) * 250 * gs;
+      gasCloudPos[i3 + 1] = (Math.random() - 0.5) * 300 * gs;
       gasCloudPos[i3 + 2] = Math.sin(finalAngle) * r;
       
-      // Smooth gradient: warm pink core → purple → blue outer
-      if (normalizedR < 0.2) {
-        // Core - warm salmon/pink
-        color.setHSL(0.97 + Math.random() * 0.03, 0.55 + Math.random() * 0.25, 0.5 + Math.random() * 0.2);
-      } else if (normalizedR < 0.4) {
-        // Inner - pink/magenta
-        color.setHSL(0.9 + Math.random() * 0.08, 0.5 + Math.random() * 0.25, 0.45 + Math.random() * 0.2);
-      } else if (normalizedR < 0.6) {
-        // Middle - purple
-        color.setHSL(0.8 + Math.random() * 0.08, 0.45 + Math.random() * 0.25, 0.4 + Math.random() * 0.18);
-      } else if (normalizedR < 0.8) {
-        // Outer-middle - blue-purple
-        color.setHSL(0.7 + Math.random() * 0.08, 0.45 + Math.random() * 0.25, 0.38 + Math.random() * 0.18);
+      // YELLOW center → PURPLE middle → BLUE outer
+      if (normalizedR < 0.15) {
+        // Core - golden yellow
+        color.setHSL(0.12 + Math.random() * 0.04, 0.5 + Math.random() * 0.3, 0.5 + Math.random() * 0.25);
+      } else if (normalizedR < 0.3) {
+        // Inner - orange/salmon transition
+        color.setHSL(0.05 + Math.random() * 0.08, 0.45 + Math.random() * 0.25, 0.45 + Math.random() * 0.2);
+      } else if (normalizedR < 0.5) {
+        // Inner-middle - purple/magenta
+        color.setHSL(0.82 + Math.random() * 0.1, 0.45 + Math.random() * 0.25, 0.4 + Math.random() * 0.2);
+      } else if (normalizedR < 0.75) {
+        // Middle-outer - purple-blue
+        color.setHSL(0.7 + Math.random() * 0.1, 0.4 + Math.random() * 0.25, 0.38 + Math.random() * 0.18);
       } else {
-        // Outer - deep blue
-        color.setHSL(0.6 + Math.random() * 0.08, 0.4 + Math.random() * 0.25, 0.35 + Math.random() * 0.15);
+        // Outer - BLUE
+        color.setHSL(0.58 + Math.random() * 0.1, 0.4 + Math.random() * 0.3, 0.35 + Math.random() * 0.18);
       }
       gasCloudCol[i3] = color.r;
       gasCloudCol[i3 + 1] = color.g;
@@ -790,26 +780,26 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
       {/* Nebulae - large overlapping gas clouds for smooth appearance */}
       <points geometry={nebulaGeo}>
         <pointsMaterial
-          size={gs * 1200}
+          size={gs * 2000}
           map={cloudTexture}
           vertexColors
           sizeAttenuation
           transparent
-          opacity={0.7}
+          opacity={0.6}
           blending={THREE.AdditiveBlending}
           depthWrite={false}
         />
       </points>
       
-      {/* Gas clouds - very large diffuse clouds for smooth nebula effect */}
+      {/* Gas clouds - VERY large diffuse clouds for ultra smooth nebula effect */}
       <points geometry={gasCloudGeo}>
         <pointsMaterial
-          size={gs * 1800}
+          size={gs * 3000}
           map={cloudTexture}
           vertexColors
           sizeAttenuation
           transparent
-          opacity={0.5}
+          opacity={0.55}
           blending={THREE.AdditiveBlending}
           depthWrite={false}
         />
@@ -857,72 +847,82 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
         />
       </points>
       
-      {/* Core glow layers - bright white center with pink/purple halo - MUCH brighter */}
-      {/* Outer purple glow */}
+      {/* Core glow layers - YELLOW/GOLDEN center with purple transition */}
+      {/* Outer blue glow */}
       <mesh>
-        <sphereGeometry args={[MILKY_WAY.bulgeRadius * gs * 1.2, 32, 32]} />
+        <sphereGeometry args={[MILKY_WAY.bulgeRadius * gs * 1.5, 32, 32]} />
         <meshBasicMaterial
-          color="#6644aa"
+          color="#4466cc"
           transparent
-          opacity={0.1}
+          opacity={0.08}
+          blending={THREE.AdditiveBlending}
+        />
+      </mesh>
+      {/* Purple outer */}
+      <mesh>
+        <sphereGeometry args={[MILKY_WAY.bulgeRadius * gs * 1.1, 32, 32]} />
+        <meshBasicMaterial
+          color="#7755bb"
+          transparent
+          opacity={0.12}
           blending={THREE.AdditiveBlending}
         />
       </mesh>
       {/* Purple-pink transition */}
       <mesh>
-        <sphereGeometry args={[MILKY_WAY.bulgeRadius * gs * 0.9, 32, 32]} />
+        <sphereGeometry args={[MILKY_WAY.bulgeRadius * gs * 0.8, 32, 32]} />
         <meshBasicMaterial
-          color="#9966cc"
+          color="#aa6699"
           transparent
-          opacity={0.15}
+          opacity={0.18}
           blending={THREE.AdditiveBlending}
         />
       </mesh>
-      {/* Pink glow */}
+      {/* Pink/salmon ring */}
       <mesh>
-        <sphereGeometry args={[MILKY_WAY.bulgeRadius * gs * 0.6, 32, 32]} />
+        <sphereGeometry args={[MILKY_WAY.bulgeRadius * gs * 0.55, 32, 32]} />
         <meshBasicMaterial
-          color="#dd88bb"
+          color="#dd9977"
           transparent
-          opacity={0.2}
+          opacity={0.25}
           blending={THREE.AdditiveBlending}
         />
       </mesh>
-      {/* Light pink/salmon */}
+      {/* Orange/gold */}
       <mesh>
-        <sphereGeometry args={[MILKY_WAY.bulgeRadius * gs * 0.4, 32, 32]} />
+        <sphereGeometry args={[MILKY_WAY.bulgeRadius * gs * 0.35, 32, 32]} />
         <meshBasicMaterial
-          color="#ffaacc"
+          color="#ffaa44"
           transparent
-          opacity={0.3}
+          opacity={0.35}
           blending={THREE.AdditiveBlending}
         />
       </mesh>
-      {/* Warm cream inner */}
+      {/* BRIGHT YELLOW core */}
       <mesh>
-        <sphereGeometry args={[MILKY_WAY.bulgeRadius * gs * 0.25, 32, 32]} />
+        <sphereGeometry args={[MILKY_WAY.bulgeRadius * gs * 0.2, 32, 32]} />
         <meshBasicMaterial
-          color="#ffeedd"
+          color="#ffcc44"
           transparent
-          opacity={0.45}
+          opacity={0.55}
           blending={THREE.AdditiveBlending}
         />
       </mesh>
-      {/* Bright white core */}
+      {/* Brightest yellow center */}
       <mesh>
-        <sphereGeometry args={[MILKY_WAY.bulgeRadius * gs * 0.12, 32, 32]} />
+        <sphereGeometry args={[MILKY_WAY.bulgeRadius * gs * 0.1, 32, 32]} />
         <meshBasicMaterial
-          color="#ffffff"
+          color="#ffdd66"
           transparent
-          opacity={0.7}
+          opacity={0.8}
           blending={THREE.AdditiveBlending}
         />
       </mesh>
-      {/* Super bright center point */}
+      {/* White hot center point */}
       <mesh>
         <sphereGeometry args={[MILKY_WAY.bulgeRadius * gs * 0.04, 32, 32]} />
         <meshBasicMaterial
-          color="#ffffff"
+          color="#ffffee"
           transparent
           opacity={0.95}
           blending={THREE.AdditiveBlending}
