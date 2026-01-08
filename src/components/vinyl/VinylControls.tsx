@@ -160,8 +160,8 @@ export const VinylControls = ({
         </div>
       </div>
 
-      {/* Volume - Full Width */}
-      <div className="flex items-center gap-3 w-full">
+      {/* Volume - Full Width - extra padding top on mobile/tablet */}
+      <div className="flex items-center gap-3 w-full pt-4 lg:pt-0">
         <span className="text-xs text-muted-foreground flex-shrink-0">{t.vinylPlayer.volume}</span>
         <Slider
           value={[volume]}
