@@ -7,7 +7,7 @@ import { CosmosUI } from './ui/CosmosUI';
 
 export const CosmosExplorer = () => {
   return (
-    <div className="relative w-full h-full">
+    <div className="relative w-full h-full cursor-default" style={{ cursor: 'default' }}>
       <Canvas>
         <Suspense fallback={null}>
           <PerspectiveCamera makeDefault position={[0, 10000, 50000]} fov={60} near={1} far={1e15} />
