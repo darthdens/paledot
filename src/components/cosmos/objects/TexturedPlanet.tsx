@@ -187,6 +187,119 @@ const PLANET_VISUALS: Record<string, {
     metalness: 0,
     surfaceDetail: 'icy',
   },
+  // Mars moons
+  phobos: {
+    baseColor: '#8b7d6b',
+    secondaryColor: '#5a4d3d',
+    roughness: 0.95,
+    metalness: 0.05,
+    surfaceDetail: 'rocky',
+  },
+  deimos: {
+    baseColor: '#9e8b7d',
+    secondaryColor: '#6a5a4d',
+    roughness: 0.95,
+    metalness: 0.05,
+    surfaceDetail: 'rocky',
+  },
+  // Dwarf planet
+  ceres: {
+    baseColor: '#a0a0a0',
+    secondaryColor: '#707070',
+    roughness: 0.85,
+    metalness: 0.1,
+    surfaceDetail: 'rocky',
+  },
+  // Saturn moons
+  mimas: {
+    baseColor: '#e0e0e0',
+    secondaryColor: '#b0b0b0',
+    roughness: 0.7,
+    metalness: 0.15,
+    surfaceDetail: 'icy',
+  },
+  enceladus: {
+    baseColor: '#ffffff',
+    secondaryColor: '#e8e8e8',
+    roughness: 0.3,
+    metalness: 0.2,
+    surfaceDetail: 'icy',
+  },
+  tethys: {
+    baseColor: '#d8d8d8',
+    secondaryColor: '#a8a8a8',
+    roughness: 0.6,
+    metalness: 0.15,
+    surfaceDetail: 'icy',
+  },
+  dione: {
+    baseColor: '#c8c8c8',
+    secondaryColor: '#989898',
+    roughness: 0.65,
+    metalness: 0.1,
+    surfaceDetail: 'icy',
+  },
+  rhea: {
+    baseColor: '#d0d0d0',
+    secondaryColor: '#a0a0a0',
+    roughness: 0.7,
+    metalness: 0.1,
+    surfaceDetail: 'icy',
+  },
+  iapetus: {
+    baseColor: '#a08060',
+    secondaryColor: '#e0e0e0',
+    roughness: 0.8,
+    metalness: 0.05,
+    surfaceDetail: 'icy',
+  },
+  // Uranus moons
+  miranda: {
+    baseColor: '#c0c0c0',
+    secondaryColor: '#808080',
+    roughness: 0.75,
+    metalness: 0.1,
+    surfaceDetail: 'icy',
+  },
+  ariel: {
+    baseColor: '#d0d0d0',
+    secondaryColor: '#a0a0a0',
+    roughness: 0.6,
+    metalness: 0.15,
+    surfaceDetail: 'icy',
+  },
+  umbriel: {
+    baseColor: '#606060',
+    secondaryColor: '#404040',
+    roughness: 0.85,
+    metalness: 0.05,
+    surfaceDetail: 'rocky',
+  },
+  titania: {
+    baseColor: '#b8b8b8',
+    secondaryColor: '#888888',
+    roughness: 0.7,
+    metalness: 0.1,
+    surfaceDetail: 'icy',
+  },
+  oberon: {
+    baseColor: '#a0a0a0',
+    secondaryColor: '#707070',
+    roughness: 0.75,
+    metalness: 0.1,
+    surfaceDetail: 'icy',
+  },
+  // Neptune moon
+  triton: {
+    baseColor: '#d8c8b8',
+    secondaryColor: '#a89888',
+    roughness: 0.5,
+    metalness: 0.15,
+    hasAtmosphere: true,
+    atmosphereColor: '#f0e8e0',
+    atmosphereIntensity: 0.15,
+    surfaceDetail: 'icy',
+  },
 };
 
 export const TexturedPlanet = ({ 
