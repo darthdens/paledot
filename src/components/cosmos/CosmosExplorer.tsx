@@ -72,8 +72,8 @@ export const CosmosExplorer = () => {
     return () => observer.disconnect();
   }, []);
   
-  // Orbits visibility - controlled directly by user toggle
-  const shouldShowOrbits = showOrbits;
+  // Auto-hide orbits when zoomed in close (earth scale) - they're distracting up close
+  const shouldShowOrbits = showOrbits && currentScale !== 'earth';
   
   const planets = celestialObjects.filter(obj => 
     obj.type === 'planet' || obj.type === 'dwarf-planet'
