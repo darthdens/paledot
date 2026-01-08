@@ -41,8 +41,11 @@ export const Sun = ({ position = [0, 0, 0], visualScale = 80 }: SunProps) => {
     }
   });
 
-  // Use same visual scale as planets for consistency
-  const sunSize = SUN_DIAMETER * visualScale;
+  // Cap Sun size to prevent it from swallowing inner planets
+  // Real ratio: Sun is 109x Earth's diameter, but we cap it for visualization
+  // Mercury orbits at ~8.7M units with 0.15 distance scale, so Sun should be smaller than that
+  const maxSunSize = 5e6; // Cap at 5 million units radius
+  const sunSize = Math.min(SUN_DIAMETER * visualScale, maxSunSize);
 
   const sunObject = {
     id: 'sun',
