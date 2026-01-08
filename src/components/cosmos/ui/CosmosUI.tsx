@@ -432,7 +432,6 @@ export const CosmosUI = () => {
             />
             <div className="flex justify-between text-[10px] sm:text-xs text-white/50">
               <span>{t.paused}</span>
-              <span>1×</span>
               <span>10×</span>
             </div>
           </div>
