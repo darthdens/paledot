@@ -289,21 +289,30 @@ export const TexturedPlanet = ({
     }
 
     if (groupRef.current) {
+      // Calculate orbital angular velocity from real orbital period
+      // Scale: 1 Earth year (365.25 days) = 60 seconds at 1x speed
+      // angular velocity = 2π / (periodDays / 365.25 * 60) = 2π * 365.25 / (periodDays * 60)
+      const getOrbitalAngularVelocity = (periodDays: number) => {
+        return (2 * Math.PI * 365.25) / (periodDays * 60);
+      };
+      
       // Moons: orbit around their parent planet's world position
       if (isMoon && moonOrbitRadius > 0) {
         const parentPos = objectWorldPositions[object.parentId!];
         if (parentPos) {
-          const orbitSpeed = object.orbitSpeed || 0.0001;
-          const angle = time * orbitSpeed * 500;
+          const periodDays = object.orbitPeriodDays || 27.32; // Default to Moon's period
+          const orbitalVelocity = getOrbitalAngularVelocity(periodDays);
+          const angle = time * orbitalVelocity;
           groupRef.current.position.x = parentPos[0] + Math.cos(angle) * moonOrbitRadius;
           groupRef.current.position.y = parentPos[1];
           groupRef.current.position.z = parentPos[2] + Math.sin(angle) * moonOrbitRadius;
         }
       }
-      // Planets: orbit around the Sun (origin) with compressed distances
+      // Planets: orbit around the Sun (origin) with real Keplerian proportions
       else if (orbitRadius > 0 && !isMoon) {
-        const orbitSpeed = object.orbitSpeed || 0.00001;
-        const angle = time * orbitSpeed * 100;
+        const periodDays = object.orbitPeriodDays || 365.25; // Default to Earth's period
+        const orbitalVelocity = getOrbitalAngularVelocity(periodDays);
+        const angle = time * orbitalVelocity;
         groupRef.current.position.x = Math.cos(angle) * orbitRadius;
         groupRef.current.position.z = Math.sin(angle) * orbitRadius;
       }

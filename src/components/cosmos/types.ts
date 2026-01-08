@@ -20,7 +20,8 @@ export interface CelestialObject {
   };
   texture?: string;
   orbitRadius?: number;
-  orbitSpeed?: number;
+  orbitSpeed?: number;        // deprecated - use orbitPeriodDays
+  orbitPeriodDays?: number;   // real orbital period in Earth days
   rotationSpeed?: number;
   parentId?: string; // For moons - the id of the parent planet
   category: 'solarSystem' | 'stars' | 'nebulae' | 'galaxies' | 'deepSpace';
