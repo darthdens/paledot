@@ -139,6 +139,8 @@ export const TexturedPlanet = ({ object, showOrbit = true, visualScale = 500 }: 
   const setSelectedObject = useCosmosStore(state => state.setSelectedObject);
   const setHoveredObject = useCosmosStore(state => state.setHoveredObject);
   const setObjectWorldPosition = useCosmosStore(state => state.setObjectWorldPosition);
+  const objectWorldPositions = useCosmosStore(state => state.objectWorldPositions);
+  
   const visuals = PLANET_VISUALS[object.id] || {
     baseColor: object.color,
     roughness: 0.7,
@@ -148,6 +150,7 @@ export const TexturedPlanet = ({ object, showOrbit = true, visualScale = 500 }: 
   const planetSize = object.size * visualScale;
   const orbitRadius = object.orbitRadius || 0;
   const tiltRadians = ((visuals.tilt || 0) * Math.PI) / 180;
+  const isMoon = !!object.parentId;
 
   useFrame((state) => {
     const time = state.clock.getElapsedTime();
@@ -157,19 +160,32 @@ export const TexturedPlanet = ({ object, showOrbit = true, visualScale = 500 }: 
       planetRef.current.rotation.y += (object.rotationSpeed || 0.001) * 0.1;
     }
 
-    // Orbital motion around Sun (for planets)
-    if (groupRef.current && orbitRadius > 0 && !object.parentId) {
-      const orbitSpeed = object.orbitSpeed || 0.00001;
-      const angle = time * orbitSpeed * 100;
-      groupRef.current.position.x = Math.cos(angle) * orbitRadius;
-      groupRef.current.position.z = Math.sin(angle) * orbitRadius;
-    }
+    if (groupRef.current) {
+      // Moons: orbit around their parent planet's world position
+      if (isMoon && orbitRadius > 0) {
+        const parentPos = objectWorldPositions[object.parentId!];
+        if (parentPos) {
+          const orbitSpeed = object.orbitSpeed || 0.0001;
+          const angle = time * orbitSpeed * 500; // Faster for moons
+          groupRef.current.position.x = parentPos[0] + Math.cos(angle) * orbitRadius * visualScale;
+          groupRef.current.position.y = parentPos[1];
+          groupRef.current.position.z = parentPos[2] + Math.sin(angle) * orbitRadius * visualScale;
+        }
+      }
+      // Planets: orbit around the Sun (origin)
+      else if (orbitRadius > 0 && !isMoon) {
+        const orbitSpeed = object.orbitSpeed || 0.00001;
+        const angle = time * orbitSpeed * 100;
+        groupRef.current.position.x = Math.cos(angle) * orbitRadius;
+        groupRef.current.position.z = Math.sin(angle) * orbitRadius;
+      }
 
-    // Keep a live world-position for camera targeting (planets move)
-    if (groupRef.current && time - lastWorldPosUpdate.current > 0.05) {
-      lastWorldPosUpdate.current = time;
-      groupRef.current.getWorldPosition(worldPos.current);
-      setObjectWorldPosition(object.id, [worldPos.current.x, worldPos.current.y, worldPos.current.z]);
+      // Keep a live world-position for camera targeting (planets/moons move)
+      if (time - lastWorldPosUpdate.current > 0.03) {
+        lastWorldPosUpdate.current = time;
+        groupRef.current.getWorldPosition(worldPos.current);
+        setObjectWorldPosition(object.id, [worldPos.current.x, worldPos.current.y, worldPos.current.z]);
+      }
     }
     
     // Atmosphere pulse
@@ -179,9 +195,9 @@ export const TexturedPlanet = ({ object, showOrbit = true, visualScale = 500 }: 
     }
   });
 
-  // Create orbit line
+  // Create orbit line (only for planets orbiting sun, not moons)
   const orbitPoints = useMemo(() => {
-    if (!showOrbit || orbitRadius === 0 || object.parentId) return null;
+    if (!showOrbit || orbitRadius === 0 || isMoon) return null;
     const points = [];
     const segments = 128;
     for (let i = 0; i <= segments; i++) {
@@ -195,7 +211,7 @@ export const TexturedPlanet = ({ object, showOrbit = true, visualScale = 500 }: 
       );
     }
     return points;
-  }, [orbitRadius, showOrbit, object.parentId]);
+  }, [orbitRadius, showOrbit, isMoon]);
 
   const handleClick = (e: { stopPropagation: () => void }) => {
     e.stopPropagation();
@@ -213,6 +229,11 @@ export const TexturedPlanet = ({ object, showOrbit = true, visualScale = 500 }: 
     document.body.style.cursor = 'default';
   };
 
+  // Initial position: for moons, start at parent position + offset; for planets, use static position
+  const initialPosition: [number, number, number] = isMoon 
+    ? [object.position[0], object.position[1], object.position[2]]
+    : object.position;
+
   return (
     <>
       {/* Orbit line */}
@@ -229,7 +250,7 @@ export const TexturedPlanet = ({ object, showOrbit = true, visualScale = 500 }: 
       )}
 
       {/* Planet group */}
-      <group ref={groupRef} position={object.position}>
+      <group ref={groupRef} position={initialPosition}>
         <group rotation={[tiltRadians, 0, 0]}>
           {/* Main planet sphere */}
           <mesh 
