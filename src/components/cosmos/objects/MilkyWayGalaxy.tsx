@@ -273,17 +273,17 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
   useFrame(({ clock, camera }) => {
     const t = clock.getElapsedTime();
     
-    // Pulse animation
+    // Pulse animation - faster and more noticeable
     if (pulseRef.current) {
-      const phase = (t * 1.2) % 1;
-      pulseRef.current.scale.setScalar(1 + phase * 2);
-      (pulseRef.current.material as THREE.MeshBasicMaterial).opacity = (1 - phase) * 0.6;
+      const phase = (t * 2) % 1;
+      pulseRef.current.scale.setScalar(1 + phase * 4);
+      (pulseRef.current.material as THREE.MeshBasicMaterial).opacity = (1 - phase) * 0.8;
     }
     
     if (pulseRef2.current) {
-      const phase = ((t * 1.2) + 0.5) % 1;
-      pulseRef2.current.scale.setScalar(1 + phase * 2);
-      (pulseRef2.current.material as THREE.MeshBasicMaterial).opacity = (1 - phase) * 0.6;
+      const phase = ((t * 2) + 0.5) % 1;
+      pulseRef2.current.scale.setScalar(1 + phase * 4);
+      (pulseRef2.current.material as THREE.MeshBasicMaterial).opacity = (1 - phase) * 0.8;
     }
     
     // Scale marker group based on camera distance so it's always visible
@@ -291,13 +291,13 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
       const markerWorldPos = new THREE.Vector3();
       markerGroupRef.current.getWorldPosition(markerWorldPos);
       const distance = camera.position.distanceTo(markerWorldPos);
-      // Scale proportionally to distance - keeps consistent screen size
-      const scale = Math.max(1, distance * 0.015);
+      // Scale more aggressively to stay visible at extreme distances
+      const scale = Math.max(1, distance * 0.025);
       markerGroupRef.current.scale.setScalar(scale);
     }
   });
   
-  const baseMarkerSize = gs * 150;
+  const baseMarkerSize = gs * 300;
   
   return (
     <group ref={groupRef} position={galaxyOffset}>
@@ -417,42 +417,55 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
             Math.sin(MILKY_WAY.sunAngle) * MILKY_WAY.sunDistance * gs
           ]}
         >
-          {/* Core dot */}
+          {/* Core dot - bright green */}
           <mesh>
             <sphereGeometry args={[baseMarkerSize, 16, 16]} />
-            <meshBasicMaterial color="#00ff88" />
+            <meshBasicMaterial color="#00ff44" />
           </mesh>
           
-          {/* Soft glow */}
+          {/* Inner glow */}
           <mesh>
-            <sphereGeometry args={[baseMarkerSize * 2, 16, 16]} />
+            <sphereGeometry args={[baseMarkerSize * 1.5, 16, 16]} />
             <meshBasicMaterial
-              color="#00ff88"
+              color="#00ff44"
               transparent
-              opacity={0.25}
+              opacity={0.5}
+              blending={THREE.AdditiveBlending}
+            />
+          </mesh>
+          
+          {/* Outer glow */}
+          <mesh>
+            <sphereGeometry args={[baseMarkerSize * 3, 16, 16]} />
+            <meshBasicMaterial
+              color="#00ff44"
+              transparent
+              opacity={0.2}
               blending={THREE.AdditiveBlending}
             />
           </mesh>
           
           {/* Pulse ring 1 */}
           <mesh ref={pulseRef} rotation={[Math.PI / 2, 0, 0]}>
-            <ringGeometry args={[baseMarkerSize * 1.2, baseMarkerSize * 1.6, 32]} />
+            <ringGeometry args={[baseMarkerSize * 1.5, baseMarkerSize * 2.5, 32]} />
             <meshBasicMaterial
-              color="#00ff88"
+              color="#00ff44"
               transparent
-              opacity={0.6}
+              opacity={0.8}
               side={THREE.DoubleSide}
+              blending={THREE.AdditiveBlending}
             />
           </mesh>
           
           {/* Pulse ring 2 (offset) */}
           <mesh ref={pulseRef2} rotation={[Math.PI / 2, 0, 0]}>
-            <ringGeometry args={[baseMarkerSize * 1.2, baseMarkerSize * 1.6, 32]} />
+            <ringGeometry args={[baseMarkerSize * 1.5, baseMarkerSize * 2.5, 32]} />
             <meshBasicMaterial
-              color="#00ff88"
+              color="#00ff44"
               transparent
-              opacity={0.6}
+              opacity={0.8}
               side={THREE.DoubleSide}
+              blending={THREE.AdditiveBlending}
             />
           </mesh>
         </group>
