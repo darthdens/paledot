@@ -260,7 +260,6 @@ export const CosmosExplorer = () => {
       <QuickJumpMenu />
       <KeyboardShortcuts />
       <SizeComparison />
-      <ScaleBarUI />
       <YouAreHereLabel />
     </div>
   );
