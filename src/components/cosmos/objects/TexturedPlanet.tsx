@@ -35,269 +35,269 @@ const PLANET_VISUALS: Record<string, {
   surfaceDetail?: 'rocky' | 'gaseous' | 'icy' | 'volcanic';
 }> = {
   sun: {
-    baseColor: '#FDB813',
-    emissive: '#FF6600',
-    emissiveIntensity: 2,
+    baseColor: '#FFF5E0',
+    secondaryColor: '#FF8C00',
+    emissive: '#FF6B00',
+    emissiveIntensity: 2.5,
     roughness: 1,
     metalness: 0,
   },
   mercury: {
-    baseColor: '#9d8b7a',
-    secondaryColor: '#6b5d4f',
-    roughness: 0.95,
-    metalness: 0.15,
+    baseColor: '#8C8680',        // Gray-brown, heavily cratered
+    secondaryColor: '#5C5650',
+    roughness: 0.98,
+    metalness: 0.1,
     surfaceDetail: 'rocky',
   },
   venus: {
-    baseColor: '#e8c86e',
-    secondaryColor: '#c9a94f',
-    roughness: 0.6,
+    baseColor: '#E6C87A',        // Yellowish cloud cover
+    secondaryColor: '#D4A84A',
+    roughness: 0.4,
     metalness: 0,
     hasAtmosphere: true,
-    atmosphereColor: '#f5e0a0',
-    atmosphereIntensity: 0.7,
+    atmosphereColor: '#FFF0C0',
+    atmosphereIntensity: 0.9,
     hasClouds: true,
-    cloudColor: '#fffbe8',
+    cloudColor: '#F5E6C8',
   },
   earth: {
-    baseColor: '#6b93d6',
-    secondaryColor: '#4a7c59',
-    roughness: 0.4,
-    metalness: 0.1,
+    baseColor: '#4A7BA7',        // Ocean blue
+    secondaryColor: '#2D5016',   // Land green
+    roughness: 0.35,
+    metalness: 0.05,
     hasAtmosphere: true,
-    atmosphereColor: '#88c0ff',
+    atmosphereColor: '#87CEEB',
     atmosphereIntensity: 0.5,
     hasClouds: true,
-    cloudColor: '#ffffff',
+    cloudColor: '#FFFFFF',
     tilt: 23.4,
   },
   moon: {
-    baseColor: '#c8c8c8',
-    secondaryColor: '#8a8a8a',
-    roughness: 0.98,
+    baseColor: '#AEAEA8',        // Light gray highlands
+    secondaryColor: '#6B6B66',   // Dark maria
+    roughness: 0.99,
     metalness: 0,
     surfaceDetail: 'rocky',
   },
   mars: {
-    baseColor: '#c1440e',
-    secondaryColor: '#8b3a0e',
-    roughness: 0.85,
-    metalness: 0.1,
+    baseColor: '#C1440E',        // Rusty red-orange
+    secondaryColor: '#8B2500',   // Darker red canyons
+    roughness: 0.9,
+    metalness: 0.05,
     hasAtmosphere: true,
-    atmosphereColor: '#e8a87c',
-    atmosphereIntensity: 0.25,
+    atmosphereColor: '#FFB090',
+    atmosphereIntensity: 0.15,
     surfaceDetail: 'rocky',
   },
   jupiter: {
-    baseColor: '#d8ca9d',
-    secondaryColor: '#c4a574',
-    roughness: 0.5,
+    baseColor: '#D4B896',        // Tan-beige base
+    secondaryColor: '#A67C52',   // Brown bands
+    roughness: 0.6,
     metalness: 0,
     hasAtmosphere: true,
-    atmosphereColor: '#f0e6d2',
-    atmosphereIntensity: 0.4,
+    atmosphereColor: '#F5E6D3',
+    atmosphereIntensity: 0.3,
     surfaceDetail: 'gaseous',
   },
   io: {
-    baseColor: '#f5d742',
-    secondaryColor: '#e85d04',
-    roughness: 0.75,
-    metalness: 0.1,
+    baseColor: '#FFDE59',        // Bright yellow sulfur
+    secondaryColor: '#FF6B35',   // Orange-red volcanic
+    roughness: 0.7,
+    metalness: 0.05,
     surfaceDetail: 'volcanic',
   },
   europa: {
-    baseColor: '#d4cfc0',
-    secondaryColor: '#a89f90',
-    roughness: 0.4,
-    metalness: 0.25,
+    baseColor: '#E8E4DC',        // Bright icy white
+    secondaryColor: '#C4A882',   // Brown ice cracks
+    roughness: 0.25,
+    metalness: 0.3,
     surfaceDetail: 'icy',
   },
   ganymede: {
-    baseColor: '#a0a0a0',
-    secondaryColor: '#707070',
-    roughness: 0.8,
+    baseColor: '#A8A090',        // Gray-brown
+    secondaryColor: '#787068',   // Darker terrain
+    roughness: 0.85,
     metalness: 0.1,
     surfaceDetail: 'icy',
   },
   callisto: {
-    baseColor: '#5a5a5a',
-    secondaryColor: '#3a3a3a',
-    roughness: 0.92,
+    baseColor: '#4A4A48',        // Very dark gray
+    secondaryColor: '#2A2A28',   // Almost black craters
+    roughness: 0.95,
     metalness: 0.05,
     surfaceDetail: 'rocky',
   },
   saturn: {
-    baseColor: '#f4d59e',
-    secondaryColor: '#d4b87a',
-    roughness: 0.5,
+    baseColor: '#F4D7A8',        // Pale gold
+    secondaryColor: '#D4A86A',   // Darker gold bands
+    roughness: 0.55,
     metalness: 0,
     hasAtmosphere: true,
-    atmosphereColor: '#fff5e0',
+    atmosphereColor: '#FFF8E8',
     atmosphereIntensity: 0.35,
     hasRings: true,
-    ringColor: '#c9b896',
-    ringOpacity: 0.8,
-    ringInnerMult: 1.3,
-    ringOuterMult: 2.2,
+    ringColor: '#D4C4A8',
+    ringOpacity: 0.85,
+    ringInnerMult: 1.25,
+    ringOuterMult: 2.3,
     ringStyle: 0,
     tilt: 26.7,
     surfaceDetail: 'gaseous',
   },
   titan: {
-    baseColor: '#e8a43c',
-    secondaryColor: '#c07830',
-    roughness: 0.7,
+    baseColor: '#E8A050',        // Orange haze
+    secondaryColor: '#C07830',   // Darker orange
+    roughness: 0.5,
     metalness: 0,
     hasAtmosphere: true,
-    atmosphereColor: '#ffcc66',
-    atmosphereIntensity: 0.8,
+    atmosphereColor: '#FFB060',
+    atmosphereIntensity: 1.0,    // Very thick atmosphere
   },
   uranus: {
-    baseColor: '#b8e4e4',
-    secondaryColor: '#7ec8c8',
+    baseColor: '#A8E0E8',        // Pale cyan-blue
+    secondaryColor: '#80C8D0',   // Slightly darker cyan
     roughness: 0.5,
     metalness: 0.1,
     hasAtmosphere: true,
-    atmosphereColor: '#c8f0f0',
-    atmosphereIntensity: 0.4,
+    atmosphereColor: '#C8F0F8',
+    atmosphereIntensity: 0.35,
     hasRings: true,
-    // Uranus rings are narrow and dark, brightened for visibility
-    ringColor: '#5a6570',
-    ringOpacity: 0.7,
-    ringInnerMult: 1.4,
-    ringOuterMult: 2.1,
+    ringColor: '#4A5560',
+    ringOpacity: 0.5,
+    ringInnerMult: 1.5,
+    ringOuterMult: 2.0,
     ringStyle: 1,
     tilt: 97.8,
     surfaceDetail: 'gaseous',
   },
   neptune: {
-    baseColor: '#5b5ddf',
-    secondaryColor: '#3d3faf',
+    baseColor: '#4B70DD',        // Deep blue
+    secondaryColor: '#3050A0',   // Darker blue
     roughness: 0.5,
     metalness: 0.1,
     hasAtmosphere: true,
-    atmosphereColor: '#8888ff',
-    atmosphereIntensity: 0.5,
+    atmosphereColor: '#6688FF',
+    atmosphereIntensity: 0.45,
     surfaceDetail: 'gaseous',
   },
   pluto: {
-    baseColor: '#c4b49a',
-    secondaryColor: '#8a7a6a',
+    baseColor: '#E8D8C0',        // Pale tan/beige
+    secondaryColor: '#A89878',   // Darker brown patches
     roughness: 0.9,
     metalness: 0,
     surfaceDetail: 'icy',
   },
-  // Mars moons
+  // Mars moons - small, dark, irregular
   phobos: {
-    baseColor: '#8b7d6b',
-    secondaryColor: '#5a4d3d',
-    roughness: 0.95,
+    baseColor: '#605850',        // Dark brown-gray
+    secondaryColor: '#403830',
+    roughness: 0.98,
     metalness: 0.05,
     surfaceDetail: 'rocky',
   },
   deimos: {
-    baseColor: '#9e8b7d',
-    secondaryColor: '#6a5a4d',
-    roughness: 0.95,
+    baseColor: '#706860',        // Slightly lighter than Phobos
+    secondaryColor: '#504840',
+    roughness: 0.98,
     metalness: 0.05,
     surfaceDetail: 'rocky',
   },
   // Dwarf planet
   ceres: {
-    baseColor: '#a0a0a0',
-    secondaryColor: '#707070',
-    roughness: 0.85,
+    baseColor: '#909090',        // Medium gray
+    secondaryColor: '#606060',
+    roughness: 0.88,
     metalness: 0.1,
     surfaceDetail: 'rocky',
   },
   // Saturn moons
   mimas: {
-    baseColor: '#e0e0e0',
-    secondaryColor: '#b0b0b0',
-    roughness: 0.7,
+    baseColor: '#E0E0E0',        // Very bright ice
+    secondaryColor: '#B0B0B0',
+    roughness: 0.75,
     metalness: 0.15,
     surfaceDetail: 'icy',
   },
   enceladus: {
-    baseColor: '#ffffff',
-    secondaryColor: '#e8e8e8',
-    roughness: 0.3,
-    metalness: 0.2,
+    baseColor: '#FFFFFF',        // Brightest object in solar system
+    secondaryColor: '#F0F0F0',
+    roughness: 0.2,
+    metalness: 0.25,
     surfaceDetail: 'icy',
   },
   tethys: {
-    baseColor: '#d8d8d8',
-    secondaryColor: '#a8a8a8',
-    roughness: 0.6,
+    baseColor: '#D8D8D8',        // Bright icy
+    secondaryColor: '#A8A8A8',
+    roughness: 0.65,
     metalness: 0.15,
     surfaceDetail: 'icy',
   },
   dione: {
-    baseColor: '#c8c8c8',
-    secondaryColor: '#989898',
-    roughness: 0.65,
-    metalness: 0.1,
-    surfaceDetail: 'icy',
-  },
-  rhea: {
-    baseColor: '#d0d0d0',
-    secondaryColor: '#a0a0a0',
-    roughness: 0.7,
-    metalness: 0.1,
-    surfaceDetail: 'icy',
-  },
-  iapetus: {
-    baseColor: '#a08060',
-    secondaryColor: '#e0e0e0',
-    roughness: 0.8,
-    metalness: 0.05,
-    surfaceDetail: 'icy',
-  },
-  // Uranus moons
-  miranda: {
-    baseColor: '#c0c0c0',
-    secondaryColor: '#808080',
-    roughness: 0.75,
-    metalness: 0.1,
-    surfaceDetail: 'icy',
-  },
-  ariel: {
-    baseColor: '#d0d0d0',
-    secondaryColor: '#a0a0a0',
-    roughness: 0.6,
-    metalness: 0.15,
-    surfaceDetail: 'icy',
-  },
-  umbriel: {
-    baseColor: '#606060',
-    secondaryColor: '#404040',
-    roughness: 0.85,
-    metalness: 0.05,
-    surfaceDetail: 'rocky',
-  },
-  titania: {
-    baseColor: '#b8b8b8',
+    baseColor: '#C8C8C8',        // Icy with dark streaks
     secondaryColor: '#888888',
     roughness: 0.7,
     metalness: 0.1,
     surfaceDetail: 'icy',
   },
-  oberon: {
-    baseColor: '#a0a0a0',
-    secondaryColor: '#707070',
+  rhea: {
+    baseColor: '#D0D0D0',        // Heavily cratered ice
+    secondaryColor: '#909090',
+    roughness: 0.8,
+    metalness: 0.1,
+    surfaceDetail: 'icy',
+  },
+  iapetus: {
+    baseColor: '#E8E8E8',        // Bright trailing side
+    secondaryColor: '#302820',   // Dark leading side (dramatic two-tone!)
+    roughness: 0.85,
+    metalness: 0.05,
+    surfaceDetail: 'icy',
+  },
+  // Uranus moons
+  miranda: {
+    baseColor: '#B8B8B8',        // Gray, chaotic terrain
+    secondaryColor: '#686868',
+    roughness: 0.8,
+    metalness: 0.1,
+    surfaceDetail: 'icy',
+  },
+  ariel: {
+    baseColor: '#C8C8C8',        // Bright, youngest surface
+    secondaryColor: '#989898',
+    roughness: 0.55,
+    metalness: 0.15,
+    surfaceDetail: 'icy',
+  },
+  umbriel: {
+    baseColor: '#484848',        // Very dark
+    secondaryColor: '#282828',
+    roughness: 0.9,
+    metalness: 0.05,
+    surfaceDetail: 'rocky',
+  },
+  titania: {
+    baseColor: '#A8A8A8',        // Grayish
+    secondaryColor: '#787878',
     roughness: 0.75,
+    metalness: 0.1,
+    surfaceDetail: 'icy',
+  },
+  oberon: {
+    baseColor: '#909090',        // Dark gray with red tint
+    secondaryColor: '#605858',
+    roughness: 0.8,
     metalness: 0.1,
     surfaceDetail: 'icy',
   },
   // Neptune moon
   triton: {
-    baseColor: '#d8c8b8',
-    secondaryColor: '#a89888',
-    roughness: 0.5,
+    baseColor: '#E0D0C0',        // Pinkish-tan from nitrogen ice
+    secondaryColor: '#B0A090',
+    roughness: 0.45,
     metalness: 0.15,
     hasAtmosphere: true,
-    atmosphereColor: '#f0e8e0',
-    atmosphereIntensity: 0.15,
+    atmosphereColor: '#F8E8E0',
+    atmosphereIntensity: 0.1,
     surfaceDetail: 'icy',
   },
 };
@@ -785,21 +785,42 @@ export const TexturedPlanet = ({
                   float ambient = 0.012;
                   float diffuse = max(NdotL, 0.0) * 0.988 * totalShadow;
                   
-                  vec2 noiseCoord = vUv * 20.0;
+                  // Multi-scale noise for rich surface detail
+                  vec2 noiseCoord = vUv * 12.0;
                   float surfaceNoise = fbm(noiseCoord);
+                  float fineNoise = fbm(noiseCoord * 4.0);
+                  float microNoise = noise(noiseCoord * 25.0);
                   
                   vec3 surfaceColor;
                   if (surfaceType > 2.5) {
-                    float lava = smoothstep(0.5, 0.7, surfaceNoise);
-                    surfaceColor = mix(baseColor, secondaryColor, surfaceNoise * 0.6 + lava * 0.4);
+                    // Volcanic (Io) - bright sulfur with volcanic hot spots
+                    float lavaFlow = smoothstep(0.55, 0.75, surfaceNoise);
+                    float hotSpots = smoothstep(0.7, 0.85, fineNoise) * 0.8;
+                    vec3 lavaGlow = vec3(1.0, 0.3, 0.0) * hotSpots * 0.5;
+                    surfaceColor = mix(baseColor, secondaryColor, surfaceNoise * 0.5 + lavaFlow * 0.5);
+                    surfaceColor += lavaGlow;
                   } else if (surfaceType > 1.5) {
-                    float cracks = smoothstep(0.4, 0.5, surfaceNoise);
-                    surfaceColor = mix(baseColor, secondaryColor, cracks * 0.4);
+                    // Icy (Europa, Enceladus) - smooth with cracks and ridges
+                    float cracks = smoothstep(0.42, 0.48, fineNoise);
+                    float ridges = smoothstep(0.3, 0.35, abs(sin(vUv.x * 80.0 + surfaceNoise * 5.0)));
+                    float blend = cracks * 0.5 + ridges * 0.3 + microNoise * 0.1;
+                    surfaceColor = mix(baseColor, secondaryColor, blend);
                   } else if (surfaceType > 0.5) {
-                    float bands = sin(vUv.y * 30.0 + surfaceNoise * 3.0) * 0.5 + 0.5;
-                    surfaceColor = mix(baseColor, secondaryColor, bands * 0.5);
+                    // Gaseous (Jupiter, Saturn) - horizontal bands with turbulence
+                    float latitude = vUv.y;
+                    float mainBands = sin(latitude * 45.0) * 0.5 + 0.5;
+                    float fineBands = sin(latitude * 120.0 + surfaceNoise * 2.0) * 0.3 + 0.5;
+                    float turbulence = surfaceNoise * 0.3;
+                    float storm = smoothstep(0.75, 0.85, fineNoise) * 0.2;
+                    float bands = mainBands * 0.6 + fineBands * 0.3 + turbulence;
+                    surfaceColor = mix(baseColor, secondaryColor, clamp(bands + storm, 0.0, 1.0));
                   } else {
-                    surfaceColor = mix(baseColor, secondaryColor, surfaceNoise * 0.5);
+                    // Rocky (Mercury, Moon, Mars) - craters and terrain variation
+                    float craters = 1.0 - smoothstep(0.5, 0.6, surfaceNoise) * 0.4;
+                    float terrain = fineNoise * 0.3 + microNoise * 0.15;
+                    float highlands = smoothstep(0.55, 0.7, surfaceNoise) * 0.25;
+                    surfaceColor = mix(baseColor, secondaryColor, terrain + highlands);
+                    surfaceColor *= craters;
                   }
                   
                   vec3 litColor = surfaceColor * (ambient + diffuse);
