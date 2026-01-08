@@ -44,7 +44,7 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
     const color = new THREE.Color();
     
     // === CENTRAL BULGE (warm golden/orange core - spheroidal) ===
-    const bulgeCount = 25000;
+    const bulgeCount = 50000;
     const bulgePos = new Float32Array(bulgeCount * 3);
     const bulgeCol = new Float32Array(bulgeCount * 3);
     
@@ -75,7 +75,7 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
     }
     
     // === CENTRAL BAR (bright golden bar structure) ===
-    const barCount = 18000;
+    const barCount = 35000;
     const barPos = new Float32Array(barCount * 3);
     const barCol = new Float32Array(barCount * 3);
     const barAngle = 0.45; // Bar tilted ~25 degrees to line of sight
@@ -113,7 +113,7 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
     }
     
     // === SPIRAL ARMS (blue-white stars with structure) ===
-    const diskCount = 80000;
+    const diskCount = 150000;
     const diskPos = new Float32Array(diskCount * 3);
     const diskCol = new Float32Array(diskCount * 3);
     
@@ -165,7 +165,7 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
     }
     
     // === ARM CORES (bright blue-white star forming regions) ===
-    const armCoreCount = 15000;
+    const armCoreCount = 30000;
     const armCorePos = new Float32Array(armCoreCount * 3);
     const armCoreCol = new Float32Array(armCoreCount * 3);
     
@@ -196,7 +196,7 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
     }
     
     // === DUST LANES (dark bands on inner edge of arms) ===
-    const dustCount = 12000;
+    const dustCount = 25000;
     const dustPos = new Float32Array(dustCount * 3);
     const dustCol = new Float32Array(dustCount * 3);
     
@@ -227,7 +227,7 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
     }
     
     // === NEBULAE / HII REGIONS (pink/red emission in arms) ===
-    const nebulaCount = 5000;
+    const nebulaCount = 10000;
     const nebulaPos = new Float32Array(nebulaCount * 3);
     const nebulaCol = new Float32Array(nebulaCount * 3);
     
@@ -260,7 +260,7 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
     }
     
     // === STELLAR HALO (faint outer stars and globular clusters) ===
-    const haloCount = 5000;
+    const haloCount = 10000;
     const haloPos = new Float32Array(haloCount * 3);
     const haloCol = new Float32Array(haloCount * 3);
     
