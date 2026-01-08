@@ -535,18 +535,19 @@ export const CosmosUI = () => {
 
       {/* Top controls - icon buttons with tooltips */}
       <div
-        className={`${isFullscreen ? 'fixed' : 'absolute'} top-2 sm:top-4 right-2 sm:right-4 z-[10000]`}
+        className={`${isFullscreen ? 'fixed' : 'absolute'} top-4 right-4 z-[10000]`}
         style={
           isFullscreen
             ? {
-                top: 'calc(0.5rem + env(safe-area-inset-top))',
-                right: 'calc(0.5rem + env(safe-area-inset-right))',
+                top: 'calc(1rem + env(safe-area-inset-top))',
+                right: 'calc(1rem + env(safe-area-inset-right))',
               }
             : undefined
         }
       >
         <div className="bg-black/60 backdrop-blur-sm rounded-lg p-1.5 sm:p-2">
-          <div className="flex flex-wrap gap-1 sm:gap-1.5 justify-end max-w-[200px] sm:max-w-none">
+          <div className="flex items-center gap-1 sm:gap-1.5">
+            {/* Navigation group */}
             <Button size="icon" variant="ghost" onClick={toggleFullscreen} className="h-8 w-8 sm:h-9 sm:w-9 bg-white/10 hover:bg-white/20 text-white" title={isFullscreen ? t.exitFullscreen : t.fullscreen}>
               {isFullscreen ? <Minimize className="w-4 h-4 sm:w-5 sm:h-5" /> : <Maximize className="w-4 h-4 sm:w-5 sm:h-5" />}
             </Button>
@@ -556,6 +557,11 @@ export const CosmosUI = () => {
             <Button size="icon" variant="ghost" onClick={goHome} className="h-8 w-8 sm:h-9 sm:w-9 bg-white/10 hover:bg-white/20 text-white" title={t.home}>
               <Home className="w-4 h-4 sm:w-5 sm:h-5" />
             </Button>
+            
+            {/* Divider */}
+            <div className="w-px h-6 bg-white/20 mx-0.5" />
+            
+            {/* Display options group */}
             <Button size="icon" variant="ghost" onClick={toggleOrbits} className={`h-8 w-8 sm:h-9 sm:w-9 text-white ${showOrbits ? 'bg-white/25' : 'bg-white/10 hover:bg-white/20'}`} title={showOrbits ? t.hideOrbits : t.showOrbits}>
               {showOrbits ? <CircleDot className="w-4 h-4 sm:w-5 sm:h-5" /> : <CircleOff className="w-4 h-4 sm:w-5 sm:h-5" />}
             </Button>
@@ -565,6 +571,11 @@ export const CosmosUI = () => {
             <Button size="icon" variant="ghost" onClick={() => setShowTimeSlider(!showTimeSlider)} className={`h-8 w-8 sm:h-9 sm:w-9 text-white ${showTimeSlider ? 'bg-white/25' : 'bg-white/10 hover:bg-white/20'}`} title={t.timeSpeed}>
               <Clock className="w-4 h-4 sm:w-5 sm:h-5" />
             </Button>
+            
+            {/* Divider */}
+            <div className="w-px h-6 bg-white/20 mx-0.5" />
+            
+            {/* Advanced options group */}
             <Button size="icon" variant="ghost" onClick={toggleRealPeriods} className={`h-8 w-8 sm:h-9 sm:w-9 text-white ${showRealPeriods ? 'bg-white/25' : 'bg-white/10 hover:bg-white/20'}`} title={showRealPeriods ? t.hidePeriods : t.showPeriods}>
               {showRealPeriods ? <Timer className="w-4 h-4 sm:w-5 sm:h-5" /> : <TimerOff className="w-4 h-4 sm:w-5 sm:h-5" />}
             </Button>
@@ -577,6 +588,11 @@ export const CosmosUI = () => {
             <Button size="icon" variant="ghost" onClick={togglePerformanceHUD} className={`h-8 w-8 sm:h-9 sm:w-9 text-white ${showPerformanceHUD ? 'bg-green-500/40' : 'bg-white/10 hover:bg-white/20'}`} title={showPerformanceHUD ? t.hideStats : t.showStats}>
               <Activity className="w-4 h-4 sm:w-5 sm:h-5" />
             </Button>
+            
+            {/* Divider */}
+            <div className="w-px h-6 bg-white/20 mx-0.5" />
+            
+            {/* Help */}
             <Button size="icon" variant="ghost" onClick={() => setShowControlHints(true)} className="h-8 w-8 sm:h-9 sm:w-9 bg-blue-500/30 hover:bg-blue-500/50 text-white" title={t.help}>
               <HelpCircle className="w-4 h-4 sm:w-5 sm:h-5" />
             </Button>
