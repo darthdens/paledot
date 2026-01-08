@@ -198,7 +198,6 @@ export const TexturedPlanet = ({
   const setSelectedObject = useCosmosStore(state => state.setSelectedObject);
   const setHoveredObject = useCosmosStore(state => state.setHoveredObject);
   const setObjectWorldPosition = useCosmosStore(state => state.setObjectWorldPosition);
-  const objectWorldPositions = useCosmosStore(state => state.objectWorldPositions);
   const selectedObject = useCosmosStore(state => state.selectedObject);
   const timeSpeed = useCosmosStore(state => state.timeSpeed);
   const selectedObjectId = selectedObject?.id;
@@ -261,7 +260,7 @@ export const TexturedPlanet = ({
 
   useFrame((state, delta) => {
     const time = state.clock.getElapsedTime() * timeSpeed;
-    
+
     // Planet rotation with accurate real rotation speeds (delta in seconds)
     rotationAngle.current += rotationSpeed * delta * timeSpeed;
     if (planetRef.current) {
@@ -271,7 +270,7 @@ export const TexturedPlanet = ({
     // Update shader uniforms for proper lighting - pass the object's center world position
     if (groupRef.current) {
       groupRef.current.getWorldPosition(worldPos.current);
-      
+
       if (planetMaterialRef.current) {
         planetMaterialRef.current.uniforms.time.value = time;
         planetMaterialRef.current.uniforms.objectCenter.value.copy(worldPos.current);
@@ -295,10 +294,10 @@ export const TexturedPlanet = ({
       const getOrbitalAngularVelocity = (periodDays: number) => {
         return (2 * Math.PI * 365.25) / (periodDays * 60);
       };
-      
+
       // Moons: orbit around their parent planet's world position
       if (isMoon && moonOrbitRadius > 0) {
-        const parentPos = objectWorldPositions[object.parentId!];
+        const parentPos = useCosmosStore.getState().objectWorldPositions[object.parentId!];
         if (parentPos) {
           const periodDays = object.orbitPeriodDays || 27.32; // Default to Moon's period
           const orbitalVelocity = getOrbitalAngularVelocity(periodDays);
@@ -330,13 +329,13 @@ export const TexturedPlanet = ({
         setObjectWorldPosition(object.id, [worldPos.current.x, worldPos.current.y, worldPos.current.z]);
       }
     }
-    
+
     // Atmosphere pulse
     if (atmosphereRef.current) {
       const scale = 1 + Math.sin(time * 0.5) * 0.02;
       atmosphereRef.current.scale.setScalar(scale);
     }
-  });
+  }, -1);
 
   // Create orbit line (only for planets orbiting sun, not moons) with compressed distances
   const orbitPoints = useMemo(() => {
