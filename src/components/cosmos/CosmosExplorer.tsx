@@ -6,6 +6,7 @@ import { Sun } from './objects/Sun';
 import { TexturedPlanet } from './objects/TexturedPlanet';
 import { MoonOrbit } from './objects/MoonOrbit';
 import { OrbitalTrail } from './objects/OrbitalTrail';
+import { AsteroidBelt } from './objects/AsteroidBelt';
 import { CosmosUI } from './ui/CosmosUI';
 import { InfoCard } from './ui/InfoCard';
 import { QuickJumpMenu } from './ui/QuickJumpMenu';
@@ -115,6 +116,16 @@ export const CosmosExplorer = () => {
           
           {/* The Sun at center - same unified scale as planets */}
           <Sun position={[0, 0, 0]} visualScale={UNIFIED_SCALE} />
+          
+          {/* Asteroid Belt between Mars and Jupiter */}
+          {/* Mars orbit: ~228M km, Jupiter orbit: ~778M km */}
+          {/* Belt is mainly between 2.2-3.2 AU (329M-479M km) */}
+          <AsteroidBelt 
+            innerRadius={300000000 * UNIFIED_SCALE}  // ~300M km (2 AU)
+            outerRadius={500000000 * UNIFIED_SCALE}  // ~500M km (3.3 AU)
+            count={4000}
+            scale={UNIFIED_SCALE}
+          />
           
           {/* All planets - using unified scale for both size and distance */}
           {planets.map(planet => (
