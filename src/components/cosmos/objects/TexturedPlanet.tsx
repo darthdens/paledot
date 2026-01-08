@@ -476,15 +476,16 @@ export const TexturedPlanet = ({
                 
                 void main() {
                   vec3 worldNormal = normalize(vWorldNormal);
-                  // Sun is at origin - light direction from object center toward sun
+                  // Sun is at origin - light direction from object toward sun (origin)
                   vec3 lightDir = normalize(-objectCenter);
                   
                   // Calculate sun-facing illumination (realistic lighting)
-                  float NdotL = max(dot(worldNormal, lightDir), 0.0);
+                  float NdotL = dot(worldNormal, lightDir);
                   
-                  // Add subtle ambient to see dark side slightly
-                  float ambient = 0.08;
-                  float diffuse = NdotL * 0.92;
+                  // Very dark ambient for realistic space lighting (almost no light on dark side)
+                  float ambient = 0.015;
+                  // Only apply diffuse on sun-facing side
+                  float diffuse = max(NdotL, 0.0) * 0.985;
                   
                   // Generate surface variation based on type
                   vec2 noiseCoord = vUv * 20.0;
@@ -512,17 +513,16 @@ export const TexturedPlanet = ({
                   // Apply lighting
                   vec3 litColor = surfaceColor * (ambient + diffuse);
                   
-                  // Add rim lighting for atmosphere effect
-                  float rimLight = pow(1.0 - max(dot(worldNormal, lightDir), 0.0), 3.0);
-                  litColor += rimLight * 0.1 * surfaceColor;
-                  
                   // Add emissive (for Sun)
                   litColor += emissive * emissiveIntensity;
                   
-                  // Simple specular highlight
-                  vec3 halfDir = normalize(lightDir + lightDir);
-                  float spec = pow(max(dot(worldNormal, halfDir), 0.0), 32.0 / max(roughness, 0.1));
-                  litColor += spec * (1.0 - roughness) * 0.2 * NdotL;
+                  // Simple specular highlight - only on lit side
+                  if (NdotL > 0.0) {
+                    vec3 viewDir = normalize(cameraPosition - objectCenter);
+                    vec3 halfDir = normalize(lightDir + viewDir);
+                    float spec = pow(max(dot(worldNormal, halfDir), 0.0), 64.0 / max(roughness, 0.1));
+                    litColor += spec * (1.0 - roughness) * 0.3 * max(NdotL, 0.0);
+                  }
                   
                   gl_FragColor = vec4(litColor, 1.0);
                 }
@@ -597,11 +597,12 @@ export const TexturedPlanet = ({
                     float clouds = fbm(cloudCoord);
                     float cloudCoverage = smoothstep(0.35, 0.65, clouds);
                     
-                    float lighting = 0.1 + NdotL * 0.9;
+                    // Very minimal ambient for clouds on dark side
+                    float lighting = 0.02 + NdotL * 0.98;
                     vec3 litCloud = cloudColor * lighting;
                     
-                    // Clouds only visible on lit side
-                    gl_FragColor = vec4(litCloud, cloudCoverage * 0.5 * (0.2 + NdotL * 0.8));
+                    // Clouds fade to nearly invisible on dark side
+                    gl_FragColor = vec4(litCloud, cloudCoverage * 0.5 * NdotL);
                   }
                 `}
               />
@@ -641,11 +642,12 @@ export const TexturedPlanet = ({
                     vec3 lightDir = normalize(-objectCenter);
                     float NdotL = max(dot(worldNormal, lightDir), 0.0);
                     
-                    // Fresnel-like rim glow
-                    float rim = pow(0.7 - dot(worldNormal, vec3(0.0, 0.0, 1.0)), 2.0);
+                    // Fresnel-like rim glow based on view direction
+                    vec3 viewDir = normalize(cameraPosition - objectCenter);
+                    float rim = pow(1.0 - abs(dot(worldNormal, viewDir)), 2.5);
                     
-                    // Brighter on sun-facing side
-                    float sunGlow = 0.15 + NdotL * 0.85;
+                    // Atmosphere glow only visible on sun-facing side with smooth terminator
+                    float sunGlow = smoothstep(-0.1, 0.3, NdotL);
                     
                     gl_FragColor = vec4(glowColor, rim * intensity * sunGlow);
                   }
@@ -696,9 +698,14 @@ export const TexturedPlanet = ({
                   float hash(float n) { return fract(sin(n) * 43758.5453); }
                   
                   void main() {
-                    // Sun at origin - use object center for consistent lighting
-                    vec3 lightDir = normalize(-objectCenter);
-                    float NdotL = abs(dot(normalize(vWorldNormal), lightDir));
+                    // Sun at origin - direction from ring fragment to sun
+                    vec3 toSun = normalize(-vWorldPosition);
+                    vec3 ringNormal = normalize(vWorldNormal);
+                    
+                    // Calculate lighting based on which side of ring faces sun
+                    float NdotL = dot(ringNormal, toSun);
+                    // Rings are double-sided, use absolute but favor front-lit
+                    float lighting = 0.05 + max(abs(NdotL), 0.0) * 0.95;
                     
                     // Create ring bands
                     float dist = length(vWorldPosition.xz);
@@ -710,8 +717,6 @@ export const TexturedPlanet = ({
                     float gap = smoothstep(0.45, 0.5, normalizedDist) * (1.0 - smoothstep(0.5, 0.55, normalizedDist));
                     float ringOpacity = opacity * bands * (1.0 - gap * 0.8);
                     
-                    // Lighting - darker on shadow side
-                    float lighting = 0.2 + NdotL * 0.8;
                     vec3 litRing = ringColor * lighting;
                     
                     // Fade edges
