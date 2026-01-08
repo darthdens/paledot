@@ -8,7 +8,6 @@ const UNIFIED_SCALE = 0.001;
 export const CameraController = () => {
   const { camera, controls } = useThree();
   const selectedObject = useCosmosStore((state) => state.selectedObject);
-  const objectWorldPositions = useCosmosStore((state) => state.objectWorldPositions);
   const isFollowing = useCosmosStore((state) => state.isFollowing);
 
   const isAnimating = useRef(false);
@@ -111,9 +110,9 @@ export const CameraController = () => {
       const t = animationProgress.current;
       const eased = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
 
-      // Get current live position during animation
-      if (selectedObject && isFollowing) {
-        const livePos = objectWorldPositions[selectedObject.id];
+      // Get current live position during animation so camera tracks the moving object
+      if (selectedObject) {
+        const livePos = useCosmosStore.getState().objectWorldPositions[selectedObject.id];
         if (livePos) {
           endTarget.current.set(livePos[0], livePos[1], livePos[2]);
           endPosition.current.copy(endTarget.current).add(cameraOffset.current);
@@ -128,13 +127,22 @@ export const CameraController = () => {
 
     // After fly-to: continuously follow the selected object (keep it centered)
     if (selectedObject && isFollowing) {
-      const livePos = objectWorldPositions[selectedObject.id];
+      const livePos = useCosmosStore.getState().objectWorldPositions[selectedObject.id];
       if (livePos) {
         const targetVec = new THREE.Vector3(livePos[0], livePos[1], livePos[2]);
+        const currentTarget = orbitControls.target as THREE.Vector3;
 
-        // Smooth, frame-rate independent follow
-        const alpha = 1 - Math.exp(-delta * 10);
-        orbitControls.target.lerp(targetVec, alpha);
+        // Compute how far the target needs to move this frame
+        const delta3 = new THREE.Vector3().subVectors(targetVec, currentTarget);
+
+        // Frame-rate independent smoothing
+        const alpha = 1 - Math.exp(-delta * 12);
+        delta3.multiplyScalar(alpha);
+
+        // Move both target and camera by the same amount so the view stays locked
+        currentTarget.add(delta3);
+        camera.position.add(delta3);
+
         orbitControls.update();
       }
     }
