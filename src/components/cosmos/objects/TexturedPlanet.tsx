@@ -1,4 +1,4 @@
-import { useRef, useMemo } from 'react';
+import { useRef, useMemo, useEffect } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { CelestialObject } from '../types';
@@ -146,6 +146,14 @@ export const TexturedPlanet = ({
   const setHoveredObject = useCosmosStore(state => state.setHoveredObject);
   const setObjectWorldPosition = useCosmosStore(state => state.setObjectWorldPosition);
   const objectWorldPositions = useCosmosStore(state => state.objectWorldPositions);
+
+  // Ensure we have an initial world position early (helps camera fly-to be accurate immediately)
+  useEffect(() => {
+    if (!groupRef.current) return;
+    groupRef.current.getWorldPosition(worldPos.current);
+    setObjectWorldPosition(object.id, [worldPos.current.x, worldPos.current.y, worldPos.current.z]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [object.id, setObjectWorldPosition]);
   
   const visuals = PLANET_VISUALS[object.id] || {
     baseColor: object.color,
