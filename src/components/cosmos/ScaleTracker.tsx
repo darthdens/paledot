@@ -1,4 +1,5 @@
 import { useFrame, useThree } from '@react-three/fiber';
+import * as THREE from 'three';
 import { useCosmosStore } from './store/useCosmosStore';
 import { useRef } from 'react';
 
@@ -14,11 +15,28 @@ export const ScaleTracker = () => {
     const now = Date.now();
     if (now - lastUpdate.current < 100) return;
     lastUpdate.current = now;
-    
+
+    const cam = camera as unknown as THREE.PerspectiveCamera;
+
     // Convert camera distance from scene units back to km
-    const distanceKm = camera.position.length() / UNIFIED_SCALE;
+    const distanceScene = cam.position.length();
+    const distanceKm = distanceScene / UNIFIED_SCALE;
     setCameraDistance(distanceKm);
-    
+
+    // Keep far/near planes adaptive so solar-system structures (e.g. Oort Cloud)
+    // don't get clipped when zooming way out.
+    const desiredFar = Math.max(1e12, distanceScene * 100);
+    const desiredNear = Math.max(0.1, distanceScene / 1e7);
+
+    const farChanged = Math.abs(cam.far - desiredFar) / Math.max(cam.far, 1) > 0.25;
+    const nearChanged = Math.abs(cam.near - desiredNear) / Math.max(cam.near, 1) > 0.25;
+
+    if (farChanged || nearChanged) {
+      cam.far = desiredFar;
+      cam.near = Math.min(desiredNear, desiredFar / 1000);
+      cam.updateProjectionMatrix();
+    }
+
     // Also store for ScaleBar UI
     (window as any).__cosmosScaleDistance = distanceKm;
   });
