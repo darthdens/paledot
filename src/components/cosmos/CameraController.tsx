@@ -30,6 +30,11 @@ export const CameraController = () => {
     const orbitControls = controls as any;
     if (!orbitControls.target) return;
 
+    // If we don't yet have a live world position for solar-system bodies (especially moons),
+    // wait for the next position update so we don't fly to an incorrect static coordinate.
+    const livePos = objectWorldPositions[selectedObject.id];
+    if (selectedObject.category === 'solarSystem' && !livePos) return;
+
     // Skip if we already triggered for this object
     if (animationTriggerId.current === selectedObject.id && isAnimating.current) return;
     animationTriggerId.current = selectedObject.id;
@@ -46,8 +51,7 @@ export const CameraController = () => {
     const visualSize = selectedObject.size * UNIFIED_SCALE;
     flyToDistance.current = Math.max(visualSize * 5, 50);
 
-    // Get live world position or fallback to scaled static position
-    const livePos = objectWorldPositions[selectedObject.id];
+    // Use live world position (guaranteed above for solarSystem)
     const fallbackPos: [number, number, number] =
       selectedObject.category === 'solarSystem'
         ? [
@@ -56,18 +60,19 @@ export const CameraController = () => {
             selectedObject.position[2] * UNIFIED_SCALE,
           ]
         : selectedObject.position;
+
     const targetPos: [number, number, number] = livePos ?? fallbackPos;
 
     // Set target to object center
     endTarget.current.set(targetPos[0], targetPos[1], targetPos[2]);
-    
+
     // Calculate camera position - offset from target
     cameraOffset.current.set(
       flyToDistance.current * 0.5,
       flyToDistance.current * 0.3,
       flyToDistance.current
     );
-    
+
     endPosition.current.copy(endTarget.current).add(cameraOffset.current);
   }, [selectedObject, camera, controls, objectWorldPositions]);
 
