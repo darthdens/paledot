@@ -47,14 +47,18 @@ export const CosmosUI = () => {
     containerEl.style.inset = '0';
     containerEl.style.zIndex = '9999';
     containerEl.style.width = '100vw';
+    // iOS Safari support: prefer 100vh fallback, then 100dvh when available
+    containerEl.style.height = '100vh';
     containerEl.style.height = '100dvh';
     containerEl.style.borderRadius = '0px';
     containerEl.style.border = '0px';
     containerEl.style.maxWidth = 'none';
+    containerEl.style.backgroundColor = '#000';
 
     // Prevent page scroll behind the fullscreen canvas
     document.documentElement.style.overflow = 'hidden';
     document.body.style.overflow = 'hidden';
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' as ScrollBehavior });
   }, []);
 
   const clearFullscreenOverrides = useCallback((containerEl: HTMLElement) => {
@@ -231,7 +235,7 @@ export const CosmosUI = () => {
 
       {/* Top controls - compact on mobile */}
       <div
-        className="absolute top-2 sm:top-4 right-2 sm:right-4 flex gap-1 sm:gap-2 z-[10000]"
+        className={`${isFullscreen ? 'fixed' : 'absolute'} top-2 sm:top-4 right-2 sm:right-4 flex gap-1 sm:gap-2 z-[10000]`}
         style={
           isFullscreen
             ? {
