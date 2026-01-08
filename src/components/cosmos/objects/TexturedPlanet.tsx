@@ -196,6 +196,8 @@ export const TexturedPlanet = ({
   const parentPos = useRef(new THREE.Vector3());
   const lastWorldPosUpdate = useRef(0);
   const rotationAngle = useRef(0);
+  const simTime = useRef(0);
+  const simTimeInitialized = useRef(false);
   
   const setSelectedObject = useCosmosStore(state => state.setSelectedObject);
   const setHoveredObject = useCosmosStore(state => state.setHoveredObject);
@@ -274,7 +276,13 @@ export const TexturedPlanet = ({
 
 
   useFrame((state, delta) => {
-    const time = state.clock.getElapsedTime() * timeSpeed;
+    // Use an accumulated simulation time so changing timeSpeed doesn't "jump" positions/lighting.
+    if (!simTimeInitialized.current) {
+      simTime.current = state.clock.getElapsedTime();
+      simTimeInitialized.current = true;
+    }
+    simTime.current += delta * timeSpeed;
+    const time = simTime.current;
 
     // Planet rotation with accurate real rotation speeds (delta in seconds)
     rotationAngle.current += rotationSpeed * delta * timeSpeed;
