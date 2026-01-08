@@ -13,10 +13,10 @@ export const Tonearm = ({ position, isPoweredOn, onPositionChange }: TonearmProp
   const dragStartRef = useRef({ x: 0, y: 0, rotation: 0 });
 
 
-  // Target rotations: rest = 0deg, playing = -38deg (swings toward the record)
+  // Target rotations: rest = 0deg, playing = -32deg (swings toward the record)
   const REST_ROTATION = 0;
-  const PLAYING_ROTATION = -38;
-  const THRESHOLD = -20; // If rotation < -20, consider it "playing"
+  const PLAYING_ROTATION = -32;
+  const THRESHOLD = -16; // If rotation < -16, consider it "playing"
 
   const currentRotation = isDragging && dragRotation !== null 
     ? dragRotation 

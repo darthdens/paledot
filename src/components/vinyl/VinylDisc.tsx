@@ -150,6 +150,7 @@ export const VinylDisc = ({
     const disc = discRef.current;
     if (disc && isSpinning) {
       disc.style.animation = `vinyl-spin ${rotationDuration} linear infinite`;
+      disc.style.animationPlayState = "running";
     }
   }, [isSpinning, rotationDuration]);
 
@@ -158,15 +159,10 @@ export const VinylDisc = ({
     const disc = discRef.current;
     if (!disc || isDraggingRef.current) return;
 
-    if (isSpinning) {
-      disc.style.animation = `vinyl-spin ${rotationDuration} linear infinite`;
-    } else {
-      // Get current rotation and hold it
-      const computedStyle = window.getComputedStyle(disc);
-      const transform = computedStyle.transform;
-      disc.style.animation = "none";
-      disc.style.transform = transform;
-    }
+    // Keep the same animation and simply pause/resume it.
+    // This prevents any direction flip / snap when pressing play.
+    disc.style.animation = `vinyl-spin ${rotationDuration} linear infinite`;
+    disc.style.animationPlayState = isSpinning ? "running" : "paused";
   }, [isSpinning, rotationDuration]);
 
   if (!record) {
