@@ -878,56 +878,53 @@ export const TexturedPlanet = ({
                   void main() {
                     // Sun is at origin - light direction from fragment toward sun (same as planets)
                     vec3 sunDir = normalize(-vWorldPosition);
+
+                    // IMPORTANT: with DoubleSide, we must flip normals for the back face
+                    // so that lighting behaves like standard materials (planets/moons).
                     vec3 ringNormal = normalize(vWorldNormal);
-                    
-                    // Calculate sun-facing illumination
-                    // Rings are thin particles that scatter light, so we use a modified lighting model
-                    float NdotL = dot(ringNormal, sunDir);
-                    
-                    // Calculate shadow from parent planet
+                    vec3 faceNormal = gl_FrontFacing ? ringNormal : -ringNormal;
+
+                    // Planet shadow on rings
                     float shadow = calculatePlanetShadow(vWorldPosition, sunDir);
-                    
-                    // Ring lighting model:
-                    // - Ambient: very dark (same as planets) = 0.012
-                    // - Diffuse: rings scatter light from both sides, but front side is brighter
-                    // - The ring normal points up/down, so abs(NdotL) gives how "face-on" to sun
-                    // - But rings also have forward scattering, so they're visible even edge-on
-                    float ambient = 0.012;
-                    float faceLighting = abs(NdotL); // How perpendicular ring is to sun
-                    
-                    // Forward scattering effect - rings glow when backlit by sun
+
+                    // Lighting model aligned with planets/moons:
+                    // - Strongly lit on sun-facing side
+                    // - Dimmer on the back side, but still slightly visible due to particle scattering
+                    float NdotL = dot(faceNormal, sunDir);
+                    float frontDiffuse = max(NdotL, 0.0);
+                    float backScatter = max(-NdotL, 0.0) * 0.25;
+
+                    // Forward scattering: brighter when sun is behind the rings relative to the camera
                     vec3 viewDir = normalize(cameraPosition - vWorldPosition);
-                    float forwardScatter = pow(max(dot(-viewDir, sunDir), 0.0), 3.0) * 0.4;
-                    
-                    // Combine lighting components, apply shadow
-                    float diffuse = (faceLighting * 0.6 + 0.3 + forwardScatter) * shadow;
+                    float forwardScatter = pow(max(dot(-viewDir, sunDir), 0.0), 3.0) * 0.35;
+
+                    float ambient = 0.012;
+                    float diffuse = (frontDiffuse * 0.85 + backScatter + 0.12 + forwardScatter) * shadow;
                     float totalLight = ambient + diffuse * 0.988;
-                    
+
                     // Use local position for distance calculation (ring is in XY plane locally)
                     float dist = length(vLocalPosition.xy);
                     float normalizedDist = (dist - innerRadius) / (outerRadius - innerRadius);
-                    
+
                     // Create ring bands with varying density
                     float bands = sin(normalizedDist * 60.0) * 0.5 + 0.5;
                     bands = mix(0.6, 1.0, bands);
-                    
+
                     // Add Cassini division-like gap
                     float gap = smoothstep(0.45, 0.5, normalizedDist) * (1.0 - smoothstep(0.5, 0.55, normalizedDist));
                     float ringDensity = bands * (1.0 - gap * 0.8);
-                    
+
                     // Ring opacity varies with density
                     float ringOpacity = opacity * ringDensity;
-                    
-                    // Apply lighting to color
-                    vec3 litRing = ringColor * totalLight;
-                    
+
                     // Fade edges smoothly
                     float edgeFade = smoothstep(0.0, 0.1, normalizedDist) * smoothstep(1.0, 0.9, normalizedDist);
-                    
-                    // In shadow, rings should be nearly invisible (same ambient as planets)
-                    float shadowedOpacity = ringOpacity * edgeFade * (ambient + shadow * 0.988);
-                    
-                    gl_FragColor = vec4(litRing, ringOpacity * edgeFade);
+
+                    // In full planet shadow, rings should be much dimmer + less visible
+                    float visibilityInShadow = mix(0.18, 1.0, shadow);
+
+                    vec3 litRing = ringColor * totalLight;
+                    gl_FragColor = vec4(litRing, ringOpacity * edgeFade * visibilityInShadow);
                   }
                 `}
               />
