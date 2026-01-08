@@ -1,16 +1,26 @@
 import { useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
+import { useCosmosStore } from '../store/useCosmosStore';
 
 interface SunProps {
   position?: [number, number, number];
-  scale?: number;
+  visualScale?: number;
 }
 
-export const Sun = ({ position = [0, 0, 0], scale = 1 }: SunProps) => {
+// Sun's real diameter is 1,392,700 km
+const SUN_DIAMETER = 1392700;
+
+export const Sun = ({ position = [0, 0, 0], visualScale = 80 }: SunProps) => {
   const sunRef = useRef<THREE.Mesh>(null);
   const coronaRef = useRef<THREE.Mesh>(null);
   const glowRef = useRef<THREE.Mesh>(null);
+  const groupRef = useRef<THREE.Group>(null);
+  const worldPos = useRef(new THREE.Vector3());
+  
+  const setSelectedObject = useCosmosStore(state => state.setSelectedObject);
+  const setHoveredObject = useCosmosStore(state => state.setHoveredObject);
+  const setObjectWorldPosition = useCosmosStore(state => state.setObjectWorldPosition);
 
   useFrame((state) => {
     const time = state.clock.getElapsedTime();
@@ -23,14 +33,58 @@ export const Sun = ({ position = [0, 0, 0], scale = 1 }: SunProps) => {
     if (glowRef.current) {
       glowRef.current.scale.setScalar(1 + Math.sin(time * 0.5) * 0.05);
     }
+    
+    // Update world position for camera targeting
+    if (groupRef.current) {
+      groupRef.current.getWorldPosition(worldPos.current);
+      setObjectWorldPosition('sun', [worldPos.current.x, worldPos.current.y, worldPos.current.z]);
+    }
   });
 
-  const sunSize = 696340 * scale;
+  // Use same visual scale as planets for consistency
+  const sunSize = SUN_DIAMETER * visualScale;
+
+  const sunObject = {
+    id: 'sun',
+    name: { en: 'Sun', fr: 'Soleil' },
+    type: 'star' as const,
+    position: position as [number, number, number],
+    size: SUN_DIAMETER,
+    color: '#FDB813',
+    distanceFromEarth: 149597870.7,
+    distanceUnit: 'AU' as const,
+    category: 'solarSystem' as const,
+    facts: {
+      en: ['G-type main-sequence star', 'Contains 99.86% of solar system mass', 'Surface temperature: 5,500°C'],
+      fr: ['Étoile naine jaune de type G', 'Contient 99,86% de la masse du système solaire', 'Température de surface: 5 500°C'],
+    },
+  };
+
+  const handleClick = (e: { stopPropagation: () => void }) => {
+    e.stopPropagation();
+    setSelectedObject(sunObject);
+  };
+
+  const handlePointerOver = (e: { stopPropagation: () => void }) => {
+    e.stopPropagation();
+    setHoveredObject(sunObject);
+    document.body.style.cursor = 'pointer';
+  };
+
+  const handlePointerOut = () => {
+    setHoveredObject(null);
+    document.body.style.cursor = 'default';
+  };
 
   return (
-    <group position={position}>
+    <group ref={groupRef} position={position}>
       {/* Sun core */}
-      <mesh ref={sunRef}>
+      <mesh 
+        ref={sunRef}
+        onClick={handleClick}
+        onPointerOver={handlePointerOver}
+        onPointerOut={handlePointerOut}
+      >
         <sphereGeometry args={[sunSize, 64, 64]} />
         <meshBasicMaterial color="#FDB813" />
       </mesh>
