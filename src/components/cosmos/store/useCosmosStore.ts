@@ -28,6 +28,7 @@ interface CosmosStore {
   showControlHints: boolean;
   showQuickJump: boolean;
   showSizeComparison: boolean;
+  showOrbits: boolean;
   recentJumps: string[];
 
   // Audio
@@ -96,8 +97,9 @@ export const useCosmosStore = create<CosmosStore>()(
       showControlHints: true,
       showQuickJump: false,
       showSizeComparison: false,
+      showOrbits: true,
       recentJumps: [],
-      
+
       isMuted: false,
       volume: 0.5,
       
