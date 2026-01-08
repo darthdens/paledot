@@ -553,12 +553,10 @@ export const TexturedPlanet = ({
   const handlePointerOver = (e: { stopPropagation: () => void }) => {
     e.stopPropagation();
     setHoveredObject(object);
-    document.body.style.cursor = 'pointer';
   };
 
   const handlePointerOut = () => {
     setHoveredObject(null);
-    document.body.style.cursor = 'default';
   };
 
   // Initial position with distance compression

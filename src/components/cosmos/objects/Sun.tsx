@@ -68,12 +68,10 @@ export const Sun = ({ position = [0, 0, 0], visualScale = 80 }: SunProps) => {
   const handlePointerOver = (e: { stopPropagation: () => void }) => {
     e.stopPropagation();
     setHoveredObject(sunObject);
-    document.body.style.cursor = 'pointer';
   };
 
   const handlePointerOut = () => {
     setHoveredObject(null);
-    document.body.style.cursor = 'default';
   };
 
   return (
