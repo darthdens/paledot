@@ -469,7 +469,7 @@ export const CosmosUI = () => {
               <Button 
                 size="sm" 
                 variant="outline" 
-                onClick={() => setShowControlHints(false)} 
+                onClick={() => { setShowControlHints(false); goHome(); }} 
                 className="text-xs sm:text-sm bg-transparent border-white/30 text-white hover:bg-white/10 hover:text-white"
               >
                 {t.explore}
