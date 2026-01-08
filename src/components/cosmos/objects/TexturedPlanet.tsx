@@ -200,6 +200,7 @@ export const TexturedPlanet = ({
   const setObjectWorldPosition = useCosmosStore(state => state.setObjectWorldPosition);
   const objectWorldPositions = useCosmosStore(state => state.objectWorldPositions);
   const selectedObject = useCosmosStore(state => state.selectedObject);
+  const timeSpeed = useCosmosStore(state => state.timeSpeed);
   const selectedObjectId = selectedObject?.id;
   const selectedParentId = selectedObject?.type === 'moon' ? selectedObject.parentId : null;
 
@@ -257,21 +258,33 @@ export const TexturedPlanet = ({
   const rotationSpeed = getRotationSpeed();
 
 
-  useFrame((state) => {
-    const time = state.clock.getElapsedTime();
+  useFrame((state, delta) => {
+    const time = state.clock.getElapsedTime() * timeSpeed;
     
     // Planet rotation with real rotation speeds
-    rotationAngle.current += rotationSpeed;
+    rotationAngle.current += rotationSpeed * timeSpeed;
     if (planetRef.current) {
       planetRef.current.rotation.y = rotationAngle.current;
     }
 
-    // Update shader uniforms for proper lighting
-    if (planetMaterialRef.current) {
-      planetMaterialRef.current.uniforms.time.value = time;
-    }
-    if (cloudMaterialRef.current) {
-      cloudMaterialRef.current.uniforms.time.value = time;
+    // Update shader uniforms for proper lighting - pass the object's center world position
+    if (groupRef.current) {
+      groupRef.current.getWorldPosition(worldPos.current);
+      
+      if (planetMaterialRef.current) {
+        planetMaterialRef.current.uniforms.time.value = time;
+        planetMaterialRef.current.uniforms.objectCenter.value.copy(worldPos.current);
+      }
+      if (cloudMaterialRef.current) {
+        cloudMaterialRef.current.uniforms.time.value = time;
+        cloudMaterialRef.current.uniforms.objectCenter.value.copy(worldPos.current);
+      }
+      if (atmosphereMaterialRef.current) {
+        atmosphereMaterialRef.current.uniforms.objectCenter.value.copy(worldPos.current);
+      }
+      if (ringMaterialRef.current) {
+        ringMaterialRef.current.uniforms.objectCenter.value.copy(worldPos.current);
+      }
     }
 
     if (groupRef.current) {
@@ -391,18 +404,20 @@ export const TexturedPlanet = ({
                 emissiveIntensity: { value: visuals.emissiveIntensity || 0 },
                 time: { value: 0 },
                 surfaceType: { value: visuals.surfaceDetail === 'gaseous' ? 1.0 : visuals.surfaceDetail === 'icy' ? 2.0 : visuals.surfaceDetail === 'volcanic' ? 3.0 : 0.0 },
+                objectCenter: { value: new THREE.Vector3(0, 0, 0) },
               }}
               vertexShader={`
                 varying vec3 vNormal;
-                varying vec3 vWorldPosition;
+                varying vec3 vPosition;
                 varying vec2 vUv;
+                varying vec3 vWorldNormal;
                 
                 void main() {
                   vUv = uv;
-                  vNormal = normalize(normalMatrix * normal);
-                  vec4 worldPos = modelMatrix * vec4(position, 1.0);
-                  vWorldPosition = worldPos.xyz;
-                  gl_Position = projectionMatrix * viewMatrix * worldPos;
+                  vPosition = position;
+                  vNormal = normal;
+                  vWorldNormal = normalize((modelMatrix * vec4(normal, 0.0)).xyz);
+                  gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
                 }
               `}
               fragmentShader={`
@@ -414,10 +429,12 @@ export const TexturedPlanet = ({
                 uniform float emissiveIntensity;
                 uniform float time;
                 uniform float surfaceType;
+                uniform vec3 objectCenter;
                 
                 varying vec3 vNormal;
-                varying vec3 vWorldPosition;
+                varying vec3 vPosition;
                 varying vec2 vUv;
+                varying vec3 vWorldNormal;
                 
                 // Simple noise function for surface detail
                 float hash(vec2 p) {
@@ -449,12 +466,12 @@ export const TexturedPlanet = ({
                 }
                 
                 void main() {
-                  vec3 normal = normalize(vNormal);
-                  // Sun is always at origin (0,0,0) - light direction points from planet toward sun
-                  vec3 lightDir = normalize(-vWorldPosition);
+                  vec3 worldNormal = normalize(vWorldNormal);
+                  // Sun is at origin - light direction from object center toward sun
+                  vec3 lightDir = normalize(-objectCenter);
                   
                   // Calculate sun-facing illumination (realistic lighting)
-                  float NdotL = max(dot(normal, lightDir), 0.0);
+                  float NdotL = max(dot(worldNormal, lightDir), 0.0);
                   
                   // Add subtle ambient to see dark side slightly
                   float ambient = 0.08;
@@ -487,17 +504,16 @@ export const TexturedPlanet = ({
                   vec3 litColor = surfaceColor * (ambient + diffuse);
                   
                   // Add rim lighting for atmosphere effect
-                  float rimLight = pow(1.0 - max(dot(normal, normalize(-vWorldPosition)), 0.0), 3.0);
-                  litColor += rimLight * 0.15 * surfaceColor;
+                  float rimLight = pow(1.0 - max(dot(worldNormal, lightDir), 0.0), 3.0);
+                  litColor += rimLight * 0.1 * surfaceColor;
                   
                   // Add emissive (for Sun)
                   litColor += emissive * emissiveIntensity;
                   
                   // Simple specular highlight
-                  vec3 viewDir = normalize(-vWorldPosition);
-                  vec3 halfDir = normalize(lightDir + viewDir);
-                  float spec = pow(max(dot(normal, halfDir), 0.0), 32.0 / max(roughness, 0.1));
-                  litColor += spec * (1.0 - roughness) * 0.3;
+                  vec3 halfDir = normalize(lightDir + lightDir);
+                  float spec = pow(max(dot(worldNormal, halfDir), 0.0), 32.0 / max(roughness, 0.1));
+                  litColor += spec * (1.0 - roughness) * 0.2 * NdotL;
                   
                   gl_FragColor = vec4(litColor, 1.0);
                 }
@@ -516,26 +532,24 @@ export const TexturedPlanet = ({
                 uniforms={{
                   cloudColor: { value: new THREE.Color(visuals.cloudColor || '#ffffff') },
                   time: { value: 0 },
+                  objectCenter: { value: new THREE.Vector3(0, 0, 0) },
                 }}
                 vertexShader={`
-                  varying vec3 vNormal;
-                  varying vec3 vWorldPosition;
+                  varying vec3 vWorldNormal;
                   varying vec2 vUv;
                   
                   void main() {
                     vUv = uv;
-                    vNormal = normalize(normalMatrix * normal);
-                    vec4 worldPos = modelMatrix * vec4(position, 1.0);
-                    vWorldPosition = worldPos.xyz;
-                    gl_Position = projectionMatrix * viewMatrix * worldPos;
+                    vWorldNormal = normalize((modelMatrix * vec4(normal, 0.0)).xyz);
+                    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
                   }
                 `}
                 fragmentShader={`
                   uniform vec3 cloudColor;
                   uniform float time;
+                  uniform vec3 objectCenter;
                   
-                  varying vec3 vNormal;
-                  varying vec3 vWorldPosition;
+                  varying vec3 vWorldNormal;
                   varying vec2 vUv;
                   
                   float hash(vec2 p) {
@@ -565,19 +579,20 @@ export const TexturedPlanet = ({
                   }
                   
                   void main() {
-                    vec3 normal = normalize(vNormal);
+                    vec3 worldNormal = normalize(vWorldNormal);
                     // Sun at origin
-                    vec3 lightDir = normalize(-vWorldPosition);
-                    float NdotL = max(dot(normal, lightDir), 0.0);
+                    vec3 lightDir = normalize(-objectCenter);
+                    float NdotL = max(dot(worldNormal, lightDir), 0.0);
                     
                     vec2 cloudCoord = vUv * 15.0 + time * 0.01;
                     float clouds = fbm(cloudCoord);
                     float cloudCoverage = smoothstep(0.35, 0.65, clouds);
                     
-                    float lighting = 0.15 + NdotL * 0.85;
+                    float lighting = 0.1 + NdotL * 0.9;
                     vec3 litCloud = cloudColor * lighting;
                     
-                    gl_FragColor = vec4(litCloud, cloudCoverage * 0.5 * NdotL);
+                    // Clouds only visible on lit side
+                    gl_FragColor = vec4(litCloud, cloudCoverage * 0.5 * (0.2 + NdotL * 0.8));
                   }
                 `}
               />
@@ -596,34 +611,32 @@ export const TexturedPlanet = ({
                 uniforms={{
                   glowColor: { value: new THREE.Color(visuals.atmosphereColor || '#4da6ff') },
                   intensity: { value: visuals.atmosphereIntensity || 0.4 },
+                  objectCenter: { value: new THREE.Vector3(0, 0, 0) },
                 }}
                 vertexShader={`
-                  varying vec3 vNormal;
-                  varying vec3 vWorldPosition;
+                  varying vec3 vWorldNormal;
                   void main() {
-                    vNormal = normalize(normalMatrix * normal);
-                    vec4 worldPos = modelMatrix * vec4(position, 1.0);
-                    vWorldPosition = worldPos.xyz;
-                    gl_Position = projectionMatrix * viewMatrix * worldPos;
+                    vWorldNormal = normalize((modelMatrix * vec4(normal, 0.0)).xyz);
+                    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
                   }
                 `}
                 fragmentShader={`
-                  varying vec3 vNormal;
-                  varying vec3 vWorldPosition;
+                  varying vec3 vWorldNormal;
                   uniform vec3 glowColor;
                   uniform float intensity;
+                  uniform vec3 objectCenter;
                   
                   void main() {
-                    vec3 normal = normalize(vNormal);
+                    vec3 worldNormal = normalize(vWorldNormal);
                     // Sun at origin
-                    vec3 lightDir = normalize(-vWorldPosition);
-                    float NdotL = max(dot(normal, lightDir), 0.0);
+                    vec3 lightDir = normalize(-objectCenter);
+                    float NdotL = max(dot(worldNormal, lightDir), 0.0);
                     
                     // Fresnel-like rim glow
-                    float rim = pow(0.7 - dot(normal, vec3(0.0, 0.0, 1.0)), 2.0);
+                    float rim = pow(0.7 - dot(worldNormal, vec3(0.0, 0.0, 1.0)), 2.0);
                     
                     // Brighter on sun-facing side
-                    float sunGlow = 0.2 + NdotL * 0.8;
+                    float sunGlow = 0.15 + NdotL * 0.85;
                     
                     gl_FragColor = vec4(glowColor, rim * intensity * sunGlow);
                   }
@@ -645,15 +658,16 @@ export const TexturedPlanet = ({
                   opacity: { value: visuals.ringOpacity || 0.7 },
                   innerRadius: { value: planetSize * 1.3 },
                   outerRadius: { value: planetSize * 2.2 },
+                  objectCenter: { value: new THREE.Vector3(0, 0, 0) },
                 }}
                 vertexShader={`
                   varying vec2 vUv;
                   varying vec3 vWorldPosition;
-                  varying vec3 vNormal;
+                  varying vec3 vWorldNormal;
                   
                   void main() {
                     vUv = uv;
-                    vNormal = normalize(normalMatrix * normal);
+                    vWorldNormal = normalize((modelMatrix * vec4(normal, 0.0)).xyz);
                     vec4 worldPos = modelMatrix * vec4(position, 1.0);
                     vWorldPosition = worldPos.xyz;
                     gl_Position = projectionMatrix * viewMatrix * worldPos;
@@ -664,17 +678,18 @@ export const TexturedPlanet = ({
                   uniform float opacity;
                   uniform float innerRadius;
                   uniform float outerRadius;
+                  uniform vec3 objectCenter;
                   
                   varying vec2 vUv;
                   varying vec3 vWorldPosition;
-                  varying vec3 vNormal;
+                  varying vec3 vWorldNormal;
                   
                   float hash(float n) { return fract(sin(n) * 43758.5453); }
                   
                   void main() {
-                    // Sun at origin
-                    vec3 lightDir = normalize(-vWorldPosition);
-                    float NdotL = abs(dot(normalize(vNormal), lightDir));
+                    // Sun at origin - use object center for consistent lighting
+                    vec3 lightDir = normalize(-objectCenter);
+                    float NdotL = abs(dot(normalize(vWorldNormal), lightDir));
                     
                     // Create ring bands
                     float dist = length(vWorldPosition.xz);
@@ -686,8 +701,8 @@ export const TexturedPlanet = ({
                     float gap = smoothstep(0.45, 0.5, normalizedDist) * (1.0 - smoothstep(0.5, 0.55, normalizedDist));
                     float ringOpacity = opacity * bands * (1.0 - gap * 0.8);
                     
-                    // Lighting
-                    float lighting = 0.3 + NdotL * 0.7;
+                    // Lighting - darker on shadow side
+                    float lighting = 0.2 + NdotL * 0.8;
                     vec3 litRing = ringColor * lighting;
                     
                     // Fade edges

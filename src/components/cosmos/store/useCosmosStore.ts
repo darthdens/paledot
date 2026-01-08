@@ -37,6 +37,7 @@ interface CosmosStore {
 
   // Time travel
   timeOffset: number; // Years from present
+  timeSpeed: number; // Multiplier for orbit/rotation speed (1 = normal)
 
   // Actions
   setCameraDistance: (distance: number) => void;
@@ -64,6 +65,7 @@ interface CosmosStore {
   setMuted: (muted: boolean) => void;
   setVolume: (volume: number) => void;
   setTimeOffset: (offset: number) => void;
+  setTimeSpeed: (speed: number) => void;
 }
 
 const getScaleFromDistance = (distance: number): ScaleLevel => {
@@ -105,6 +107,7 @@ export const useCosmosStore = create<CosmosStore>()(
       volume: 0.5,
       
       timeOffset: 0,
+      timeSpeed: 1,
       
       // Actions
       setCameraDistance: (distance) => {
@@ -180,6 +183,8 @@ export const useCosmosStore = create<CosmosStore>()(
       setVolume: (volume) => set({ volume }),
       
       setTimeOffset: (offset) => set({ timeOffset: offset }),
+      
+      setTimeSpeed: (speed) => set({ timeSpeed: speed }),
     }),
     {
       name: 'cosmos-storage',
