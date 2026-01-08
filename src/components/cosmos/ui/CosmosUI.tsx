@@ -161,7 +161,7 @@ export const CosmosUI = () => {
       // Force true viewport fill (Tailwind class ordering can't override h-[50vh] reliably)
       containerEl.style.position = 'fixed';
       containerEl.style.inset = '0';
-      containerEl.style.zIndex = '9999';
+      containerEl.style.zIndex = '99999'; // Higher than Echo widget (typically 9999)
       containerEl.style.width = '100vw';
       // iOS Safari support: prefer 100vh fallback, then 100dvh when available
       containerEl.style.height = '100vh';
@@ -174,6 +174,13 @@ export const CosmosUI = () => {
        containerEl.style.backgroundColor = 'hsl(var(--background))';
 
       setPageChromeHidden(true);
+      
+      // Hide Echo widget in fullscreen
+      const echoWidget = document.querySelector('[data-echo-widget], .echo-widget, #echo-widget, [class*="EchoWidget"]') as HTMLElement | null;
+      if (echoWidget) {
+        echoWidget.dataset.cosmosPrevDisplay = echoWidget.style.display || '';
+        echoWidget.style.display = 'none';
+      }
 
       // Prevent page scroll behind the fullscreen canvas
       document.documentElement.style.overflow = 'hidden';
@@ -190,6 +197,14 @@ export const CosmosUI = () => {
       restorePrevContainerStyles(containerEl);
 
       setPageChromeHidden(false);
+      
+      // Restore Echo widget
+      const echoWidget = document.querySelector('[data-echo-widget], .echo-widget, #echo-widget, [class*="EchoWidget"]') as HTMLElement | null;
+      if (echoWidget && echoWidget.dataset.cosmosPrevDisplay !== undefined) {
+        echoWidget.style.display = echoWidget.dataset.cosmosPrevDisplay;
+        delete echoWidget.dataset.cosmosPrevDisplay;
+      }
+      
       document.documentElement.style.overflow = '';
       document.body.style.overflow = '';
     },
@@ -492,14 +507,7 @@ export const CosmosUI = () => {
         </div>
       )}
 
-      {/* Bottom tour button - hide when touring */}
-      {!showControlHints && !isTouring && (
-        <div className="absolute bottom-3 sm:bottom-6 left-1/2 -translate-x-1/2 z-40">
-          <Button size="sm" onClick={startTour} className="animate-pulse text-xs sm:text-sm">
-            {t.startTour}
-          </Button>
-        </div>
-      )}
+      {/* Bottom tour button removed - users can access tour from the help (?) button */}
     </>
   );
 };

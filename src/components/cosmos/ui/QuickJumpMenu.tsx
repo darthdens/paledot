@@ -1,6 +1,6 @@
 import { useLanguage } from '@/i18n/LanguageContext';
 import { Button } from '@/components/ui/button';
-import { X, ChevronRight } from 'lucide-react';
+import { X, ChevronRight, Clock } from 'lucide-react';
 import { useCosmosStore } from '../store/useCosmosStore';
 import { useFullscreenStore } from '../store/useFullscreenStore';
 import { quickJumpCategories, getObjectById } from '../data/celestialObjects';
@@ -10,12 +10,17 @@ const translations = {
   en: {
     title: 'Quick Jump',
     recentJumps: 'Recent',
+    comingSoon: 'Coming Soon',
   },
   fr: {
     title: 'Saut Rapide',
     recentJumps: 'Récents',
+    comingSoon: 'Bientôt',
   },
 };
+
+// Categories that are fully implemented (Solar System only for now)
+const IMPLEMENTED_CATEGORIES = ['solarSystem'];
 
 export const QuickJumpMenu = () => {
   const { language } = useLanguage();
@@ -38,8 +43,12 @@ export const QuickJumpMenu = () => {
   };
 
   const toggleCategory = (categoryId: string) => {
+    // Only allow expanding implemented categories
+    if (!IMPLEMENTED_CATEGORIES.includes(categoryId)) return;
     setExpandedCategory(expandedCategory === categoryId ? null : categoryId);
   };
+
+  const isComingSoon = (categoryId: string) => !IMPLEMENTED_CATEGORIES.includes(categoryId);
 
   const menu = (
     <div 
@@ -73,6 +82,8 @@ export const QuickJumpMenu = () => {
               {recentJumps.map(id => {
                 const obj = getObjectById(id);
                 if (!obj) return null;
+                // Only show recent jumps from implemented categories
+                if (!IMPLEMENTED_CATEGORIES.includes(obj.category || '')) return null;
                 return (
                   <button
                     key={id}
@@ -89,49 +100,68 @@ export const QuickJumpMenu = () => {
 
         {/* Categories */}
         <div className="p-1 sm:p-2">
-          {quickJumpCategories.map(category => (
-            <div key={category.id} className="mb-1">
-              {/* Category header */}
-              <button
-                onClick={() => toggleCategory(category.id)}
-                className="w-full flex items-center justify-between p-1.5 sm:p-2 rounded hover:bg-white/10 transition-colors"
-              >
-                <span className="text-white/90 text-xs sm:text-sm font-medium">
-                  {category.name[language]}
-                </span>
-                <ChevronRight 
-                  className={`w-3.5 h-3.5 text-white/50 transition-transform ${
-                    expandedCategory === category.id ? 'rotate-90' : ''
+          {quickJumpCategories.map(category => {
+            const comingSoon = isComingSoon(category.id);
+            
+            return (
+              <div key={category.id} className="mb-1">
+                {/* Category header */}
+                <button
+                  onClick={() => toggleCategory(category.id)}
+                  className={`w-full flex items-center justify-between p-1.5 sm:p-2 rounded transition-colors ${
+                    comingSoon 
+                      ? 'opacity-60 cursor-not-allowed' 
+                      : 'hover:bg-white/10'
                   }`}
-                />
-              </button>
+                  disabled={comingSoon}
+                >
+                  <div className="flex items-center gap-2">
+                    <span className={`text-xs sm:text-sm font-medium ${comingSoon ? 'text-white/50' : 'text-white/90'}`}>
+                      {category.name[language]}
+                    </span>
+                    {comingSoon && (
+                      <span className="flex items-center gap-1 px-1.5 py-0.5 bg-amber-500/20 border border-amber-500/30 rounded text-[10px] text-amber-400">
+                        <Clock className="w-2.5 h-2.5" />
+                        {t.comingSoon}
+                      </span>
+                    )}
+                  </div>
+                  {!comingSoon && (
+                    <ChevronRight 
+                      className={`w-3.5 h-3.5 text-white/50 transition-transform ${
+                        expandedCategory === category.id ? 'rotate-90' : ''
+                      }`}
+                    />
+                  )}
+                </button>
 
-              {/* Category items */}
-              {expandedCategory === category.id && (
-                <div className="ml-2 sm:ml-3 mt-0.5 space-y-0.5 border-l border-white/10 pl-2">
-                  {category.locations.map(locationId => {
-                    const obj = getObjectById(locationId);
-                    if (!obj) return null;
-                    return (
-                      <button
-                        key={locationId}
-                        onClick={() => handleJump(locationId)}
-                        className="w-full flex items-center gap-2 p-1.5 rounded hover:bg-white/10 transition-colors text-left"
-                      >
-                        <span
-                          className="w-2 h-2 rounded-full shrink-0"
-                          style={{ backgroundColor: obj.color }}
-                        />
-                        <span className="text-white/70 hover:text-white text-xs truncate">
-                          {obj.name[language]}
-                        </span>
-                      </button>
-                    );
-                  })}
-                </div>
-              )}
-            </div>
-          ))}
+                {/* Category items - only for implemented categories */}
+                {!comingSoon && expandedCategory === category.id && (
+                  <div className="ml-2 sm:ml-3 mt-0.5 space-y-0.5 border-l border-white/10 pl-2">
+                    {category.locations.map(locationId => {
+                      const obj = getObjectById(locationId);
+                      if (!obj) return null;
+                      return (
+                        <button
+                          key={locationId}
+                          onClick={() => handleJump(locationId)}
+                          className="w-full flex items-center gap-2 p-1.5 rounded hover:bg-white/10 transition-colors text-left"
+                        >
+                          <span
+                            className="w-2 h-2 rounded-full shrink-0"
+                            style={{ backgroundColor: obj.color }}
+                          />
+                          <span className="text-white/70 hover:text-white text-xs truncate">
+                            {obj.name[language]}
+                          </span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </div>
       </div>
     </div>
