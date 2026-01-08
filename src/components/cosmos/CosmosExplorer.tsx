@@ -1,7 +1,7 @@
 // Cosmos Explorer - Solar System visualization with fly-to navigation
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls, Stars, PerspectiveCamera } from '@react-three/drei';
-import { Suspense, useMemo, useEffect, useRef } from 'react';
+import { Suspense, useMemo } from 'react';
 import { Sun } from './objects/Sun';
 import { TexturedPlanet } from './objects/TexturedPlanet';
 import { MoonOrbit } from './objects/MoonOrbit';
@@ -31,25 +31,9 @@ const getMoonOrbitRadius = (moon: typeof celestialObjects[0], distanceScale: num
 
 export const CosmosExplorer = () => {
   const selectedObject = useCosmosStore(state => state.selectedObject);
-  const setSelectedObject = useCosmosStore(state => state.setSelectedObject);
   const showOrbits = useCosmosStore(state => state.showOrbits);
   const showTrails = useCosmosStore(state => state.showTrails);
   const isFollowing = useCosmosStore(state => state.isFollowing);
-  const hasInitialized = useRef(false);
-  
-  // Auto-select Earth on first load so camera flies to Earth
-  useEffect(() => {
-    if (hasInitialized.current) return;
-    hasInitialized.current = true;
-    
-    const earth = celestialObjects.find(obj => obj.id === 'earth');
-    if (earth && !selectedObject) {
-      // Small delay to let the scene initialize
-      setTimeout(() => {
-        setSelectedObject(earth);
-      }, 100);
-    }
-  }, [selectedObject, setSelectedObject]);
   
   // Hide orbits when actively following a moving object (they're distracting)
   const shouldShowOrbits = showOrbits && (!selectedObject || !isFollowing);
