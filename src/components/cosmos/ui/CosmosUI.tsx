@@ -1,9 +1,10 @@
 import { useLanguage } from '@/i18n/LanguageContext';
 import { Button } from '@/components/ui/button';
-import { HelpCircle, Compass, Maximize, Minimize, CircleDot, CircleOff } from 'lucide-react';
+import { Slider } from '@/components/ui/slider';
+import { HelpCircle, Compass, Maximize, Minimize, CircleDot, CircleOff, Clock } from 'lucide-react';
 import { useCosmosStore } from '../store/useCosmosStore';
 import { useFullscreenStore } from '../store/useFullscreenStore';
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 const translations = {
   en: {
@@ -20,6 +21,10 @@ const translations = {
     explore: 'Explore',
     showOrbits: 'Show orbits',
     hideOrbits: 'Hide orbits',
+    timeSpeed: 'Time Speed',
+    paused: 'Paused',
+    realTime: 'Real-time',
+    fast: 'Fast',
   },
   fr: {
     startTour: 'Commencer la Visite',
@@ -35,6 +40,10 @@ const translations = {
     explore: 'Explorer',
     showOrbits: 'Afficher les orbites',
     hideOrbits: 'Masquer les orbites',
+    timeSpeed: 'Vitesse du temps',
+    paused: 'Pause',
+    realTime: 'Temps réel',
+    fast: 'Rapide',
   },
 };
 
@@ -48,8 +57,11 @@ export const CosmosUI = () => {
     setShowControlHints,
     showOrbits,
     toggleOrbits,
+    timeSpeed,
+    setTimeSpeed,
   } = useCosmosStore();
   const { isFullscreen, setIsFullscreen } = useFullscreenStore();
+  const [showTimeSlider, setShowTimeSlider] = useState(false);
 
   const setPageChromeHidden = useCallback((hidden: boolean) => {
     const nav = document.querySelector('nav') as HTMLElement | null;
@@ -374,12 +386,58 @@ export const CosmosUI = () => {
         <Button
           size="icon"
           variant="ghost"
+          onClick={() => setShowTimeSlider(!showTimeSlider)}
+          className="h-7 w-7 sm:h-9 sm:w-9 bg-white/10 hover:bg-white/20 text-white"
+          title={t.timeSpeed}
+        >
+          <Clock className="w-3.5 h-3.5 sm:w-5 sm:h-5" />
+        </Button>
+        <Button
+          size="icon"
+          variant="ghost"
           onClick={() => setShowControlHints(true)}
           className="h-7 w-7 sm:h-9 sm:w-9 bg-white/10 hover:bg-white/20 text-white"
         >
           <HelpCircle className="w-3.5 h-3.5 sm:w-5 sm:h-5" />
         </Button>
       </div>
+
+      {/* Time speed slider */}
+      {showTimeSlider && !showControlHints && (
+        <div
+          className={`${isFullscreen ? 'fixed' : 'absolute'} top-14 sm:top-16 right-2 sm:right-4 z-[10000] bg-black/80 backdrop-blur-sm rounded-lg p-3 sm:p-4 min-w-[180px] sm:min-w-[220px]`}
+          style={
+            isFullscreen
+              ? {
+                  top: 'calc(3.5rem + env(safe-area-inset-top))',
+                  right: 'calc(0.5rem + env(safe-area-inset-right))',
+                }
+              : undefined
+          }
+        >
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <span className="text-white text-xs sm:text-sm font-medium">{t.timeSpeed}</span>
+              <span className="text-white/70 text-xs">
+                {timeSpeed === 0 ? t.paused : timeSpeed === 1 ? '1×' : `${timeSpeed}×`}
+              </span>
+            </div>
+            <Slider
+              value={[timeSpeed]}
+              onValueChange={([value]) => setTimeSpeed(value)}
+              min={0}
+              max={10}
+              step={0.5}
+              className="w-full"
+            />
+            <div className="flex justify-between text-[10px] sm:text-xs text-white/50">
+              <span>{t.paused}</span>
+              <span>1×</span>
+              <span>10×</span>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Bottom tour button - smaller on mobile */}
       {!showControlHints && (
