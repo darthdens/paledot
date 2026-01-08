@@ -589,12 +589,12 @@ export const CosmosUI = () => {
       {/* Time speed slider */}
       {showTimeSlider && !showControlHints && (
         <div
-          className={`${isFullscreen ? 'fixed' : 'absolute'} top-14 sm:top-16 right-2 sm:right-4 z-[10000] bg-black/80 backdrop-blur-sm rounded-lg p-3 sm:p-4 min-w-[180px] sm:min-w-[220px]`}
+          className={`${isFullscreen ? 'fixed' : 'absolute'} top-[68px] right-4 z-[10000] bg-black/80 backdrop-blur-sm rounded-lg p-3 sm:p-4 min-w-[180px] sm:min-w-[220px]`}
           style={
             isFullscreen
               ? {
-                  top: 'calc(3.5rem + env(safe-area-inset-top))',
-                  right: 'calc(0.5rem + env(safe-area-inset-right))',
+                  top: 'calc(68px + env(safe-area-inset-top))',
+                  right: 'calc(1rem + env(safe-area-inset-right))',
                 }
               : undefined
           }
