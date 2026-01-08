@@ -50,47 +50,62 @@ export const CosmosUI = () => {
     <>
       {/* Welcome overlay for first visit */}
       {showControlHints && (
-        <div className="absolute inset-0 flex items-center justify-center bg-black/70 z-50">
-          <div className="text-center space-y-6 max-w-md px-6">
-            <h1 className="text-4xl font-bold text-white">{t.welcome}</h1>
-            <p className="text-lg text-white/70">{t.subtitle}</p>
+        <div className="absolute inset-0 flex items-center justify-center bg-black/80 z-50 p-3">
+          <div className="text-center space-y-3 sm:space-y-5 max-w-sm sm:max-w-md px-4">
+            <h1 className="text-xl sm:text-3xl md:text-4xl font-bold text-white leading-tight">{t.welcome}</h1>
+            <p className="text-sm sm:text-base text-white/70">{t.subtitle}</p>
             
-            <div className="space-y-2 text-left bg-white/10 rounded-lg p-4">
-              <p className="text-white/90 font-medium">{t.controls}:</p>
-              <p className="text-white/70 text-sm">• {t.scrollZoom}</p>
-              <p className="text-white/70 text-sm">• {t.dragRotate}</p>
-              <p className="text-white/70 text-sm">• {t.rightDragPan}</p>
+            <div className="space-y-1.5 text-left bg-white/10 rounded-lg p-3 sm:p-4">
+              <p className="text-white/90 font-medium text-sm sm:text-base">{t.controls}:</p>
+              <p className="text-white/70 text-xs sm:text-sm">• {t.scrollZoom}</p>
+              <p className="text-white/70 text-xs sm:text-sm">• {t.dragRotate}</p>
+              <p className="text-white/70 text-xs sm:text-sm">• {t.rightDragPan}</p>
             </div>
 
-            <div className="flex gap-4 justify-center">
-              <Button onClick={() => { setShowControlHints(false); startTour(); }}>
+            <div className="flex gap-2 sm:gap-3 justify-center flex-wrap">
+              <Button size="sm" onClick={() => { setShowControlHints(false); startTour(); }} className="text-xs sm:text-sm">
                 {t.startTour}
               </Button>
-              <Button variant="outline" onClick={() => setShowControlHints(false)}>
-                Explore Freely
+              <Button size="sm" variant="outline" onClick={() => setShowControlHints(false)} className="text-xs sm:text-sm">
+                {language === 'fr' ? 'Explorer' : 'Explore'}
               </Button>
             </div>
           </div>
         </div>
       )}
 
-      {/* Top controls */}
-      <div className="absolute top-4 right-4 flex gap-2 z-40">
-        <Button size="icon" variant="ghost" onClick={toggleFullscreen} className="bg-white/10 hover:bg-white/20 text-white">
-          {isFullscreen ? <Minimize className="w-5 h-5" /> : <Maximize className="w-5 h-5" />}
+      {/* Top controls - compact on mobile */}
+      <div className="absolute top-2 sm:top-4 right-2 sm:right-4 flex gap-1 sm:gap-2 z-40">
+        <Button 
+          size="icon" 
+          variant="ghost" 
+          onClick={toggleFullscreen} 
+          className="h-7 w-7 sm:h-9 sm:w-9 bg-white/10 hover:bg-white/20 text-white"
+        >
+          {isFullscreen ? <Minimize className="w-3.5 h-3.5 sm:w-5 sm:h-5" /> : <Maximize className="w-3.5 h-3.5 sm:w-5 sm:h-5" />}
         </Button>
-        <Button size="icon" variant="ghost" onClick={toggleQuickJump} className="bg-white/10 hover:bg-white/20 text-white">
-          <Compass className="w-5 h-5" />
+        <Button 
+          size="icon" 
+          variant="ghost" 
+          onClick={toggleQuickJump} 
+          className="h-7 w-7 sm:h-9 sm:w-9 bg-white/10 hover:bg-white/20 text-white"
+        >
+          <Compass className="w-3.5 h-3.5 sm:w-5 sm:h-5" />
         </Button>
-        <Button size="icon" variant="ghost" onClick={() => setShowControlHints(true)} className="bg-white/10 hover:bg-white/20 text-white">
-          <HelpCircle className="w-5 h-5" />
+        <Button 
+          size="icon" 
+          variant="ghost" 
+          onClick={() => setShowControlHints(true)} 
+          className="h-7 w-7 sm:h-9 sm:w-9 bg-white/10 hover:bg-white/20 text-white"
+        >
+          <HelpCircle className="w-3.5 h-3.5 sm:w-5 sm:h-5" />
         </Button>
       </div>
 
-      {/* Bottom tour button */}
+      {/* Bottom tour button - smaller on mobile */}
       {!showControlHints && (
-        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-40">
-          <Button onClick={startTour} className="animate-pulse">
+        <div className="absolute bottom-3 sm:bottom-6 left-1/2 -translate-x-1/2 z-40">
+          <Button size="sm" onClick={startTour} className="animate-pulse text-xs sm:text-sm">
             {t.startTour}
           </Button>
         </div>
