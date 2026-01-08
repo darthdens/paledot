@@ -45,6 +45,10 @@ const translations = {
     realisticScale: 'Realistic scale',
     // Touch tip
     useButtons: 'Use buttons to control',
+    // Button tooltips
+    fullscreen: 'Fullscreen',
+    exitFullscreen: 'Exit fullscreen',
+    help: 'Help & Controls',
   },
   fr: {
     startTour: 'Commencer la Visite',
@@ -82,6 +86,10 @@ const translations = {
     realisticScale: 'Échelle réaliste',
     // Touch tip
     useButtons: 'Utilisez les boutons',
+    // Button tooltips
+    fullscreen: 'Plein écran',
+    exitFullscreen: 'Quitter plein écran',
+    help: 'Aide & Contrôles',
   },
 };
 
@@ -542,6 +550,7 @@ export const CosmosUI = () => {
           variant="ghost"
           onClick={toggleFullscreen}
           className="h-7 w-7 sm:h-9 sm:w-9 bg-white/10 hover:bg-white/20 text-white"
+          title={isFullscreen ? t.exitFullscreen : t.fullscreen}
         >
           {isFullscreen ? (
             <Minimize className="w-3.5 h-3.5 sm:w-5 sm:h-5" />
@@ -554,6 +563,7 @@ export const CosmosUI = () => {
           variant="ghost"
           onClick={toggleQuickJump}
           className="h-7 w-7 sm:h-9 sm:w-9 bg-white/10 hover:bg-white/20 text-white"
+          title={t.quickJump}
         >
           <Compass className="w-3.5 h-3.5 sm:w-5 sm:h-5" />
         </Button>
@@ -637,11 +647,13 @@ export const CosmosUI = () => {
         >
           <Scaling className={`w-3.5 h-3.5 sm:w-5 sm:h-5 ${useExaggeratedScale ? 'text-yellow-400' : ''}`} />
         </Button>
+        {/* Help button - more prominent with pulsing ring */}
         <Button
           size="icon"
           variant="ghost"
           onClick={() => setShowControlHints(true)}
-          className="h-7 w-7 sm:h-9 sm:w-9 bg-white/10 hover:bg-white/20 text-white"
+          className="h-7 w-7 sm:h-9 sm:w-9 bg-blue-500/30 hover:bg-blue-500/50 text-white ring-2 ring-blue-400/50 animate-pulse"
+          title={t.help}
         >
           <HelpCircle className="w-3.5 h-3.5 sm:w-5 sm:h-5" />
         </Button>
