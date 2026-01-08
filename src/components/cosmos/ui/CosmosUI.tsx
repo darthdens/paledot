@@ -549,12 +549,12 @@ export const CosmosUI = () => {
 
       {/* Top controls - icon buttons with tooltips */}
       <div
-        className={`${isFullscreen ? 'fixed' : 'absolute'} top-4 right-4 z-[10000]`}
+        className={`${isFullscreen ? 'fixed' : 'absolute'} top-2 right-2 sm:top-4 sm:right-4 z-[10000]`}
         style={
           isFullscreen
             ? {
-                top: 'calc(1rem + env(safe-area-inset-top))',
-                right: 'calc(1rem + env(safe-area-inset-right))',
+                top: 'calc(0.5rem + env(safe-area-inset-top))',
+                right: 'calc(0.5rem + env(safe-area-inset-right))',
               }
             : undefined
         }
