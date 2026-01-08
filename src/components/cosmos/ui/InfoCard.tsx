@@ -15,15 +15,30 @@ const ROTATION_PERIODS_HOURS: Record<string, number> = {
   earth: 23.934,
   moon: 655.7,
   mars: 24.623,
+  phobos: 7.66,        // Tidally locked to Mars
+  deimos: 30.3,        // Tidally locked to Mars
+  ceres: 9.07,
   jupiter: 9.925,
   io: 42.46,
   europa: 85.23,
   ganymede: 171.71,
   callisto: 400.54,
   saturn: 10.656,
+  mimas: 22.6,         // Tidally locked to Saturn
+  enceladus: 32.9,     // Tidally locked to Saturn
+  tethys: 45.3,        // Tidally locked to Saturn
+  dione: 65.7,         // Tidally locked to Saturn
+  rhea: 108.4,         // Tidally locked to Saturn
   titan: 382.68,
+  iapetus: 1903.9,     // Tidally locked to Saturn
   uranus: -17.24,
+  miranda: 33.9,       // Tidally locked to Uranus
+  ariel: 60.5,         // Tidally locked to Uranus
+  umbriel: 99.5,       // Tidally locked to Uranus
+  titania: 209.0,      // Tidally locked to Uranus
+  oberon: 323.1,       // Tidally locked to Uranus
   neptune: 16.11,
+  triton: -141.0,      // Retrograde, tidally locked to Neptune
   pluto: -153.29,
 };
 
