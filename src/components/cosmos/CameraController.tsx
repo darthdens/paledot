@@ -179,19 +179,15 @@ export const CameraController = () => {
       if (livePos) {
         const currentTarget = orbitControls.target as THREE.Vector3;
 
-        // Get the actual live position
+        // Get the exact live position - no smoothing for perfect tracking
         tmpTarget.current.set(livePos[0], livePos[1], livePos[2]);
         
-        // Use very tight tracking - almost instant follow for smooth centered view
-        // Higher alpha = tighter tracking (20 gives near-instant response)
-        const smoothAlpha = 1 - Math.exp(-delta * 20);
-        smoothedTarget.current.lerp(tmpTarget.current, smoothAlpha);
-
-        // Calculate the delta between smoothed target and current target
-        tmpDelta.current.subVectors(smoothedTarget.current, currentTarget);
+        // Calculate how much the object moved since last frame
+        tmpDelta.current.subVectors(tmpTarget.current, currentTarget);
         
-        // Move both target and camera by the same amount so the view stays locked
-        currentTarget.copy(smoothedTarget.current);
+        // Move both target and camera by exactly the same amount
+        // This keeps the object perfectly centered with no lag
+        currentTarget.copy(tmpTarget.current);
         camera.position.add(tmpDelta.current);
 
         orbitControls.update();
