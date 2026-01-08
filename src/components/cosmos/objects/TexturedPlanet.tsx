@@ -461,6 +461,7 @@ export const TexturedPlanet = ({
                 ringInnerRadius: { value: planetSize * 1.3 },
                 ringOuterRadius: { value: planetSize * 2.2 },
                 planetTilt: { value: tiltRadians },
+                ringOpacity: { value: visuals.ringOpacity || 0.8 },
               }}
               vertexShader={`
                 varying vec3 vNormal;
@@ -496,6 +497,7 @@ export const TexturedPlanet = ({
                 uniform float ringInnerRadius;
                 uniform float ringOuterRadius;
                 uniform float planetTilt;
+                uniform float ringOpacity;
                 
                 varying vec3 vNormal;
                 varying vec3 vPosition;
@@ -575,7 +577,8 @@ export const TexturedPlanet = ({
                   ringFrameSunDir.y = sunDir.y * cosT - sunDir.z * sinT;
                   ringFrameSunDir.z = sunDir.y * sinT + sunDir.z * cosT;
                   
-                  if (abs(ringFrameSunDir.y) < 0.0001) return 1.0;
+                  // Need sufficient vertical component for ray-plane intersection
+                  if (abs(ringFrameSunDir.y) < 0.001) return 1.0;
                   
                   float t = -ringFramePos.y / ringFrameSunDir.y;
                   if (t <= 0.0) return 1.0;
@@ -586,12 +589,9 @@ export const TexturedPlanet = ({
                   // Check if within ring bounds with penumbra zones
                   float ringWidth = ringOuterRadius - ringInnerRadius;
                   
-                  // Calculate penumbra softness based on:
-                  // 1. Distance from planet to sun (further = softer shadows)
-                  // 2. Ring thickness creates natural blur
-                  float sunDist = length(objectCenter);
-                  float penumbraScale = 0.03 + (sunDist / 50000.0) * 0.02; // Softer shadows for distant planets
-                  float penumbraWidth = ringWidth * penumbraScale;
+                  // Calculate penumbra softness - use a fixed reasonable value
+                  // to avoid issues with varying distances
+                  float penumbraWidth = ringWidth * 0.05;
                   
                   // Soft inner edge
                   float innerShadow = smoothstep(ringInnerRadius - penumbraWidth, ringInnerRadius + penumbraWidth * 0.5, distFromCenter);
@@ -622,14 +622,17 @@ export const TexturedPlanet = ({
                     float enckeGap = 1.0 - 0.5 * exp(-pow((ringPos - 0.82) / 0.02, 2.0));
                     ringDensity *= enckeGap;
                     
-                    // Apply penumbra softening - shadows get softer based on density variation
-                    float shadowStrength = ringDensity * inRing * 0.7;
+                    // Apply ring opacity to shadow strength - faint rings (Uranus) cast fainter shadows
+                    // ringOpacity: Saturn ~0.8, Uranus ~0.5
+                    float opacityFactor = ringOpacity * ringOpacity; // Square for stronger effect
                     
-                    // Add subtle blur to shadow edges based on sun distance
-                    float blur = 1.0 + (sunDist / 30000.0) * 0.3;
-                    shadowStrength = pow(shadowStrength, 1.0 / blur);
+                    // Shadow strength combines density, ring coverage, and ring opacity
+                    float shadowStrength = ringDensity * inRing * opacityFactor * 0.7;
                     
-                    return 1.0 - clamp(shadowStrength, 0.0, 0.75);
+                    // Clamp maximum shadow based on ring opacity (Uranus max ~0.2, Saturn max ~0.5)
+                    float maxShadow = 0.75 * opacityFactor;
+                    
+                    return 1.0 - clamp(shadowStrength, 0.0, maxShadow);
                   }
                   return 1.0;
                 }
