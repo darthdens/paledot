@@ -43,10 +43,34 @@ export const CosmosUI = () => {
     const container = document.querySelector('[data-cosmos-container]');
     if (!container) return;
 
-    if (!document.fullscreenElement) {
-      container.requestFullscreen().then(() => setIsFullscreen(true)).catch(() => {});
+    // Check for fullscreen with webkit prefix for iOS Safari
+    const doc = document as any;
+    const elem = container as any;
+    
+    const isCurrentlyFullscreen = doc.fullscreenElement || doc.webkitFullscreenElement || doc.mozFullScreenElement;
+
+    if (!isCurrentlyFullscreen) {
+      // Enter fullscreen
+      const requestFs = elem.requestFullscreen || elem.webkitRequestFullscreen || elem.mozRequestFullScreen || elem.msRequestFullscreen;
+      if (requestFs) {
+        requestFs.call(elem).then(() => setIsFullscreen(true)).catch(() => {
+          // Fallback: expand the container to fill viewport
+          container.classList.add('fixed', 'inset-0', 'z-[100]', 'h-screen', 'w-screen', 'rounded-none');
+          setIsFullscreen(true);
+        });
+      } else {
+        // No fullscreen API - use CSS fallback
+        container.classList.add('fixed', 'inset-0', 'z-[100]', 'h-screen', 'w-screen', 'rounded-none');
+        setIsFullscreen(true);
+      }
     } else {
-      document.exitFullscreen().then(() => setIsFullscreen(false)).catch(() => {});
+      // Exit fullscreen
+      const exitFs = doc.exitFullscreen || doc.webkitExitFullscreen || doc.mozCancelFullScreen || doc.msExitFullscreen;
+      if (exitFs) {
+        exitFs.call(doc).then(() => setIsFullscreen(false)).catch(() => {});
+      }
+      container.classList.remove('fixed', 'inset-0', 'z-[100]', 'h-screen', 'w-screen', 'rounded-none');
+      setIsFullscreen(false);
     }
   }, []);
 

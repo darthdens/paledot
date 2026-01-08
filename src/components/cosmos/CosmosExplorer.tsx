@@ -1,15 +1,28 @@
 // Cosmos Explorer - Solar System visualization with fly-to navigation
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls, Stars, PerspectiveCamera } from '@react-three/drei';
-import { Suspense } from 'react';
+import { Suspense, useMemo } from 'react';
 import { Sun } from './objects/Sun';
 import { TexturedPlanet } from './objects/TexturedPlanet';
+import { MoonOrbit } from './objects/MoonOrbit';
 import { CosmosUI } from './ui/CosmosUI';
 import { InfoCard } from './ui/InfoCard';
 import { QuickJumpMenu } from './ui/QuickJumpMenu';
 import { CameraController } from './CameraController';
 import { celestialObjects } from './data/celestialObjects';
 import { UNITS } from './types';
+
+// Helper to calculate moon orbit radius (same logic as in TexturedPlanet)
+const getMoonOrbitRadius = (moon: typeof celestialObjects[0], visualScale: number) => {
+  if (!moon.parentId) return 0;
+  const parentSize = moon.parentId === 'earth' ? 12742 : 
+                     moon.parentId === 'jupiter' ? 139820 :
+                     moon.parentId === 'saturn' ? 116460 : 50000;
+  const parentVisualSize = parentSize * visualScale;
+  const realOrbitRadius = moon.orbitRadius || 0;
+  const baseOrbitMultiplier = 2 + (realOrbitRadius / 2000000);
+  return parentVisualSize * Math.min(baseOrbitMultiplier, 5);
+};
 
 export const CosmosExplorer = () => {
   const planets = celestialObjects.filter(obj => 
@@ -25,6 +38,16 @@ export const CosmosExplorer = () => {
   // Distance compression factor - compresses orbital distances to make navigation practical
   // Real distances would make planets invisible specks
   const DISTANCE_SCALE = 0.15;
+
+  // Pre-calculate moon orbit data for orbit visualization
+  const moonOrbits = useMemo(() => {
+    return moons.map(moon => ({
+      id: moon.id,
+      parentId: moon.parentId!,
+      orbitRadius: getMoonOrbitRadius(moon, VISUAL_SCALE * 1.5),
+      color: moon.color,
+    }));
+  }, [moons]);
 
   // Start camera looking at inner solar system
   const initialCameraPosition: [number, number, number] = [
@@ -77,6 +100,16 @@ export const CosmosExplorer = () => {
               showOrbit={true} 
               visualScale={VISUAL_SCALE}
               distanceScale={DISTANCE_SCALE}
+            />
+          ))}
+          
+          {/* Moon orbit paths - faint circles around parent planets */}
+          {moonOrbits.map(orbit => (
+            <MoonOrbit
+              key={`orbit-${orbit.id}`}
+              parentId={orbit.parentId}
+              moonOrbitRadius={orbit.orbitRadius}
+              color={orbit.color}
             />
           ))}
           
