@@ -290,88 +290,84 @@ export const TexturedPlanet = ({
       planetRef.current.rotation.y = rotationAngle.current;
     }
 
-    // Update shader uniforms for proper lighting - pass the object's center world position
-    if (groupRef.current) {
-      groupRef.current.getWorldPosition(worldPos.current);
+    if (!groupRef.current) return;
 
-      // Get parent position for shadow calculations (moons only)
-      if (isMoon && object.parentId) {
-        const parentPosArr = useCosmosStore.getState().objectWorldPositions[object.parentId];
-        if (parentPosArr) {
-          parentPos.current.set(parentPosArr[0], parentPosArr[1], parentPosArr[2]);
-        }
-      }
+    // Calculate orbital angular velocity from real orbital period
+    // Scale: 1 Earth year (365.25 days) = 60 seconds at 1x speed
+    // angular velocity = 2π / (periodDays / 365.25 * 60) = 2π * 365.25 / (periodDays * 60)
+    const getOrbitalAngularVelocity = (periodDays: number) => {
+      return (2 * Math.PI * 365.25) / (periodDays * 60);
+    };
 
-      if (planetMaterialRef.current) {
-        planetMaterialRef.current.uniforms.time.value = time;
-        planetMaterialRef.current.uniforms.objectCenter.value.copy(worldPos.current);
-        if (isMoon) {
-          planetMaterialRef.current.uniforms.parentCenter.value.copy(parentPos.current);
-          planetMaterialRef.current.uniforms.parentRadius.value = parentPlanetSize;
-        }
+    // Moons: orbit around their parent planet's world position
+    if (isMoon && moonOrbitRadius > 0) {
+      const parentPosArr = useCosmosStore.getState().objectWorldPositions[object.parentId!];
+      if (parentPosArr) {
+        const periodDays = object.orbitPeriodDays || 27.32; // Default to Moon's period
+        const orbitalVelocity = getOrbitalAngularVelocity(periodDays);
+        const angle = time * orbitalVelocity;
+        groupRef.current.position.x = parentPosArr[0] + Math.cos(angle) * moonOrbitRadius;
+        groupRef.current.position.y = parentPosArr[1];
+        groupRef.current.position.z = parentPosArr[2] + Math.sin(angle) * moonOrbitRadius;
       }
-      if (cloudMaterialRef.current) {
-        cloudMaterialRef.current.uniforms.time.value = time;
-        cloudMaterialRef.current.uniforms.objectCenter.value.copy(worldPos.current);
-        if (isMoon) {
-          cloudMaterialRef.current.uniforms.parentCenter.value.copy(parentPos.current);
-          cloudMaterialRef.current.uniforms.parentRadius.value = parentPlanetSize;
-        }
-      }
-      if (atmosphereMaterialRef.current) {
-        atmosphereMaterialRef.current.uniforms.objectCenter.value.copy(worldPos.current);
-        if (isMoon) {
-          atmosphereMaterialRef.current.uniforms.parentCenter.value.copy(parentPos.current);
-          atmosphereMaterialRef.current.uniforms.parentRadius.value = parentPlanetSize;
-        }
-      }
-      if (ringMaterialRef.current) {
-        ringMaterialRef.current.uniforms.objectCenter.value.copy(worldPos.current);
-        ringMaterialRef.current.uniforms.planetRadius.value = planetSize;
+    }
+    // Planets: orbit around the Sun (origin) with real Keplerian proportions
+    else if (orbitRadius > 0 && !isMoon) {
+      const periodDays = object.orbitPeriodDays || 365.25; // Default to Earth's period
+      const orbitalVelocity = getOrbitalAngularVelocity(periodDays);
+      const angle = time * orbitalVelocity;
+      groupRef.current.position.x = Math.cos(angle) * orbitRadius;
+      groupRef.current.position.z = Math.sin(angle) * orbitRadius;
+    }
+
+    // Now that motion is applied, compute world position and update shader uniforms
+    groupRef.current.getWorldPosition(worldPos.current);
+
+    // Get parent position for shadow calculations (moons only)
+    if (isMoon && object.parentId) {
+      const parentPosArr = useCosmosStore.getState().objectWorldPositions[object.parentId];
+      if (parentPosArr) {
+        parentPos.current.set(parentPosArr[0], parentPosArr[1], parentPosArr[2]);
       }
     }
 
-    if (groupRef.current) {
-      // Calculate orbital angular velocity from real orbital period
-      // Scale: 1 Earth year (365.25 days) = 60 seconds at 1x speed
-      // angular velocity = 2π / (periodDays / 365.25 * 60) = 2π * 365.25 / (periodDays * 60)
-      const getOrbitalAngularVelocity = (periodDays: number) => {
-        return (2 * Math.PI * 365.25) / (periodDays * 60);
-      };
+    if (planetMaterialRef.current) {
+      planetMaterialRef.current.uniforms.time.value = time;
+      planetMaterialRef.current.uniforms.objectCenter.value.copy(worldPos.current);
+      if (isMoon) {
+        planetMaterialRef.current.uniforms.parentCenter.value.copy(parentPos.current);
+        planetMaterialRef.current.uniforms.parentRadius.value = parentPlanetSize;
+      }
+    }
+    if (cloudMaterialRef.current) {
+      cloudMaterialRef.current.uniforms.time.value = time;
+      cloudMaterialRef.current.uniforms.objectCenter.value.copy(worldPos.current);
+      if (isMoon) {
+        cloudMaterialRef.current.uniforms.parentCenter.value.copy(parentPos.current);
+        cloudMaterialRef.current.uniforms.parentRadius.value = parentPlanetSize;
+      }
+    }
+    if (atmosphereMaterialRef.current) {
+      atmosphereMaterialRef.current.uniforms.objectCenter.value.copy(worldPos.current);
+      if (isMoon) {
+        atmosphereMaterialRef.current.uniforms.parentCenter.value.copy(parentPos.current);
+        atmosphereMaterialRef.current.uniforms.parentRadius.value = parentPlanetSize;
+      }
+    }
+    if (ringMaterialRef.current) {
+      ringMaterialRef.current.uniforms.objectCenter.value.copy(worldPos.current);
+      ringMaterialRef.current.uniforms.planetRadius.value = planetSize;
+    }
 
-      // Moons: orbit around their parent planet's world position
-      if (isMoon && moonOrbitRadius > 0) {
-        const parentPos = useCosmosStore.getState().objectWorldPositions[object.parentId!];
-        if (parentPos) {
-          const periodDays = object.orbitPeriodDays || 27.32; // Default to Moon's period
-          const orbitalVelocity = getOrbitalAngularVelocity(periodDays);
-          const angle = time * orbitalVelocity;
-          groupRef.current.position.x = parentPos[0] + Math.cos(angle) * moonOrbitRadius;
-          groupRef.current.position.y = parentPos[1];
-          groupRef.current.position.z = parentPos[2] + Math.sin(angle) * moonOrbitRadius;
-        }
-      }
-      // Planets: orbit around the Sun (origin) with real Keplerian proportions
-      else if (orbitRadius > 0 && !isMoon) {
-        const periodDays = object.orbitPeriodDays || 365.25; // Default to Earth's period
-        const orbitalVelocity = getOrbitalAngularVelocity(periodDays);
-        const angle = time * orbitalVelocity;
-        groupRef.current.position.x = Math.cos(angle) * orbitRadius;
-        groupRef.current.position.z = Math.sin(angle) * orbitRadius;
-      }
+    // Keep a live world-position for camera targeting (planets/moons move)
+    const shouldUpdateNow =
+      object.id === selectedObjectId ||
+      (selectedParentId && object.id === selectedParentId) ||
+      time - lastWorldPosUpdate.current > 0.03;
 
-      // Keep a live world-position for camera targeting (planets/moons move)
-      // Update the selected object every frame for smoother camera tracking.
-      // Also update the parent planet every frame when a moon is selected, so moon motion stays smooth.
-      const shouldUpdateNow =
-        object.id === selectedObjectId ||
-        (selectedParentId && object.id === selectedParentId) ||
-        time - lastWorldPosUpdate.current > 0.03;
-      if (shouldUpdateNow) {
-        lastWorldPosUpdate.current = time;
-        groupRef.current.getWorldPosition(worldPos.current);
-        setObjectWorldPosition(object.id, [worldPos.current.x, worldPos.current.y, worldPos.current.z]);
-      }
+    if (shouldUpdateNow) {
+      lastWorldPosUpdate.current = time;
+      setObjectWorldPosition(object.id, [worldPos.current.x, worldPos.current.y, worldPos.current.z]);
     }
 
     // Atmosphere pulse
@@ -822,6 +818,7 @@ export const TexturedPlanet = ({
               <shaderMaterial
                 ref={ringMaterialRef}
                 transparent
+                depthWrite={false}
                 side={THREE.DoubleSide}
                 uniforms={{
                   ringColor: { value: new THREE.Color(visuals.ringColor || '#d4b896') },
@@ -909,11 +906,11 @@ export const TexturedPlanet = ({
 
                     // Forward scattering when sun behind rings relative to camera
                     vec3 viewDir = normalize(cameraPosition - vWorldPosition);
-                    float forwardScatter = pow(max(dot(-viewDir, sunDir), 0.0), 2.5) * 0.25;
+                    float forwardScatter = pow(max(dot(-viewDir, sunDir), 0.0), 2.2) * 0.35;
 
                     // Combine lighting - brighter base for visibility
-                    float ambient = 0.015;
-                    float baseDiffuse = planeIncidence * 0.9 + 0.15 + forwardScatter;
+                    float ambient = 0.025;
+                    float baseDiffuse = planeIncidence * 1.15 + 0.28 + forwardScatter * 1.25;
                     float diffuse = baseDiffuse * shadow * daylight;
                     float totalLight = ambient + diffuse;
 
