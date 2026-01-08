@@ -301,36 +301,48 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
       armCoreCol[i3 + 2] = color.b;
     }
     
-    // === DUST LANES (PROMINENT dark brown bands - like reference) ===
-    const dustCount = 80000;
+    // === DUST LANES (VERY PROMINENT dark brown bands - like reference side view) ===
+    const dustCount = 150000;
     const dustPos = new Float32Array(dustCount * 3);
     const dustCol = new Float32Array(dustCount * 3);
     
     for (let i = 0; i < dustCount; i++) {
       const i3 = i * 3;
       
-      // Dust throughout the disk, concentrated along arms
+      // Dust concentrated along the disk midplane and arm edges
       const armIdx = Math.floor(Math.random() * 4);
       const arm = MILKY_WAY.arms[armIdx];
       
-      const t = Math.pow(Math.random(), 0.35);
-      const r = (4000 + t * 48000) * gs;
+      const t = Math.pow(Math.random(), 0.3);
+      const r = (3000 + t * 50000) * gs;
       
       const winding = 0.22;
-      const spiralAngle = arm.startAngle + Math.log(r / (5000 * gs) + 0.1) / winding;
+      const spiralAngle = arm.startAngle + Math.log(r / (4000 * gs) + 0.1) / winding;
       
-      // Dust on inner edge of arms and in between
-      const laneOffset = Math.random() < 0.6 ? -0.08 : (Math.random() - 0.5) * 0.3;
-      const spread = (Math.random() - 0.5) * 2000 * gs;
+      // Create prominent lane structure - inner edges of arms + scattered through disk
+      const laneType = Math.random();
+      let laneOffset;
+      if (laneType < 0.5) {
+        // Inner edge of arm - most prominent
+        laneOffset = -0.1 + (Math.random() - 0.5) * 0.04;
+      } else if (laneType < 0.75) {
+        // Through arm center
+        laneOffset = (Math.random() - 0.5) * 0.15;
+      } else {
+        // Between arms - scattered
+        laneOffset = (Math.random() - 0.5) * 0.5;
+      }
+      
+      const spread = (Math.random() - 0.5) * 2500 * gs;
       const finalAngle = spiralAngle + laneOffset + spread / (r + 1);
       
       dustPos[i3] = Math.cos(finalAngle) * r;
-      dustPos[i3 + 1] = (Math.random() - 0.5) * 25 * gs; // Very thin dust layer
+      dustPos[i3 + 1] = (Math.random() - 0.5) * 15 * gs; // Very thin - concentrated in midplane
       dustPos[i3 + 2] = Math.sin(finalAngle) * r;
       
-      // Dark brown/reddish dust like in reference side view
-      const dustBrightness = 0.05 + Math.random() * 0.08;
-      color.setHSL(0.03 + Math.random() * 0.04, 0.6 + Math.random() * 0.25, dustBrightness);
+      // DARK brown/reddish dust - very dark like reference
+      const dustBrightness = 0.02 + Math.random() * 0.06;
+      color.setHSL(0.02 + Math.random() * 0.04, 0.7 + Math.random() * 0.25, dustBrightness);
       dustCol[i3] = color.r;
       dustCol[i3 + 1] = color.g;
       dustCol[i3 + 2] = color.b;
@@ -783,15 +795,15 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
         />
       </points>
       
-      {/* Dust lanes - PROMINENT dark brown bands */}
+      {/* Dust lanes - VERY PROMINENT dark brown bands */}
       <points geometry={dustGeo}>
         <pointsMaterial
-          size={gs * 800}
+          size={gs * 1200}
           map={dustTexture}
           vertexColors
           sizeAttenuation
           transparent
-          opacity={0.7}
+          opacity={0.85}
           blending={THREE.NormalBlending}
           depthWrite={false}
         />
