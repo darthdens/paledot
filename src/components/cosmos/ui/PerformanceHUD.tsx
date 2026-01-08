@@ -1,14 +1,18 @@
 import { useThree, useFrame } from '@react-three/fiber';
 import { Html } from '@react-three/drei';
 import { useRef, useState } from 'react';
+import { useCosmosStore } from '../store/useCosmosStore';
 
 export const PerformanceHUD = () => {
   const { gl } = useThree();
+  const showPerformanceHUD = useCosmosStore((state) => state.showPerformanceHUD);
   const [stats, setStats] = useState({ fps: 0, drawCalls: 0, triangles: 0 });
   const frameCount = useRef(0);
   const lastTime = useRef(performance.now());
 
   useFrame(() => {
+    if (!showPerformanceHUD) return;
+    
     frameCount.current++;
     const now = performance.now();
     const elapsed = now - lastTime.current;
@@ -28,6 +32,8 @@ export const PerformanceHUD = () => {
       lastTime.current = now;
     }
   });
+
+  if (!showPerformanceHUD) return null;
 
   return (
     <Html
