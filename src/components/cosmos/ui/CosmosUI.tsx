@@ -1,7 +1,8 @@
 import { useLanguage } from '@/i18n/LanguageContext';
 import { Button } from '@/components/ui/button';
-import { HelpCircle, Compass } from 'lucide-react';
+import { HelpCircle, Compass, Maximize, Minimize } from 'lucide-react';
 import { useCosmosStore } from '../store/useCosmosStore';
+import { useState, useCallback } from 'react';
 
 const translations = {
   en: {
@@ -32,6 +33,18 @@ export const CosmosUI = () => {
   const { language } = useLanguage();
   const t = translations[language];
   const { startTour, toggleQuickJump, showControlHints, setShowControlHints } = useCosmosStore();
+  const [isFullscreen, setIsFullscreen] = useState(false);
+
+  const toggleFullscreen = useCallback(() => {
+    const container = document.querySelector('[data-cosmos-container]');
+    if (!container) return;
+
+    if (!document.fullscreenElement) {
+      container.requestFullscreen().then(() => setIsFullscreen(true)).catch(() => {});
+    } else {
+      document.exitFullscreen().then(() => setIsFullscreen(false)).catch(() => {});
+    }
+  }, []);
 
   return (
     <>
@@ -63,6 +76,9 @@ export const CosmosUI = () => {
 
       {/* Top controls */}
       <div className="absolute top-4 right-4 flex gap-2 z-40">
+        <Button size="icon" variant="ghost" onClick={toggleFullscreen} className="bg-white/10 hover:bg-white/20 text-white">
+          {isFullscreen ? <Minimize className="w-5 h-5" /> : <Maximize className="w-5 h-5" />}
+        </Button>
         <Button size="icon" variant="ghost" onClick={toggleQuickJump} className="bg-white/10 hover:bg-white/20 text-white">
           <Compass className="w-5 h-5" />
         </Button>

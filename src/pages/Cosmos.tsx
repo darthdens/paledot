@@ -38,11 +38,12 @@ const Cosmos = () => {
         </section>
 
         {/* 3D Cosmos Section */}
-        <section className="container mx-auto px-2 sm:px-4 md:px-6 max-w-7xl pb-8">
+        <section className="container mx-auto px-4 sm:px-6 max-w-7xl pb-8">
           <div 
             className="w-full h-[50vh] sm:h-[55vh] md:h-[65vh] lg:h-[70vh] rounded-lg overflow-hidden border border-border"
             style={{ backgroundColor: '#000', colorScheme: 'dark' }}
             data-theme="dark"
+            data-cosmos-container
           >
             <CosmosExplorer />
           </div>
