@@ -898,24 +898,26 @@ export const TexturedPlanet = ({
                     float ambient = 0.012;
                     float diffuse = NdotL * 0.988 * shadow;
                     float totalLight = ambient + diffuse;
-
+ 
                     // Ring density and bands
                     float dist = length(vLocalPosition.xy);
                     float normalizedDist = (dist - innerRadius) / (outerRadius - innerRadius);
                     float bands = sin(normalizedDist * 60.0) * 0.5 + 0.5;
                     bands = mix(0.75, 1.0, bands);
-
+ 
                     // Cassini division gap
                     float gap = smoothstep(0.45, 0.5, normalizedDist) * (1.0 - smoothstep(0.5, 0.55, normalizedDist));
                     float ringDensity = bands * (1.0 - gap * 0.7);
-
+ 
                     float ringOpacity = opacity * ringDensity;
                     float edgeFade = smoothstep(0.0, 0.08, normalizedDist) * smoothstep(1.0, 0.92, normalizedDist);
-
+ 
                     // Stable opacity (not affected by lighting)
                     float alpha = ringOpacity * edgeFade;
-
-                    vec3 litRing = ringColor * totalLight;
+ 
+                    // Keep ring visibility comparable to planet surface (same lighting model, slightly boosted output)
+                    float ringBrightness = 1.8;
+                    vec3 litRing = ringColor * totalLight * ringBrightness;
                     gl_FragColor = vec4(litRing, alpha);
                   }
                 `}
