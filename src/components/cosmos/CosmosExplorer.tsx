@@ -72,9 +72,6 @@ export const CosmosExplorer = () => {
     return () => observer.disconnect();
   }, []);
   
-  // Auto-hide orbits when zoomed in close (earth scale) - they're distracting up close
-  const shouldShowOrbits = showOrbits && currentScale !== 'earth';
-  
   const planets = celestialObjects.filter(obj => 
     obj.type === 'planet' || obj.type === 'dwarf-planet'
   );
@@ -89,7 +86,7 @@ export const CosmosExplorer = () => {
   // Pre-calculate moon orbit data for orbit visualization
   // Only show orbits for moons of the selected planet (or if a moon of that planet is selected)
   const moonOrbits = useMemo(() => {
-    if (!shouldShowOrbits || !selectedObject) return [];
+    if (!showOrbits || !selectedObject) return [];
 
     // Get the parent planet ID to show moon orbits for
     const focusedPlanetId = selectedObject.type === 'moon' 
@@ -106,7 +103,7 @@ export const CosmosExplorer = () => {
          orbitRadius: getMoonOrbitRadius(moon, UNIFIED_SCALE),
          color: moon.color,
        }));
-  }, [moons, selectedObject, shouldShowOrbits]);
+  }, [moons, selectedObject, showOrbits]);
 
   // Start camera looking at Earth - the natural starting point for exploration
   const earthOrbitRadius = UNITS.KM_PER_AU * UNIFIED_SCALE; // Earth's distance from Sun in scene units
@@ -202,7 +199,7 @@ export const CosmosExplorer = () => {
             <TexturedPlanet 
               key={planet.id} 
               object={planet} 
-              showOrbit={shouldShowOrbits} 
+              showOrbit={showOrbits} 
               visualScale={UNIFIED_SCALE}
               distanceScale={UNIFIED_SCALE}
             />
