@@ -1,7 +1,7 @@
 import { useLanguage } from '@/i18n/LanguageContext';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
-import { HelpCircle, Compass, Maximize, Minimize, CircleDot, CircleOff, Clock, Timer, TimerOff, Sparkles } from 'lucide-react';
+import { HelpCircle, Compass, Maximize, Minimize, CircleDot, CircleOff, Clock, Timer, TimerOff, Sparkles, Activity } from 'lucide-react';
 import { useCosmosStore } from '../store/useCosmosStore';
 import { useFullscreenStore } from '../store/useFullscreenStore';
 import { useCallback, useEffect, useState } from 'react';
@@ -30,6 +30,8 @@ const translations = {
     hidePeriods: 'Hide periods',
     showTrails: 'Show trails',
     hideTrails: 'Hide trails',
+    showStats: 'Show performance stats',
+    hideStats: 'Hide performance stats',
   },
   fr: {
     startTour: 'Commencer la Visite',
@@ -53,6 +55,8 @@ const translations = {
     hidePeriods: 'Masquer périodes',
     showTrails: 'Afficher traînées',
     hideTrails: 'Masquer traînées',
+    showStats: 'Afficher stats performance',
+    hideStats: 'Masquer stats performance',
   },
 };
 
@@ -71,6 +75,8 @@ export const CosmosUI = () => {
     toggleTrails,
     showRealPeriods,
     toggleRealPeriods,
+    showPerformanceHUD,
+    togglePerformanceHUD,
     timeSpeed,
     setTimeSpeed,
   } = useCosmosStore();
@@ -430,6 +436,15 @@ export const CosmosUI = () => {
           ) : (
             <TimerOff className="w-3.5 h-3.5 sm:w-5 sm:h-5" />
           )}
+        </Button>
+        <Button
+          size="icon"
+          variant="ghost"
+          onClick={togglePerformanceHUD}
+          className="h-7 w-7 sm:h-9 sm:w-9 bg-white/10 hover:bg-white/20 text-white"
+          title={showPerformanceHUD ? t.hideStats : t.showStats}
+        >
+          <Activity className={`w-3.5 h-3.5 sm:w-5 sm:h-5 ${showPerformanceHUD ? 'text-green-400' : ''}`} />
         </Button>
         <Button
           size="icon"

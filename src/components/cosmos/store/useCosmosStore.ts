@@ -37,6 +37,7 @@ interface CosmosStore {
   showOrbits: boolean;
   showTrails: boolean;
   showRealPeriods: boolean;
+  showPerformanceHUD: boolean;
   recentJumps: string[];
 
   // Audio
@@ -71,6 +72,7 @@ interface CosmosStore {
   toggleOrbits: () => void;
   toggleTrails: () => void;
   toggleRealPeriods: () => void;
+  togglePerformanceHUD: () => void;
   addRecentJump: (objectId: string) => void;
   jumpToObject: (object: CelestialObject) => void;
   setMuted: (muted: boolean) => void;
@@ -115,6 +117,7 @@ export const useCosmosStore = create<CosmosStore>()(
       showOrbits: true,
       showTrails: true,
       showRealPeriods: false,
+      showPerformanceHUD: false,
       recentJumps: [],
 
       isMuted: false,
@@ -174,6 +177,8 @@ export const useCosmosStore = create<CosmosStore>()(
       toggleTrails: () => set((state) => ({ showTrails: !state.showTrails })),
 
       toggleRealPeriods: () => set((state) => ({ showRealPeriods: !state.showRealPeriods })),
+
+      togglePerformanceHUD: () => set((state) => ({ showPerformanceHUD: !state.showPerformanceHUD })),
       
       addRecentJump: (objectId) => {
         const { recentJumps } = get();
