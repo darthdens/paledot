@@ -908,9 +908,9 @@ export const TexturedPlanet = ({
                     vec3 viewDir = normalize(cameraPosition - vWorldPosition);
                     float forwardScatter = pow(max(dot(-viewDir, sunDir), 0.0), 2.2) * 0.35;
 
-                    // Combine lighting - brighter base for visibility
-                    float ambient = 0.025;
-                    float baseDiffuse = planeIncidence * 1.15 + 0.28 + forwardScatter * 1.25;
+                    // Combine lighting - boost lit-side visibility
+                    float ambient = 0.04;
+                    float baseDiffuse = planeIncidence * 1.25 + 0.4 + forwardScatter * 1.4;
                     float diffuse = baseDiffuse * shadow * daylight;
                     float totalLight = ambient + diffuse;
 
@@ -918,7 +918,7 @@ export const TexturedPlanet = ({
                     float dist = length(vLocalPosition.xy);
                     float normalizedDist = (dist - innerRadius) / (outerRadius - innerRadius);
                     float bands = sin(normalizedDist * 60.0) * 0.5 + 0.5;
-                    bands = mix(0.7, 1.0, bands);
+                    bands = mix(0.75, 1.0, bands);
 
                     // Cassini division gap
                     float gap = smoothstep(0.45, 0.5, normalizedDist) * (1.0 - smoothstep(0.5, 0.55, normalizedDist));
@@ -927,14 +927,13 @@ export const TexturedPlanet = ({
                     float ringOpacity = opacity * ringDensity;
                     float edgeFade = smoothstep(0.0, 0.08, normalizedDist) * smoothstep(1.0, 0.92, normalizedDist);
 
-                    // Alpha: night side dim but not invisible, shadow areas dimmer
-                    // Ensure rings stay visible on lit side
-                    float nightFloor = 0.04;
-                    float shadowFloor = 0.08;
+                    // Alpha: keep night-side visible enough to never "disappear" when time speed changes.
+                    float nightFloor = 0.06;
+                    float shadowFloor = 0.12;
                     float visibility = max(nightFloor, daylight) * max(shadowFloor, shadow);
-                    float alpha = ringOpacity * edgeFade * visibility;
+                    float alpha = ringOpacity * edgeFade * max(0.02, visibility);
 
-                    vec3 litRing = ringColor * totalLight;
+                    vec3 litRing = ringColor * totalLight * 1.6;
                     gl_FragColor = vec4(litRing, alpha);
                   }
                 `}
