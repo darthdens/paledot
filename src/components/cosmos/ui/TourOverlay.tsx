@@ -88,6 +88,40 @@ export const TourOverlay = () => {
     
     return () => clearTimeout(timer);
   }, [isTouring, isPaused, tourIndex, currentStop, goToStop, stopTour]);
+
+  // Keyboard shortcuts
+  useEffect(() => {
+    if (!isTouring) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Prevent default behavior for our shortcuts
+      if (['ArrowLeft', 'ArrowRight', 'Space', 'Escape'].includes(e.code)) {
+        e.preventDefault();
+      }
+
+      switch (e.code) {
+        case 'ArrowLeft':
+          if (tourIndex > 0) {
+            goToStop(tourIndex - 1);
+          }
+          break;
+        case 'ArrowRight':
+          if (tourIndex < tourStops.length - 1) {
+            goToStop(tourIndex + 1);
+          }
+          break;
+        case 'Space':
+          togglePause();
+          break;
+        case 'Escape':
+          stopTour();
+          break;
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isTouring, tourIndex, goToStop, togglePause, stopTour]);
   
   const handlePrevious = () => {
     if (tourIndex > 0) {
