@@ -11,6 +11,7 @@ import { KuiperBelt } from './objects/KuiperBelt';
 import { TrojanAsteroids } from './objects/TrojanAsteroids';
 import { Comets } from './objects/Comet';
 import { MilkyWayGalaxy } from './objects/MilkyWayGalaxy';
+import { OortCloud } from './objects/OortCloud';
 import { CosmosUI } from './ui/CosmosUI';
 import { InfoCard } from './ui/InfoCard';
 import { QuickJumpMenu } from './ui/QuickJumpMenu';
@@ -190,6 +191,9 @@ export const CosmosExplorer = () => {
             scale={UNIFIED_SCALE}
           />
           
+          {/* Oort Cloud - outermost boundary of Solar System */}
+          <OortCloud visualScale={UNIFIED_SCALE} />
+          
           {/* Famous comets with tails */}
           <Comets scale={UNIFIED_SCALE} />
           
@@ -236,13 +240,17 @@ export const CosmosExplorer = () => {
             />
           ))}
           
-          {/* Distant stars (very simplified) */}
-          {stars.map(star => (
-            <mesh key={star.id} position={star.position}>
-              <sphereGeometry args={[star.size * 0.001, 16, 16]} />
-              <meshBasicMaterial color={star.color} />
-            </mesh>
-          ))}
+          {/* Distant stars - render as point lights, not scaled spheres */}
+          {stars.map(star => {
+            // Stars should appear as bright points, not scaled spheres
+            const starVisualSize = Math.min(star.size * UNIFIED_SCALE * 0.1, 5000);
+            return (
+              <mesh key={star.id} position={star.position.map(p => p * UNIFIED_SCALE) as [number, number, number]}>
+                <sphereGeometry args={[starVisualSize, 8, 8]} />
+                <meshBasicMaterial color={star.color} transparent opacity={0.9} />
+              </mesh>
+            );
+          })}
           
           {/* Performance stats */}
           <PerformanceHUD />
