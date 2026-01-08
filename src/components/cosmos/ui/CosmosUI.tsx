@@ -559,9 +559,8 @@ export const CosmosUI = () => {
             : undefined
         }
       >
-        <div className="bg-black/60 backdrop-blur-sm rounded-lg p-1.5 sm:p-2">
-          <div className="flex items-center gap-1 sm:gap-1.5">
-            {/* Navigation group */}
+        <div className="flex items-center gap-1 sm:gap-1.5">
+          {/* Navigation group */}
             <Button size="icon" variant="ghost" onClick={toggleFullscreen} className="h-8 w-8 sm:h-9 sm:w-9 bg-white/10 hover:bg-white/20 text-white" title={isFullscreen ? t.exitFullscreen : t.fullscreen}>
               {isFullscreen ? <Minimize className="w-4 h-4 sm:w-5 sm:h-5" /> : <Maximize className="w-4 h-4 sm:w-5 sm:h-5" />}
             </Button>
@@ -597,7 +596,6 @@ export const CosmosUI = () => {
               <HelpCircle className="w-4 h-4 sm:w-5 sm:h-5" />
             </Button>
           </div>
-        </div>
       </div>
 
       {/* Time speed slider */}
