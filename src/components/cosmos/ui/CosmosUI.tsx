@@ -4,7 +4,7 @@ import { Slider } from '@/components/ui/slider';
 import { HelpCircle, Compass, Maximize, Minimize, CircleDot, CircleOff, Clock, Timer, TimerOff, Sparkles, Activity, Home, Scaling, BarChart3 } from 'lucide-react';
 import { useCosmosStore } from '../store/useCosmosStore';
 import { useFullscreenStore } from '../store/useFullscreenStore';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { ObjectSearch } from './ObjectSearch';
 import { useIsMobile } from '@/hooks/use-mobile';
 
@@ -97,10 +97,12 @@ export const CosmosUI = () => {
   const { language } = useLanguage();
   const t = translations[language];
   const isMobile = useIsMobile();
+  const quickJumpButtonRef = useRef<HTMLButtonElement | null>(null);
   const {
     startTour,
     isTouring,
     toggleQuickJump,
+    setQuickJumpAnchorRect,
     showControlHints,
     setShowControlHints,
     showOrbits,
@@ -120,6 +122,17 @@ export const CosmosUI = () => {
   } = useCosmosStore();
   const { isFullscreen, setIsFullscreen } = useFullscreenStore();
   const [showTimeSlider, setShowTimeSlider] = useState(false);
+
+  const handleQuickJumpClick = () => {
+    const el = quickJumpButtonRef.current;
+    if (el) {
+      const r = el.getBoundingClientRect();
+      setQuickJumpAnchorRect({ left: r.left, top: r.top, width: r.width, height: r.height });
+    } else {
+      setQuickJumpAnchorRect(null);
+    }
+    toggleQuickJump();
+  };
 
   const setPageChromeHidden = useCallback((hidden: boolean) => {
     const nav = (document.querySelector('[data-app-nav]') || document.querySelector('nav')) as HTMLElement | null;
@@ -551,7 +564,7 @@ export const CosmosUI = () => {
             <Button size="icon" variant="ghost" onClick={toggleFullscreen} className="h-8 w-8 sm:h-9 sm:w-9 bg-white/10 hover:bg-white/20 text-white" title={isFullscreen ? t.exitFullscreen : t.fullscreen}>
               {isFullscreen ? <Minimize className="w-4 h-4 sm:w-5 sm:h-5" /> : <Maximize className="w-4 h-4 sm:w-5 sm:h-5" />}
             </Button>
-            <Button size="icon" variant="ghost" onClick={toggleQuickJump} className="h-8 w-8 sm:h-9 sm:w-9 bg-white/10 hover:bg-white/20 text-white" title={t.quickJump}>
+            <Button ref={quickJumpButtonRef} size="icon" variant="ghost" onClick={handleQuickJumpClick} className="h-8 w-8 sm:h-9 sm:w-9 bg-white/10 hover:bg-white/20 text-white" title={t.quickJump}>
               <Compass className="w-4 h-4 sm:w-5 sm:h-5" />
             </Button>
             <Button size="icon" variant="ghost" onClick={goHome} className="h-8 w-8 sm:h-9 sm:w-9 bg-white/10 hover:bg-white/20 text-white" title={t.home}>

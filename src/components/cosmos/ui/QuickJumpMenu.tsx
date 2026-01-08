@@ -28,6 +28,7 @@ export const QuickJumpMenu = () => {
   const [expandedCategory, setExpandedCategory] = useState<string | null>('solarSystem');
   
   const showQuickJump = useCosmosStore(state => state.showQuickJump);
+  const quickJumpAnchorRect = useCosmosStore(state => state.quickJumpAnchorRect);
   const toggleQuickJump = useCosmosStore(state => state.toggleQuickJump);
   const jumpToObject = useCosmosStore(state => state.jumpToObject);
   const recentJumps = useCosmosStore(state => state.recentJumps);
@@ -50,17 +51,25 @@ export const QuickJumpMenu = () => {
 
   const isComingSoon = (categoryId: string) => !IMPLEMENTED_CATEGORIES.includes(categoryId);
 
-  // Position: align left edge of modal with left edge of Quick Jump button
-  // Button order from right: Help, divider, Size, Time, Trails, Orbits, divider, Home, QuickJump, Fullscreen
-  // From right edge: need to offset to reach QuickJump's LEFT edge
-  // Buttons: 36px each (h-9 w-9), gaps: 6px (gap-1.5), dividers: 1px + 2px margins = ~5px, padding: 8px
-  // Right offset to QuickJump left = Help(36) + gap(6) + div(5) + gap(6) + Size(36) + gap(6) + Time(36) + gap(6) + Trails(36) + gap(6) + Orbits(36) + gap(6) + div(5) + gap(6) + Home(36) + gap(6) + QuickJump(36) + padding(8) = ~298px
+  const gap = 8;
+
+  const menuTop = quickJumpAnchorRect
+    ? `${Math.round(quickJumpAnchorRect.top + quickJumpAnchorRect.height + gap)}px`
+    : isFullscreen
+      ? 'calc(68px + env(safe-area-inset-top))'
+      : '68px';
+
+  const menuLeft = quickJumpAnchorRect
+    ? `${Math.round(quickJumpAnchorRect.left)}px`
+    : undefined;
+
   const menu = (
     <div 
-      className={`${isFullscreen ? 'fixed' : 'absolute'} top-[68px] right-4 z-[10001] w-[calc(100vw-2rem)] max-w-56 sm:max-w-64 max-h-[calc(100vh-100px)] bg-black/90 backdrop-blur-md rounded-lg border border-white/20 overflow-hidden flex flex-col`}
+      className={`fixed z-[10001] w-[calc(100vw-2rem)] max-w-56 sm:max-w-64 max-h-[calc(100vh-100px)] bg-black/90 backdrop-blur-md rounded-lg border border-white/20 overflow-hidden flex flex-col`}
       style={{
-        right: isFullscreen ? 'calc(232px + env(safe-area-inset-right))' : '232px',
-        top: isFullscreen ? 'calc(68px + env(safe-area-inset-top))' : '68px',
+        top: menuTop,
+        left: menuLeft,
+        right: menuLeft ? 'auto' : isFullscreen ? 'calc(1rem + env(safe-area-inset-right))' : '1rem',
       }}
     >
       {/* Header */}

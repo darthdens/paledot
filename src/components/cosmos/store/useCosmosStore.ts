@@ -2,6 +2,13 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { ScaleLevel, CelestialObject, SCALE_BOUNDARIES } from '../types';
 
+export type AnchorRect = {
+  left: number;
+  top: number;
+  width: number;
+  height: number;
+};
+
 interface TourCameraTarget {
   position: [number, number, number];
   lookAt: [number, number, number];
@@ -33,6 +40,7 @@ interface CosmosStore {
   // UI
   showControlHints: boolean;
   showQuickJump: boolean;
+  quickJumpAnchorRect: AnchorRect | null;
   showSizeComparison: boolean;
   showOrbits: boolean;
   showTrails: boolean;
@@ -68,13 +76,14 @@ interface CosmosStore {
   setTourCameraTarget: (target: TourCameraTarget | null) => void;
   togglePause: () => void;
   setShowControlHints: (show: boolean) => void;
+  setQuickJumpAnchorRect: (rect: AnchorRect | null) => void;
   toggleQuickJump: () => void;
   toggleSizeComparison: () => void;
   toggleOrbits: () => void;
   toggleTrails: () => void;
   toggleRealPeriods: () => void;
   togglePerformanceHUD: () => void;
-  toggleExaggeratedScale: () => void;
+
   addRecentJump: (objectId: string) => void;
   jumpToObject: (object: CelestialObject) => void;
   goHome: () => void;
@@ -116,11 +125,13 @@ export const useCosmosStore = create<CosmosStore>()(
       
       showControlHints: true,
       showQuickJump: false,
+      quickJumpAnchorRect: null,
       showSizeComparison: false,
       showOrbits: true,
       showTrails: true,
       showRealPeriods: false,
       showPerformanceHUD: false,
+
       useExaggeratedScale: true,
       recentJumps: [],
 
@@ -171,6 +182,8 @@ export const useCosmosStore = create<CosmosStore>()(
       togglePause: () => set((state) => ({ isPaused: !state.isPaused })),
       
       setShowControlHints: (show) => set({ showControlHints: show }),
+
+      setQuickJumpAnchorRect: (rect) => set({ quickJumpAnchorRect: rect }),
       
       toggleQuickJump: () => set((state) => ({ showQuickJump: !state.showQuickJump })),
       
