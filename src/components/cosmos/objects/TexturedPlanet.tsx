@@ -554,43 +554,59 @@ export const TexturedPlanet = ({
                 float calculateRingShadow(vec3 fragWorldPos, vec3 sunDir) {
                   if (hasRings < 0.5) return 1.0;
                   
-                  // Ring plane is in XZ plane of the planet (after tilt), passing through objectCenter
-                  // For simplicity, we'll use the world Y coordinate relative to planet center
+                  // Get fragment position relative to planet center
                   vec3 relPos = fragWorldPos - objectCenter;
                   
-                  // Apply inverse tilt to get position in ring's reference frame
-                  float cosT = cos(-planetTilt);
-                  float sinT = sin(-planetTilt);
+                  // Build rotation matrix for planet tilt (rings are tilted with planet)
+                  // Tilt is around X axis
+                  float cosT = cos(planetTilt);
+                  float sinT = sin(planetTilt);
+                  
+                  // Transform to ring's local frame (undo tilt)
                   vec3 ringFramePos;
                   ringFramePos.x = relPos.x;
-                  ringFramePos.y = relPos.y * cosT - relPos.z * sinT;
-                  ringFramePos.z = relPos.y * sinT + relPos.z * cosT;
+                  ringFramePos.y = relPos.y * cosT + relPos.z * sinT;
+                  ringFramePos.z = -relPos.y * sinT + relPos.z * cosT;
                   
-                  // Transform sun direction to ring frame too
+                  // Transform sun direction to ring frame
                   vec3 ringFrameSunDir;
                   ringFrameSunDir.x = sunDir.x;
-                  ringFrameSunDir.y = sunDir.y * cosT - sunDir.z * sinT;
-                  ringFrameSunDir.z = sunDir.y * sinT + sunDir.z * cosT;
+                  ringFrameSunDir.y = sunDir.y * cosT + sunDir.z * sinT;
+                  ringFrameSunDir.z = -sunDir.y * sinT + sunDir.z * cosT;
                   
-                  // Ray-plane intersection: ring plane is Y=0 in ring frame
-                  if (abs(ringFrameSunDir.y) < 0.001) return 1.0; // Ray parallel to plane
+                  // Ring plane is Y=0 in ring frame
+                  // We need to trace a ray FROM the fragment TOWARD the sun
+                  // and see if it hits the ring plane within ring bounds
+                  if (abs(ringFrameSunDir.y) < 0.0001) return 1.0; // Ray parallel to plane
                   
+                  // t = how far along sunDir to reach y=0
                   float t = -ringFramePos.y / ringFrameSunDir.y;
-                  if (t < 0.0) return 1.0; // Ring plane is behind us relative to sun
+                  
+                  // t > 0 means ring plane is between fragment and sun
+                  if (t <= 0.0) return 1.0;
                   
                   // Intersection point on ring plane
                   vec3 hitPoint = ringFramePos + ringFrameSunDir * t;
                   float distFromCenter = length(vec2(hitPoint.x, hitPoint.z));
                   
                   // Check if within ring bounds
-                  if (distFromCenter > ringInnerRadius && distFromCenter < ringOuterRadius) {
-                    // Create some variation in shadow (ring density)
+                  if (distFromCenter >= ringInnerRadius && distFromCenter <= ringOuterRadius) {
+                    // Ring shadow with density variation
                     float ringPos = (distFromCenter - ringInnerRadius) / (ringOuterRadius - ringInnerRadius);
-                    float ringDensity = 0.3 + 0.4 * (sin(ringPos * 60.0) * 0.5 + 0.5);
-                    // Gap in the middle of rings
-                    float gap = smoothstep(0.45, 0.5, ringPos) * (1.0 - smoothstep(0.5, 0.55, ringPos));
-                    ringDensity *= (1.0 - gap * 0.8);
-                    return 1.0 - ringDensity * 0.7;
+                    
+                    // Multiple ring bands with varying density
+                    float bands = 0.5 + 0.5 * sin(ringPos * 80.0);
+                    float fineBands = 0.7 + 0.3 * sin(ringPos * 200.0);
+                    float ringDensity = 0.4 + 0.35 * bands * fineBands;
+                    
+                    // Cassini Division (gap at ~0.55-0.65 of ring width for Saturn)
+                    float cassiniGap = smoothstep(0.55, 0.58, ringPos) * (1.0 - smoothstep(0.62, 0.65, ringPos));
+                    ringDensity *= (1.0 - cassiniGap * 0.9);
+                    
+                    // Inner rings are denser
+                    ringDensity *= 1.2 - ringPos * 0.4;
+                    
+                    return 1.0 - clamp(ringDensity * 0.75, 0.0, 0.8);
                   }
                   return 1.0;
                 }
