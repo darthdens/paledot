@@ -137,7 +137,7 @@ export const CosmosExplorer = () => {
             panSpeed={1}
             rotateSpeed={0.5}
             minDistance={1}
-            maxDistance={1e10}
+            maxDistance={1e15}
           />
           
           {/* Camera fly-to controller */}
@@ -240,17 +240,13 @@ export const CosmosExplorer = () => {
             />
           ))}
           
-          {/* Distant stars - render as point lights, not scaled spheres */}
-          {stars.map(star => {
-            // Stars should appear as bright points, not scaled spheres
-            const starVisualSize = Math.min(star.size * UNIFIED_SCALE * 0.1, 5000);
-            return (
-              <mesh key={star.id} position={star.position.map(p => p * UNIFIED_SCALE) as [number, number, number]}>
-                <sphereGeometry args={[starVisualSize, 8, 8]} />
-                <meshBasicMaterial color={star.color} transparent opacity={0.9} />
-              </mesh>
-            );
-          })}
+          {/* Distant stars - tiny point-like spheres */}
+          {stars.map(star => (
+            <mesh key={star.id} position={star.position.map(p => p * UNIFIED_SCALE) as [number, number, number]}>
+              <sphereGeometry args={[200, 6, 6]} />
+              <meshBasicMaterial color={star.color} transparent opacity={0.5} />
+            </mesh>
+          ))}
           
           {/* Performance stats */}
           <PerformanceHUD />
