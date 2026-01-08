@@ -40,7 +40,7 @@ export const QuickJumpMenu = () => {
   };
 
   return (
-    <div className="absolute top-12 right-2 sm:top-16 sm:right-4 z-50 w-56 sm:w-64 max-h-[70vh] bg-black/85 backdrop-blur-md rounded-lg border border-white/20 overflow-hidden flex flex-col">
+    <div className="absolute top-12 right-2 sm:top-16 sm:right-4 z-50 w-[calc(100vw-1rem)] max-w-56 sm:max-w-64 max-h-[50vh] sm:max-h-[60vh] bg-black/90 backdrop-blur-md rounded-lg border border-white/20 overflow-hidden flex flex-col">
       {/* Header */}
       <div className="flex items-center justify-between p-2 sm:p-3 border-b border-white/10 shrink-0">
         <h3 className="text-white font-semibold text-sm">{t.title}</h3>
