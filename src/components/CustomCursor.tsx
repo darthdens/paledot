@@ -11,6 +11,7 @@ export default function CustomCursor() {
   const [isVisible, setIsVisible] = useState(false);
   const [isPointer, setIsPointer] = useState(false);
   const [isDown, setIsDown] = useState(false);
+  const [isOnCosmos, setIsOnCosmos] = useState(false);
 
   useEffect(() => {
     // Only enable on devices that actually have a precise pointer (mouse/trackpad)
@@ -30,6 +31,10 @@ export default function CustomCursor() {
         "a[href], button[type='submit'], .nav-link, [data-external]"
       );
       setIsPointer(Boolean(el));
+      
+      // Check if hovering over cosmos container
+      const cosmosEl = (e.target as HTMLElement | null)?.closest('[data-cosmos-container]');
+      setIsOnCosmos(Boolean(cosmosEl));
     };
 
     const onEnter = () => setIsVisible(true);
@@ -76,7 +81,8 @@ export default function CustomCursor() {
         "custom-cursor",
         isVisible && "is-visible",
         isPointer && "is-pointer",
-        isDown && "is-down"
+        isDown && "is-down",
+        isOnCosmos && "is-cosmos"
       )}
     >
       <div className="custom-cursor__ring">
