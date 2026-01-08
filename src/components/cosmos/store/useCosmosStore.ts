@@ -15,6 +15,9 @@ interface CosmosStore {
   selectedObject: CelestialObject | null;
   hoveredObject: CelestialObject | null;
 
+  // Following
+  isFollowing: boolean;
+
   // Tour
   isTouring: boolean;
   tourIndex: number;
@@ -44,6 +47,8 @@ interface CosmosStore {
 
   setSelectedObject: (object: CelestialObject | null) => void;
   setHoveredObject: (object: CelestialObject | null) => void;
+  setIsFollowing: (following: boolean) => void;
+  toggleFollowing: () => void;
   startTour: () => void;
   stopTour: () => void;
   setTourIndex: (index: number) => void;
@@ -80,6 +85,8 @@ export const useCosmosStore = create<CosmosStore>()(
       
       selectedObject: null,
       hoveredObject: null,
+
+      isFollowing: true,
       
       isTouring: false,
       tourIndex: 0,
@@ -116,9 +123,13 @@ export const useCosmosStore = create<CosmosStore>()(
 
       getObjectWorldPosition: (objectId) => get().objectWorldPositions[objectId] ?? null,
       
-      setSelectedObject: (object) => set({ selectedObject: object }),
+      setSelectedObject: (object) => set({ selectedObject: object, isFollowing: true }),
       
       setHoveredObject: (object) => set({ hoveredObject: object }),
+
+      setIsFollowing: (following) => set({ isFollowing: following }),
+
+      toggleFollowing: () => set((state) => ({ isFollowing: !state.isFollowing })),
       
       startTour: () => set({ isTouring: true, tourIndex: 0, isPaused: false }),
       

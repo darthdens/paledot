@@ -1,8 +1,11 @@
 import { useLanguage } from '@/i18n/LanguageContext';
 import { Button } from '@/components/ui/button';
-import { X, Navigation, Maximize2 } from 'lucide-react';
+import { X, Navigation, ChevronDown, ChevronUp, Eye, EyeOff } from 'lucide-react';
 import { useCosmosStore } from '../store/useCosmosStore';
+import { useFullscreenStore } from '../store/useFullscreenStore';
 import { UNITS } from '../types';
+import { useState } from 'react';
+import { createPortal } from 'react-dom';
 
 const translations = {
   en: {
@@ -12,6 +15,8 @@ const translations = {
     facts: 'Facts',
     flyTo: 'Fly to',
     close: 'Close',
+    follow: 'Follow',
+    unfollow: 'Unfollow',
     km: 'km',
     planet: 'Planet',
     star: 'Star',
@@ -29,6 +34,8 @@ const translations = {
     facts: 'Faits',
     flyTo: 'Aller vers',
     close: 'Fermer',
+    follow: 'Suivre',
+    unfollow: 'Arrêter',
     km: 'km',
     planet: 'Planète',
     star: 'Étoile',
@@ -94,6 +101,10 @@ export const InfoCard = () => {
   const selectedObject = useCosmosStore(state => state.selectedObject);
   const setSelectedObject = useCosmosStore(state => state.setSelectedObject);
   const jumpToObject = useCosmosStore(state => state.jumpToObject);
+  const isFollowing = useCosmosStore(state => state.isFollowing);
+  const toggleFollowing = useCosmosStore(state => state.toggleFollowing);
+  const isFullscreen = useFullscreenStore(state => state.isFullscreen);
+  const [isMinimized, setIsMinimized] = useState(false);
 
   if (!selectedObject) return null;
 
@@ -106,25 +117,42 @@ export const InfoCard = () => {
   const objectType = t[selectedObject.type as keyof typeof t] || selectedObject.type;
   const facts = selectedObject.facts?.[language] || [];
 
-  return (
-    <div className="absolute bottom-2 left-2 right-2 sm:bottom-4 sm:left-4 sm:right-auto z-50 w-auto sm:w-72 md:w-80 max-h-[40vh] sm:max-h-[45vh] overflow-y-auto bg-black/90 backdrop-blur-md rounded-lg border border-white/20">
+  const card = (
+    <div 
+      className={`${isFullscreen ? 'fixed' : 'absolute'} bottom-2 left-2 right-2 sm:bottom-4 sm:left-4 sm:right-auto z-[10001] w-auto sm:w-72 md:w-80 bg-black/90 backdrop-blur-md rounded-lg border border-white/20`}
+      style={isFullscreen ? { 
+        bottom: 'calc(0.5rem + env(safe-area-inset-bottom))',
+        left: 'calc(0.5rem + env(safe-area-inset-left))',
+      } : undefined}
+    >
       {/* Header */}
       <div className="flex items-center justify-between p-3 border-b border-white/10">
-        <h3 className="text-white font-semibold text-sm sm:text-base">
+        <h3 className="text-white font-semibold text-sm sm:text-base truncate flex-1 mr-2">
           {selectedObject.name[language]}
         </h3>
-        <Button
-          size="icon"
-          variant="ghost"
-          onClick={handleClose}
-          className="h-6 w-6 text-white/70 hover:text-white hover:bg-white/10"
-        >
-          <X className="w-4 h-4" />
-        </Button>
+        <div className="flex items-center gap-1">
+          <Button
+            size="icon"
+            variant="ghost"
+            onClick={() => setIsMinimized(!isMinimized)}
+            className="h-6 w-6 text-white/70 hover:text-white hover:bg-white/10"
+          >
+            {isMinimized ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+          </Button>
+          <Button
+            size="icon"
+            variant="ghost"
+            onClick={handleClose}
+            className="h-6 w-6 text-white/70 hover:text-white hover:bg-white/10"
+          >
+            <X className="w-4 h-4" />
+          </Button>
+        </div>
       </div>
 
-      {/* Content */}
-      <div className="p-3 space-y-3">
+      {/* Content - collapsible */}
+      {!isMinimized && (
+        <div className="p-3 space-y-3 max-h-[40vh] sm:max-h-[45vh] overflow-y-auto">
         {/* Type badge */}
         <div className="flex items-center gap-2">
           <span 
@@ -180,8 +208,19 @@ export const InfoCard = () => {
             <Navigation className="w-3 h-3 mr-1.5" />
             {t.flyTo}
           </Button>
+          <Button
+            size="sm"
+            onClick={toggleFollowing}
+            className={`flex-1 text-xs border-0 ${isFollowing ? 'bg-primary/80 hover:bg-primary text-primary-foreground' : 'bg-white/10 hover:bg-white/20 text-white'}`}
+          >
+            {isFollowing ? <EyeOff className="w-3 h-3 mr-1.5" /> : <Eye className="w-3 h-3 mr-1.5" />}
+            {isFollowing ? t.unfollow : t.follow}
+          </Button>
         </div>
       </div>
+      )}
     </div>
   );
+
+  return isFullscreen ? createPortal(card, document.body) : card;
 };

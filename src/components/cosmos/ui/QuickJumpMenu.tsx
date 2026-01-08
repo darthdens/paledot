@@ -2,8 +2,10 @@ import { useLanguage } from '@/i18n/LanguageContext';
 import { Button } from '@/components/ui/button';
 import { X, ChevronRight } from 'lucide-react';
 import { useCosmosStore } from '../store/useCosmosStore';
+import { useFullscreenStore } from '../store/useFullscreenStore';
 import { quickJumpCategories, getObjectById } from '../data/celestialObjects';
 import { useState } from 'react';
+import { createPortal } from 'react-dom';
 
 const translations = {
   en: {
@@ -25,6 +27,7 @@ export const QuickJumpMenu = () => {
   const toggleQuickJump = useCosmosStore(state => state.toggleQuickJump);
   const jumpToObject = useCosmosStore(state => state.jumpToObject);
   const recentJumps = useCosmosStore(state => state.recentJumps);
+  const isFullscreen = useFullscreenStore(state => state.isFullscreen);
 
   if (!showQuickJump) return null;
 
@@ -39,8 +42,15 @@ export const QuickJumpMenu = () => {
     setExpandedCategory(expandedCategory === categoryId ? null : categoryId);
   };
 
-  return (
-    <div className="absolute top-12 bottom-2 right-2 sm:top-16 sm:bottom-4 sm:right-4 z-50 w-[calc(100vw-1rem)] max-w-56 sm:max-w-64 bg-black/90 backdrop-blur-md rounded-lg border border-white/20 overflow-hidden flex flex-col">
+  const menu = (
+    <div 
+      className={`${isFullscreen ? 'fixed' : 'absolute'} top-12 bottom-2 right-2 sm:top-16 sm:bottom-4 sm:right-4 z-[10001] w-[calc(100vw-1rem)] max-w-56 sm:max-w-64 bg-black/90 backdrop-blur-md rounded-lg border border-white/20 overflow-hidden flex flex-col`}
+      style={isFullscreen ? {
+        top: 'calc(3rem + env(safe-area-inset-top))',
+        right: 'calc(0.5rem + env(safe-area-inset-right))',
+        bottom: 'calc(0.5rem + env(safe-area-inset-bottom))',
+      } : undefined}
+    >
       {/* Header */}
       <div className="flex items-center justify-between p-2 sm:p-3 border-b border-white/10 shrink-0">
         <h3 className="text-white font-semibold text-sm">{t.title}</h3>
@@ -127,4 +137,6 @@ export const QuickJumpMenu = () => {
       </div>
     </div>
   );
+
+  return isFullscreen ? createPortal(menu, document.body) : menu;
 };
