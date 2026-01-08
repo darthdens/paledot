@@ -1,6 +1,7 @@
 import { cn } from "@/lib/utils";
 import { ArrowUpRight } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { useCosmosStore } from "@/components/cosmos/store/useCosmosStore";
 
 export default function CustomCursor() {
@@ -16,6 +17,29 @@ export default function CustomCursor() {
   
   // Get hovered object from cosmos store
   const hoveredObject = useCosmosStore(state => state.hoveredObject);
+
+  // In native fullscreen, only the fullscreen element (and its children) are rendered.
+  // Portal the cursor into the fullscreen element so it remains visible.
+  const [portalTarget, setPortalTarget] = useState<HTMLElement | null>(null);
+
+  useEffect(() => {
+    const updateTarget = () => {
+      const doc = document as any;
+      const el = (doc.fullscreenElement || doc.webkitFullscreenElement || doc.mozFullScreenElement) as HTMLElement | null;
+      setPortalTarget(el ?? null);
+    };
+
+    updateTarget();
+    document.addEventListener('fullscreenchange', updateTarget);
+    document.addEventListener('webkitfullscreenchange', updateTarget);
+    document.addEventListener('mozfullscreenchange', updateTarget);
+
+    return () => {
+      document.removeEventListener('fullscreenchange', updateTarget);
+      document.removeEventListener('webkitfullscreenchange', updateTarget);
+      document.removeEventListener('mozfullscreenchange', updateTarget);
+    };
+  }, []);
 
   useEffect(() => {
     // Only enable on devices that actually have a precise pointer (mouse/trackpad)
@@ -35,7 +59,7 @@ export default function CustomCursor() {
         "a[href], button[type='submit'], .nav-link, [data-external]"
       );
       setIsPointer(Boolean(el));
-      
+
       // Check if hovering over cosmos container
       const cosmosEl = (e.target as HTMLElement | null)?.closest('[data-cosmos-container]');
       setIsOnCosmos(Boolean(cosmosEl));
@@ -80,7 +104,7 @@ export default function CustomCursor() {
   // Show pointer style when hovering a cosmos object
   const showPointer = isPointer || (isOnCosmos && hoveredObject !== null);
 
-  return (
+  const cursorNode = (
     <div
       ref={cursorRef}
       aria-hidden="true"
@@ -98,4 +122,6 @@ export default function CustomCursor() {
       <div className="custom-cursor__dot" />
     </div>
   );
+
+  return portalTarget ? createPortal(cursorNode, portalTarget) : cursorNode;
 }
