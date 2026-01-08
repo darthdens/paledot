@@ -1,45 +1,13 @@
 import { CelestialObject, UNITS } from '../types';
 
 export const celestialObjects: CelestialObject[] = [
-  // Solar System - Planets
-  {
-    id: 'earth',
-    name: { en: 'Earth', fr: 'Terre' },
-    type: 'planet',
-    position: [0, 0, 0],
-    size: 12742,
-    color: '#6b93d6',
-    distanceFromEarth: 0,
-    distanceUnit: 'km',
-    category: 'solarSystem',
-    rotationSpeed: 0.001,
-    facts: {
-      en: ['Only known planet with life', 'Age: 4.5 billion years', '71% covered by water'],
-      fr: ['Seule planète connue avec la vie', 'Âge: 4,5 milliards d\'années', '71% couverte d\'eau'],
-    },
-  },
-  {
-    id: 'moon',
-    name: { en: 'Moon', fr: 'Lune' },
-    type: 'moon',
-    position: [384400, 0, 0],
-    size: 3474,
-    color: '#c4c4c4',
-    distanceFromEarth: 384400,
-    distanceUnit: 'km',
-    category: 'solarSystem',
-    orbitRadius: 384400,
-    orbitSpeed: 0.0001,
-    facts: {
-      en: ['Earth\'s only natural satellite', 'Formed 4.5 billion years ago', 'Causes tides on Earth'],
-      fr: ['Seul satellite naturel de la Terre', 'Formée il y a 4,5 milliards d\'années', 'Cause les marées sur Terre'],
-    },
-  },
+  // ==================== SOLAR SYSTEM ====================
+  // The Sun (center of solar system)
   {
     id: 'sun',
     name: { en: 'Sun', fr: 'Soleil' },
     type: 'star',
-    position: [-UNITS.KM_PER_AU, 0, 0],
+    position: [0, 0, 0],
     size: 1392700,
     color: '#FDB813',
     distanceFromEarth: UNITS.KM_PER_AU,
@@ -51,40 +19,83 @@ export const celestialObjects: CelestialObject[] = [
       fr: ['Étoile naine jaune de type G', 'Contient 99,86% de la masse du système solaire', 'Température de surface: 5 500°C'],
     },
   },
+  // Mercury
   {
     id: 'mercury',
     name: { en: 'Mercury', fr: 'Mercure' },
     type: 'planet',
-    position: [-0.39 * UNITS.KM_PER_AU, 0, 0],
+    position: [0.39 * UNITS.KM_PER_AU, 0, 0],
     size: 4879,
     color: '#8c8c8c',
     distanceFromEarth: 0.61 * UNITS.KM_PER_AU,
     distanceUnit: 'AU',
     category: 'solarSystem',
     orbitRadius: 0.39 * UNITS.KM_PER_AU,
-    orbitSpeed: 0.004,
+    orbitSpeed: 0.00004,
+    rotationSpeed: 0.0001,
     facts: {
       en: ['Smallest planet in solar system', 'Orbital period: 88 days', 'No atmosphere'],
       fr: ['Plus petite planète du système solaire', 'Période orbitale: 88 jours', 'Pas d\'atmosphère'],
     },
   },
+  // Venus
   {
     id: 'venus',
     name: { en: 'Venus', fr: 'Vénus' },
     type: 'planet',
-    position: [-0.72 * UNITS.KM_PER_AU, 0, 0],
+    position: [0.72 * UNITS.KM_PER_AU, 0, 0],
     size: 12104,
     color: '#e6c35c',
     distanceFromEarth: 0.28 * UNITS.KM_PER_AU,
     distanceUnit: 'AU',
     category: 'solarSystem',
     orbitRadius: 0.72 * UNITS.KM_PER_AU,
-    orbitSpeed: 0.003,
+    orbitSpeed: 0.00003,
+    rotationSpeed: -0.00001,
     facts: {
       en: ['Hottest planet (462°C)', 'Rotates backwards', 'Day longer than year'],
       fr: ['Planète la plus chaude (462°C)', 'Rotation rétrograde', 'Jour plus long que l\'année'],
     },
   },
+  // Earth
+  {
+    id: 'earth',
+    name: { en: 'Earth', fr: 'Terre' },
+    type: 'planet',
+    position: [UNITS.KM_PER_AU, 0, 0],
+    size: 12742,
+    color: '#6b93d6',
+    distanceFromEarth: 0,
+    distanceUnit: 'km',
+    category: 'solarSystem',
+    orbitRadius: UNITS.KM_PER_AU,
+    orbitSpeed: 0.00002,
+    rotationSpeed: 0.001,
+    facts: {
+      en: ['Only known planet with life', 'Age: 4.5 billion years', '71% covered by water'],
+      fr: ['Seule planète connue avec la vie', 'Âge: 4,5 milliards d\'années', '71% couverte d\'eau'],
+    },
+  },
+  // Earth's Moon
+  {
+    id: 'moon',
+    name: { en: 'Moon', fr: 'Lune' },
+    type: 'moon',
+    position: [UNITS.KM_PER_AU + 384400, 0, 0],
+    size: 3474,
+    color: '#c4c4c4',
+    distanceFromEarth: 384400,
+    distanceUnit: 'km',
+    category: 'solarSystem',
+    orbitRadius: 384400,
+    orbitSpeed: 0.0001,
+    parentId: 'earth',
+    facts: {
+      en: ['Earth\'s only natural satellite', 'Formed 4.5 billion years ago', 'Causes tides on Earth'],
+      fr: ['Seul satellite naturel de la Terre', 'Formée il y a 4,5 milliards d\'années', 'Cause les marées sur Terre'],
+    },
+  },
+  // Mars
   {
     id: 'mars',
     name: { en: 'Mars', fr: 'Mars' },
@@ -96,12 +107,14 @@ export const celestialObjects: CelestialObject[] = [
     distanceUnit: 'AU',
     category: 'solarSystem',
     orbitRadius: 1.52 * UNITS.KM_PER_AU,
-    orbitSpeed: 0.002,
+    orbitSpeed: 0.000016,
+    rotationSpeed: 0.001,
     facts: {
       en: ['The Red Planet', 'Has the largest volcano (Olympus Mons)', 'Two moons: Phobos and Deimos'],
       fr: ['La planète rouge', 'Possède le plus grand volcan (Olympus Mons)', 'Deux lunes: Phobos et Déimos'],
     },
   },
+  // Jupiter
   {
     id: 'jupiter',
     name: { en: 'Jupiter', fr: 'Jupiter' },
@@ -113,12 +126,87 @@ export const celestialObjects: CelestialObject[] = [
     distanceUnit: 'AU',
     category: 'solarSystem',
     orbitRadius: 5.2 * UNITS.KM_PER_AU,
-    orbitSpeed: 0.0008,
+    orbitSpeed: 0.000008,
+    rotationSpeed: 0.002,
     facts: {
       en: ['Largest planet in solar system', 'Great Red Spot storm', '95 known moons'],
       fr: ['Plus grande planète du système solaire', 'Grande Tache Rouge', '95 lunes connues'],
     },
   },
+  // Jupiter's Galilean Moons
+  {
+    id: 'io',
+    name: { en: 'Io', fr: 'Io' },
+    type: 'moon',
+    position: [5.2 * UNITS.KM_PER_AU + 421800, 0, 0],
+    size: 3643,
+    color: '#f5d742',
+    distanceFromEarth: 4.2 * UNITS.KM_PER_AU,
+    distanceUnit: 'AU',
+    category: 'solarSystem',
+    orbitRadius: 421800,
+    orbitSpeed: 0.0004,
+    parentId: 'jupiter',
+    facts: {
+      en: ['Most volcanically active body', 'Over 400 active volcanoes', 'Sulfur-covered surface'],
+      fr: ['Corps le plus actif volcaniquement', 'Plus de 400 volcans actifs', 'Surface couverte de soufre'],
+    },
+  },
+  {
+    id: 'europa',
+    name: { en: 'Europa', fr: 'Europe' },
+    type: 'moon',
+    position: [5.2 * UNITS.KM_PER_AU + 671100, 0, 0],
+    size: 3122,
+    color: '#c9b896',
+    distanceFromEarth: 4.2 * UNITS.KM_PER_AU,
+    distanceUnit: 'AU',
+    category: 'solarSystem',
+    orbitRadius: 671100,
+    orbitSpeed: 0.0002,
+    parentId: 'jupiter',
+    facts: {
+      en: ['Has subsurface ocean', 'Possible conditions for life', 'Smoothest surface in solar system'],
+      fr: ['Possède un océan souterrain', 'Conditions possibles pour la vie', 'Surface la plus lisse'],
+    },
+  },
+  {
+    id: 'ganymede',
+    name: { en: 'Ganymede', fr: 'Ganymède' },
+    type: 'moon',
+    position: [5.2 * UNITS.KM_PER_AU + 1070400, 0, 0],
+    size: 5268,
+    color: '#9e9e9e',
+    distanceFromEarth: 4.2 * UNITS.KM_PER_AU,
+    distanceUnit: 'AU',
+    category: 'solarSystem',
+    orbitRadius: 1070400,
+    orbitSpeed: 0.00014,
+    parentId: 'jupiter',
+    facts: {
+      en: ['Largest moon in solar system', 'Larger than Mercury', 'Has its own magnetic field'],
+      fr: ['Plus grande lune du système', 'Plus grande que Mercure', 'Champ magnétique propre'],
+    },
+  },
+  {
+    id: 'callisto',
+    name: { en: 'Callisto', fr: 'Callisto' },
+    type: 'moon',
+    position: [5.2 * UNITS.KM_PER_AU + 1882700, 0, 0],
+    size: 4821,
+    color: '#6b6b6b',
+    distanceFromEarth: 4.2 * UNITS.KM_PER_AU,
+    distanceUnit: 'AU',
+    category: 'solarSystem',
+    orbitRadius: 1882700,
+    orbitSpeed: 0.00006,
+    parentId: 'jupiter',
+    facts: {
+      en: ['Most heavily cratered object', 'May have subsurface ocean', 'Ancient, geologically dead'],
+      fr: ['Objet le plus cratérisé', 'Océan souterrain possible', 'Ancienne, géologiquement morte'],
+    },
+  },
+  // Saturn
   {
     id: 'saturn',
     name: { en: 'Saturn', fr: 'Saturne' },
@@ -130,12 +218,33 @@ export const celestialObjects: CelestialObject[] = [
     distanceUnit: 'AU',
     category: 'solarSystem',
     orbitRadius: 9.5 * UNITS.KM_PER_AU,
-    orbitSpeed: 0.0006,
+    orbitSpeed: 0.000006,
+    rotationSpeed: 0.002,
     facts: {
       en: ['Famous for its rings', 'Could float on water', '146 known moons'],
       fr: ['Célèbre pour ses anneaux', 'Pourrait flotter sur l\'eau', '146 lunes connues'],
     },
   },
+  // Titan
+  {
+    id: 'titan',
+    name: { en: 'Titan', fr: 'Titan' },
+    type: 'moon',
+    position: [9.5 * UNITS.KM_PER_AU + 1221870, 0, 0],
+    size: 5150,
+    color: '#e8a43c',
+    distanceFromEarth: 8.5 * UNITS.KM_PER_AU,
+    distanceUnit: 'AU',
+    category: 'solarSystem',
+    orbitRadius: 1221870,
+    orbitSpeed: 0.00006,
+    parentId: 'saturn',
+    facts: {
+      en: ['Only moon with dense atmosphere', 'Lakes of liquid methane', 'Larger than Mercury'],
+      fr: ['Seule lune avec atmosphère dense', 'Lacs de méthane liquide', 'Plus grande que Mercure'],
+    },
+  },
+  // Uranus
   {
     id: 'uranus',
     name: { en: 'Uranus', fr: 'Uranus' },
@@ -147,12 +256,14 @@ export const celestialObjects: CelestialObject[] = [
     distanceUnit: 'AU',
     category: 'solarSystem',
     orbitRadius: 19.2 * UNITS.KM_PER_AU,
-    orbitSpeed: 0.0004,
+    orbitSpeed: 0.000004,
+    rotationSpeed: -0.001,
     facts: {
       en: ['Rotates on its side', 'Ice giant', 'Coldest atmosphere (-224°C)'],
       fr: ['Tourne sur le côté', 'Géante de glace', 'Atmosphère la plus froide (-224°C)'],
     },
   },
+  // Neptune
   {
     id: 'neptune',
     name: { en: 'Neptune', fr: 'Neptune' },
@@ -164,12 +275,14 @@ export const celestialObjects: CelestialObject[] = [
     distanceUnit: 'AU',
     category: 'solarSystem',
     orbitRadius: 30.1 * UNITS.KM_PER_AU,
-    orbitSpeed: 0.0003,
+    orbitSpeed: 0.000003,
+    rotationSpeed: 0.001,
     facts: {
       en: ['Strongest winds in solar system', 'Discovered mathematically', '14 known moons'],
-      fr: ['Vents les plus forts du système solaire', 'Découverte mathématiquement', '14 lunes connues'],
+      fr: ['Vents les plus forts du système', 'Découverte mathématiquement', '14 lunes connues'],
     },
   },
+  // Pluto (dwarf planet)
   {
     id: 'pluto',
     name: { en: 'Pluto', fr: 'Pluton' },
@@ -181,13 +294,14 @@ export const celestialObjects: CelestialObject[] = [
     distanceUnit: 'AU',
     category: 'solarSystem',
     orbitRadius: 39.5 * UNITS.KM_PER_AU,
-    orbitSpeed: 0.0002,
+    orbitSpeed: 0.000002,
     facts: {
       en: ['Reclassified as dwarf planet in 2006', 'Has a heart-shaped glacier', '5 known moons'],
-      fr: ['Reclassée planète naine en 2006', 'Possède un glacier en forme de cœur', '5 lunes connues'],
+      fr: ['Reclassée planète naine en 2006', 'Glacier en forme de cœur', '5 lunes connues'],
     },
   },
-  // Stars
+
+  // ==================== STARS ====================
   {
     id: 'alpha-centauri',
     name: { en: 'Alpha Centauri', fr: 'Alpha du Centaure' },
@@ -200,7 +314,7 @@ export const celestialObjects: CelestialObject[] = [
     category: 'stars',
     facts: {
       en: ['Closest star system to the Sun', 'Triple star system', 'Alpha Centauri A is similar to our Sun'],
-      fr: ['Système stellaire le plus proche du Soleil', 'Système d\'étoiles triple', 'Alpha Centauri A est similaire à notre Soleil'],
+      fr: ['Système stellaire le plus proche', 'Système d\'étoiles triple', 'Alpha Centauri A similaire au Soleil'],
     },
   },
   {
@@ -215,7 +329,7 @@ export const celestialObjects: CelestialObject[] = [
     category: 'stars',
     facts: {
       en: ['Closest star to the Sun', 'Red dwarf star', 'Has at least 2 exoplanets'],
-      fr: ['Étoile la plus proche du Soleil', 'Naine rouge', 'Possède au moins 2 exoplanètes'],
+      fr: ['Étoile la plus proche du Soleil', 'Naine rouge', 'Au moins 2 exoplanètes'],
     },
   },
   {
@@ -229,8 +343,8 @@ export const celestialObjects: CelestialObject[] = [
     distanceUnit: 'ly',
     category: 'stars',
     facts: {
-      en: ['Brightest star in the night sky', 'Binary star system', 'Also known as the Dog Star'],
-      fr: ['Étoile la plus brillante du ciel nocturne', 'Système binaire', 'Aussi appelée l\'étoile du Chien'],
+      en: ['Brightest star in night sky', 'Binary star system', 'Also known as the Dog Star'],
+      fr: ['Étoile la plus brillante', 'Système binaire', 'Aussi appelée l\'étoile du Chien'],
     },
   },
   {
@@ -245,7 +359,7 @@ export const celestialObjects: CelestialObject[] = [
     category: 'stars',
     facts: {
       en: ['Red supergiant star', 'Could explode as supernova anytime', 'One of the largest known stars'],
-      fr: ['Supergéante rouge', 'Pourrait exploser en supernova à tout moment', 'L\'une des plus grandes étoiles connues'],
+      fr: ['Supergéante rouge', 'Pourrait exploser en supernova', 'Une des plus grandes étoiles'],
     },
   },
   {
@@ -260,10 +374,11 @@ export const celestialObjects: CelestialObject[] = [
     category: 'stars',
     facts: {
       en: ['The North Star', 'Triple star system', 'Used for navigation for centuries'],
-      fr: ['L\'Étoile du Nord', 'Système triple', 'Utilisée pour la navigation depuis des siècles'],
+      fr: ['L\'Étoile du Nord', 'Système triple', 'Navigation depuis des siècles'],
     },
   },
-  // Nebulae
+
+  // ==================== NEBULAE ====================
   {
     id: 'orion-nebula',
     name: { en: 'Orion Nebula', fr: 'Nébuleuse d\'Orion' },
@@ -276,7 +391,7 @@ export const celestialObjects: CelestialObject[] = [
     category: 'nebulae',
     facts: {
       en: ['Closest massive star-forming region', 'Visible to the naked eye', '24 light-years across'],
-      fr: ['Région de formation d\'étoiles massive la plus proche', 'Visible à l\'œil nu', '24 années-lumière de diamètre'],
+      fr: ['Région de formation d\'étoiles la plus proche', 'Visible à l\'œil nu', '24 années-lumière'],
     },
   },
   {
@@ -290,8 +405,8 @@ export const celestialObjects: CelestialObject[] = [
     distanceUnit: 'ly',
     category: 'nebulae',
     facts: {
-      en: ['Supernova remnant from 1054 AD', 'Contains a pulsar at its center', 'Expanding at 1,500 km/s'],
-      fr: ['Rémanent de supernova de 1054', 'Contient un pulsar en son centre', 'S\'étend à 1 500 km/s'],
+      en: ['Supernova remnant from 1054 AD', 'Contains a pulsar at center', 'Expanding at 1,500 km/s'],
+      fr: ['Rémanent de supernova de 1054', 'Contient un pulsar', 'S\'étend à 1 500 km/s'],
     },
   },
   {
@@ -305,8 +420,8 @@ export const celestialObjects: CelestialObject[] = [
     distanceUnit: 'ly',
     category: 'nebulae',
     facts: {
-      en: ['Home to the Pillars of Creation', 'Active star-forming region', 'Discovered in 1745'],
-      fr: ['Abrite les Piliers de la Création', 'Région active de formation d\'étoiles', 'Découverte en 1745'],
+      en: ['Home to Pillars of Creation', 'Active star-forming region', 'Discovered in 1745'],
+      fr: ['Piliers de la Création', 'Formation d\'étoiles active', 'Découverte en 1745'],
     },
   },
   {
@@ -321,10 +436,11 @@ export const celestialObjects: CelestialObject[] = [
     category: 'nebulae',
     facts: {
       en: ['Planetary nebula', 'Formed by a dying star', 'About 4,000 years old'],
-      fr: ['Nébuleuse planétaire', 'Formée par une étoile mourante', 'Environ 4 000 ans'],
+      fr: ['Nébuleuse planétaire', 'Étoile mourante', 'Environ 4 000 ans'],
     },
   },
-  // Galaxies
+
+  // ==================== GALAXIES ====================
   {
     id: 'milky-way-center',
     name: { en: 'Milky Way Center', fr: 'Centre de la Voie Lactée' },
@@ -336,8 +452,8 @@ export const celestialObjects: CelestialObject[] = [
     distanceUnit: 'ly',
     category: 'galaxies',
     facts: {
-      en: ['Home to supermassive black hole Sagittarius A*', '200-400 billion stars', 'Our home galaxy'],
-      fr: ['Abrite le trou noir supermassif Sagittarius A*', '200-400 milliards d\'étoiles', 'Notre galaxie'],
+      en: ['Supermassive black hole Sagittarius A*', '200-400 billion stars', 'Our home galaxy'],
+      fr: ['Trou noir Sagittarius A*', '200-400 milliards d\'étoiles', 'Notre galaxie'],
     },
   },
   {
@@ -351,8 +467,8 @@ export const celestialObjects: CelestialObject[] = [
     distanceUnit: 'Mly',
     category: 'galaxies',
     facts: {
-      en: ['Nearest major galaxy to Milky Way', 'Will collide with Milky Way in 4.5 billion years', '1 trillion stars'],
-      fr: ['Galaxie majeure la plus proche de la Voie Lactée', 'Entrera en collision avec la Voie Lactée dans 4,5 milliards d\'années', '1 billion d\'étoiles'],
+      en: ['Nearest major galaxy', 'Will collide with Milky Way in 4.5B years', '1 trillion stars'],
+      fr: ['Galaxie majeure la plus proche', 'Collision dans 4,5 milliards d\'années', '1 billion d\'étoiles'],
     },
   },
   {
@@ -366,8 +482,8 @@ export const celestialObjects: CelestialObject[] = [
     distanceUnit: 'Mly',
     category: 'galaxies',
     facts: {
-      en: ['Third-largest galaxy in Local Group', 'Spiral galaxy like the Milky Way', '40 billion stars'],
-      fr: ['Troisième plus grande galaxie du Groupe Local', 'Galaxie spirale comme la Voie Lactée', '40 milliards d\'étoiles'],
+      en: ['Third-largest in Local Group', 'Spiral galaxy like Milky Way', '40 billion stars'],
+      fr: ['3ème plus grande du Groupe Local', 'Galaxie spirale', '40 milliards d\'étoiles'],
     },
   },
   {
@@ -381,8 +497,8 @@ export const celestialObjects: CelestialObject[] = [
     distanceUnit: 'Mly',
     category: 'galaxies',
     facts: {
-      en: ['Classic spiral galaxy', 'Interacting with companion galaxy', 'First galaxy with spiral structure identified'],
-      fr: ['Galaxie spirale classique', 'Interagit avec une galaxie compagnon', 'Première galaxie avec structure spirale identifiée'],
+      en: ['Classic spiral galaxy', 'Interacting with companion', 'First spiral identified'],
+      fr: ['Galaxie spirale classique', 'Interagit avec compagnon', 'Première spirale identifiée'],
     },
   },
   {
@@ -396,11 +512,12 @@ export const celestialObjects: CelestialObject[] = [
     distanceUnit: 'Mly',
     category: 'galaxies',
     facts: {
-      en: ['Named for its hat-like appearance', 'Large central bulge', '100 billion stars'],
-      fr: ['Nommée pour son apparence de chapeau', 'Grand bulbe central', '100 milliards d\'étoiles'],
+      en: ['Named for hat-like appearance', 'Large central bulge', '100 billion stars'],
+      fr: ['Apparence de chapeau', 'Grand bulbe central', '100 milliards d\'étoiles'],
     },
   },
-  // Deep Space
+
+  // ==================== DEEP SPACE ====================
   {
     id: 'virgo-cluster',
     name: { en: 'Virgo Cluster', fr: 'Amas de la Vierge' },
@@ -412,8 +529,8 @@ export const celestialObjects: CelestialObject[] = [
     distanceUnit: 'Mly',
     category: 'deepSpace',
     facts: {
-      en: ['Nearest large galaxy cluster', 'Contains 1,300-2,000 galaxies', 'Gravitational center of our supercluster'],
-      fr: ['Amas de galaxies massif le plus proche', 'Contient 1 300 à 2 000 galaxies', 'Centre gravitationnel de notre superamas'],
+      en: ['Nearest large galaxy cluster', 'Contains 1,300-2,000 galaxies', 'Our supercluster center'],
+      fr: ['Amas de galaxies le plus proche', '1 300 à 2 000 galaxies', 'Centre de notre superamas'],
     },
   },
   {
@@ -427,13 +544,13 @@ export const celestialObjects: CelestialObject[] = [
     distanceUnit: 'Mly',
     category: 'deepSpace',
     facts: {
-      en: ['One of densest known galaxy clusters', 'Contains over 1,000 galaxies', 'Mostly elliptical galaxies'],
-      fr: ['L\'un des amas de galaxies les plus denses connus', 'Contient plus de 1 000 galaxies', 'Principalement des galaxies elliptiques'],
+      en: ['One of densest clusters', 'Over 1,000 galaxies', 'Mostly elliptical galaxies'],
+      fr: ['Un des amas les plus denses', 'Plus de 1 000 galaxies', 'Galaxies elliptiques'],
     },
   },
   {
     id: 'hubble-deep-field',
-    name: { en: 'Hubble Deep Field', fr: 'Champ Ultra-Profond de Hubble' },
+    name: { en: 'Hubble Deep Field', fr: 'Champ Profond de Hubble' },
     type: 'other',
     position: [13e9 * UNITS.KM_PER_LY, 5e9 * UNITS.KM_PER_LY, 0],
     size: 1e9 * UNITS.KM_PER_LY,
@@ -442,8 +559,8 @@ export const celestialObjects: CelestialObject[] = [
     distanceUnit: 'Bly',
     category: 'deepSpace',
     facts: {
-      en: ['Shows some of the oldest galaxies', 'Tiny patch of sky, thousands of galaxies', 'Light from 13 billion years ago'],
-      fr: ['Montre certaines des plus anciennes galaxies', 'Petit patch de ciel, milliers de galaxies', 'Lumière d\'il y a 13 milliards d\'années'],
+      en: ['Shows oldest galaxies', 'Tiny patch, thousands of galaxies', 'Light from 13 billion years ago'],
+      fr: ['Plus anciennes galaxies', 'Petit patch, milliers de galaxies', 'Lumière de 13 milliards d\'années'],
     },
   },
   {
@@ -457,8 +574,8 @@ export const celestialObjects: CelestialObject[] = [
     distanceUnit: 'Bly',
     category: 'deepSpace',
     facts: {
-      en: ['The cosmic microwave background', 'Light from 380,000 years after Big Bang', 'Beyond here, light hasn\'t reached us yet'],
-      fr: ['Le fond diffus cosmologique', 'Lumière de 380 000 ans après le Big Bang', 'Au-delà, la lumière ne nous a pas encore atteints'],
+      en: ['Cosmic microwave background', 'Light from 380,000 years after Big Bang', 'Beyond: light hasn\'t reached us'],
+      fr: ['Fond diffus cosmologique', '380 000 ans après le Big Bang', 'Au-delà: lumière pas encore arrivée'],
     },
   },
 ];
@@ -467,7 +584,7 @@ export const quickJumpCategories = [
   {
     id: 'solarSystem',
     name: { en: 'Solar System', fr: 'Système Solaire' },
-    locations: ['sun', 'mercury', 'venus', 'earth', 'moon', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune', 'pluto'],
+    locations: ['sun', 'mercury', 'venus', 'earth', 'moon', 'mars', 'jupiter', 'io', 'europa', 'ganymede', 'callisto', 'saturn', 'titan', 'uranus', 'neptune', 'pluto'],
   },
   {
     id: 'stars',
