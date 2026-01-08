@@ -40,16 +40,24 @@ export const OortCloud = ({ visualScale, highlight = false }: OortCloudProps) =>
     return geo;
   }, [visualScale]);
 
-  const baseSize = 80000 * visualScale;
+  const MIN_SIZE = 60;      // scene units
+  const MAX_SIZE = 3500;    // scene units
+  const SIZE_FACTOR = 0.0005; // size grows with zoom distance
 
-  // Subtle pulse when highlighted (to match "You Are Here" signal)
-  useFrame(({ clock }) => {
-    if (!highlight || !materialRef.current) return;
+  // Keep it visible at any zoom + subtle pulse when highlighted
+  useFrame(({ clock, camera }) => {
+    if (!materialRef.current) return;
 
-    const t = clock.getElapsedTime();
-    const p = 0.5 + 0.5 * Math.sin(t * 1.4);
+    const distance = camera.position.length();
+    materialRef.current.size = THREE.MathUtils.clamp(distance * SIZE_FACTOR, MIN_SIZE, MAX_SIZE);
 
-    materialRef.current.opacity = 0.3 + p * 0.15;
+    if (highlight) {
+      const t = clock.getElapsedTime();
+      const p = 0.5 + 0.5 * Math.sin(t * 1.4);
+      materialRef.current.opacity = 0.26 + p * 0.12;
+    } else {
+      materialRef.current.opacity = 0.22;
+    }
   });
 
   return (
@@ -57,10 +65,10 @@ export const OortCloud = ({ visualScale, highlight = false }: OortCloudProps) =>
       <pointsMaterial
         ref={materialRef}
         color={highlight ? '#00ff88' : '#8899aa'}
-        size={baseSize}
+        size={MIN_SIZE}
         sizeAttenuation={true}
         transparent
-        opacity={highlight ? 0.35 : 0.25}
+        opacity={highlight ? 0.34 : 0.22}
         blending={THREE.AdditiveBlending}
         depthWrite={false}
       />
