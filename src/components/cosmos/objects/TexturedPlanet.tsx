@@ -613,12 +613,15 @@ export const TexturedPlanet = ({
                 
                 void main() {
                   vec3 worldNormal = normalize(vWorldNormal);
-                  vec3 sunDir = normalize(-vWorldPosition);
+                  // Sun is at origin - use object center for consistent sun direction across the planet
+                  vec3 sunDir = normalize(-objectCenter);
                   
-                  float NdotL = dot(worldNormal, sunDir);
+                  // For lighting, use per-fragment direction for accurate shading
+                  vec3 fragSunDir = normalize(-vWorldPosition);
+                  float NdotL = dot(worldNormal, fragSunDir);
                   
-                  // Calculate shadows
-                  float moonShadow = calculateShadow(vWorldPosition, sunDir);
+                  // Calculate shadows - use planet-center sun direction for ring shadow
+                  float moonShadow = calculateShadow(vWorldPosition, fragSunDir);
                   float ringShadow = calculateRingShadow(vWorldPosition, sunDir);
                   float totalShadow = min(moonShadow, ringShadow);
                   
@@ -647,7 +650,7 @@ export const TexturedPlanet = ({
                   
                   if (NdotL > 0.0 && totalShadow > 0.5) {
                     vec3 viewDir = normalize(cameraPosition - vWorldPosition);
-                    vec3 halfDir = normalize(sunDir + viewDir);
+                    vec3 halfDir = normalize(fragSunDir + viewDir);
                     float spec = pow(max(dot(worldNormal, halfDir), 0.0), 64.0 / max(roughness, 0.1));
                     litColor += spec * (1.0 - roughness) * 0.3 * max(NdotL, 0.0) * totalShadow;
                   }
