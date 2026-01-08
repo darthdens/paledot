@@ -161,11 +161,11 @@ const PLANET_VISUALS: Record<string, {
     atmosphereColor: '#c8f0f0',
     atmosphereIntensity: 0.4,
     hasRings: true,
-    // Uranus rings are narrow and very dark
-    ringColor: '#2b3036',
-    ringOpacity: 0.4,
-    ringInnerMult: 1.55,
-    ringOuterMult: 1.95,
+    // Uranus rings are narrow and very dark, but still need to be visible in our scale
+    ringColor: '#3a4046',
+    ringOpacity: 0.55,
+    ringInnerMult: 1.45,
+    ringOuterMult: 2.05,
     ringStyle: 1,
     tilt: 97.8,
     surfaceDetail: 'gaseous',
@@ -1040,10 +1040,11 @@ export const TexturedPlanet = ({
                     
                     // Uranus-like narrow, dark ringlets (few sharp bands)
                     float uranusBands = 0.0;
-                    uranusBands += 1.00 * exp(-pow((normalizedDist - 0.82) / 0.010, 2.0)); // epsilon-like bright ring
-                    uranusBands += 0.55 * exp(-pow((normalizedDist - 0.62) / 0.012, 2.0));
-                    uranusBands += 0.40 * exp(-pow((normalizedDist - 0.46) / 0.010, 2.0));
-                    uranusBands += 0.30 * exp(-pow((normalizedDist - 0.28) / 0.012, 2.0));
+                    // Slightly wider than physical reality so they read at our viewing scale
+                    uranusBands += 1.00 * exp(-pow((normalizedDist - 0.82) / 0.018, 2.0)); // epsilon-like ring
+                    uranusBands += 0.55 * exp(-pow((normalizedDist - 0.62) / 0.020, 2.0));
+                    uranusBands += 0.40 * exp(-pow((normalizedDist - 0.46) / 0.016, 2.0));
+                    uranusBands += 0.30 * exp(-pow((normalizedDist - 0.28) / 0.020, 2.0));
                     
                     float ringDensityUranus = clamp(uranusBands, 0.0, 1.0);
                     ringDensityUranus *= 0.90 + 0.10 * noise(normalizedDist * 900.0);
@@ -1082,7 +1083,7 @@ export const TexturedPlanet = ({
                     float alpha = clamp(ringOpacity * edgeFade, 0.0, 0.95);
                     
                     // Lit ring with enhanced brightness
-                    float ringBrightness = mix(1.8, 1.15, ringStyle);
+                    float ringBrightness = mix(1.8, 1.35, ringStyle);
                     vec3 litRing = finalColor * totalLight * ringBrightness;
                     
                     gl_FragColor = vec4(litRing, alpha);
