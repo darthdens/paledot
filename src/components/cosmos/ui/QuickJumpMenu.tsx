@@ -65,7 +65,7 @@ export const QuickJumpMenu = () => {
 
   const menu = (
     <div 
-      className={`fixed z-[10001] w-[calc(100vw-2rem)] max-w-56 sm:max-w-64 max-h-[calc(100vh-100px)] bg-black/90 backdrop-blur-md rounded-lg border border-white/20 overflow-hidden flex flex-col`}
+      className={`fixed z-[10001] w-[calc(100vw-2rem)] max-w-56 sm:max-w-64 h-[320px] max-h-[calc(100vh-100px)] bg-black/90 backdrop-blur-md rounded-lg border border-white/20 overflow-hidden flex flex-col`}
       style={{
         top: menuTop,
         left: menuLeft,
