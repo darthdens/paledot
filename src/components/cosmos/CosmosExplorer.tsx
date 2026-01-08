@@ -4,13 +4,10 @@ import { Suspense } from 'react';
 import { Earth } from './objects/Earth';
 import { Sun } from './objects/Sun';
 import { CosmosUI } from './ui/CosmosUI';
-import { useLanguage } from '@/i18n/LanguageContext';
 
 export const CosmosExplorer = () => {
-  const { language } = useLanguage();
-
   return (
-    <div className="fixed inset-0 bg-black">
+    <div className="relative w-full h-full">
       <Canvas>
         <Suspense fallback={null}>
           <PerspectiveCamera makeDefault position={[0, 10000, 50000]} fov={60} near={1} far={1e15} />
