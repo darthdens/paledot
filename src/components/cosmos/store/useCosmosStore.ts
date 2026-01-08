@@ -38,6 +38,7 @@ interface CosmosStore {
   showTrails: boolean;
   showRealPeriods: boolean;
   showPerformanceHUD: boolean;
+  useExaggeratedScale: boolean;
   recentJumps: string[];
 
   // Audio
@@ -73,8 +74,10 @@ interface CosmosStore {
   toggleTrails: () => void;
   toggleRealPeriods: () => void;
   togglePerformanceHUD: () => void;
+  toggleExaggeratedScale: () => void;
   addRecentJump: (objectId: string) => void;
   jumpToObject: (object: CelestialObject) => void;
+  goHome: () => void;
   setMuted: (muted: boolean) => void;
   setVolume: (volume: number) => void;
   setTimeOffset: (offset: number) => void;
@@ -118,6 +121,7 @@ export const useCosmosStore = create<CosmosStore>()(
       showTrails: true,
       showRealPeriods: false,
       showPerformanceHUD: false,
+      useExaggeratedScale: true,
       recentJumps: [],
 
       isMuted: false,
@@ -179,6 +183,8 @@ export const useCosmosStore = create<CosmosStore>()(
       toggleRealPeriods: () => set((state) => ({ showRealPeriods: !state.showRealPeriods })),
 
       togglePerformanceHUD: () => set((state) => ({ showPerformanceHUD: !state.showPerformanceHUD })),
+
+      toggleExaggeratedScale: () => set((state) => ({ useExaggeratedScale: !state.useExaggeratedScale })),
       
       addRecentJump: (objectId) => {
         const { recentJumps } = get();
@@ -199,6 +205,29 @@ export const useCosmosStore = create<CosmosStore>()(
         set({
           targetPosition: position,
           selectedObject: object,
+          showQuickJump: false,
+        });
+      },
+
+      goHome: () => {
+        // Import celestialObjects inline to avoid circular dependency
+        const { selectedObject } = get();
+        // Find Earth from the current objects if available via selection
+        // For simplicity, we create a minimal Earth object for navigation
+        const earthObject: CelestialObject = {
+          id: 'earth',
+          name: { en: 'Earth', fr: 'Terre' },
+          type: 'planet',
+          position: [149597870.7, 0, 0], // 1 AU
+          size: 12742,
+          color: '#6b93d6',
+          distanceFromEarth: 0,
+          distanceUnit: 'km',
+          category: 'solarSystem',
+        };
+        set({
+          selectedObject: earthObject,
+          isFollowing: true,
           showQuickJump: false,
         });
       },

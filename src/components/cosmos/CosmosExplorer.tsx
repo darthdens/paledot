@@ -9,12 +9,14 @@ import { OrbitalTrail } from './objects/OrbitalTrail';
 import { AsteroidBelt } from './objects/AsteroidBelt';
 import { KuiperBelt } from './objects/KuiperBelt';
 import { TrojanAsteroids } from './objects/TrojanAsteroids';
+import { Comets } from './objects/Comet';
 import { CosmosUI } from './ui/CosmosUI';
 import { InfoCard } from './ui/InfoCard';
 import { QuickJumpMenu } from './ui/QuickJumpMenu';
 import { TourOverlay } from './ui/TourOverlay';
 import { PerformanceHUD } from './ui/PerformanceHUD';
 import { KeyboardShortcuts } from './ui/KeyboardShortcuts';
+import { SizeComparison } from './ui/SizeComparison';
 import { CameraController } from './CameraController';
 import { celestialObjects } from './data/celestialObjects';
 import { UNITS } from './types';
@@ -160,6 +162,9 @@ export const CosmosExplorer = () => {
             scale={UNIFIED_SCALE}
           />
           
+          {/* Famous comets with tails */}
+          <Comets scale={UNIFIED_SCALE} />
+          
           {/* All planets - using unified scale for both size and distance */}
           {planets.map(planet => (
             <TexturedPlanet 
@@ -222,6 +227,7 @@ export const CosmosExplorer = () => {
       <InfoCard />
       <QuickJumpMenu />
       <KeyboardShortcuts />
+      <SizeComparison />
     </div>
   );
 };

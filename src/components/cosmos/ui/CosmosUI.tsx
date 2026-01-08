@@ -1,7 +1,7 @@
 import { useLanguage } from '@/i18n/LanguageContext';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
-import { HelpCircle, Compass, Maximize, Minimize, CircleDot, CircleOff, Clock, Timer, TimerOff, Sparkles, Activity } from 'lucide-react';
+import { HelpCircle, Compass, Maximize, Minimize, CircleDot, CircleOff, Clock, Timer, TimerOff, Sparkles, Activity, Home, Scaling, BarChart3 } from 'lucide-react';
 import { useCosmosStore } from '../store/useCosmosStore';
 import { useFullscreenStore } from '../store/useFullscreenStore';
 import { useCallback, useEffect, useState } from 'react';
@@ -32,6 +32,10 @@ const translations = {
     hideTrails: 'Hide trails',
     showStats: 'Show performance stats',
     hideStats: 'Hide performance stats',
+    home: 'Go to Earth',
+    sizeComparison: 'Size comparison',
+    exaggeratedScale: 'Exaggerated scale',
+    realisticScale: 'Realistic scale',
   },
   fr: {
     startTour: 'Commencer la Visite',
@@ -57,6 +61,10 @@ const translations = {
     hideTrails: 'Masquer traînées',
     showStats: 'Afficher stats performance',
     hideStats: 'Masquer stats performance',
+    home: 'Aller sur Terre',
+    sizeComparison: 'Comparaison tailles',
+    exaggeratedScale: 'Échelle exagérée',
+    realisticScale: 'Échelle réaliste',
   },
 };
 
@@ -77,6 +85,10 @@ export const CosmosUI = () => {
     toggleRealPeriods,
     showPerformanceHUD,
     togglePerformanceHUD,
+    toggleSizeComparison,
+    useExaggeratedScale,
+    toggleExaggeratedScale,
+    goHome,
     timeSpeed,
     setTimeSpeed,
   } = useCosmosStore();
@@ -555,6 +567,33 @@ export const CosmosUI = () => {
           title={showPerformanceHUD ? t.hideStats : t.showStats}
         >
           <Activity className={`w-3.5 h-3.5 sm:w-5 sm:h-5 ${showPerformanceHUD ? 'text-green-400' : ''}`} />
+        </Button>
+        <Button
+          size="icon"
+          variant="ghost"
+          onClick={goHome}
+          className="h-7 w-7 sm:h-9 sm:w-9 bg-white/10 hover:bg-white/20 text-white"
+          title={t.home}
+        >
+          <Home className="w-3.5 h-3.5 sm:w-5 sm:h-5" />
+        </Button>
+        <Button
+          size="icon"
+          variant="ghost"
+          onClick={toggleSizeComparison}
+          className="h-7 w-7 sm:h-9 sm:w-9 bg-white/10 hover:bg-white/20 text-white"
+          title={t.sizeComparison}
+        >
+          <BarChart3 className="w-3.5 h-3.5 sm:w-5 sm:h-5" />
+        </Button>
+        <Button
+          size="icon"
+          variant="ghost"
+          onClick={toggleExaggeratedScale}
+          className="h-7 w-7 sm:h-9 sm:w-9 bg-white/10 hover:bg-white/20 text-white"
+          title={useExaggeratedScale ? t.exaggeratedScale : t.realisticScale}
+        >
+          <Scaling className={`w-3.5 h-3.5 sm:w-5 sm:h-5 ${useExaggeratedScale ? 'text-yellow-400' : ''}`} />
         </Button>
         <Button
           size="icon"
