@@ -8,7 +8,7 @@ export interface CelestialObject {
     en: string;
     fr: string;
   };
-  type: 'planet' | 'star' | 'moon' | 'dwarf-planet' | 'asteroid' | 'nebula' | 'galaxy' | 'cluster' | 'other';
+  type: 'planet' | 'star' | 'moon' | 'dwarf-planet' | 'asteroid' | 'comet' | 'nebula' | 'galaxy' | 'cluster' | 'other';
   position: [number, number, number];
   size: number;
   color: string;
