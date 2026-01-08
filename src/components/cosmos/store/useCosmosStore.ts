@@ -83,7 +83,7 @@ interface CosmosStore {
   toggleTrails: () => void;
   toggleRealPeriods: () => void;
   togglePerformanceHUD: () => void;
-
+  toggleExaggeratedScale: () => void;
   addRecentJump: (objectId: string) => void;
   jumpToObject: (object: CelestialObject) => void;
   goHome: () => void;
