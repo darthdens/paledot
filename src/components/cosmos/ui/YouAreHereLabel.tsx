@@ -33,8 +33,8 @@ export const YouAreHereLabel = () => {
   if (!isGalacticScale) return null;
   
   return (
-    <div className="absolute top-4 left-4 z-20 animate-fade-in">
-      <div className="bg-black/70 backdrop-blur-sm rounded-lg border border-emerald-500/30 overflow-hidden">
+    <div className="absolute bottom-20 left-4 sm:bottom-auto sm:top-4 z-20 animate-fade-in">
+      <div className="bg-black/70 backdrop-blur-sm rounded-lg border border-emerald-500/30 overflow-hidden max-w-[200px] sm:max-w-none">
         <button
           onClick={() => setIsMinimized(!isMinimized)}
           className="w-full flex items-center justify-between gap-2 px-3 py-2 hover:bg-white/5 transition-colors"
