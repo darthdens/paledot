@@ -550,28 +550,30 @@ export const TexturedPlanet = ({
                   return 1.0;
                 }
                 
-                // Check if point is in shadow of the rings with soft penumbra
+              // Check if point is in shadow of the rings with soft penumbra
                 float calculateRingShadow(vec3 fragWorldPos, vec3 sunDir) {
                   if (hasRings < 0.5) return 1.0;
                   
                   // Get fragment position relative to planet center
                   vec3 relPos = fragWorldPos - objectCenter;
                   
-                  // Build rotation matrix for planet tilt (rings are tilted with planet)
-                  float cosT = cos(planetTilt);
-                  float sinT = sin(planetTilt);
+                  // Build rotation matrix for planet tilt around X axis (rings are tilted with planet)
+                  // This matches the group rotation: rotation={[tiltRadians, 0, 0]}
+                  float cosT = cos(-planetTilt); // Negative to undo the tilt
+                  float sinT = sin(-planetTilt);
                   
-                  // Transform to ring's local frame (undo tilt)
+                  // Transform to ring's local frame (undo X-axis tilt)
+                  // Ring plane is XZ in local space after rotation
                   vec3 ringFramePos;
                   ringFramePos.x = relPos.x;
-                  ringFramePos.y = relPos.y * cosT + relPos.z * sinT;
-                  ringFramePos.z = -relPos.y * sinT + relPos.z * cosT;
+                  ringFramePos.y = relPos.y * cosT - relPos.z * sinT;
+                  ringFramePos.z = relPos.y * sinT + relPos.z * cosT;
                   
                   // Transform sun direction to ring frame
                   vec3 ringFrameSunDir;
                   ringFrameSunDir.x = sunDir.x;
-                  ringFrameSunDir.y = sunDir.y * cosT + sunDir.z * sinT;
-                  ringFrameSunDir.z = -sunDir.y * sinT + sunDir.z * cosT;
+                  ringFrameSunDir.y = sunDir.y * cosT - sunDir.z * sinT;
+                  ringFrameSunDir.z = sunDir.y * sinT + sunDir.z * cosT;
                   
                   if (abs(ringFrameSunDir.y) < 0.0001) return 1.0;
                   
@@ -853,12 +855,16 @@ export const TexturedPlanet = ({
 
           {/* Rings (Saturn, Uranus) - enhanced with lighting and planet shadow */}
           {visuals.hasRings && (
-            <mesh rotation={[Math.PI / 2, 0, 0]}>
-              <ringGeometry args={[planetSize * 1.3, planetSize * 2.2, 128]} />
+            <mesh rotation={[Math.PI / 2, 0, 0]} renderOrder={1}>
+              <ringGeometry args={[planetSize * 1.3, planetSize * 2.2, 256]} />
               <shaderMaterial
                 ref={ringMaterialRef}
                 transparent
                 depthWrite={false}
+                depthTest={true}
+                polygonOffset={true}
+                polygonOffsetFactor={-1}
+                polygonOffsetUnits={-1}
                 side={THREE.DoubleSide}
                 uniforms={{
                   ringColor: { value: new THREE.Color(visuals.ringColor || '#d4b896') },
@@ -991,9 +997,10 @@ export const TexturedPlanet = ({
                     float ringCDensity = 0.4;  // C ring is faint
                     
                     // Fine radial structure - thousands of ringlets
-                    float fineStructure = 0.7 + 0.3 * sin(normalizedDist * 400.0 + fbm(normalizedDist * 50.0) * 2.0);
-                    float microStructure = 0.85 + 0.15 * sin(normalizedDist * 1500.0);
-                    float ultraFine = 0.92 + 0.08 * noise(normalizedDist * 3000.0);
+                    // Use moderate frequencies to avoid aliasing/flickering
+                    float fineStructure = 0.75 + 0.25 * sin(normalizedDist * 200.0 + fbm(normalizedDist * 30.0) * 1.5);
+                    float microStructure = 0.88 + 0.12 * sin(normalizedDist * 600.0);
+                    float ultraFine = 0.95 + 0.05 * noise(normalizedDist * 800.0);
                     
                     // Azimuthal variation (spokes and clumps)
                     float azimuthalVar = 0.95 + 0.05 * sin(angle * 30.0 + normalizedDist * 10.0);
