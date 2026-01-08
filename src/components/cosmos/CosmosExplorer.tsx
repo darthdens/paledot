@@ -72,8 +72,8 @@ export const CosmosExplorer = () => {
     return () => observer.disconnect();
   }, []);
   
-  // Hide orbits when actively following a moving object (they're distracting)
-  const shouldShowOrbits = showOrbits && (!selectedObject || !isFollowing);
+  // Orbits visibility - controlled directly by user toggle
+  const shouldShowOrbits = showOrbits;
   
   const planets = celestialObjects.filter(obj => 
     obj.type === 'planet' || obj.type === 'dwarf-planet'
