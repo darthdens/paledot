@@ -26,7 +26,6 @@ export const OrbitalTrail = ({
 }: OrbitalTrailProps) => {
   const geometryRef = useRef<THREE.BufferGeometry | null>(null);
 
-  const objectWorldPositions = useCosmosStore((state) => state.objectWorldPositions);
   const timeSpeed = useCosmosStore((state) => state.timeSpeed);
 
   const { line, geometry, material, positionAttr, positions } = useMemo(() => {
@@ -71,7 +70,7 @@ export const OrbitalTrail = ({
     // If paused, don't keep appending points (prevents "noise" when camera is following)
     if (timeSpeed === 0) return;
 
-    const worldPos = objectWorldPositions[objectId];
+    const worldPos = useCosmosStore.getState().objectWorldPositions[objectId];
     if (!worldPos || !geometryRef.current) return;
 
     // Sample every few frames (cheap throttle)

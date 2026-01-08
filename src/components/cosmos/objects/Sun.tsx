@@ -33,13 +33,13 @@ export const Sun = ({ position = [0, 0, 0], visualScale = 80 }: SunProps) => {
     if (glowRef.current) {
       glowRef.current.scale.setScalar(1 + Math.sin(time * 0.5) * 0.05);
     }
-    
+
     // Update world position for camera targeting
     if (groupRef.current) {
       groupRef.current.getWorldPosition(worldPos.current);
       setObjectWorldPosition('sun', [worldPos.current.x, worldPos.current.y, worldPos.current.z]);
     }
-  });
+  }, -1);
 
   // Use the same unified scale as everything else - no caps needed when using true proportions
   const sunSize = SUN_DIAMETER * visualScale;
