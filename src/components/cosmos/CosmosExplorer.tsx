@@ -1,3 +1,4 @@
+// Cosmos Explorer - Solar System visualization
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls, Stars, PerspectiveCamera } from '@react-three/drei';
 import { Suspense } from 'react';
