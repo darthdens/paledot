@@ -14,35 +14,34 @@ const MILKY_WAY = {
   diskRadius: 52500, // ~105,000 ly diameter
   diskThickness: 1000, // Thin disk ~1,000 ly
   bulgeRadius: 10000, // Central bulge ~20,000 ly diameter
-  bulgeHeight: 6000, // Bulge is more spherical
+  barLength: 27000, // Central bar ~27,000 ly long
+  barWidth: 5000,
   
   // Sun's position (from galactic center)
   sunDistanceFromCenter: 26000, // ~26,000 ly from center
-  sunAngle: Math.PI * 0.6, // Position in Orion-Cygnus arm
+  sunAngle: Math.PI * 0.75, // Position in Orion-Cygnus arm (between Perseus and Sagittarius)
   sunHeight: 65, // ~65 ly above galactic plane
   
-  // Spiral arm parameters (4 main arms)
+  // Spiral arm parameters - Milky Way has 4 major arms
   arms: [
-    { name: 'Perseus', startAngle: 0, color: '#88a4d0' },
-    { name: 'Sagittarius-Carina', startAngle: Math.PI / 2, color: '#94b8d4' },
-    { name: 'Scutum-Centaurus', startAngle: Math.PI, color: '#7c9bc4' },
-    { name: 'Norma-Outer', startAngle: (3 * Math.PI) / 2, color: '#8fb0d8' },
+    { name: 'Perseus', startAngle: 0, color: '#a8c4e8' },
+    { name: 'Sagittarius-Carina', startAngle: Math.PI / 2, color: '#9bb8dc' },
+    { name: 'Scutum-Centaurus', startAngle: Math.PI, color: '#8eacd0' },
+    { name: 'Norma-Outer', startAngle: (3 * Math.PI) / 2, color: '#81a0c4' },
   ],
-  armWindingNumber: 2, // How tightly wound the arms are
-  armWidth: 3500, // Width of each arm
+  armWindingTightness: 0.22, // How tightly wound (lower = tighter)
+  armWidth: 3500,
 };
 
 export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayGalaxyProps) => {
   const groupRef = useRef<THREE.Group>(null);
   const youAreHereRef = useRef<THREE.Mesh>(null);
   const pulseRef = useRef<THREE.Mesh>(null);
-  const particlesRef = useRef<THREE.Points>(null);
   
   // Scale factor for galaxy visualization
-  // Galaxy is ~100,000 ly across, we want it visible when zoomed out
   const galaxyScale = UNITS.KM_PER_LY * visualScale;
   
-  // Sun's position in 3D space (at galactic coordinates)
+  // Sun's position in 3D space
   const sunPosition = useMemo(() => {
     const x = Math.cos(MILKY_WAY.sunAngle) * MILKY_WAY.sunDistanceFromCenter * galaxyScale;
     const z = Math.sin(MILKY_WAY.sunAngle) * MILKY_WAY.sunDistanceFromCenter * galaxyScale;
@@ -50,9 +49,9 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
     return new THREE.Vector3(x, y, z);
   }, [galaxyScale]);
   
-  // Generate galaxy particle system
+  // Generate realistic galaxy particle system
   const { positions, colors, sizes } = useMemo(() => {
-    const starCount = 50000;
+    const starCount = 80000;
     const positions = new Float32Array(starCount * 3);
     const colors = new Float32Array(starCount * 3);
     const sizes = new Float32Array(starCount);
@@ -61,54 +60,89 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
     
     for (let i = 0; i < starCount; i++) {
       const i3 = i * 3;
+      const rand = Math.random();
       
-      // Determine if this is a bulge star or disk star
-      const isBulge = Math.random() < 0.15;
+      // Distribution: 20% bulge/bar, 80% disk
+      const isBulge = rand < 0.12;
+      const isBar = rand >= 0.12 && rand < 0.20;
       
       if (isBulge) {
-        // Central bulge - more spherical distribution
-        const r = Math.pow(Math.random(), 0.5) * MILKY_WAY.bulgeRadius * galaxyScale;
+        // Central bulge - ellipsoidal, denser toward center
+        const r = Math.pow(Math.random(), 0.7) * MILKY_WAY.bulgeRadius * galaxyScale;
         const theta = Math.random() * Math.PI * 2;
         const phi = Math.acos(2 * Math.random() - 1);
         
         positions[i3] = r * Math.sin(phi) * Math.cos(theta);
-        positions[i3 + 1] = r * Math.cos(phi) * 0.6; // Flatten slightly
+        positions[i3 + 1] = r * Math.cos(phi) * 0.5; // Flattened
         positions[i3 + 2] = r * Math.sin(phi) * Math.sin(theta);
         
-        // Bulge is yellower/redder (older stars)
-        color.setHSL(0.12 + Math.random() * 0.05, 0.4 + Math.random() * 0.3, 0.7 + Math.random() * 0.3);
-        sizes[i] = (0.8 + Math.random() * 0.5) * galaxyScale * 100;
+        // Bulge is yellow/orange (old population II stars)
+        color.setHSL(0.08 + Math.random() * 0.04, 0.6 + Math.random() * 0.2, 0.7 + Math.random() * 0.25);
+        sizes[i] = (0.6 + Math.random() * 0.4) * galaxyScale * 150;
+        
+      } else if (isBar) {
+        // Central bar structure
+        const barPos = (Math.random() - 0.5) * MILKY_WAY.barLength * galaxyScale;
+        const barWidth = (Math.random() - 0.5) * MILKY_WAY.barWidth * galaxyScale;
+        const barAngle = Math.PI * 0.15; // Bar is tilted ~15-30 degrees
+        
+        positions[i3] = barPos * Math.cos(barAngle) - barWidth * Math.sin(barAngle);
+        positions[i3 + 1] = (Math.random() - 0.5) * 500 * galaxyScale;
+        positions[i3 + 2] = barPos * Math.sin(barAngle) + barWidth * Math.cos(barAngle);
+        
+        color.setHSL(0.1 + Math.random() * 0.03, 0.5 + Math.random() * 0.2, 0.65 + Math.random() * 0.25);
+        sizes[i] = (0.5 + Math.random() * 0.3) * galaxyScale * 120;
+        
       } else {
-        // Disk stars - follow spiral arm pattern
+        // Disk stars following logarithmic spiral arms
         const armIndex = Math.floor(Math.random() * 4);
         const arm = MILKY_WAY.arms[armIndex];
         
-        // Logarithmic spiral: r = a * e^(b*theta)
-        const t = Math.pow(Math.random(), 0.7); // Bias toward center
-        const r = (2000 + t * (MILKY_WAY.diskRadius - 2000)) * galaxyScale;
-        const armAngle = arm.startAngle + (r / (MILKY_WAY.diskRadius * galaxyScale)) * Math.PI * MILKY_WAY.armWindingNumber;
+        // Logarithmic spiral: theta = a * ln(r/r0)
+        // Or parametric: r = r0 * e^(b*theta)
+        const t = Math.pow(Math.random(), 0.5); // Bias toward outer regions for visibility
+        const r = (3000 + t * (MILKY_WAY.diskRadius - 3000)) * galaxyScale;
         
-        // Add spread around the arm
-        const spread = (Math.random() - 0.5) * MILKY_WAY.armWidth * galaxyScale;
-        const angleSpread = spread / r;
+        // Logarithmic spiral equation
+        const spiralAngle = arm.startAngle + Math.log(r / (3000 * galaxyScale)) / MILKY_WAY.armWindingTightness;
         
-        const finalAngle = armAngle + angleSpread;
-        const radialSpread = (Math.random() - 0.5) * MILKY_WAY.armWidth * 0.5 * galaxyScale;
+        // Add spread around the arm - Gaussian-like distribution
+        const spreadFactor = 1 - Math.exp(-r / (MILKY_WAY.diskRadius * galaxyScale * 0.3));
+        const armSpread = MILKY_WAY.armWidth * galaxyScale * spreadFactor;
+        const gaussianSpread = (Math.random() + Math.random() + Math.random() - 1.5) * armSpread * 0.7;
+        const angleSpread = gaussianSpread / (r + 1);
+        
+        const finalAngle = spiralAngle + angleSpread;
+        
+        // Add some inter-arm stars (30% of disk stars)
+        const isInterArm = Math.random() < 0.3;
+        const radialSpread = isInterArm 
+          ? (Math.random() - 0.5) * armSpread * 3 
+          : (Math.random() - 0.5) * armSpread * 0.5;
         
         positions[i3] = Math.cos(finalAngle) * (r + radialSpread);
-        positions[i3 + 1] = (Math.random() - 0.5) * MILKY_WAY.diskThickness * galaxyScale * Math.exp(-r / (MILKY_WAY.diskRadius * galaxyScale * 0.5));
+        
+        // Disk thickness decreases with radius (exponential)
+        const heightScale = Math.exp(-r / (MILKY_WAY.diskRadius * galaxyScale * 0.4));
+        positions[i3 + 1] = (Math.random() - 0.5) * MILKY_WAY.diskThickness * galaxyScale * heightScale;
+        
         positions[i3 + 2] = Math.sin(finalAngle) * (r + radialSpread);
         
-        // Disk stars - bluer in arms (young stars), mix of colors
-        const inArm = Math.abs(spread) < MILKY_WAY.armWidth * galaxyScale * 0.3;
-        if (inArm && Math.random() < 0.3) {
-          // Young blue stars in arms
-          color.setHSL(0.6 + Math.random() * 0.1, 0.7 + Math.random() * 0.3, 0.8 + Math.random() * 0.2);
+        // Color based on position
+        const distFromArm = Math.abs(gaussianSpread) / armSpread;
+        if (distFromArm < 0.3 && Math.random() < 0.15) {
+          // Young blue stars in arm cores (star-forming regions)
+          color.setHSL(0.58 + Math.random() * 0.08, 0.7 + Math.random() * 0.3, 0.75 + Math.random() * 0.2);
+          sizes[i] = (0.4 + Math.random() * 0.5) * galaxyScale * 100;
+        } else if (distFromArm < 0.5 && Math.random() < 0.1) {
+          // Pink/red nebular regions
+          color.setHSL(0.95 + Math.random() * 0.1, 0.6 + Math.random() * 0.3, 0.6 + Math.random() * 0.2);
+          sizes[i] = (0.3 + Math.random() * 0.3) * galaxyScale * 80;
         } else {
-          // Mix of star types
-          color.setHSL(0.1 + Math.random() * 0.15, 0.3 + Math.random() * 0.4, 0.7 + Math.random() * 0.3);
+          // General stellar population (white/yellow)
+          color.setHSL(0.12 + Math.random() * 0.08, 0.2 + Math.random() * 0.3, 0.7 + Math.random() * 0.3);
+          sizes[i] = (0.2 + Math.random() * 0.4) * galaxyScale * 60;
         }
-        sizes[i] = (0.3 + Math.random() * 0.7) * galaxyScale * 80;
       }
       
       colors[i3] = color.r;
@@ -125,60 +159,24 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
       const t = clock.getElapsedTime();
       
       // Gentle breathing animation
-      const scale = 1 + Math.sin(t * 2) * 0.2;
+      const scale = 1 + Math.sin(t * 2) * 0.15;
       youAreHereRef.current.scale.setScalar(scale);
       
       // Expanding pulse ring
-      const pulseScale = 1 + (t % 2) * 2;
-      const pulseOpacity = 1 - (t % 2) / 2;
+      const pulsePhase = (t * 0.8) % 1;
+      const pulseScale = 1 + pulsePhase * 3;
+      const pulseOpacity = (1 - pulsePhase) * 0.6;
       pulseRef.current.scale.setScalar(pulseScale);
-      (pulseRef.current.material as THREE.MeshBasicMaterial).opacity = pulseOpacity * 0.5;
-    }
-    
-    // Slow galaxy rotation (cosmetic, not physically accurate)
-    if (groupRef.current) {
-      groupRef.current.rotation.y += 0.00002;
+      (pulseRef.current.material as THREE.MeshBasicMaterial).opacity = pulseOpacity;
     }
   });
   
-  // Custom shader for glow effect
-  const glowMaterial = useMemo(() => {
-    return new THREE.ShaderMaterial({
-      uniforms: {
-        color: { value: new THREE.Color('#fff8e7') },
-        intensity: { value: 1.5 },
-      },
-      vertexShader: `
-        attribute float size;
-        varying vec3 vColor;
-        void main() {
-          vColor = color;
-          vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
-          gl_PointSize = size * (300.0 / -mvPosition.z);
-          gl_Position = projectionMatrix * mvPosition;
-        }
-      `,
-      fragmentShader: `
-        varying vec3 vColor;
-        void main() {
-          float r = distance(gl_PointCoord, vec2(0.5));
-          if (r > 0.5) discard;
-          float alpha = 1.0 - smoothstep(0.0, 0.5, r);
-          gl_FragColor = vec4(vColor, alpha * 0.7);
-        }
-      `,
-      transparent: true,
-      blending: THREE.AdditiveBlending,
-      depthWrite: false,
-    });
-  }, []);
-  
-  const markerSize = galaxyScale * 500; // Visible marker at galaxy scale
+  const markerSize = galaxyScale * 400;
   
   return (
     <group ref={groupRef}>
       {/* Galaxy particle system */}
-      <points ref={particlesRef}>
+      <points>
         <bufferGeometry>
           <bufferAttribute
             attach="attributes-position"
@@ -204,21 +202,32 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
             attribute float size;
             attribute vec3 color;
             varying vec3 vColor;
+            varying float vSize;
             void main() {
               vColor = color;
+              vSize = size;
               vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
-              gl_PointSize = size * (300.0 / -mvPosition.z);
-              gl_PointSize = clamp(gl_PointSize, 1.0, 100.0);
+              gl_PointSize = size * (400.0 / -mvPosition.z);
+              gl_PointSize = clamp(gl_PointSize, 0.5, 80.0);
               gl_Position = projectionMatrix * mvPosition;
             }
           `}
           fragmentShader={`
             varying vec3 vColor;
+            varying float vSize;
             void main() {
               float r = distance(gl_PointCoord, vec2(0.5));
               if (r > 0.5) discard;
-              float alpha = 1.0 - smoothstep(0.1, 0.5, r);
-              gl_FragColor = vec4(vColor, alpha * 0.8);
+              
+              // Soft glow falloff
+              float alpha = 1.0 - smoothstep(0.0, 0.5, r);
+              alpha = pow(alpha, 1.5);
+              
+              // Brighter core
+              float core = 1.0 - smoothstep(0.0, 0.15, r);
+              vec3 finalColor = vColor + core * 0.3;
+              
+              gl_FragColor = vec4(finalColor, alpha * 0.85);
             }
           `}
           transparent
@@ -227,45 +236,107 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
         />
       </points>
       
-      {/* Central bulge glow */}
+      {/* Central bulge glow layers */}
       <mesh position={[0, 0, 0]}>
-        <sphereGeometry args={[MILKY_WAY.bulgeRadius * galaxyScale * 0.3, 32, 32]} />
+        <sphereGeometry args={[MILKY_WAY.bulgeRadius * galaxyScale * 0.5, 32, 32]} />
         <meshBasicMaterial
-          color="#fff8dc"
+          color="#fff4d6"
           transparent
-          opacity={0.15}
+          opacity={0.08}
           blending={THREE.AdditiveBlending}
+        />
+      </mesh>
+      <mesh position={[0, 0, 0]}>
+        <sphereGeometry args={[MILKY_WAY.bulgeRadius * galaxyScale * 0.25, 32, 32]} />
+        <meshBasicMaterial
+          color="#ffe8b0"
+          transparent
+          opacity={0.12}
+          blending={THREE.AdditiveBlending}
+        />
+      </mesh>
+      
+      {/* Disk glow plane */}
+      <mesh rotation={[Math.PI / 2, 0, 0]}>
+        <planeGeometry args={[MILKY_WAY.diskRadius * galaxyScale * 2.2, MILKY_WAY.diskRadius * galaxyScale * 2.2]} />
+        <shaderMaterial
+          transparent
+          blending={THREE.AdditiveBlending}
+          depthWrite={false}
+          side={THREE.DoubleSide}
+          uniforms={{
+            diskRadius: { value: MILKY_WAY.diskRadius * galaxyScale },
+          }}
+          vertexShader={`
+            varying vec2 vUv;
+            void main() {
+              vUv = uv;
+              gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+            }
+          `}
+          fragmentShader={`
+            varying vec2 vUv;
+            uniform float diskRadius;
+            void main() {
+              vec2 center = vec2(0.5, 0.5);
+              float dist = distance(vUv, center) * 2.0;
+              
+              // Exponential disk profile
+              float brightness = exp(-dist * 2.5) * 0.15;
+              
+              // Add spiral hint
+              vec2 pos = vUv - center;
+              float angle = atan(pos.y, pos.x);
+              float spiral = sin(angle * 4.0 - dist * 8.0) * 0.5 + 0.5;
+              brightness += spiral * exp(-dist * 3.0) * 0.03;
+              
+              vec3 color = mix(vec3(0.9, 0.85, 0.7), vec3(0.7, 0.8, 1.0), dist);
+              
+              gl_FragColor = vec4(color, brightness);
+            }
+          `}
         />
       </mesh>
       
       {/* "You Are Here" marker at Sun's position */}
       {showYouAreHere && (
         <group position={sunPosition}>
-          {/* Main marker */}
+          {/* Main marker - bright core */}
           <mesh ref={youAreHereRef}>
             <sphereGeometry args={[markerSize, 16, 16]} />
-            <meshBasicMaterial color="#00ff88" transparent opacity={0.9} />
+            <meshBasicMaterial color="#00ff88" transparent opacity={0.95} />
+          </mesh>
+          
+          {/* Outer glow */}
+          <mesh>
+            <sphereGeometry args={[markerSize * 2, 16, 16]} />
+            <meshBasicMaterial
+              color="#00ff88"
+              transparent
+              opacity={0.2}
+              blending={THREE.AdditiveBlending}
+            />
           </mesh>
           
           {/* Pulse ring */}
           <mesh ref={pulseRef} rotation={[Math.PI / 2, 0, 0]}>
-            <ringGeometry args={[markerSize * 0.8, markerSize * 1.2, 32]} />
+            <ringGeometry args={[markerSize * 0.9, markerSize * 1.3, 32]} />
             <meshBasicMaterial
               color="#00ff88"
               transparent
-              opacity={0.5}
+              opacity={0.6}
               side={THREE.DoubleSide}
               blending={THREE.AdditiveBlending}
             />
           </mesh>
           
-          {/* Vertical beam for visibility */}
+          {/* Vertical beacon for visibility */}
           <mesh>
-            <cylinderGeometry args={[markerSize * 0.1, markerSize * 0.1, markerSize * 20, 8]} />
+            <cylinderGeometry args={[markerSize * 0.08, markerSize * 0.08, markerSize * 30, 8]} />
             <meshBasicMaterial
               color="#00ff88"
               transparent
-              opacity={0.3}
+              opacity={0.25}
               blending={THREE.AdditiveBlending}
             />
           </mesh>
