@@ -533,9 +533,9 @@ export const CosmosUI = () => {
       {/* Search bar */}
       <ObjectSearch isFullscreen={isFullscreen} />
 
-      {/* Top controls - compact on mobile */}
+      {/* Top controls - with labels on desktop */}
       <div
-        className={`${isFullscreen ? 'fixed' : 'absolute'} top-2 sm:top-4 right-2 sm:right-4 flex gap-1 sm:gap-2 z-[10000]`}
+        className={`${isFullscreen ? 'fixed' : 'absolute'} top-2 sm:top-4 right-2 sm:right-4 z-[10000]`}
         style={
           isFullscreen
             ? {
@@ -545,118 +545,92 @@ export const CosmosUI = () => {
             : undefined
         }
       >
-        <Button
-          size="icon"
-          variant="ghost"
-          onClick={toggleFullscreen}
-          className="h-7 w-7 sm:h-9 sm:w-9 bg-white/10 hover:bg-white/20 text-white"
-          title={isFullscreen ? t.exitFullscreen : t.fullscreen}
-        >
-          {isFullscreen ? (
-            <Minimize className="w-3.5 h-3.5 sm:w-5 sm:h-5" />
-          ) : (
-            <Maximize className="w-3.5 h-3.5 sm:w-5 sm:h-5" />
-          )}
-        </Button>
-        <Button
-          size="icon"
-          variant="ghost"
-          onClick={toggleQuickJump}
-          className="h-7 w-7 sm:h-9 sm:w-9 bg-white/10 hover:bg-white/20 text-white"
-          title={t.quickJump}
-        >
-          <Compass className="w-3.5 h-3.5 sm:w-5 sm:h-5" />
-        </Button>
-        <Button
-          size="icon"
-          variant="ghost"
-          onClick={toggleOrbits}
-          className="h-7 w-7 sm:h-9 sm:w-9 bg-white/10 hover:bg-white/20 text-white"
-          title={showOrbits ? t.hideOrbits : t.showOrbits}
-        >
-          {showOrbits ? (
-            <CircleDot className="w-3.5 h-3.5 sm:w-5 sm:h-5" />
-          ) : (
-            <CircleOff className="w-3.5 h-3.5 sm:w-5 sm:h-5" />
-          )}
-        </Button>
-        <Button
-          size="icon"
-          variant="ghost"
-          onClick={toggleTrails}
-          className="h-7 w-7 sm:h-9 sm:w-9 bg-white/10 hover:bg-white/20 text-white"
-          title={showTrails ? t.hideTrails : t.showTrails}
-        >
-          <Sparkles className={`w-3.5 h-3.5 sm:w-5 sm:h-5 ${showTrails ? 'opacity-100' : 'opacity-50'}`} />
-        </Button>
-        <Button
-          size="icon"
-          variant="ghost"
-          onClick={() => setShowTimeSlider(!showTimeSlider)}
-          className="h-7 w-7 sm:h-9 sm:w-9 bg-white/10 hover:bg-white/20 text-white"
-          title={t.timeSpeed}
-        >
-          <Clock className="w-3.5 h-3.5 sm:w-5 sm:h-5" />
-        </Button>
-        <Button
-          size="icon"
-          variant="ghost"
-          onClick={toggleRealPeriods}
-          className="h-7 w-7 sm:h-9 sm:w-9 bg-white/10 hover:bg-white/20 text-white"
-          title={showRealPeriods ? t.hidePeriods : t.showPeriods}
-        >
-          {showRealPeriods ? (
-            <Timer className="w-3.5 h-3.5 sm:w-5 sm:h-5" />
-          ) : (
-            <TimerOff className="w-3.5 h-3.5 sm:w-5 sm:h-5" />
-          )}
-        </Button>
-        <Button
-          size="icon"
-          variant="ghost"
-          onClick={togglePerformanceHUD}
-          className="h-7 w-7 sm:h-9 sm:w-9 bg-white/10 hover:bg-white/20 text-white"
-          title={showPerformanceHUD ? t.hideStats : t.showStats}
-        >
-          <Activity className={`w-3.5 h-3.5 sm:w-5 sm:h-5 ${showPerformanceHUD ? 'text-green-400' : ''}`} />
-        </Button>
-        <Button
-          size="icon"
-          variant="ghost"
-          onClick={goHome}
-          className="h-7 w-7 sm:h-9 sm:w-9 bg-white/10 hover:bg-white/20 text-white"
-          title={t.home}
-        >
-          <Home className="w-3.5 h-3.5 sm:w-5 sm:h-5" />
-        </Button>
-        <Button
-          size="icon"
-          variant="ghost"
-          onClick={toggleSizeComparison}
-          className="h-7 w-7 sm:h-9 sm:w-9 bg-white/10 hover:bg-white/20 text-white"
-          title={t.sizeComparison}
-        >
-          <BarChart3 className="w-3.5 h-3.5 sm:w-5 sm:h-5" />
-        </Button>
-        <Button
-          size="icon"
-          variant="ghost"
-          onClick={toggleExaggeratedScale}
-          className="h-7 w-7 sm:h-9 sm:w-9 bg-white/10 hover:bg-white/20 text-white"
-          title={useExaggeratedScale ? t.exaggeratedScale : t.realisticScale}
-        >
-          <Scaling className={`w-3.5 h-3.5 sm:w-5 sm:h-5 ${useExaggeratedScale ? 'text-yellow-400' : ''}`} />
-        </Button>
-        {/* Help button - more prominent with pulsing ring */}
-        <Button
-          size="icon"
-          variant="ghost"
-          onClick={() => setShowControlHints(true)}
-          className="h-7 w-7 sm:h-9 sm:w-9 bg-blue-500/30 hover:bg-blue-500/50 text-white ring-2 ring-blue-400/50 animate-pulse"
-          title={t.help}
-        >
-          <HelpCircle className="w-3.5 h-3.5 sm:w-5 sm:h-5" />
-        </Button>
+        {/* Mobile: icon-only row */}
+        {isMobile ? (
+          <div className="flex gap-1 flex-wrap justify-end">
+            <Button size="icon" variant="ghost" onClick={toggleFullscreen} className="h-7 w-7 bg-white/10 hover:bg-white/20 text-white" title={isFullscreen ? t.exitFullscreen : t.fullscreen}>
+              {isFullscreen ? <Minimize className="w-3.5 h-3.5" /> : <Maximize className="w-3.5 h-3.5" />}
+            </Button>
+            <Button size="icon" variant="ghost" onClick={toggleQuickJump} className="h-7 w-7 bg-white/10 hover:bg-white/20 text-white" title={t.quickJump}>
+              <Compass className="w-3.5 h-3.5" />
+            </Button>
+            <Button size="icon" variant="ghost" onClick={toggleOrbits} className="h-7 w-7 bg-white/10 hover:bg-white/20 text-white" title={showOrbits ? t.hideOrbits : t.showOrbits}>
+              {showOrbits ? <CircleDot className="w-3.5 h-3.5" /> : <CircleOff className="w-3.5 h-3.5" />}
+            </Button>
+            <Button size="icon" variant="ghost" onClick={() => setShowTimeSlider(!showTimeSlider)} className="h-7 w-7 bg-white/10 hover:bg-white/20 text-white" title={t.timeSpeed}>
+              <Clock className="w-3.5 h-3.5" />
+            </Button>
+            <Button size="icon" variant="ghost" onClick={goHome} className="h-7 w-7 bg-white/10 hover:bg-white/20 text-white" title={t.home}>
+              <Home className="w-3.5 h-3.5" />
+            </Button>
+            <Button size="icon" variant="ghost" onClick={() => setShowControlHints(true)} className="h-7 w-7 bg-blue-500/30 hover:bg-blue-500/50 text-white ring-2 ring-blue-400/50" title={t.help}>
+              <HelpCircle className="w-3.5 h-3.5" />
+            </Button>
+          </div>
+        ) : (
+          /* Desktop: labeled buttons in a compact toolbar */
+          <div className="bg-black/60 backdrop-blur-sm rounded-lg p-2 space-y-2">
+            {/* Primary actions row */}
+            <div className="flex gap-1.5 items-center">
+              <Button size="sm" variant="ghost" onClick={toggleFullscreen} className="h-8 px-2.5 bg-white/10 hover:bg-white/20 text-white text-xs gap-1.5">
+                {isFullscreen ? <Minimize className="w-4 h-4" /> : <Maximize className="w-4 h-4" />}
+                <span>{isFullscreen ? t.exitFullscreen : t.fullscreen}</span>
+              </Button>
+              <Button size="sm" variant="ghost" onClick={toggleQuickJump} className="h-8 px-2.5 bg-white/10 hover:bg-white/20 text-white text-xs gap-1.5">
+                <Compass className="w-4 h-4" />
+                <span>{t.quickJump}</span>
+              </Button>
+              <Button size="sm" variant="ghost" onClick={goHome} className="h-8 px-2.5 bg-white/10 hover:bg-white/20 text-white text-xs gap-1.5">
+                <Home className="w-4 h-4" />
+                <span>{t.home}</span>
+              </Button>
+            </div>
+            
+            {/* Display options row */}
+            <div className="flex gap-1.5 items-center">
+              <Button size="sm" variant="ghost" onClick={toggleOrbits} className={`h-8 px-2.5 text-white text-xs gap-1.5 ${showOrbits ? 'bg-white/20' : 'bg-white/10 hover:bg-white/20'}`}>
+                {showOrbits ? <CircleDot className="w-4 h-4" /> : <CircleOff className="w-4 h-4" />}
+                <span>{language === 'fr' ? 'Orbites' : 'Orbits'}</span>
+              </Button>
+              <Button size="sm" variant="ghost" onClick={toggleTrails} className={`h-8 px-2.5 text-white text-xs gap-1.5 ${showTrails ? 'bg-white/20' : 'bg-white/10 hover:bg-white/20'}`}>
+                <Sparkles className="w-4 h-4" />
+                <span>{language === 'fr' ? 'Traînées' : 'Trails'}</span>
+              </Button>
+              <Button size="sm" variant="ghost" onClick={() => setShowTimeSlider(!showTimeSlider)} className={`h-8 px-2.5 text-white text-xs gap-1.5 ${showTimeSlider ? 'bg-white/20' : 'bg-white/10 hover:bg-white/20'}`}>
+                <Clock className="w-4 h-4" />
+                <span>{language === 'fr' ? 'Temps' : 'Time'}</span>
+              </Button>
+            </div>
+            
+            {/* Advanced options row */}
+            <div className="flex gap-1.5 items-center">
+              <Button size="sm" variant="ghost" onClick={toggleRealPeriods} className={`h-8 px-2.5 text-white text-xs gap-1.5 ${showRealPeriods ? 'bg-white/20' : 'bg-white/10 hover:bg-white/20'}`}>
+                {showRealPeriods ? <Timer className="w-4 h-4" /> : <TimerOff className="w-4 h-4" />}
+                <span>{language === 'fr' ? 'Périodes' : 'Periods'}</span>
+              </Button>
+              <Button size="sm" variant="ghost" onClick={toggleExaggeratedScale} className={`h-8 px-2.5 text-white text-xs gap-1.5 ${useExaggeratedScale ? 'bg-yellow-500/30' : 'bg-white/10 hover:bg-white/20'}`}>
+                <Scaling className="w-4 h-4" />
+                <span>{language === 'fr' ? 'Échelle' : 'Scale'}</span>
+              </Button>
+              <Button size="sm" variant="ghost" onClick={toggleSizeComparison} className="h-8 px-2.5 bg-white/10 hover:bg-white/20 text-white text-xs gap-1.5">
+                <BarChart3 className="w-4 h-4" />
+                <span>{language === 'fr' ? 'Tailles' : 'Sizes'}</span>
+              </Button>
+            </div>
+            
+            {/* Help & Stats row */}
+            <div className="flex gap-1.5 items-center border-t border-white/10 pt-2">
+              <Button size="sm" variant="ghost" onClick={togglePerformanceHUD} className={`h-8 px-2.5 text-white text-xs gap-1.5 ${showPerformanceHUD ? 'bg-green-500/30' : 'bg-white/10 hover:bg-white/20'}`}>
+                <Activity className="w-4 h-4" />
+                <span>Stats</span>
+              </Button>
+              <Button size="sm" variant="ghost" onClick={() => setShowControlHints(true)} className="h-8 px-2.5 bg-blue-500/30 hover:bg-blue-500/50 text-white text-xs gap-1.5 ring-1 ring-blue-400/50">
+                <HelpCircle className="w-4 h-4" />
+                <span>{t.help}</span>
+              </Button>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Time speed slider */}
