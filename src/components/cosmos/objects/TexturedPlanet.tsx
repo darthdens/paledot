@@ -33,7 +33,7 @@ const PLANET_VISUALS: Record<string, {
   tilt?: number;
   hasClouds?: boolean;
   cloudColor?: string;
-  surfaceDetail?: 'rocky' | 'gaseous' | 'icy' | 'volcanic' | 'earth' | 'jupiter' | 'saturn' | 'moon' | 'io' | 'europa' | 'pluto' | 'mars';
+  surfaceDetail?: 'rocky' | 'gaseous' | 'icy' | 'volcanic' | 'sun' | 'mercury' | 'venus' | 'earth' | 'moon' | 'mars' | 'jupiter' | 'saturn' | 'uranus' | 'neptune' | 'io' | 'europa' | 'ganymede' | 'callisto' | 'titan' | 'iapetus' | 'triton' | 'enceladus' | 'pluto' | 'ceres';
   uniqueFeature?: string;
 }> = {
   sun: {
@@ -44,6 +44,7 @@ const PLANET_VISUALS: Record<string, {
     emissiveIntensity: 2.5,
     roughness: 1,
     metalness: 0,
+    surfaceDetail: 'sun',
   },
   mercury: {
     baseColor: '#707070',        // Dark gray like the Moon but darker
@@ -51,11 +52,12 @@ const PLANET_VISUALS: Record<string, {
     tertiaryColor: '#888888',    // Lighter highlands
     roughness: 0.98,
     metalness: 0.1,
-    surfaceDetail: 'rocky',
+    surfaceDetail: 'mercury',
   },
   venus: {
     baseColor: '#E8E0C8',        // Yellowish-white cloud cover
     secondaryColor: '#D4C8A0',   // Slightly darker cloud bands
+    tertiaryColor: '#C0B090',    // Darker swirls
     roughness: 0.3,
     metalness: 0,
     hasAtmosphere: true,
@@ -63,6 +65,7 @@ const PLANET_VISUALS: Record<string, {
     atmosphereIntensity: 1.0,
     hasClouds: true,
     cloudColor: '#F5EED8',
+    surfaceDetail: 'venus',
   },
   earth: {
     baseColor: '#1E4D7C',        // Deep ocean blue
@@ -131,7 +134,7 @@ const PLANET_VISUALS: Record<string, {
     tertiaryColor: '#B8B0A8',    // Lighter grooved terrain
     roughness: 0.85,
     metalness: 0.1,
-    surfaceDetail: 'rocky',
+    surfaceDetail: 'ganymede',
   },
   callisto: {
     baseColor: '#4B3621',        // Very dark brown base
@@ -139,7 +142,7 @@ const PLANET_VISUALS: Record<string, {
     tertiaryColor: '#E8E8E8',    // Bright white crater impacts
     roughness: 0.95,
     metalness: 0.05,
-    surfaceDetail: 'rocky',
+    surfaceDetail: 'callisto',
   },
   saturn: {
     baseColor: '#F4D7A8',        // Pale gold/butterscotch
@@ -162,11 +165,13 @@ const PLANET_VISUALS: Record<string, {
   titan: {
     baseColor: '#FF8C00',        // Orange haze - completely opaque
     secondaryColor: '#CC7000',   // Darker orange
+    tertiaryColor: '#FFB040',    // Lighter orange areas
     roughness: 0.4,
     metalness: 0,
     hasAtmosphere: true,
     atmosphereColor: '#FFA500',
     atmosphereIntensity: 1.2,    // Very thick - hides surface
+    surfaceDetail: 'titan',
   },
   uranus: {
     baseColor: '#AFEEEE',        // Pale cyan/aquamarine
@@ -184,7 +189,7 @@ const PLANET_VISUALS: Record<string, {
     ringOuterMult: 2.0,
     ringStyle: 1,
     tilt: 97.8,
-    surfaceDetail: 'gaseous',
+    surfaceDetail: 'uranus',
   },
   neptune: {
     baseColor: '#4169E1',        // Deep azure blue
@@ -195,8 +200,7 @@ const PLANET_VISUALS: Record<string, {
     hasAtmosphere: true,
     atmosphereColor: '#6688FF',
     atmosphereIntensity: 0.45,
-    surfaceDetail: 'gaseous',
-    uniqueFeature: 'darkSpot',
+    surfaceDetail: 'neptune',
   },
   pluto: {
     baseColor: '#D4C4A8',        // Tan base
@@ -227,7 +231,7 @@ const PLANET_VISUALS: Record<string, {
     tertiaryColor: '#FFFFFF',    // Bright spots (Occator crater)
     roughness: 0.88,
     metalness: 0.1,
-    surfaceDetail: 'rocky',
+    surfaceDetail: 'ceres',
   },
   mimas: {
     baseColor: '#E0E0E0',
@@ -239,10 +243,10 @@ const PLANET_VISUALS: Record<string, {
   enceladus: {
     baseColor: '#FFFFFF',        // Brightest object - pure white ice
     secondaryColor: '#E8E8F0',
-    tertiaryColor: '#A0C0D0',    // Tiger stripe fractures
+    tertiaryColor: '#80B0C0',    // Tiger stripe fractures (bluish)
     roughness: 0.15,
     metalness: 0.25,
-    surfaceDetail: 'icy',
+    surfaceDetail: 'enceladus',
   },
   tethys: {
     baseColor: '#D8D8D8',
@@ -268,9 +272,10 @@ const PLANET_VISUALS: Record<string, {
   iapetus: {
     baseColor: '#FFFFFF',        // Bright trailing hemisphere
     secondaryColor: '#201008',   // Very dark leading hemisphere
+    tertiaryColor: '#808080',    // Transition zone
     roughness: 0.85,
     metalness: 0.05,
-    surfaceDetail: 'icy',
+    surfaceDetail: 'iapetus',
   },
   miranda: {
     baseColor: '#B8B8B8',
@@ -316,7 +321,7 @@ const PLANET_VISUALS: Record<string, {
     hasAtmosphere: true,
     atmosphereColor: '#FFE8E0',
     atmosphereIntensity: 0.1,
-    surfaceDetail: 'icy',
+    surfaceDetail: 'triton',
   },
 };
 
@@ -599,17 +604,30 @@ export const TexturedPlanet = ({
                 emissiveIntensity: { value: visuals.emissiveIntensity || 0 },
                 time: { value: 0 },
                 surfaceType: { value: 
-                  visuals.surfaceDetail === 'jupiter' ? 10.0 :
-                  visuals.surfaceDetail === 'saturn' ? 11.0 :
-                  visuals.surfaceDetail === 'earth' ? 12.0 :
-                  visuals.surfaceDetail === 'moon' ? 13.0 :
-                  visuals.surfaceDetail === 'mars' ? 14.0 :
-                  visuals.surfaceDetail === 'io' ? 15.0 :
-                  visuals.surfaceDetail === 'europa' ? 16.0 :
-                  visuals.surfaceDetail === 'pluto' ? 17.0 :
-                  visuals.surfaceDetail === 'gaseous' ? 1.0 : 
-                  visuals.surfaceDetail === 'icy' ? 2.0 : 
-                  visuals.surfaceDetail === 'volcanic' ? 3.0 : 0.0 
+                  visuals.surfaceDetail === 'sun' ? 1.0 :
+                  visuals.surfaceDetail === 'mercury' ? 2.0 :
+                  visuals.surfaceDetail === 'venus' ? 3.0 :
+                  visuals.surfaceDetail === 'earth' ? 4.0 :
+                  visuals.surfaceDetail === 'moon' ? 5.0 :
+                  visuals.surfaceDetail === 'mars' ? 6.0 :
+                  visuals.surfaceDetail === 'jupiter' ? 7.0 :
+                  visuals.surfaceDetail === 'saturn' ? 8.0 :
+                  visuals.surfaceDetail === 'uranus' ? 9.0 :
+                  visuals.surfaceDetail === 'neptune' ? 10.0 :
+                  visuals.surfaceDetail === 'io' ? 11.0 :
+                  visuals.surfaceDetail === 'europa' ? 12.0 :
+                  visuals.surfaceDetail === 'ganymede' ? 13.0 :
+                  visuals.surfaceDetail === 'callisto' ? 14.0 :
+                  visuals.surfaceDetail === 'titan' ? 15.0 :
+                  visuals.surfaceDetail === 'enceladus' ? 16.0 :
+                  visuals.surfaceDetail === 'iapetus' ? 17.0 :
+                  visuals.surfaceDetail === 'triton' ? 18.0 :
+                  visuals.surfaceDetail === 'pluto' ? 19.0 :
+                  visuals.surfaceDetail === 'ceres' ? 20.0 :
+                  visuals.surfaceDetail === 'gaseous' ? 50.0 : 
+                  visuals.surfaceDetail === 'icy' ? 51.0 : 
+                  visuals.surfaceDetail === 'volcanic' ? 52.0 : 
+                  visuals.surfaceDetail === 'rocky' ? 53.0 : 0.0 
                 },
                 planetSeed: { value: object.id.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) * 0.1 },
                 objectCenter: { value: new THREE.Vector3(0, 0, 0) },
@@ -828,134 +846,214 @@ export const TexturedPlanet = ({
                   
                   vec3 surfaceColor;
                   
-                  // === JUPITER - Tan/brown bands with Great Red Spot ===
-                  if (surfaceType > 9.5 && surfaceType < 10.5) {
-                    float lat = vUv.y;
-                    // Multiple band frequencies for realistic look
-                    float band1 = sin(lat * 25.0) * 0.5 + 0.5;
-                    float band2 = sin(lat * 55.0 + 0.5) * 0.3 + 0.5;
-                    float band3 = sin(lat * 90.0 + surfaceNoise * 1.5) * 0.2 + 0.5;
-                    float bands = band1 * 0.5 + band2 * 0.3 + band3 * 0.2;
-                    // Add turbulence at band edges
-                    float turbulence = surfaceNoise * 0.15;
-                    bands = clamp(bands + turbulence, 0.0, 1.0);
-                    surfaceColor = mix(tertiaryColor, secondaryColor, bands);
-                    surfaceColor = mix(surfaceColor, baseColor, 0.3);
-                    // Great Red Spot - positioned at ~22° south latitude
-                    vec2 spotCenter = vec2(0.6, 0.35);
-                    vec2 spotSize = vec2(0.08, 0.05);
-                    vec2 spotDist = (vUv - spotCenter) / spotSize;
-                    float spot = 1.0 - smoothstep(0.8, 1.0, length(spotDist));
-                    vec3 spotColor = vec3(0.7, 0.25, 0.2); // Reddish
-                    surfaceColor = mix(surfaceColor, spotColor, spot * 0.8);
+                  // === SUN (1) - Plasma surface with granulation ===
+                  if (surfaceType > 0.5 && surfaceType < 1.5) {
+                    float granulation = fbm(noiseCoord * 3.0 + time * 0.1);
+                    float prominences = smoothstep(0.6, 0.8, fineNoise);
+                    surfaceColor = mix(baseColor, secondaryColor, granulation * 0.5);
+                    surfaceColor = mix(surfaceColor, tertiaryColor, prominences * 0.3);
+                    // Add solar flare effect
+                    float flare = smoothstep(0.85, 0.95, surfaceNoise) * 0.4;
+                    surfaceColor += vec3(flare, flare * 0.5, 0.0);
                   }
-                  // === SATURN - Pale gold subtle bands ===
-                  else if (surfaceType > 10.5 && surfaceType < 11.5) {
-                    float lat = vUv.y;
-                    float band1 = sin(lat * 20.0) * 0.3 + 0.5;
-                    float band2 = sin(lat * 45.0 + 0.3) * 0.2 + 0.5;
-                    float bands = band1 * 0.6 + band2 * 0.4 + surfaceNoise * 0.1;
-                    surfaceColor = mix(tertiaryColor, secondaryColor, clamp(bands, 0.0, 1.0));
-                    surfaceColor = mix(surfaceColor, baseColor, 0.4);
+                  // === MERCURY (2) - Heavily cratered gray ===
+                  else if (surfaceType > 1.5 && surfaceType < 2.5) {
+                    float craters = 1.0 - smoothstep(0.5, 0.65, surfaceNoise) * 0.5;
+                    float smallCraters = 1.0 - smoothstep(0.55, 0.65, fineNoise) * 0.3;
+                    float highlands = smoothstep(0.6, 0.75, surfaceNoise);
+                    surfaceColor = mix(baseColor, secondaryColor, 0.3 + fineNoise * 0.2);
+                    surfaceColor = mix(surfaceColor, tertiaryColor, highlands * 0.4);
+                    surfaceColor *= craters * smallCraters;
                   }
-                  // === EARTH - Oceans, continents, ice caps ===
-                  else if (surfaceType > 11.5 && surfaceType < 12.5) {
+                  // === VENUS (3) - Swirling yellowish clouds ===
+                  else if (surfaceType > 2.5 && surfaceType < 3.5) {
+                    float swirl = sin(vUv.y * 15.0 + surfaceNoise * 4.0 + vUv.x * 3.0) * 0.5 + 0.5;
+                    float bands = sin(vUv.y * 8.0) * 0.3 + 0.5;
+                    surfaceColor = mix(baseColor, secondaryColor, swirl * 0.4);
+                    surfaceColor = mix(surfaceColor, tertiaryColor, bands * 0.2);
+                  }
+                  // === EARTH (4) - Oceans, continents, ice caps ===
+                  else if (surfaceType > 3.5 && surfaceType < 4.5) {
                     float continent = smoothstep(0.45, 0.55, surfaceNoise);
                     float desert = smoothstep(0.6, 0.7, fineNoise);
-                    // Polar ice caps
                     float polarLat = abs(vUv.y - 0.5) * 2.0;
                     float iceCap = smoothstep(0.85, 0.95, polarLat);
-                    // Ocean is base, land is secondary, desert is tertiary
                     surfaceColor = baseColor; // Ocean
                     surfaceColor = mix(surfaceColor, secondaryColor, continent); // Land
                     surfaceColor = mix(surfaceColor, tertiaryColor, continent * desert); // Desert
                     surfaceColor = mix(surfaceColor, vec3(1.0), iceCap); // Ice
                   }
-                  // === MOON - Dark maria, bright highlands ===
-                  else if (surfaceType > 12.5 && surfaceType < 13.5) {
-                    // Large maria regions (dark basaltic)
+                  // === MOON (5) - Dark maria, bright highlands ===
+                  else if (surfaceType > 4.5 && surfaceType < 5.5) {
                     float maria = smoothstep(0.4, 0.6, surfaceNoise);
-                    // Craters
-                    float craters = 1.0 - smoothstep(0.6, 0.7, fineNoise) * 0.3;
+                    float craters = 1.0 - smoothstep(0.6, 0.7, fineNoise) * 0.35;
                     surfaceColor = mix(secondaryColor, baseColor, maria);
+                    surfaceColor = mix(surfaceColor, tertiaryColor, microNoise * 0.2);
                     surfaceColor *= craters;
-                    // Add some brightness variation
-                    surfaceColor += vec3(microNoise * 0.1);
                   }
-                  // === MARS - Red with dark regions and polar caps ===
-                  else if (surfaceType > 13.5 && surfaceType < 14.5) {
+                  // === MARS (6) - Red with dark regions and white polar caps ===
+                  else if (surfaceType > 5.5 && surfaceType < 6.5) {
                     float terrain = surfaceNoise * 0.6 + fineNoise * 0.4;
                     float darkRegions = smoothstep(0.5, 0.65, terrain);
                     surfaceColor = mix(baseColor, secondaryColor, darkRegions * 0.6);
-                    // Polar ice caps (white)
                     float polarLat = abs(vUv.y - 0.5) * 2.0;
                     float iceCap = smoothstep(0.88, 0.98, polarLat);
                     surfaceColor = mix(surfaceColor, tertiaryColor, iceCap);
-                    // Add subtle variation
-                    surfaceColor += vec3(microNoise * 0.05, microNoise * 0.02, 0.0);
                   }
-                  // === IO - Yellow sulfur with orange/red volcanic spots ===
-                  else if (surfaceType > 14.5 && surfaceType < 15.5) {
+                  // === JUPITER (7) - Tan/brown bands with Great Red Spot ===
+                  else if (surfaceType > 6.5 && surfaceType < 7.5) {
+                    float lat = vUv.y;
+                    float band1 = sin(lat * 25.0) * 0.5 + 0.5;
+                    float band2 = sin(lat * 55.0 + 0.5) * 0.3 + 0.5;
+                    float band3 = sin(lat * 90.0 + surfaceNoise * 1.5) * 0.2 + 0.5;
+                    float bands = band1 * 0.5 + band2 * 0.3 + band3 * 0.2 + surfaceNoise * 0.15;
+                    surfaceColor = mix(tertiaryColor, secondaryColor, clamp(bands, 0.0, 1.0));
+                    surfaceColor = mix(surfaceColor, baseColor, 0.3);
+                    // Great Red Spot
+                    vec2 spotCenter = vec2(0.6, 0.35);
+                    vec2 spotDist = (vUv - spotCenter) / vec2(0.08, 0.05);
+                    float spot = 1.0 - smoothstep(0.8, 1.0, length(spotDist));
+                    surfaceColor = mix(surfaceColor, vec3(0.7, 0.25, 0.2), spot * 0.8);
+                  }
+                  // === SATURN (8) - Pale gold subtle bands ===
+                  else if (surfaceType > 7.5 && surfaceType < 8.5) {
+                    float lat = vUv.y;
+                    float band1 = sin(lat * 18.0) * 0.25 + 0.5;
+                    float band2 = sin(lat * 40.0 + 0.3) * 0.15 + 0.5;
+                    float bands = band1 * 0.6 + band2 * 0.4 + surfaceNoise * 0.08;
+                    surfaceColor = mix(tertiaryColor, secondaryColor, clamp(bands, 0.0, 1.0));
+                    surfaceColor = mix(surfaceColor, baseColor, 0.5);
+                  }
+                  // === URANUS (9) - Pale cyan with very subtle bands ===
+                  else if (surfaceType > 8.5 && surfaceType < 9.5) {
+                    float lat = vUv.y;
+                    float band = sin(lat * 12.0) * 0.1 + 0.5;
+                    surfaceColor = mix(baseColor, secondaryColor, band + surfaceNoise * 0.05);
+                    surfaceColor = mix(surfaceColor, tertiaryColor, 0.2);
+                  }
+                  // === NEPTUNE (10) - Deep blue with white clouds ===
+                  else if (surfaceType > 9.5 && surfaceType < 10.5) {
+                    float lat = vUv.y;
+                    float bands = sin(lat * 20.0) * 0.15 + 0.5;
+                    surfaceColor = mix(baseColor, secondaryColor, bands + surfaceNoise * 0.1);
+                    // White cirrus clouds
+                    float clouds = smoothstep(0.7, 0.85, fineNoise) * 0.5;
+                    surfaceColor = mix(surfaceColor, tertiaryColor, clouds);
+                    // Great Dark Spot
+                    vec2 darkSpotCenter = vec2(0.3, 0.4);
+                    float darkSpot = 1.0 - smoothstep(0.06, 0.1, length(vUv - darkSpotCenter));
+                    surfaceColor = mix(surfaceColor, secondaryColor * 0.7, darkSpot * 0.6);
+                  }
+                  // === IO (11) - Yellow sulfur with orange/red volcanic spots ===
+                  else if (surfaceType > 10.5 && surfaceType < 11.5) {
                     float sulfur = surfaceNoise;
-                    float volcanic = smoothstep(0.6, 0.8, fineNoise);
-                    float hotSpots = smoothstep(0.75, 0.9, fineNoise);
+                    float volcanic = smoothstep(0.55, 0.75, fineNoise);
+                    float hotSpots = smoothstep(0.7, 0.85, fineNoise);
                     surfaceColor = baseColor; // Yellow
-                    surfaceColor = mix(surfaceColor, secondaryColor, volcanic * 0.7); // Orange
-                    surfaceColor = mix(surfaceColor, tertiaryColor, hotSpots * 0.5); // Red vents
-                    // Volcanic glow
-                    surfaceColor += vec3(0.3, 0.1, 0.0) * hotSpots;
+                    surfaceColor = mix(surfaceColor, secondaryColor, volcanic * 0.6); // Orange
+                    surfaceColor = mix(surfaceColor, tertiaryColor, hotSpots * 0.4); // Red
+                    surfaceColor += vec3(0.25, 0.08, 0.0) * hotSpots; // Glow
                   }
-                  // === EUROPA - White ice with brown cracks ===
-                  else if (surfaceType > 15.5 && surfaceType < 16.5) {
-                    // Linear cracks (lineae)
-                    float crack1 = smoothstep(0.48, 0.52, sin(vUv.x * 60.0 + vUv.y * 20.0 + surfaceNoise * 3.0));
-                    float crack2 = smoothstep(0.48, 0.52, sin(vUv.y * 50.0 - vUv.x * 15.0 + fineNoise * 2.0));
-                    float cracks = max(crack1, crack2) * 0.6;
+                  // === EUROPA (12) - White ice with brown linear cracks ===
+                  else if (surfaceType > 11.5 && surfaceType < 12.5) {
+                    float crack1 = smoothstep(0.47, 0.53, sin(vUv.x * 60.0 + vUv.y * 20.0 + surfaceNoise * 3.0));
+                    float crack2 = smoothstep(0.47, 0.53, sin(vUv.y * 50.0 - vUv.x * 15.0 + fineNoise * 2.0));
+                    float crack3 = smoothstep(0.48, 0.52, sin(vUv.x * 35.0 - vUv.y * 40.0));
+                    float cracks = max(max(crack1, crack2), crack3 * 0.5) * 0.55;
                     surfaceColor = baseColor; // White ice
                     surfaceColor = mix(surfaceColor, secondaryColor, cracks); // Brown cracks
-                    surfaceColor = mix(surfaceColor, tertiaryColor, microNoise * 0.15); // Tan patches
+                    surfaceColor = mix(surfaceColor, tertiaryColor, microNoise * 0.1);
                   }
-                  // === PLUTO - Tan/charcoal with white heart ===
+                  // === GANYMEDE (13) - Mixed gray/brown with grooved terrain ===
+                  else if (surfaceType > 12.5 && surfaceType < 13.5) {
+                    float darkTerrain = smoothstep(0.4, 0.6, surfaceNoise);
+                    float grooves = sin(vUv.x * 80.0 + vUv.y * 30.0) * 0.5 + 0.5;
+                    surfaceColor = mix(secondaryColor, baseColor, darkTerrain);
+                    surfaceColor = mix(surfaceColor, tertiaryColor, grooves * darkTerrain * 0.3);
+                    surfaceColor *= 1.0 - smoothstep(0.6, 0.7, fineNoise) * 0.2;
+                  }
+                  // === CALLISTO (14) - Very dark with bright crater impacts ===
+                  else if (surfaceType > 13.5 && surfaceType < 14.5) {
+                    float craters = smoothstep(0.65, 0.8, fineNoise);
+                    surfaceColor = mix(secondaryColor, baseColor, surfaceNoise * 0.3);
+                    // Bright impact craters
+                    surfaceColor = mix(surfaceColor, tertiaryColor, craters * 0.7);
+                  }
+                  // === TITAN (15) - Orange haze, no surface visible ===
+                  else if (surfaceType > 14.5 && surfaceType < 15.5) {
+                    float haze = surfaceNoise * 0.2 + 0.4;
+                    surfaceColor = mix(baseColor, secondaryColor, haze);
+                    surfaceColor = mix(surfaceColor, tertiaryColor, fineNoise * 0.15);
+                  }
+                  // === ENCELADUS (16) - Bright white with tiger stripes ===
+                  else if (surfaceType > 15.5 && surfaceType < 16.5) {
+                    surfaceColor = baseColor; // Pure white
+                    surfaceColor = mix(surfaceColor, secondaryColor, microNoise * 0.1);
+                    // Tiger stripes at south pole
+                    float southPole = smoothstep(0.15, 0.0, vUv.y);
+                    float stripes = sin(vUv.x * 40.0 + surfaceNoise * 3.0) * 0.5 + 0.5;
+                    surfaceColor = mix(surfaceColor, tertiaryColor, southPole * stripes * 0.6);
+                  }
+                  // === IAPETUS (17) - Two-toned: bright and dark hemispheres ===
                   else if (surfaceType > 16.5 && surfaceType < 17.5) {
+                    // Sharp transition between hemispheres
+                    float hemisphere = smoothstep(0.4, 0.6, vUv.x);
+                    surfaceColor = mix(secondaryColor, baseColor, hemisphere);
+                    surfaceColor = mix(surfaceColor, tertiaryColor, surfaceNoise * 0.15);
+                  }
+                  // === TRITON (18) - Pinkish with cantaloupe texture and dark streaks ===
+                  else if (surfaceType > 17.5 && surfaceType < 18.5) {
+                    // Cantaloupe terrain (dimpled appearance)
+                    float cantaloupe = sin(noiseCoord.x * 15.0) * sin(noiseCoord.y * 15.0) * 0.5 + 0.5;
+                    surfaceColor = mix(baseColor, secondaryColor, cantaloupe * 0.4 + surfaceNoise * 0.3);
+                    // Dark geyser streaks
+                    float streaks = smoothstep(0.7, 0.85, fineNoise) * 0.5;
+                    surfaceColor = mix(surfaceColor, tertiaryColor, streaks);
+                  }
+                  // === PLUTO (19) - Tan/charcoal with white heart ===
+                  else if (surfaceType > 18.5 && surfaceType < 19.5) {
                     float terrain = surfaceNoise * 0.5 + fineNoise * 0.5;
                     float darkRegions = smoothstep(0.4, 0.6, terrain);
                     surfaceColor = mix(baseColor, secondaryColor, darkRegions);
-                    // Heart-shaped region (Sputnik Planitia) - simplified as bright patch
+                    // Heart-shaped Sputnik Planitia
                     vec2 heartCenter = vec2(0.4, 0.5);
                     float heartDist = length((vUv - heartCenter) * vec2(1.2, 1.0));
                     float heart = 1.0 - smoothstep(0.12, 0.18, heartDist);
                     surfaceColor = mix(surfaceColor, tertiaryColor, heart * 0.9);
                   }
-                  // === Generic volcanic ===
-                  else if (surfaceType > 2.5 && surfaceType < 4.0) {
-                    float lavaFlow = smoothstep(0.55, 0.75, surfaceNoise);
-                    float hotSpots = smoothstep(0.7, 0.85, fineNoise) * 0.8;
-                    vec3 lavaGlow = vec3(1.0, 0.3, 0.0) * hotSpots * 0.5;
-                    surfaceColor = mix(baseColor, secondaryColor, surfaceNoise * 0.5 + lavaFlow * 0.5);
-                    surfaceColor += lavaGlow;
+                  // === CERES (20) - Gray with bright spots ===
+                  else if (surfaceType > 19.5 && surfaceType < 20.5) {
+                    float craters = 1.0 - smoothstep(0.55, 0.65, surfaceNoise) * 0.3;
+                    surfaceColor = mix(baseColor, secondaryColor, fineNoise * 0.4);
+                    surfaceColor *= craters;
+                    // Bright spots (Occator crater)
+                    float brightSpot = smoothstep(0.85, 0.95, fineNoise);
+                    surfaceColor = mix(surfaceColor, tertiaryColor, brightSpot * 0.8);
                   }
-                  // === Generic icy ===
-                  else if (surfaceType > 1.5 && surfaceType < 2.5) {
-                    float cracks = smoothstep(0.42, 0.48, fineNoise);
-                    float ridges = smoothstep(0.3, 0.35, abs(sin(vUv.x * 80.0 + surfaceNoise * 5.0)));
-                    float blend = cracks * 0.5 + ridges * 0.3 + microNoise * 0.1;
-                    surfaceColor = mix(baseColor, secondaryColor, blend);
-                  }
-                  // === Generic gaseous ===
-                  else if (surfaceType > 0.5 && surfaceType < 1.5) {
-                    float latitude = vUv.y;
-                    float mainBands = sin(latitude * 45.0) * 0.5 + 0.5;
-                    float fineBands = sin(latitude * 120.0 + surfaceNoise * 2.0) * 0.3 + 0.5;
-                    float turbulence = surfaceNoise * 0.3;
-                    float bands = mainBands * 0.6 + fineBands * 0.3 + turbulence;
+                  // === Generic gaseous (50) ===
+                  else if (surfaceType > 49.5 && surfaceType < 50.5) {
+                    float lat = vUv.y;
+                    float bands = sin(lat * 30.0) * 0.4 + 0.5 + surfaceNoise * 0.2;
                     surfaceColor = mix(baseColor, secondaryColor, clamp(bands, 0.0, 1.0));
                   }
-                  // === Generic rocky (Mercury, etc.) ===
+                  // === Generic icy (51) ===
+                  else if (surfaceType > 50.5 && surfaceType < 51.5) {
+                    float cracks = smoothstep(0.42, 0.48, fineNoise);
+                    float ridges = smoothstep(0.3, 0.35, abs(sin(vUv.x * 80.0 + surfaceNoise * 5.0)));
+                    surfaceColor = mix(baseColor, secondaryColor, cracks * 0.5 + ridges * 0.3);
+                  }
+                  // === Generic volcanic (52) ===
+                  else if (surfaceType > 51.5 && surfaceType < 52.5) {
+                    float lavaFlow = smoothstep(0.55, 0.75, surfaceNoise);
+                    float hotSpots = smoothstep(0.7, 0.85, fineNoise);
+                    surfaceColor = mix(baseColor, secondaryColor, lavaFlow * 0.6);
+                    surfaceColor += vec3(1.0, 0.3, 0.0) * hotSpots * 0.4;
+                  }
+                  // === Generic rocky (53) or default ===
                   else {
                     float craters = 1.0 - smoothstep(0.5, 0.6, surfaceNoise) * 0.4;
                     float terrain = fineNoise * 0.3 + microNoise * 0.15;
-                    float highlands = smoothstep(0.55, 0.7, surfaceNoise) * 0.25;
-                    surfaceColor = mix(baseColor, secondaryColor, terrain + highlands);
+                    surfaceColor = mix(baseColor, secondaryColor, terrain);
                     surfaceColor *= craters;
                   }
                   
