@@ -152,6 +152,23 @@ export const TexturedPlanet = ({ object, showOrbit = true, visualScale = 500 }: 
   const tiltRadians = ((visuals.tilt || 0) * Math.PI) / 180;
   const isMoon = !!object.parentId;
 
+  // For moons, scale orbit radius to be visible relative to parent planet size
+  // Real moon orbits are too small compared to scaled planet sizes
+  const getMoonOrbitRadius = () => {
+    if (!isMoon || !object.parentId) return 0;
+    // Get parent planet size and scale moon orbit to be ~2-4x parent visual size
+    // This makes moons visible while keeping relative distances
+    const parentSize = object.parentId === 'earth' ? 12742 : 
+                       object.parentId === 'jupiter' ? 139820 :
+                       object.parentId === 'saturn' ? 116460 : 50000;
+    const parentVisualSize = parentSize * visualScale;
+    // Scale based on relative orbit distance (closer moons orbit closer)
+    const baseOrbitMultiplier = 2 + (orbitRadius / 2000000); // Io is closest, Callisto furthest
+    return parentVisualSize * Math.min(baseOrbitMultiplier, 5);
+  };
+
+  const moonOrbitRadius = getMoonOrbitRadius();
+
   useFrame((state) => {
     const time = state.clock.getElapsedTime();
     
@@ -162,14 +179,14 @@ export const TexturedPlanet = ({ object, showOrbit = true, visualScale = 500 }: 
 
     if (groupRef.current) {
       // Moons: orbit around their parent planet's world position
-      if (isMoon && orbitRadius > 0) {
+      if (isMoon && moonOrbitRadius > 0) {
         const parentPos = objectWorldPositions[object.parentId!];
         if (parentPos) {
           const orbitSpeed = object.orbitSpeed || 0.0001;
           const angle = time * orbitSpeed * 500; // Faster for moons
-          groupRef.current.position.x = parentPos[0] + Math.cos(angle) * orbitRadius * visualScale;
+          groupRef.current.position.x = parentPos[0] + Math.cos(angle) * moonOrbitRadius;
           groupRef.current.position.y = parentPos[1];
-          groupRef.current.position.z = parentPos[2] + Math.sin(angle) * orbitRadius * visualScale;
+          groupRef.current.position.z = parentPos[2] + Math.sin(angle) * moonOrbitRadius;
         }
       }
       // Planets: orbit around the Sun (origin)
