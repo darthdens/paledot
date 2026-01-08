@@ -192,6 +192,7 @@ export const TexturedPlanet = ({
   const atmosphereMaterialRef = useRef<THREE.ShaderMaterial>(null);
   const ringMaterialRef = useRef<THREE.ShaderMaterial>(null);
   const worldPos = useRef(new THREE.Vector3());
+  const parentPos = useRef(new THREE.Vector3());
   const lastWorldPosUpdate = useRef(0);
   const rotationAngle = useRef(0);
   
@@ -202,6 +203,20 @@ export const TexturedPlanet = ({
   const timeSpeed = useCosmosStore(state => state.timeSpeed);
   const selectedObjectId = selectedObject?.id;
   const selectedParentId = selectedObject?.type === 'moon' ? selectedObject.parentId : null;
+
+  const isMoon = !!object.parentId;
+  
+  // Get parent planet size for shadow calculations (moons only)
+  const parentPlanetSize = useMemo(() => {
+    if (!isMoon || !object.parentId) return 0;
+    // Planet sizes in km - need to match celestialObjects data
+    const planetSizes: Record<string, number> = {
+      earth: 12742,
+      jupiter: 139820,
+      saturn: 116460,
+    };
+    return (planetSizes[object.parentId] || 0) * visualScale;
+  }, [isMoon, object.parentId, visualScale]);
 
   // Ensure we have an initial world position early (helps camera fly-to be accurate immediately)
   useEffect(() => {
@@ -220,7 +235,6 @@ export const TexturedPlanet = ({
   const planetSize = object.size * visualScale;
   const orbitRadius = (object.orbitRadius || 0) * distanceScale;
   const tiltRadians = ((visuals.tilt || 0) * Math.PI) / 180;
-  const isMoon = !!object.parentId;
 
   // For moons, use the real orbit radius scaled into scene units (so orbit paths match motion).
   const moonOrbitRadius = isMoon ? (object.orbitRadius || 0) * distanceScale : 0;
@@ -271,19 +285,40 @@ export const TexturedPlanet = ({
     if (groupRef.current) {
       groupRef.current.getWorldPosition(worldPos.current);
 
+      // Get parent position for shadow calculations (moons only)
+      if (isMoon && object.parentId) {
+        const parentPosArr = useCosmosStore.getState().objectWorldPositions[object.parentId];
+        if (parentPosArr) {
+          parentPos.current.set(parentPosArr[0], parentPosArr[1], parentPosArr[2]);
+        }
+      }
+
       if (planetMaterialRef.current) {
         planetMaterialRef.current.uniforms.time.value = time;
         planetMaterialRef.current.uniforms.objectCenter.value.copy(worldPos.current);
+        if (isMoon) {
+          planetMaterialRef.current.uniforms.parentCenter.value.copy(parentPos.current);
+          planetMaterialRef.current.uniforms.parentRadius.value = parentPlanetSize;
+        }
       }
       if (cloudMaterialRef.current) {
         cloudMaterialRef.current.uniforms.time.value = time;
         cloudMaterialRef.current.uniforms.objectCenter.value.copy(worldPos.current);
+        if (isMoon) {
+          cloudMaterialRef.current.uniforms.parentCenter.value.copy(parentPos.current);
+          cloudMaterialRef.current.uniforms.parentRadius.value = parentPlanetSize;
+        }
       }
       if (atmosphereMaterialRef.current) {
         atmosphereMaterialRef.current.uniforms.objectCenter.value.copy(worldPos.current);
+        if (isMoon) {
+          atmosphereMaterialRef.current.uniforms.parentCenter.value.copy(parentPos.current);
+          atmosphereMaterialRef.current.uniforms.parentRadius.value = parentPlanetSize;
+        }
       }
       if (ringMaterialRef.current) {
         ringMaterialRef.current.uniforms.objectCenter.value.copy(worldPos.current);
+        ringMaterialRef.current.uniforms.planetRadius.value = planetSize;
       }
     }
 
@@ -414,18 +449,24 @@ export const TexturedPlanet = ({
                 time: { value: 0 },
                 surfaceType: { value: visuals.surfaceDetail === 'gaseous' ? 1.0 : visuals.surfaceDetail === 'icy' ? 2.0 : visuals.surfaceDetail === 'volcanic' ? 3.0 : 0.0 },
                 objectCenter: { value: new THREE.Vector3(0, 0, 0) },
+                parentCenter: { value: new THREE.Vector3(0, 0, 0) },
+                parentRadius: { value: parentPlanetSize },
+                isMoon: { value: isMoon ? 1.0 : 0.0 },
               }}
               vertexShader={`
                 varying vec3 vNormal;
                 varying vec3 vPosition;
                 varying vec2 vUv;
                 varying vec3 vWorldNormal;
+                varying vec3 vWorldPosition;
                 
                 void main() {
                   vUv = uv;
                   vPosition = position;
                   vNormal = normal;
                   vWorldNormal = normalize((modelMatrix * vec4(normal, 0.0)).xyz);
+                  vec4 worldPos = modelMatrix * vec4(position, 1.0);
+                  vWorldPosition = worldPos.xyz;
                   gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
                 }
               `}
@@ -439,11 +480,15 @@ export const TexturedPlanet = ({
                 uniform float time;
                 uniform float surfaceType;
                 uniform vec3 objectCenter;
+                uniform vec3 parentCenter;
+                uniform float parentRadius;
+                uniform float isMoon;
                 
                 varying vec3 vNormal;
                 varying vec3 vPosition;
                 varying vec2 vUv;
                 varying vec3 vWorldNormal;
+                varying vec3 vWorldPosition;
                 
                 // Simple noise function for surface detail
                 float hash(vec2 p) {
@@ -474,18 +519,47 @@ export const TexturedPlanet = ({
                   return value;
                 }
                 
+                // Check if point is in shadow of parent planet (for moons)
+                float calculateShadow(vec3 fragWorldPos, vec3 sunDir) {
+                  if (isMoon < 0.5) return 1.0; // Not a moon, no shadow
+                  
+                  // Vector from fragment to parent planet center
+                  vec3 toParent = parentCenter - fragWorldPos;
+                  
+                  // Project fragment position onto the sun-parent line
+                  float distAlongRay = dot(toParent, sunDir);
+                  
+                  // Only shadow if parent is between fragment and sun
+                  if (distAlongRay < 0.0) return 1.0;
+                  
+                  // Closest point on sun ray to parent center
+                  vec3 closestPoint = fragWorldPos + sunDir * distAlongRay;
+                  float distFromAxis = length(parentCenter - closestPoint);
+                  
+                  // Check if within shadow cone (simplified cylindrical shadow)
+                  float shadowRadius = parentRadius * 1.0; // Could add penumbra with * 1.1
+                  if (distFromAxis < shadowRadius) {
+                    // Smooth shadow edge (penumbra)
+                    return smoothstep(shadowRadius * 0.8, shadowRadius, distFromAxis);
+                  }
+                  return 1.0;
+                }
+                
                 void main() {
                   vec3 worldNormal = normalize(vWorldNormal);
-                  // Sun is at origin - light direction from object toward sun (origin)
-                  vec3 lightDir = normalize(-objectCenter);
+                  // Sun is at origin - light direction from fragment toward sun
+                  vec3 sunDir = normalize(-vWorldPosition);
                   
                   // Calculate sun-facing illumination (realistic lighting)
-                  float NdotL = dot(worldNormal, lightDir);
+                  float NdotL = dot(worldNormal, sunDir);
                   
-                  // Very dark ambient for realistic space lighting (almost no light on dark side)
-                  float ambient = 0.015;
-                  // Only apply diffuse on sun-facing side
-                  float diffuse = max(NdotL, 0.0) * 0.985;
+                  // Calculate shadow from parent planet (for moons)
+                  float shadow = calculateShadow(vWorldPosition, sunDir);
+                  
+                  // Very dark ambient for realistic space lighting
+                  float ambient = 0.012;
+                  // Only apply diffuse on sun-facing side, multiplied by shadow
+                  float diffuse = max(NdotL, 0.0) * 0.988 * shadow;
                   
                   // Generate surface variation based on type
                   vec2 noiseCoord = vUv * 20.0;
@@ -516,12 +590,12 @@ export const TexturedPlanet = ({
                   // Add emissive (for Sun)
                   litColor += emissive * emissiveIntensity;
                   
-                  // Simple specular highlight - only on lit side
-                  if (NdotL > 0.0) {
-                    vec3 viewDir = normalize(cameraPosition - objectCenter);
-                    vec3 halfDir = normalize(lightDir + viewDir);
+                  // Simple specular highlight - only on lit side and not in shadow
+                  if (NdotL > 0.0 && shadow > 0.5) {
+                    vec3 viewDir = normalize(cameraPosition - vWorldPosition);
+                    vec3 halfDir = normalize(sunDir + viewDir);
                     float spec = pow(max(dot(worldNormal, halfDir), 0.0), 64.0 / max(roughness, 0.1));
-                    litColor += spec * (1.0 - roughness) * 0.3 * max(NdotL, 0.0);
+                    litColor += spec * (1.0 - roughness) * 0.3 * max(NdotL, 0.0) * shadow;
                   }
                   
                   gl_FragColor = vec4(litColor, 1.0);
@@ -542,14 +616,20 @@ export const TexturedPlanet = ({
                   cloudColor: { value: new THREE.Color(visuals.cloudColor || '#ffffff') },
                   time: { value: 0 },
                   objectCenter: { value: new THREE.Vector3(0, 0, 0) },
+                  parentCenter: { value: new THREE.Vector3(0, 0, 0) },
+                  parentRadius: { value: parentPlanetSize },
+                  isMoon: { value: isMoon ? 1.0 : 0.0 },
                 }}
                 vertexShader={`
                   varying vec3 vWorldNormal;
+                  varying vec3 vWorldPosition;
                   varying vec2 vUv;
                   
                   void main() {
                     vUv = uv;
                     vWorldNormal = normalize((modelMatrix * vec4(normal, 0.0)).xyz);
+                    vec4 worldPos = modelMatrix * vec4(position, 1.0);
+                    vWorldPosition = worldPos.xyz;
                     gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
                   }
                 `}
@@ -557,8 +637,12 @@ export const TexturedPlanet = ({
                   uniform vec3 cloudColor;
                   uniform float time;
                   uniform vec3 objectCenter;
+                  uniform vec3 parentCenter;
+                  uniform float parentRadius;
+                  uniform float isMoon;
                   
                   varying vec3 vWorldNormal;
+                  varying vec3 vWorldPosition;
                   varying vec2 vUv;
                   
                   float hash(vec2 p) {
@@ -587,22 +671,34 @@ export const TexturedPlanet = ({
                     return value;
                   }
                   
+                  float calculateShadow(vec3 fragWorldPos, vec3 sunDir) {
+                    if (isMoon < 0.5) return 1.0;
+                    vec3 toParent = parentCenter - fragWorldPos;
+                    float distAlongRay = dot(toParent, sunDir);
+                    if (distAlongRay < 0.0) return 1.0;
+                    vec3 closestPoint = fragWorldPos + sunDir * distAlongRay;
+                    float distFromAxis = length(parentCenter - closestPoint);
+                    float shadowRadius = parentRadius;
+                    if (distFromAxis < shadowRadius) {
+                      return smoothstep(shadowRadius * 0.8, shadowRadius, distFromAxis);
+                    }
+                    return 1.0;
+                  }
+                  
                   void main() {
                     vec3 worldNormal = normalize(vWorldNormal);
-                    // Sun at origin
-                    vec3 lightDir = normalize(-objectCenter);
-                    float NdotL = max(dot(worldNormal, lightDir), 0.0);
+                    vec3 sunDir = normalize(-vWorldPosition);
+                    float NdotL = max(dot(worldNormal, sunDir), 0.0);
+                    float shadow = calculateShadow(vWorldPosition, sunDir);
                     
                     vec2 cloudCoord = vUv * 15.0 + time * 0.01;
                     float clouds = fbm(cloudCoord);
                     float cloudCoverage = smoothstep(0.35, 0.65, clouds);
                     
-                    // Very minimal ambient for clouds on dark side
-                    float lighting = 0.02 + NdotL * 0.98;
+                    float lighting = 0.02 + NdotL * 0.98 * shadow;
                     vec3 litCloud = cloudColor * lighting;
                     
-                    // Clouds fade to nearly invisible on dark side
-                    gl_FragColor = vec4(litCloud, cloudCoverage * 0.5 * NdotL);
+                    gl_FragColor = vec4(litCloud, cloudCoverage * 0.5 * NdotL * shadow);
                   }
                 `}
               />
@@ -622,32 +718,53 @@ export const TexturedPlanet = ({
                   glowColor: { value: new THREE.Color(visuals.atmosphereColor || '#4da6ff') },
                   intensity: { value: visuals.atmosphereIntensity || 0.4 },
                   objectCenter: { value: new THREE.Vector3(0, 0, 0) },
+                  parentCenter: { value: new THREE.Vector3(0, 0, 0) },
+                  parentRadius: { value: parentPlanetSize },
+                  isMoon: { value: isMoon ? 1.0 : 0.0 },
                 }}
                 vertexShader={`
                   varying vec3 vWorldNormal;
+                  varying vec3 vWorldPosition;
                   void main() {
                     vWorldNormal = normalize((modelMatrix * vec4(normal, 0.0)).xyz);
+                    vec4 worldPos = modelMatrix * vec4(position, 1.0);
+                    vWorldPosition = worldPos.xyz;
                     gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
                   }
                 `}
                 fragmentShader={`
                   varying vec3 vWorldNormal;
+                  varying vec3 vWorldPosition;
                   uniform vec3 glowColor;
                   uniform float intensity;
                   uniform vec3 objectCenter;
+                  uniform vec3 parentCenter;
+                  uniform float parentRadius;
+                  uniform float isMoon;
+                  
+                  float calculateShadow(vec3 fragWorldPos, vec3 sunDir) {
+                    if (isMoon < 0.5) return 1.0;
+                    vec3 toParent = parentCenter - fragWorldPos;
+                    float distAlongRay = dot(toParent, sunDir);
+                    if (distAlongRay < 0.0) return 1.0;
+                    vec3 closestPoint = fragWorldPos + sunDir * distAlongRay;
+                    float distFromAxis = length(parentCenter - closestPoint);
+                    if (distFromAxis < parentRadius) {
+                      return smoothstep(parentRadius * 0.8, parentRadius, distFromAxis);
+                    }
+                    return 1.0;
+                  }
                   
                   void main() {
                     vec3 worldNormal = normalize(vWorldNormal);
-                    // Sun at origin
-                    vec3 lightDir = normalize(-objectCenter);
-                    float NdotL = max(dot(worldNormal, lightDir), 0.0);
+                    vec3 sunDir = normalize(-vWorldPosition);
+                    float NdotL = max(dot(worldNormal, sunDir), 0.0);
+                    float shadow = calculateShadow(vWorldPosition, sunDir);
                     
-                    // Fresnel-like rim glow based on view direction
-                    vec3 viewDir = normalize(cameraPosition - objectCenter);
+                    vec3 viewDir = normalize(cameraPosition - vWorldPosition);
                     float rim = pow(1.0 - abs(dot(worldNormal, viewDir)), 2.5);
                     
-                    // Atmosphere glow only visible on sun-facing side with smooth terminator
-                    float sunGlow = smoothstep(-0.1, 0.3, NdotL);
+                    float sunGlow = smoothstep(-0.1, 0.3, NdotL) * shadow;
                     
                     gl_FragColor = vec4(glowColor, rim * intensity * sunGlow);
                   }
@@ -656,7 +773,7 @@ export const TexturedPlanet = ({
             </mesh>
           )}
 
-          {/* Rings (Saturn, Uranus) - enhanced with lighting */}
+          {/* Rings (Saturn, Uranus) - enhanced with lighting and planet shadow */}
           {visuals.hasRings && (
             <mesh rotation={[Math.PI / 2, 0, 0]}>
               <ringGeometry args={[planetSize * 1.3, planetSize * 2.2, 128]} />
@@ -670,6 +787,7 @@ export const TexturedPlanet = ({
                   innerRadius: { value: planetSize * 1.3 },
                   outerRadius: { value: planetSize * 2.2 },
                   objectCenter: { value: new THREE.Vector3(0, 0, 0) },
+                  planetRadius: { value: planetSize },
                 }}
                 vertexShader={`
                   varying vec2 vUv;
@@ -690,12 +808,35 @@ export const TexturedPlanet = ({
                   uniform float innerRadius;
                   uniform float outerRadius;
                   uniform vec3 objectCenter;
+                  uniform float planetRadius;
                   
                   varying vec2 vUv;
                   varying vec3 vWorldPosition;
                   varying vec3 vWorldNormal;
                   
                   float hash(float n) { return fract(sin(n) * 43758.5453); }
+                  
+                  // Check if ring fragment is in shadow of the planet
+                  float calculatePlanetShadow(vec3 fragWorldPos, vec3 sunDir) {
+                    // Vector from fragment to planet center
+                    vec3 toPlanet = objectCenter - fragWorldPos;
+                    
+                    // Project onto sun direction
+                    float distAlongRay = dot(toPlanet, sunDir);
+                    
+                    // Only shadow if planet is between fragment and sun
+                    if (distAlongRay < 0.0) return 1.0;
+                    
+                    // Closest point on sun ray to planet center
+                    vec3 closestPoint = fragWorldPos + sunDir * distAlongRay;
+                    float distFromAxis = length(objectCenter - closestPoint);
+                    
+                    // Check if within planet's shadow cylinder
+                    if (distFromAxis < planetRadius) {
+                      return smoothstep(planetRadius * 0.85, planetRadius, distFromAxis);
+                    }
+                    return 1.0;
+                  }
                   
                   void main() {
                     // Sun at origin - direction from ring fragment to sun
@@ -704,8 +845,12 @@ export const TexturedPlanet = ({
                     
                     // Calculate lighting based on which side of ring faces sun
                     float NdotL = dot(ringNormal, toSun);
+                    
+                    // Calculate shadow from planet
+                    float shadow = calculatePlanetShadow(vWorldPosition, toSun);
+                    
                     // Rings are double-sided, use absolute but favor front-lit
-                    float lighting = 0.05 + max(abs(NdotL), 0.0) * 0.95;
+                    float lighting = (0.03 + max(abs(NdotL), 0.0) * 0.97) * shadow;
                     
                     // Create ring bands
                     float dist = length(vWorldPosition.xz);
