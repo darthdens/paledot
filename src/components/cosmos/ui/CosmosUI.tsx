@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { HelpCircle, Compass, Maximize, Minimize } from 'lucide-react';
 import { useCosmosStore } from '../store/useCosmosStore';
 import { useState, useCallback, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 
 const translations = {
   en: {
@@ -39,6 +40,25 @@ export const CosmosUI = () => {
   const { startTour, toggleQuickJump, showControlHints, setShowControlHints } = useCosmosStore();
   const [isFullscreen, setIsFullscreen] = useState(false);
 
+  const setPageChromeHidden = useCallback((hidden: boolean) => {
+    const nav = document.querySelector('nav') as HTMLElement | null;
+    const footer = document.querySelector('footer') as HTMLElement | null;
+
+    const setHidden = (el: HTMLElement | null) => {
+      if (!el) return;
+      if (hidden) {
+        if (!el.dataset.prevDisplay) el.dataset.prevDisplay = el.style.display || '';
+        el.style.display = 'none';
+      } else {
+        el.style.display = el.dataset.prevDisplay ?? '';
+        delete el.dataset.prevDisplay;
+      }
+    };
+
+    setHidden(nav);
+    setHidden(footer);
+  }, []);
+
   const applyFullscreenFallback = useCallback((containerEl: HTMLElement) => {
     containerEl.setAttribute('data-cosmos-fullscreen-fallback', 'true');
 
@@ -55,11 +75,13 @@ export const CosmosUI = () => {
     containerEl.style.maxWidth = 'none';
     containerEl.style.backgroundColor = '#000';
 
+    setPageChromeHidden(true);
+
     // Prevent page scroll behind the fullscreen canvas
     document.documentElement.style.overflow = 'hidden';
     document.body.style.overflow = 'hidden';
-    window.scrollTo({ top: 0, left: 0, behavior: 'instant' as ScrollBehavior });
-  }, []);
+    window.scrollTo(0, 0);
+  }, [setPageChromeHidden]);
 
   const clearFullscreenOverrides = useCallback((containerEl: HTMLElement) => {
     containerEl.removeAttribute('data-cosmos-fullscreen-fallback');
@@ -72,10 +94,13 @@ export const CosmosUI = () => {
     containerEl.style.borderRadius = '';
     containerEl.style.border = '';
     containerEl.style.maxWidth = '';
+    containerEl.style.backgroundColor = '';
+
+    setPageChromeHidden(false);
 
     document.documentElement.style.overflow = '';
     document.body.style.overflow = '';
-  }, []);
+  }, [setPageChromeHidden]);
 
   // Listen for native fullscreen changes (e.g., user presses Esc)
   useEffect(() => {
@@ -234,42 +259,48 @@ export const CosmosUI = () => {
       )}
 
       {/* Top controls - compact on mobile */}
-      <div
-        className={`${isFullscreen ? 'fixed' : 'absolute'} top-2 sm:top-4 right-2 sm:right-4 flex gap-1 sm:gap-2 z-[10000]`}
-        style={
-          isFullscreen
-            ? {
-                top: 'calc(0.5rem + env(safe-area-inset-top))',
-                right: 'calc(0.5rem + env(safe-area-inset-right))',
-              }
-            : undefined
-        }
-      >
-        <Button 
-          size="icon" 
-          variant="ghost" 
-          onClick={toggleFullscreen} 
-          className="h-7 w-7 sm:h-9 sm:w-9 bg-white/10 hover:bg-white/20 text-white"
-        >
-          {isFullscreen ? <Minimize className="w-3.5 h-3.5 sm:w-5 sm:h-5" /> : <Maximize className="w-3.5 h-3.5 sm:w-5 sm:h-5" />}
-        </Button>
-        <Button 
-          size="icon" 
-          variant="ghost" 
-          onClick={toggleQuickJump} 
-          className="h-7 w-7 sm:h-9 sm:w-9 bg-white/10 hover:bg-white/20 text-white"
-        >
-          <Compass className="w-3.5 h-3.5 sm:w-5 sm:h-5" />
-        </Button>
-        <Button 
-          size="icon" 
-          variant="ghost" 
-          onClick={() => setShowControlHints(true)} 
-          className="h-7 w-7 sm:h-9 sm:w-9 bg-white/10 hover:bg-white/20 text-white"
-        >
-          <HelpCircle className="w-3.5 h-3.5 sm:w-5 sm:h-5" />
-        </Button>
-      </div>
+      {(() => {
+        const controls = (
+          <div
+            className={`${isFullscreen ? 'fixed' : 'absolute'} top-2 sm:top-4 right-2 sm:right-4 flex gap-1 sm:gap-2 z-[10000]`}
+            style={
+              isFullscreen
+                ? {
+                    top: 'calc(0.5rem + env(safe-area-inset-top))',
+                    right: 'calc(0.5rem + env(safe-area-inset-right))',
+                  }
+                : undefined
+            }
+          >
+            <Button 
+              size="icon" 
+              variant="ghost" 
+              onClick={toggleFullscreen} 
+              className="h-7 w-7 sm:h-9 sm:w-9 bg-white/10 hover:bg-white/20 text-white"
+            >
+              {isFullscreen ? <Minimize className="w-3.5 h-3.5 sm:w-5 sm:h-5" /> : <Maximize className="w-3.5 h-3.5 sm:w-5 sm:h-5" />}
+            </Button>
+            <Button 
+              size="icon" 
+              variant="ghost" 
+              onClick={toggleQuickJump} 
+              className="h-7 w-7 sm:h-9 sm:w-9 bg-white/10 hover:bg-white/20 text-white"
+            >
+              <Compass className="w-3.5 h-3.5 sm:w-5 sm:h-5" />
+            </Button>
+            <Button 
+              size="icon" 
+              variant="ghost" 
+              onClick={() => setShowControlHints(true)} 
+              className="h-7 w-7 sm:h-9 sm:w-9 bg-white/10 hover:bg-white/20 text-white"
+            >
+              <HelpCircle className="w-3.5 h-3.5 sm:w-5 sm:h-5" />
+            </Button>
+          </div>
+        );
+
+        return isFullscreen ? createPortal(controls, document.body) : controls;
+      })()}
 
       {/* Bottom tour button - smaller on mobile */}
       {!showControlHints && (
