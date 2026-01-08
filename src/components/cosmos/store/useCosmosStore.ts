@@ -58,6 +58,7 @@ interface CosmosStore {
   setShowControlHints: (show: boolean) => void;
   toggleQuickJump: () => void;
   toggleSizeComparison: () => void;
+  toggleOrbits: () => void;
   addRecentJump: (objectId: string) => void;
   jumpToObject: (object: CelestialObject) => void;
   setMuted: (muted: boolean) => void;
@@ -148,6 +149,8 @@ export const useCosmosStore = create<CosmosStore>()(
       toggleQuickJump: () => set((state) => ({ showQuickJump: !state.showQuickJump })),
       
       toggleSizeComparison: () => set((state) => ({ showSizeComparison: !state.showSizeComparison })),
+
+      toggleOrbits: () => set((state) => ({ showOrbits: !state.showOrbits })),
       
       addRecentJump: (objectId) => {
         const { recentJumps } = get();

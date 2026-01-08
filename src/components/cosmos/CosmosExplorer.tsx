@@ -22,6 +22,7 @@ const getMoonOrbitRadius = (moon: typeof celestialObjects[0], distanceScale: num
 
 export const CosmosExplorer = () => {
   const selectedObject = useCosmosStore(state => state.selectedObject);
+  const showOrbits = useCosmosStore(state => state.showOrbits);
   
   const planets = celestialObjects.filter(obj => 
     obj.type === 'planet' || obj.type === 'dwarf-planet'

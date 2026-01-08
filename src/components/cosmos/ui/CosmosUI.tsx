@@ -361,6 +361,19 @@ export const CosmosUI = () => {
         <Button
           size="icon"
           variant="ghost"
+          onClick={toggleOrbits}
+          className="h-7 w-7 sm:h-9 sm:w-9 bg-white/10 hover:bg-white/20 text-white"
+          title={showOrbits ? t.hideOrbits : t.showOrbits}
+        >
+          {showOrbits ? (
+            <CircleDot className="w-3.5 h-3.5 sm:w-5 sm:h-5" />
+          ) : (
+            <CircleOff className="w-3.5 h-3.5 sm:w-5 sm:h-5" />
+          )}
+        </Button>
+        <Button
+          size="icon"
+          variant="ghost"
           onClick={() => setShowControlHints(true)}
           className="h-7 w-7 sm:h-9 sm:w-9 bg-white/10 hover:bg-white/20 text-white"
         >
