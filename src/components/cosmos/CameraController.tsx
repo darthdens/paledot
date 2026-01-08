@@ -23,6 +23,11 @@ export const CameraController = () => {
   const flyToDistance = useRef(1000);
   const cameraOffset = useRef(new THREE.Vector3());
 
+  // Follow smoothing (avoid jitter + avoid per-frame allocations)
+  const smoothedTarget = useRef(new THREE.Vector3());
+  const tmpTarget = useRef(new THREE.Vector3());
+  const tmpDelta = useRef(new THREE.Vector3());
+
   // Trigger animation when selectedObject changes
   useEffect(() => {
     if (!selectedObject || !controls) return;
@@ -61,6 +66,9 @@ export const CameraController = () => {
 
       // Set target to object center
       endTarget.current.set(targetPos[0], targetPos[1], targetPos[2]);
+
+      // Initialize follow smoothing from the current target to avoid an initial "snap"
+      smoothedTarget.current.copy(orbitControls.target);
 
       // Calculate camera position - offset from target
       cameraOffset.current.set(
@@ -129,19 +137,17 @@ export const CameraController = () => {
     if (selectedObject && isFollowing) {
       const livePos = useCosmosStore.getState().objectWorldPositions[selectedObject.id];
       if (livePos) {
-        const targetVec = new THREE.Vector3(livePos[0], livePos[1], livePos[2]);
         const currentTarget = orbitControls.target as THREE.Vector3;
 
-        // Compute how far the target needs to move this frame
-        const delta3 = new THREE.Vector3().subVectors(targetVec, currentTarget);
-
-        // Frame-rate independent smoothing
-        const alpha = 1 - Math.exp(-delta * 12);
-        delta3.multiplyScalar(alpha);
+        // Smooth the object's runtime position first (removes jitter from discrete orbit updates)
+        tmpTarget.current.set(livePos[0], livePos[1], livePos[2]);
+        const smoothAlpha = 1 - Math.exp(-delta * 10);
+        smoothedTarget.current.lerp(tmpTarget.current, smoothAlpha);
 
         // Move both target and camera by the same amount so the view stays locked
-        currentTarget.add(delta3);
-        camera.position.add(delta3);
+        tmpDelta.current.subVectors(smoothedTarget.current, currentTarget);
+        currentTarget.add(tmpDelta.current);
+        camera.position.add(tmpDelta.current);
 
         orbitControls.update();
       }
