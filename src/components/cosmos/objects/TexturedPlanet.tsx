@@ -26,6 +26,9 @@ const PLANET_VISUALS: Record<string, {
   hasRings?: boolean;
   ringColor?: string;
   ringOpacity?: number;
+  ringInnerMult?: number;
+  ringOuterMult?: number;
+  ringStyle?: 0 | 1; // 0 = Saturn-like wide/bright, 1 = Uranus-like narrow/dark
   tilt?: number;
   hasClouds?: boolean;
   cloudColor?: string;
@@ -134,6 +137,9 @@ const PLANET_VISUALS: Record<string, {
     hasRings: true,
     ringColor: '#c9b896',
     ringOpacity: 0.8,
+    ringInnerMult: 1.3,
+    ringOuterMult: 2.2,
+    ringStyle: 0,
     tilt: 26.7,
     surfaceDetail: 'gaseous',
   },
@@ -155,8 +161,12 @@ const PLANET_VISUALS: Record<string, {
     atmosphereColor: '#c8f0f0',
     atmosphereIntensity: 0.4,
     hasRings: true,
-    ringColor: '#a0c8c8',
-    ringOpacity: 0.5,
+    // Uranus rings are narrow and very dark
+    ringColor: '#2b3036',
+    ringOpacity: 0.4,
+    ringInnerMult: 1.55,
+    ringOuterMult: 1.95,
+    ringStyle: 1,
     tilt: 97.8,
     surfaceDetail: 'gaseous',
   },
@@ -238,6 +248,10 @@ export const TexturedPlanet = ({
   const planetSize = object.size * visualScale;
   const orbitRadius = (object.orbitRadius || 0) * distanceScale;
   const tiltRadians = ((visuals.tilt || 0) * Math.PI) / 180;
+
+  const ringInnerRadius = planetSize * (visuals.ringInnerMult ?? 1.3);
+  const ringOuterRadius = planetSize * (visuals.ringOuterMult ?? 2.2);
+  const ringStyle = visuals.ringStyle ?? (object.id === 'uranus' ? 1 : 0);
 
   // For moons, use the real orbit radius scaled into scene units (so orbit paths match motion).
   const moonOrbitRadius = isMoon ? (object.orbitRadius || 0) * distanceScale : 0;
@@ -458,10 +472,10 @@ export const TexturedPlanet = ({
                 parentRadius: { value: parentPlanetSize },
                 isMoon: { value: isMoon ? 1.0 : 0.0 },
                 hasRings: { value: visuals.hasRings ? 1.0 : 0.0 },
-                ringInnerRadius: { value: planetSize * 1.3 },
-                ringOuterRadius: { value: planetSize * 2.2 },
+                ringInnerRadius: { value: ringInnerRadius },
+                ringOuterRadius: { value: ringOuterRadius },
                 planetTilt: { value: tiltRadians },
-                ringOpacity: { value: visuals.ringOpacity || 0.8 },
+                ringOpacity: { value: visuals.ringOpacity ?? 0.8 },
               }}
               vertexShader={`
                 varying vec3 vNormal;
@@ -469,6 +483,7 @@ export const TexturedPlanet = ({
                 varying vec2 vUv;
                 varying vec3 vWorldNormal;
                 varying vec3 vWorldPosition;
+                varying vec3 vWorldCenter;
                 
                 void main() {
                   vUv = uv;
@@ -477,6 +492,7 @@ export const TexturedPlanet = ({
                   vWorldNormal = normalize((modelMatrix * vec4(normal, 0.0)).xyz);
                   vec4 worldPos = modelMatrix * vec4(position, 1.0);
                   vWorldPosition = worldPos.xyz;
+                  vWorldCenter = (modelMatrix * vec4(0.0, 0.0, 0.0, 1.0)).xyz;
                   gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
                 }
               `}
@@ -504,7 +520,8 @@ export const TexturedPlanet = ({
                 varying vec2 vUv;
                 varying vec3 vWorldNormal;
                 varying vec3 vWorldPosition;
-                
+                varying vec3 vWorldCenter;
+
                 // Simple noise function for surface detail
                 float hash(vec2 p) {
                   return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453);
@@ -557,13 +574,13 @@ export const TexturedPlanet = ({
                   if (hasRings < 0.5) return 1.0;
                   
                   // Get fragment position relative to planet center
-                  vec3 relPos = fragWorldPos - objectCenter;
+                  vec3 relPos = fragWorldPos - vWorldCenter;
                   
                   // Build rotation matrix for planet tilt around X axis (rings are tilted with planet)
                   // This matches the group rotation: rotation={[tiltRadians, 0, 0]}
                   float cosT = cos(-planetTilt); // Negative to undo the tilt
                   float sinT = sin(-planetTilt);
-                  
+
                   // Transform to ring's local frame (undo X-axis tilt)
                   // Ring plane is XZ in local space after rotation
                   vec3 ringFramePos;
@@ -577,8 +594,14 @@ export const TexturedPlanet = ({
                   ringFrameSunDir.y = sunDir.y * cosT - sunDir.z * sinT;
                   ringFrameSunDir.z = sunDir.y * sinT + sunDir.z * cosT;
                   
-                  // Need sufficient vertical component for ray-plane intersection
-                  if (abs(ringFrameSunDir.y) < 0.001) return 1.0;
+                  // How aligned the sun is with the ring plane.
+                  // When the sun is nearly in the ring plane (edge-on), ring shadows should fade smoothly
+                  // rather than abruptly popping off.
+                  float sunPlane = abs(ringFrameSunDir.y);
+                  float planeFactor = smoothstep(0.0005, 0.02, sunPlane);
+
+                  // Avoid unstable ray-plane intersection when nearly parallel
+                  if (sunPlane < 0.0001) return 1.0;
                   
                   float t = -ringFramePos.y / ringFrameSunDir.y;
                   if (t <= 0.0) return 1.0;
@@ -589,8 +612,7 @@ export const TexturedPlanet = ({
                   // Check if within ring bounds with penumbra zones
                   float ringWidth = ringOuterRadius - ringInnerRadius;
                   
-                  // Calculate penumbra softness - use a fixed reasonable value
-                  // to avoid issues with varying distances
+                  // Calculate penumbra softness - fixed value for stability
                   float penumbraWidth = ringWidth * 0.05;
                   
                   // Soft inner edge
@@ -609,7 +631,7 @@ export const TexturedPlanet = ({
                     float microBands = 0.85 + 0.15 * sin(ringPos * 500.0);
                     
                     // Base density varies across ring
-                    float baseDensity = 0.3 + 0.4 * (1.0 - ringPos * 0.5);
+                    float baseDensity = 0.35 + 0.45 * (1.0 - ringPos * 0.5);
                     float ringDensity = baseDensity * mainBands * fineBands * microBands;
                     
                     // Cassini Division - soft gap
@@ -622,15 +644,9 @@ export const TexturedPlanet = ({
                     float enckeGap = 1.0 - 0.5 * exp(-pow((ringPos - 0.82) / 0.02, 2.0));
                     ringDensity *= enckeGap;
                     
-                    // Apply ring opacity to shadow strength - faint rings (Uranus) cast fainter shadows
-                    // ringOpacity: Saturn ~0.8, Uranus ~0.5
-                    float opacityFactor = ringOpacity * ringOpacity; // Square for stronger effect
-                    
-                    // Shadow strength combines density, ring coverage, and ring opacity
-                    float shadowStrength = ringDensity * inRing * opacityFactor * 0.7;
-                    
-                    // Clamp maximum shadow based on ring opacity (Uranus max ~0.2, Saturn max ~0.5)
-                    float maxShadow = 0.75 * opacityFactor;
+                    // Shadow strength combines density, ring coverage, ring opacity, and plane alignment
+                    float shadowStrength = ringDensity * inRing * ringOpacity * planeFactor * 0.9;
+                    float maxShadow = 0.75 * ringOpacity;
                     
                     return 1.0 - clamp(shadowStrength, 0.0, maxShadow);
                   }
@@ -639,13 +655,13 @@ export const TexturedPlanet = ({
                 
                 void main() {
                   vec3 worldNormal = normalize(vWorldNormal);
-                  // Sun is at origin - use object center for consistent sun direction across the planet
-                  vec3 sunDir = normalize(-objectCenter);
+                  // Sun is at origin - use the mesh-derived center for stable sun direction
+                  vec3 sunDir = normalize(-vWorldCenter);
                   
                   // For lighting, use per-fragment direction for accurate shading
                   vec3 fragSunDir = normalize(-vWorldPosition);
                   float NdotL = dot(worldNormal, fragSunDir);
-                  
+
                   // Calculate shadows - use planet-center sun direction for ring shadow
                   float moonShadow = calculateShadow(vWorldPosition, fragSunDir);
                   float ringShadow = calculateRingShadow(vWorldPosition, sunDir);
@@ -857,26 +873,27 @@ export const TexturedPlanet = ({
           )}
 
           {/* Rings (Saturn, Uranus) - enhanced with lighting and planet shadow */}
-          {visuals.hasRings && (
-            <mesh rotation={[Math.PI / 2, 0, 0]} renderOrder={1}>
-              <ringGeometry args={[planetSize * 1.3, planetSize * 2.2, 256]} />
-              <shaderMaterial
-                ref={ringMaterialRef}
-                transparent
-                depthWrite={false}
-                depthTest={true}
-                polygonOffset={true}
-                polygonOffsetFactor={-1}
-                polygonOffsetUnits={-1}
-                side={THREE.DoubleSide}
-                uniforms={{
-                  ringColor: { value: new THREE.Color(visuals.ringColor || '#d4b896') },
-                  opacity: { value: visuals.ringOpacity || 0.7 },
-                  innerRadius: { value: planetSize * 1.3 },
-                  outerRadius: { value: planetSize * 2.2 },
-                  objectCenter: { value: new THREE.Vector3(0, 0, 0) },
-                  planetRadius: { value: planetSize },
-                }}
+            {visuals.hasRings && (
+              <mesh rotation={[Math.PI / 2, 0, 0]} renderOrder={1}>
+                <ringGeometry args={[ringInnerRadius, ringOuterRadius, 256]} />
+                <shaderMaterial
+                  ref={ringMaterialRef}
+                  transparent
+                  depthWrite={false}
+                  depthTest={true}
+                  polygonOffset={true}
+                  polygonOffsetFactor={-1}
+                  polygonOffsetUnits={-1}
+                  side={THREE.DoubleSide}
+                  uniforms={{
+                    ringColor: { value: new THREE.Color(visuals.ringColor ?? '#d4b896') },
+                    opacity: { value: visuals.ringOpacity ?? 0.7 },
+                    ringStyle: { value: ringStyle },
+                    innerRadius: { value: ringInnerRadius },
+                    outerRadius: { value: ringOuterRadius },
+                    objectCenter: { value: new THREE.Vector3(0, 0, 0) },
+                    planetRadius: { value: planetSize },
+                  }}
                 vertexShader={`
                   varying vec2 vUv;
                   varying vec3 vWorldPosition;
@@ -901,6 +918,7 @@ export const TexturedPlanet = ({
                 fragmentShader={`
                   uniform vec3 ringColor;
                   uniform float opacity;
+                  uniform float ringStyle;
                   uniform float innerRadius;
                   uniform float outerRadius;
                   uniform vec3 objectCenter;
@@ -989,18 +1007,16 @@ export const TexturedPlanet = ({
                     
                     // === DETAILED RING STRUCTURE ===
                     
-                    // Main ring divisions (A, B, C rings)
+                    // Saturn-like wide rings (A, B, C)
                     float ringA = smoothstep(0.7, 0.72, normalizedDist) * smoothstep(1.0, 0.98, normalizedDist);
                     float ringB = smoothstep(0.35, 0.38, normalizedDist) * smoothstep(0.68, 0.65, normalizedDist);
                     float ringC = smoothstep(0.0, 0.03, normalizedDist) * smoothstep(0.33, 0.30, normalizedDist);
                     
-                    // Density varies by ring
                     float ringADensity = 0.85;
                     float ringBDensity = 1.0;  // B ring is densest
                     float ringCDensity = 0.4;  // C ring is faint
                     
-                    // Fine radial structure - thousands of ringlets
-                    // Use moderate frequencies to avoid aliasing/flickering
+                    // Fine radial structure - moderate frequencies to avoid aliasing/flickering
                     float fineStructure = 0.75 + 0.25 * sin(normalizedDist * 200.0 + fbm(normalizedDist * 30.0) * 1.5);
                     float microStructure = 0.88 + 0.12 * sin(normalizedDist * 600.0);
                     float ultraFine = 0.95 + 0.05 * noise(normalizedDist * 800.0);
@@ -1009,34 +1025,33 @@ export const TexturedPlanet = ({
                     float azimuthalVar = 0.95 + 0.05 * sin(angle * 30.0 + normalizedDist * 10.0);
                     float spokes = 0.97 + 0.03 * sin(angle * 8.0) * sin(normalizedDist * 20.0);
                     
-                    // Combine ring sections with their densities
-                    float baseDensity = ringA * ringADensity + ringB * ringBDensity + ringC * ringCDensity;
+                    float baseDensitySaturn = ringA * ringADensity + ringB * ringBDensity + ringC * ringCDensity;
+                    float ringDensitySaturn = baseDensitySaturn * fineStructure * microStructure * ultraFine * azimuthalVar * spokes;
                     
-                    // Apply fine structure
-                    float ringDensity = baseDensity * fineStructure * microStructure * ultraFine * azimuthalVar * spokes;
-                    
-                    // === GAPS ===
-                    
-                    // Cassini Division (between A and B rings)
+                    // Saturn gaps
                     float cassiniGap = 1.0 - 0.95 * exp(-pow((normalizedDist - 0.685) / 0.025, 2.0));
-                    
-                    // Encke Gap (in A ring)
                     float enckeGap = 1.0 - 0.8 * exp(-pow((normalizedDist - 0.88) / 0.008, 2.0));
-                    
-                    // Keeler Gap (outer A ring)
                     float keelerGap = 1.0 - 0.7 * exp(-pow((normalizedDist - 0.96) / 0.004, 2.0));
-                    
-                    // Colombo Gap (in C ring)
                     float colomboGap = 1.0 - 0.6 * exp(-pow((normalizedDist - 0.15) / 0.01, 2.0));
-                    
-                    // Maxwell Gap (in C ring)
                     float maxwellGap = 1.0 - 0.5 * exp(-pow((normalizedDist - 0.22) / 0.008, 2.0));
+                    ringDensitySaturn *= cassiniGap * enckeGap * keelerGap * colomboGap * maxwellGap;
                     
-                    ringDensity *= cassiniGap * enckeGap * keelerGap * colomboGap * maxwellGap;
+                    // Uranus-like narrow, dark ringlets (few sharp bands)
+                    float uranusBands = 0.0;
+                    uranusBands += 1.00 * exp(-pow((normalizedDist - 0.82) / 0.010, 2.0)); // epsilon-like bright ring
+                    uranusBands += 0.55 * exp(-pow((normalizedDist - 0.62) / 0.012, 2.0));
+                    uranusBands += 0.40 * exp(-pow((normalizedDist - 0.46) / 0.010, 2.0));
+                    uranusBands += 0.30 * exp(-pow((normalizedDist - 0.28) / 0.012, 2.0));
                     
+                    float ringDensityUranus = clamp(uranusBands, 0.0, 1.0);
+                    ringDensityUranus *= 0.90 + 0.10 * noise(normalizedDist * 900.0);
+                    ringDensityUranus *= 0.97 + 0.03 * sin(angle * 12.0);
+                    
+                    float ringDensity = mix(ringDensitySaturn, ringDensityUranus, ringStyle);
+
                     // === COLOR VARIATION ===
                     
-                    // Rings have subtle color variation (redder inner, bluer outer)
+                    // Saturn-like subtle color variation (redder inner, bluer outer)
                     vec3 innerColor = ringColor * vec3(1.05, 0.98, 0.92);
                     vec3 outerColor = ringColor * vec3(0.95, 0.98, 1.05);
                     vec3 finalColor = mix(innerColor, outerColor, normalizedDist);
@@ -1048,10 +1063,14 @@ export const TexturedPlanet = ({
                     // C ring is darker/grayer
                     vec3 cRingTint = vec3(0.85, 0.85, 0.88);
                     finalColor = mix(finalColor, finalColor * cRingTint, ringC * 0.5);
+
+                    // Uranus rings: very dark, low-color-variation
+                    vec3 uranusColor = ringColor * vec3(0.95, 0.98, 1.05);
+                    finalColor = mix(finalColor, uranusColor, ringStyle);
                     
-                    // Add subtle particle glitter on lit side
+                    // Add subtle particle glitter on lit side (mostly Saturn)
                     float glitter = noise2D(vec2(normalizedDist * 500.0, angle * 50.0));
-                    glitter = pow(glitter, 8.0) * 0.3 * max(NdotL, 0.0);
+                    glitter = pow(glitter, 8.0) * 0.3 * max(NdotL, 0.0) * (1.0 - ringStyle);
                     finalColor += vec3(glitter);
                     
                     // === OPACITY ===
@@ -1061,7 +1080,7 @@ export const TexturedPlanet = ({
                     float alpha = clamp(ringOpacity * edgeFade, 0.0, 0.95);
                     
                     // Lit ring with enhanced brightness
-                    float ringBrightness = 1.8;
+                    float ringBrightness = mix(1.8, 1.15, ringStyle);
                     vec3 litRing = finalColor * totalLight * ringBrightness;
                     
                     gl_FragColor = vec4(litRing, alpha);
