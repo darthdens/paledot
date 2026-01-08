@@ -40,7 +40,7 @@ export const OortCloud = ({ visualScale, highlight = false }: OortCloudProps) =>
     return geo;
   }, [visualScale]);
 
-  const baseSize = (highlight ? 240000 : 180000) * visualScale;
+  const baseSize = 80000 * visualScale;
 
   // Subtle pulse when highlighted (to match "You Are Here" signal)
   useFrame(({ clock }) => {
@@ -49,19 +49,18 @@ export const OortCloud = ({ visualScale, highlight = false }: OortCloudProps) =>
     const t = clock.getElapsedTime();
     const p = 0.5 + 0.5 * Math.sin(t * 1.4);
 
-    materialRef.current.opacity = 0.28 + p * 0.12;
-    materialRef.current.size = baseSize * (1 + p * 0.08);
+    materialRef.current.opacity = 0.3 + p * 0.15;
   });
 
   return (
     <points geometry={geometry}>
       <pointsMaterial
         ref={materialRef}
-        color={highlight ? '#00ff88' : '#aabbcc'}
+        color={highlight ? '#00ff88' : '#8899aa'}
         size={baseSize}
-        sizeAttenuation={false}
+        sizeAttenuation={true}
         transparent
-        opacity={highlight ? 0.34 : 0.22}
+        opacity={highlight ? 0.35 : 0.25}
         blending={THREE.AdditiveBlending}
         depthWrite={false}
       />
