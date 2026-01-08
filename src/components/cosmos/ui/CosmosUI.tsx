@@ -37,6 +37,7 @@ const translations = {
     hidePeriods: 'Hide periods',
     showTrails: 'Show trails',
     hideTrails: 'Hide trails',
+    orbitsAutoHidden: 'Orbits hidden (zoom out to see)',
     showStats: 'Show performance stats',
     hideStats: 'Hide performance stats',
     home: 'Go to Earth',
@@ -78,6 +79,7 @@ const translations = {
     hidePeriods: 'Masquer périodes',
     showTrails: 'Afficher traînées',
     hideTrails: 'Masquer traînées',
+    orbitsAutoHidden: 'Orbites masquées (dézoomer pour voir)',
     showStats: 'Afficher stats performance',
     hideStats: 'Masquer stats performance',
     home: 'Aller sur Terre',
@@ -117,6 +119,7 @@ export const CosmosUI = () => {
     goHome,
     timeSpeed,
     setTimeSpeed,
+    currentScale,
   } = useCosmosStore();
   const { isFullscreen, setIsFullscreen } = useFullscreenStore();
   const [showTimeSlider, setShowTimeSlider] = useState(false);
@@ -562,9 +565,27 @@ export const CosmosUI = () => {
             <div className="w-px h-6 bg-white/20 mx-0.5" />
             
             {/* Display options group */}
-            <Button size="icon" variant="ghost" onClick={toggleOrbits} className={`h-8 w-8 sm:h-9 sm:w-9 text-white ${showOrbits ? 'bg-white/25' : 'bg-white/10 hover:bg-white/20'}`} title={showOrbits ? t.hideOrbits : t.showOrbits}>
-              {showOrbits ? <CircleDot className="w-4 h-4 sm:w-5 sm:h-5" /> : <CircleOff className="w-4 h-4 sm:w-5 sm:h-5" />}
-            </Button>
+            {(() => {
+              const orbitsAutoHidden = showOrbits && currentScale === 'earth';
+              const orbitTitle = orbitsAutoHidden ? t.orbitsAutoHidden : (showOrbits ? t.hideOrbits : t.showOrbits);
+              return (
+                <Button 
+                  size="icon" 
+                  variant="ghost" 
+                  onClick={toggleOrbits} 
+                  className={`h-8 w-8 sm:h-9 sm:w-9 text-white relative ${
+                    orbitsAutoHidden ? 'bg-orange-500/30' : 
+                    showOrbits ? 'bg-white/25' : 'bg-white/10 hover:bg-white/20'
+                  }`} 
+                  title={orbitTitle}
+                >
+                  {showOrbits ? <CircleDot className="w-4 h-4 sm:w-5 sm:h-5" /> : <CircleOff className="w-4 h-4 sm:w-5 sm:h-5" />}
+                  {orbitsAutoHidden && (
+                    <span className="absolute -top-1 -right-1 w-2 h-2 bg-orange-400 rounded-full" />
+                  )}
+                </Button>
+              );
+            })()}
             <Button size="icon" variant="ghost" onClick={toggleTrails} className={`h-8 w-8 sm:h-9 sm:w-9 text-white ${showTrails ? 'bg-white/25' : 'bg-white/10 hover:bg-white/20'}`} title={showTrails ? t.hideTrails : t.showTrails}>
               <Sparkles className="w-4 h-4 sm:w-5 sm:h-5" />
             </Button>
