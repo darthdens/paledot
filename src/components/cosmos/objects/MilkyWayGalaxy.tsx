@@ -26,6 +26,48 @@ const MILKY_WAY = {
   ],
 };
 
+// Create circular star texture procedurally
+const createStarTexture = () => {
+  const size = 64;
+  const canvas = document.createElement('canvas');
+  canvas.width = size;
+  canvas.height = size;
+  const ctx = canvas.getContext('2d')!;
+  
+  // Radial gradient for soft circular glow
+  const gradient = ctx.createRadialGradient(size/2, size/2, 0, size/2, size/2, size/2);
+  gradient.addColorStop(0, 'rgba(255, 255, 255, 1)');
+  gradient.addColorStop(0.2, 'rgba(255, 255, 255, 0.8)');
+  gradient.addColorStop(0.5, 'rgba(255, 255, 255, 0.3)');
+  gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
+  
+  ctx.fillStyle = gradient;
+  ctx.fillRect(0, 0, size, size);
+  
+  return new THREE.CanvasTexture(canvas);
+};
+
+// Create soft gas/nebula texture
+const createGasTexture = () => {
+  const size = 128;
+  const canvas = document.createElement('canvas');
+  canvas.width = size;
+  canvas.height = size;
+  const ctx = canvas.getContext('2d')!;
+  
+  // Very soft, diffuse gradient
+  const gradient = ctx.createRadialGradient(size/2, size/2, 0, size/2, size/2, size/2);
+  gradient.addColorStop(0, 'rgba(255, 255, 255, 0.6)');
+  gradient.addColorStop(0.3, 'rgba(255, 255, 255, 0.3)');
+  gradient.addColorStop(0.6, 'rgba(255, 255, 255, 0.1)');
+  gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
+  
+  ctx.fillStyle = gradient;
+  ctx.fillRect(0, 0, size, size);
+  
+  return new THREE.CanvasTexture(canvas);
+};
+
 export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayGalaxyProps) => {
   const groupRef = useRef<THREE.Group>(null);
   const pulseRef = useRef<THREE.Mesh>(null);
@@ -38,6 +80,10 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
     0,
     -Math.sin(MILKY_WAY.sunAngle) * MILKY_WAY.sunDistance * gs
   ), [gs]);
+  
+  // Create textures once
+  const starTexture = useMemo(() => createStarTexture(), []);
+  const gasTexture = useMemo(() => createGasTexture(), []);
   
   // Generate detailed galaxy particle systems
   const { bulgeGeo, barGeo, diskGeo, armCoreGeo, dustGeo, nebulaGeo, haloGeo } = useMemo(() => {
@@ -352,7 +398,8 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
       {/* Central bulge - warm golden glow */}
       <points geometry={bulgeGeo}>
         <pointsMaterial
-          size={gs * 120}
+          size={gs * 150}
+          map={starTexture}
           vertexColors
           sizeAttenuation
           transparent
@@ -365,7 +412,8 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
       {/* Central bar */}
       <points geometry={barGeo}>
         <pointsMaterial
-          size={gs * 100}
+          size={gs * 120}
+          map={starTexture}
           vertexColors
           sizeAttenuation
           transparent
@@ -378,11 +426,12 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
       {/* Main disk / spiral arms */}
       <points geometry={diskGeo}>
         <pointsMaterial
-          size={gs * 50}
+          size={gs * 60}
+          map={starTexture}
           vertexColors
           sizeAttenuation
           transparent
-          opacity={0.8}
+          opacity={0.85}
           blending={THREE.AdditiveBlending}
           depthWrite={false}
         />
@@ -391,37 +440,40 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
       {/* Bright arm cores */}
       <points geometry={armCoreGeo}>
         <pointsMaterial
-          size={gs * 70}
+          size={gs * 80}
+          map={starTexture}
           vertexColors
           sizeAttenuation
           transparent
-          opacity={0.9}
+          opacity={0.95}
           blending={THREE.AdditiveBlending}
           depthWrite={false}
         />
       </points>
       
-      {/* Dust lanes */}
+      {/* Dust lanes - larger soft particles */}
       <points geometry={dustGeo}>
         <pointsMaterial
-          size={gs * 250}
+          size={gs * 350}
+          map={gasTexture}
           vertexColors
           sizeAttenuation
           transparent
-          opacity={0.5}
+          opacity={0.6}
           blending={THREE.NormalBlending}
           depthWrite={false}
         />
       </points>
       
-      {/* Nebulae - pink emission */}
+      {/* Nebulae - pink emission gas clouds */}
       <points geometry={nebulaGeo}>
         <pointsMaterial
-          size={gs * 200}
+          size={gs * 300}
+          map={gasTexture}
           vertexColors
           sizeAttenuation
           transparent
-          opacity={0.6}
+          opacity={0.7}
           blending={THREE.AdditiveBlending}
           depthWrite={false}
         />
@@ -430,11 +482,12 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
       {/* Stellar halo */}
       <points geometry={haloGeo}>
         <pointsMaterial
-          size={gs * 80}
+          size={gs * 100}
+          map={starTexture}
           vertexColors
           sizeAttenuation
           transparent
-          opacity={0.5}
+          opacity={0.6}
           blending={THREE.AdditiveBlending}
           depthWrite={false}
         />
