@@ -1,10 +1,11 @@
-import { useRef, useMemo } from 'react';
+import { useRef, useMemo, useCallback } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { Html } from '@react-three/drei';
 import * as THREE from 'three';
 import { UNITS } from '../types';
 import { useCosmosStore } from '../store/useCosmosStore';
 import { useLanguage } from '@/i18n/LanguageContext';
+import { getObjectById } from '../data/celestialObjects';
 
 interface MilkyWayGalaxyProps {
   visualScale: number;
@@ -91,12 +92,28 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
   const { language } = useLanguage();
 
   const setObjectWorldPosition = useCosmosStore((s) => s.setObjectWorldPosition);
+  const setSelectedObject = useCosmosStore((s) => s.setSelectedObject);
   const currentScale = useCosmosStore((s) => s.currentScale);
   
   // Only show label at galaxy-scale views
   const showLabel = currentScale === 'stellar' || currentScale === 'milkyWay' || currentScale === 'localGroup' || currentScale === 'universe';
 
   const gs = UNITS.KM_PER_LY * visualScale;
+
+  // Get celestial objects for click handlers
+  const sunObject = useMemo(() => getObjectById('sun'), []);
+  const proximaObject = useMemo(() => getObjectById('proxima-centauri'), []);
+
+  // Click handlers
+  const handleSunClick = useCallback((e: { stopPropagation: () => void }) => {
+    e.stopPropagation();
+    if (sunObject) setSelectedObject(sunObject);
+  }, [sunObject, setSelectedObject]);
+
+  const handleProximaClick = useCallback((e: { stopPropagation: () => void }) => {
+    e.stopPropagation();
+    if (proximaObject) setSelectedObject(proximaObject);
+  }, [proximaObject, setSelectedObject]);
 
   // Offset to position the galaxy so the solar system (Sun) stays at scene origin (0,0,0)
   // The galaxy center is displaced by the Sun's distance from galactic center
@@ -593,12 +610,12 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
             </Html>
           )}
           
-          <mesh>
+          <mesh onClick={handleSunClick}>
             <sphereGeometry args={[baseMarkerSize, 16, 16]} />
             <meshBasicMaterial color="#00ff44" />
           </mesh>
           
-          <mesh>
+          <mesh onClick={handleSunClick}>
             <sphereGeometry args={[baseMarkerSize * 1.5, 16, 16]} />
             <meshBasicMaterial
               color="#00ff44"
@@ -608,7 +625,7 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
             />
           </mesh>
           
-          <mesh>
+          <mesh onClick={handleSunClick}>
             <sphereGeometry args={[baseMarkerSize * 3, 16, 16]} />
             <meshBasicMaterial
               color="#00ff44"
@@ -691,13 +708,13 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
           </Html>
           
           {/* Core sphere - red/orange for red dwarf */}
-          <mesh>
+          <mesh onClick={handleProximaClick}>
             <sphereGeometry args={[baseMarkerSize * 0.7, 16, 16]} />
             <meshBasicMaterial color="#ff6b4a" />
           </mesh>
           
           {/* Inner glow */}
-          <mesh>
+          <mesh onClick={handleProximaClick}>
             <sphereGeometry args={[baseMarkerSize * 1.2, 16, 16]} />
             <meshBasicMaterial
               color="#ff6b4a"
@@ -708,7 +725,7 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
           </mesh>
           
           {/* Outer glow */}
-          <mesh>
+          <mesh onClick={handleProximaClick}>
             <sphereGeometry args={[baseMarkerSize * 2.5, 16, 16]} />
             <meshBasicMaterial
               color="#ff6b4a"
