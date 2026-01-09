@@ -106,6 +106,7 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
   // Get celestial objects for click handlers
   const earthObject = useMemo(() => getObjectById('earth'), []);
   const proximaObject = useMemo(() => getObjectById('proxima-centauri'), []);
+  const milkyWayObject = useMemo(() => getObjectById('milky-way-center'), []);
 
   // Click handlers - "You are here" marker goes to Earth (our home!)
   const handleYouAreHereClick = useCallback((e: { stopPropagation: () => void }) => {
@@ -117,6 +118,12 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
     e.stopPropagation();
     if (proximaObject) setSelectedObject(proximaObject);
   }, [proximaObject, setSelectedObject]);
+
+  // Click on the galaxy itself (when zoomed out to local group view)
+  const handleMilkyWayClick = useCallback((e: { stopPropagation: () => void }) => {
+    e.stopPropagation();
+    if (milkyWayObject) setSelectedObject(milkyWayObject);
+  }, [milkyWayObject, setSelectedObject]);
 
   // Click handlers for HTML labels (DOM events)
   const handleYouAreHereLabelClick = useCallback((e: ReactMouseEvent<HTMLDivElement>) => {
@@ -571,6 +578,17 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
             toneMapped={false}
           />
         </sprite>
+
+        {/* Invisible click target for the galaxy (visible at local group scale) */}
+        <mesh 
+          onClick={handleMilkyWayClick}
+          onPointerDown={handleMilkyWayClick}
+          onPointerOver={(e) => { e.stopPropagation(); document.body.style.cursor = 'pointer'; }}
+          onPointerOut={() => { document.body.style.cursor = 'auto'; }}
+        >
+          <sphereGeometry args={[diskR * 1.2, 32, 32]} />
+          <meshBasicMaterial transparent opacity={0} depthWrite={false} />
+        </mesh>
       </group>
 
       {/* Solar system marker ("You are here") - stays at origin since that's where the solar system is */}
