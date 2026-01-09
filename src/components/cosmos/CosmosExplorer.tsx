@@ -11,6 +11,7 @@ import { KuiperBelt } from './objects/KuiperBelt';
 import { TrojanAsteroids } from './objects/TrojanAsteroids';
 import { Comets } from './objects/Comet';
 import { MilkyWayGalaxy } from './objects/MilkyWayGalaxy';
+import { GalaxyAmbientGlow } from './objects/GalaxyAmbientGlow';
 import { GalaxyRotator } from './objects/GalaxyRotator';
 import { WorldPositionTracker } from './objects/WorldPositionTracker';
 import { SolarSystemTracker } from './objects/SolarSystemTracker';
@@ -152,6 +153,9 @@ export const CosmosExplorer = () => {
           {/* Lighting - ambient stays outside, Sun light goes inside rotator */}
           <ambientLight intensity={0.02} />
           <hemisphereLight args={['#ffffff', '#444466', 0.15]} />
+          
+          {/* Persistent ambient glow from galaxy - always visible regardless of camera orientation */}
+          <GalaxyAmbientGlow />
           
           {/* Everything that should rotate together at galaxy scale */}
           <GalaxyRotator visualScale={UNIFIED_SCALE}>
