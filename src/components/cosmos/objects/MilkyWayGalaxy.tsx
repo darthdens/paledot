@@ -243,83 +243,6 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
     geo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
     return geo;
   }, [gs]);
-
-  // Spiral arm glow sprites - dense overlapping glows along each arm (blends into a continuous ribbon)
-  const spiralArmGlows = useMemo(() => {
-    const { branches, spinTurns } = MILKY_WAY;
-    const maxRadius = MILKY_WAY.diskRadius * gs;
-
-    // Higher density + multi-lane offsets to avoid "pearl" gaps
-    const pointsPerArm = 260;
-
-    const glows: {
-      x: number;
-      z: number;
-      baseScale: number;
-      color: string;
-      innerOpacity: number;
-      outerOpacity: number;
-    }[] = [];
-
-    for (let arm = 0; arm < branches; arm++) {
-      const branchAngle = (arm / branches) * Math.PI * 2;
-
-      for (let i = 0; i < pointsPerArm; i++) {
-        const t = 0.08 + (i / (pointsPerArm - 1)) * 0.9;
-        const radius = t * maxRadius;
-        const spinAngle = t * spinTurns * Math.PI * 2;
-        const angle = branchAngle + spinAngle;
-
-        // Arm thickness - tighter lanes for sharper arms
-        const armWidth = maxRadius * (0.004 + (1 - t) * 0.01);
-        const perp = angle + Math.PI / 2;
-
-        const laneOffsets = [0, armWidth * 0.4, -armWidth * 0.4];
-
-        // Smaller sprites for tighter arms while still overlapping
-        const baseScale = maxRadius * (0.12 - t * 0.05);
-
-        // Color + opacity by radius (warm core → purple → blue) - toned down
-        let color: string;
-        let innerOpacity: number;
-        let outerOpacity: number;
-
-        if (t < 0.28) {
-          color = '#FFB35A';
-          innerOpacity = 0.18;
-          outerOpacity = 0.08;
-        } else if (t < 0.45) {
-          color = '#FF8A58';
-          innerOpacity = 0.16;
-          outerOpacity = 0.075;
-        } else if (t < 0.62) {
-          color = '#D070C0';
-          innerOpacity = 0.14;
-          outerOpacity = 0.065;
-        } else if (t < 0.8) {
-          color = '#6F93F0';
-          innerOpacity = 0.13;
-          outerOpacity = 0.06;
-        } else {
-          color = '#4E7DDF';
-          innerOpacity = 0.12;
-          outerOpacity = 0.055;
-        }
-
-        for (const baseOffset of laneOffsets) {
-          const jitter = (Math.random() - 0.5) * armWidth * 0.25;
-          const offset = baseOffset + jitter;
-
-          const x = Math.cos(angle) * radius + Math.cos(perp) * offset;
-          const z = Math.sin(angle) * radius + Math.sin(perp) * offset;
-
-          glows.push({ x, z, baseScale, color, innerOpacity, outerOpacity });
-        }
-      }
-    }
-
-    return glows;
-  }, [gs]);
   
   useFrame(({ clock, camera }) => {
     const t = clock.getElapsedTime();
@@ -396,70 +319,29 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
         />
       </points>
 
-      {/* Spiral arm glows - dense overlapping sprites to form continuous arms */}
-      {/* Outer soft pass */}
-      {spiralArmGlows.map((g, idx) => (
-        <sprite
-          key={`arm-glow-outer-${idx}`}
-          position={[g.x, 0, g.z]}
-          renderOrder={-31}
-          scale={[g.baseScale * 3.0, g.baseScale * 3.0, 1]}
-        >
-          <spriteMaterial
-            map={glowTexture}
-            color={g.color}
-            transparent
-            opacity={g.outerOpacity}
-            blending={THREE.AdditiveBlending}
-            depthWrite={false}
-            depthTest={false}
-          />
-        </sprite>
-      ))}
-
-      {/* Inner brighter pass */}
-      {spiralArmGlows.map((g, idx) => (
-        <sprite
-          key={`arm-glow-inner-${idx}`}
-          position={[g.x, 0, g.z]}
-          renderOrder={-30}
-          scale={[g.baseScale * 1.45, g.baseScale * 1.45, 1]}
-        >
-          <spriteMaterial
-            map={glowTexture}
-            color={g.color}
-            transparent
-            opacity={g.innerOpacity}
-            blending={THREE.AdditiveBlending}
-            depthWrite={false}
-            depthTest={false}
-          />
-        </sprite>
-      ))}
-
       {/* Smooth gradient glow - white → yellow → orange → purple → blue → dark blue */}
       {/* Glow reaches to galaxy edges (diskR * 2 = galaxy edge) */}
       
-      {/* Dark blue at edges - toned down */}
+      {/* Dark blue at edges */}
       <sprite renderOrder={-25} scale={[diskR * 2.2, diskR * 2.2, 1]}>
         <spriteMaterial
           map={glowTexture}
           color="#2255BB"
           transparent
-          opacity={0.08}
+          opacity={0.18}
           blending={THREE.AdditiveBlending}
           depthWrite={false}
           depthTest={false}
         />
       </sprite>
 
-      {/* Blue - toned down */}
+      {/* Blue */}
       <sprite renderOrder={-24} scale={[diskR * 1.9, diskR * 1.9, 1]}>
         <spriteMaterial
           map={glowTexture}
           color="#3366DD"
           transparent
-          opacity={0.10}
+          opacity={0.22}
           blending={THREE.AdditiveBlending}
           depthWrite={false}
           depthTest={false}
@@ -471,33 +353,33 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
           map={glowTexture}
           color="#4477EE"
           transparent
-          opacity={0.11}
+          opacity={0.25}
           blending={THREE.AdditiveBlending}
           depthWrite={false}
           depthTest={false}
         />
       </sprite>
 
-      {/* Blue to purple - toned down */}
+      {/* Blue to purple */}
       <sprite renderOrder={-22} scale={[diskR * 1.45, diskR * 1.45, 1]}>
         <spriteMaterial
           map={glowTexture}
           color="#6666DD"
           transparent
-          opacity={0.12}
+          opacity={0.28}
           blending={THREE.AdditiveBlending}
           depthWrite={false}
           depthTest={false}
         />
       </sprite>
 
-      {/* Purple - toned down */}
+      {/* Purple */}
       <sprite renderOrder={-21} scale={[diskR * 1.25, diskR * 1.25, 1]}>
         <spriteMaterial
           map={glowTexture}
           color="#8855CC"
           transparent
-          opacity={0.14}
+          opacity={0.3}
           blending={THREE.AdditiveBlending}
           depthWrite={false}
           depthTest={false}
@@ -509,18 +391,31 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
           map={glowTexture}
           color="#AA55BB"
           transparent
-          opacity={0.15}
+          opacity={0.32}
           blending={THREE.AdditiveBlending}
           depthWrite={false}
           depthTest={false}
         />
       </sprite>
 
-      {/* Purple to orange - toned down */}
+      {/* Purple to orange */}
       <sprite renderOrder={-19} scale={[diskR * 1.25, diskR * 1.25, 1]}>
         <spriteMaterial
           map={glowTexture}
           color="#DD5577"
+          transparent
+          opacity={0.26}
+          blending={THREE.AdditiveBlending}
+          depthWrite={false}
+          depthTest={false}
+        />
+      </sprite>
+
+      {/* Warm wash that carries yellow/orange outward (so it reaches the spiral edges) */}
+      <sprite renderOrder={-18} scale={[diskR * 1.65, diskR * 1.65, 1]}>
+        <spriteMaterial
+          map={glowTexture}
+          color="#FF8844"
           transparent
           opacity={0.12}
           blending={THREE.AdditiveBlending}
@@ -529,39 +424,13 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
         />
       </sprite>
 
-      {/* Warm wash - toned down */}
-      <sprite renderOrder={-18} scale={[diskR * 2.0, diskR * 2.0, 1]}>
-        <spriteMaterial
-          map={glowTexture}
-          color="#FF8844"
-          transparent
-          opacity={0.07}
-          blending={THREE.AdditiveBlending}
-          depthWrite={false}
-          depthTest={false}
-        />
-      </sprite>
-
-      {/* Additional warm glow layer - toned down */}
-      <sprite renderOrder={-17.5} scale={[diskR * 1.75, diskR * 1.75, 1]}>
-        <spriteMaterial
-          map={glowTexture}
-          color="#FF9955"
-          transparent
-          opacity={0.08}
-          blending={THREE.AdditiveBlending}
-          depthWrite={false}
-          depthTest={false}
-        />
-      </sprite>
-
-      {/* Orange - toned down */}
+      {/* Orange - more visible + expanded */}
       <sprite renderOrder={-17} scale={[diskR * 1.1, diskR * 1.1, 1]}>
         <spriteMaterial
           map={glowTexture}
           color="#FF7733"
           transparent
-          opacity={0.14}
+          opacity={0.3}
           blending={THREE.AdditiveBlending}
           depthWrite={false}
           depthTest={false}
@@ -573,7 +442,7 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
           map={glowTexture}
           color="#FF8822"
           transparent
-          opacity={0.18}
+          opacity={0.38}
           blending={THREE.AdditiveBlending}
           depthWrite={false}
           depthTest={false}
@@ -585,20 +454,20 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
           map={glowTexture}
           color="#FF9911"
           transparent
-          opacity={0.22}
+          opacity={0.45}
           blending={THREE.AdditiveBlending}
           depthWrite={false}
           depthTest={false}
         />
       </sprite>
 
-      {/* Yellow - toned down */}
+      {/* Yellow - more visible + expanded */}
       <sprite renderOrder={-14} scale={[diskR * 0.65, diskR * 0.65, 1]}>
         <spriteMaterial
           map={glowTexture}
           color="#FFBB22"
           transparent
-          opacity={0.28}
+          opacity={0.5}
           blending={THREE.AdditiveBlending}
           depthWrite={false}
           depthTest={false}
@@ -610,7 +479,7 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
           map={glowTexture}
           color="#FFDD44"
           transparent
-          opacity={0.35}
+          opacity={0.62}
           blending={THREE.AdditiveBlending}
           depthWrite={false}
           depthTest={false}
