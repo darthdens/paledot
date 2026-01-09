@@ -13,6 +13,7 @@ import { Comets } from './objects/Comet';
 import { MilkyWayGalaxy } from './objects/MilkyWayGalaxy';
 import { GalaxyRotator } from './objects/GalaxyRotator';
 import { WorldPositionTracker } from './objects/WorldPositionTracker';
+import { SolarSystemTracker } from './objects/SolarSystemTracker';
 import { OortCloud } from './objects/OortCloud';
 import { CosmosUI } from './ui/CosmosUI';
 import { InfoCard } from './ui/InfoCard';
@@ -167,6 +168,9 @@ export const CosmosExplorer = () => {
               decay={1} 
               color="#FFF8E7" 
             />
+            
+            {/* Track solar system position for camera following at all scales */}
+            <SolarSystemTracker />
             
             {/* The Sun at center - same unified scale as planets */}
             <Sun position={[0, 0, 0]} visualScale={UNIFIED_SCALE} />
