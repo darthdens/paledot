@@ -2,6 +2,19 @@ import { TourStop, UNITS } from '../types';
 
 // Tour stops now use relative camera offsets from the target object
 // The CameraController will compute actual positions based on live world positions
+// Object radii in km for consistent zoom calculations
+const OBJECT_RADII: Record<string, number> = {
+  earth: 6371,
+  moon: 1737,
+  sun: 696350,
+  jupiter: 69911,
+  saturn: 58232,
+  uranus: 25362,
+};
+
+// Consistent zoom multiplier: camera distance = radius * ZOOM_MULTIPLIER
+const ZOOM_MULTIPLIER = 4;
+
 export const tourStops: TourStop[] = [
   {
     id: 'intro',
@@ -15,8 +28,8 @@ export const tourStops: TourStop[] = [
       fr: 'Bienvenue dans l\'Explorateur du Cosmos. Nous commençons notre voyage sur Terre, notre planète dans l\'immense univers. Embarquons pour un voyage incroyable d\'ici jusqu\'aux confins de l\'univers observable.',
     },
     duration: 8,
-    // Close view of Earth - about 5 Earth radii away
-    cameraPosition: [0, 5000, 30000],
+    // Consistent zoom: ~4x Earth radius
+    cameraPosition: [0, OBJECT_RADII.earth * 0.5, OBJECT_RADII.earth * ZOOM_MULTIPLIER],
     lookAt: [0, 0, 0],
     scaleLevel: 'earth',
   },
@@ -32,8 +45,8 @@ export const tourStops: TourStop[] = [
       fr: 'En s\'élevant au-dessus de l\'atmosphère terrestre, nous voyons notre Lune - le seul corps céleste que les humains ont visité. Elle est à 384 400 km, une distance que la lumière traverse en seulement 1,3 seconde.',
     },
     duration: 7,
-    // Close to the Moon - about 3 Moon radii
-    cameraPosition: [3000, 2000, 8000],
+    // Consistent zoom: ~4x Moon radius
+    cameraPosition: [0, OBJECT_RADII.moon * 0.5, OBJECT_RADII.moon * ZOOM_MULTIPLIER],
     lookAt: [0, 0, 0],
     scaleLevel: 'earth',
   },
@@ -65,8 +78,8 @@ export const tourStops: TourStop[] = [
       fr: 'Au-delà de la ceinture d\'astéroïdes, nous trouvons Jupiter, la plus grande planète. Elle pourrait contenir toutes les autres. Sa Grande Tache Rouge est une tempête plus grande que la Terre qui fait rage depuis des siècles.',
     },
     duration: 8,
-    // Close to Jupiter - about 2x its radius away
-    cameraPosition: [50000, 30000, 150000],
+    // Consistent zoom: ~4x Jupiter radius
+    cameraPosition: [0, OBJECT_RADII.jupiter * 0.5, OBJECT_RADII.jupiter * ZOOM_MULTIPLIER],
     lookAt: [0, 0, 0],
     scaleLevel: 'solarSystem',
   },
@@ -82,8 +95,8 @@ export const tourStops: TourStop[] = [
       fr: 'Les anneaux emblématiques de Saturne sont composés de milliards de particules de glace et de roche. Malgré leurs 282 000 km d\'envergure, ils sont incroyablement fins - en moyenne seulement 10 mètres d\'épaisseur.',
     },
     duration: 7,
-    // Close to Saturn to see the rings - about 2x its radius
-    cameraPosition: [40000, 25000, 120000],
+    // Consistent zoom: ~4x Saturn radius
+    cameraPosition: [0, OBJECT_RADII.saturn * 0.5, OBJECT_RADII.saturn * ZOOM_MULTIPLIER],
     lookAt: [0, 0, 0],
     scaleLevel: 'solarSystem',
   },
@@ -99,8 +112,8 @@ export const tourStops: TourStop[] = [
       fr: 'Uranus est unique parmi les planètes - elle tourne sur le côté, probablement en raison d\'une collision massive ancienne. Cette géante de glace possède 27 lunes connues et de faibles anneaux.',
     },
     duration: 7,
-    // Close to Uranus - about 2x its radius
-    cameraPosition: [20000, 15000, 80000],
+    // Consistent zoom: ~4x Uranus radius
+    cameraPosition: [0, OBJECT_RADII.uranus * 0.5, OBJECT_RADII.uranus * ZOOM_MULTIPLIER],
     lookAt: [0, 0, 0],
     scaleLevel: 'solarSystem',
   },
@@ -149,8 +162,8 @@ export const tourStops: TourStop[] = [
       fr: 'Notre voyage à travers le cosmos touche à sa fin, de retour sur notre point bleu pâle. Dans l\'immensité de l\'espace, la Terre reste notre seule maison - une précieuse oasis de vie dans le désert cosmique.',
     },
     duration: 10,
-    // Back close to Earth
-    cameraPosition: [0, 5000, 30000],
+    // Same view as intro - consistent zoom: ~4x Earth radius
+    cameraPosition: [0, OBJECT_RADII.earth * 0.5, OBJECT_RADII.earth * ZOOM_MULTIPLIER],
     lookAt: [0, 0, 0],
     scaleLevel: 'earth',
   },
