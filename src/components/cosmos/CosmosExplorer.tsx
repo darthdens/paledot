@@ -11,6 +11,7 @@ import { KuiperBelt } from './objects/KuiperBelt';
 import { TrojanAsteroids } from './objects/TrojanAsteroids';
 import { Comets } from './objects/Comet';
 import { MilkyWayGalaxy } from './objects/MilkyWayGalaxy';
+import { GalaxyRotator } from './objects/GalaxyRotator';
 import { OortCloud } from './objects/OortCloud';
 import { CosmosUI } from './ui/CosmosUI';
 import { InfoCard } from './ui/InfoCard';
@@ -157,94 +158,97 @@ export const CosmosExplorer = () => {
           {/* Star background - scaled down for new coordinate system */}
           <Stars radius={1e8} depth={1e7} count={15000} factor={1e5} saturation={0} fade speed={0.3} />
           
-          {/* Milky Way Galaxy - visible at larger scales */}
-          {showMilkyWay && (
-            <MilkyWayGalaxy visualScale={UNIFIED_SCALE} showYouAreHere={true} />
-          )}
-          
-          {/* The Sun at center - same unified scale as planets */}
-          <Sun position={[0, 0, 0]} visualScale={UNIFIED_SCALE} />
-          
-          {/* Asteroid Belt between Mars and Jupiter */}
-          <AsteroidBelt 
-            innerRadius={300000000 * UNIFIED_SCALE}
-            outerRadius={500000000 * UNIFIED_SCALE}
-            count={3500}
-            scale={UNIFIED_SCALE}
-          />
-          
-          {/* Jupiter Trojan Asteroids at L4 and L5 */}
-          <TrojanAsteroids
-            jupiterOrbitRadius={778500000 * UNIFIED_SCALE}
-            count={600}
-            scale={UNIFIED_SCALE}
-          />
-          
-          {/* Kuiper Belt beyond Neptune */}
-          <KuiperBelt
-            innerRadius={4500000000 * UNIFIED_SCALE}
-            outerRadius={7500000000 * UNIFIED_SCALE}
-            count={2000}
-            scale={UNIFIED_SCALE}
-          />
-          
-          {/* Oort Cloud - outermost boundary of Solar System */}
-          <OortCloud visualScale={UNIFIED_SCALE} />
-          
-          {/* Famous comets with tails */}
-          <Comets scale={UNIFIED_SCALE} />
-          
-          {/* All planets - using unified scale for both size and distance */}
-          {planets.map(planet => (
-            <TexturedPlanet 
-              key={planet.id} 
-              object={planet} 
-              showOrbit={showOrbits} 
-              visualScale={UNIFIED_SCALE}
-              distanceScale={UNIFIED_SCALE}
+          {/* Everything that should rotate with the galaxy */}
+          <GalaxyRotator visualScale={UNIFIED_SCALE}>
+            {/* Milky Way Galaxy - visible at larger scales */}
+            {showMilkyWay && (
+              <MilkyWayGalaxy visualScale={UNIFIED_SCALE} showYouAreHere={true} />
+            )}
+            
+            {/* The Sun at center - same unified scale as planets */}
+            <Sun position={[0, 0, 0]} visualScale={UNIFIED_SCALE} />
+            
+            {/* Asteroid Belt between Mars and Jupiter */}
+            <AsteroidBelt 
+              innerRadius={300000000 * UNIFIED_SCALE}
+              outerRadius={500000000 * UNIFIED_SCALE}
+              count={3500}
+              scale={UNIFIED_SCALE}
             />
-          ))}
+            
+            {/* Jupiter Trojan Asteroids at L4 and L5 */}
+            <TrojanAsteroids
+              jupiterOrbitRadius={778500000 * UNIFIED_SCALE}
+              count={600}
+              scale={UNIFIED_SCALE}
+            />
+            
+            {/* Kuiper Belt beyond Neptune */}
+            <KuiperBelt
+              innerRadius={4500000000 * UNIFIED_SCALE}
+              outerRadius={7500000000 * UNIFIED_SCALE}
+              count={2000}
+              scale={UNIFIED_SCALE}
+            />
+            
+            {/* Oort Cloud - outermost boundary of Solar System */}
+            <OortCloud visualScale={UNIFIED_SCALE} />
+            
+            {/* Famous comets with tails */}
+            <Comets scale={UNIFIED_SCALE} />
+            
+            {/* All planets - using unified scale for both size and distance */}
+            {planets.map(planet => (
+              <TexturedPlanet 
+                key={planet.id} 
+                object={planet} 
+                showOrbit={showOrbits} 
+                visualScale={UNIFIED_SCALE}
+                distanceScale={UNIFIED_SCALE}
+              />
+            ))}
 
-          {/* Orbital trails for planets (kept mounted; toggle only changes visibility for consistency) */}
-          {planets.map((planet) => (
-            <OrbitalTrail
-              key={`trail-${planet.id}`}
-              objectId={planet.id}
-              color={planet.color}
-              enabled={showTrails}
-              maxPoints={120}
-              opacity={0.35}
-            />
-          ))}
+            {/* Orbital trails for planets (kept mounted; toggle only changes visibility for consistency) */}
+            {planets.map((planet) => (
+              <OrbitalTrail
+                key={`trail-${planet.id}`}
+                objectId={planet.id}
+                color={planet.color}
+                enabled={showTrails}
+                maxPoints={120}
+                opacity={0.35}
+              />
+            ))}
 
-          {/* Moon orbit paths - faint circles around parent planets */}
-          {showOrbits && moonOrbits.map(orbit => (
-            <MoonOrbit
-              key={`orbit-${orbit.id}`}
-              parentId={orbit.parentId}
-              moonOrbitRadius={orbit.orbitRadius}
-              color={orbit.color}
-            />
-          ))}
+            {/* Moon orbit paths - faint circles around parent planets */}
+            {showOrbits && moonOrbits.map(orbit => (
+              <MoonOrbit
+                key={`orbit-${orbit.id}`}
+                parentId={orbit.parentId}
+                moonOrbitRadius={orbit.orbitRadius}
+                color={orbit.color}
+              />
+            ))}
 
-          {/* All moons */}
-          {moons.map(moon => (
-            <TexturedPlanet 
-              key={moon.id} 
-              object={moon} 
-              showOrbit={false} 
-              visualScale={UNIFIED_SCALE * 1.5}
-              distanceScale={UNIFIED_SCALE}
-            />
-          ))}
-          
-          {/* Distant stars - tiny point-like spheres */}
-          {stars.map(star => (
-            <mesh key={star.id} position={star.position.map(p => p * UNIFIED_SCALE) as [number, number, number]}>
-              <sphereGeometry args={[200, 6, 6]} />
-              <meshBasicMaterial color={star.color} transparent opacity={0.5} />
-            </mesh>
-          ))}
+            {/* All moons */}
+            {moons.map(moon => (
+              <TexturedPlanet 
+                key={moon.id} 
+                object={moon} 
+                showOrbit={false} 
+                visualScale={UNIFIED_SCALE * 1.5}
+                distanceScale={UNIFIED_SCALE}
+              />
+            ))}
+            
+            {/* Distant stars - tiny point-like spheres */}
+            {stars.map(star => (
+              <mesh key={star.id} position={star.position.map(p => p * UNIFIED_SCALE) as [number, number, number]}>
+                <sphereGeometry args={[200, 6, 6]} />
+                <meshBasicMaterial color={star.color} transparent opacity={0.5} />
+              </mesh>
+            ))}
+          </GalaxyRotator>
           
           {/* Performance stats */}
           <PerformanceHUD />

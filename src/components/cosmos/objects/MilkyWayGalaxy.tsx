@@ -371,10 +371,7 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
   useFrame(({ clock, camera }) => {
     const t = clock.getElapsedTime();
 
-    // Slow galaxy rotation - one full rotation every ~4 minutes
-    if (rotatingGroupRef.current) {
-      rotatingGroupRef.current.rotation.y = t * 0.025;
-    }
+    // Galaxy rotation is now handled by GalaxyRotator in CosmosExplorer
 
     // Cache the galaxy center world position once (used by camera-based UI overlays)
     if (!hasSetCenterRef.current && rotatingGroupRef.current) {
