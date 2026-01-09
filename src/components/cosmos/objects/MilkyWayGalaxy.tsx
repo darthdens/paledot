@@ -538,12 +538,14 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
           {/* "We are here" label */}
           {showLabel && (
             <Html
-              position={[0, baseMarkerSize * 8, 0]}
+              position={[0, baseMarkerSize * 15, 0]}
               center
+              distanceFactor={baseMarkerSize * 50}
+              occlude={false}
               style={{ pointerEvents: 'none' }}
             >
-              <div className="bg-black/80 backdrop-blur-sm px-3 py-1.5 rounded-lg border border-emerald-500/50 whitespace-nowrap">
-                <span className="text-emerald-400 text-sm font-semibold">
+              <div className="bg-black/80 backdrop-blur-sm px-3 py-1.5 rounded-lg border border-emerald-500/50 whitespace-nowrap shadow-lg">
+                <span className="text-emerald-400 text-sm font-semibold drop-shadow-md">
                   {language === 'fr' ? 'Nous sommes ici' : 'We are here'}
                 </span>
               </div>
