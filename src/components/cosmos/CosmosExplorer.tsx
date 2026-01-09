@@ -258,10 +258,10 @@ export const CosmosExplorer = () => {
             })}
           </GalaxyRotator>
           
-          {/* Galaxy orbit trail - outside GalaxyRotator to show actual orbital path */}
+          {/* Galaxy orbit trail - outside GalaxyRotator so it doesn't rotate with the scene */}
           {showMilkyWay && (
             <OrbitalTrail
-              objectId="sun"
+              objectId="solar-system-marker"
               color="#00ff44"
               enabled={showTrails}
               maxPoints={500}

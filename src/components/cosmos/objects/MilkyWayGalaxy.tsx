@@ -78,16 +78,21 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
   const pulseRef2 = useRef<THREE.Mesh>(null);
   const markerGroupRef = useRef<THREE.Group>(null);
   const centerWorldPos = useRef(new THREE.Vector3());
+  const markerWorldPos = useRef(new THREE.Vector3());
   
   const setObjectWorldPosition = useCosmosStore((s) => s.setObjectWorldPosition);
   
   const gs = UNITS.KM_PER_LY * visualScale;
-  
-  const galaxyOffset = useMemo(() => new THREE.Vector3(
-    -Math.cos(MILKY_WAY.sunAngle) * MILKY_WAY.sunDistance * gs,
-    0,
-    -Math.sin(MILKY_WAY.sunAngle) * MILKY_WAY.sunDistance * gs
-  ), [gs]);
+
+  // Position of the Solar System within the Milky Way (in scene units)
+  const solarSystemPos = useMemo<[number, number, number]>(
+    () => [
+      Math.cos(MILKY_WAY.sunAngle) * MILKY_WAY.sunDistance * gs,
+      0,
+      Math.sin(MILKY_WAY.sunAngle) * MILKY_WAY.sunDistance * gs,
+    ],
+    [gs]
+  );
   
   const dotTexture = useMemo(() => createDotTexture(), []);
   const glowTexture = useMemo(() => createGalaxyGlowTexture(), []);
@@ -388,23 +393,30 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
       // Back-compat with any older references
       setObjectWorldPosition('milkyWay_center', pos);
     }
-    
+
     if (pulseRef.current) {
       const phase = (t * 2) % 1;
       pulseRef.current.scale.setScalar(1 + phase * 4);
       (pulseRef.current.material as THREE.MeshBasicMaterial).opacity = (1 - phase) * 0.8;
     }
-    
+
     if (pulseRef2.current) {
       const phase = ((t * 2) + 0.5) % 1;
       pulseRef2.current.scale.setScalar(1 + phase * 4);
       (pulseRef2.current.material as THREE.MeshBasicMaterial).opacity = (1 - phase) * 0.8;
     }
-    
+
     if (markerGroupRef.current) {
-      const markerWorldPos = new THREE.Vector3();
-      markerGroupRef.current.getWorldPosition(markerWorldPos);
-      const distance = camera.position.distanceTo(markerWorldPos);
+      markerGroupRef.current.getWorldPosition(markerWorldPos.current);
+
+      // Expose this position so OrbitalTrail can render the galaxy-orbit path
+      setObjectWorldPosition('solar-system-marker', [
+        markerWorldPos.current.x,
+        markerWorldPos.current.y,
+        markerWorldPos.current.z,
+      ]);
+
+      const distance = camera.position.distanceTo(markerWorldPos.current);
       const scale = Math.max(1, distance * 0.025);
       markerGroupRef.current.scale.setScalar(scale);
     }
