@@ -312,6 +312,57 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
     geo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
     return geo;
   }, [gs]);
+
+  // Halo stars - scattered above/below the disk, denser near center
+  const haloGeo = useMemo(() => {
+    const count = 15000; // Much fewer than disk stars
+    const maxRadius = MILKY_WAY.diskRadius * gs * 0.6; // Don't extend as far out
+    const maxHeight = MILKY_WAY.diskRadius * gs * 0.25; // Vertical extent
+    const positions = new Float32Array(count * 3);
+    const colors = new Float32Array(count * 3);
+    const color = new THREE.Color();
+
+    for (let i = 0; i < count; i++) {
+      const i3 = i * 3;
+      
+      // Strongly concentrated toward center (power of 2.5 for steep falloff)
+      const t = Math.pow(Math.random(), 2.5);
+      const radius = t * maxRadius;
+      const angle = Math.random() * Math.PI * 2;
+
+      positions[i3] = Math.cos(angle) * radius;
+      positions[i3 + 2] = Math.sin(angle) * radius;
+
+      // Vertical position: can be high above or below, but decreases with radius
+      const heightScale = 1 - t * 0.7; // Less height spread further from center
+      const y = (Math.random() * 2 - 1) * maxHeight * heightScale;
+      // Make sure stars are actually above/below the disk (not in it)
+      const minY = MILKY_WAY.diskRadius * gs * 0.02;
+      positions[i3 + 1] = y > 0 ? y + minY : y - minY;
+
+      // Halo stars: older, more yellow/orange, some ancient blue stragglers
+      const rand = Math.random();
+      if (rand < 0.6) {
+        // Yellow-orange (old stars)
+        color.setHSL(0.08 + Math.random() * 0.06, 0.85 + Math.random() * 0.1, 0.5 + Math.random() * 0.1);
+      } else if (rand < 0.85) {
+        // Orange-red
+        color.setHSL(0.03 + Math.random() * 0.04, 0.9, 0.45 + Math.random() * 0.1);
+      } else {
+        // Rare blue stragglers
+        color.setHSL(0.6 + Math.random() * 0.08, 0.8, 0.5 + Math.random() * 0.1);
+      }
+
+      colors[i3] = color.r;
+      colors[i3 + 1] = color.g;
+      colors[i3 + 2] = color.b;
+    }
+
+    const geo = new THREE.BufferGeometry();
+    geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    geo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+    return geo;
+  }, [gs]);
   
   useFrame(({ clock, camera }) => {
     const t = clock.getElapsedTime();
@@ -390,6 +441,21 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
           sizeAttenuation
           transparent
           opacity={0.45}
+          blending={THREE.AdditiveBlending}
+          depthWrite={false}
+          depthTest={false}
+        />
+      </points>
+
+      {/* Halo stars - scattered above/below the disk */}
+      <points geometry={haloGeo}>
+        <pointsMaterial
+          size={gs * 45}
+          map={dotTexture}
+          vertexColors
+          sizeAttenuation
+          transparent
+          opacity={0.35}
           blending={THREE.AdditiveBlending}
           depthWrite={false}
           depthTest={false}
