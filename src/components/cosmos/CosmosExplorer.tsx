@@ -262,10 +262,11 @@ export const CosmosExplorer = () => {
           {showMilkyWay && (
             <OrbitalTrail
               objectId="solar-system-marker"
-              color="#00ff44"
+              color="#00ff88"
               enabled={showTrails}
-              maxPoints={500}
-              opacity={0.6}
+              maxPoints={800}
+              opacity={0.9}
+              glow
             />
           )}
           
