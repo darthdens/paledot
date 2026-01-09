@@ -486,6 +486,35 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
             Math.sin(MILKY_WAY.sunAngle) * MILKY_WAY.sunDistance * gs
           ]}
         >
+          {/* White star point that matches the galaxy stars style */}
+          <points>
+            <bufferGeometry>
+              <bufferAttribute
+                attach="attributes-position"
+                count={1}
+                array={new Float32Array([0, 0, 0])}
+                itemSize={3}
+              />
+              <bufferAttribute
+                attach="attributes-color"
+                count={1}
+                array={new Float32Array([1, 1, 1])}
+                itemSize={3}
+              />
+            </bufferGeometry>
+            <pointsMaterial
+              size={gs * 120}
+              map={dotTexture}
+              vertexColors
+              sizeAttenuation
+              transparent
+              opacity={1}
+              blending={THREE.AdditiveBlending}
+              depthWrite={false}
+              depthTest={false}
+            />
+          </points>
+          
           <mesh>
             <sphereGeometry args={[baseMarkerSize, 16, 16]} />
             <meshBasicMaterial color="#00ff44" />
