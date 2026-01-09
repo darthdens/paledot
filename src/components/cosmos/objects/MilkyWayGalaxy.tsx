@@ -95,8 +95,11 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
   const setSelectedObject = useCosmosStore((s) => s.setSelectedObject);
   const currentScale = useCosmosStore((s) => s.currentScale);
   
-  // Only show label at galaxy-scale views
-  const showLabel = currentScale === 'stellar' || currentScale === 'milkyWay' || currentScale === 'localGroup' || currentScale === 'universe';
+  // Only show label at galaxy-scale views (not at local group or universe scale - too far away)
+  const showLabel = currentScale === 'stellar' || currentScale === 'milkyWay';
+  
+  // Hide "We are here" marker when zoomed out to local group or universe scale
+  const showYouAreHereMarker = showYouAreHere && (currentScale === 'stellar' || currentScale === 'milkyWay');
 
   const gs = UNITS.KM_PER_LY * visualScale;
 
@@ -571,7 +574,7 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
       </group>
 
       {/* Solar system marker ("You are here") - stays at origin since that's where the solar system is */}
-      {showYouAreHere && (
+      {showYouAreHereMarker && (
         <group ref={markerGroupRef} position={[0, 0, 0]}>
           {/* White star point that matches the galaxy stars style */}
           <points>
