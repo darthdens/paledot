@@ -156,17 +156,7 @@ export const CosmosExplorer = () => {
 
             {/* Milky Way Galaxy - visible at larger scales */}
             {showMilkyWay && (
-              <>
-                <MilkyWayGalaxy visualScale={UNIFIED_SCALE} showYouAreHere={true} />
-                {/* Trail showing solar system's orbit around the galaxy */}
-                <OrbitalTrail
-                  objectId="sun"
-                  color="#00ff44"
-                  enabled={showTrails}
-                  maxPoints={300}
-                  opacity={0.5}
-                />
-              </>
+              <MilkyWayGalaxy visualScale={UNIFIED_SCALE} showYouAreHere={true} />
             )}
             
             {/* Sun's light - moves with the solar system */}
@@ -267,6 +257,17 @@ export const CosmosExplorer = () => {
               );
             })}
           </GalaxyRotator>
+          
+          {/* Galaxy orbit trail - outside GalaxyRotator to show actual orbital path */}
+          {showMilkyWay && (
+            <OrbitalTrail
+              objectId="sun"
+              color="#00ff44"
+              enabled={showTrails}
+              maxPoints={500}
+              opacity={0.6}
+            />
+          )}
           
           {/* Performance stats */}
           <PerformanceHUD />
