@@ -84,12 +84,13 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
   
   const gs = UNITS.KM_PER_LY * visualScale;
 
-  // Position of the Solar System within the Milky Way (in scene units)
-  const solarSystemPos = useMemo<[number, number, number]>(
+  // Offset to position the galaxy so the solar system (Sun) stays at scene origin (0,0,0)
+  // The galaxy center is displaced by the Sun's distance from galactic center
+  const galaxyOffset = useMemo<[number, number, number]>(
     () => [
-      Math.cos(MILKY_WAY.sunAngle) * MILKY_WAY.sunDistance * gs,
+      -Math.cos(MILKY_WAY.sunAngle) * MILKY_WAY.sunDistance * gs,
       0,
-      Math.sin(MILKY_WAY.sunAngle) * MILKY_WAY.sunDistance * gs,
+      -Math.sin(MILKY_WAY.sunAngle) * MILKY_WAY.sunDistance * gs,
     ],
     [gs]
   );
@@ -427,8 +428,8 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
   
   return (
     <>
-      {/* Rotating galaxy group - stars and glow rotate */}
-      <group ref={rotatingGroupRef}>
+      {/* Rotating galaxy group - offset so the solar system stays at origin */}
+      <group ref={rotatingGroupRef} position={galaxyOffset}>
         <points geometry={coreGeo}>
           <pointsMaterial
             size={gs * 100}
@@ -501,9 +502,9 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
         </sprite>
       </group>
 
-      {/* Solar system marker ("You are here") */}
+      {/* Solar system marker ("You are here") - stays at origin since that's where the solar system is */}
       {showYouAreHere && (
-        <group ref={markerGroupRef} position={solarSystemPos}>
+        <group ref={markerGroupRef} position={[0, 0, 0]}>
           {/* White star point that matches the galaxy stars style */}
           <points>
             <bufferGeometry>
