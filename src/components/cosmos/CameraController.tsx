@@ -5,6 +5,10 @@ import { useCosmosStore } from './store/useCosmosStore';
 
 const UNIFIED_SCALE = 0.001;
 
+// Helper to check if we're at galaxy scale
+const isGalaxyScale = (scale: string) =>
+  scale === 'stellar' || scale === 'milkyWay' || scale === 'localGroup' || scale === 'universe';
+
 export const CameraController = () => {
   const { camera, controls } = useThree();
   const selectedObject = useCosmosStore((state) => state.selectedObject);
@@ -31,6 +35,28 @@ export const CameraController = () => {
   const smoothedTarget = useRef(new THREE.Vector3());
   const tmpTarget = useRef(new THREE.Vector3());
   const tmpDelta = useRef(new THREE.Vector3());
+
+  // Track previous scale to detect transitions
+  const prevScaleRef = useRef(currentScale);
+  // Store the selection before entering galaxy scale
+  const savedSelectionRef = useRef<typeof selectedObject>(null);
+
+  // Handle scale transitions - when entering galaxy scale, save selection and re-center
+  useEffect(() => {
+    const wasGalaxy = isGalaxyScale(prevScaleRef.current);
+    const nowGalaxy = isGalaxyScale(currentScale);
+
+    if (!wasGalaxy && nowGalaxy) {
+      // Entering galaxy scale - save current selection
+      savedSelectionRef.current = selectedObject;
+    } else if (wasGalaxy && !nowGalaxy && savedSelectionRef.current) {
+      // Leaving galaxy scale - restore previous selection
+      useCosmosStore.getState().setSelectedObject(savedSelectionRef.current);
+      savedSelectionRef.current = null;
+    }
+
+    prevScaleRef.current = currentScale;
+  }, [currentScale, selectedObject]);
 
   // Handle tour camera target changes
   useEffect(() => {
@@ -144,6 +170,9 @@ export const CameraController = () => {
     const orbitControls = controls as any;
     if (!orbitControls.target) return;
 
+    // Determine what we should be following
+    const atGalaxyScale = isGalaxyScale(currentScale);
+
     if (isAnimating.current) {
       // Slower animation speed for tour (more cinematic), faster for object selection
       const animSpeed = isTourAnimation.current ? 0.4 : 1.2;
@@ -173,31 +202,28 @@ export const CameraController = () => {
       return;
     }
 
-    // After fly-to: continuously follow the selected object (keep it centered)
+    // After fly-to: continuously follow
     // Don't follow during tour - let the user see the full scene
-    if (selectedObject && isFollowing && !isTouring) {
-      // At galaxy scales, always follow the solar system marker (our reference star),
-      // otherwise the camera can end up following a tiny planet position and feel "lost".
-      const followId =
-        currentScale === 'stellar' ||
-        currentScale === 'milkyWay' ||
-        currentScale === 'localGroup' ||
-        currentScale === 'universe'
-          ? 'solar-system-marker'
-          : selectedObject.id;
+    if (isFollowing && !isTouring) {
+      // At galaxy scales, ALWAYS follow solar-system-marker to keep our star centered
+      // At smaller scales, follow the selected object
+      const followId = atGalaxyScale ? 'solar-system-marker' : selectedObject?.id;
 
-      const livePos = useCosmosStore.getState().objectWorldPositions[followId];
+      if (followId) {
+        const livePos = useCosmosStore.getState().objectWorldPositions[followId];
 
-      if (livePos) {
-        const currentTarget = orbitControls.target as THREE.Vector3;
+        if (livePos) {
+          const currentTarget = orbitControls.target as THREE.Vector3;
 
-        tmpTarget.current.set(livePos[0], livePos[1], livePos[2]);
-        tmpDelta.current.subVectors(tmpTarget.current, currentTarget);
+          tmpTarget.current.set(livePos[0], livePos[1], livePos[2]);
+          tmpDelta.current.subVectors(tmpTarget.current, currentTarget);
 
-        currentTarget.copy(tmpTarget.current);
-        camera.position.add(tmpDelta.current);
+          // Move both target and camera by the delta to keep object centered
+          currentTarget.copy(tmpTarget.current);
+          camera.position.add(tmpDelta.current);
 
-        orbitControls.update();
+          orbitControls.update();
+        }
       }
     }
   });

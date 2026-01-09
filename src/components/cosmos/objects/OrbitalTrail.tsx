@@ -111,7 +111,8 @@ export const OrbitalTrail = ({
   }, [geometry, material, glowLine]);
 
   useFrame(() => {
-    if (!enabled) return;
+    // Always record positions (so trail doesn't reset on visibility toggle)
+    // Only skip if time is paused
     if (timeSpeed === 0) return;
 
     const worldPos = useCosmosStore.getState().objectWorldPositions[objectId];
