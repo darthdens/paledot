@@ -344,38 +344,8 @@ export const AndromedaGalaxy = ({ visualScale }: AndromedaGalaxyProps) => {
     <group ref={groupRef} position={andromedaPosition}>
       {/* Apply 77° inclination - tilt around X axis */}
       <group rotation={[ANDROMEDA.inclination, 0.3, 0]}>
-        {/* Core bulge */}
-        <points geometry={coreGeo} frustumCulled={false}>
-          <pointsMaterial
-            size={gs * 90}
-            map={dotTexture}
-            vertexColors
-            sizeAttenuation
-            transparent
-            opacity={0.95}
-            blending={THREE.AdditiveBlending}
-            depthWrite={false}
-            depthTest={false}
-          />
-        </points>
-
-        {/* Main spiral arms */}
-        <points geometry={starsGeo} frustumCulled={false}>
-          <pointsMaterial
-            size={gs * 55}
-            map={dotTexture}
-            vertexColors
-            sizeAttenuation
-            transparent
-            opacity={0.85}
-            blending={THREE.AdditiveBlending}
-            depthWrite={false}
-            depthTest={false}
-          />
-        </points>
-
-        {/* Halo stars */}
-        <points geometry={haloGeo} frustumCulled={false}>
+        {/* Halo stars - render first (back) */}
+        <points geometry={haloGeo} frustumCulled={false} renderOrder={1}>
           <pointsMaterial
             size={gs * 40}
             map={dotTexture}
@@ -389,8 +359,38 @@ export const AndromedaGalaxy = ({ visualScale }: AndromedaGalaxyProps) => {
           />
         </points>
 
-        {/* Center glow (billboard) */}
-        <sprite renderOrder={10} frustumCulled={false} scale={[diskR * 2.4, diskR * 2.4, 1]}>
+        {/* Main spiral arms */}
+        <points geometry={starsGeo} frustumCulled={false} renderOrder={2}>
+          <pointsMaterial
+            size={gs * 55}
+            map={dotTexture}
+            vertexColors
+            sizeAttenuation
+            transparent
+            opacity={0.85}
+            blending={THREE.AdditiveBlending}
+            depthWrite={false}
+            depthTest={false}
+          />
+        </points>
+
+        {/* Core bulge - render on top */}
+        <points geometry={coreGeo} frustumCulled={false} renderOrder={3}>
+          <pointsMaterial
+            size={gs * 90}
+            map={dotTexture}
+            vertexColors
+            sizeAttenuation
+            transparent
+            opacity={0.95}
+            blending={THREE.AdditiveBlending}
+            depthWrite={false}
+            depthTest={false}
+          />
+        </points>
+
+        {/* Center glow (billboard) - topmost */}
+        <sprite renderOrder={4} frustumCulled={false} scale={[diskR * 2.4, diskR * 2.4, 1]}>
           <spriteMaterial
             map={glowTexture}
             transparent
