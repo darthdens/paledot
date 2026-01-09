@@ -149,11 +149,11 @@ export const CosmosExplorer = () => {
           <ambientLight intensity={0.02} />
           <hemisphereLight args={['#ffffff', '#444466', 0.15]} />
           
-          {/* Star background - scaled down for new coordinate system */}
-          <Stars radius={1e8} depth={1e7} count={15000} factor={1e5} saturation={0} fade speed={0.3} />
-          
-          {/* Everything that should rotate with the galaxy */}
+          {/* Everything that should rotate together at galaxy scale */}
           <GalaxyRotator visualScale={UNIFIED_SCALE}>
+            {/* Star background - rotates with the rest so the view never "sticks" to it */}
+            <Stars radius={1e8} depth={1e7} count={15000} factor={1e5} saturation={0} fade speed={0.3} />
+
             {/* Milky Way Galaxy - visible at larger scales */}
             {showMilkyWay && (
               <MilkyWayGalaxy visualScale={UNIFIED_SCALE} showYouAreHere={true} />
