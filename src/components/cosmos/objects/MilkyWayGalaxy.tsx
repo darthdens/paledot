@@ -114,34 +114,38 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
       // Exponential distribution for radius fraction
       const u = Math.random();
       const t = -Math.log(1 - u * denom) / k;
-      const radius = t * maxRadius;
+
+      // Avoid stacking many points at x=z≈0 (creates a visible vertical "needle")
+      const innerRadius = maxRadius * 0.02;
+      const radius = innerRadius + t * (maxRadius - innerRadius);
+      const rt = radius / maxRadius;
 
       // Pick an arm
       const branchIndex = Math.floor(Math.random() * branches);
       const branchAngle = (branchIndex / branches) * Math.PI * 2;
 
       // Turn the arms as radius increases
-      const spinAngle = t * spinTurns * Math.PI * 2;
+      const spinAngle = rt * spinTurns * Math.PI * 2;
 
       // Arm thickness in radians
-      const armWidth = 0.06 + t * 0.12;
+      const armWidth = 0.06 + rt * 0.12;
       const armJitter = (Math.random() + Math.random() + Math.random() - 1.5) * armWidth;
 
       // Inter-arm fill
       const isInterArm = Math.random() < 0.35;
-      const interArmJitter = isInterArm ? (Math.random() - 0.5) * (0.8 + t * 0.6) : 0;
+      const interArmJitter = isInterArm ? (Math.random() - 0.5) * (0.8 + rt * 0.6) : 0;
 
       const angle = branchAngle + spinAngle + armJitter + interArmJitter;
 
       // Radial spread to make arms thicker horizontally (not just angular)
-      const radialSpread = (0.03 + t * 0.06) * maxRadius;
+      const radialSpread = (0.03 + rt * 0.06) * maxRadius;
       const radialJitter = (Math.random() + Math.random() - 1) * radialSpread;
       const finalRadius = radius + radialJitter;
 
       positions[i3] = Math.cos(angle) * finalRadius;
 
-      // Vertical thickness: keep the very center tighter to avoid a visible "needle"
-      const thickness = 0.012 + t * 0.03;
+      // Vertical thickness
+      const thickness = 0.012 + rt * 0.03;
       const yJitter = (Math.random() + Math.random() + Math.random() - 1.5) * maxRadius * thickness;
       positions[i3 + 1] = yJitter;
 
@@ -150,8 +154,8 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
       // Star colors with diversity: yellow center → yellow+orange → yellow+orange+purple → purple+blue → blue
       // More saturated colors (less white), with mixing in transition zones
       const rand = Math.random();
-      
-      if (t < 0.15) {
+
+      if (rt < 0.15) {
         // Center: mostly yellow, some orange - VIBRANT
         if (rand < 0.85) {
           // Yellow
@@ -160,7 +164,7 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
           // Orange
           color.setHSL(0.06 + Math.random() * 0.04, 1.0, 0.5 + Math.random() * 0.12);
         }
-      } else if (t < 0.3) {
+      } else if (rt < 0.3) {
         // Yellow and orange mix - VIBRANT
         if (rand < 0.5) {
           // Yellow
@@ -169,7 +173,7 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
           // Orange
           color.setHSL(0.05 + Math.random() * 0.04, 1.0, 0.48 + Math.random() * 0.1);
         }
-      } else if (t < 0.5) {
+      } else if (rt < 0.5) {
         // Yellow, orange, and purple mix - VIBRANT
         if (rand < 0.33) {
           // Yellow
@@ -181,7 +185,7 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
           // Purple
           color.setHSL(0.78 + Math.random() * 0.08, 0.9, 0.45 + Math.random() * 0.12);
         }
-      } else if (t < 0.7) {
+      } else if (rt < 0.7) {
         // Purple and blue mix - VIBRANT
         if (rand < 0.5) {
           // Purple
@@ -327,15 +331,16 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
       
       // Concentrated toward center (power of 2 for falloff)
       const t = Math.pow(Math.random(), 2);
-      const radius = t * maxRadius;
+      const innerRadius = maxRadius * 0.02;
+      const radius = innerRadius + t * (maxRadius - innerRadius);
       const angle = Math.random() * Math.PI * 2;
 
       positions[i3] = Math.cos(angle) * radius;
       positions[i3 + 2] = Math.sin(angle) * radius;
 
-      // Vertical position: avoid a bright "needle" at the very center by
-      // compressing height when radius is near 0.
-      const heightScale = 0.25 + t * 0.75;
+      // Vertical position: keep some thickness, but never stack points at x=z≈0
+      const rt = radius / maxRadius;
+      const heightScale = 0.25 + rt * 0.75;
       const y = (Math.random() * 2 - 1) * maxHeight * heightScale;
       positions[i3 + 1] = y;
 
