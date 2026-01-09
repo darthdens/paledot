@@ -603,9 +603,14 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
           </points>
           
           {/* Invisible click target for star point - large size for easy clicking at galaxy scale */}
-          <mesh onClick={handleSunClick} onPointerDown={handleSunClick}>
-            <sphereGeometry args={[baseMarkerSize * 25, 16, 16]} />
-            <meshBasicMaterial transparent opacity={0.001} depthWrite={false} />
+          <mesh 
+            onClick={handleSunClick} 
+            onPointerDown={handleSunClick}
+            onPointerOver={(e) => { e.stopPropagation(); document.body.style.cursor = 'pointer'; }}
+            onPointerOut={() => { document.body.style.cursor = 'auto'; }}
+          >
+            <sphereGeometry args={[baseMarkerSize * 40, 32, 32]} />
+            <meshBasicMaterial visible={false} />
           </mesh>
           
           {/* "We are here" label */}
@@ -712,9 +717,14 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
           </points>
           
           {/* Invisible click target for star point - large size for easy clicking at galaxy scale */}
-          <mesh onClick={handleProximaClick} onPointerDown={handleProximaClick}>
-            <sphereGeometry args={[baseMarkerSize * 25, 16, 16]} />
-            <meshBasicMaterial transparent opacity={0.001} depthWrite={false} />
+          <mesh 
+            onClick={handleProximaClick} 
+            onPointerDown={handleProximaClick}
+            onPointerOver={(e) => { e.stopPropagation(); document.body.style.cursor = 'pointer'; }}
+            onPointerOut={() => { document.body.style.cursor = 'auto'; }}
+          >
+            <sphereGeometry args={[baseMarkerSize * 40, 32, 32]} />
+            <meshBasicMaterial visible={false} />
           </mesh>
           
           {/* "Proxima Centauri" label */}
