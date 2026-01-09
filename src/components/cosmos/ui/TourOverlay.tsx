@@ -314,7 +314,7 @@ export const TourOverlay = () => {
   if (isCollapsed) {
     return (
       <div 
-        className={`${isFullscreen ? 'fixed' : 'absolute'} z-[10001] bg-black/90 backdrop-blur-md rounded-full border border-white/20 overflow-hidden cursor-pointer
+        className={`${isFullscreen ? 'fixed' : 'absolute'} z-[10001] bg-black/90 backdrop-blur-md rounded-lg border border-white/20 overflow-hidden cursor-pointer
           bottom-2 left-2 right-2 
           sm:bottom-auto sm:top-4 sm:left-4 sm:right-auto sm:w-auto`}
         style={isFullscreen ? { 
@@ -421,8 +421,11 @@ export const TourOverlay = () => {
         />
       </div>
       
-      {/* Header - compact on mobile */}
-      <div className="flex items-center justify-between px-3 py-2 sm:p-3 border-b border-white/10">
+      {/* Header - clickable to collapse */}
+      <div 
+        className="flex items-center justify-between px-3 py-2 sm:p-3 border-b border-white/10 cursor-pointer hover:bg-white/5 transition-colors"
+        onClick={toggleCollapse}
+      >
         <div className="flex items-center gap-2">
           <span className="text-white/50 text-[10px] sm:text-xs">
             {tourIndex + 1}/{totalStops}
@@ -432,19 +435,14 @@ export const TourOverlay = () => {
           </h2>
         </div>
         <div className="flex items-center gap-1">
+          <ChevronDown className="w-4 h-4 text-white/70" />
           <Button
             size="icon"
             variant="ghost"
-            onClick={toggleCollapse}
-            className="h-6 w-6 text-white/70 hover:text-white hover:bg-white/10"
-            title={t.collapse}
-          >
-            <ChevronDown className="w-4 h-4" />
-          </Button>
-          <Button
-            size="icon"
-            variant="ghost"
-            onClick={handleExit}
+            onClick={(e) => {
+              e.stopPropagation();
+              handleExit();
+            }}
             className="h-6 w-6 text-white/70 hover:text-white hover:bg-white/10"
           >
             <X className="w-4 h-4" />
