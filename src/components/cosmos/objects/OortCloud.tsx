@@ -22,9 +22,11 @@ export const OortCloud = ({ visualScale, parentStarId }: OortCloudProps) => {
   const hoverGlowRef = useRef<THREE.Mesh>(null);
   const currentOpacity = useRef(0);
   
-  // Only show this Oort Cloud when we're in its parent star's system
+  // Show this Oort Cloud when:
+  // 1. We're in its parent star's system (for detailed view)
+  // 2. We're NOT in any star system (galaxy/stellar scale - can see both)
   // If no parentStarId, always show (backward compat)
-  const shouldShow = !parentStarId || currentStarSystem === parentStarId;
+  const shouldShow = !parentStarId || currentStarSystem === parentStarId || currentStarSystem === null;
   
   // Get the parent star object for click handling
   const parentStar = useMemo(() => 
