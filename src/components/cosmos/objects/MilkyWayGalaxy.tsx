@@ -92,9 +92,14 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true, showSunOrbi
   
   const gs = UNITS.KM_PER_LY * visualScale;
   
-  // Keep the galaxy centered at the scene origin.
-  // The solar system will orbit around the galactic center just like the other stars.
-  const galaxyOffset = useMemo(() => new THREE.Vector3(0, 0, 0), []);
+  // Offset so the galactic center is NOT at the origin.
+  // The solar system starts at the origin; the galaxy is offset so the Sun is at its
+  // correct distance from the galactic center.
+  const galaxyOffset = useMemo(() => new THREE.Vector3(
+    -Math.cos(MILKY_WAY.sunAngle) * MILKY_WAY.sunDistance * gs,
+    0,
+    -Math.sin(MILKY_WAY.sunAngle) * MILKY_WAY.sunDistance * gs
+  ), [gs]);
   
   const dotTexture = useMemo(() => createDotTexture(), []);
   const glowTexture = useMemo(() => createGalaxyGlowTexture(), []);
