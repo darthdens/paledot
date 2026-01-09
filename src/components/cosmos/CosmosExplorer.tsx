@@ -14,6 +14,7 @@ import { MilkyWayGalaxy } from './objects/MilkyWayGalaxy';
 import { GalaxyRotator } from './objects/GalaxyRotator';
 import { WorldPositionTracker } from './objects/WorldPositionTracker';
 import { SolarSystemTracker } from './objects/SolarSystemTracker';
+import { GalacticOrbitRing } from './objects/GalacticOrbitRing';
 import { OortCloud } from './objects/OortCloud';
 import { CosmosUI } from './ui/CosmosUI';
 import { InfoCard } from './ui/InfoCard';
@@ -262,16 +263,10 @@ export const CosmosExplorer = () => {
             })}
           </GalaxyRotator>
           
-          {/* Galaxy orbit trail - kept mounted to avoid resetting when crossing scale thresholds */}
-          <OrbitalTrail
-            objectId="solar-system-marker"
-            color="#00ff88"
-            enabled={showTrails && showMilkyWay}
-            maxPoints={800}
-            opacity={0.9}
-            glow
-            minMovementSq={1}
-          />
+          {/* Static galactic orbit ring - shows the solar system's path around the galaxy */}
+          {showMilkyWay && showOrbits && (
+            <GalacticOrbitRing visualScale={UNIFIED_SCALE} />
+          )}
           
           {/* Performance stats */}
           <PerformanceHUD />
