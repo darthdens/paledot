@@ -12,6 +12,7 @@ const OBJECT_RADII: Record<string, number> = {
   sun: 696350,
   jupiter: 69911,
   saturn: 58232,
+  titan: 2575,
   uranus: 25362,
   neptune: 24622,
   pluto: 1188,
@@ -170,6 +171,23 @@ export const tourStops: TourStop[] = [
     duration: 7,
     // Consistent zoom: ~4x Saturn radius
     cameraPosition: [0, OBJECT_RADII.saturn * 0.5, OBJECT_RADII.saturn * ZOOM_MULTIPLIER],
+    lookAt: [0, 0, 0],
+    scaleLevel: 'solarSystem',
+  },
+  {
+    id: 'titan',
+    locationId: 'titan',
+    title: {
+      en: 'Titan - A Moon with an Atmosphere',
+      fr: 'Titan - Une Lune avec une Atmosphère',
+    },
+    narration: {
+      en: 'Titan is the only moon in our solar system with a dense atmosphere - even thicker than Earth\'s. Beneath its orange haze lie lakes and seas of liquid methane, making it one of the most Earth-like worlds we\'ve discovered.',
+      fr: 'Titan est la seule lune de notre système solaire avec une atmosphère dense - encore plus épaisse que celle de la Terre. Sous sa brume orange se trouvent des lacs et des mers de méthane liquide, en faisant l\'un des mondes les plus semblables à la Terre que nous ayons découverts.',
+    },
+    duration: 7,
+    // Consistent zoom: ~4x Titan radius
+    cameraPosition: [0, OBJECT_RADII.titan * 0.5, OBJECT_RADII.titan * ZOOM_MULTIPLIER],
     lookAt: [0, 0, 0],
     scaleLevel: 'solarSystem',
   },
