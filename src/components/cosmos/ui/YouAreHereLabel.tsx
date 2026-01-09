@@ -110,7 +110,7 @@ export const YouAreHereLabel = () => {
         >
           <div className="flex items-center gap-2 text-emerald-400">
             <MapPin className="w-4 h-4" />
-            <span className="text-sm font-semibold">{t.currentLocation}</span>
+            <span className="text-sm font-semibold">{locationInfo.title}</span>
           </div>
           {isMinimized ? (
             <ChevronDown className="w-4 h-4 text-white/60" />
@@ -121,7 +121,6 @@ export const YouAreHereLabel = () => {
         
         {!isMinimized && (
           <div className="px-3 pb-3 space-y-1 border-t border-white/10 pt-2">
-            <p className="text-white font-medium">{locationInfo.title}</p>
             <p className="text-emerald-300/80 text-xs">{locationInfo.subtitle}</p>
             <div className="mt-2 space-y-0.5">
               {locationInfo.details.map((detail, index) => (
