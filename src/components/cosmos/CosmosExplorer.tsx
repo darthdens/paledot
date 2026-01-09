@@ -16,6 +16,7 @@ import { WorldPositionTracker } from './objects/WorldPositionTracker';
 import { SolarSystemTracker } from './objects/SolarSystemTracker';
 import { GalacticOrbitRing } from './objects/GalacticOrbitRing';
 import { OortCloud } from './objects/OortCloud';
+import { Nebula } from './objects/Nebula';
 import { CosmosUI } from './ui/CosmosUI';
 import { InfoCard } from './ui/InfoCard';
 import { QuickJumpMenu } from './ui/QuickJumpMenu';
@@ -81,6 +82,7 @@ export const CosmosExplorer = () => {
   );
   const moons = celestialObjects.filter(obj => obj.type === 'moon');
   const stars = celestialObjects.filter(obj => obj.type === 'star' && obj.id !== 'sun');
+  const nebulae = celestialObjects.filter(obj => obj.type === 'nebula');
 
   // Unified scale factor - same for objects AND distances to maintain true proportions
   // Sun diameter: 1,392,700 km, Mercury orbit: 57.9M km (0.39 AU)
@@ -261,6 +263,15 @@ export const CosmosExplorer = () => {
                 </WorldPositionTracker>
               );
             })}
+            
+            {/* Nebulae - visible at stellar scale and above */}
+            {showMilkyWay && nebulae.map((nebula) => (
+              <Nebula
+                key={nebula.id}
+                nebula={nebula}
+                visualScale={UNIFIED_SCALE}
+              />
+            ))}
           </GalaxyRotator>
           
           {/* Static galactic orbit ring - shows the solar system's path around the galaxy */}

@@ -693,10 +693,11 @@ export const celestialObjects: CelestialObject[] = [
     id: 'orion-nebula',
     name: { en: 'Orion Nebula', fr: 'Nébuleuse d\'Orion' },
     type: 'nebula',
-    // Galactic coordinates: l=209°, b=-19°, d=1344 ly
-    // x = d*cos(b)*cos(l), y = d*sin(b), z = d*cos(b)*sin(l)
-    position: [-1112 * UNITS.KM_PER_LY, -438 * UNITS.KM_PER_LY, -617 * UNITS.KM_PER_LY],
-    size: 24 * UNITS.KM_PER_LY,
+    // Galactic coordinates: l=209°, b=-19°, d=1344 ly from Sun (which is at scene origin)
+    // Position in light-years (will be scaled by visualScale * KM_PER_LY in renderer)
+    // x = d*cos(b)*cos(l) ≈ -1112 ly, y = d*sin(b) ≈ -438 ly, z = d*cos(b)*sin(l) ≈ -617 ly
+    position: [-1112, -438, -617], // in light-years, not km
+    size: 24, // 24 light-years across
     color: '#ff69b4',
     distanceFromEarth: 1344,
     distanceUnit: 'ly',
