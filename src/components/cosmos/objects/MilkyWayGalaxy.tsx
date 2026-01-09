@@ -244,59 +244,74 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
     return geo;
   }, [gs]);
 
-  // Spiral arm tube geometries - continuous glowing arms
-  const spiralArmTubes = useMemo(() => {
+  // Spiral arm glow sprites - dense overlapping glows along each arm (blends into a continuous ribbon)
+  const spiralArmGlows = useMemo(() => {
     const { branches, spinTurns } = MILKY_WAY;
     const maxRadius = MILKY_WAY.diskRadius * gs;
-    const tubes: { geometry: THREE.TubeGeometry; color: string; opacity: number }[] = [];
 
-    // Create a tube for each arm with multiple color segments
+    const pointsPerArm = 90;
+    const glows: {
+      x: number;
+      z: number;
+      baseScale: number;
+      color: string;
+      innerOpacity: number;
+      outerOpacity: number;
+    }[] = [];
+
     for (let arm = 0; arm < branches; arm++) {
       const branchAngle = (arm / branches) * Math.PI * 2;
 
-      // Create curve points for this arm
-      const curvePoints: THREE.Vector3[] = [];
-      const segments = 80;
-      
-      for (let i = 0; i < segments; i++) {
-        const t = 0.08 + (i / (segments - 1)) * 0.9;
+      for (let i = 0; i < pointsPerArm; i++) {
+        const t = 0.08 + (i / (pointsPerArm - 1)) * 0.9;
         const radius = t * maxRadius;
         const spinAngle = t * spinTurns * Math.PI * 2;
         const angle = branchAngle + spinAngle;
 
-        const x = Math.cos(angle) * radius;
-        const z = Math.sin(angle) * radius;
-        curvePoints.push(new THREE.Vector3(x, 0, z));
+        // Arm thickness (wider inside, tighter outside)
+        const armWidth = maxRadius * (0.02 + (1 - t) * 0.035);
+        const offset = (Math.random() - 0.5) * armWidth;
+        const perp = angle + Math.PI / 2;
+
+        const x = Math.cos(angle) * radius + Math.cos(perp) * offset;
+        const z = Math.sin(angle) * radius + Math.sin(perp) * offset;
+
+        // Base sprite size (bigger in the inner arm, smaller outside)
+        const baseScale = maxRadius * (0.11 - t * 0.05);
+
+        // Color + opacity by radius (warm core → purple → blue)
+        let color: string;
+        let innerOpacity: number;
+        let outerOpacity: number;
+
+        if (t < 0.28) {
+          color = '#FFB35A';
+          innerOpacity = 0.55;
+          outerOpacity = 0.28;
+        } else if (t < 0.45) {
+          color = '#FF8A58';
+          innerOpacity = 0.5;
+          outerOpacity = 0.26;
+        } else if (t < 0.62) {
+          color = '#D070C0';
+          innerOpacity = 0.45;
+          outerOpacity = 0.24;
+        } else if (t < 0.8) {
+          color = '#6F93F0';
+          innerOpacity = 0.4;
+          outerOpacity = 0.22;
+        } else {
+          color = '#4E7DDF';
+          innerOpacity = 0.35;
+          outerOpacity = 0.2;
+        }
+
+        glows.push({ x, z, baseScale, color, innerOpacity, outerOpacity });
       }
-
-      // Create a smooth curve through the points
-      const curve = new THREE.CatmullRomCurve3(curvePoints);
-      
-      // Tube radius tapers from thick inner to thin outer
-      const tubeRadius = maxRadius * 0.025;
-      const geometry = new THREE.TubeGeometry(curve, 64, tubeRadius, 8, false);
-
-      tubes.push({
-        geometry,
-        color: '#FF9966',
-        opacity: 0.35
-      });
     }
 
-    return tubes;
+    return glows;
   }, [gs]);
-
-  // Create glow texture for arm tubes
-  const armGlowMaterial = useMemo(() => {
-    return new THREE.MeshBasicMaterial({
-      color: '#FFAA77',
-      transparent: true,
-      opacity: 0.4,
-      blending: THREE.AdditiveBlending,
-      side: THREE.DoubleSide,
-      depthWrite: false,
-    });
-  }, []);
   
   useFrame(({ clock, camera }) => {
     const t = clock.getElapsedTime();
@@ -373,54 +388,46 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
         />
       </points>
 
-      {/* Spiral arm glows - continuous tubes along each arm */}
-      {spiralArmTubes.map((tube, idx) => (
-        <mesh key={`arm-tube-${idx}`} geometry={tube.geometry} renderOrder={-30}>
-          <meshBasicMaterial
-            color={tube.color}
+      {/* Spiral arm glows - dense overlapping sprites to form continuous arms */}
+      {/* Outer soft pass */}
+      {spiralArmGlows.map((g, idx) => (
+        <sprite
+          key={`arm-glow-outer-${idx}`}
+          position={[g.x, 0, g.z]}
+          renderOrder={-31}
+          scale={[g.baseScale * 2.4, g.baseScale * 2.4, 1]}
+        >
+          <spriteMaterial
+            map={glowTexture}
+            color={g.color}
             transparent
-            opacity={tube.opacity}
+            opacity={g.outerOpacity}
             blending={THREE.AdditiveBlending}
             depthWrite={false}
-            side={THREE.DoubleSide}
+            depthTest={false}
           />
-        </mesh>
+        </sprite>
       ))}
-      
-      {/* Secondary wider glow layer for arm tubes */}
-      {spiralArmTubes.map((tube, idx) => {
-        // Create a wider version for outer glow
-        const { branches, spinTurns } = MILKY_WAY;
-        const maxRadius = MILKY_WAY.diskRadius * gs;
-        const branchAngle = (idx / branches) * Math.PI * 2;
-        
-        const curvePoints: THREE.Vector3[] = [];
-        const segments = 80;
-        
-        for (let i = 0; i < segments; i++) {
-          const t = 0.08 + (i / (segments - 1)) * 0.9;
-          const radius = t * maxRadius;
-          const spinAngle = t * spinTurns * Math.PI * 2;
-          const angle = branchAngle + spinAngle;
-          curvePoints.push(new THREE.Vector3(Math.cos(angle) * radius, 0, Math.sin(angle) * radius));
-        }
-        
-        const curve = new THREE.CatmullRomCurve3(curvePoints);
-        const outerGeo = new THREE.TubeGeometry(curve, 64, maxRadius * 0.06, 8, false);
-        
-        return (
-          <mesh key={`arm-outer-${idx}`} geometry={outerGeo} renderOrder={-31}>
-            <meshBasicMaterial
-              color="#9977DD"
-              transparent
-              opacity={0.18}
-              blending={THREE.AdditiveBlending}
-              depthWrite={false}
-              side={THREE.DoubleSide}
-            />
-          </mesh>
-        );
-      })}
+
+      {/* Inner brighter pass */}
+      {spiralArmGlows.map((g, idx) => (
+        <sprite
+          key={`arm-glow-inner-${idx}`}
+          position={[g.x, 0, g.z]}
+          renderOrder={-30}
+          scale={[g.baseScale * 1.25, g.baseScale * 1.25, 1]}
+        >
+          <spriteMaterial
+            map={glowTexture}
+            color={g.color}
+            transparent
+            opacity={g.innerOpacity}
+            blending={THREE.AdditiveBlending}
+            depthWrite={false}
+            depthTest={false}
+          />
+        </sprite>
+      ))}
 
       {/* Smooth gradient glow - white → yellow → orange → purple → blue → dark blue */}
       {/* Glow reaches to galaxy edges (diskR * 2 = galaxy edge) */}
