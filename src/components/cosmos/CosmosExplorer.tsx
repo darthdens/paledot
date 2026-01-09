@@ -5,6 +5,7 @@ import { OrbitControls, Stars, PerspectiveCamera } from '@react-three/drei';
 import { Suspense, useEffect, useRef } from 'react';
 import { ProximaSystem } from './objects/ProximaSystem';
 import { MilkyWayGalaxy } from './objects/MilkyWayGalaxy';
+import { AndromedaGalaxy } from './objects/AndromedaGalaxy';
 import { GalaxySkyGlow } from './objects/GalaxySkyGlow';
 import { GalaxyRotator } from './objects/GalaxyRotator';
 import { GalaxyFadeWrapper } from './GalaxyFadeWrapper';
@@ -27,7 +28,6 @@ import { StarSystemTracker } from './StarSystemTracker';
 import { celestialObjects } from './data/celestialObjects';
 import { UNITS } from './types';
 import { useCosmosStore } from './store/useCosmosStore';
-
 
 export const CosmosExplorer = () => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -165,6 +165,9 @@ export const CosmosExplorer = () => {
             {/* Proxima Centauri system - hidden when in Sun's system */}
             <ProximaSystem visualScale={UNIFIED_SCALE} />
             
+            {/* Andromeda Galaxy - 2.5 million light-years away */}
+            <AndromedaGalaxy visualScale={UNIFIED_SCALE} />
+
             {/* Nebulae and galactic orbit ring - fade with galaxy */}
             <GalaxyFadeWrapper>
               {nebulae.map((nebula) => (
