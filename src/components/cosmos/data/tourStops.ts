@@ -107,6 +107,23 @@ export const tourStops: TourStop[] = [
     scaleLevel: 'solarSystem',
   },
   {
+    id: 'asteroid-belt',
+    locationId: 'ceres',
+    title: {
+      en: 'The Asteroid Belt',
+      fr: 'La Ceinture d\'Astéroïdes',
+    },
+    narration: {
+      en: 'Between Mars and Jupiter lies the asteroid belt, home to millions of rocky remnants from the solar system\'s formation. Ceres, the largest object here, is a dwarf planet containing about a third of the belt\'s total mass.',
+      fr: 'Entre Mars et Jupiter se trouve la ceinture d\'astéroïdes, abritant des millions de vestiges rocheux de la formation du système solaire. Cérès, le plus gros objet ici, est une planète naine contenant environ un tiers de la masse totale de la ceinture.',
+    },
+    duration: 7,
+    // View of Ceres in the asteroid belt - using a wider view
+    cameraPosition: [0, 5000, 15000],
+    lookAt: [0, 0, 0],
+    scaleLevel: 'solarSystem',
+  },
+  {
     id: 'inner-planets',
     locationId: 'sun',
     title: {
