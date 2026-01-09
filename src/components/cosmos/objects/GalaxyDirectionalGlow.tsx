@@ -4,12 +4,14 @@ import * as THREE from "three";
 import { useCosmosStore } from "../store/useCosmosStore";
 
 /**
- * Screen-space glow that is *anchored to the actual galactic center direction*.
- * This avoids the "random" fullscreen glow look and keeps the same color palette
- * even when the center goes behind the camera (intensity just softens).
+ * Screen-space glow that represents the galactic center light.
+ * Uses a fullscreen shader quad that ALWAYS renders, shifting the glow center
+ * based on where the galactic center is (or was) on screen.
+ * When the center goes behind the camera, we keep the glow centered but maintain color.
  */
 export const GalaxyDirectionalGlow = () => {
   const meshRef = useRef<THREE.Mesh>(null);
+  const lastValidUV = useRef(new THREE.Vector2(0.5, 0.5));
 
   const { camera, size } = useThree();
   const currentScale = useCosmosStore((s) => s.currentScale);
@@ -22,7 +24,7 @@ export const GalaxyDirectionalGlow = () => {
     currentScale === "universe";
 
   const material = useMemo(() => {
-    const m = new THREE.ShaderMaterial({
+    return new THREE.ShaderMaterial({
       transparent: true,
       depthTest: false,
       depthWrite: false,
@@ -31,13 +33,13 @@ export const GalaxyDirectionalGlow = () => {
       uniforms: {
         uCenter: { value: new THREE.Vector2(0.5, 0.5) },
         uAspect: { value: 1 },
-        uIntensity: { value: 0 },
+        uBaseIntensity: { value: 0.35 }, // Always-visible floor
       },
       vertexShader: `
         varying vec2 vUv;
         void main() {
           vUv = uv;
-          gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+          gl_Position = vec4(position.xy * 2.0, 0.0, 1.0);
         }
       `,
       fragmentShader: `
@@ -46,7 +48,7 @@ export const GalaxyDirectionalGlow = () => {
         varying vec2 vUv;
         uniform vec2 uCenter;
         uniform float uAspect;
-        uniform float uIntensity;
+        uniform float uBaseIntensity;
 
         vec3 ramp(float t) {
           // t: 0 (center) -> 1 (edge)
@@ -71,87 +73,58 @@ export const GalaxyDirectionalGlow = () => {
           d.x *= uAspect;
           float r = length(d);
 
-          // Soft radius falloff (keep it subtle; intensity handled by uIntensity)
-          float alpha = smoothstep(0.95, 0.0, r);
+          // Very soft falloff to keep glow visible across entire screen
+          float alpha = 1.0 - smoothstep(0.0, 1.2, r);
 
-          // Slightly compress so the color transition happens closer to the center
-          float t = clamp(r * 1.15, 0.0, 1.0);
+          float t = clamp(r * 0.9, 0.0, 1.0);
           vec3 col = ramp(t);
 
-          // Keep a floor so you still see color when behind camera
-          float k = clamp(uIntensity, 0.0, 1.0);
-          float gain = mix(0.18, 0.75, k);
-
-          gl_FragColor = vec4(col * alpha * gain, alpha * gain);
+          gl_FragColor = vec4(col * alpha * uBaseIntensity, alpha * uBaseIntensity);
         }
       `,
     });
-
-    return m;
   }, []);
 
   useFrame(() => {
     const m = meshRef.current;
     if (!m) return;
 
-    // Scale plane to fill the viewport at distance d
-    const d = 1;
-    const perspective = camera as THREE.PerspectiveCamera;
-    const fovRad = (perspective.fov * Math.PI) / 180;
-    const height = 2 * Math.tan(fovRad / 2) * d;
-    const width = height * (size.width / size.height);
-    m.scale.set(width, height, 1);
-
-    // Place it in front of camera and match orientation
-    const forward = new THREE.Vector3();
-    camera.getWorldDirection(forward);
-    m.position.copy(camera.position).addScaledVector(forward, d);
-    m.quaternion.copy(camera.quaternion);
-
-    // Update uniforms based on true galactic center direction
-    const uniforms = material.uniforms as any;
+    const uniforms = material.uniforms as {
+      uCenter: { value: THREE.Vector2 };
+      uAspect: { value: number };
+      uBaseIntensity: { value: number };
+    };
     uniforms.uAspect.value = size.width / size.height;
 
     if (!centerPos) {
-      uniforms.uCenter.value.set(0.5, 0.5);
-      uniforms.uIntensity.value = 0;
+      // No center tracked yet – keep last known or center
+      uniforms.uCenter.value.copy(lastValidUV.current);
       return;
     }
 
     const centerWorld = new THREE.Vector3(centerPos[0], centerPos[1], centerPos[2]);
-    const toCenter = centerWorld.clone().sub(camera.position);
 
-    // Directional intensity: 1 when looking at center, 0 when opposite
-    const toCenterDir = toCenter.clone().normalize();
-    const lookDir = forward.clone().normalize();
-    const dot = lookDir.dot(toCenterDir); // [-1..1]
-    const facing = THREE.MathUtils.clamp((dot + 1) * 0.5, 0, 1);
-    uniforms.uIntensity.value = facing;
-
-    // Screen-space anchor:
-    // - if center is behind camera, keep glow centered (diffuse sky glow)
-    // - if in front, anchor glow towards projected position
-    // In camera space, forward is -Z. If z > 0 => behind.
+    // Check if galactic center is in front of or behind camera
     const centerCam = centerWorld.clone().applyMatrix4(camera.matrixWorldInverse);
-    if (centerCam.z > 0) {
+    const isBehind = centerCam.z > 0;
+
+    if (isBehind) {
+      // Keep glow centered when galaxy center is behind camera
+      // This gives the "ambient sky glow" effect
       uniforms.uCenter.value.set(0.5, 0.5);
-      return;
+    } else {
+      // Project to screen and anchor glow there
+      const ndc = centerWorld.clone().project(camera);
+      const u = THREE.MathUtils.clamp((ndc.x + 1) * 0.5, 0.0, 1.0);
+      const v = THREE.MathUtils.clamp((ndc.y + 1) * 0.5, 0.0, 1.0);
+      uniforms.uCenter.value.set(u, v);
+      lastValidUV.current.set(u, v);
     }
-
-    const ndc = centerWorld.clone().project(camera);
-    // Convert NDC [-1..1] -> UV [0..1]
-    const u = (ndc.x + 1) * 0.5;
-    const v = (ndc.y + 1) * 0.5;
-
-    // Clamp so the glow doesn't jump when the center is just off-screen
-    uniforms.uCenter.value.set(
-      THREE.MathUtils.clamp(u, 0.0, 1.0),
-      THREE.MathUtils.clamp(v, 0.0, 1.0)
-    );
   });
 
   if (!visible) return null;
 
+  // Fullscreen quad using clip-space coordinates (-1 to 1)
   return (
     <mesh ref={meshRef} frustumCulled={false} renderOrder={-100}>
       <planeGeometry args={[1, 1]} />
@@ -159,3 +132,4 @@ export const GalaxyDirectionalGlow = () => {
     </mesh>
   );
 };
+
