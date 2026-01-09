@@ -610,7 +610,7 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
             onPointerOut={() => { document.body.style.cursor = 'auto'; }}
           >
             <sphereGeometry args={[baseMarkerSize * 40, 32, 32]} />
-            <meshBasicMaterial visible={false} />
+            <meshBasicMaterial transparent opacity={0} depthWrite={false} />
           </mesh>
           
           {/* "We are here" label */}
@@ -724,7 +724,7 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
             onPointerOut={() => { document.body.style.cursor = 'auto'; }}
           >
             <sphereGeometry args={[baseMarkerSize * 40, 32, 32]} />
-            <meshBasicMaterial visible={false} />
+            <meshBasicMaterial transparent opacity={0} depthWrite={false} />
           </mesh>
           
           {/* "Proxima Centauri" label */}
