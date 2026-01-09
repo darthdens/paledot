@@ -272,12 +272,12 @@ export const CosmosExplorer = () => {
                 visualScale={UNIFIED_SCALE}
               />
             ))}
+            
+            {/* Galactic orbit ring - inside rotator so it rotates with everything */}
+            {showMilkyWay && showOrbits && (
+              <GalacticOrbitRing visualScale={UNIFIED_SCALE} />
+            )}
           </GalaxyRotator>
-          
-          {/* Static galactic orbit ring - shows the solar system's path around the galaxy */}
-          {showMilkyWay && showOrbits && (
-            <GalacticOrbitRing visualScale={UNIFIED_SCALE} />
-          )}
           
           {/* Performance stats */}
           <PerformanceHUD />
