@@ -287,9 +287,8 @@ export const tourStops: TourStop[] = [
       fr: 'À seulement 4,24 années-lumière, Proxima du Centaure est l\'étoile la plus proche de notre Soleil. Cette naine rouge abrite au moins deux planètes, dont Proxima b, qui orbite dans la zone habitable où l\'eau liquide pourrait exister.',
     },
     duration: 8,
-    // Much wider view to see Proxima Centauri's star system with potential planets
-    // Use 50 million km offset (similar to Mercury-Sun distance) for a system overview
-    cameraPosition: [0, 20000000, 60000000],
+    // Close view of Proxima Centauri - same as quick jump, just the star
+    cameraPosition: [0, 200000, 600000],
     lookAt: [0, 0, 0],
     scaleLevel: 'stellar',
   },
