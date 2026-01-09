@@ -244,12 +244,13 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
     return geo;
   }, [gs]);
 
-  // Spiral arm glow sprites - dense overlapping glows along each arm (blends into a continuous ribbon)
+  // Spiral arm glow sprites - very dense overlapping glows along each arm (blends into a continuous ribbon)
   const spiralArmGlows = useMemo(() => {
     const { branches, spinTurns } = MILKY_WAY;
     const maxRadius = MILKY_WAY.diskRadius * gs;
 
-    const pointsPerArm = 90;
+    // Much denser - 180 points per arm for seamless overlap
+    const pointsPerArm = 180;
     const glows: {
       x: number;
       z: number;
@@ -269,41 +270,41 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
         const angle = branchAngle + spinAngle;
 
         // Arm thickness (wider inside, tighter outside)
-        const armWidth = maxRadius * (0.02 + (1 - t) * 0.035);
+        const armWidth = maxRadius * (0.015 + (1 - t) * 0.025);
         const offset = (Math.random() - 0.5) * armWidth;
         const perp = angle + Math.PI / 2;
 
         const x = Math.cos(angle) * radius + Math.cos(perp) * offset;
         const z = Math.sin(angle) * radius + Math.sin(perp) * offset;
 
-        // Base sprite size (bigger in the inner arm, smaller outside)
-        const baseScale = maxRadius * (0.11 - t * 0.05);
+        // Larger base sprite size for more overlap
+        const baseScale = maxRadius * (0.14 - t * 0.06);
 
-        // Color + opacity by radius (warm core → purple → blue)
+        // Color + REDUCED opacity for subtler glow
         let color: string;
         let innerOpacity: number;
         let outerOpacity: number;
 
         if (t < 0.28) {
           color = '#FFB35A';
-          innerOpacity = 0.55;
-          outerOpacity = 0.28;
+          innerOpacity = 0.28;
+          outerOpacity = 0.12;
         } else if (t < 0.45) {
           color = '#FF8A58';
-          innerOpacity = 0.5;
-          outerOpacity = 0.26;
+          innerOpacity = 0.25;
+          outerOpacity = 0.11;
         } else if (t < 0.62) {
           color = '#D070C0';
-          innerOpacity = 0.45;
-          outerOpacity = 0.24;
+          innerOpacity = 0.22;
+          outerOpacity = 0.10;
         } else if (t < 0.8) {
           color = '#6F93F0';
-          innerOpacity = 0.4;
-          outerOpacity = 0.22;
+          innerOpacity = 0.20;
+          outerOpacity = 0.09;
         } else {
           color = '#4E7DDF';
-          innerOpacity = 0.35;
-          outerOpacity = 0.2;
+          innerOpacity = 0.18;
+          outerOpacity = 0.08;
         }
 
         glows.push({ x, z, baseScale, color, innerOpacity, outerOpacity });
