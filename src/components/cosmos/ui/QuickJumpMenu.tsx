@@ -25,9 +25,9 @@ const EXPANDABLE_CATEGORIES = ['solarSystem', 'stars', 'nebulae', 'galaxies'];
 // Specific objects that are implemented per category (empty array = all implemented)
 const IMPLEMENTED_OBJECTS: Record<string, string[]> = {
   solarSystem: [], // empty means all are implemented
-  stars: ['sun'],
-  nebulae: ['orion-nebula'],
-  galaxies: ['milky-way-center'],
+  stars: ['sun', 'alpha-centauri', 'proxima-centauri', 'sirius', 'betelgeuse', 'polaris'],
+  nebulae: ['orion-nebula', 'crab-nebula', 'eagle-nebula', 'ring-nebula'],
+  galaxies: ['milky-way-center', 'andromeda', 'triangulum', 'whirlpool', 'sombrero'],
 };
 
 export const QuickJumpMenu = () => {
