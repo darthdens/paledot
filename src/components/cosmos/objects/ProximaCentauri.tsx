@@ -55,12 +55,13 @@ export const ProximaCentauri = ({ visualScale = 0.001 }: ProximaCentauriProps) =
   // Scale factor for light-year based coordinates (matching Nebula and MilkyWayGalaxy)
   const gs = UNITS.KM_PER_LY * visualScale;
   
-  // Position: 4.24 light years away (position in light-years, scaled to scene units)
-  // Memoized to prevent recalculation on every render
+  // Position using galactic coordinates like Orion Nebula
+  // Galactic coords: l=313.54°, b=-1.93°, d=4.24 ly
+  // x = d*cos(b)*cos(l) ≈ 2.90 ly, y = d*sin(b) ≈ -0.14 ly, z = d*cos(b)*sin(l) ≈ -3.08 ly
   const position = useMemo<[number, number, number]>(() => [
-    4.24 * gs,
-    0.5 * gs,
-    0
+    2.90 * gs,
+    -0.14 * gs,
+    -3.08 * gs
   ], [gs]);
 
   // Throttle world position updates to reduce state churn
