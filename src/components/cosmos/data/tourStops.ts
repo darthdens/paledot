@@ -70,8 +70,8 @@ export const tourStops: TourStop[] = [
       fr: 'Vénus, notre plus proche voisine planétaire, est souvent appelée la jumelle de la Terre en raison de sa taille similaire. Mais sous ses épais nuages se cache un monde infernal - avec des températures de surface de 465°C et une pression atmosphérique écrasante 90 fois supérieure à celle de la Terre.',
     },
     duration: 7,
-    // Consistent zoom: ~4x Venus radius
-    cameraPosition: [0, OBJECT_RADII.venus * 0.5, OBJECT_RADII.venus * ZOOM_MULTIPLIER],
+    // Venus radius is 6052 km - use larger offset for proper view
+    cameraPosition: [0, 15000, 45000],
     lookAt: [0, 0, 0],
     scaleLevel: 'solarSystem',
   },
@@ -87,8 +87,8 @@ export const tourStops: TourStop[] = [
       fr: 'Mercure, la plus petite planète, fait le tour du Soleil en seulement 88 jours. Sa surface est marquée par d\'innombrables cratères et connaît des variations de température extrêmes - de 430°C au soleil à -180°C dans l\'ombre.',
     },
     duration: 7,
-    // Consistent zoom: ~4x Mercury radius
-    cameraPosition: [0, OBJECT_RADII.mercury * 0.5, OBJECT_RADII.mercury * ZOOM_MULTIPLIER],
+    // Mercury radius is 2440 km - use larger offset for proper view
+    cameraPosition: [0, 8000, 25000],
     lookAt: [0, 0, 0],
     scaleLevel: 'solarSystem',
   },
