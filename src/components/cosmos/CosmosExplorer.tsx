@@ -31,6 +31,7 @@ import { ScaleBarUI } from './ui/ScaleBar';
 import { YouAreHereLabel } from './ui/YouAreHereLabel';
 import { CameraController } from './CameraController';
 import { ScaleTracker } from './ScaleTracker';
+import { StarSystemTracker } from './StarSystemTracker';
 import { celestialObjects } from './data/celestialObjects';
 import { UNITS } from './types';
 import { useCosmosStore } from './store/useCosmosStore';
@@ -48,10 +49,10 @@ export const CosmosExplorer = () => {
   const showOrbits = useCosmosStore(state => state.showOrbits);
   const showTrails = useCosmosStore(state => state.showTrails);
   const isFollowing = useCosmosStore(state => state.isFollowing);
-  const currentScale = useCosmosStore(state => state.currentScale);
+  const isInStarSystem = useCosmosStore(state => state.isInStarSystem);
   
-  // Show Milky Way only at stellar scale or larger (not visible in solar system view)
-  const showMilkyWay = currentScale === 'stellar' || currentScale === 'milkyWay' || currentScale === 'localGroup' || currentScale === 'universe';
+  // Hide galaxy when inside any star system (Sun or Proxima Centauri)
+  const showMilkyWay = !isInStarSystem;
   
   // Force cursor none on canvas - OrbitControls tries to set cursor styles
   useEffect(() => {
@@ -151,6 +152,9 @@ export const CosmosExplorer = () => {
           
           {/* Scale tracker - updates store with current scale level */}
           <ScaleTracker />
+          
+          {/* Star system tracker - detects when zoomed into any star system */}
+          <StarSystemTracker />
           
           {/* Lighting - ambient stays outside, Sun light goes inside rotator */}
           <ambientLight intensity={0.02} />
