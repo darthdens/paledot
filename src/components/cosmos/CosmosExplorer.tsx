@@ -4,7 +4,7 @@ import { OrbitControls, Stars, PerspectiveCamera } from '@react-three/drei';
 
 import { Suspense, useMemo, useEffect, useRef } from 'react';
 import { Sun } from './objects/Sun';
-import { ProximaCentauri } from './objects/ProximaCentauri';
+import { ProximaSystem } from './objects/ProximaSystem';
 import { TexturedPlanet } from './objects/TexturedPlanet';
 import { MoonOrbit } from './objects/MoonOrbit';
 import { OrbitalTrail } from './objects/OrbitalTrail';
@@ -270,8 +270,8 @@ export const CosmosExplorer = () => {
               );
             })}
             
-            {/* Proxima Centauri - closest star to the Sun */}
-            <ProximaCentauri visualScale={UNIFIED_SCALE} />
+            {/* Proxima Centauri system - tracked + nested (Oort Cloud) */}
+            <ProximaSystem visualScale={UNIFIED_SCALE} />
             
             {/* Nebulae - visible at stellar scale and above */}
             {showMilkyWay && nebulae.map((nebula) => (
