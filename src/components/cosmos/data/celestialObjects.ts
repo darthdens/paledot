@@ -783,38 +783,8 @@ export const celestialObjects: CelestialObject[] = [
     distanceUnit: 'Mly',
     category: 'galaxies',
     facts: {
-      en: ['Nearest major galaxy at 2.5M light-years', 'Will collide with Milky Way in 4.5B years', '~1 trillion stars, 77° inclination', 'Two satellite galaxies: M32 and M110'],
-      fr: ['Galaxie majeure la plus proche à 2,5M années-lumière', 'Collision avec la Voie Lactée dans 4,5 milliards d\'années', '~1 billion d\'étoiles, inclinaison de 77°', 'Deux galaxies satellites: M32 et M110'],
-    },
-  },
-  {
-    id: 'm32',
-    name: { en: 'M32 (Andromeda Satellite)', fr: 'M32 (Satellite d\'Andromède)' },
-    type: 'galaxy',
-    position: [2.537e6 * UNITS.KM_PER_LY * 0.7 - 22000 * UNITS.KM_PER_LY * 0.5, 2.537e6 * UNITS.KM_PER_LY * 0.15 - 22000 * UNITS.KM_PER_LY * 0.3, 2.537e6 * UNITS.KM_PER_LY * 0.7 + 22000 * UNITS.KM_PER_LY * 0.6],
-    size: 6500 * UNITS.KM_PER_LY,
-    color: '#ffcc80',
-    distanceFromEarth: 2.49,
-    distanceUnit: 'Mly',
-    category: 'galaxies',
-    facts: {
-      en: ['Compact elliptical satellite of Andromeda', 'Likely remnant core of a larger galaxy', 'Contains ~3 billion stars'],
-      fr: ['Satellite elliptique compact d\'Andromède', 'Probablement le noyau d\'une galaxie plus grande', 'Contient ~3 milliards d\'étoiles'],
-    },
-  },
-  {
-    id: 'm110',
-    name: { en: 'M110 (Andromeda Satellite)', fr: 'M110 (Satellite d\'Andromède)' },
-    type: 'galaxy',
-    position: [2.537e6 * UNITS.KM_PER_LY * 0.7 - 130000 * UNITS.KM_PER_LY * 0.4, 2.537e6 * UNITS.KM_PER_LY * 0.15 - 130000 * UNITS.KM_PER_LY * 0.2, 2.537e6 * UNITS.KM_PER_LY * 0.7 + 130000 * UNITS.KM_PER_LY * 0.85],
-    size: 17000 * UNITS.KM_PER_LY,
-    color: '#90caf9',
-    distanceFromEarth: 2.69,
-    distanceUnit: 'Mly',
-    category: 'galaxies',
-    facts: {
-      en: ['Dwarf elliptical satellite of Andromeda', 'Shows signs of recent star formation', 'Currently interacting with M31'],
-      fr: ['Satellite elliptique nain d\'Andromède', 'Montre des signes de formation stellaire récente', 'En interaction avec M31'],
+      en: ['Nearest major galaxy at 2.5M light-years', 'Will collide with Milky Way in 4.5B years', '~1 trillion stars, 77° inclination'],
+      fr: ['Galaxie majeure la plus proche à 2,5M années-lumière', 'Collision avec la Voie Lactée dans 4,5 milliards d\'années', '~1 billion d\'étoiles, inclinaison de 77°'],
     },
   },
   {
@@ -954,7 +924,7 @@ export const quickJumpCategories = [
   {
     id: 'galaxies',
     name: { en: 'Galaxies', fr: 'Galaxies' },
-    locations: ['milky-way-center', 'andromeda', 'm32', 'm110', 'triangulum', 'whirlpool', 'sombrero'],
+    locations: ['milky-way-center', 'andromeda', 'triangulum', 'whirlpool', 'sombrero'],
   },
   {
     id: 'deepSpace',
