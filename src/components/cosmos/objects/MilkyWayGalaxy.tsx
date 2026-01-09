@@ -100,6 +100,9 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
   
   // Hide "We are here" marker when zoomed out to local group or universe scale
   const showYouAreHereMarker = showYouAreHere && (currentScale === 'stellar' || currentScale === 'milkyWay');
+  
+  // Reduce glow opacity when zoomed out to local group (glow is too dominant at that scale)
+  const glowOpacity = currentScale === 'localGroup' || currentScale === 'universe' ? 0.25 : 1;
 
   const gs = UNITS.KM_PER_LY * visualScale;
 
@@ -565,12 +568,12 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
           />
         </points>
 
-        {/* Center glow (billboard) */}
-        <sprite renderOrder={10} frustumCulled={false} scale={[diskR * 2.2, diskR * 2.2, 1]}>
+        {/* Center glow (billboard) - reduced at local group scale */}
+        <sprite renderOrder={10} frustumCulled={false} scale={[diskR * 1.6, diskR * 1.6, 1]}>
           <spriteMaterial
             map={glowTexture}
             transparent
-            opacity={1}
+            opacity={glowOpacity}
             blending={THREE.AdditiveBlending}
             depthWrite={false}
             depthTest={false}
