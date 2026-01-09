@@ -12,6 +12,7 @@ import { TrojanAsteroids } from './objects/TrojanAsteroids';
 import { Comets } from './objects/Comet';
 import { MilkyWayGalaxy } from './objects/MilkyWayGalaxy';
 import { GalaxyRotator } from './objects/GalaxyRotator';
+import { WorldPositionTracker } from './objects/WorldPositionTracker';
 import { OortCloud } from './objects/OortCloud';
 import { CosmosUI } from './ui/CosmosUI';
 import { InfoCard } from './ui/InfoCard';
@@ -23,7 +24,6 @@ import { SizeComparison } from './ui/SizeComparison';
 import { ScaleBarUI } from './ui/ScaleBar';
 import { YouAreHereLabel } from './ui/YouAreHereLabel';
 import { CameraController } from './CameraController';
-import { ScaleTracker } from './ScaleTracker';
 import { celestialObjects } from './data/celestialObjects';
 import { UNITS } from './types';
 import { useCosmosStore } from './store/useCosmosStore';
@@ -244,11 +244,13 @@ export const CosmosExplorer = () => {
             ))}
             
             {/* Distant stars - tiny point-like spheres */}
-            {stars.map(star => (
-              <mesh key={star.id} position={star.position.map(p => p * UNIFIED_SCALE) as [number, number, number]}>
-                <sphereGeometry args={[200, 6, 6]} />
-                <meshBasicMaterial color={star.color} transparent opacity={0.5} />
-              </mesh>
+            {stars.map((star) => (
+              <WorldPositionTracker key={star.id} objectId={star.id} updateInterval={0.1}>
+                <mesh position={star.position.map((p) => p * UNIFIED_SCALE) as [number, number, number]}>
+                  <sphereGeometry args={[200, 6, 6]} />
+                  <meshBasicMaterial color={star.color} transparent opacity={0.5} />
+                </mesh>
+              </WorldPositionTracker>
             ))}
           </GalaxyRotator>
           
