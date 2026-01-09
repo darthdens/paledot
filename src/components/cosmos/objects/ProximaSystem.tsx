@@ -30,8 +30,10 @@ export const ProximaSystem = ({
   const proxima = getObjectById('proxima-centauri');
   if (!proxima) return null;
 
-  // Hide Proxima's internal details when we're in the Sun's system
+  // Hide Proxima's internal details (star, local stars background) when we're in the Sun's system
+  // But always show the Oort Cloud at galaxy scale for click targeting
   const isInSunSystem = currentStarSystem === 'sun';
+  const showFullDetails = !isInSunSystem;
   
   // Stars are stored in light-years in celestialObjects; convert to scene units.
   const gs = UNITS.KM_PER_LY * visualScale;
@@ -45,24 +47,26 @@ export const ProximaSystem = ({
     <WorldPositionTracker objectId={proxima.id} position={position} updateInterval={updateInterval}>
       {/* Local star system space (0,0,0) */}
       <group>
-        {/* Only show Proxima's local details when NOT in Sun's system */}
-        {!isInSunSystem && (
-          <>
-            {/* Local star background - same as solar system */}
-            <Stars 
-              radius={1e8} 
-              depth={1e7} 
-              count={8000} 
-              factor={1e5} 
-              saturation={0} 
-              fade 
-              speed={0.1} 
-            />
-            
-            <ProximaCentauri visualScale={visualScale} />
-            {showOortCloud && <OortCloud visualScale={visualScale} parentStarId="proxima-centauri" />}
-          </>
-        )}
+      {/* Only show Proxima's local details when NOT in Sun's system */}
+      {showFullDetails && (
+        <>
+          {/* Local star background - same as solar system */}
+          <Stars 
+            radius={1e8} 
+            depth={1e7} 
+            count={8000} 
+            factor={1e5} 
+            saturation={0} 
+            fade 
+            speed={0.1} 
+          />
+          
+          <ProximaCentauri visualScale={visualScale} />
+        </>
+      )}
+      
+      {/* Oort Cloud - always rendered, handles its own visibility for click targeting at galaxy scale */}
+      {showOortCloud && <OortCloud visualScale={visualScale} parentStarId="proxima-centauri" />}
       </group>
     </WorldPositionTracker>
   );

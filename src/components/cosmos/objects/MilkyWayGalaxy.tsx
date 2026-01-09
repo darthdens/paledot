@@ -602,9 +602,9 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
             />
           </points>
           
-          {/* Invisible click target for star point - opacity 0.001 so raycaster doesn't skip it */}
+          {/* Invisible click target for star point - large size for easy clicking at galaxy scale */}
           <mesh onClick={handleSunClick} onPointerDown={handleSunClick}>
-            <sphereGeometry args={[baseMarkerSize * 8, 8, 8]} />
+            <sphereGeometry args={[baseMarkerSize * 25, 16, 16]} />
             <meshBasicMaterial transparent opacity={0.001} depthWrite={false} />
           </mesh>
           
@@ -711,9 +711,9 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
             />
           </points>
           
-          {/* Invisible click target for star point - opacity 0.001 so raycaster doesn't skip it */}
+          {/* Invisible click target for star point - large size for easy clicking at galaxy scale */}
           <mesh onClick={handleProximaClick} onPointerDown={handleProximaClick}>
-            <sphereGeometry args={[baseMarkerSize * 8, 8, 8]} />
+            <sphereGeometry args={[baseMarkerSize * 25, 16, 16]} />
             <meshBasicMaterial transparent opacity={0.001} depthWrite={false} />
           </mesh>
           
