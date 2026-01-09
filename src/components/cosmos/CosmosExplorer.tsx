@@ -4,7 +4,6 @@ import { OrbitControls, Stars, PerspectiveCamera } from '@react-three/drei';
 
 import { Suspense, useMemo, useEffect, useRef } from 'react';
 import { Sun } from './objects/Sun';
-import { ProximaCentauri } from './objects/ProximaCentauri';
 import { TexturedPlanet } from './objects/TexturedPlanet';
 import { MoonOrbit } from './objects/MoonOrbit';
 import { OrbitalTrail } from './objects/OrbitalTrail';
@@ -84,7 +83,7 @@ export const CosmosExplorer = () => {
     obj.type === 'planet' || obj.type === 'dwarf-planet'
   );
   const moons = celestialObjects.filter(obj => obj.type === 'moon');
-  const stars = celestialObjects.filter(obj => obj.type === 'star' && obj.id !== 'sun' && obj.id !== 'proxima-centauri');
+  const stars = celestialObjects.filter(obj => obj.type === 'star' && obj.id !== 'sun');
   const nebulae = celestialObjects.filter(obj => obj.type === 'nebula');
 
   // Unified scale factor - same for objects AND distances to maintain true proportions
@@ -269,9 +268,6 @@ export const CosmosExplorer = () => {
                 </WorldPositionTracker>
               );
             })}
-            
-            {/* Proxima Centauri - nearest star with proper visuals (always rendered for navigation) */}
-            <ProximaCentauri visualScale={UNIFIED_SCALE} />
             
             {/* Nebulae - visible at stellar scale and above */}
             {showMilkyWay && nebulae.map((nebula) => (

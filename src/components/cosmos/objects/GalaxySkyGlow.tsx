@@ -37,9 +37,9 @@ export const GalaxySkyGlow = () => {
       uniforms: {
         uCenterDirView: { value: new THREE.Vector3(0, 0, -1) },
         uInvProjection: { value: new THREE.Matrix4() },
-        // Tuned to be clearly visible - bright ambient glow at galaxy scale
-        uBase: { value: 0.35 },
-        uPeak: { value: 0.85 },
+        // Tuned to be clearly visible but not overpowering.
+        uBase: { value: 0.18 },
+        uPeak: { value: 0.55 },
       },
       vertexShader: `
         varying vec2 vUv;

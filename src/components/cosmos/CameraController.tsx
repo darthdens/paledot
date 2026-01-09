@@ -103,41 +103,33 @@ export const CameraController = () => {
       startTarget.current.copy(orbitControls.target);
 
       // Desired distance based on visual size
-      let visualSize: number;
-      if (selectedObject.category === 'nebulae') {
-        // Nebula size is in light-years
-        visualSize = selectedObject.size * UNITS.KM_PER_LY * UNIFIED_SCALE;
-      } else {
-        // All objects use real km sizes with visualScale
-        visualSize = selectedObject.size * UNIFIED_SCALE;
-      }
+      // For nebulae (category 'nebulae'), size is in light-years, need larger distance
+      // For other objects, size is in km
+      let visualSize = selectedObject.size * UNIFIED_SCALE;
       
-      // Calculate fly-to distance based on object type
       if (selectedObject.category === 'nebulae') {
+        // Nebula size is in light-years - use a much larger viewing distance
+        visualSize = selectedObject.size * UNITS.KM_PER_LY * UNIFIED_SCALE;
         flyToDistance.current = Math.max(visualSize * 3, 1e9);
       } else {
         flyToDistance.current = Math.max(visualSize * 5, 50);
       }
 
       // Use live world position when available (for moving solar-system bodies)
-      // All positions are in km, scaled to scene units
-      let fallbackPos: [number, number, number];
-      
-      if (selectedObject.category === 'solarSystem' || selectedObject.category === 'stars') {
-        fallbackPos = [
-          selectedObject.position[0] * UNIFIED_SCALE,
-          selectedObject.position[1] * UNIFIED_SCALE,
-          selectedObject.position[2] * UNIFIED_SCALE,
-        ];
-      } else if (selectedObject.category === 'nebulae') {
-        fallbackPos = [
-          selectedObject.position[0] * UNITS.KM_PER_LY * UNIFIED_SCALE,
-          selectedObject.position[1] * UNITS.KM_PER_LY * UNIFIED_SCALE,
-          selectedObject.position[2] * UNITS.KM_PER_LY * UNIFIED_SCALE,
-        ];
-      } else {
-        fallbackPos = selectedObject.position as [number, number, number];
-      }
+      const fallbackPos: [number, number, number] =
+        selectedObject.category === 'solarSystem'
+          ? [
+              selectedObject.position[0] * UNIFIED_SCALE,
+              selectedObject.position[1] * UNIFIED_SCALE,
+              selectedObject.position[2] * UNIFIED_SCALE,
+            ]
+          : selectedObject.category === 'nebulae'
+            ? [
+                selectedObject.position[0] * UNITS.KM_PER_LY * UNIFIED_SCALE,
+                selectedObject.position[1] * UNITS.KM_PER_LY * UNIFIED_SCALE,
+                selectedObject.position[2] * UNITS.KM_PER_LY * UNIFIED_SCALE,
+              ]
+            : selectedObject.position;
 
       const targetPos = liveTargetPos ?? fallbackPos;
 
