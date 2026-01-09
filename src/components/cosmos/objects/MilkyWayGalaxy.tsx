@@ -603,7 +603,7 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
           </points>
           
           {/* Invisible click target for star point */}
-          <mesh onClick={handleSunClick}>
+          <mesh onClick={handleSunClick} onPointerDown={handleSunClick}>
             <sphereGeometry args={[baseMarkerSize * 8, 8, 8]} />
             <meshBasicMaterial transparent opacity={0} />
           </mesh>
@@ -630,12 +630,12 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
             </Html>
           )}
           
-          <mesh onClick={handleSunClick}>
+          <mesh onClick={handleSunClick} onPointerDown={handleSunClick}>
             <sphereGeometry args={[baseMarkerSize, 16, 16]} />
             <meshBasicMaterial color="#00ff44" />
           </mesh>
           
-          <mesh onClick={handleSunClick}>
+          <mesh onClick={handleSunClick} onPointerDown={handleSunClick}>
             <sphereGeometry args={[baseMarkerSize * 1.5, 16, 16]} />
             <meshBasicMaterial
               color="#00ff44"
@@ -645,7 +645,7 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
             />
           </mesh>
           
-          <mesh onClick={handleSunClick}>
+          <mesh onClick={handleSunClick} onPointerDown={handleSunClick}>
             <sphereGeometry args={[baseMarkerSize * 3, 16, 16]} />
             <meshBasicMaterial
               color="#00ff44"
@@ -712,7 +712,7 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
           </points>
           
           {/* Invisible click target for star point */}
-          <mesh onClick={handleProximaClick}>
+          <mesh onClick={handleProximaClick} onPointerDown={handleProximaClick}>
             <sphereGeometry args={[baseMarkerSize * 8, 8, 8]} />
             <meshBasicMaterial transparent opacity={0} />
           </mesh>
@@ -737,13 +737,13 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
           </Html>
           
           {/* Core sphere - red/orange for red dwarf */}
-          <mesh onClick={handleProximaClick}>
+          <mesh onClick={handleProximaClick} onPointerDown={handleProximaClick}>
             <sphereGeometry args={[baseMarkerSize * 0.7, 16, 16]} />
             <meshBasicMaterial color="#ff6b4a" />
           </mesh>
           
           {/* Inner glow */}
-          <mesh onClick={handleProximaClick}>
+          <mesh onClick={handleProximaClick} onPointerDown={handleProximaClick}>
             <sphereGeometry args={[baseMarkerSize * 1.2, 16, 16]} />
             <meshBasicMaterial
               color="#ff6b4a"
@@ -754,7 +754,7 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
           </mesh>
           
           {/* Outer glow */}
-          <mesh onClick={handleProximaClick}>
+          <mesh onClick={handleProximaClick} onPointerDown={handleProximaClick}>
             <sphereGeometry args={[baseMarkerSize * 2.5, 16, 16]} />
             <meshBasicMaterial
               color="#ff6b4a"
