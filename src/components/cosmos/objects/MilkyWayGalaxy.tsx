@@ -1,4 +1,4 @@
-import { useRef, useMemo, useCallback } from 'react';
+import { useRef, useMemo, useCallback, type MouseEvent as ReactMouseEvent } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { Html } from '@react-three/drei';
 import * as THREE from 'three';
@@ -104,23 +104,26 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
   const sunObject = useMemo(() => getObjectById('sun'), []);
   const proximaObject = useMemo(() => getObjectById('proxima-centauri'), []);
 
-  // Click handlers - using ThreeEvent type from R3F
+  // Click handlers
   const handleSunClick = useCallback((e: { stopPropagation: () => void }) => {
-    console.log('Sun marker clicked!', sunObject);
     e.stopPropagation();
-    if (sunObject) {
-      console.log('Setting selected object to Sun');
-      setSelectedObject(sunObject);
-    }
+    if (sunObject) setSelectedObject(sunObject);
   }, [sunObject, setSelectedObject]);
 
   const handleProximaClick = useCallback((e: { stopPropagation: () => void }) => {
-    console.log('Proxima marker clicked!', proximaObject);
     e.stopPropagation();
-    if (proximaObject) {
-      console.log('Setting selected object to Proxima');
-      setSelectedObject(proximaObject);
-    }
+    if (proximaObject) setSelectedObject(proximaObject);
+  }, [proximaObject, setSelectedObject]);
+
+  // Click handlers for HTML labels (DOM events)
+  const handleSunLabelClick = useCallback((e: ReactMouseEvent<HTMLDivElement>) => {
+    e.stopPropagation();
+    if (sunObject) setSelectedObject(sunObject);
+  }, [sunObject, setSelectedObject]);
+
+  const handleProximaLabelClick = useCallback((e: ReactMouseEvent<HTMLDivElement>) => {
+    e.stopPropagation();
+    if (proximaObject) setSelectedObject(proximaObject);
   }, [proximaObject, setSelectedObject]);
 
   // Offset to position the galaxy so the solar system (Sun) stays at scene origin (0,0,0)
@@ -608,9 +611,12 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
               occlude={false}
               // Keep this label beneath app modals/overlays (e.g., Help & Controls)
               zIndexRange={[0, 0]}
-              style={{ pointerEvents: 'none' }}
+              style={{ pointerEvents: 'auto' }}
             >
-              <div className="bg-black/80 backdrop-blur-sm px-3 py-1.5 rounded-lg border border-emerald-500/50 whitespace-nowrap shadow-lg">
+              <div
+                className="bg-black/80 backdrop-blur-sm px-3 py-1.5 rounded-lg border border-emerald-500/50 whitespace-nowrap shadow-lg cursor-pointer"
+                onClick={handleSunLabelClick}
+              >
                 <span className="text-emerald-400 text-sm font-semibold drop-shadow-md">
                   {language === 'fr' ? 'Nous sommes ici' : 'We are here'}
                 </span>
@@ -706,9 +712,12 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
             distanceFactor={baseMarkerSize * 50}
             occlude={false}
             zIndexRange={[0, 0]}
-            style={{ pointerEvents: 'none' }}
+            style={{ pointerEvents: 'auto' }}
           >
-            <div className="bg-black/80 backdrop-blur-sm px-3 py-1.5 rounded-lg border border-orange-500/50 whitespace-nowrap shadow-lg">
+            <div
+              className="bg-black/80 backdrop-blur-sm px-3 py-1.5 rounded-lg border border-orange-500/50 whitespace-nowrap shadow-lg cursor-pointer"
+              onClick={handleProximaLabelClick}
+            >
               <span className="text-orange-400 text-sm font-semibold drop-shadow-md">
                 {language === 'fr' ? 'Proxima du Centaure' : 'Proxima Centauri'}
               </span>
