@@ -544,7 +544,7 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true, showSunOrbi
               args={[new Float32Array(sunOrbitPoints.flatMap(p => [p.x, p.y, p.z])), 3]}
             />
           </bufferGeometry>
-          <lineBasicMaterial color="#00ff44" transparent opacity={0.25} />
+          <lineBasicMaterial color="#ffffff" transparent opacity={0.25} />
         </line>
       )}
       
@@ -559,13 +559,13 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true, showSunOrbi
         >
           <mesh>
             <sphereGeometry args={[baseMarkerSize, 16, 16]} />
-            <meshBasicMaterial color="#00ff44" />
+            <meshBasicMaterial color="#ffffff" />
           </mesh>
           
           <mesh>
             <sphereGeometry args={[baseMarkerSize * 1.5, 16, 16]} />
             <meshBasicMaterial
-              color="#00ff44"
+              color="#ffffff"
               transparent
               opacity={0.5}
               blending={THREE.AdditiveBlending}
@@ -575,7 +575,7 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true, showSunOrbi
           <mesh>
             <sphereGeometry args={[baseMarkerSize * 3, 16, 16]} />
             <meshBasicMaterial
-              color="#00ff44"
+              color="#ffffff"
               transparent
               opacity={0.2}
               blending={THREE.AdditiveBlending}
@@ -585,7 +585,7 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true, showSunOrbi
           <mesh ref={pulseRef} rotation={[Math.PI / 2, 0, 0]}>
             <ringGeometry args={[baseMarkerSize * 1.5, baseMarkerSize * 2.5, 32]} />
             <meshBasicMaterial
-              color="#00ff44"
+              color="#ffffff"
               transparent
               opacity={0.8}
               side={THREE.DoubleSide}
@@ -596,7 +596,7 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true, showSunOrbi
           <mesh ref={pulseRef2} rotation={[Math.PI / 2, 0, 0]}>
             <ringGeometry args={[baseMarkerSize * 1.5, baseMarkerSize * 2.5, 32]} />
             <meshBasicMaterial
-              color="#00ff44"
+              color="#ffffff"
               transparent
               opacity={0.8}
               side={THREE.DoubleSide}
