@@ -278,6 +278,23 @@ export const tourStops: TourStop[] = [
     scaleLevel: 'solarSystem',
   },
   {
+    id: 'oort-cloud',
+    locationId: 'sun',
+    title: {
+      en: 'The Oort Cloud',
+      fr: 'Le Nuage d\'Oort',
+    },
+    narration: {
+      en: 'At the outermost edge of our solar system lies the Oort Cloud, a theoretical shell of icy objects extending up to 100,000 AU from the Sun - nearly halfway to the nearest star. This is where long-period comets originate, taking millions of years to complete a single orbit.',
+      fr: 'À l\'extrémité de notre système solaire se trouve le nuage d\'Oort, une enveloppe théorique d\'objets glacés s\'étendant jusqu\'à 100 000 UA du Soleil - presque à mi-chemin de l\'étoile la plus proche. C\'est de là que proviennent les comètes à longue période, mettant des millions d\'années pour compléter une seule orbite.',
+    },
+    duration: 8,
+    // Very wide view to show the Oort Cloud scale
+    cameraPosition: [0, 500 * UNITS.KM_PER_AU, 800 * UNITS.KM_PER_AU],
+    lookAt: [0, 0, 0],
+    scaleLevel: 'solarSystem',
+  },
+  {
     id: 'milky-way',
     locationId: 'milky-way-center',
     title: {
