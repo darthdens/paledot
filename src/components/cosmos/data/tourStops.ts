@@ -132,8 +132,8 @@ export const tourStops: TourStop[] = [
       fr: 'La Nébuleuse d\'Orion est l\'une des nébuleuses les plus brillantes visibles à l\'œil nu. Située à 1 344 années-lumière, c\'est une pouponnière stellaire où de nouvelles étoiles naissent.',
     },
     duration: 8,
-    // Much closer to see the nebula details
-    cameraPosition: [0, 5 * UNITS.KM_PER_LY, 15 * UNITS.KM_PER_LY],
+    // Much closer to see the nebula details (offset from the nebula center)
+    cameraPosition: [0, 40 * UNITS.KM_PER_LY, 120 * UNITS.KM_PER_LY],
     lookAt: [0, 0, 0],
     scaleLevel: 'stellar',
   },
