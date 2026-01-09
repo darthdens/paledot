@@ -81,7 +81,10 @@ export const ProximaCentauri = ({ visualScale = 0.001 }: ProximaCentauriProps) =
     }
   }, -1);
 
-  const starSize = PROXIMA_DIAMETER * visualScale;
+  // Visual boost for visibility at stellar distances (similar to nebula approach)
+  // Real size is 214,550 km, but at 4.24 ly away it would be invisible
+  // Apply 500x boost to make it visible when flying to it
+  const starSize = PROXIMA_DIAMETER * visualScale * 500;
 
   const starObject = {
     id: 'proxima-centauri',

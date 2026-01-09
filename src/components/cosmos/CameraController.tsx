@@ -113,8 +113,10 @@ export const CameraController = () => {
         visualSize = selectedObject.size * UNITS.KM_PER_LY * UNIFIED_SCALE;
         flyToDistance.current = Math.max(visualSize * 3, 1e9);
       } else if (selectedObject.category === 'stars' && selectedObject.id !== 'sun') {
-        // Distant stars - size in km, position in km (already scaled in celestialObjects)
-        flyToDistance.current = Math.max(visualSize * 8, 5000);
+        // Distant stars have 500x visual boost applied in their component
+        // Use boosted size for camera distance calculation
+        const boostedSize = visualSize * 500;
+        flyToDistance.current = Math.max(boostedSize * 5, 50000);
       } else {
         flyToDistance.current = Math.max(visualSize * 5, 50);
       }
