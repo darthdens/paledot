@@ -472,7 +472,7 @@ export const CosmosUI = () => {
     <>
       {/* Welcome overlay for first visit */}
       {showControlHints && (
-        <div className="absolute inset-0 flex items-center justify-center bg-black/90 z-50 p-3">
+        <div className="absolute inset-0 flex items-center justify-center bg-black/90 z-[20000] p-3">
           <div className="text-center space-y-3 sm:space-y-5 max-w-sm sm:max-w-lg px-4">
             <h1 className="text-xl sm:text-3xl md:text-4xl font-bold text-white leading-tight">{t.welcome}</h1>
             <p className="text-sm sm:text-base text-white/70">{t.subtitle}</p>
