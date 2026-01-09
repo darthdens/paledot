@@ -89,20 +89,31 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
   const glowTexture = useMemo(() => createGalaxyGlowTexture(), []);
   
   // Generate ONLY stars - crisp dots with colors matching glow regions
+  // Density decreases with distance from center
   const starsGeo = useMemo(() => {
     const { branches, spinTurns } = MILKY_WAY;
     const maxRadius = MILKY_WAY.diskRadius * gs;
     const starCount = 280000;
 
-    const positions = new Float32Array(starCount * 3);
-    const colors = new Float32Array(starCount * 3);
+    const positions: number[] = [];
+    const colors: number[] = [];
     const color = new THREE.Color();
 
-    for (let i = 0; i < starCount; i++) {
-      const i3 = i * 3;
+    let generated = 0;
+    let attempts = 0;
+    const maxAttempts = starCount * 3; // Prevent infinite loop
 
-      // Radius - slightly center-heavy
-      const t = Math.pow(Math.random(), 0.55);
+    while (generated < starCount && attempts < maxAttempts) {
+      attempts++;
+
+      // Radius - uniform distribution initially
+      const t = Math.random();
+      
+      // Density falloff: probability of keeping star decreases with distance
+      // Dense center, sparse edges (exponential falloff)
+      const keepProbability = Math.exp(-t * 2.5) + 0.08;
+      if (Math.random() > keepProbability) continue;
+
       const radius = t * maxRadius;
 
       // Pick an arm
@@ -122,14 +133,16 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
 
       const angle = branchAngle + spinAngle + armJitter + interArmJitter;
 
-      positions[i3] = Math.cos(angle) * radius;
+      const x = Math.cos(angle) * radius;
 
       // Thicker vertical distribution
       const thickness = (0.045 * (1 - t) + 0.015);
       const yJitter = (Math.random() + Math.random() + Math.random() - 1.5) * maxRadius * thickness;
-      positions[i3 + 1] = yJitter;
+      const y = yJitter;
 
-      positions[i3 + 2] = Math.sin(angle) * radius;
+      const z = Math.sin(angle) * radius;
+
+      positions.push(x, y, z);
 
       // Color gradient matching glow regions: white center → yellow → orange → purple → blue → dark blue
       if (t < 0.05) {
@@ -155,14 +168,13 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
         color.setHSL(0.6 + Math.random() * 0.04, 0.75, 0.45 + Math.random() * 0.15);
       }
 
-      colors[i3] = color.r;
-      colors[i3 + 1] = color.g;
-      colors[i3 + 2] = color.b;
+      colors.push(color.r, color.g, color.b);
+      generated++;
     }
 
     const geo = new THREE.BufferGeometry();
-    geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-    geo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+    geo.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+    geo.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
     return geo;
   }, [gs]);
   
@@ -325,7 +337,7 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
       </points>
 
       {/* Single smooth gradient glow: yellow → orange → purple → blue → fade */}
-      <sprite renderOrder={-10} scale={[diskR * 5.5, diskR * 5.5, 1]}>
+      <sprite renderOrder={-10} scale={[diskR * 2.2, diskR * 2.2, 1]}>
         <spriteMaterial
           map={glowTexture}
           transparent
