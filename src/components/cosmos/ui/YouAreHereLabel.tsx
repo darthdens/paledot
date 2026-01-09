@@ -77,8 +77,11 @@ const translations = {
 export const YouAreHereLabel = () => {
   const { language } = useLanguage();
   const t = translations[language];
-  const currentScale = useCosmosStore(state => state.currentScale);
+  const currentScale: ScaleLevel = useCosmosStore((state) => state.currentScale as ScaleLevel);
   const [isMinimized, setIsMinimized] = useState(false);
+
+  // Hide this panel when outside the Milky Way view
+  if (currentScale === 'localGroup' || currentScale === 'universe') return null;
   
   // Get location info based on current scale
   const getLocationInfo = () => {

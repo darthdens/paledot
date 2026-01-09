@@ -122,9 +122,9 @@ export const CameraController = () => {
       }
 
       // Use live world position when available (for moving solar-system bodies and stars)
-      // Positions in celestialObjects: solarSystem in km, stars/nebulae in light-years
+      // Positions in celestialObjects: solarSystem in km, stars/nebulae in light-years, galaxies in km
       const fallbackPos: [number, number, number] =
-        selectedObject.category === 'solarSystem'
+        selectedObject.category === 'solarSystem' || selectedObject.category === 'galaxies'
           ? [
               selectedObject.position[0] * UNIFIED_SCALE,
               selectedObject.position[1] * UNIFIED_SCALE,
@@ -198,7 +198,11 @@ export const CameraController = () => {
       const eased = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
 
       // For non-tour animations, track moving objects during animation
-      if (!isTourAnimation.current && selectedObject) {
+      if (
+        !isTourAnimation.current &&
+        selectedObject &&
+        (selectedObject.category === 'solarSystem' || selectedObject.category === 'stars')
+      ) {
         const livePos = useCosmosStore.getState().objectWorldPositions[selectedObject.id];
         if (livePos) {
           endTarget.current.set(livePos[0], livePos[1], livePos[2]);
@@ -213,8 +217,13 @@ export const CameraController = () => {
     }
 
     // After fly-to: continuously follow the selected object (keep it centered)
-    // Don't follow during tour - let the user see the full scene
-    if (selectedObject && isFollowing && !isTouring) {
+    // Only follow objects that actually move (solar system bodies + stars)
+    if (
+      selectedObject &&
+      isFollowing &&
+      !isTouring &&
+      (selectedObject.category === 'solarSystem' || selectedObject.category === 'stars')
+    ) {
       const livePos = useCosmosStore.getState().objectWorldPositions[selectedObject.id];
       if (livePos) {
         const currentTarget = orbitControls.target as THREE.Vector3;
