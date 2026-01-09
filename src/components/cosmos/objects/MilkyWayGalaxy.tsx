@@ -637,15 +637,15 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
           
           <mesh onClick={handleYouAreHereClick} onPointerDown={handleYouAreHereClick}>
             <sphereGeometry args={[baseMarkerSize, 16, 16]} />
-            <meshBasicMaterial color="#00ff44" />
+            <meshBasicMaterial color="#00ff88" />
           </mesh>
           
           <mesh onClick={handleYouAreHereClick} onPointerDown={handleYouAreHereClick}>
             <sphereGeometry args={[baseMarkerSize * 1.5, 16, 16]} />
             <meshBasicMaterial
-              color="#00ff44"
+              color="#00ff88"
               transparent
-              opacity={0.5}
+              opacity={0.7}
               blending={THREE.AdditiveBlending}
             />
           </mesh>
@@ -653,9 +653,9 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
           <mesh onClick={handleYouAreHereClick} onPointerDown={handleYouAreHereClick}>
             <sphereGeometry args={[baseMarkerSize * 3, 16, 16]} />
             <meshBasicMaterial
-              color="#00ff44"
+              color="#00ff88"
               transparent
-              opacity={0.2}
+              opacity={0.4}
               blending={THREE.AdditiveBlending}
             />
           </mesh>
@@ -663,7 +663,7 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
           <mesh ref={pulseRef} rotation={[Math.PI / 2, 0, 0]} onClick={handleYouAreHereClick} onPointerDown={handleYouAreHereClick}>
             <ringGeometry args={[baseMarkerSize * 1.5, baseMarkerSize * 2.5, 32]} />
             <meshBasicMaterial
-              color="#00ff44"
+              color="#00ff88"
               transparent
               opacity={0.8}
               side={THREE.DoubleSide}
@@ -674,7 +674,7 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
           <mesh ref={pulseRef2} rotation={[Math.PI / 2, 0, 0]} onClick={handleYouAreHereClick} onPointerDown={handleYouAreHereClick}>
             <ringGeometry args={[baseMarkerSize * 1.5, baseMarkerSize * 2.5, 32]} />
             <meshBasicMaterial
-              color="#00ff44"
+              color="#00ff88"
               transparent
               opacity={0.8}
               side={THREE.DoubleSide}
