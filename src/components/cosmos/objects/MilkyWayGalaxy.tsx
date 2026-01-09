@@ -472,7 +472,8 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
       markerGroupRef.current.getWorldPosition(markerWorldPos.current);
 
       const distance = camera.position.distanceTo(markerWorldPos.current);
-      const scale = Math.max(1, distance * 0.025);
+      // Increase scale factor for better visibility at galaxy scale
+      const scale = Math.max(1, distance * 0.05);
       markerGroupRef.current.scale.setScalar(scale);
     }
 
@@ -481,7 +482,8 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
       const worldPos = new THREE.Vector3();
       proximaMarkerRef.current.getWorldPosition(worldPos);
       const distance = camera.position.distanceTo(worldPos);
-      const scale = Math.max(1, distance * 0.025);
+      // Increase scale factor for better visibility at galaxy scale
+      const scale = Math.max(1, distance * 0.05);
       proximaMarkerRef.current.scale.setScalar(scale);
     }
   });
