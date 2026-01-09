@@ -371,6 +371,11 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
   useFrame(({ clock, camera }) => {
     const t = clock.getElapsedTime();
 
+    // Slow galaxy rotation - one full rotation every ~4 minutes
+    if (groupRef.current) {
+      groupRef.current.rotation.y = t * 0.025;
+    }
+
     // Cache the galaxy center world position once (used by camera-based UI overlays)
     if (!hasSetCenterRef.current && groupRef.current) {
       const p = new THREE.Vector3();
