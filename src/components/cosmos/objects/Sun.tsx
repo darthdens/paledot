@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useRef, useMemo } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { useCosmosStore } from '../store/useCosmosStore';
@@ -7,6 +7,34 @@ interface SunProps {
   position?: [number, number, number];
   visualScale?: number;
 }
+
+// Sun glow texture with color gradient: bright white center → yellow → orange → fade
+const createSunGlowTexture = () => {
+  const size = 512;
+  const canvas = document.createElement('canvas');
+  canvas.width = size;
+  canvas.height = size;
+  const ctx = canvas.getContext('2d')!;
+
+  const gradient = ctx.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2);
+  
+  // Bright white center → Yellow → Orange → Fade
+  gradient.addColorStop(0, 'rgba(255, 255, 240, 1)');       // Bright white-yellow center
+  gradient.addColorStop(0.08, 'rgba(255, 245, 180, 0.9)');  // Warm white
+  gradient.addColorStop(0.18, 'rgba(255, 220, 100, 0.7)');  // Yellow
+  gradient.addColorStop(0.35, 'rgba(255, 180, 50, 0.45)');  // Yellow-orange
+  gradient.addColorStop(0.55, 'rgba(255, 130, 30, 0.25)');  // Orange
+  gradient.addColorStop(0.75, 'rgba(255, 100, 20, 0.1)');   // Deep orange
+  gradient.addColorStop(1, 'rgba(255, 80, 0, 0)');          // Fade to transparent
+
+  ctx.fillStyle = gradient;
+  ctx.fillRect(0, 0, size, size);
+
+  const tex = new THREE.CanvasTexture(canvas);
+  tex.minFilter = THREE.LinearFilter;
+  tex.magFilter = THREE.LinearFilter;
+  return tex;
+};
 
 // Sun's real diameter is 1,392,700 km
 const SUN_DIAMETER = 1392700;
@@ -17,6 +45,8 @@ export const Sun = ({ position = [0, 0, 0], visualScale = 80 }: SunProps) => {
   const glowRef = useRef<THREE.Mesh>(null);
   const groupRef = useRef<THREE.Group>(null);
   const worldPos = useRef(new THREE.Vector3());
+  
+  const glowTexture = useMemo(() => createSunGlowTexture(), []);
   
   const setSelectedObject = useCosmosStore(state => state.setSelectedObject);
   const setHoveredObject = useCosmosStore(state => state.setHoveredObject);
@@ -213,6 +243,18 @@ export const Sun = ({ position = [0, 0, 0], visualScale = 80 }: SunProps) => {
           `}
         />
       </mesh>
+
+      {/* Sprite-based gradient glow - like galaxy center */}
+      <sprite renderOrder={-5} scale={[sunSize * 8, sunSize * 8, 1]}>
+        <spriteMaterial
+          map={glowTexture}
+          transparent
+          opacity={1}
+          blending={THREE.AdditiveBlending}
+          depthWrite={false}
+          depthTest={false}
+        />
+      </sprite>
 
       {/* Strong point light from sun */}
       <pointLight
