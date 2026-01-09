@@ -80,8 +80,8 @@ export const YouAreHereLabel = () => {
   const currentScale: ScaleLevel = useCosmosStore((state) => state.currentScale as ScaleLevel);
   const [isMinimized, setIsMinimized] = useState(false);
 
-  // Hide this panel when outside the Milky Way view
-  if (currentScale === 'localGroup' || currentScale === 'universe') return null;
+  // Hide this panel only at universe scale
+  if (currentScale === 'universe') return null;
   
   // Get location info based on current scale
   const getLocationInfo = () => {
@@ -94,6 +94,8 @@ export const YouAreHereLabel = () => {
         return t.stellar;
       case 'milkyWay':
         return t.milkyWay;
+      case 'localGroup':
+        return t.localGroup;
       default:
         return t.solarSystem;
     }
