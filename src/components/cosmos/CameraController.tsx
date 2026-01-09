@@ -49,19 +49,10 @@ export const CameraController = () => {
     startPosition.current.copy(camera.position);
     startTarget.current.copy(orbitControls.target);
 
-    // Check if the position values are in scene units (small) or km (large)
-    // If values are already small (< 1e6), they're in scene units from live positions
-    // If values are large, they're in km and need scaling
-    const positionMagnitude = Math.sqrt(
-      tourCameraTarget.position[0] ** 2 +
-      tourCameraTarget.position[1] ** 2 +
-      tourCameraTarget.position[2] ** 2
-    );
-    
-    const isAlreadyScaled = positionMagnitude < 1e9; // Live positions are already in scene units
-    
-    if (isAlreadyScaled) {
-      // Positions are already in scene units (from live world positions)
+    const space = tourCameraTarget.space ?? 'km';
+
+    if (space === 'scene') {
+      // Positions are already in scene units (e.g., from live world positions)
       endPosition.current.set(
         tourCameraTarget.position[0],
         tourCameraTarget.position[1],
@@ -73,7 +64,7 @@ export const CameraController = () => {
         tourCameraTarget.lookAt[2]
       );
     } else {
-      // Tour positions are in real km - scale them to scene units
+      // Positions are in real km - scale them to scene units
       endPosition.current.set(
         tourCameraTarget.position[0] * UNIFIED_SCALE,
         tourCameraTarget.position[1] * UNIFIED_SCALE,

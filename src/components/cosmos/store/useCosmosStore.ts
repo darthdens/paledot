@@ -12,6 +12,8 @@ export type AnchorRect = {
 interface TourCameraTarget {
   position: [number, number, number];
   lookAt: [number, number, number];
+  /** Explicitly declare which coordinate space these vectors are in. */
+  space?: 'scene' | 'km';
 }
 
 interface CosmosStore {
