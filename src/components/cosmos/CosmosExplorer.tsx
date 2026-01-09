@@ -42,12 +42,12 @@ export const CosmosExplorer = () => {
   const showTrails = useCosmosStore(state => state.showTrails);
   const isFollowing = useCosmosStore(state => state.isFollowing);
   const currentScale = useCosmosStore(state => state.currentScale);
+  const galaxyFollowEnabled = useCosmosStore(state => state.galaxyFollowEnabled);
   
-  // Show Milky Way only at stellar scale or larger
-  // Solar system follows the same galactic motion as soon as you're zoomed out to "stellar" scale or beyond
-  const showMilkyWay = currentScale === 'stellar' || currentScale === 'milkyWay' || currentScale === 'localGroup' || currentScale === 'universe';
-  const solarSystemFollowsGalactic = showMilkyWay;
-  
+  // Show Milky Way + move the whole solar system with the Sun's galactic marker.
+  // (Uses hysteresis in the store to avoid flicker near the boundary.)
+  const showMilkyWay = galaxyFollowEnabled;
+  const solarSystemFollowsGalactic = galaxyFollowEnabled;
   // Force cursor none on canvas - OrbitControls tries to set cursor styles
   useEffect(() => {
     const container = containerRef.current;
