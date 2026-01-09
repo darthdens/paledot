@@ -116,7 +116,7 @@ export const AndromedaGalaxy = ({ visualScale }: AndromedaGalaxyProps) => {
   const starsGeo = useMemo(() => {
     const { branches, spinTurns } = ANDROMEDA;
     const maxRadius = ANDROMEDA.diskRadius * gs;
-    const starCount = 300000; // Fewer than Milky Way (we're viewing from outside)
+    const starCount = 450000; // Increased star count for fuller galaxy
 
     const positions = new Float32Array(starCount * 3);
     const colors = new Float32Array(starCount * 3);
@@ -140,15 +140,18 @@ export const AndromedaGalaxy = ({ visualScale }: AndromedaGalaxyProps) => {
 
       const spinAngle = rt * spinTurns * Math.PI * 2;
 
-      const armWidth = 0.08 + rt * 0.15;
+      // Wider arm spread for more stars around arms
+      const armWidth = 0.12 + rt * 0.20;
       const armJitter = (Math.random() + Math.random() + Math.random() - 1.5) * armWidth;
 
-      const isInterArm = Math.random() < 0.3;
-      const interArmJitter = isInterArm ? (Math.random() - 0.5) * (0.7 + rt * 0.5) : 0;
+      // More inter-arm stars (45% chance instead of 30%)
+      const isInterArm = Math.random() < 0.45;
+      const interArmJitter = isInterArm ? (Math.random() - 0.5) * (1.0 + rt * 0.7) : 0;
 
       const angle = branchAngle + spinAngle + armJitter + interArmJitter;
 
-      const radialSpread = (0.04 + rt * 0.08) * maxRadius;
+      // More radial spread for fuller arms
+      const radialSpread = (0.06 + rt * 0.12) * maxRadius;
       const radialJitter = (Math.random() + Math.random() - 1) * radialSpread;
       const finalRadius = radius + radialJitter;
 
