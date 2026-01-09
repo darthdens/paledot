@@ -10,20 +10,17 @@ interface MilkyWayGalaxyProps {
 
 // Milky Way parameters
 const MILKY_WAY = {
-  diskRadius: 52500,           // ~105,000 ly diameter
-  bulgeRadius: 10000,          // Central bulge
-  barLength: 27000,            // Central bar length
-  barWidth: 4500,
-  sunDistance: 26000,          // Sun's distance from center
-  sunAngle: Math.PI * 0.72,    // Position in Orion-Cygnus arm
-  branches: 4,                 // Number of spiral arms
-  spin: 1.2,                   // How much the arms spin outward
-  randomness: 0.35,            // Particle scatter
+  diskRadius: 52500,
+  bulgeRadius: 10000,
+  sunDistance: 26000,
+  sunAngle: Math.PI * 0.72,
+  branches: 4,
+  spin: 1.8,
 };
 
-// Create soft glowing particle texture
-const createGlowTexture = () => {
-  const size = 128;
+// Simple crisp dot texture
+const createDotTexture = () => {
+  const size = 32;
   const canvas = document.createElement('canvas');
   canvas.width = size;
   canvas.height = size;
@@ -31,86 +28,14 @@ const createGlowTexture = () => {
   
   const gradient = ctx.createRadialGradient(size/2, size/2, 0, size/2, size/2, size/2);
   gradient.addColorStop(0, 'rgba(255, 255, 255, 1)');
-  gradient.addColorStop(0.1, 'rgba(255, 255, 255, 0.8)');
-  gradient.addColorStop(0.3, 'rgba(255, 255, 255, 0.4)');
-  gradient.addColorStop(0.6, 'rgba(255, 255, 255, 0.1)');
+  gradient.addColorStop(0.3, 'rgba(255, 255, 255, 0.6)');
+  gradient.addColorStop(0.6, 'rgba(255, 255, 255, 0.15)');
   gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
   
   ctx.fillStyle = gradient;
   ctx.fillRect(0, 0, size, size);
   
   return new THREE.CanvasTexture(canvas);
-};
-
-// Create ultra-soft cloud texture for nebula glow
-const createNebulaTexture = () => {
-  const size = 256;
-  const canvas = document.createElement('canvas');
-  canvas.width = size;
-  canvas.height = size;
-  const ctx = canvas.getContext('2d')!;
-  
-  const gradient = ctx.createRadialGradient(size/2, size/2, 0, size/2, size/2, size/2);
-  gradient.addColorStop(0, 'rgba(255, 255, 255, 0.5)');
-  gradient.addColorStop(0.2, 'rgba(255, 255, 255, 0.25)');
-  gradient.addColorStop(0.5, 'rgba(255, 255, 255, 0.08)');
-  gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
-  
-  ctx.fillStyle = gradient;
-  ctx.fillRect(0, 0, size, size);
-  
-  return new THREE.CanvasTexture(canvas);
-};
-
-// Color palette inspired by techinz.dev galaxy
-const getGalaxyColor = (normalizedRadius: number, inArm: boolean): THREE.Color => {
-  const color = new THREE.Color();
-  
-  // Core: bright golden-orange (#FFE4A0)
-  // Inner: warm pink/salmon (#FFAA88 → #DD88AA)
-  // Middle: lavender/purple (#AA77CC → #8866BB)
-  // Outer: cool blue/teal (#6688CC → #4488AA)
-  
-  if (normalizedRadius < 0.08) {
-    // Bright golden core
-    const brightness = 0.95 + Math.random() * 0.05;
-    color.setHSL(0.12 + Math.random() * 0.02, 0.7 + Math.random() * 0.2, brightness);
-  } else if (normalizedRadius < 0.18) {
-    // Golden-orange transition
-    const brightness = 0.85 + Math.random() * 0.1;
-    color.setHSL(0.10 + Math.random() * 0.03, 0.65 + Math.random() * 0.2, brightness);
-  } else if (normalizedRadius < 0.3) {
-    // Warm pink/salmon
-    const brightness = 0.75 + Math.random() * 0.15;
-    color.setHSL(0.97 + Math.random() * 0.04, 0.55 + Math.random() * 0.25, brightness);
-  } else if (normalizedRadius < 0.45) {
-    // Pink to lavender transition
-    const brightness = 0.7 + Math.random() * 0.15;
-    const t = (normalizedRadius - 0.3) / 0.15;
-    const hue = 0.92 - t * 0.1; // pink → purple
-    color.setHSL(hue + Math.random() * 0.03, 0.5 + Math.random() * 0.2, brightness);
-  } else if (normalizedRadius < 0.65) {
-    // Lavender/purple
-    const brightness = 0.65 + Math.random() * 0.15;
-    color.setHSL(0.78 + Math.random() * 0.06, 0.45 + Math.random() * 0.2, brightness);
-  } else if (normalizedRadius < 0.82) {
-    // Purple to blue transition
-    const brightness = 0.6 + Math.random() * 0.15;
-    const t = (normalizedRadius - 0.65) / 0.17;
-    const hue = 0.75 - t * 0.1; // purple → blue
-    color.setHSL(hue + Math.random() * 0.04, 0.4 + Math.random() * 0.2, brightness);
-  } else {
-    // Outer blue/teal
-    const brightness = 0.55 + Math.random() * 0.15;
-    color.setHSL(0.58 + Math.random() * 0.08, 0.4 + Math.random() * 0.25, brightness);
-  }
-  
-  // Arm cores are slightly brighter
-  if (inArm) {
-    color.offsetHSL(0, 0.05, 0.08);
-  }
-  
-  return color;
 };
 
 export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayGalaxyProps) => {
@@ -119,147 +44,116 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
   const pulseRef2 = useRef<THREE.Mesh>(null);
   const markerGroupRef = useRef<THREE.Group>(null);
   
-  const gs = UNITS.KM_PER_LY * visualScale; // galaxy scale
+  const gs = UNITS.KM_PER_LY * visualScale;
   
-  // Offset galaxy so Sun (at origin) is at correct position
   const galaxyOffset = useMemo(() => new THREE.Vector3(
     -Math.cos(MILKY_WAY.sunAngle) * MILKY_WAY.sunDistance * gs,
     0,
     -Math.sin(MILKY_WAY.sunAngle) * MILKY_WAY.sunDistance * gs
   ), [gs]);
   
-  // Create textures once
-  const glowTexture = useMemo(() => createGlowTexture(), []);
-  const nebulaTexture = useMemo(() => createNebulaTexture(), []);
+  const dotTexture = useMemo(() => createDotTexture(), []);
   
-  // Generate galaxy particles - inspired by techinz.dev smooth style
-  const { starsGeo, nebulaGeo, coreGeo } = useMemo(() => {
-    const { branches, spin, randomness } = MILKY_WAY;
+  // Generate ONLY stars - simple dots with colors
+  const starsGeo = useMemo(() => {
+    const { branches, spin } = MILKY_WAY;
     const maxRadius = MILKY_WAY.diskRadius * gs;
+    const starCount = 250000;
     
-    // === STARS (main spiral structure) ===
-    const starCount = 180000;
-    const starPos = new Float32Array(starCount * 3);
-    const starCol = new Float32Array(starCount * 3);
-    const starSizes = new Float32Array(starCount);
+    const positions = new Float32Array(starCount * 3);
+    const colors = new Float32Array(starCount * 3);
+    const color = new THREE.Color();
     
     for (let i = 0; i < starCount; i++) {
       const i3 = i * 3;
       
-      // Radius with concentration toward center
-      const radiusPow = Math.pow(Math.random(), 0.5);
-      const radius = radiusPow * maxRadius;
-      const normalizedR = radiusPow;
+      // Radius - concentrated toward center
+      const t = Math.pow(Math.random(), 0.55);
+      const radius = t * maxRadius;
       
-      // Spiral arm structure
-      const branchAngle = ((i % branches) / branches) * Math.PI * 2;
+      // Spiral arm angle
+      const branchIndex = i % branches;
+      const branchAngle = (branchIndex / branches) * Math.PI * 2;
       const spinAngle = radius * spin / maxRadius;
       
-      // Add randomness - more spread between arms, tighter in arms
-      const inArm = Math.random() > 0.35;
-      const randX = Math.pow(Math.random(), 3) * (Math.random() < 0.5 ? 1 : -1) * randomness * radius / maxRadius;
-      const randY = Math.pow(Math.random(), 3) * (Math.random() < 0.5 ? 1 : -1) * randomness * 0.08;
-      const randZ = Math.pow(Math.random(), 3) * (Math.random() < 0.5 ? 1 : -1) * randomness * radius / maxRadius;
+      // Randomness for natural look
+      const randomOffset = (Math.random() - 0.5) * 0.4 * (1 - t * 0.5);
       
-      // Extra spread for inter-arm particles
-      const interArmSpread = inArm ? 0 : (Math.random() - 0.5) * Math.PI / 2;
+      // Some stars between arms (30%)
+      const interArm = Math.random() < 0.3;
+      const extraOffset = interArm ? (Math.random() - 0.5) * 1.2 : 0;
       
-      const angle = branchAngle + spinAngle + randX + interArmSpread;
+      const angle = branchAngle + spinAngle + randomOffset + extraOffset;
       
-      starPos[i3] = Math.cos(angle) * radius;
-      starPos[i3 + 1] = randY * maxRadius * 0.02; // Very thin disk
-      starPos[i3 + 2] = Math.sin(angle) * radius;
+      positions[i3] = Math.cos(angle) * radius;
+      positions[i3 + 1] = (Math.random() - 0.5) * maxRadius * 0.012; // Very thin
+      positions[i3 + 2] = Math.sin(angle) * radius;
       
-      // Color gradient
-      const color = getGalaxyColor(normalizedR, inArm);
-      starCol[i3] = color.r;
-      starCol[i3 + 1] = color.g;
-      starCol[i3 + 2] = color.b;
+      // Color based on distance from center
+      // Core: golden → Middle: pink/purple → Outer: blue
+      if (t < 0.12) {
+        // Golden core
+        color.setHSL(0.11 + Math.random() * 0.02, 0.7, 0.85 + Math.random() * 0.15);
+      } else if (t < 0.25) {
+        // Orange-gold transition
+        color.setHSL(0.08 + Math.random() * 0.04, 0.6, 0.8 + Math.random() * 0.15);
+      } else if (t < 0.4) {
+        // Pink/salmon
+        color.setHSL(0.95 + Math.random() * 0.05, 0.5, 0.75 + Math.random() * 0.15);
+      } else if (t < 0.6) {
+        // Purple/lavender
+        color.setHSL(0.8 + Math.random() * 0.08, 0.45, 0.7 + Math.random() * 0.15);
+      } else if (t < 0.8) {
+        // Blue-purple
+        color.setHSL(0.68 + Math.random() * 0.08, 0.4, 0.65 + Math.random() * 0.15);
+      } else {
+        // Blue outer
+        color.setHSL(0.58 + Math.random() * 0.08, 0.4, 0.6 + Math.random() * 0.15);
+      }
       
-      // Size varies - smaller toward edge
-      starSizes[i] = (1 - normalizedR * 0.5) * (0.5 + Math.random() * 0.5);
+      colors[i3] = color.r;
+      colors[i3 + 1] = color.g;
+      colors[i3 + 2] = color.b;
     }
     
-    // === NEBULA CLOUDS (smooth gassy effect) ===
-    const nebulaCount = 120000;
-    const nebulaPos = new Float32Array(nebulaCount * 3);
-    const nebulaCol = new Float32Array(nebulaCount * 3);
-    
-    for (let i = 0; i < nebulaCount; i++) {
-      const i3 = i * 3;
-      
-      // More uniform distribution for smooth coverage
-      const radiusPow = Math.pow(Math.random(), 0.4);
-      const radius = radiusPow * maxRadius;
-      const normalizedR = radiusPow;
-      
-      // Looser spiral for gas
-      const branchAngle = ((i % branches) / branches) * Math.PI * 2;
-      const spinAngle = radius * spin * 0.8 / maxRadius;
-      
-      // Wider spread for nebula
-      const randAngle = (Math.random() - 0.5) * Math.PI * 0.6;
-      const angle = branchAngle + spinAngle + randAngle;
-      
-      nebulaPos[i3] = Math.cos(angle) * radius;
-      nebulaPos[i3 + 1] = (Math.random() - 0.5) * maxRadius * 0.015;
-      nebulaPos[i3 + 2] = Math.sin(angle) * radius;
-      
-      // Nebula uses same color palette but slightly more saturated
-      const color = getGalaxyColor(normalizedR, false);
-      color.offsetHSL(0, 0.1, -0.1);
-      nebulaCol[i3] = color.r;
-      nebulaCol[i3 + 1] = color.g;
-      nebulaCol[i3 + 2] = color.b;
-    }
-    
-    // === CORE (bright central bulge) ===
-    const coreCount = 50000;
-    const corePos = new Float32Array(coreCount * 3);
-    const coreCol = new Float32Array(coreCount * 3);
+    const geo = new THREE.BufferGeometry();
+    geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    geo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+    return geo;
+  }, [gs]);
+  
+  // Core bulge stars - denser center
+  const coreGeo = useMemo(() => {
+    const coreCount = 60000;
+    const positions = new Float32Array(coreCount * 3);
+    const colors = new Float32Array(coreCount * 3);
+    const color = new THREE.Color();
+    const coreRadius = MILKY_WAY.bulgeRadius * gs * 0.7;
     
     for (let i = 0; i < coreCount; i++) {
       const i3 = i * 3;
       
-      // Concentrated toward center
-      const r = Math.pow(Math.random(), 1.5) * MILKY_WAY.bulgeRadius * gs * 0.8;
+      const r = Math.pow(Math.random(), 1.2) * coreRadius;
       const theta = Math.random() * Math.PI * 2;
       const phi = Math.acos(2 * Math.random() - 1);
       
-      // Flattened spheroid
-      corePos[i3] = r * Math.sin(phi) * Math.cos(theta);
-      corePos[i3 + 1] = r * Math.cos(phi) * 0.25;
-      corePos[i3 + 2] = r * Math.sin(phi) * Math.sin(theta);
+      positions[i3] = r * Math.sin(phi) * Math.cos(theta);
+      positions[i3 + 1] = r * Math.cos(phi) * 0.3; // Flattened
+      positions[i3 + 2] = r * Math.sin(phi) * Math.sin(theta);
       
-      // Bright golden colors
-      const dist = r / (MILKY_WAY.bulgeRadius * gs * 0.8);
-      const brightness = 0.9 + (1 - dist) * 0.1;
-      const color = new THREE.Color();
-      color.setHSL(0.11 + Math.random() * 0.03, 0.6 + Math.random() * 0.2, brightness);
-      
-      coreCol[i3] = color.r;
-      coreCol[i3 + 1] = color.g;
-      coreCol[i3 + 2] = color.b;
+      // Bright golden
+      color.setHSL(0.10 + Math.random() * 0.03, 0.65, 0.88 + Math.random() * 0.12);
+      colors[i3] = color.r;
+      colors[i3 + 1] = color.g;
+      colors[i3 + 2] = color.b;
     }
     
-    // Build geometries
-    const starsGeo = new THREE.BufferGeometry();
-    starsGeo.setAttribute('position', new THREE.BufferAttribute(starPos, 3));
-    starsGeo.setAttribute('color', new THREE.BufferAttribute(starCol, 3));
-    starsGeo.setAttribute('size', new THREE.BufferAttribute(starSizes, 1));
-    
-    const nebulaGeo = new THREE.BufferGeometry();
-    nebulaGeo.setAttribute('position', new THREE.BufferAttribute(nebulaPos, 3));
-    nebulaGeo.setAttribute('color', new THREE.BufferAttribute(nebulaCol, 3));
-    
-    const coreGeo = new THREE.BufferGeometry();
-    coreGeo.setAttribute('position', new THREE.BufferAttribute(corePos, 3));
-    coreGeo.setAttribute('color', new THREE.BufferAttribute(coreCol, 3));
-    
-    return { starsGeo, nebulaGeo, coreGeo };
+    const geo = new THREE.BufferGeometry();
+    geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    geo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+    return geo;
   }, [gs]);
   
-  // Animate marker
   useFrame(({ clock, camera }) => {
     const t = clock.getElapsedTime();
     
@@ -285,14 +179,30 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
   });
   
   const baseMarkerSize = gs * 300;
+  const bulgeR = MILKY_WAY.bulgeRadius * gs;
+  const diskR = MILKY_WAY.diskRadius * gs;
   
   return (
     <group ref={groupRef} position={galaxyOffset}>
-      {/* Central core - bright golden bulge */}
+      {/* Core stars - bright golden center */}
       <points geometry={coreGeo}>
         <pointsMaterial
-          size={gs * 150}
-          map={glowTexture}
+          size={gs * 100}
+          map={dotTexture}
+          vertexColors
+          sizeAttenuation
+          transparent
+          opacity={0.95}
+          blending={THREE.AdditiveBlending}
+          depthWrite={false}
+        />
+      </points>
+      
+      {/* Main stars - spiral structure */}
+      <points geometry={starsGeo}>
+        <pointsMaterial
+          size={gs * 60}
+          map={dotTexture}
           vertexColors
           sizeAttenuation
           transparent
@@ -302,68 +212,83 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
         />
       </points>
       
-      {/* Main stars - spiral structure */}
-      <points geometry={starsGeo}>
-        <pointsMaterial
-          size={gs * 80}
-          map={glowTexture}
-          vertexColors
-          sizeAttenuation
-          transparent
-          opacity={0.85}
-          blending={THREE.AdditiveBlending}
-          depthWrite={false}
-        />
-      </points>
-      
-      {/* Nebula clouds - smooth gassy glow */}
-      <points geometry={nebulaGeo}>
-        <pointsMaterial
-          size={gs * 2500}
-          map={nebulaTexture}
-          vertexColors
-          sizeAttenuation
-          transparent
-          opacity={0.4}
-          blending={THREE.AdditiveBlending}
-          depthWrite={false}
-        />
-      </points>
-      
-      {/* Core glow layers - golden center */}
+      {/* GLOW SPHERES - large gradients replacing gas clouds */}
+      {/* Outer blue glow */}
       <mesh>
-        <sphereGeometry args={[MILKY_WAY.bulgeRadius * gs * 0.6, 32, 32]} />
+        <sphereGeometry args={[diskR * 0.9, 64, 64]} />
         <meshBasicMaterial
-          color="#FFE8C0"
+          color="#5577AA"
+          transparent
+          opacity={0.06}
+          blending={THREE.AdditiveBlending}
+          side={THREE.BackSide}
+        />
+      </mesh>
+      
+      {/* Mid purple glow */}
+      <mesh>
+        <sphereGeometry args={[diskR * 0.55, 64, 64]} />
+        <meshBasicMaterial
+          color="#8866AA"
+          transparent
+          opacity={0.08}
+          blending={THREE.AdditiveBlending}
+          side={THREE.BackSide}
+        />
+      </mesh>
+      
+      {/* Inner pink glow */}
+      <mesh>
+        <sphereGeometry args={[diskR * 0.35, 64, 64]} />
+        <meshBasicMaterial
+          color="#CC8899"
+          transparent
+          opacity={0.1}
+          blending={THREE.AdditiveBlending}
+          side={THREE.BackSide}
+        />
+      </mesh>
+      
+      {/* Core orange glow */}
+      <mesh>
+        <sphereGeometry args={[bulgeR * 1.2, 32, 32]} />
+        <meshBasicMaterial
+          color="#DDAA66"
+          transparent
+          opacity={0.15}
+          blending={THREE.AdditiveBlending}
+        />
+      </mesh>
+      
+      {/* Core golden glow */}
+      <mesh>
+        <sphereGeometry args={[bulgeR * 0.6, 32, 32]} />
+        <meshBasicMaterial
+          color="#FFCC77"
           transparent
           opacity={0.25}
           blending={THREE.AdditiveBlending}
         />
       </mesh>
+      
+      {/* Core bright center */}
       <mesh>
-        <sphereGeometry args={[MILKY_WAY.bulgeRadius * gs * 0.35, 32, 32]} />
+        <sphereGeometry args={[bulgeR * 0.25, 32, 32]} />
         <meshBasicMaterial
-          color="#FFDD99"
+          color="#FFEEAA"
           transparent
-          opacity={0.4}
+          opacity={0.45}
           blending={THREE.AdditiveBlending}
         />
       </mesh>
+      
+      {/* Core white hot */}
       <mesh>
-        <sphereGeometry args={[MILKY_WAY.bulgeRadius * gs * 0.15, 32, 32]} />
+        <sphereGeometry args={[bulgeR * 0.08, 32, 32]} />
         <meshBasicMaterial
-          color="#FFEECC"
+          color="#FFFFEE"
           transparent
-          opacity={0.6}
-          blending={THREE.AdditiveBlending}
-        />
-      </mesh>
-      <mesh>
-        <sphereGeometry args={[MILKY_WAY.bulgeRadius * gs * 0.05, 32, 32]} />
-        <meshBasicMaterial
-          color="#FFFFF0"
-          transparent
-          opacity={0.8}
+          opacity={0.7}
           blending={THREE.AdditiveBlending}
         />
       </mesh>
@@ -378,13 +303,11 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
             Math.sin(MILKY_WAY.sunAngle) * MILKY_WAY.sunDistance * gs
           ]}
         >
-          {/* Core dot */}
           <mesh>
             <sphereGeometry args={[baseMarkerSize, 16, 16]} />
             <meshBasicMaterial color="#00ff44" />
           </mesh>
           
-          {/* Inner glow */}
           <mesh>
             <sphereGeometry args={[baseMarkerSize * 1.5, 16, 16]} />
             <meshBasicMaterial
@@ -395,7 +318,6 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
             />
           </mesh>
           
-          {/* Outer glow */}
           <mesh>
             <sphereGeometry args={[baseMarkerSize * 3, 16, 16]} />
             <meshBasicMaterial
@@ -406,7 +328,6 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
             />
           </mesh>
           
-          {/* Pulse ring 1 */}
           <mesh ref={pulseRef} rotation={[Math.PI / 2, 0, 0]}>
             <ringGeometry args={[baseMarkerSize * 1.5, baseMarkerSize * 2.5, 32]} />
             <meshBasicMaterial
@@ -418,7 +339,6 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
             />
           </mesh>
           
-          {/* Pulse ring 2 */}
           <mesh ref={pulseRef2} rotation={[Math.PI / 2, 0, 0]}>
             <ringGeometry args={[baseMarkerSize * 1.5, baseMarkerSize * 2.5, 32]} />
             <meshBasicMaterial
