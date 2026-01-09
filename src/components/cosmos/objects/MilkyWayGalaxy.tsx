@@ -79,11 +79,8 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
   const markerGroupRef = useRef<THREE.Group>(null);
   const centerWorldPos = useRef(new THREE.Vector3());
   const markerWorldPos = useRef(new THREE.Vector3());
-  const currentRotation = useRef(0);
 
   const setObjectWorldPosition = useCosmosStore((s) => s.setObjectWorldPosition);
-  const currentScale = useCosmosStore((s) => s.currentScale);
-  const timeSpeed = useCosmosStore((s) => s.timeSpeed);
 
   const gs = UNITS.KM_PER_LY * visualScale;
 
@@ -377,21 +374,10 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
     return geo;
   }, [gs]);
   
-  useFrame(({ clock, camera }, delta) => {
+  useFrame(({ clock, camera }) => {
     const t = clock.getElapsedTime();
 
-    const shouldRotate =
-      currentScale === 'stellar' ||
-      currentScale === 'milkyWay' ||
-      currentScale === 'localGroup' ||
-      currentScale === 'universe';
-
-    if (rotatingGroupRef.current && shouldRotate) {
-      // Base rotation speed * timeSpeed multiplier
-      // 0.025 rad/s base = one full rotation every ~4 minutes at 1x speed
-      currentRotation.current += delta * 0.025 * timeSpeed;
-      rotatingGroupRef.current.rotation.y = currentRotation.current;
-    }
+    // Galaxy rotation is handled by GalaxyRotator in CosmosExplorer
 
     // Keep the galaxy center world position live (needed for camera tracking while rotating)
     if (rotatingGroupRef.current) {
