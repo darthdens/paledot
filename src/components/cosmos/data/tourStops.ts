@@ -310,6 +310,23 @@ export const tourStops: TourStop[] = [
     scaleLevel: 'milkyWay',
   },
   {
+    id: 'andromeda',
+    locationId: 'andromeda',
+    title: {
+      en: 'Andromeda Galaxy',
+      fr: 'La Galaxie d\'Andromède',
+    },
+    narration: {
+      en: 'The Andromeda Galaxy, also known as M31, is the nearest major galaxy to the Milky Way at 2.5 million light-years away. It contains roughly one trillion stars and is on a collision course with our galaxy - but don\'t worry, the merger won\'t happen for another 4.5 billion years.',
+      fr: 'La galaxie d\'Andromède, également connue sous le nom de M31, est la grande galaxie la plus proche de la Voie Lactée à 2,5 millions d\'années-lumière. Elle contient environ mille milliards d\'étoiles et est en trajectoire de collision avec notre galaxie - mais ne vous inquiétez pas, la fusion n\'aura lieu que dans 4,5 milliards d\'années.',
+    },
+    duration: 10,
+    // Position camera to view Andromeda from a good angle
+    cameraPosition: [0, 500000 * UNITS.KM_PER_LY, 1500000 * UNITS.KM_PER_LY],
+    lookAt: [0, 0, 2500000 * UNITS.KM_PER_LY],
+    scaleLevel: 'localGroup',
+  },
+  {
     id: 'orion-nebula',
     locationId: 'orion-nebula',
     title: {
