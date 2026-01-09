@@ -295,6 +295,23 @@ export const tourStops: TourStop[] = [
     scaleLevel: 'solarSystem',
   },
   {
+    id: 'proxima-centauri',
+    locationId: 'proxima-centauri',
+    title: {
+      en: 'Proxima Centauri - Our Nearest Star',
+      fr: 'Proxima du Centaure - Notre Étoile la Plus Proche',
+    },
+    narration: {
+      en: 'Just 4.24 light-years away, Proxima Centauri is the closest star to our Sun. This red dwarf hosts at least two planets, including Proxima b, which orbits in the habitable zone where liquid water could exist.',
+      fr: 'À seulement 4,24 années-lumière, Proxima du Centaure est l\'étoile la plus proche de notre Soleil. Cette naine rouge abrite au moins deux planètes, dont Proxima b, qui orbite dans la zone habitable où l\'eau liquide pourrait exister.',
+    },
+    duration: 8,
+    // View of Proxima Centauri - small red dwarf star
+    cameraPosition: [0, 0.5 * UNITS.KM_PER_LY, 1.5 * UNITS.KM_PER_LY],
+    lookAt: [0, 0, 0],
+    scaleLevel: 'stellar',
+  },
+  {
     id: 'milky-way',
     locationId: 'milky-way-center',
     title: {
