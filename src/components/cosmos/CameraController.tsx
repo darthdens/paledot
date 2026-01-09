@@ -103,38 +103,27 @@ export const CameraController = () => {
       startTarget.current.copy(orbitControls.target);
 
       // Desired distance based on visual size
-      // Check if object has sceneUnits flag (position already in scene units)
-      const hasSceneUnits = (selectedObject as any).sceneUnits === true;
-      
       let visualSize: number;
-      if (hasSceneUnits) {
-        // Size is already the visual size in scene units
-        visualSize = selectedObject.size;
-      } else if (selectedObject.category === 'nebulae') {
+      if (selectedObject.category === 'nebulae') {
         // Nebula size is in light-years
         visualSize = selectedObject.size * UNITS.KM_PER_LY * UNIFIED_SCALE;
       } else {
+        // All objects use real km sizes with visualScale
         visualSize = selectedObject.size * UNIFIED_SCALE;
       }
       
       // Calculate fly-to distance based on object type
       if (selectedObject.category === 'nebulae') {
         flyToDistance.current = Math.max(visualSize * 3, 1e9);
-      } else if (hasSceneUnits) {
-        // For objects already in scene units, use a multiplier of the size
-        flyToDistance.current = Math.max(visualSize * 5, 1e6);
       } else {
         flyToDistance.current = Math.max(visualSize * 5, 50);
       }
 
       // Use live world position when available (for moving solar-system bodies)
-      // For objects with sceneUnits, position is already correct
+      // All positions are in km, scaled to scene units
       let fallbackPos: [number, number, number];
       
-      if (hasSceneUnits) {
-        // Position is already in scene units
-        fallbackPos = selectedObject.position as [number, number, number];
-      } else if (selectedObject.category === 'solarSystem') {
+      if (selectedObject.category === 'solarSystem' || selectedObject.category === 'stars') {
         fallbackPos = [
           selectedObject.position[0] * UNIFIED_SCALE,
           selectedObject.position[1] * UNIFIED_SCALE,

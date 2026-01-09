@@ -1,9 +1,12 @@
 import { useRef, useMemo } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
+import { Stars } from '@react-three/drei';
 import { useCosmosStore } from '../store/useCosmosStore';
+import { UNITS } from '../types';
 
 interface ProximaCentauriProps {
+  position?: [number, number, number];
   visualScale?: number;
 }
 
@@ -37,13 +40,6 @@ const createRedDwarfGlowTexture = () => {
 
 // Proxima Centauri's real diameter is about 214,550 km (0.154 solar radii)
 const PROXIMA_DIAMETER = 214550;
-// Place at a manageable distance beyond the Oort Cloud for navigation
-// Oort Cloud outer edge is ~15 trillion km = 15e9 scene units at 0.001 scale
-// We place Proxima at 50 billion scene units - far beyond Oort but reachable
-const PROXIMA_DISTANCE_SCENE = 5e10;
-
-// Visual star size - proportional to Sun but scaled for visibility at distance
-const STAR_SIZE = 1e7; // 10 million scene units for good visibility
 
 export const ProximaCentauri = ({ visualScale = 0.001 }: ProximaCentauriProps) => {
   const starRef = useRef<THREE.Mesh>(null);
@@ -58,11 +54,12 @@ export const ProximaCentauri = ({ visualScale = 0.001 }: ProximaCentauriProps) =
   const setHoveredObject = useCosmosStore(state => state.setHoveredObject);
   const setObjectWorldPosition = useCosmosStore(state => state.setObjectWorldPosition);
 
-  // Position in scene units
+  // Position at 4.24 light-years from Sun, with offset matching celestialObjects data
+  // Matches: [4.24 * UNITS.KM_PER_LY, 0.5 * UNITS.KM_PER_LY, 0]
   const position: [number, number, number] = [
-    PROXIMA_DISTANCE_SCENE,
-    PROXIMA_DISTANCE_SCENE * 0.05, // Slight Y offset
-    PROXIMA_DISTANCE_SCENE * 0.02  // Slight Z offset
+    4.24 * UNITS.KM_PER_LY,
+    0.5 * UNITS.KM_PER_LY,
+    0
   ];
 
   useFrame((state) => {
@@ -84,17 +81,19 @@ export const ProximaCentauri = ({ visualScale = 0.001 }: ProximaCentauriProps) =
     }
   }, -1);
 
+  // Use the same unified scale as everything else - consistent with Sun
+  const starSize = PROXIMA_DIAMETER * visualScale;
+
   const proximaObject = {
     id: 'proxima-centauri',
     name: { en: 'Proxima Centauri', fr: 'Proxima du Centaure' },
     type: 'star' as const,
-    position: position, // Already in scene units
-    size: STAR_SIZE, // Use visual size for camera distance calc
+    position: position,
+    size: PROXIMA_DIAMETER, // Real diameter in km for camera distance calc
     color: '#ffcccb',
     distanceFromEarth: 4.24,
     distanceUnit: 'ly' as const,
     category: 'stars' as const,
-    sceneUnits: true, // Flag to tell CameraController position is already in scene units
     facts: {
       en: ['Closest star to the Sun', 'Red dwarf star', 'Has at least 2 exoplanets'],
       fr: ['Étoile la plus proche du Soleil', 'Naine rouge', 'Au moins 2 exoplanètes'],
@@ -115,8 +114,26 @@ export const ProximaCentauri = ({ visualScale = 0.001 }: ProximaCentauriProps) =
     setHoveredObject(null);
   };
 
+  // Position in scene units (same as Sun)
+  const scenePosition: [number, number, number] = [
+    position[0] * visualScale,
+    position[1] * visualScale,
+    position[2] * visualScale
+  ];
+
   return (
-    <group ref={groupRef} position={position}>
+    <group ref={groupRef} position={scenePosition}>
+      {/* Regional background stars around Proxima - like solar system has background stars */}
+      <Stars 
+        radius={starSize * 500} 
+        depth={starSize * 400} 
+        count={3000} 
+        factor={starSize * 50} 
+        saturation={0.3} 
+        fade 
+        speed={0.2} 
+      />
+
       {/* Star core - red dwarf surface */}
       <mesh 
         ref={starRef}
@@ -124,7 +141,7 @@ export const ProximaCentauri = ({ visualScale = 0.001 }: ProximaCentauriProps) =
         onPointerOver={handlePointerOver}
         onPointerOut={handlePointerOut}
       >
-        <sphereGeometry args={[STAR_SIZE, 48, 48]} />
+        <sphereGeometry args={[starSize, 64, 64]} />
         <shaderMaterial
           uniforms={{
             time: { value: 0 },
@@ -168,8 +185,8 @@ export const ProximaCentauri = ({ visualScale = 0.001 }: ProximaCentauriProps) =
               vec3 coolColor = vec3(0.9, 0.4, 0.35);
               vec3 surfaceColor = mix(coolColor, coreColor, n);
               
-              // Red dwarfs are dimmer than the Sun
-              surfaceColor *= 1.8;
+              // Red dwarfs are dimmer than the Sun but still bright
+              surfaceColor *= 2.0;
               
               gl_FragColor = vec4(surfaceColor, 1.0);
             }
@@ -179,9 +196,9 @@ export const ProximaCentauri = ({ visualScale = 0.001 }: ProximaCentauriProps) =
 
       {/* Inner corona - subtle red glow */}
       <mesh ref={coronaRef}>
-        <sphereGeometry args={[STAR_SIZE * 1.1, 48, 48]} />
+        <sphereGeometry args={[starSize * 1.08, 64, 64]} />
         <meshBasicMaterial
-          color="#FF8888"
+          color="#FF9999"
           transparent
           opacity={0.5}
           depthWrite={false}
@@ -190,24 +207,24 @@ export const ProximaCentauri = ({ visualScale = 0.001 }: ProximaCentauriProps) =
 
       {/* Middle glow layer */}
       <mesh>
-        <sphereGeometry args={[STAR_SIZE * 1.25, 32, 32]} />
+        <sphereGeometry args={[starSize * 1.2, 48, 48]} />
         <meshBasicMaterial
-          color="#FF6666"
+          color="#FF7777"
           transparent
-          opacity={0.3}
+          opacity={0.35}
           depthWrite={false}
         />
       </mesh>
 
       {/* Outer glow - soft red */}
       <mesh ref={glowRef}>
-        <sphereGeometry args={[STAR_SIZE * 1.6, 32, 32]} />
+        <sphereGeometry args={[starSize * 1.5, 32, 32]} />
         <shaderMaterial
           transparent
           depthWrite={false}
           side={THREE.BackSide}
           uniforms={{
-            glowColor: { value: new THREE.Color('#CC4444') },
+            glowColor: { value: new THREE.Color('#CC5555') },
           }}
           vertexShader={`
             varying vec3 vNormal;
@@ -220,8 +237,8 @@ export const ProximaCentauri = ({ visualScale = 0.001 }: ProximaCentauriProps) =
             varying vec3 vNormal;
             uniform vec3 glowColor;
             void main() {
-              float intensity = pow(0.6 - dot(vNormal, vec3(0.0, 0.0, 1.0)), 1.5);
-              gl_FragColor = vec4(glowColor, intensity * 0.6);
+              float intensity = pow(0.65 - dot(vNormal, vec3(0.0, 0.0, 1.0)), 1.5);
+              gl_FragColor = vec4(glowColor, intensity * 0.7);
             }
           `}
         />
@@ -229,13 +246,13 @@ export const ProximaCentauri = ({ visualScale = 0.001 }: ProximaCentauriProps) =
 
       {/* Far outer glow */}
       <mesh>
-        <sphereGeometry args={[STAR_SIZE * 2.2, 24, 24]} />
+        <sphereGeometry args={[starSize * 2.0, 32, 32]} />
         <shaderMaterial
           transparent
           depthWrite={false}
           side={THREE.BackSide}
           uniforms={{
-            glowColor: { value: new THREE.Color('#992222') },
+            glowColor: { value: new THREE.Color('#AA3333') },
           }}
           vertexShader={`
             varying vec3 vNormal;
@@ -248,28 +265,28 @@ export const ProximaCentauri = ({ visualScale = 0.001 }: ProximaCentauriProps) =
             varying vec3 vNormal;
             uniform vec3 glowColor;
             void main() {
-              float intensity = pow(0.45 - dot(vNormal, vec3(0.0, 0.0, 1.0)), 2.0);
-              gl_FragColor = vec4(glowColor, intensity * 0.3);
+              float intensity = pow(0.5 - dot(vNormal, vec3(0.0, 0.0, 1.0)), 2.0);
+              gl_FragColor = vec4(glowColor, intensity * 0.4);
             }
           `}
         />
       </mesh>
 
-      {/* Sprite-based gradient glow */}
-      <sprite renderOrder={-5} scale={[STAR_SIZE * 6, STAR_SIZE * 6, 1]}>
+      {/* Sprite-based gradient glow - like Sun */}
+      <sprite renderOrder={-5} scale={[starSize * 8, starSize * 8, 1]}>
         <spriteMaterial
           map={glowTexture}
           transparent
-          opacity={0.8}
+          opacity={1}
           blending={THREE.AdditiveBlending}
           depthWrite={false}
           depthTest={false}
         />
       </sprite>
 
-      {/* Dim point light - red dwarfs emit much less light than the Sun */}
+      {/* Point light - red dwarf emits less light than Sun but still significant */}
       <pointLight
-        intensity={0.5}
+        intensity={2}
         distance={0}
         decay={1}
         color="#FFCCCC"
