@@ -15,9 +15,8 @@ export const tourStops: TourStop[] = [
       fr: 'Bienvenue dans l\'Explorateur du Cosmos. Nous commençons notre voyage sur Terre, notre planète dans l\'immense univers. Embarquons pour un voyage incroyable d\'ici jusqu\'aux confins de l\'univers observable.',
     },
     duration: 8,
-    // These are now relative offsets from the object, not absolute positions
-    // [distance multiplier, height multiplier, side offset multiplier] relative to object size
-    cameraPosition: [0, 0, 50000], // Will be computed dynamically
+    // Close view of Earth - about 5 Earth radii away
+    cameraPosition: [0, 5000, 30000],
     lookAt: [0, 0, 0],
     scaleLevel: 'earth',
   },
@@ -33,7 +32,8 @@ export const tourStops: TourStop[] = [
       fr: 'En s\'élevant au-dessus de l\'atmosphère terrestre, nous voyons notre Lune - le seul corps céleste que les humains ont visité. Elle est à 384 400 km, une distance que la lumière traverse en seulement 1,3 seconde.',
     },
     duration: 7,
-    cameraPosition: [0, 0, 20000], // Relative to moon
+    // Close to the Moon - about 3 Moon radii
+    cameraPosition: [3000, 2000, 8000],
     lookAt: [0, 0, 0],
     scaleLevel: 'earth',
   },
@@ -57,15 +57,16 @@ export const tourStops: TourStop[] = [
     id: 'gas-giants',
     locationId: 'jupiter',
     title: {
-      en: 'The Gas Giants',
-      fr: 'Les Géantes Gazeuses',
+      en: 'Jupiter - King of Planets',
+      fr: 'Jupiter - Roi des Planètes',
     },
     narration: {
-      en: 'Beyond the asteroid belt, we find the gas giants. Jupiter, the largest planet, could fit all other planets inside it. Saturn\'s rings span 282,000 km but are only 10 meters thick!',
-      fr: 'Au-delà de la ceinture d\'astéroïdes, nous trouvons les géantes gazeuses. Jupiter, la plus grande planète, pourrait contenir toutes les autres. Les anneaux de Saturne s\'étendent sur 282 000 km mais n\'ont que 10 mètres d\'épaisseur!',
+      en: 'Beyond the asteroid belt, we find Jupiter, the largest planet. It could fit all other planets inside it. Its Great Red Spot is a storm larger than Earth that has raged for centuries.',
+      fr: 'Au-delà de la ceinture d\'astéroïdes, nous trouvons Jupiter, la plus grande planète. Elle pourrait contenir toutes les autres. Sa Grande Tache Rouge est une tempête plus grande que la Terre qui fait rage depuis des siècles.',
     },
     duration: 8,
-    cameraPosition: [0, 200000, 500000], // Relative to Jupiter
+    // Close to Jupiter - about 2x its radius away
+    cameraPosition: [50000, 30000, 150000],
     lookAt: [0, 0, 0],
     scaleLevel: 'solarSystem',
   },
@@ -81,23 +82,25 @@ export const tourStops: TourStop[] = [
       fr: 'Les anneaux emblématiques de Saturne sont composés de milliards de particules de glace et de roche. Malgré leurs 282 000 km d\'envergure, ils sont incroyablement fins - en moyenne seulement 10 mètres d\'épaisseur.',
     },
     duration: 7,
-    cameraPosition: [0, 150000, 400000], // Relative to Saturn
+    // Close to Saturn to see the rings - about 2x its radius
+    cameraPosition: [40000, 25000, 120000],
     lookAt: [0, 0, 0],
     scaleLevel: 'solarSystem',
   },
   {
-    id: 'outer-planets',
-    locationId: 'neptune',
+    id: 'ice-giant',
+    locationId: 'uranus',
     title: {
-      en: 'The Ice Giants',
-      fr: 'Les Géantes de Glace',
+      en: 'Uranus - The Tilted Planet',
+      fr: 'Uranus - La Planète Inclinée',
     },
     narration: {
-      en: 'Uranus and Neptune are the ice giants, composed mainly of water, ammonia, and methane. Neptune, the farthest planet, takes 165 years to orbit the Sun once.',
-      fr: 'Uranus et Neptune sont les géantes de glace, composées principalement d\'eau, d\'ammoniac et de méthane. Neptune, la planète la plus éloignée, met 165 ans pour orbiter une fois autour du Soleil.',
+      en: 'Uranus is unique among planets - it rotates on its side, likely due to a massive ancient collision. This ice giant has 27 known moons and faint rings.',
+      fr: 'Uranus est unique parmi les planètes - elle tourne sur le côté, probablement en raison d\'une collision massive ancienne. Cette géante de glace possède 27 lunes connues et de faibles anneaux.',
     },
     duration: 7,
-    cameraPosition: [0, 100000, 250000], // Relative to Neptune
+    // Close to Uranus - about 2x its radius
+    cameraPosition: [20000, 15000, 80000],
     lookAt: [0, 0, 0],
     scaleLevel: 'solarSystem',
   },
@@ -129,7 +132,8 @@ export const tourStops: TourStop[] = [
       fr: 'La Nébuleuse d\'Orion est l\'une des nébuleuses les plus brillantes visibles à l\'œil nu. Située à 1 344 années-lumière, c\'est une pouponnière stellaire où de nouvelles étoiles naissent.',
     },
     duration: 8,
-    cameraPosition: [0, 50 * UNITS.KM_PER_LY, 100 * UNITS.KM_PER_LY],
+    // Much closer to see the nebula details
+    cameraPosition: [0, 5 * UNITS.KM_PER_LY, 15 * UNITS.KM_PER_LY],
     lookAt: [0, 0, 0],
     scaleLevel: 'stellar',
   },
@@ -145,7 +149,8 @@ export const tourStops: TourStop[] = [
       fr: 'Notre voyage à travers le cosmos touche à sa fin, de retour sur notre point bleu pâle. Dans l\'immensité de l\'espace, la Terre reste notre seule maison - une précieuse oasis de vie dans le désert cosmique.',
     },
     duration: 10,
-    cameraPosition: [0, 0, 50000],
+    // Back close to Earth
+    cameraPosition: [0, 5000, 30000],
     lookAt: [0, 0, 0],
     scaleLevel: 'earth',
   },
