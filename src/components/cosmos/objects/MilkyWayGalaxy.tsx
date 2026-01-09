@@ -504,6 +504,8 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
             blending={THREE.AdditiveBlending}
             depthWrite={false}
             depthTest={false}
+            side={THREE.DoubleSide}
+            toneMapped={false}
           />
         </sprite>
       </group>
