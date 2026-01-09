@@ -321,8 +321,9 @@ export const tourStops: TourStop[] = [
       fr: 'En s\'élevant au-dessus du plan galactique, notre Voie Lactée révèle sa structure spirale. Notre Soleil est situé sur le Bras d\'Orion, à environ 26 000 années-lumière du trou noir supermassif au centre.',
     },
     duration: 10,
-    cameraPosition: [0, 50000 * UNITS.KM_PER_LY, 0],
-    lookAt: [26000 * UNITS.KM_PER_LY, 0, 0],
+    // Position camera above and behind the galactic center for a centered top-down view
+    cameraPosition: [0, 60000 * UNITS.KM_PER_LY, 30000 * UNITS.KM_PER_LY],
+    lookAt: [0, 0, 0],
     scaleLevel: 'milkyWay',
   },
   {
