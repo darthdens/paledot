@@ -1,6 +1,7 @@
 // Cosmos Explorer - Solar System visualization with fly-to navigation
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls, Stars, PerspectiveCamera } from '@react-three/drei';
+import * as THREE from 'three';
 import { Suspense, useMemo, useEffect, useRef } from 'react';
 import { Sun } from './objects/Sun';
 import { TexturedPlanet } from './objects/TexturedPlanet';
@@ -123,7 +124,14 @@ export const CosmosExplorer = () => {
 
   return (
     <div ref={containerRef} className="relative w-full h-full">
-      <Canvas gl={{ alpha: false }}>
+      <Canvas
+        gl={{ alpha: false }}
+        onCreated={({ gl }) => {
+          // Keep additive glows saturated and consistent across camera angles
+          gl.toneMapping = THREE.NoToneMapping;
+          gl.outputColorSpace = THREE.SRGBColorSpace;
+        }}
+      >
         <Suspense fallback={null}>
           <PerspectiveCamera 
             makeDefault 
