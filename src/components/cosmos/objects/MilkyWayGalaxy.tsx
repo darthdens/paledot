@@ -343,21 +343,6 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
         />
       </points>
 
-      {/* Omnidirectional galactic haze so the glow doesn't vanish when viewed from behind */}
-      <mesh renderOrder={5} frustumCulled={false}>
-        <sphereGeometry args={[diskR * 2.2, 32, 32]} />
-        <meshBasicMaterial
-          map={glowTexture}
-          transparent
-          opacity={0.18}
-          blending={THREE.AdditiveBlending}
-          depthWrite={false}
-          depthTest={false}
-          toneMapped={false}
-          side={THREE.DoubleSide}
-        />
-      </mesh>
-
       {/* Center glow (billboard) */}
       <sprite renderOrder={10} frustumCulled={false} scale={[diskR * 2.2, diskR * 2.2, 1]}>
         <spriteMaterial
@@ -367,7 +352,6 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
           blending={THREE.AdditiveBlending}
           depthWrite={false}
           depthTest={false}
-          side={THREE.DoubleSide}
         />
       </sprite>
       {showYouAreHere && (
