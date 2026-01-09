@@ -655,7 +655,7 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
             />
           </mesh>
           
-          <mesh ref={pulseRef} rotation={[Math.PI / 2, 0, 0]}>
+          <mesh ref={pulseRef} rotation={[Math.PI / 2, 0, 0]} onClick={handleSunClick} onPointerDown={handleSunClick}>
             <ringGeometry args={[baseMarkerSize * 1.5, baseMarkerSize * 2.5, 32]} />
             <meshBasicMaterial
               color="#00ff44"
@@ -666,7 +666,7 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
             />
           </mesh>
           
-          <mesh ref={pulseRef2} rotation={[Math.PI / 2, 0, 0]}>
+          <mesh ref={pulseRef2} rotation={[Math.PI / 2, 0, 0]} onClick={handleSunClick} onPointerDown={handleSunClick}>
             <ringGeometry args={[baseMarkerSize * 1.5, baseMarkerSize * 2.5, 32]} />
             <meshBasicMaterial
               color="#00ff44"
@@ -765,7 +765,7 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
           </mesh>
           
           {/* Pulse rings */}
-          <mesh ref={proximaPulseRef} rotation={[Math.PI / 2, 0, 0]}>
+          <mesh ref={proximaPulseRef} rotation={[Math.PI / 2, 0, 0]} onClick={handleProximaClick} onPointerDown={handleProximaClick}>
             <ringGeometry args={[baseMarkerSize * 1.2, baseMarkerSize * 2, 32]} />
             <meshBasicMaterial
               color="#ff6b4a"
@@ -776,7 +776,7 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
             />
           </mesh>
           
-          <mesh ref={proximaPulseRef2} rotation={[Math.PI / 2, 0, 0]}>
+          <mesh ref={proximaPulseRef2} rotation={[Math.PI / 2, 0, 0]} onClick={handleProximaClick} onPointerDown={handleProximaClick}>
             <ringGeometry args={[baseMarkerSize * 1.2, baseMarkerSize * 2, 32]} />
             <meshBasicMaterial
               color="#ff6b4a"
