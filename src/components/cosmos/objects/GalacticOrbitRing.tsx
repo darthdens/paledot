@@ -1,6 +1,8 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
+import { Html } from '@react-three/drei';
 import * as THREE from 'three';
 import { UNITS } from '../types';
+import { useLanguage } from '@/i18n/LanguageContext';
 
 interface GalacticOrbitRingProps {
   visualScale: number;
@@ -14,12 +16,15 @@ const MILKY_WAY = {
 };
 
 /**
- * A static ring showing the solar system's orbital path around the galactic center.
- * This is rendered outside the GalaxyRotator so it stays fixed while the galaxy rotates.
+ * A ring showing the solar system's orbital path around the galactic center.
  */
 export const GalacticOrbitRing = ({ visualScale, visible = true }: GalacticOrbitRingProps) => {
+  const { language } = useLanguage();
+  const [isHovered, setIsHovered] = useState(false);
+
   const gs = UNITS.KM_PER_LY * visualScale;
   const orbitRadius = MILKY_WAY.sunDistance * gs;
+  const markerRadius = orbitRadius * 0.01;
 
   // Galaxy center position (offset from solar system at origin)
   const galaxyCenter = useMemo<[number, number, number]>(
@@ -31,6 +36,9 @@ export const GalacticOrbitRing = ({ visualScale, visible = true }: GalacticOrbit
     [orbitRadius]
   );
 
+  const markerX = Math.cos(MILKY_WAY.sunAngle) * orbitRadius;
+  const markerZ = Math.sin(MILKY_WAY.sunAngle) * orbitRadius;
+
   // Create a dashed ring geometry
   const ringGeometry = useMemo(() => {
     const segments = 128;
@@ -38,13 +46,7 @@ export const GalacticOrbitRing = ({ visualScale, visible = true }: GalacticOrbit
 
     for (let i = 0; i <= segments; i++) {
       const angle = (i / segments) * Math.PI * 2;
-      points.push(
-        new THREE.Vector3(
-          Math.cos(angle) * orbitRadius,
-          0,
-          Math.sin(angle) * orbitRadius
-        )
-      );
+      points.push(new THREE.Vector3(Math.cos(angle) * orbitRadius, 0, Math.sin(angle) * orbitRadius));
     }
 
     return new THREE.BufferGeometry().setFromPoints(points);
@@ -55,30 +57,47 @@ export const GalacticOrbitRing = ({ visualScale, visible = true }: GalacticOrbit
   return (
     <group position={galaxyCenter}>
       {/* Main orbit ring */}
-      <primitive object={new THREE.Line(ringGeometry, new THREE.LineBasicMaterial({
-        color: 0x00ff88,
-        transparent: true,
-        opacity: 0.6,
-        blending: THREE.AdditiveBlending,
-        depthWrite: false,
-      }))} />
+      <primitive
+        object={
+          new THREE.Line(
+            ringGeometry,
+            new THREE.LineBasicMaterial({
+              color: 0x00ff88,
+              transparent: true,
+              opacity: 0.6,
+              blending: THREE.AdditiveBlending,
+              depthWrite: false,
+            })
+          )
+        }
+      />
 
-      {/* Current position marker at origin relative to this group = solar system position on the ring */}
+      {/* Current position marker on the ring */}
       <mesh
-        position={[
-          Math.cos(MILKY_WAY.sunAngle) * orbitRadius,
-          0,
-          Math.sin(MILKY_WAY.sunAngle) * orbitRadius,
-        ]}
+        position={[markerX, 0, markerZ]}
+        onPointerOver={() => setIsHovered(true)}
+        onPointerOut={() => setIsHovered(false)}
       >
-        <sphereGeometry args={[orbitRadius * 0.01, 16, 16]} />
-        <meshBasicMaterial
-          color="#00ff88"
-          transparent
-          opacity={0.8}
-          blending={THREE.AdditiveBlending}
-        />
+        <sphereGeometry args={[markerRadius, 16, 16]} />
+        <meshBasicMaterial color="#00ff88" transparent opacity={0.8} blending={THREE.AdditiveBlending} />
       </mesh>
+
+      {/* Tooltip label */}
+      {isHovered && (
+        <Html
+          position={[markerX, markerRadius * 3, markerZ]}
+          center
+          occlude={false}
+          style={{ pointerEvents: 'none' }}
+        >
+          <div className="bg-black/80 backdrop-blur-sm px-3 py-1.5 rounded-lg border border-emerald-500/50 whitespace-nowrap">
+            <span className="text-emerald-400 text-sm font-semibold">
+              {language === 'fr' ? 'Nous sommes ici' : 'We are here'}
+            </span>
+          </div>
+        </Html>
+      )}
     </group>
   );
 };
+
