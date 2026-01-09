@@ -82,6 +82,9 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
   const pulseRef = useRef<THREE.Mesh>(null);
   const pulseRef2 = useRef<THREE.Mesh>(null);
   const markerGroupRef = useRef<THREE.Group>(null);
+  const proximaMarkerRef = useRef<THREE.Group>(null);
+  const proximaPulseRef = useRef<THREE.Mesh>(null);
+  const proximaPulseRef2 = useRef<THREE.Mesh>(null);
   const centerWorldPos = useRef(new THREE.Vector3());
   const markerWorldPos = useRef(new THREE.Vector3());
   
@@ -411,6 +414,7 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
       setObjectWorldPosition('milkyWay_center', pos);
     }
 
+    // Sun marker pulses
     if (pulseRef.current) {
       const phase = (t * 2) % 1;
       pulseRef.current.scale.setScalar(1 + phase * 4);
@@ -423,6 +427,19 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
       (pulseRef2.current.material as THREE.MeshBasicMaterial).opacity = (1 - phase) * 0.8;
     }
 
+    // Proxima marker pulses
+    if (proximaPulseRef.current) {
+      const phase = (t * 2) % 1;
+      proximaPulseRef.current.scale.setScalar(1 + phase * 4);
+      (proximaPulseRef.current.material as THREE.MeshBasicMaterial).opacity = (1 - phase) * 0.8;
+    }
+
+    if (proximaPulseRef2.current) {
+      const phase = ((t * 2) + 0.5) % 1;
+      proximaPulseRef2.current.scale.setScalar(1 + phase * 4);
+      (proximaPulseRef2.current.material as THREE.MeshBasicMaterial).opacity = (1 - phase) * 0.8;
+    }
+
     if (markerGroupRef.current) {
       markerGroupRef.current.getWorldPosition(markerWorldPos.current);
 
@@ -430,11 +447,23 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
       const scale = Math.max(1, distance * 0.025);
       markerGroupRef.current.scale.setScalar(scale);
     }
+
+    // Scale Proxima marker similarly
+    if (proximaMarkerRef.current) {
+      const worldPos = new THREE.Vector3();
+      proximaMarkerRef.current.getWorldPosition(worldPos);
+      const distance = camera.position.distanceTo(worldPos);
+      const scale = Math.max(1, distance * 0.025);
+      proximaMarkerRef.current.scale.setScalar(scale);
+    }
   });
   
   const baseMarkerSize = gs * 300;
   const diskR = MILKY_WAY.diskRadius * gs;
   
+  // Proxima Centauri position in scene units (it's at 4.24 ly from Sun)
+  // Position in light-years: [2.90, -0.14, -3.08]
+  const proximaPosition: [number, number, number] = [2.90 * gs, -0.14 * gs, -3.08 * gs];
   return (
     <>
       {/* Rotating galaxy group - offset so the solar system stays at origin */}
@@ -604,6 +633,107 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
             <ringGeometry args={[baseMarkerSize * 1.5, baseMarkerSize * 2.5, 32]} />
             <meshBasicMaterial
               color="#00ff44"
+              transparent
+              opacity={0.8}
+              side={THREE.DoubleSide}
+              blending={THREE.AdditiveBlending}
+            />
+          </mesh>
+        </group>
+      )}
+
+      {/* Proxima Centauri marker - visible at galaxy scales */}
+      {showLabel && (
+        <group ref={proximaMarkerRef} position={proximaPosition}>
+          {/* Red-orange star point matching Proxima's color */}
+          <points>
+            <bufferGeometry>
+              <bufferAttribute
+                attach="attributes-position"
+                count={1}
+                array={new Float32Array([0, 0, 0])}
+                itemSize={3}
+              />
+              <bufferAttribute
+                attach="attributes-color"
+                count={1}
+                array={new Float32Array([1, 0.8, 0.8])}
+                itemSize={3}
+              />
+            </bufferGeometry>
+            <pointsMaterial
+              size={gs * 120}
+              map={dotTexture}
+              vertexColors
+              sizeAttenuation
+              transparent
+              opacity={1}
+              blending={THREE.AdditiveBlending}
+              depthWrite={false}
+              depthTest={false}
+            />
+          </points>
+          
+          {/* "Proxima Centauri" label */}
+          <Html
+            position={[0, baseMarkerSize * 15, 0]}
+            center
+            distanceFactor={baseMarkerSize * 50}
+            occlude={false}
+            zIndexRange={[0, 0]}
+            style={{ pointerEvents: 'none' }}
+          >
+            <div className="bg-black/80 backdrop-blur-sm px-3 py-1.5 rounded-lg border border-orange-500/50 whitespace-nowrap shadow-lg">
+              <span className="text-orange-400 text-sm font-semibold drop-shadow-md">
+                {language === 'fr' ? 'Proxima du Centaure' : 'Proxima Centauri'}
+              </span>
+            </div>
+          </Html>
+          
+          {/* Core sphere - red/orange for red dwarf */}
+          <mesh>
+            <sphereGeometry args={[baseMarkerSize * 0.7, 16, 16]} />
+            <meshBasicMaterial color="#ff6b4a" />
+          </mesh>
+          
+          {/* Inner glow */}
+          <mesh>
+            <sphereGeometry args={[baseMarkerSize * 1.2, 16, 16]} />
+            <meshBasicMaterial
+              color="#ff6b4a"
+              transparent
+              opacity={0.5}
+              blending={THREE.AdditiveBlending}
+            />
+          </mesh>
+          
+          {/* Outer glow */}
+          <mesh>
+            <sphereGeometry args={[baseMarkerSize * 2.5, 16, 16]} />
+            <meshBasicMaterial
+              color="#ff6b4a"
+              transparent
+              opacity={0.2}
+              blending={THREE.AdditiveBlending}
+            />
+          </mesh>
+          
+          {/* Pulse rings */}
+          <mesh ref={proximaPulseRef} rotation={[Math.PI / 2, 0, 0]}>
+            <ringGeometry args={[baseMarkerSize * 1.2, baseMarkerSize * 2, 32]} />
+            <meshBasicMaterial
+              color="#ff6b4a"
+              transparent
+              opacity={0.8}
+              side={THREE.DoubleSide}
+              blending={THREE.AdditiveBlending}
+            />
+          </mesh>
+          
+          <mesh ref={proximaPulseRef2} rotation={[Math.PI / 2, 0, 0]}>
+            <ringGeometry args={[baseMarkerSize * 1.2, baseMarkerSize * 2, 32]} />
+            <meshBasicMaterial
+              color="#ff6b4a"
               transparent
               opacity={0.8}
               side={THREE.DoubleSide}
