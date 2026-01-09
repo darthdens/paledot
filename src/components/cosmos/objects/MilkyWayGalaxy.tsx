@@ -66,6 +66,82 @@ const createGlowTexture = () => {
   return tex;
 };
 
+// Spiral arm glow texture - warm colors follow the spiral structure
+const createSpiralGlowTexture = (branches: number, spinTurns: number) => {
+  const size = 1024;
+  const canvas = document.createElement('canvas');
+  canvas.width = size;
+  canvas.height = size;
+  const ctx = canvas.getContext('2d')!;
+  
+  const cx = size / 2;
+  const cy = size / 2;
+  const maxR = size / 2;
+  
+  // Create image data for pixel-level control
+  const imageData = ctx.createImageData(size, size);
+  const data = imageData.data;
+  
+  for (let y = 0; y < size; y++) {
+    for (let x = 0; x < size; x++) {
+      const dx = x - cx;
+      const dy = y - cy;
+      const r = Math.sqrt(dx * dx + dy * dy);
+      const t = r / maxR; // 0 at center, 1 at edge
+      
+      if (t > 1) {
+        continue; // Outside circle
+      }
+      
+      let angle = Math.atan2(dy, dx);
+      if (angle < 0) angle += Math.PI * 2;
+      
+      // Calculate expected arm angle at this radius (spiral formula)
+      const spinAngle = t * spinTurns * Math.PI * 2;
+      
+      // Find distance to nearest arm
+      let minArmDist = Infinity;
+      for (let b = 0; b < branches; b++) {
+        const armBaseAngle = (b / branches) * Math.PI * 2;
+        const armAngle = (armBaseAngle + spinAngle) % (Math.PI * 2);
+        
+        // Angular distance to this arm
+        let angleDiff = Math.abs(angle - armAngle);
+        if (angleDiff > Math.PI) angleDiff = Math.PI * 2 - angleDiff;
+        
+        minArmDist = Math.min(minArmDist, angleDiff);
+      }
+      
+      // Arm width increases with radius (narrower at center, wider at edge)
+      const armWidth = 0.25 + t * 0.4;
+      
+      // Softness of arm edges
+      const armIntensity = Math.max(0, 1 - (minArmDist / armWidth));
+      const smoothArm = armIntensity * armIntensity * (3 - 2 * armIntensity); // smoothstep
+      
+      // Radial falloff - brighter in center, fading outward
+      const radialFalloff = Math.pow(1 - t, 0.6);
+      
+      // Combine: arm shape * radial falloff
+      const intensity = smoothArm * radialFalloff * 0.85 + radialFalloff * 0.15; // keep some radial glow between arms
+      
+      const idx = (y * size + x) * 4;
+      const alpha = Math.min(255, intensity * 255);
+      data[idx] = 255;     // R
+      data[idx + 1] = 255; // G
+      data[idx + 2] = 255; // B
+      data[idx + 3] = alpha;
+    }
+  }
+  
+  ctx.putImageData(imageData, 0, 0);
+  
+  const tex = new THREE.CanvasTexture(canvas);
+  tex.minFilter = THREE.LinearFilter;
+  tex.magFilter = THREE.LinearFilter;
+  return tex;
+};
+
 export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayGalaxyProps) => {
   const groupRef = useRef<THREE.Group>(null);
   const pulseRef = useRef<THREE.Mesh>(null);
@@ -82,6 +158,7 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
   
   const dotTexture = useMemo(() => createDotTexture(), []);
   const glowTexture = useMemo(() => createGlowTexture(), []);
+  const spiralGlowTexture = useMemo(() => createSpiralGlowTexture(MILKY_WAY.branches, MILKY_WAY.spinTurns), []);
   
   // Generate ONLY stars - crisp dots with colors matching glow regions
   const starsGeo = useMemo(() => {
@@ -398,48 +475,48 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
         />
       </sprite>
 
-      {/* Purple to orange */}
-      <sprite renderOrder={-19} scale={[diskR * 1.25, diskR * 1.25, 1]}>
+      {/* Purple to orange - using spiral texture */}
+      <sprite renderOrder={-19} scale={[diskR * 1.4, diskR * 1.4, 1]}>
         <spriteMaterial
-          map={glowTexture}
+          map={spiralGlowTexture}
           color="#DD5577"
           transparent
-          opacity={0.26}
+          opacity={0.28}
           blending={THREE.AdditiveBlending}
           depthWrite={false}
           depthTest={false}
         />
       </sprite>
 
-      {/* Warm wash that carries yellow/orange outward (so it reaches the spiral edges) */}
-      <sprite renderOrder={-18} scale={[diskR * 1.65, diskR * 1.65, 1]}>
+      {/* Warm spiral glow - orange/yellow follows arm structure */}
+      <sprite renderOrder={-18} scale={[diskR * 2.0, diskR * 2.0, 1]}>
         <spriteMaterial
-          map={glowTexture}
+          map={spiralGlowTexture}
           color="#FF8844"
           transparent
-          opacity={0.12}
+          opacity={0.18}
           blending={THREE.AdditiveBlending}
           depthWrite={false}
           depthTest={false}
         />
       </sprite>
 
-      {/* Orange - more visible + expanded */}
-      <sprite renderOrder={-17} scale={[diskR * 1.1, diskR * 1.1, 1]}>
+      {/* Orange spiral */}
+      <sprite renderOrder={-17} scale={[diskR * 1.5, diskR * 1.5, 1]}>
         <spriteMaterial
-          map={glowTexture}
+          map={spiralGlowTexture}
           color="#FF7733"
           transparent
-          opacity={0.3}
+          opacity={0.32}
           blending={THREE.AdditiveBlending}
           depthWrite={false}
           depthTest={false}
         />
       </sprite>
 
-      <sprite renderOrder={-16} scale={[diskR * 0.92, diskR * 0.92, 1]}>
+      <sprite renderOrder={-16} scale={[diskR * 1.2, diskR * 1.2, 1]}>
         <spriteMaterial
-          map={glowTexture}
+          map={spiralGlowTexture}
           color="#FF8822"
           transparent
           opacity={0.38}
@@ -449,9 +526,9 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
         />
       </sprite>
 
-      <sprite renderOrder={-15} scale={[diskR * 0.78, diskR * 0.78, 1]}>
+      <sprite renderOrder={-15} scale={[diskR * 0.95, diskR * 0.95, 1]}>
         <spriteMaterial
-          map={glowTexture}
+          map={spiralGlowTexture}
           color="#FF9911"
           transparent
           opacity={0.45}
@@ -461,25 +538,25 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
         />
       </sprite>
 
-      {/* Yellow - more visible + expanded */}
-      <sprite renderOrder={-14} scale={[diskR * 0.65, diskR * 0.65, 1]}>
+      {/* Yellow spiral */}
+      <sprite renderOrder={-14} scale={[diskR * 0.75, diskR * 0.75, 1]}>
         <spriteMaterial
-          map={glowTexture}
+          map={spiralGlowTexture}
           color="#FFBB22"
           transparent
-          opacity={0.5}
+          opacity={0.52}
           blending={THREE.AdditiveBlending}
           depthWrite={false}
           depthTest={false}
         />
       </sprite>
 
-      <sprite renderOrder={-13} scale={[diskR * 0.48, diskR * 0.48, 1]}>
+      <sprite renderOrder={-13} scale={[diskR * 0.55, diskR * 0.55, 1]}>
         <spriteMaterial
-          map={glowTexture}
+          map={spiralGlowTexture}
           color="#FFDD44"
           transparent
-          opacity={0.62}
+          opacity={0.6}
           blending={THREE.AdditiveBlending}
           depthWrite={false}
           depthTest={false}
