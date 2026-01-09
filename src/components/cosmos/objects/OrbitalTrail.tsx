@@ -83,12 +83,29 @@ export const OrbitalTrail = ({
     if (frameCountRef.current < 4) return;
     frameCountRef.current = 0;
 
-    // Skip tiny movements (e.g. very slow bodies) to keep trail stable
+    // If the object "teleports" (e.g. we switch to galaxy-follow mode), reset the trail
     if (lastPosRef.current) {
       const dx = worldPos[0] - lastPosRef.current[0];
       const dy = worldPos[1] - lastPosRef.current[1];
       const dz = worldPos[2] - lastPosRef.current[2];
-      if (dx * dx + dy * dy + dz * dz < 0.01) return;
+      const d2 = dx * dx + dy * dy + dz * dz;
+
+      // Skip tiny movements (e.g. very slow bodies) to keep trail stable
+      if (d2 < 0.01) return;
+
+      // Reset on very large jumps to avoid a huge line across space
+      if (d2 > 1e12) {
+        positions.fill(0);
+        const tail = (maxPoints - 1) * 3;
+        positions[tail] = worldPos[0];
+        positions[tail + 1] = worldPos[1];
+        positions[tail + 2] = worldPos[2];
+        countRef.current = 1;
+        geometryRef.current.setDrawRange(0, 1);
+        positionAttr.needsUpdate = true;
+        lastPosRef.current = [worldPos[0], worldPos[1], worldPos[2]];
+        return;
+      }
     }
     lastPosRef.current = [worldPos[0], worldPos[1], worldPos[2]];
 
