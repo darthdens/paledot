@@ -18,6 +18,11 @@ interface CosmosStore {
   // Camera state
   cameraDistance: number;
   currentScale: ScaleLevel;
+  /**
+   * True when zoomed out enough that the solar system should follow the Sun's galactic marker.
+   * Uses hysteresis to avoid flicker around the scale boundary.
+   */
+  galaxyFollowEnabled: boolean;
   targetPosition: [number, number, number];
 
   // Runtime positions (used for moving/orbiting bodies)
@@ -108,6 +113,7 @@ export const useCosmosStore = create<CosmosStore>()(
       // Initial state
       cameraDistance: 50000,
       currentScale: 'earth',
+      galaxyFollowEnabled: false,
       targetPosition: [0, 0, 50000],
 
       objectWorldPositions: {},
@@ -144,7 +150,20 @@ export const useCosmosStore = create<CosmosStore>()(
       // Actions
       setCameraDistance: (distance) => {
         const scale = getScaleFromDistance(distance);
-        set({ cameraDistance: distance, currentScale: scale });
+
+        // Hysteresis around the solarSystem ↔ stellar boundary to prevent flicker.
+        // Enter galaxy-follow slightly ABOVE the boundary; exit slightly BELOW.
+        const boundary = SCALE_BOUNDARIES.stellar.min;
+        const enterKm = boundary * 1.05;
+        const exitKm = boundary * 0.95;
+
+        const prevFollow = get().galaxyFollowEnabled;
+        let nextFollow = prevFollow;
+
+        if (!prevFollow && distance >= enterKm) nextFollow = true;
+        if (prevFollow && distance <= exitKm) nextFollow = false;
+
+        set({ cameraDistance: distance, currentScale: scale, galaxyFollowEnabled: nextFollow });
       },
       
       setCurrentScale: (scale) => set({ currentScale: scale }),
