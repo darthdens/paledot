@@ -20,7 +20,8 @@ const OBJECT_RADII: Record<string, number> = {
 };
 
 // Consistent zoom multiplier: camera distance = radius * ZOOM_MULTIPLIER
-const ZOOM_MULTIPLIER = 4;
+// Increased from 4 to 6 for planets/moons to prevent too-close views
+const ZOOM_MULTIPLIER = 6;
 
 export const tourStops: TourStop[] = [
   {
@@ -120,8 +121,8 @@ export const tourStops: TourStop[] = [
       fr: 'Entre Mars et Jupiter se trouve la ceinture d\'astéroïdes, abritant des millions de vestiges rocheux de la formation du système solaire. Cérès, le plus gros objet ici, est une planète naine contenant environ un tiers de la masse totale de la ceinture.',
     },
     duration: 7,
-    // View of Ceres in the asteroid belt - using a wider view
-    cameraPosition: [0, 5000, 15000],
+    // Much wider view to show multiple asteroids in the belt
+    cameraPosition: [0, 0.3 * UNITS.KM_PER_AU, 0.5 * UNITS.KM_PER_AU],
     lookAt: [0, 0, 0],
     scaleLevel: 'solarSystem',
   },
@@ -289,8 +290,8 @@ export const tourStops: TourStop[] = [
       fr: 'À l\'extrémité de notre système solaire se trouve le nuage d\'Oort, une enveloppe théorique d\'objets glacés s\'étendant jusqu\'à 100 000 UA du Soleil - presque à mi-chemin de l\'étoile la plus proche. C\'est de là que proviennent les comètes à longue période, mettant des millions d\'années pour compléter une seule orbite.',
     },
     duration: 8,
-    // Very wide view to show the Oort Cloud scale
-    cameraPosition: [0, 500 * UNITS.KM_PER_AU, 800 * UNITS.KM_PER_AU],
+    // Much wider view to show the full Oort Cloud sphere (extends to ~100,000 AU)
+    cameraPosition: [0, 2000 * UNITS.KM_PER_AU, 3000 * UNITS.KM_PER_AU],
     lookAt: [0, 0, 0],
     scaleLevel: 'solarSystem',
   },
@@ -306,8 +307,9 @@ export const tourStops: TourStop[] = [
       fr: 'À seulement 4,24 années-lumière, Proxima du Centaure est l\'étoile la plus proche de notre Soleil. Cette naine rouge abrite au moins deux planètes, dont Proxima b, qui orbite dans la zone habitable où l\'eau liquide pourrait exister.',
     },
     duration: 8,
-    // View of Proxima Centauri - small red dwarf star
-    cameraPosition: [0, 0.5 * UNITS.KM_PER_LY, 1.5 * UNITS.KM_PER_LY],
+    // Close view of Proxima Centauri - zoom in to the star like quick jump does
+    // Proxima has radius ~0.1545 solar radii = ~107,500 km, use similar multiplier as planets
+    cameraPosition: [0, 200000, 600000],
     lookAt: [0, 0, 0],
     scaleLevel: 'stellar',
   },

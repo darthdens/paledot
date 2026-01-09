@@ -171,13 +171,12 @@ export const TourOverlay = () => {
           stop.cameraPosition[2] * UNIFIED_SCALE,
         ];
       } else if (targetObject?.category === 'stars' && targetObject.id !== 'sun') {
-        // For distant stars like Proxima Centauri, position camera relative to the star
-        // The cameraPosition offset is in km but scaled for stellar distances
-        const starViewDist = Math.hypot(offsetScene[0], offsetScene[1], offsetScene[2]);
+        // For distant stars like Proxima Centauri, use the tour stop's camera position
+        // directly as an offset from the star's position (in km, scaled to scene)
         cameraPos = [
-          targetPos[0] + starViewDist * 0.3,
-          targetPos[1] + starViewDist * 0.2,
-          targetPos[2] + starViewDist,
+          targetPos[0] + offsetScene[0],
+          targetPos[1] + offsetScene[1],
+          targetPos[2] + offsetScene[2],
         ];
       } else {
         // Default: apply the offset directly in scene space
@@ -198,12 +197,13 @@ export const TourOverlay = () => {
     [setTourIndex, setSelectedObject, setTourCameraTarget]
   );
   
-  // Initialize tour on first render when touring starts
+  // Initialize tour on first render when touring starts - always go to stop 0
   useEffect(() => {
-    if (isTouring && tourIndex === 0) {
+    if (isTouring) {
+      // Always navigate to the first stop when tour starts, regardless of current position
       goToStop(0);
     }
-  }, [isTouring, tourIndex, goToStop]);
+  }, [isTouring, goToStop]);
   
   // Auto-advance when not paused
   useEffect(() => {
