@@ -136,6 +136,16 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
     ],
     [gs]
   );
+
+  // Sun position in the galaxy's local coordinate space (used to place markers so they land at world origin after galaxyOffset)
+  const sunPosition = useMemo<[number, number, number]>(
+    () => [
+      Math.cos(MILKY_WAY.sunAngle) * MILKY_WAY.sunDistance * gs,
+      0,
+      Math.sin(MILKY_WAY.sunAngle) * MILKY_WAY.sunDistance * gs,
+    ],
+    [gs]
+  );
   
   const dotTexture = useMemo(() => createDotTexture(), []);
   const glowTexture = useMemo(() => createGalaxyGlowTexture(), []);
@@ -472,8 +482,8 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
       markerGroupRef.current.getWorldPosition(markerWorldPos.current);
 
       const distance = camera.position.distanceTo(markerWorldPos.current);
-      // Increase scale factor for better visibility at galaxy scale
-      const scale = Math.max(1, distance * 0.05);
+      // Scale more aggressively so the marker stays obvious at Milky Way / Local Group scales
+      const scale = Math.max(1, distance * 0.12);
       markerGroupRef.current.scale.setScalar(scale);
     }
 
@@ -482,18 +492,22 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
       const worldPos = new THREE.Vector3();
       proximaMarkerRef.current.getWorldPosition(worldPos);
       const distance = camera.position.distanceTo(worldPos);
-      // Increase scale factor for better visibility at galaxy scale
-      const scale = Math.max(1, distance * 0.05);
+      const scale = Math.max(1, distance * 0.12);
       proximaMarkerRef.current.scale.setScalar(scale);
     }
   });
   
-  const baseMarkerSize = gs * 300;
+  const baseMarkerSize = gs * 600;
   const diskR = MILKY_WAY.diskRadius * gs;
-  
-  // Proxima Centauri position in scene units (2x actual distance for visual separation)
-  // Position in light-years: [5.80, -0.28, -6.16]
-  const proximaPosition: [number, number, number] = [5.80 * gs, -0.28 * gs, -6.16 * gs];
+
+  // Proxima Centauri position in scene units relative to the Sun's galactic position
+  // Offset in light-years: [5.80, -0.28, -6.16]
+  const proximaOffset: [number, number, number] = [5.80 * gs, -0.28 * gs, -6.16 * gs];
+  const proximaPosition: [number, number, number] = [
+    sunPosition[0] + proximaOffset[0],
+    sunPosition[1] + proximaOffset[1],
+    sunPosition[2] + proximaOffset[2],
+  ];
   return (
     <>
       {/* Rotating galaxy group - offset so the solar system stays at origin */}
@@ -572,9 +586,9 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
         </sprite>
       </group>
 
-      {/* Solar system marker ("You are here") - stays at origin since that's where the solar system is */}
+      {/* Solar system marker ("You are here") - placed at the Sun's galactic position so it lands at world origin after galaxyOffset */}
       {showYouAreHere && (
-        <group ref={markerGroupRef} position={[0, 0, 0]}>
+        <group ref={markerGroupRef} position={sunPosition}>
           {/* White star point that matches the galaxy stars style */}
           <points>
             <bufferGeometry>
@@ -622,8 +636,7 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
               center
               distanceFactor={baseMarkerSize * 50}
               occlude={false}
-              // Keep this label beneath app modals/overlays (e.g., Help & Controls)
-              zIndexRange={[0, 0]}
+              zIndexRange={[50, 0]}
               style={{ pointerEvents: 'auto' }}
             >
               <div
@@ -636,51 +649,73 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
               </div>
             </Html>
           )}
-          
+
           <mesh onClick={handleYouAreHereClick} onPointerDown={handleYouAreHereClick}>
             <sphereGeometry args={[baseMarkerSize, 16, 16]} />
-            <meshBasicMaterial color="#00ff44" />
+            <meshBasicMaterial color="#00ff44" depthWrite={false} depthTest={false} toneMapped={false} />
           </mesh>
-          
+
           <mesh onClick={handleYouAreHereClick} onPointerDown={handleYouAreHereClick}>
             <sphereGeometry args={[baseMarkerSize * 1.5, 16, 16]} />
             <meshBasicMaterial
               color="#00ff44"
               transparent
-              opacity={0.5}
+              opacity={0.55}
               blending={THREE.AdditiveBlending}
+              depthWrite={false}
+              depthTest={false}
+              toneMapped={false}
             />
           </mesh>
-          
+
           <mesh onClick={handleYouAreHereClick} onPointerDown={handleYouAreHereClick}>
             <sphereGeometry args={[baseMarkerSize * 3, 16, 16]} />
             <meshBasicMaterial
               color="#00ff44"
               transparent
-              opacity={0.2}
+              opacity={0.25}
               blending={THREE.AdditiveBlending}
+              depthWrite={false}
+              depthTest={false}
+              toneMapped={false}
             />
           </mesh>
-          
-          <mesh ref={pulseRef} rotation={[Math.PI / 2, 0, 0]} onClick={handleYouAreHereClick} onPointerDown={handleYouAreHereClick}>
+
+          <mesh
+            ref={pulseRef}
+            rotation={[Math.PI / 2, 0, 0]}
+            onClick={handleYouAreHereClick}
+            onPointerDown={handleYouAreHereClick}
+          >
             <ringGeometry args={[baseMarkerSize * 1.5, baseMarkerSize * 2.5, 32]} />
             <meshBasicMaterial
               color="#00ff44"
               transparent
-              opacity={0.8}
+              opacity={0.9}
               side={THREE.DoubleSide}
               blending={THREE.AdditiveBlending}
+              depthWrite={false}
+              depthTest={false}
+              toneMapped={false}
             />
           </mesh>
-          
-          <mesh ref={pulseRef2} rotation={[Math.PI / 2, 0, 0]} onClick={handleYouAreHereClick} onPointerDown={handleYouAreHereClick}>
+
+          <mesh
+            ref={pulseRef2}
+            rotation={[Math.PI / 2, 0, 0]}
+            onClick={handleYouAreHereClick}
+            onPointerDown={handleYouAreHereClick}
+          >
             <ringGeometry args={[baseMarkerSize * 1.5, baseMarkerSize * 2.5, 32]} />
             <meshBasicMaterial
               color="#00ff44"
               transparent
-              opacity={0.8}
+              opacity={0.9}
               side={THREE.DoubleSide}
               blending={THREE.AdditiveBlending}
+              depthWrite={false}
+              depthTest={false}
+              toneMapped={false}
             />
           </mesh>
         </group>
