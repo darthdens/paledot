@@ -6,12 +6,15 @@ import { useCosmosStore } from '../store/useCosmosStore';
 
 type WorldPositionTrackerProps = PropsWithChildren<{
   objectId: string;
+  /** Scene-space position for the tracked group (recommended for static children with their own local offsets). */
+  position?: [number, number, number];
   /** Seconds between position updates (lower = smoother camera follow). */
   updateInterval?: number;
 }>;
 
 export const WorldPositionTracker = ({
   objectId,
+  position,
   updateInterval = 0.1,
   children,
 }: WorldPositionTrackerProps) => {
@@ -32,5 +35,9 @@ export const WorldPositionTracker = ({
     setObjectWorldPosition(objectId, [worldPos.current.x, worldPos.current.y, worldPos.current.z]);
   }, -1);
 
-  return <group ref={groupRef}>{children}</group>;
+  return (
+    <group ref={groupRef} position={position}>
+      {children}
+    </group>
+  );
 };

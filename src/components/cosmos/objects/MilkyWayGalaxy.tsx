@@ -376,11 +376,17 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
     // Keep the galaxy center world position live (needed for camera tracking while rotating)
     if (rotatingGroupRef.current) {
       rotatingGroupRef.current.getWorldPosition(centerWorldPos.current);
-      setObjectWorldPosition('milkyWay_center', [
+
+      // NOTE: selectable object id uses dashes (see celestialObjects.ts)
+      const pos: [number, number, number] = [
         centerWorldPos.current.x,
         centerWorldPos.current.y,
         centerWorldPos.current.z,
-      ]);
+      ];
+      setObjectWorldPosition('milky-way-center', pos);
+
+      // Back-compat with any older references
+      setObjectWorldPosition('milkyWay_center', pos);
     }
     
     if (pulseRef.current) {
