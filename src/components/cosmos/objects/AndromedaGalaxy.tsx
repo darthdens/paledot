@@ -163,7 +163,7 @@ export const AndromedaGalaxy = ({ visualScale }: AndromedaGalaxyProps) => {
 
       positions[i3 + 2] = Math.sin(angle) * finalRadius;
 
-      // Andromeda colors: white/blue center → orange dust lanes → blue outer
+      // Andromeda colors: white/blue center → orange dust lanes → vibrant blue outer arms
       const rand = Math.random();
 
       if (rt < 0.12) {
@@ -173,41 +173,50 @@ export const AndromedaGalaxy = ({ visualScale }: AndromedaGalaxyProps) => {
           color.setHSL(0.6 + Math.random() * 0.05, 0.15 + Math.random() * 0.1, 0.85 + Math.random() * 0.1);
         } else {
           // Light blue
-          color.setHSL(0.58 + Math.random() * 0.06, 0.5 + Math.random() * 0.2, 0.7 + Math.random() * 0.15);
+          color.setHSL(0.58 + Math.random() * 0.06, 0.6 + Math.random() * 0.2, 0.75 + Math.random() * 0.12);
         }
       } else if (rt < 0.25) {
         // Inner region: blue with some white
         if (rand < 0.7) {
-          // Blue
-          color.setHSL(0.58 + Math.random() * 0.08, 0.65 + Math.random() * 0.2, 0.55 + Math.random() * 0.15);
+          // Blue - more saturated
+          color.setHSL(0.58 + Math.random() * 0.08, 0.75 + Math.random() * 0.2, 0.58 + Math.random() * 0.12);
         } else {
           // White-blue
-          color.setHSL(0.6 + Math.random() * 0.04, 0.3 + Math.random() * 0.15, 0.75 + Math.random() * 0.1);
+          color.setHSL(0.6 + Math.random() * 0.04, 0.4 + Math.random() * 0.15, 0.75 + Math.random() * 0.1);
         }
       } else if (rt < 0.45) {
         // Dust ring region: orange/golden mixed with blue
-        if (rand < 0.55) {
+        if (rand < 0.45) {
           // Orange/golden dust
-          color.setHSL(0.08 + Math.random() * 0.06, 0.85 + Math.random() * 0.1, 0.5 + Math.random() * 0.15);
-        } else if (rand < 0.8) {
-          // Blue stars in arms
-          color.setHSL(0.58 + Math.random() * 0.08, 0.7 + Math.random() * 0.2, 0.5 + Math.random() * 0.12);
+          color.setHSL(0.08 + Math.random() * 0.06, 0.9 + Math.random() * 0.1, 0.52 + Math.random() * 0.12);
+        } else if (rand < 0.85) {
+          // Vibrant blue stars in arms
+          color.setHSL(0.56 + Math.random() * 0.1, 0.85 + Math.random() * 0.15, 0.55 + Math.random() * 0.12);
         } else {
-          // Yellow-green (young star regions)
-          color.setHSL(0.18 + Math.random() * 0.08, 0.6 + Math.random() * 0.2, 0.5 + Math.random() * 0.1);
+          // Cyan-blue (hot young stars)
+          color.setHSL(0.52 + Math.random() * 0.06, 0.9 + Math.random() * 0.1, 0.6 + Math.random() * 0.1);
         }
       } else if (rt < 0.7) {
-        // Outer arms: mostly blue with some orange
-        if (rand < 0.7) {
-          // Blue
-          color.setHSL(0.56 + Math.random() * 0.1, 0.75 + Math.random() * 0.15, 0.45 + Math.random() * 0.15);
+        // Outer arms: predominantly vibrant blue young stars
+        if (rand < 0.8) {
+          // Vibrant blue - high saturation, good brightness
+          color.setHSL(0.55 + Math.random() * 0.12, 0.9 + Math.random() * 0.1, 0.55 + Math.random() * 0.15);
+        } else if (rand < 0.92) {
+          // Cyan-blue (very hot young stars)
+          color.setHSL(0.5 + Math.random() * 0.08, 0.95, 0.6 + Math.random() * 0.1);
         } else {
-          // Orange remnants
-          color.setHSL(0.06 + Math.random() * 0.05, 0.8 + Math.random() * 0.15, 0.45 + Math.random() * 0.1);
+          // Orange remnants (fewer)
+          color.setHSL(0.06 + Math.random() * 0.05, 0.85 + Math.random() * 0.1, 0.5 + Math.random() * 0.1);
         }
       } else {
-        // Outer halo: faint blue
-        color.setHSL(0.58 + Math.random() * 0.08, 0.6 + Math.random() * 0.2, 0.35 + Math.random() * 0.15);
+        // Outer halo: vibrant blue young stars (star-forming regions at edges)
+        if (rand < 0.85) {
+          // Bright vibrant blue
+          color.setHSL(0.55 + Math.random() * 0.1, 0.92 + Math.random() * 0.08, 0.5 + Math.random() * 0.15);
+        } else {
+          // Cyan highlights
+          color.setHSL(0.5 + Math.random() * 0.06, 0.95, 0.58 + Math.random() * 0.12);
+        }
       }
 
       colors[i3] = color.r;
