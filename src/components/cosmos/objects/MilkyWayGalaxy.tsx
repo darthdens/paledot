@@ -142,28 +142,52 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
 
       positions[i3 + 2] = Math.sin(angle) * radius;
 
-      // Color gradient matching glow regions: white center → yellow → orange → purple → blue → dark blue
-      if (t < 0.05) {
-        // White/cream center
-        color.setHSL(0.14, 0.15, 0.95 + Math.random() * 0.05);
-      } else if (t < 0.12) {
-        // Yellow
-        color.setHSL(0.14 + Math.random() * 0.02, 0.8, 0.7 + Math.random() * 0.15);
-      } else if (t < 0.25) {
-        // Orange
-        color.setHSL(0.08 + Math.random() * 0.03, 0.85, 0.65 + Math.random() * 0.15);
-      } else if (t < 0.42) {
-        // Orange to purple transition
-        color.setHSL(0.95 + Math.random() * 0.08, 0.7, 0.6 + Math.random() * 0.15);
-      } else if (t < 0.58) {
-        // Purple
-        color.setHSL(0.78 + Math.random() * 0.06, 0.65, 0.55 + Math.random() * 0.15);
-      } else if (t < 0.75) {
-        // Blue
-        color.setHSL(0.62 + Math.random() * 0.05, 0.7, 0.55 + Math.random() * 0.15);
+      // Star colors with diversity: yellow center → yellow+orange → yellow+orange+purple → purple+blue → blue
+      // More saturated colors (less white), with mixing in transition zones
+      const rand = Math.random();
+      
+      if (t < 0.15) {
+        // Center: mostly yellow, some orange
+        if (rand < 0.85) {
+          // Yellow
+          color.setHSL(0.12 + Math.random() * 0.04, 0.85 + Math.random() * 0.1, 0.6 + Math.random() * 0.15);
+        } else {
+          // Orange
+          color.setHSL(0.06 + Math.random() * 0.04, 0.9, 0.55 + Math.random() * 0.15);
+        }
+      } else if (t < 0.3) {
+        // Yellow and orange mix
+        if (rand < 0.5) {
+          // Yellow
+          color.setHSL(0.11 + Math.random() * 0.04, 0.85, 0.58 + Math.random() * 0.15);
+        } else {
+          // Orange
+          color.setHSL(0.05 + Math.random() * 0.04, 0.88, 0.55 + Math.random() * 0.12);
+        }
+      } else if (t < 0.5) {
+        // Yellow, orange, and purple mix
+        if (rand < 0.33) {
+          // Yellow
+          color.setHSL(0.12 + Math.random() * 0.03, 0.8, 0.58 + Math.random() * 0.12);
+        } else if (rand < 0.66) {
+          // Orange
+          color.setHSL(0.04 + Math.random() * 0.04, 0.85, 0.52 + Math.random() * 0.12);
+        } else {
+          // Purple
+          color.setHSL(0.78 + Math.random() * 0.08, 0.7, 0.5 + Math.random() * 0.15);
+        }
+      } else if (t < 0.7) {
+        // Purple and blue mix
+        if (rand < 0.5) {
+          // Purple
+          color.setHSL(0.76 + Math.random() * 0.08, 0.7, 0.5 + Math.random() * 0.12);
+        } else {
+          // Blue
+          color.setHSL(0.6 + Math.random() * 0.08, 0.75, 0.5 + Math.random() * 0.12);
+        }
       } else {
-        // Dark blue (outer)
-        color.setHSL(0.6 + Math.random() * 0.04, 0.75, 0.45 + Math.random() * 0.15);
+        // Outer: mostly blue
+        color.setHSL(0.58 + Math.random() * 0.08, 0.8, 0.45 + Math.random() * 0.15);
       }
 
       colors[i3] = color.r;
@@ -197,13 +221,17 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
       positions[i3 + 1] = r * Math.cos(phi) * 0.55;
       positions[i3 + 2] = r * Math.sin(phi) * Math.sin(theta);
 
-      // Color matches glow: white center → golden
-      if (t < 0.25) {
-        color.setHSL(0.12 + Math.random() * 0.02, 0.25, 0.92 + Math.random() * 0.08);
-      } else if (t < 0.6) {
-        color.setHSL(0.11 + Math.random() * 0.03, 0.55, 0.85 + Math.random() * 0.12);
+      // Core: mostly yellow with some orange, more saturated
+      const rand = Math.random();
+      if (t < 0.4) {
+        // Inner core: bright yellow
+        color.setHSL(0.12 + Math.random() * 0.03, 0.9, 0.65 + Math.random() * 0.1);
+      } else if (rand < 0.7) {
+        // Yellow
+        color.setHSL(0.11 + Math.random() * 0.04, 0.85, 0.6 + Math.random() * 0.12);
       } else {
-        color.setHSL(0.08 + Math.random() * 0.04, 0.6, 0.8 + Math.random() * 0.12);
+        // Orange
+        color.setHSL(0.06 + Math.random() * 0.04, 0.88, 0.55 + Math.random() * 0.12);
       }
 
       colors[i3] = color.r;
@@ -237,16 +265,36 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
       const ySpread = (0.12 + (1 - t) * 0.22) * maxRadius;
       positions[i3 + 1] = (Math.random() + Math.random() + Math.random() - 1.5) * ySpread * 0.08;
 
-      // Match star colors to glow regions
-      const regionT = 0.15 + t * 0.85; // corresponds to radius from center
-      if (regionT < 0.35) {
-        color.setHSL(0.06 + Math.random() * 0.04, 0.4, 0.7 + Math.random() * 0.15);
-      } else if (regionT < 0.55) {
-        color.setHSL(0.92 + Math.random() * 0.06, 0.35, 0.65 + Math.random() * 0.15);
+      // Volume stars: same color logic as main stars
+      const regionT = 0.15 + t * 0.85;
+      const rand = Math.random();
+      
+      if (regionT < 0.25) {
+        // Yellow/orange mix
+        if (rand < 0.6) {
+          color.setHSL(0.11 + Math.random() * 0.04, 0.85, 0.58 + Math.random() * 0.12);
+        } else {
+          color.setHSL(0.05 + Math.random() * 0.04, 0.85, 0.55 + Math.random() * 0.12);
+        }
+      } else if (regionT < 0.5) {
+        // Yellow, orange, purple mix
+        if (rand < 0.33) {
+          color.setHSL(0.11 + Math.random() * 0.03, 0.8, 0.55 + Math.random() * 0.12);
+        } else if (rand < 0.66) {
+          color.setHSL(0.04 + Math.random() * 0.04, 0.82, 0.52 + Math.random() * 0.12);
+        } else {
+          color.setHSL(0.78 + Math.random() * 0.08, 0.7, 0.5 + Math.random() * 0.12);
+        }
       } else if (regionT < 0.75) {
-        color.setHSL(0.72 + Math.random() * 0.08, 0.38, 0.6 + Math.random() * 0.15);
+        // Purple/blue mix
+        if (rand < 0.5) {
+          color.setHSL(0.76 + Math.random() * 0.08, 0.7, 0.5 + Math.random() * 0.1);
+        } else {
+          color.setHSL(0.6 + Math.random() * 0.08, 0.75, 0.5 + Math.random() * 0.1);
+        }
       } else {
-        color.setHSL(0.58 + Math.random() * 0.08, 0.45, 0.55 + Math.random() * 0.15);
+        // Outer: blue
+        color.setHSL(0.58 + Math.random() * 0.08, 0.8, 0.45 + Math.random() * 0.12);
       }
 
       colors[i3] = color.r;
