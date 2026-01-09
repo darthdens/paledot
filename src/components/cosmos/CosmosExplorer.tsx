@@ -24,6 +24,7 @@ import { SizeComparison } from './ui/SizeComparison';
 import { ScaleBarUI } from './ui/ScaleBar';
 import { YouAreHereLabel } from './ui/YouAreHereLabel';
 import { CameraController } from './CameraController';
+import { ScaleTracker } from './ScaleTracker';
 import { celestialObjects } from './data/celestialObjects';
 import { UNITS } from './types';
 import { useCosmosStore } from './store/useCosmosStore';
