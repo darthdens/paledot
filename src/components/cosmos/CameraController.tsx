@@ -175,7 +175,15 @@ export const CameraController = () => {
     // After fly-to: continuously follow the selected object (keep it centered)
     // Don't follow during tour - let the user see the full scene
     if (selectedObject && isFollowing && !isTouring) {
-      const livePos = useCosmosStore.getState().objectWorldPositions[selectedObject.id];
+      // Try the selected object's position first, fall back to sun for galaxy scale
+      let livePos = useCosmosStore.getState().objectWorldPositions[selectedObject.id];
+      
+      // At galaxy scale, if no live position for selected object, use the solar-system-marker
+      // which represents where the whole solar system is in the galaxy
+      if (!livePos) {
+        livePos = useCosmosStore.getState().objectWorldPositions['solar-system-marker'];
+      }
+      
       if (livePos) {
         const currentTarget = orbitControls.target as THREE.Vector3;
 
