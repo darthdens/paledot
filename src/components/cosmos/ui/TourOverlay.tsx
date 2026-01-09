@@ -72,127 +72,161 @@ export const TourOverlay = () => {
         setSelectedObject(targetObject);
       }
 
-      const store = useCosmosStore.getState();
+      const computeAndSetCamera = (livePos: [number, number, number] | undefined) => {
+        const store = useCosmosStore.getState();
 
-      // Prefer live world position when available (keeps tour accurate even when the galaxy rotates)
-      const livePos = store.objectWorldPositions[stop.locationId];
+        const fallbackTargetPos = (): [number, number, number] => {
+          if (!targetObject) return [0, 0, 0];
 
-      const fallbackTargetPos = (): [number, number, number] => {
-        if (!targetObject) return [0, 0, 0];
+          // Nebulae positions are stored in light-years in celestialObjects.ts
+          if (targetObject.category === 'nebulae') {
+            const gs = UNITS.KM_PER_LY * UNIFIED_SCALE;
+            return [
+              targetObject.position[0] * gs,
+              targetObject.position[1] * gs,
+              targetObject.position[2] * gs,
+            ];
+          }
 
-        // Nebulae positions are stored in light-years in celestialObjects.ts
-        if (targetObject.category === 'nebulae') {
-          const gs = UNITS.KM_PER_LY * UNIFIED_SCALE;
+          // Stars (like Proxima Centauri) positions are also in light-years
+          if (targetObject.category === 'stars') {
+            const gs = UNITS.KM_PER_LY * UNIFIED_SCALE;
+            return [
+              targetObject.position[0] * gs,
+              targetObject.position[1] * gs,
+              targetObject.position[2] * gs,
+            ];
+          }
+
+          // Most other objects store positions in km
           return [
-            targetObject.position[0] * gs,
-            targetObject.position[1] * gs,
-            targetObject.position[2] * gs,
+            targetObject.position[0] * UNIFIED_SCALE,
+            targetObject.position[1] * UNIFIED_SCALE,
+            targetObject.position[2] * UNIFIED_SCALE,
           ];
-        }
+        };
 
-        // Stars (like Proxima Centauri) positions are also in light-years
-        if (targetObject.category === 'stars') {
-          const gs = UNITS.KM_PER_LY * UNIFIED_SCALE;
-          return [
-            targetObject.position[0] * gs,
-            targetObject.position[1] * gs,
-            targetObject.position[2] * gs,
-          ];
-        }
-
-        // Most other objects store positions in km
-        return [
-          targetObject.position[0] * UNIFIED_SCALE,
-          targetObject.position[1] * UNIFIED_SCALE,
-          targetObject.position[2] * UNIFIED_SCALE,
-        ];
-      };
-
-      const targetPos: [number, number, number] = livePos ?? fallbackTargetPos();
-      
-      // For stops that look at a specific point (like Milky Way looking at Sun's position),
-      // use the stop's lookAt directly if it's not [0,0,0] and scale level is milkyWay
-      let lookAtPos: [number, number, number];
-      if (stop.scaleLevel === 'milkyWay' && (stop.lookAt[0] !== 0 || stop.lookAt[1] !== 0 || stop.lookAt[2] !== 0)) {
-        // Milky Way scale lookAt is in km
-        lookAtPos = [
-          stop.lookAt[0] * UNIFIED_SCALE,
-          stop.lookAt[1] * UNIFIED_SCALE,
-          stop.lookAt[2] * UNIFIED_SCALE,
-        ];
-      } else {
-        lookAtPos = targetPos;
-      }
-
-      // Tour stop cameraPosition is treated as an offset vector in km
-      const offsetScene: [number, number, number] = [
-        stop.cameraPosition[0] * UNIFIED_SCALE,
-        stop.cameraPosition[1] * UNIFIED_SCALE,
-        stop.cameraPosition[2] * UNIFIED_SCALE,
-      ];
-
-      let cameraPos: [number, number, number];
-
-      // For solar system bodies (except the sun itself), place the camera on the sun-facing side
-      if (targetObject?.category === 'solarSystem' && targetObject.id !== 'sun') {
-        const sunPos = store.objectWorldPositions['sun'] ?? ([0, 0, 0] as [number, number, number]);
+        const targetPos: [number, number, number] = livePos ?? fallbackTargetPos();
         
-        // Direction from object to sun
-        const dx = sunPos[0] - targetPos[0];
-        const dy = sunPos[1] - targetPos[1];
-        const dz = sunPos[2] - targetPos[2];
-        const len = Math.hypot(dx, dy, dz);
-        
-        if (len > 0) {
-          const dirToSun = [dx / len, dy / len, dz / len];
-          
-          // Calculate camera distance from offset
-          const dist = Math.hypot(offsetScene[0], offsetScene[1], offsetScene[2]) || 1;
-          
-          // Position camera between object and sun, with a slight elevation
-          cameraPos = [
-            targetPos[0] + dirToSun[0] * dist,
-            targetPos[1] + Math.abs(offsetScene[1]) * 0.5, // Add some height
-            targetPos[2] + dirToSun[2] * dist,
+        // For stops that look at a specific point (like Milky Way looking at Sun's position),
+        // use the stop's lookAt directly if it's not [0,0,0] and scale level is milkyWay
+        let lookAtPos: [number, number, number];
+        if (stop.scaleLevel === 'milkyWay' && (stop.lookAt[0] !== 0 || stop.lookAt[1] !== 0 || stop.lookAt[2] !== 0)) {
+          // Milky Way scale lookAt is in km
+          lookAtPos = [
+            stop.lookAt[0] * UNIFIED_SCALE,
+            stop.lookAt[1] * UNIFIED_SCALE,
+            stop.lookAt[2] * UNIFIED_SCALE,
           ];
         } else {
-          // Fallback if somehow at sun's position
+          lookAtPos = targetPos;
+        }
+
+        // Tour stop cameraPosition is treated as an offset vector in km
+        const offsetScene: [number, number, number] = [
+          stop.cameraPosition[0] * UNIFIED_SCALE,
+          stop.cameraPosition[1] * UNIFIED_SCALE,
+          stop.cameraPosition[2] * UNIFIED_SCALE,
+        ];
+
+        let cameraPos: [number, number, number];
+
+        // For solar system bodies (except the sun itself), place the camera on the sun-facing side
+        if (targetObject?.category === 'solarSystem' && targetObject.id !== 'sun') {
+          const sunPos = store.objectWorldPositions['sun'] ?? ([0, 0, 0] as [number, number, number]);
+          
+          // Direction from object to sun
+          const dx = sunPos[0] - targetPos[0];
+          const dy = sunPos[1] - targetPos[1];
+          const dz = sunPos[2] - targetPos[2];
+          const len = Math.hypot(dx, dy, dz);
+          
+          if (len > 0) {
+            const dirToSun = [dx / len, dy / len, dz / len];
+            
+            // Calculate camera distance from offset
+            const dist = Math.hypot(offsetScene[0], offsetScene[1], offsetScene[2]) || 1;
+            
+            // Position camera between object and sun, with a slight elevation
+            cameraPos = [
+              targetPos[0] + dirToSun[0] * dist,
+              targetPos[1] + Math.abs(offsetScene[1]) * 0.5, // Add some height
+              targetPos[2] + dirToSun[2] * dist,
+            ];
+          } else {
+            // Fallback if somehow at sun's position
+            cameraPos = [
+              targetPos[0] + offsetScene[0],
+              targetPos[1] + offsetScene[1],
+              targetPos[2] + offsetScene[2],
+            ];
+          }
+        } else if (stop.scaleLevel === 'milkyWay') {
+          // For milky way scale, use absolute positions from the stop
+          cameraPos = [
+            stop.cameraPosition[0] * UNIFIED_SCALE,
+            stop.cameraPosition[1] * UNIFIED_SCALE,
+            stop.cameraPosition[2] * UNIFIED_SCALE,
+          ];
+        } else if (targetObject?.category === 'stars' && targetObject.id !== 'sun') {
+          // For distant stars like Proxima Centauri, use the tour stop's camera position
+          // directly as an offset from the star's position (in km, scaled to scene)
+          cameraPos = [
+            targetPos[0] + offsetScene[0],
+            targetPos[1] + offsetScene[1],
+            targetPos[2] + offsetScene[2],
+          ];
+        } else {
+          // Default: apply the offset directly in scene space
           cameraPos = [
             targetPos[0] + offsetScene[0],
             targetPos[1] + offsetScene[1],
             targetPos[2] + offsetScene[2],
           ];
         }
-      } else if (stop.scaleLevel === 'milkyWay') {
-        // For milky way scale, use absolute positions from the stop
-        cameraPos = [
-          stop.cameraPosition[0] * UNIFIED_SCALE,
-          stop.cameraPosition[1] * UNIFIED_SCALE,
-          stop.cameraPosition[2] * UNIFIED_SCALE,
-        ];
-      } else if (targetObject?.category === 'stars' && targetObject.id !== 'sun') {
-        // For distant stars like Proxima Centauri, use the tour stop's camera position
-        // directly as an offset from the star's position (in km, scaled to scene)
-        cameraPos = [
-          targetPos[0] + offsetScene[0],
-          targetPos[1] + offsetScene[1],
-          targetPos[2] + offsetScene[2],
-        ];
-      } else {
-        // Default: apply the offset directly in scene space
-        cameraPos = [
-          targetPos[0] + offsetScene[0],
-          targetPos[1] + offsetScene[1],
-          targetPos[2] + offsetScene[2],
-        ];
-      }
 
-      // Set tour camera target for the CameraController
-      setTourCameraTarget({
-        position: cameraPos,
-        lookAt: lookAtPos,
-        space: 'scene',
-      });
+        // Set tour camera target for the CameraController
+        setTourCameraTarget({
+          position: cameraPos,
+          lookAt: lookAtPos,
+          space: 'scene',
+        });
+      };
+
+      const store = useCosmosStore.getState();
+      const livePos = store.objectWorldPositions[stop.locationId];
+
+      // For solar system bodies, we need both the object's live position AND the sun's position
+      // to correctly calculate sun-facing camera placement
+      const needsSunPos = targetObject?.category === 'solarSystem' && targetObject?.id !== 'sun';
+      const hasSunPos = !!store.objectWorldPositions['sun'];
+
+      if (livePos && (!needsSunPos || hasSunPos)) {
+        // We have all positions we need, compute immediately
+        computeAndSetCamera(livePos);
+      } else {
+        // Wait for live positions to become available
+        let done = false;
+        const unsubscribe = useCosmosStore.subscribe((state) => {
+          if (done) return;
+          const objPos = state.objectWorldPositions[stop.locationId];
+          const sunOk = !needsSunPos || !!state.objectWorldPositions['sun'];
+          if (objPos && sunOk) {
+            done = true;
+            unsubscribe();
+            computeAndSetCamera(objPos);
+          }
+        });
+
+        // Fallback: if positions never arrive (e.g., static objects), compute with fallback after a short delay
+        setTimeout(() => {
+          if (!done) {
+            done = true;
+            unsubscribe();
+            computeAndSetCamera(undefined);
+          }
+        }, 100);
+      }
     },
     [setTourIndex, setSelectedObject, setTourCameraTarget]
   );
