@@ -1,0 +1,36 @@
+import type { PropsWithChildren } from 'react';
+import { useRef } from 'react';
+import { useFrame } from '@react-three/fiber';
+import * as THREE from 'three';
+import { useCosmosStore } from '../store/useCosmosStore';
+
+type WorldPositionTrackerProps = PropsWithChildren<{
+  objectId: string;
+  /** Seconds between position updates (lower = smoother camera follow). */
+  updateInterval?: number;
+}>;
+
+export const WorldPositionTracker = ({
+  objectId,
+  updateInterval = 0.1,
+  children,
+}: WorldPositionTrackerProps) => {
+  const groupRef = useRef<THREE.Group>(null);
+  const setObjectWorldPosition = useCosmosStore((s) => s.setObjectWorldPosition);
+
+  const accumulator = useRef(0);
+  const worldPos = useRef(new THREE.Vector3());
+
+  useFrame((_, delta) => {
+    if (!groupRef.current) return;
+
+    accumulator.current += delta;
+    if (accumulator.current < updateInterval) return;
+    accumulator.current = 0;
+
+    groupRef.current.getWorldPosition(worldPos.current);
+    setObjectWorldPosition(objectId, [worldPos.current.x, worldPos.current.y, worldPos.current.z]);
+  }, -1);
+
+  return <group ref={groupRef}>{children}</group>;
+};

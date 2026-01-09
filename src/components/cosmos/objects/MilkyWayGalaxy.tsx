@@ -77,7 +77,7 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
   const pulseRef = useRef<THREE.Mesh>(null);
   const pulseRef2 = useRef<THREE.Mesh>(null);
   const markerGroupRef = useRef<THREE.Group>(null);
-  const hasSetCenterRef = useRef(false);
+  const centerWorldPos = useRef(new THREE.Vector3());
   
   const setObjectWorldPosition = useCosmosStore((s) => s.setObjectWorldPosition);
   
@@ -371,14 +371,16 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
   useFrame(({ clock, camera }) => {
     const t = clock.getElapsedTime();
 
-    // Galaxy rotation is now handled by GalaxyRotator in CosmosExplorer
+    // Galaxy rotation is handled by GalaxyRotator in CosmosExplorer
 
-    // Cache the galaxy center world position once (used by camera-based UI overlays)
-    if (!hasSetCenterRef.current && rotatingGroupRef.current) {
-      const p = new THREE.Vector3();
-      rotatingGroupRef.current.getWorldPosition(p);
-      setObjectWorldPosition('milkyWay_center', [p.x, p.y, p.z]);
-      hasSetCenterRef.current = true;
+    // Keep the galaxy center world position live (needed for camera tracking while rotating)
+    if (rotatingGroupRef.current) {
+      rotatingGroupRef.current.getWorldPosition(centerWorldPos.current);
+      setObjectWorldPosition('milkyWay_center', [
+        centerWorldPos.current.x,
+        centerWorldPos.current.y,
+        centerWorldPos.current.z,
+      ]);
     }
     
     if (pulseRef.current) {
