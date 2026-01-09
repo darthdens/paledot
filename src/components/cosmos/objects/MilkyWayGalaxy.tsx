@@ -97,7 +97,7 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
   const starsGeo = useMemo(() => {
     const { branches, spinTurns } = MILKY_WAY;
     const maxRadius = MILKY_WAY.diskRadius * gs;
-    const starCount = 280000;
+    const starCount = 400000;
 
     const positions = new Float32Array(starCount * 3);
     const colors = new Float32Array(starCount * 3);
@@ -208,7 +208,7 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
   
   // Core bulge stars - denser center with golden color
   const coreGeo = useMemo(() => {
-    const coreCount = 90000;
+    const coreCount = 130000;
     const positions = new Float32Array(coreCount * 3);
     const colors = new Float32Array(coreCount * 3);
     const color = new THREE.Color();
@@ -252,7 +252,7 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
 
   // Extra "volume" stars above/below disk - colored by region
   const volumeGeo = useMemo(() => {
-    const count = 70000;
+    const count = 100000;
     const maxRadius = MILKY_WAY.diskRadius * gs;
     const positions = new Float32Array(count * 3);
     const colors = new Float32Array(count * 3);
@@ -315,9 +315,9 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
 
   // Halo stars - scattered above/below the disk, denser near center
   const haloGeo = useMemo(() => {
-    const count = 15000; // Much fewer than disk stars
-    const maxRadius = MILKY_WAY.diskRadius * gs * 0.6; // Don't extend as far out
-    const maxHeight = MILKY_WAY.diskRadius * gs * 0.25; // Vertical extent
+    const count = 25000;
+    const maxRadius = MILKY_WAY.diskRadius * gs * 0.65;
+    const maxHeight = MILKY_WAY.diskRadius * gs * 0.2;
     const positions = new Float32Array(count * 3);
     const colors = new Float32Array(count * 3);
     const color = new THREE.Color();
@@ -325,20 +325,18 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
     for (let i = 0; i < count; i++) {
       const i3 = i * 3;
       
-      // Strongly concentrated toward center (power of 2.5 for steep falloff)
-      const t = Math.pow(Math.random(), 2.5);
+      // Concentrated toward center (power of 2 for falloff)
+      const t = Math.pow(Math.random(), 2);
       const radius = t * maxRadius;
       const angle = Math.random() * Math.PI * 2;
 
       positions[i3] = Math.cos(angle) * radius;
       positions[i3 + 2] = Math.sin(angle) * radius;
 
-      // Vertical position: can be high above or below, but decreases with radius
-      const heightScale = 1 - t * 0.7; // Less height spread further from center
+      // Vertical position: smooth distribution above/below, decreases with radius
+      const heightScale = 1 - t * 0.6;
       const y = (Math.random() * 2 - 1) * maxHeight * heightScale;
-      // Make sure stars are actually above/below the disk (not in it)
-      const minY = MILKY_WAY.diskRadius * gs * 0.02;
-      positions[i3 + 1] = y > 0 ? y + minY : y - minY;
+      positions[i3 + 1] = y;
 
       // Halo stars: older, more yellow/orange, some ancient blue stragglers
       const rand = Math.random();
