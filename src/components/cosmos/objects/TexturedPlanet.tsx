@@ -367,13 +367,6 @@ export const TexturedPlanet = ({
     return (planetSizes[object.parentId] || 0) * visualScale;
   }, [isMoon, object.parentId, visualScale]);
 
-  // Ensure we have an initial world position early (helps camera fly-to be accurate immediately)
-  useEffect(() => {
-    if (!groupRef.current) return;
-    groupRef.current.getWorldPosition(worldPos.current);
-    setObjectWorldPosition(object.id, [worldPos.current.x, worldPos.current.y, worldPos.current.z]);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [object.id, setObjectWorldPosition]);
   
   const visuals = PLANET_VISUALS[object.id] || {
     baseColor: object.color,
