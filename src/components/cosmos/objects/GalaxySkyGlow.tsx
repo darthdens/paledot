@@ -4,15 +4,17 @@ import * as THREE from "three";
 import { useCosmosStore } from "../store/useCosmosStore";
 
 /**
- * Camera-centered sky-dome glow (not a world object).
- * Root cause: the camera cannot render objects behind it.
- * Solution: render a background dome whose intensity depends on the real galactic-center direction,
- * so the glow remains visible even when you turn your back.
+ * Galaxy ambient glow rendered in screen-space.
+ *
+ * Why: A world-space glow can disappear when the galactic center is behind the camera.
+ * This draws a fullscreen background shader and drives it from the true galactic-center
+ * direction (in view space), so it remains present regardless of camera orientation.
  */
 export const GalaxySkyGlow = () => {
   const meshRef = useRef<THREE.Mesh>(null);
-  const centerDirView = useRef(new THREE.Vector3(0, 0, -1));
-  const tmpDir = useRef(new THREE.Vector3());
+
+  const tmpDirWorld = useRef(new THREE.Vector3());
+  const tmpCenterView = useRef(new THREE.Vector3());
   const tmpMat3 = useRef(new THREE.Matrix3());
 
   const { camera } = useThree();
@@ -27,40 +29,40 @@ export const GalaxySkyGlow = () => {
 
   const material = useMemo(() => {
     return new THREE.ShaderMaterial({
-      transparent: true,
+      transparent: false,
       depthTest: false,
       depthWrite: false,
-      blending: THREE.AdditiveBlending,
-      side: THREE.BackSide,
+      blending: THREE.NoBlending,
       toneMapped: false,
       uniforms: {
         uCenterDirView: { value: new THREE.Vector3(0, 0, -1) },
-        uMin: { value: 0.12 },
-        uMax: { value: 0.28 },
+        uInvProjection: { value: new THREE.Matrix4() },
+        // Tuned to be clearly visible but not overpowering.
+        uBase: { value: 0.18 },
+        uPeak: { value: 0.55 },
       },
       vertexShader: `
-        varying vec3 vViewDir;
+        varying vec2 vUv;
         void main() {
-          // Direction from camera in VIEW space
-          vec3 viewPos = (modelViewMatrix * vec4(position, 1.0)).xyz;
-          vViewDir = normalize(viewPos);
-          gl_Position = projectionMatrix * vec4(viewPos, 1.0);
+          vUv = uv;
+          // Fullscreen quad in clip space
+          gl_Position = vec4(position.xy, 0.999999, 1.0);
         }
       `,
       fragmentShader: `
         precision highp float;
 
-        varying vec3 vViewDir;
-        uniform vec3 uCenterDirView;
-        uniform float uMin;
-        uniform float uMax;
+        varying vec2 vUv;
 
-        vec3 toLinear(vec3 c) {
-          return pow(c, vec3(2.2));
-        }
+        uniform vec3 uCenterDirView;
+        uniform mat4 uInvProjection;
+        uniform float uBase;
+        uniform float uPeak;
+
+        vec3 toLinear(vec3 c) { return pow(c, vec3(2.2)); }
 
         vec3 ramp(float t) {
-          // t: 0 (center) -> 1 (edge)
+          // t: 0 (center axis) -> 1 (edge)
           vec3 c0 = toLinear(vec3(1.00, 0.86, 0.31)); // yellow
           vec3 c1 = toLinear(vec3(1.00, 0.63, 0.16)); // yellow-orange
           vec3 c2 = toLinear(vec3(1.00, 0.47, 0.12)); // orange
@@ -78,27 +80,30 @@ export const GalaxySkyGlow = () => {
         }
 
         void main() {
-          vec3 dir = normalize(vViewDir);
+          // Reconstruct a view-space ray direction from UV using inverse projection.
+          vec2 ndc = vUv * 2.0 - 1.0;
+          vec4 clip = vec4(ndc, 1.0, 1.0);
+          vec4 view = uInvProjection * clip;
+          vec3 dir = normalize(view.xyz / view.w);
+
           vec3 cdir = normalize(uCenterDirView);
 
-          // Sky-dome should still glow when the center is behind the camera,
-          // so we drive intensity from abs(dot).
-          float d = clamp(dot(dir, cdir), -1.0, 1.0);
-          float facing = clamp(abs(d), 0.0, 1.0);
+          // Use abs() so the glow remains when the galactic center is behind the camera.
+          float d = clamp(abs(dot(dir, cdir)), 0.0, 1.0);
 
-          // Angular distance to the (possibly behind) galactic center axis
-          float ad = acos(clamp(abs(d), 0.0, 1.0));
-          // Normalize (0..~pi/2) -> (0..1)
+          // Angular distance (0..pi/2) normalized to 0..1
+          float ad = acos(clamp(d, 0.0, 1.0));
           float t = clamp(ad / 1.5707963, 0.0, 1.0);
 
           vec3 col = ramp(t);
 
-          // Soft falloff: strong near center axis, still present across the sky
-          float alpha = exp(-pow(t * 1.35, 2.0));
+          // Broad background + brighter core-axis
+          float base = 1.0 - smoothstep(0.35, 1.0, t);
+          float core = exp(-pow(t * 1.15, 2.0));
 
-          float intensity = mix(uMin, uMax, pow(facing, 1.6));
+          float intensity = uBase * base + uPeak * core;
 
-          gl_FragColor = vec4(col * alpha * intensity, alpha * intensity);
+          gl_FragColor = vec4(col * intensity, 1.0);
         }
       `,
     });
@@ -108,10 +113,9 @@ export const GalaxySkyGlow = () => {
     const m = meshRef.current;
     if (!m) return;
 
-    // Attach to the camera so the glow is rendered in camera-local space.
-    // This avoids huge world-coordinate precision issues at cosmic distances.
+    // Keep it in camera space so it doesn't suffer from large world-coordinate precision.
     camera.add(m);
-    m.position.set(0, 0, 0);
+    m.position.set(0, 0, -0.2);
     m.scale.setScalar(1);
 
     return () => {
@@ -120,22 +124,28 @@ export const GalaxySkyGlow = () => {
   }, [camera]);
 
   useFrame(() => {
-    // Update uniform direction (world -> view)
+    // Keep inverse projection up to date (FOV/resize).
+    (material.uniforms.uInvProjection.value as THREE.Matrix4).copy(camera.projectionMatrixInverse);
+
+    // Update galactic center direction (world -> view)
     if (centerPos) {
-      tmpDir.current.set(centerPos[0], centerPos[1], centerPos[2]).sub(camera.position).normalize();
+      tmpDirWorld.current
+        .set(centerPos[0], centerPos[1], centerPos[2])
+        .sub(camera.position)
+        .normalize();
 
       tmpMat3.current.setFromMatrix4(camera.matrixWorldInverse);
-      centerDirView.current.copy(tmpDir.current).applyMatrix3(tmpMat3.current).normalize();
+      tmpCenterView.current.copy(tmpDirWorld.current).applyMatrix3(tmpMat3.current).normalize();
 
-      (material.uniforms.uCenterDirView.value as THREE.Vector3).copy(centerDirView.current);
+      (material.uniforms.uCenterDirView.value as THREE.Vector3).copy(tmpCenterView.current);
     }
   });
 
   if (!visible) return null;
 
   return (
-    <mesh ref={meshRef} frustumCulled={false} renderOrder={-200}>
-      <sphereGeometry args={[10, 64, 64]} />
+    <mesh ref={meshRef} frustumCulled={false} renderOrder={-1000}>
+      <planeGeometry args={[2, 2]} />
       <primitive object={material} attach="material" />
     </mesh>
   );
