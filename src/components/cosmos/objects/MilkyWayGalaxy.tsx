@@ -398,9 +398,11 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true, showSunOrbi
     }
     
     // Animate the Sun's position around the galactic center
-    if (markerGroupRef.current && timeSpeed !== 0) {
-      const orbitSpeed = (Math.PI * 2) / SUN_GALACTIC_ORBIT_PERIOD;
-      sunAngleRef.current += orbitSpeed * delta * timeSpeed;
+    if (markerGroupRef.current) {
+      if (timeSpeed !== 0) {
+        const orbitSpeed = (Math.PI * 2) / SUN_GALACTIC_ORBIT_PERIOD;
+        sunAngleRef.current += orbitSpeed * delta * timeSpeed;
+      }
       
       const sunOrbitRadius = MILKY_WAY.sunDistance * gs;
       markerGroupRef.current.position.set(
@@ -409,7 +411,7 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true, showSunOrbi
         Math.sin(sunAngleRef.current) * sunOrbitRadius
       );
       
-      // Update world position for trail tracking
+      // Update world position for trail tracking (always, so trail works from start)
       const worldPos = new THREE.Vector3();
       markerGroupRef.current.getWorldPosition(worldPos);
       setObjectWorldPosition('sun_galactic', [worldPos.x, worldPos.y, worldPos.z]);
