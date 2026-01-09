@@ -82,21 +82,19 @@ export const GalacticOrbitRing = ({ visualScale, visible = true }: GalacticOrbit
         <meshBasicMaterial color="#00ff88" transparent opacity={0.8} blending={THREE.AdditiveBlending} />
       </mesh>
 
-      {/* Tooltip label */}
-      {isHovered && (
-        <Html
-          position={[markerX, markerRadius * 3, markerZ]}
-          center
-          occlude={false}
-          style={{ pointerEvents: 'none' }}
-        >
-          <div className="bg-black/80 backdrop-blur-sm px-3 py-1.5 rounded-lg border border-emerald-500/50 whitespace-nowrap">
-            <span className="text-emerald-400 text-sm font-semibold">
-              {language === 'fr' ? 'Nous sommes ici' : 'We are here'}
-            </span>
-          </div>
-        </Html>
-      )}
+      {/* Tooltip label - always visible, positioned well above the marker */}
+      <Html
+        position={[markerX, markerRadius * 12, markerZ]}
+        center
+        occlude={false}
+        style={{ pointerEvents: 'none' }}
+      >
+        <div className="bg-black/80 backdrop-blur-sm px-3 py-1.5 rounded-lg border border-emerald-500/50 whitespace-nowrap">
+          <span className="text-emerald-400 text-sm font-semibold">
+            {language === 'fr' ? 'Nous sommes ici' : 'We are here'}
+          </span>
+        </div>
+      </Html>
     </group>
   );
 };
