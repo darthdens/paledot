@@ -267,6 +267,7 @@ export const CosmosExplorer = () => {
               maxPoints={800}
               opacity={0.9}
               glow
+              minMovementSq={1}
             />
           )}
           

@@ -15,6 +15,8 @@ interface OrbitalTrailProps {
   lineWidth?: number;
   /** Add a glow layer behind the trail */
   glow?: boolean;
+  /** Minimum squared distance to add a new point (default 0.01, use higher for galaxy scale) */
+  minMovementSq?: number;
 }
 
 /**
@@ -29,6 +31,7 @@ export const OrbitalTrail = ({
   opacity = 0.35,
   lineWidth = 1,
   glow = false,
+  minMovementSq = 0.01,
 }: OrbitalTrailProps) => {
   const geometryRef = useRef<THREE.BufferGeometry | null>(null);
   const glowGeometryRef = useRef<THREE.BufferGeometry | null>(null);
@@ -118,12 +121,12 @@ export const OrbitalTrail = ({
     if (frameCountRef.current < 4) return;
     frameCountRef.current = 0;
 
-    // Skip tiny movements
+    // Skip tiny movements (threshold varies by scale)
     if (lastPosRef.current) {
       const dx = worldPos[0] - lastPosRef.current[0];
       const dy = worldPos[1] - lastPosRef.current[1];
       const dz = worldPos[2] - lastPosRef.current[2];
-      if (dx * dx + dy * dy + dz * dz < 0.01) return;
+      if (dx * dx + dy * dy + dz * dz < minMovementSq) return;
     }
     lastPosRef.current = [worldPos[0], worldPos[1], worldPos[2]];
 
