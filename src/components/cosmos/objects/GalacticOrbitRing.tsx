@@ -3,6 +3,7 @@ import { Html } from '@react-three/drei';
 import * as THREE from 'three';
 import { UNITS } from '../types';
 import { useLanguage } from '@/i18n/LanguageContext';
+import { useCosmosStore } from '../store/useCosmosStore';
 
 interface GalacticOrbitRingProps {
   visualScale: number;
@@ -17,10 +18,15 @@ const MILKY_WAY = {
 
 /**
  * A ring showing the solar system's orbital path around the galactic center.
+ * Only visible at stellar scale and above (not in solar system view).
  */
 export const GalacticOrbitRing = ({ visualScale, visible = true }: GalacticOrbitRingProps) => {
   const { language } = useLanguage();
   const [isHovered, setIsHovered] = useState(false);
+  
+  // Only show at stellar scale and above
+  const currentScale = useCosmosStore((s) => s.currentScale);
+  const showAtScale = currentScale === 'stellar' || currentScale === 'milkyWay' || currentScale === 'localGroup' || currentScale === 'universe';
 
   const gs = UNITS.KM_PER_LY * visualScale;
   const orbitRadius = MILKY_WAY.sunDistance * gs;
@@ -52,7 +58,8 @@ export const GalacticOrbitRing = ({ visualScale, visible = true }: GalacticOrbit
     return new THREE.BufferGeometry().setFromPoints(points);
   }, [orbitRadius]);
 
-  if (!visible) return null;
+  // Hide if not visible or at wrong scale
+  if (!visible || !showAtScale) return null;
 
   return (
     <group position={galaxyCenter}>
