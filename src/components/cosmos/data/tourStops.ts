@@ -261,6 +261,23 @@ export const tourStops: TourStop[] = [
     scaleLevel: 'solarSystem',
   },
   {
+    id: 'kuiper-belt',
+    locationId: 'pluto',
+    title: {
+      en: 'The Kuiper Belt',
+      fr: 'La Ceinture de Kuiper',
+    },
+    narration: {
+      en: 'Beyond Neptune stretches the Kuiper Belt, a vast ring of icy bodies and dwarf planets extending billions of kilometers into space. This frozen frontier contains remnants from the solar system\'s birth, including countless comets waiting to be discovered.',
+      fr: 'Au-delà de Neptune s\'étend la ceinture de Kuiper, un vaste anneau de corps glacés et de planètes naines s\'étendant sur des milliards de kilomètres dans l\'espace. Cette frontière gelée contient des vestiges de la naissance du système solaire, y compris d\'innombrables comètes attendant d\'être découvertes.',
+    },
+    duration: 8,
+    // Wide view to show the Kuiper Belt region
+    cameraPosition: [0, 10 * UNITS.KM_PER_AU, 15 * UNITS.KM_PER_AU],
+    lookAt: [0, 0, 0],
+    scaleLevel: 'solarSystem',
+  },
+  {
     id: 'milky-way',
     locationId: 'milky-way-center',
     title: {
