@@ -1,10 +1,8 @@
-import { useRef, useMemo, useCallback, type MouseEvent as ReactMouseEvent } from 'react';
+import { useRef, useMemo, useCallback } from 'react';
 import { useFrame } from '@react-three/fiber';
-import { Html } from '@react-three/drei';
 import * as THREE from 'three';
 import { UNITS } from '../types';
 import { useCosmosStore } from '../store/useCosmosStore';
-import { useLanguage } from '@/i18n/LanguageContext';
 import { getObjectById } from '../data/celestialObjects';
 
 interface AndromedaGalaxyProps {
@@ -13,16 +11,19 @@ interface AndromedaGalaxyProps {
 
 // Andromeda galaxy parameters - based on real data
 // Distance: 2.537 million light-years from Milky Way
-// Diameter: ~152,000 light-years (larger than Milky Way's ~100,000 ly)
+// Diameter: ~220,000 light-years (about 2x Milky Way's ~100,000 ly based on reference images)
 // Inclination: ~77° from face-on (appears nearly edge-on)
 // Has two prominent spiral arms with distinctive dust rings
+// 
+// Scale reference: If Milky Way were a tennis ball, Andromeda would be 5.6 feet away
+// and slightly larger (about 1.5-2x the size)
 const ANDROMEDA = {
-  diskRadius: 76000, // Half of 152,000 ly diameter
-  bulgeRadius: 15000, // Larger bulge than Milky Way
+  diskRadius: 110000, // Half of 220,000 ly diameter (larger than Milky Way's 52,500 ly radius)
+  bulgeRadius: 20000, // Larger bulge than Milky Way
   branches: 2, // Two main spiral arms
   spinTurns: 1.4, // Tighter spiral
   inclination: (77 * Math.PI) / 180, // 77° inclination
-  distanceFromMilkyWay: 2.537e6, // 2.537 million light-years
+  distanceFromMilkyWay: 2.537e6, // 2.537 million light-years (accurate)
 };
 
 // Andromeda glow texture: white/blue center → orange dust ring → blue outer haze
@@ -84,15 +85,9 @@ const createDotTexture = () => {
 export const AndromedaGalaxy = ({ visualScale }: AndromedaGalaxyProps) => {
   const groupRef = useRef<THREE.Group>(null);
   const centerWorldPos = useRef(new THREE.Vector3());
-  
-  const { language } = useLanguage();
 
   const setObjectWorldPosition = useCosmosStore((s) => s.setObjectWorldPosition);
   const setSelectedObject = useCosmosStore((s) => s.setSelectedObject);
-  const currentScale = useCosmosStore((s) => s.currentScale);
-  
-  // Only show label at local group scale views
-  const showLabel = currentScale === 'localGroup' || currentScale === 'universe';
 
   const gs = UNITS.KM_PER_LY * visualScale;
   
@@ -107,11 +102,6 @@ export const AndromedaGalaxy = ({ visualScale }: AndromedaGalaxyProps) => {
   const andromedaObject = useMemo(() => getObjectById('andromeda'), []);
 
   const handleClick = useCallback((e: { stopPropagation: () => void }) => {
-    e.stopPropagation();
-    if (andromedaObject) setSelectedObject(andromedaObject);
-  }, [andromedaObject, setSelectedObject]);
-
-  const handleLabelClick = useCallback((e: ReactMouseEvent<HTMLDivElement>) => {
     e.stopPropagation();
     if (andromedaObject) setSelectedObject(andromedaObject);
   }, [andromedaObject, setSelectedObject]);
@@ -338,7 +328,6 @@ export const AndromedaGalaxy = ({ visualScale }: AndromedaGalaxyProps) => {
   });
 
   const diskR = ANDROMEDA.diskRadius * gs;
-  const baseMarkerSize = gs * 500;
 
   return (
     <group ref={groupRef} position={andromedaPosition}>
@@ -404,7 +393,7 @@ export const AndromedaGalaxy = ({ visualScale }: AndromedaGalaxyProps) => {
         </sprite>
       </group>
 
-      {/* Click target and label (outside inclination group so label stays upright) */}
+      {/* Click target (no label - just for selection) */}
       <mesh 
         onClick={handleClick}
         onPointerDown={handleClick}
@@ -414,27 +403,6 @@ export const AndromedaGalaxy = ({ visualScale }: AndromedaGalaxyProps) => {
         <sphereGeometry args={[diskR * 1.2, 32, 32]} />
         <meshBasicMaterial transparent opacity={0} depthWrite={false} />
       </mesh>
-
-      {/* Label */}
-      {showLabel && (
-        <Html
-          position={[0, diskR * 0.8, 0]}
-          center
-          distanceFactor={baseMarkerSize * 80}
-          occlude={false}
-          zIndexRange={[0, 0]}
-          style={{ pointerEvents: 'auto' }}
-        >
-          <div
-            className="bg-black/80 backdrop-blur-sm px-3 py-1.5 rounded-lg border border-blue-400/50 whitespace-nowrap shadow-lg cursor-pointer"
-            onClick={handleLabelClick}
-          >
-            <span className="text-blue-300 text-sm font-semibold drop-shadow-md">
-              {language === 'fr' ? 'Andromède' : 'Andromeda'}
-            </span>
-          </div>
-        </Html>
-      )}
     </group>
   );
 };

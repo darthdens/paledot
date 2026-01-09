@@ -94,10 +94,6 @@ export const YouAreHereLabel = () => {
         return t.stellar;
       case 'milkyWay':
         return t.milkyWay;
-      case 'localGroup':
-        return t.localGroup;
-      case 'universe':
-        return t.universe;
       default:
         return t.solarSystem;
     }
