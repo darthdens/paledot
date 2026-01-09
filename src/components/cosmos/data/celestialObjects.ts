@@ -774,7 +774,7 @@ export const celestialObjects: CelestialObject[] = [
   },
   {
     id: 'andromeda',
-    name: { en: 'Andromeda Galaxy (M31)', fr: 'Galaxie d\'Andromède (M31)' },
+    name: { en: 'Andromeda', fr: 'Andromède' },
     type: 'galaxy',
     position: [2.537e6 * UNITS.KM_PER_LY * 0.7, 2.537e6 * UNITS.KM_PER_LY * 0.15, 2.537e6 * UNITS.KM_PER_LY * 0.7],
     size: 152000 * UNITS.KM_PER_LY, // Accurate diameter

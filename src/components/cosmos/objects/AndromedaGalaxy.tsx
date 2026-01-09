@@ -430,7 +430,7 @@ export const AndromedaGalaxy = ({ visualScale }: AndromedaGalaxyProps) => {
             onClick={handleLabelClick}
           >
             <span className="text-blue-300 text-sm font-semibold drop-shadow-md">
-              {language === 'fr' ? 'Andromède (M31)' : 'Andromeda (M31)'}
+              {language === 'fr' ? 'Andromède' : 'Andromeda'}
             </span>
           </div>
         </Html>
