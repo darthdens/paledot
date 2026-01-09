@@ -20,7 +20,7 @@ const translations = {
 };
 
 // Categories that are expandable (have at least one implemented item)
-const EXPANDABLE_CATEGORIES = ['solarSystem', 'stars', 'nebulae', 'galaxies', 'deepSpace'];
+const EXPANDABLE_CATEGORIES = ['solarSystem', 'stars', 'nebulae', 'galaxies'];
 
 // Specific objects that are implemented per category (empty array = all implemented)
 const IMPLEMENTED_OBJECTS: Record<string, string[]> = {
@@ -28,7 +28,7 @@ const IMPLEMENTED_OBJECTS: Record<string, string[]> = {
   stars: [], // all stars are implemented (rendered as spheres)
   nebulae: ['orion-nebula'], // only Orion has proper nebula visuals
   galaxies: ['milky-way-center'], // only Milky Way has proper galaxy visuals
-  deepSpace: [], // all deep space objects are implemented
+  // deepSpace not listed = entire category shows "Coming Soon"
 };
 
 export const QuickJumpMenu = () => {
