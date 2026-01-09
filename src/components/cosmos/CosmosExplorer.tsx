@@ -262,18 +262,16 @@ export const CosmosExplorer = () => {
             })}
           </GalaxyRotator>
           
-          {/* Galaxy orbit trail - outside GalaxyRotator so it doesn't rotate with the scene */}
-          {showMilkyWay && (
-            <OrbitalTrail
-              objectId="solar-system-marker"
-              color="#00ff88"
-              enabled={showTrails}
-              maxPoints={800}
-              opacity={0.9}
-              glow
-              minMovementSq={1}
-            />
-          )}
+          {/* Galaxy orbit trail - kept mounted to avoid resetting when crossing scale thresholds */}
+          <OrbitalTrail
+            objectId="solar-system-marker"
+            color="#00ff88"
+            enabled={showTrails && showMilkyWay}
+            maxPoints={800}
+            opacity={0.9}
+            glow
+            minMovementSq={1}
+          />
           
           {/* Performance stats */}
           <PerformanceHUD />

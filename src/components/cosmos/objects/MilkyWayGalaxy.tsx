@@ -410,13 +410,6 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
     if (markerGroupRef.current) {
       markerGroupRef.current.getWorldPosition(markerWorldPos.current);
 
-      // Expose this position so OrbitalTrail can render the galaxy-orbit path
-      setObjectWorldPosition('solar-system-marker', [
-        markerWorldPos.current.x,
-        markerWorldPos.current.y,
-        markerWorldPos.current.z,
-      ]);
-
       const distance = camera.position.distanceTo(markerWorldPos.current);
       const scale = Math.max(1, distance * 0.025);
       markerGroupRef.current.scale.setScalar(scale);
