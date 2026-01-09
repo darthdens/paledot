@@ -243,6 +243,48 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
     geo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
     return geo;
   }, [gs]);
+
+  // Spiral arm glow positions - generate points along the arms for glow sprites
+  const spiralArmGlows = useMemo(() => {
+    const { branches, spinTurns } = MILKY_WAY;
+    const maxRadius = MILKY_WAY.diskRadius * gs;
+    const glowPoints: { x: number; z: number; radius: number; color: string }[] = [];
+
+    // Generate glow points along each arm
+    for (let arm = 0; arm < branches; arm++) {
+      const branchAngle = (arm / branches) * Math.PI * 2;
+      
+      // Points along the arm from 20% to 95% of radius
+      for (let i = 0; i < 12; i++) {
+        const t = 0.2 + (i / 11) * 0.75;
+        const radius = t * maxRadius;
+        const spinAngle = t * spinTurns * Math.PI * 2;
+        const angle = branchAngle + spinAngle;
+
+        const x = Math.cos(angle) * radius;
+        const z = Math.sin(angle) * radius;
+
+        // Color based on distance from center
+        let color: string;
+        if (t < 0.35) {
+          color = '#FF9944'; // Orange/warm inner
+        } else if (t < 0.55) {
+          color = '#CC66AA'; // Purple transition
+        } else if (t < 0.75) {
+          color = '#6688DD'; // Blue
+        } else {
+          color = '#4477CC'; // Darker blue outer
+        }
+
+        // Glow size gets smaller as we go outward
+        const glowSize = maxRadius * (0.18 - t * 0.08);
+
+        glowPoints.push({ x, z, radius: glowSize, color });
+      }
+    }
+
+    return glowPoints;
+  }, [gs]);
   
   useFrame(({ clock, camera }) => {
     const t = clock.getElapsedTime();
@@ -318,6 +360,26 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
           depthTest={false}
         />
       </points>
+
+      {/* Spiral arm glows - glow sprites positioned along each arm */}
+      {spiralArmGlows.map((glow, idx) => (
+        <sprite 
+          key={`arm-glow-${idx}`} 
+          position={[glow.x, 0, glow.z]} 
+          renderOrder={-30}
+          scale={[glow.radius, glow.radius, 1]}
+        >
+          <spriteMaterial
+            map={glowTexture}
+            color={glow.color}
+            transparent
+            opacity={0.25}
+            blending={THREE.AdditiveBlending}
+            depthWrite={false}
+            depthTest={false}
+          />
+        </sprite>
+      ))}
 
       {/* Smooth gradient glow - white → yellow → orange → purple → blue → dark blue */}
       {/* Glow reaches to galaxy edges (diskR * 2 = galaxy edge) */}
@@ -411,13 +473,26 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
         />
       </sprite>
 
-      {/* Warm wash that carries yellow/orange outward (so it reaches the spiral edges) */}
-      <sprite renderOrder={-18} scale={[diskR * 1.65, diskR * 1.65, 1]}>
+      {/* Warm wash that carries yellow/orange outward - extends to 2.0× disk radius */}
+      <sprite renderOrder={-18} scale={[diskR * 2.0, diskR * 2.0, 1]}>
         <spriteMaterial
           map={glowTexture}
           color="#FF8844"
           transparent
-          opacity={0.12}
+          opacity={0.15}
+          blending={THREE.AdditiveBlending}
+          depthWrite={false}
+          depthTest={false}
+        />
+      </sprite>
+
+      {/* Additional warm glow layer for better coverage */}
+      <sprite renderOrder={-17.5} scale={[diskR * 1.75, diskR * 1.75, 1]}>
+        <spriteMaterial
+          map={glowTexture}
+          color="#FF9955"
+          transparent
+          opacity={0.18}
           blending={THREE.AdditiveBlending}
           depthWrite={false}
           depthTest={false}
