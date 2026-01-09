@@ -120,7 +120,7 @@ export const CameraController = () => {
       }
 
       // Use live world position when available (for moving solar-system bodies and stars)
-      // Positions in celestialObjects for stars are already in km
+      // Positions in celestialObjects: solarSystem in km, stars/nebulae in light-years
       const fallbackPos: [number, number, number] =
         selectedObject.category === 'solarSystem'
           ? [
@@ -128,19 +128,14 @@ export const CameraController = () => {
               selectedObject.position[1] * UNIFIED_SCALE,
               selectedObject.position[2] * UNIFIED_SCALE,
             ]
-          : selectedObject.category === 'nebulae'
+          : selectedObject.category === 'nebulae' || selectedObject.category === 'stars'
             ? [
+                // Stars and nebulae positions are in light-years
                 selectedObject.position[0] * UNITS.KM_PER_LY * UNIFIED_SCALE,
                 selectedObject.position[1] * UNITS.KM_PER_LY * UNIFIED_SCALE,
                 selectedObject.position[2] * UNITS.KM_PER_LY * UNIFIED_SCALE,
               ]
-            : selectedObject.category === 'stars'
-              ? [
-                  selectedObject.position[0] * UNIFIED_SCALE,
-                  selectedObject.position[1] * UNIFIED_SCALE,
-                  selectedObject.position[2] * UNIFIED_SCALE,
-                ]
-              : selectedObject.position;
+            : selectedObject.position;
 
       const targetPos = liveTargetPos ?? fallbackPos;
 
