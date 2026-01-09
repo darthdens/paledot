@@ -1,7 +1,7 @@
-import { useEffect, useCallback } from 'react';
+import { useEffect, useCallback, useState } from 'react';
 import { useLanguage } from '@/i18n/LanguageContext';
 import { Button } from '@/components/ui/button';
-import { Play, Pause, SkipForward, SkipBack, X } from 'lucide-react';
+import { Play, Pause, SkipForward, SkipBack, X, ChevronUp, ChevronDown } from 'lucide-react';
 import { useCosmosStore } from '../store/useCosmosStore';
 import { useFullscreenStore } from '../store/useFullscreenStore';
 import { tourStops } from '../data/tourStops';
@@ -17,6 +17,8 @@ const translations = {
     next: 'Next',
     pause: 'Pause',
     play: 'Play',
+    expand: 'Expand',
+    collapse: 'Collapse',
   },
   fr: {
     stop: 'Étape',
@@ -26,12 +28,15 @@ const translations = {
     next: 'Suivant',
     pause: 'Pause',
     play: 'Lecture',
+    expand: 'Agrandir',
+    collapse: 'Réduire',
   },
 };
 
 export const TourOverlay = () => {
   const { language } = useLanguage();
   const t = translations[language];
+  const [isCollapsed, setIsCollapsed] = useState(false);
 
   const isTouring = useCosmosStore((state) => state.isTouring);
   const tourIndex = useCosmosStore((state) => state.tourIndex);
@@ -216,9 +221,100 @@ export const TourOverlay = () => {
   const handleExit = () => {
     stopTour();
   };
+
+  const toggleCollapse = () => {
+    setIsCollapsed(!isCollapsed);
+  };
   
   if (!isTouring || !currentStop) return null;
+
+  // Collapsed/minimized view
+  if (isCollapsed) {
+    return (
+      <div 
+        className={`${isFullscreen ? 'fixed' : 'absolute'} z-[10001] bg-black/90 backdrop-blur-md rounded-full border border-white/20 overflow-hidden cursor-pointer
+          bottom-2 left-2 right-2 
+          sm:bottom-auto sm:top-4 sm:left-4 sm:right-auto sm:w-auto`}
+        style={isFullscreen ? { 
+          bottom: 'calc(0.5rem + env(safe-area-inset-bottom))',
+          left: 'calc(0.5rem + env(safe-area-inset-left))',
+          right: 'calc(0.5rem + env(safe-area-inset-right))',
+        } : undefined}
+        onClick={toggleCollapse}
+      >
+        <div className="flex items-center gap-2 px-3 py-2 sm:px-4 sm:py-2.5">
+          {/* Progress indicator */}
+          <div className="relative w-8 h-8 sm:w-10 sm:h-10 flex-shrink-0">
+            <svg className="w-full h-full -rotate-90" viewBox="0 0 36 36">
+              <circle
+                cx="18"
+                cy="18"
+                r="16"
+                fill="none"
+                stroke="rgba(255,255,255,0.1)"
+                strokeWidth="3"
+              />
+              <circle
+                cx="18"
+                cy="18"
+                r="16"
+                fill="none"
+                stroke="#3b82f6"
+                strokeWidth="3"
+                strokeDasharray={`${((tourIndex + 1) / totalStops) * 100} 100`}
+                strokeLinecap="round"
+              />
+            </svg>
+            <span className="absolute inset-0 flex items-center justify-center text-[10px] sm:text-xs text-white font-medium">
+              {tourIndex + 1}
+            </span>
+          </div>
+          
+          {/* Title */}
+          <div className="flex-1 min-w-0">
+            <p className="text-white text-xs sm:text-sm font-medium truncate">
+              {currentStop.title[language]}
+            </p>
+          </div>
+          
+          {/* Controls */}
+          <div className="flex items-center gap-1 flex-shrink-0">
+            <Button
+              size="icon"
+              variant="ghost"
+              onClick={(e) => {
+                e.stopPropagation();
+                togglePause();
+              }}
+              className="h-7 w-7 sm:h-8 sm:w-8 rounded-full bg-white/10 hover:bg-white/20 text-white"
+            >
+              {isPaused ? (
+                <Play className="w-3 h-3 sm:w-4 sm:h-4" />
+              ) : (
+                <Pause className="w-3 h-3 sm:w-4 sm:h-4" />
+              )}
+            </Button>
+            
+            <Button
+              size="icon"
+              variant="ghost"
+              onClick={(e) => {
+                e.stopPropagation();
+                handleNext();
+              }}
+              className="h-7 w-7 sm:h-8 sm:w-8 text-white/70 hover:text-white hover:bg-white/10"
+            >
+              <SkipForward className="w-3 h-3 sm:w-4 sm:h-4" />
+            </Button>
+            
+            <ChevronUp className="w-4 h-4 text-white/50 ml-1" />
+          </div>
+        </div>
+      </div>
+    );
+  }
   
+  // Expanded view
   return (
     <div 
       className={`${isFullscreen ? 'fixed' : 'absolute'} z-[10001] bg-black/90 backdrop-blur-md rounded-lg border border-white/20 overflow-hidden
@@ -245,18 +341,29 @@ export const TourOverlay = () => {
           <span className="text-white/50 text-[10px] sm:text-xs">
             {tourIndex + 1}/{totalStops}
           </span>
-          <h2 className="text-white font-semibold text-sm sm:hidden truncate max-w-[200px]">
+          <h2 className="text-white font-semibold text-sm sm:hidden truncate max-w-[180px]">
             {currentStop.title[language]}
           </h2>
         </div>
-        <Button
-          size="icon"
-          variant="ghost"
-          onClick={handleExit}
-          className="h-6 w-6 text-white/70 hover:text-white hover:bg-white/10"
-        >
-          <X className="w-4 h-4" />
-        </Button>
+        <div className="flex items-center gap-1">
+          <Button
+            size="icon"
+            variant="ghost"
+            onClick={toggleCollapse}
+            className="h-6 w-6 text-white/70 hover:text-white hover:bg-white/10"
+            title={t.collapse}
+          >
+            <ChevronDown className="w-4 h-4" />
+          </Button>
+          <Button
+            size="icon"
+            variant="ghost"
+            onClick={handleExit}
+            className="h-6 w-6 text-white/70 hover:text-white hover:bg-white/10"
+          >
+            <X className="w-4 h-4" />
+          </Button>
+        </div>
       </div>
       
       {/* Content - scrollable and compact on mobile */}
