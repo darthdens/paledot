@@ -633,8 +633,8 @@ export const celestialObjects: CelestialObject[] = [
     type: 'star',
     // Galactic coordinates: l=313.54°, b=-1.93°, d=4.24 ly from Sun (which is at scene origin)
     // Position in light-years (will be scaled by visualScale * KM_PER_LY in renderer)
-    // x = d*cos(b)*cos(l) ≈ 2.90 ly, y = d*sin(b) ≈ -0.14 ly, z = d*cos(b)*sin(l) ≈ -3.08 ly
-    position: [2.90, -0.14, -3.08], // in light-years, same coordinate system as Orion Nebula
+    // Original: x ≈ 2.90 ly, y ≈ -0.14 ly, z ≈ -3.08 ly - doubled for better visibility
+    position: [5.80, -0.28, -6.16], // in light-years, 2x actual distance for visual separation
     size: 214550, // diameter in km
     color: '#ffcccb',
     distanceFromEarth: 4.24,

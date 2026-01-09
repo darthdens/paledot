@@ -461,9 +461,9 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
   const baseMarkerSize = gs * 300;
   const diskR = MILKY_WAY.diskRadius * gs;
   
-  // Proxima Centauri position in scene units (it's at 4.24 ly from Sun)
-  // Position in light-years: [2.90, -0.14, -3.08]
-  const proximaPosition: [number, number, number] = [2.90 * gs, -0.14 * gs, -3.08 * gs];
+  // Proxima Centauri position in scene units (2x actual distance for visual separation)
+  // Position in light-years: [5.80, -0.28, -6.16]
+  const proximaPosition: [number, number, number] = [5.80 * gs, -0.28 * gs, -6.16 * gs];
   return (
     <>
       {/* Rotating galaxy group - offset so the solar system stays at origin */}
