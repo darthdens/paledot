@@ -44,9 +44,9 @@ export const CosmosExplorer = () => {
   const currentScale = useCosmosStore(state => state.currentScale);
   
   // Show Milky Way only at stellar scale or larger
-  // Solar system follows galactic Sun position only at milkyWay scale or beyond (when zoomed out enough)
+  // Solar system follows the same galactic motion as soon as you're zoomed out to "stellar" scale or beyond
   const showMilkyWay = currentScale === 'stellar' || currentScale === 'milkyWay' || currentScale === 'localGroup' || currentScale === 'universe';
-  const solarSystemFollowsGalactic = currentScale === 'milkyWay' || currentScale === 'localGroup' || currentScale === 'universe';
+  const solarSystemFollowsGalactic = showMilkyWay;
   
   // Force cursor none on canvas - OrbitControls tries to set cursor styles
   useEffect(() => {
