@@ -32,6 +32,9 @@ interface CosmosStore {
   // Following
   isFollowing: boolean;
 
+  // Star system view - true when zoomed into any star system (Sun or Proxima)
+  isInStarSystem: boolean;
+
   // Tour
   isTouring: boolean;
   tourIndex: number;
@@ -72,6 +75,7 @@ interface CosmosStore {
   setHoveredObject: (object: CelestialObject | null) => void;
   setIsFollowing: (following: boolean) => void;
   toggleFollowing: () => void;
+  setIsInStarSystem: (inStarSystem: boolean) => void;
   startTour: () => void;
   stopTour: () => void;
   setTourIndex: (index: number) => void;
@@ -119,6 +123,8 @@ export const useCosmosStore = create<CosmosStore>()(
       hoveredObject: null,
 
       isFollowing: true,
+
+      isInStarSystem: true, // Start in solar system view
       
       isTouring: false,
       tourIndex: 0,
@@ -172,6 +178,8 @@ export const useCosmosStore = create<CosmosStore>()(
       setIsFollowing: (following) => set({ isFollowing: following }),
 
       toggleFollowing: () => set((state) => ({ isFollowing: !state.isFollowing })),
+
+      setIsInStarSystem: (inStarSystem) => set({ isInStarSystem: inStarSystem }),
       
       startTour: () => {
         const currentSpeed = get().timeSpeed;
