@@ -15,6 +15,7 @@ import { Comets } from './objects/Comet';
 import { MilkyWayGalaxy } from './objects/MilkyWayGalaxy';
 import { GalaxySkyGlow } from './objects/GalaxySkyGlow';
 import { GalaxyRotator } from './objects/GalaxyRotator';
+import { GalaxyFadeWrapper } from './GalaxyFadeWrapper';
 import { WorldPositionTracker } from './objects/WorldPositionTracker';
 import { SolarSystemTracker } from './objects/SolarSystemTracker';
 import { GalacticOrbitRing } from './objects/GalacticOrbitRing';
@@ -49,10 +50,6 @@ export const CosmosExplorer = () => {
   const showOrbits = useCosmosStore(state => state.showOrbits);
   const showTrails = useCosmosStore(state => state.showTrails);
   const isFollowing = useCosmosStore(state => state.isFollowing);
-  const isInStarSystem = useCosmosStore(state => state.isInStarSystem);
-  
-  // Hide galaxy when inside any star system (Sun or Proxima Centauri)
-  const showMilkyWay = !isInStarSystem;
   
   // Force cursor none on canvas - OrbitControls tries to set cursor styles
   useEffect(() => {
@@ -168,10 +165,11 @@ export const CosmosExplorer = () => {
             {/* Star background - rotates with the rest so the view never "sticks" to it */}
             <Stars radius={1e8} depth={1e7} count={15000} factor={1e5} saturation={0} fade speed={0.3} />
 
-            {/* Milky Way Galaxy - visible at larger scales */}
-            {showMilkyWay && (
+            {/* Galaxy content with smooth fade transition */}
+            <GalaxyFadeWrapper>
+              {/* Milky Way Galaxy */}
               <MilkyWayGalaxy visualScale={UNIFIED_SCALE} showYouAreHere={true} />
-            )}
+            </GalaxyFadeWrapper>
             
             {/* Sun's light - moves with the solar system */}
             <pointLight 
@@ -277,19 +275,19 @@ export const CosmosExplorer = () => {
             {/* Proxima Centauri system - tracked + nested (Oort Cloud) */}
             <ProximaSystem visualScale={UNIFIED_SCALE} />
             
-            {/* Nebulae - visible at stellar scale and above */}
-            {showMilkyWay && nebulae.map((nebula) => (
-              <Nebula
-                key={nebula.id}
-                nebula={nebula}
-                visualScale={UNIFIED_SCALE}
-              />
-            ))}
-            
-            {/* Galactic orbit ring - inside rotator so it rotates with everything */}
-            {showMilkyWay && showOrbits && (
-              <GalacticOrbitRing visualScale={UNIFIED_SCALE} />
-            )}
+            {/* Nebulae and galactic orbit ring - fade with galaxy */}
+            <GalaxyFadeWrapper>
+              {nebulae.map((nebula) => (
+                <Nebula
+                  key={nebula.id}
+                  nebula={nebula}
+                  visualScale={UNIFIED_SCALE}
+                />
+              ))}
+              
+              {/* Galactic orbit ring */}
+              {showOrbits && <GalacticOrbitRing visualScale={UNIFIED_SCALE} />}
+            </GalaxyFadeWrapper>
           </GalaxyRotator>
           
           {/* Performance stats */}
