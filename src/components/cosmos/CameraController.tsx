@@ -105,6 +105,7 @@ export const CameraController = () => {
       // Desired distance based on visual size
       // For nebulae (category 'nebulae'), size is in light-years, need larger distance
       // For stars, size is in km but they're very far - need appropriate viewing distance
+      // For galaxies, size is in light-years - view from closer for better visibility
       // For other objects, size is in km
       let visualSize = selectedObject.size * UNIFIED_SCALE;
       
@@ -112,6 +113,11 @@ export const CameraController = () => {
         // Nebula size is in light-years - use a much larger viewing distance
         visualSize = selectedObject.size * UNITS.KM_PER_LY * UNIFIED_SCALE;
         flyToDistance.current = Math.max(visualSize * 3, 1e9);
+      } else if (selectedObject.category === 'galaxies') {
+        // Galaxy size is in light-years (stored as km in celestialObjects but actually ly)
+        // View from closer (1.5x size) so the galaxy fills more of the screen
+        visualSize = selectedObject.size * UNIFIED_SCALE;
+        flyToDistance.current = Math.max(visualSize * 1.5, 1e8);
       } else if (selectedObject.category === 'stars' && selectedObject.id !== 'sun') {
         // Distant stars have 500x visual boost applied in their component
         // Use boosted size for camera distance calculation
