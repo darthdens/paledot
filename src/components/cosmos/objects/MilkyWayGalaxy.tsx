@@ -244,13 +244,14 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
     return geo;
   }, [gs]);
 
-  // Spiral arm glow sprites - very dense overlapping glows along each arm (blends into a continuous ribbon)
+  // Spiral arm glow sprites - dense overlapping glows along each arm (blends into a continuous ribbon)
   const spiralArmGlows = useMemo(() => {
     const { branches, spinTurns } = MILKY_WAY;
     const maxRadius = MILKY_WAY.diskRadius * gs;
 
-    // Much denser - 180 points per arm for seamless overlap
-    const pointsPerArm = 180;
+    // Higher density + multi-lane offsets to avoid "pearl" gaps
+    const pointsPerArm = 260;
+
     const glows: {
       x: number;
       z: number;
@@ -269,45 +270,51 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
         const spinAngle = t * spinTurns * Math.PI * 2;
         const angle = branchAngle + spinAngle;
 
-        // Arm thickness (wider inside, tighter outside)
-        const armWidth = maxRadius * (0.015 + (1 - t) * 0.025);
-        const offset = (Math.random() - 0.5) * armWidth;
+        // Arm thickness (subtle) + "lanes" to fill in the ribbon
+        const armWidth = maxRadius * (0.008 + (1 - t) * 0.018);
         const perp = angle + Math.PI / 2;
 
-        const x = Math.cos(angle) * radius + Math.cos(perp) * offset;
-        const z = Math.sin(angle) * radius + Math.sin(perp) * offset;
+        const laneOffsets = [0, armWidth * 0.55, -armWidth * 0.55];
 
-        // Larger base sprite size for more overlap
-        const baseScale = maxRadius * (0.14 - t * 0.06);
+        // Slightly larger sprites for overlap, but much lower opacity to reduce overall brightness
+        const baseScale = maxRadius * (0.17 - t * 0.075);
 
-        // Color + REDUCED opacity for subtler glow
+        // Color + opacity by radius (warm core → purple → blue) - toned down
         let color: string;
         let innerOpacity: number;
         let outerOpacity: number;
 
         if (t < 0.28) {
           color = '#FFB35A';
-          innerOpacity = 0.28;
-          outerOpacity = 0.12;
-        } else if (t < 0.45) {
-          color = '#FF8A58';
-          innerOpacity = 0.25;
-          outerOpacity = 0.11;
-        } else if (t < 0.62) {
-          color = '#D070C0';
-          innerOpacity = 0.22;
-          outerOpacity = 0.10;
-        } else if (t < 0.8) {
-          color = '#6F93F0';
-          innerOpacity = 0.20;
-          outerOpacity = 0.09;
-        } else {
-          color = '#4E7DDF';
           innerOpacity = 0.18;
           outerOpacity = 0.08;
+        } else if (t < 0.45) {
+          color = '#FF8A58';
+          innerOpacity = 0.16;
+          outerOpacity = 0.075;
+        } else if (t < 0.62) {
+          color = '#D070C0';
+          innerOpacity = 0.14;
+          outerOpacity = 0.065;
+        } else if (t < 0.8) {
+          color = '#6F93F0';
+          innerOpacity = 0.13;
+          outerOpacity = 0.06;
+        } else {
+          color = '#4E7DDF';
+          innerOpacity = 0.12;
+          outerOpacity = 0.055;
         }
 
-        glows.push({ x, z, baseScale, color, innerOpacity, outerOpacity });
+        for (const baseOffset of laneOffsets) {
+          const jitter = (Math.random() - 0.5) * armWidth * 0.25;
+          const offset = baseOffset + jitter;
+
+          const x = Math.cos(angle) * radius + Math.cos(perp) * offset;
+          const z = Math.sin(angle) * radius + Math.sin(perp) * offset;
+
+          glows.push({ x, z, baseScale, color, innerOpacity, outerOpacity });
+        }
       }
     }
 
@@ -396,7 +403,7 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
           key={`arm-glow-outer-${idx}`}
           position={[g.x, 0, g.z]}
           renderOrder={-31}
-          scale={[g.baseScale * 2.4, g.baseScale * 2.4, 1]}
+          scale={[g.baseScale * 3.0, g.baseScale * 3.0, 1]}
         >
           <spriteMaterial
             map={glowTexture}
@@ -416,7 +423,7 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
           key={`arm-glow-inner-${idx}`}
           position={[g.x, 0, g.z]}
           renderOrder={-30}
-          scale={[g.baseScale * 1.25, g.baseScale * 1.25, 1]}
+          scale={[g.baseScale * 1.45, g.baseScale * 1.45, 1]}
         >
           <spriteMaterial
             map={glowTexture}
