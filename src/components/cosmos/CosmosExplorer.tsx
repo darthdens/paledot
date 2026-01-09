@@ -164,9 +164,6 @@ export const CosmosExplorer = () => {
             
             {/* Proxima Centauri system - hidden when in Sun's system */}
             <ProximaSystem visualScale={UNIFIED_SCALE} />
-            
-            {/* Andromeda Galaxy - 2.5 million light-years away */}
-            <AndromedaGalaxy visualScale={UNIFIED_SCALE} />
 
             {/* Nebulae and galactic orbit ring - fade with galaxy */}
             <GalaxyFadeWrapper>
@@ -182,6 +179,10 @@ export const CosmosExplorer = () => {
               {showOrbits && <GalacticOrbitRing visualScale={UNIFIED_SCALE} />}
             </GalaxyFadeWrapper>
           </GalaxyRotator>
+          
+          {/* Andromeda Galaxy - OUTSIDE the GalaxyRotator so it doesn't rotate with Milky Way */}
+          {/* Each galaxy rotates its own stars around its own center independently */}
+          <AndromedaGalaxy visualScale={UNIFIED_SCALE} />
           
           {/* Performance stats */}
           <PerformanceHUD />
