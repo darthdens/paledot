@@ -602,10 +602,10 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
             />
           </points>
           
-          {/* Invisible click target for star point */}
+          {/* Invisible click target for star point - opacity 0.001 so raycaster doesn't skip it */}
           <mesh onClick={handleSunClick} onPointerDown={handleSunClick}>
             <sphereGeometry args={[baseMarkerSize * 8, 8, 8]} />
-            <meshBasicMaterial transparent opacity={0} />
+            <meshBasicMaterial transparent opacity={0.001} depthWrite={false} />
           </mesh>
           
           {/* "We are here" label */}
@@ -711,10 +711,10 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
             />
           </points>
           
-          {/* Invisible click target for star point */}
+          {/* Invisible click target for star point - opacity 0.001 so raycaster doesn't skip it */}
           <mesh onClick={handleProximaClick} onPointerDown={handleProximaClick}>
             <sphereGeometry args={[baseMarkerSize * 8, 8, 8]} />
-            <meshBasicMaterial transparent opacity={0} />
+            <meshBasicMaterial transparent opacity={0.001} depthWrite={false} />
           </mesh>
           
           {/* "Proxima Centauri" label */}
