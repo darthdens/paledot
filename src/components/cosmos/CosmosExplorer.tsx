@@ -159,7 +159,23 @@ export const CosmosExplorer = () => {
           
           {/* Milky Way Galaxy - visible at larger scales */}
           {showMilkyWay && (
-            <MilkyWayGalaxy visualScale={UNIFIED_SCALE} showYouAreHere={true} />
+            <MilkyWayGalaxy 
+              visualScale={UNIFIED_SCALE} 
+              showYouAreHere={true}
+              showSunOrbit={showOrbits}
+              showSunTrail={showTrails}
+            />
+          )}
+          
+          {/* Sun's galactic orbital trail - only at galaxy scale */}
+          {showMilkyWay && (
+            <OrbitalTrail
+              objectId="sun_galactic"
+              color="#00ff44"
+              enabled={showTrails}
+              maxPoints={200}
+              opacity={0.4}
+            />
           )}
           
           {/* The Sun at center - same unified scale as planets */}
