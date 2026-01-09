@@ -82,6 +82,22 @@ export const GalacticOrbitRing = ({ visualScale, visible = true }: GalacticOrbit
         <meshBasicMaterial color="#00ff88" transparent opacity={0.8} blending={THREE.AdditiveBlending} />
       </mesh>
 
+      {/* Vertical line connecting marker to label */}
+      <line>
+        <bufferGeometry>
+          <bufferAttribute
+            attach="attributes-position"
+            count={2}
+            array={new Float32Array([
+              markerX, markerRadius, markerZ,
+              markerX, markerRadius * 10, markerZ,
+            ])}
+            itemSize={3}
+          />
+        </bufferGeometry>
+        <lineBasicMaterial color="#00ff88" transparent opacity={0.6} />
+      </line>
+
       {/* Tooltip label - always visible, positioned well above the marker */}
       <Html
         position={[markerX, markerRadius * 12, markerZ]}
