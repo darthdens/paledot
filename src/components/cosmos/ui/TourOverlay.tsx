@@ -1,4 +1,4 @@
-import { useEffect, useCallback, useState } from 'react';
+import { useEffect, useCallback, useState, useRef } from 'react';
 import { useLanguage } from '@/i18n/LanguageContext';
 import { Button } from '@/components/ui/button';
 import { Play, Pause, SkipForward, SkipBack, X, ChevronUp, ChevronDown } from 'lucide-react';
@@ -37,6 +37,11 @@ export const TourOverlay = () => {
   const { language } = useLanguage();
   const t = translations[language];
   const [isCollapsed, setIsCollapsed] = useState(false);
+  
+  // Swipe gesture handling
+  const touchStartX = useRef<number | null>(null);
+  const touchStartY = useRef<number | null>(null);
+  const SWIPE_THRESHOLD = 50; // minimum distance for a swipe
 
   const isTouring = useCosmosStore((state) => state.isTouring);
   const tourIndex = useCosmosStore((state) => state.tourIndex);
@@ -225,6 +230,36 @@ export const TourOverlay = () => {
   const toggleCollapse = () => {
     setIsCollapsed(!isCollapsed);
   };
+
+  // Touch handlers for swipe gestures
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX;
+    touchStartY.current = e.touches[0].clientY;
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (touchStartX.current === null || touchStartY.current === null) return;
+    
+    const touchEndX = e.changedTouches[0].clientX;
+    const touchEndY = e.changedTouches[0].clientY;
+    
+    const deltaX = touchEndX - touchStartX.current;
+    const deltaY = touchEndY - touchStartY.current;
+    
+    // Only register horizontal swipes (ignore if vertical movement is larger)
+    if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > SWIPE_THRESHOLD) {
+      if (deltaX > 0) {
+        // Swipe right - go to previous
+        handlePrevious();
+      } else {
+        // Swipe left - go to next
+        handleNext();
+      }
+    }
+    
+    touchStartX.current = null;
+    touchStartY.current = null;
+  };
   
   if (!isTouring || !currentStop) return null;
 
@@ -241,6 +276,8 @@ export const TourOverlay = () => {
           right: 'calc(0.5rem + env(safe-area-inset-right))',
         } : undefined}
         onClick={toggleCollapse}
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
       >
         <div className="flex items-center gap-2 px-3 py-2 sm:px-4 sm:py-2.5">
           {/* Progress indicator */}
@@ -326,6 +363,8 @@ export const TourOverlay = () => {
         left: 'calc(0.5rem + env(safe-area-inset-left))',
         right: 'calc(0.5rem + env(safe-area-inset-right))',
       } : undefined}
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
     >
       {/* Progress bar */}
       <div className="h-1 bg-white/10">
