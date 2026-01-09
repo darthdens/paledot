@@ -631,8 +631,10 @@ export const celestialObjects: CelestialObject[] = [
     id: 'proxima-centauri',
     name: { en: 'Proxima Centauri', fr: 'Proxima du Centaure' },
     type: 'star',
-    position: [4.24 * UNITS.KM_PER_LY, 0.5 * UNITS.KM_PER_LY, 0],
-    size: 214550,
+    // Position in light-years relative to Sun (same coordinate system as nebulae)
+    // Proxima is 4.24 ly away, slightly "south" in galactic coordinates
+    position: [4.24, 0.5, 0], // in light-years, will be scaled in renderer
+    size: 214550, // diameter in km
     color: '#ffcccb',
     distanceFromEarth: 4.24,
     distanceUnit: 'ly',

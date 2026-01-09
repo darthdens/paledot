@@ -52,10 +52,13 @@ export const ProximaCentauri = ({ visualScale = 0.001 }: ProximaCentauriProps) =
   const setHoveredObject = useCosmosStore(state => state.setHoveredObject);
   const setObjectWorldPosition = useCosmosStore(state => state.setObjectWorldPosition);
 
-  // Position: 4.24 light years away
+  // Scale factor for light-year based coordinates (matching Nebula and MilkyWayGalaxy)
+  const gs = UNITS.KM_PER_LY * visualScale;
+  
+  // Position: 4.24 light years away (position in light-years, scaled to scene units)
   const position: [number, number, number] = [
-    4.24 * UNITS.KM_PER_LY * visualScale,
-    0.5 * UNITS.KM_PER_LY * visualScale,
+    4.24 * gs,
+    0.5 * gs,
     0
   ];
 
