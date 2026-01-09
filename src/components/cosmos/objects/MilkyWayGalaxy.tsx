@@ -73,7 +73,7 @@ const createGalaxyGlowTexture = () => {
 };
 
 export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayGalaxyProps) => {
-  const groupRef = useRef<THREE.Group>(null);
+  const rotatingGroupRef = useRef<THREE.Group>(null);
   const pulseRef = useRef<THREE.Mesh>(null);
   const pulseRef2 = useRef<THREE.Mesh>(null);
   const markerGroupRef = useRef<THREE.Group>(null);
@@ -372,14 +372,14 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
     const t = clock.getElapsedTime();
 
     // Slow galaxy rotation - one full rotation every ~4 minutes
-    if (groupRef.current) {
-      groupRef.current.rotation.y = t * 0.025;
+    if (rotatingGroupRef.current) {
+      rotatingGroupRef.current.rotation.y = t * 0.025;
     }
 
     // Cache the galaxy center world position once (used by camera-based UI overlays)
-    if (!hasSetCenterRef.current && groupRef.current) {
+    if (!hasSetCenterRef.current && rotatingGroupRef.current) {
       const p = new THREE.Vector3();
-      groupRef.current.getWorldPosition(p);
+      rotatingGroupRef.current.getWorldPosition(p);
       setObjectWorldPosition('milkyWay_center', [p.x, p.y, p.z]);
       hasSetCenterRef.current = true;
     }
@@ -406,91 +406,88 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
   });
   
   const baseMarkerSize = gs * 300;
-  const bulgeR = MILKY_WAY.bulgeRadius * gs;
   const diskR = MILKY_WAY.diskRadius * gs;
   
   return (
-    <group ref={groupRef} position={galaxyOffset}>
-      {/* Core stars - bright golden center */}
-      <points geometry={coreGeo}>
-        <pointsMaterial
-          size={gs * 100}
-          map={dotTexture}
-          vertexColors
-          sizeAttenuation
-          transparent
-          opacity={0.95}
-          blending={THREE.AdditiveBlending}
-          depthWrite={false}
-          depthTest={false}
-        />
-      </points>
+    <>
+      {/* Rotating galaxy group - stars and glow rotate */}
+      <group ref={rotatingGroupRef} position={galaxyOffset}>
+        {/* Core stars - bright golden center */}
+        <points geometry={coreGeo}>
+          <pointsMaterial
+            size={gs * 100}
+            map={dotTexture}
+            vertexColors
+            sizeAttenuation
+            transparent
+            opacity={0.95}
+            blending={THREE.AdditiveBlending}
+            depthWrite={false}
+            depthTest={false}
+          />
+        </points>
 
-      {/* Main stars - spiral structure */}
-      <points geometry={starsGeo}>
-        <pointsMaterial
-          size={gs * 60}
-          map={dotTexture}
-          vertexColors
-          sizeAttenuation
-          transparent
-          opacity={0.9}
-          blending={THREE.AdditiveBlending}
-          depthWrite={false}
-          depthTest={false}
-        />
-      </points>
+        {/* Main stars - spiral structure */}
+        <points geometry={starsGeo}>
+          <pointsMaterial
+            size={gs * 60}
+            map={dotTexture}
+            vertexColors
+            sizeAttenuation
+            transparent
+            opacity={0.9}
+            blending={THREE.AdditiveBlending}
+            depthWrite={false}
+            depthTest={false}
+          />
+        </points>
 
-      {/* Volume stars - add height so it feels "full" */}
-      <points geometry={volumeGeo}>
-        <pointsMaterial
-          size={gs * 55}
-          map={dotTexture}
-          vertexColors
-          sizeAttenuation
-          transparent
-          opacity={0.45}
-          blending={THREE.AdditiveBlending}
-          depthWrite={false}
-          depthTest={false}
-        />
-      </points>
+        {/* Volume stars - add height so it feels "full" */}
+        <points geometry={volumeGeo}>
+          <pointsMaterial
+            size={gs * 55}
+            map={dotTexture}
+            vertexColors
+            sizeAttenuation
+            transparent
+            opacity={0.45}
+            blending={THREE.AdditiveBlending}
+            depthWrite={false}
+            depthTest={false}
+          />
+        </points>
 
-      {/* Halo stars - scattered above/below the disk */}
-      <points geometry={haloGeo}>
-        <pointsMaterial
-          size={gs * 45}
-          map={dotTexture}
-          vertexColors
-          sizeAttenuation
-          transparent
-          opacity={0.35}
-          blending={THREE.AdditiveBlending}
-          depthWrite={false}
-          depthTest={false}
-        />
-      </points>
+        {/* Halo stars - scattered above/below the disk */}
+        <points geometry={haloGeo}>
+          <pointsMaterial
+            size={gs * 45}
+            map={dotTexture}
+            vertexColors
+            sizeAttenuation
+            transparent
+            opacity={0.35}
+            blending={THREE.AdditiveBlending}
+            depthWrite={false}
+            depthTest={false}
+          />
+        </points>
 
-      {/* Center glow (billboard) */}
-      <sprite renderOrder={10} frustumCulled={false} scale={[diskR * 2.2, diskR * 2.2, 1]}>
-        <spriteMaterial
-          map={glowTexture}
-          transparent
-          opacity={1}
-          blending={THREE.AdditiveBlending}
-          depthWrite={false}
-          depthTest={false}
-        />
-      </sprite>
+        {/* Center glow (billboard) */}
+        <sprite renderOrder={10} frustumCulled={false} scale={[diskR * 2.2, diskR * 2.2, 1]}>
+          <spriteMaterial
+            map={glowTexture}
+            transparent
+            opacity={1}
+            blending={THREE.AdditiveBlending}
+            depthWrite={false}
+            depthTest={false}
+          />
+        </sprite>
+      </group>
+
+      {/* Non-rotating marker at solar system position (0,0,0) */}
       {showYouAreHere && (
-        <group 
-          ref={markerGroupRef}
-          position={[
-            Math.cos(MILKY_WAY.sunAngle) * MILKY_WAY.sunDistance * gs,
-            0,
-            Math.sin(MILKY_WAY.sunAngle) * MILKY_WAY.sunDistance * gs
-          ]}
-        >
+        <group ref={markerGroupRef} position={[0, 0, 0]}>
           {/* White star point that matches the galaxy stars style */}
           <points>
             <bufferGeometry>
@@ -568,6 +565,6 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
           </mesh>
         </group>
       )}
-    </group>
+    </>
   );
 };
