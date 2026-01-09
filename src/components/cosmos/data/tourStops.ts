@@ -288,8 +288,24 @@ export const tourStops: TourStop[] = [
     },
     duration: 8,
     // Match Quick Jump: CameraController uses a 500x visual boost for distant stars and flies to ~5x boosted size.
-    // This offset is that same computed fly-to distance converted back into km.
     cameraPosition: [268187500, 160912500, 536375000],
+    lookAt: [0, 0, 0],
+    scaleLevel: 'stellar',
+  },
+  {
+    id: 'orion-nebula',
+    locationId: 'orion-nebula',
+    title: {
+      en: 'The Orion Nebula',
+      fr: 'La Nébuleuse d\'Orion',
+    },
+    narration: {
+      en: 'The Orion Nebula is one of the brightest nebulae visible to the naked eye. Located 1,344 light-years away, it\'s a stellar nursery where new stars are being born.',
+      fr: 'La Nébuleuse d\'Orion est l\'une des nébuleuses les plus brillantes visibles à l\'œil nu. Située à 1 344 années-lumière, c\'est une pouponnière stellaire où de nouvelles étoiles naissent.',
+    },
+    duration: 8,
+    // Much closer to see the nebula details (offset from the nebula center)
+    cameraPosition: [0, 40 * UNITS.KM_PER_LY, 120 * UNITS.KM_PER_LY],
     lookAt: [0, 0, 0],
     scaleLevel: 'stellar',
   },
@@ -321,27 +337,11 @@ export const tourStops: TourStop[] = [
       fr: 'La galaxie d\'Andromède, également connue sous le nom de M31, est la grande galaxie la plus proche de la Voie Lactée à 2,5 millions d\'années-lumière. Elle contient environ mille milliards d\'étoiles et est en trajectoire de collision avec notre galaxie - mais ne vous inquiétez pas, la fusion n\'aura lieu que dans 4,5 milliards d\'années.',
     },
     duration: 10,
-    // Position camera to view Andromeda from a good angle
-    cameraPosition: [0, 500000 * UNITS.KM_PER_LY, 1500000 * UNITS.KM_PER_LY],
-    lookAt: [0, 0, 2500000 * UNITS.KM_PER_LY],
-    scaleLevel: 'localGroup',
-  },
-  {
-    id: 'orion-nebula',
-    locationId: 'orion-nebula',
-    title: {
-      en: 'The Orion Nebula',
-      fr: 'La Nébuleuse d\'Orion',
-    },
-    narration: {
-      en: 'The Orion Nebula is one of the brightest nebulae visible to the naked eye. Located 1,344 light-years away, it\'s a stellar nursery where new stars are being born.',
-      fr: 'La Nébuleuse d\'Orion est l\'une des nébuleuses les plus brillantes visibles à l\'œil nu. Située à 1 344 années-lumière, c\'est une pouponnière stellaire où de nouvelles étoiles naissent.',
-    },
-    duration: 8,
-    // Much closer to see the nebula details (offset from the nebula center)
-    cameraPosition: [0, 40 * UNITS.KM_PER_LY, 120 * UNITS.KM_PER_LY],
+    // Position camera closer to Andromeda for a better view of the galaxy structure
+    // Andromeda is at ~2.5M ly, position camera offset to see it nicely
+    cameraPosition: [150000 * UNITS.KM_PER_LY, 80000 * UNITS.KM_PER_LY, 250000 * UNITS.KM_PER_LY],
     lookAt: [0, 0, 0],
-    scaleLevel: 'stellar',
+    scaleLevel: 'localGroup',
   },
   {
     id: 'conclusion',
