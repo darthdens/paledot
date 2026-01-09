@@ -37,7 +37,6 @@ const createNebulaTexture = () => {
 export const Nebula = ({ nebula, visualScale }: NebulaProps) => {
   const groupRef = useRef<THREE.Group>(null);
   const pointsRef = useRef<THREE.Points>(null);
-  const lastWorldUpdate = useRef(0);
   
   const setSelectedObject = useCosmosStore((s) => s.setSelectedObject);
   const setObjectWorldPosition = useCosmosStore((s) => s.setObjectWorldPosition);
@@ -164,10 +163,7 @@ export const Nebula = ({ nebula, visualScale }: NebulaProps) => {
         void main() {
           vColor = color;
           vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
-
-          // Prevent size "explosions" when the camera gets too close (reduces flicker)
-          float z = max(1.0, -mvPosition.z);
-          gl_PointSize = clamp(size * (300.0 / z), 0.0, 120.0);
+          gl_PointSize = size * (300.0 / -mvPosition.z);
           gl_Position = projectionMatrix * mvPosition;
         }
       `,
@@ -182,21 +178,16 @@ export const Nebula = ({ nebula, visualScale }: NebulaProps) => {
       transparent: true,
       blending: THREE.AdditiveBlending,
       depthWrite: false,
-      depthTest: false,
     });
   }, [texture]);
   
-  // Update world position for camera tracking (throttled to reduce jitter/flicker)
-  useFrame(({ clock }) => {
-    if (!groupRef.current) return;
-
-    const t = clock.getElapsedTime();
-    if (t - lastWorldUpdate.current < 0.1) return; // ~10 updates/sec is enough
-    lastWorldUpdate.current = t;
-
-    const worldPos = new THREE.Vector3();
-    groupRef.current.getWorldPosition(worldPos);
-    setObjectWorldPosition(nebula.id, [worldPos.x, worldPos.y, worldPos.z]);
+  // Update world position for camera tracking
+  useFrame(() => {
+    if (groupRef.current) {
+      const worldPos = new THREE.Vector3();
+      groupRef.current.getWorldPosition(worldPos);
+      setObjectWorldPosition(nebula.id, [worldPos.x, worldPos.y, worldPos.z]);
+    }
   });
   
   const handleClick = (e: { stopPropagation: () => void }) => {
@@ -210,7 +201,6 @@ export const Nebula = ({ nebula, visualScale }: NebulaProps) => {
         ref={pointsRef}
         geometry={geometry}
         material={material}
-        frustumCulled={false}
         onClick={handleClick}
       />
       {/* Bright core glow - Trapezium region for Orion */}
