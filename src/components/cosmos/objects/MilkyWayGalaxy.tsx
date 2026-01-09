@@ -7,6 +7,8 @@ import { useCosmosStore } from '../store/useCosmosStore';
 interface MilkyWayGalaxyProps {
   visualScale: number;
   showYouAreHere?: boolean;
+  showSunOrbit?: boolean;
+  showSunTrail?: boolean;
 }
 
 // Milky Way parameters
@@ -72,14 +74,20 @@ const createGalaxyGlowTexture = () => {
   return tex;
 };
 
-export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayGalaxyProps) => {
+// Sun's orbital period around galactic center: ~225-250 million years
+// We'll speed it up visually but keep it proportional - one visual orbit takes ~600 seconds
+const SUN_GALACTIC_ORBIT_PERIOD = 600;
+
+export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true, showSunOrbit = false, showSunTrail = false }: MilkyWayGalaxyProps) => {
   const groupRef = useRef<THREE.Group>(null);
+  const starsGroupRef = useRef<THREE.Group>(null);
   const pulseRef = useRef<THREE.Mesh>(null);
   const pulseRef2 = useRef<THREE.Mesh>(null);
   const markerGroupRef = useRef<THREE.Group>(null);
   const hasSetCenterRef = useRef(false);
   
   const setObjectWorldPosition = useCosmosStore((s) => s.setObjectWorldPosition);
+  const timeSpeed = useCosmosStore((s) => s.timeSpeed);
   
   const gs = UNITS.KM_PER_LY * visualScale;
   
@@ -368,7 +376,10 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
     return geo;
   }, [gs]);
   
-  useFrame(({ clock, camera }) => {
+  // Sun's orbital position angle (animated)
+  const sunAngleRef = useRef(MILKY_WAY.sunAngle);
+  
+  useFrame(({ clock, camera }, delta) => {
     const t = clock.getElapsedTime();
 
     // Cache the galaxy center world position once (used by camera-based UI overlays)
@@ -377,6 +388,31 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
       groupRef.current.getWorldPosition(p);
       setObjectWorldPosition('milkyWay_center', [p.x, p.y, p.z]);
       hasSetCenterRef.current = true;
+    }
+    
+    // Rotate the galaxy slowly (Milky Way rotates once every ~200 million years)
+    // At galactic scale, one full rotation in ~1200 seconds (very slow visual rotation)
+    if (starsGroupRef.current) {
+      const rotationSpeed = (Math.PI * 2) / 1200; // radians per second
+      starsGroupRef.current.rotation.y += rotationSpeed * delta * timeSpeed;
+    }
+    
+    // Animate the Sun's position around the galactic center
+    if (markerGroupRef.current && timeSpeed !== 0) {
+      const orbitSpeed = (Math.PI * 2) / SUN_GALACTIC_ORBIT_PERIOD;
+      sunAngleRef.current += orbitSpeed * delta * timeSpeed;
+      
+      const sunOrbitRadius = MILKY_WAY.sunDistance * gs;
+      markerGroupRef.current.position.set(
+        Math.cos(sunAngleRef.current) * sunOrbitRadius,
+        0,
+        Math.sin(sunAngleRef.current) * sunOrbitRadius
+      );
+      
+      // Update world position for trail tracking
+      const worldPos = new THREE.Vector3();
+      markerGroupRef.current.getWorldPosition(worldPos);
+      setObjectWorldPosition('sun_galactic', [worldPos.x, worldPos.y, worldPos.z]);
     }
     
     if (pulseRef.current) {
@@ -403,68 +439,87 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
   const baseMarkerSize = gs * 300;
   const bulgeR = MILKY_WAY.bulgeRadius * gs;
   const diskR = MILKY_WAY.diskRadius * gs;
+  const sunOrbitRadius = MILKY_WAY.sunDistance * gs;
+  
+  // Generate Sun's orbit path points
+  const sunOrbitPoints = useMemo(() => {
+    const points: THREE.Vector3[] = [];
+    const segments = 128;
+    for (let i = 0; i <= segments; i++) {
+      const angle = (i / segments) * Math.PI * 2;
+      points.push(new THREE.Vector3(
+        Math.cos(angle) * sunOrbitRadius,
+        0,
+        Math.sin(angle) * sunOrbitRadius
+      ));
+    }
+    return points;
+  }, [sunOrbitRadius]);
   
   return (
     <group ref={groupRef} position={galaxyOffset}>
-      {/* Core stars - bright golden center */}
-      <points geometry={coreGeo}>
-        <pointsMaterial
-          size={gs * 100}
-          map={dotTexture}
-          vertexColors
-          sizeAttenuation
-          transparent
-          opacity={0.95}
-          blending={THREE.AdditiveBlending}
-          depthWrite={false}
-          depthTest={false}
-        />
-      </points>
+      {/* Rotating stars group */}
+      <group ref={starsGroupRef}>
+        {/* Core stars - bright golden center */}
+        <points geometry={coreGeo}>
+          <pointsMaterial
+            size={gs * 100}
+            map={dotTexture}
+            vertexColors
+            sizeAttenuation
+            transparent
+            opacity={0.95}
+            blending={THREE.AdditiveBlending}
+            depthWrite={false}
+            depthTest={false}
+          />
+        </points>
 
-      {/* Main stars - spiral structure */}
-      <points geometry={starsGeo}>
-        <pointsMaterial
-          size={gs * 60}
-          map={dotTexture}
-          vertexColors
-          sizeAttenuation
-          transparent
-          opacity={0.9}
-          blending={THREE.AdditiveBlending}
-          depthWrite={false}
-          depthTest={false}
-        />
-      </points>
+        {/* Main stars - spiral structure */}
+        <points geometry={starsGeo}>
+          <pointsMaterial
+            size={gs * 60}
+            map={dotTexture}
+            vertexColors
+            sizeAttenuation
+            transparent
+            opacity={0.9}
+            blending={THREE.AdditiveBlending}
+            depthWrite={false}
+            depthTest={false}
+          />
+        </points>
 
-      {/* Volume stars - add height so it feels "full" */}
-      <points geometry={volumeGeo}>
-        <pointsMaterial
-          size={gs * 55}
-          map={dotTexture}
-          vertexColors
-          sizeAttenuation
-          transparent
-          opacity={0.45}
-          blending={THREE.AdditiveBlending}
-          depthWrite={false}
-          depthTest={false}
-        />
-      </points>
+        {/* Volume stars - add height so it feels "full" */}
+        <points geometry={volumeGeo}>
+          <pointsMaterial
+            size={gs * 55}
+            map={dotTexture}
+            vertexColors
+            sizeAttenuation
+            transparent
+            opacity={0.45}
+            blending={THREE.AdditiveBlending}
+            depthWrite={false}
+            depthTest={false}
+          />
+        </points>
 
-      {/* Halo stars - scattered above/below the disk */}
-      <points geometry={haloGeo}>
-        <pointsMaterial
-          size={gs * 45}
-          map={dotTexture}
-          vertexColors
-          sizeAttenuation
-          transparent
-          opacity={0.35}
-          blending={THREE.AdditiveBlending}
-          depthWrite={false}
-          depthTest={false}
-        />
-      </points>
+        {/* Halo stars - scattered above/below the disk */}
+        <points geometry={haloGeo}>
+          <pointsMaterial
+            size={gs * 45}
+            map={dotTexture}
+            vertexColors
+            sizeAttenuation
+            transparent
+            opacity={0.35}
+            blending={THREE.AdditiveBlending}
+            depthWrite={false}
+            depthTest={false}
+          />
+        </points>
+      </group>
 
       {/* Center glow (billboard) */}
       <sprite renderOrder={10} frustumCulled={false} scale={[diskR * 2.2, diskR * 2.2, 1]}>
@@ -477,13 +532,27 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
           depthTest={false}
         />
       </sprite>
+      
+      {/* Sun's orbit path around galactic center */}
+      {showSunOrbit && (
+        <line>
+          <bufferGeometry>
+            <bufferAttribute
+              attach="attributes-position"
+              args={[new Float32Array(sunOrbitPoints.flatMap(p => [p.x, p.y, p.z])), 3]}
+            />
+          </bufferGeometry>
+          <lineBasicMaterial color="#00ff44" transparent opacity={0.25} />
+        </line>
+      )}
+      
       {showYouAreHere && (
         <group 
           ref={markerGroupRef}
           position={[
-            Math.cos(MILKY_WAY.sunAngle) * MILKY_WAY.sunDistance * gs,
+            Math.cos(MILKY_WAY.sunAngle) * sunOrbitRadius,
             0,
-            Math.sin(MILKY_WAY.sunAngle) * MILKY_WAY.sunDistance * gs
+            Math.sin(MILKY_WAY.sunAngle) * sunOrbitRadius
           ]}
         >
           <mesh>
