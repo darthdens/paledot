@@ -30,10 +30,12 @@ export const SolarSystemContent = ({
   selectedObject,
 }: SolarSystemContentProps) => {
   const currentStarSystem = useCosmosStore((s) => s.currentStarSystem);
+  const isTouring = useCosmosStore((s) => s.isTouring);
   
   // Hide solar system details when we're in Proxima's system
+  // BUT always show when touring so world positions are tracked for camera placement
   const isInProximaSystem = currentStarSystem === 'proxima-centauri';
-  const showFullDetails = !isInProximaSystem;
+  const showFullDetails = !isInProximaSystem || isTouring;
   
   const planets = useMemo(() => 
     celestialObjects.filter(obj => obj.type === 'planet' || obj.type === 'dwarf-planet'),
