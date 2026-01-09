@@ -320,13 +320,39 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
       </points>
 
       {/* Smooth gradient glow - white → yellow → orange → purple → blue → dark blue */}
-      {/* Glow reaches to galaxy edges (diskR * 2 = galaxy edge) */}
+      {/* Glow reaches far beyond galaxy edges to spiral tips */}
       
-      {/* Dark blue at edges */}
-      <sprite renderOrder={-25} scale={[diskR * 2.2, diskR * 2.2, 1]}>
+      {/* Dark blue at far edges */}
+      <sprite renderOrder={-25} scale={[diskR * 4.0, diskR * 4.0, 1]}>
+        <spriteMaterial
+          map={glowTexture}
+          color="#1144AA"
+          transparent
+          opacity={0.12}
+          blending={THREE.AdditiveBlending}
+          depthWrite={false}
+          depthTest={false}
+        />
+      </sprite>
+
+      {/* Dark blue */}
+      <sprite renderOrder={-24} scale={[diskR * 3.5, diskR * 3.5, 1]}>
         <spriteMaterial
           map={glowTexture}
           color="#2255BB"
+          transparent
+          opacity={0.15}
+          blending={THREE.AdditiveBlending}
+          depthWrite={false}
+          depthTest={false}
+        />
+      </sprite>
+
+      {/* Blue */}
+      <sprite renderOrder={-23} scale={[diskR * 3.0, diskR * 3.0, 1]}>
+        <spriteMaterial
+          map={glowTexture}
+          color="#3366DD"
           transparent
           opacity={0.18}
           blending={THREE.AdditiveBlending}
@@ -335,11 +361,23 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
         />
       </sprite>
 
-      {/* Blue */}
-      <sprite renderOrder={-24} scale={[diskR * 1.9, diskR * 1.9, 1]}>
+      <sprite renderOrder={-22} scale={[diskR * 2.6, diskR * 2.6, 1]}>
         <spriteMaterial
           map={glowTexture}
-          color="#3366DD"
+          color="#4477EE"
+          transparent
+          opacity={0.2}
+          blending={THREE.AdditiveBlending}
+          depthWrite={false}
+          depthTest={false}
+        />
+      </sprite>
+
+      {/* Blue to purple */}
+      <sprite renderOrder={-21} scale={[diskR * 2.2, diskR * 2.2, 1]}>
+        <spriteMaterial
+          map={glowTexture}
+          color="#6666DD"
           transparent
           opacity={0.22}
           blending={THREE.AdditiveBlending}
@@ -348,50 +386,25 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
         />
       </sprite>
 
-      <sprite renderOrder={-23} scale={[diskR * 1.65, diskR * 1.65, 1]}>
-        <spriteMaterial
-          map={glowTexture}
-          color="#4477EE"
-          transparent
-          opacity={0.25}
-          blending={THREE.AdditiveBlending}
-          depthWrite={false}
-          depthTest={false}
-        />
-      </sprite>
-
-      {/* Blue to purple */}
-      <sprite renderOrder={-22} scale={[diskR * 1.45, diskR * 1.45, 1]}>
-        <spriteMaterial
-          map={glowTexture}
-          color="#6666DD"
-          transparent
-          opacity={0.28}
-          blending={THREE.AdditiveBlending}
-          depthWrite={false}
-          depthTest={false}
-        />
-      </sprite>
-
       {/* Purple */}
-      <sprite renderOrder={-21} scale={[diskR * 1.25, diskR * 1.25, 1]}>
+      <sprite renderOrder={-20} scale={[diskR * 1.85, diskR * 1.85, 1]}>
         <spriteMaterial
           map={glowTexture}
           color="#8855CC"
           transparent
-          opacity={0.3}
+          opacity={0.24}
           blending={THREE.AdditiveBlending}
           depthWrite={false}
           depthTest={false}
         />
       </sprite>
 
-      <sprite renderOrder={-20} scale={[diskR * 1.08, diskR * 1.08, 1]}>
+      <sprite renderOrder={-19} scale={[diskR * 1.55, diskR * 1.55, 1]}>
         <spriteMaterial
           map={glowTexture}
           color="#AA55BB"
           transparent
-          opacity={0.32}
+          opacity={0.26}
           blending={THREE.AdditiveBlending}
           depthWrite={false}
           depthTest={false}
@@ -399,7 +412,7 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
       </sprite>
 
       {/* Purple to orange */}
-      <sprite renderOrder={-19} scale={[diskR * 1.25, diskR * 1.25, 1]}>
+      <sprite renderOrder={-18} scale={[diskR * 1.3, diskR * 1.3, 1]}>
         <spriteMaterial
           map={glowTexture}
           color="#DD5577"
@@ -411,13 +424,13 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
         />
       </sprite>
 
-      {/* Warm wash that carries yellow/orange outward (so it reaches the spiral edges) */}
-      <sprite renderOrder={-18} scale={[diskR * 1.65, diskR * 1.65, 1]}>
+      {/* Warm wash that carries yellow/orange outward */}
+      <sprite renderOrder={-17} scale={[diskR * 2.4, diskR * 2.4, 1]}>
         <spriteMaterial
           map={glowTexture}
           color="#FF8844"
           transparent
-          opacity={0.12}
+          opacity={0.1}
           blending={THREE.AdditiveBlending}
           depthWrite={false}
           depthTest={false}
