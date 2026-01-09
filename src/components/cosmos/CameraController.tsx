@@ -11,6 +11,7 @@ export const CameraController = () => {
   const isFollowing = useCosmosStore((state) => state.isFollowing);
   const tourCameraTarget = useCosmosStore((state) => state.tourCameraTarget);
   const isTouring = useCosmosStore((state) => state.isTouring);
+  const currentScale = useCosmosStore((state) => state.currentScale);
 
   const isAnimating = useRef(false);
   const animationProgress = useRef(0);
@@ -175,26 +176,24 @@ export const CameraController = () => {
     // After fly-to: continuously follow the selected object (keep it centered)
     // Don't follow during tour - let the user see the full scene
     if (selectedObject && isFollowing && !isTouring) {
-      // Try the selected object's position first, fall back to sun for galaxy scale
-      let livePos = useCosmosStore.getState().objectWorldPositions[selectedObject.id];
-      
-      // At galaxy scale, if no live position for selected object, use the solar-system-marker
-      // which represents where the whole solar system is in the galaxy
-      if (!livePos) {
-        livePos = useCosmosStore.getState().objectWorldPositions['solar-system-marker'];
-      }
-      
+      // At galaxy scales, always follow the solar system marker (our reference star),
+      // otherwise the camera can end up following a tiny planet position and feel "lost".
+      const followId =
+        currentScale === 'stellar' ||
+        currentScale === 'milkyWay' ||
+        currentScale === 'localGroup' ||
+        currentScale === 'universe'
+          ? 'solar-system-marker'
+          : selectedObject.id;
+
+      const livePos = useCosmosStore.getState().objectWorldPositions[followId];
+
       if (livePos) {
         const currentTarget = orbitControls.target as THREE.Vector3;
 
-        // Get the exact live position - no smoothing for perfect tracking
         tmpTarget.current.set(livePos[0], livePos[1], livePos[2]);
-        
-        // Calculate how much the object moved since last frame
         tmpDelta.current.subVectors(tmpTarget.current, currentTarget);
-        
-        // Move both target and camera by exactly the same amount
-        // This keeps the object perfectly centered with no lag
+
         currentTarget.copy(tmpTarget.current);
         camera.position.add(tmpDelta.current);
 

@@ -111,6 +111,7 @@ export const OrbitalTrail = ({
   }, [geometry, material, glowLine]);
 
   useFrame(() => {
+    if (!enabled) return;
     if (timeSpeed === 0) return;
 
     const worldPos = useCosmosStore.getState().objectWorldPositions[objectId];
