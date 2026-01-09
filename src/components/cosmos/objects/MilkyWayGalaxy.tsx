@@ -428,8 +428,7 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
   return (
     <>
       {/* Rotating galaxy group - stars and glow rotate */}
-      <group ref={rotatingGroupRef} position={galaxyOffset}>
-        {/* Core stars - bright golden center */}
+      <group ref={rotatingGroupRef}>
         <points geometry={coreGeo}>
           <pointsMaterial
             size={gs * 100}
@@ -502,9 +501,9 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
         </sprite>
       </group>
 
-      {/* Non-rotating marker at solar system position (0,0,0) */}
+      {/* Solar system marker ("You are here") */}
       {showYouAreHere && (
-        <group ref={markerGroupRef} position={[0, 0, 0]}>
+        <group ref={markerGroupRef} position={solarSystemPos}>
           {/* White star point that matches the galaxy stars style */}
           <points>
             <bufferGeometry>
