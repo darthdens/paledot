@@ -2,6 +2,7 @@ import { useRef, useMemo } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { UNITS } from '../types';
+import { useCosmosStore } from '../store/useCosmosStore';
 
 interface MilkyWayGalaxyProps {
   visualScale: number;
@@ -76,6 +77,9 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
   const pulseRef = useRef<THREE.Mesh>(null);
   const pulseRef2 = useRef<THREE.Mesh>(null);
   const markerGroupRef = useRef<THREE.Group>(null);
+  const hasSetCenterRef = useRef(false);
+  
+  const setObjectWorldPosition = useCosmosStore((s) => s.setObjectWorldPosition);
   
   const gs = UNITS.KM_PER_LY * visualScale;
   
@@ -258,6 +262,14 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
   
   useFrame(({ clock, camera }) => {
     const t = clock.getElapsedTime();
+
+    // Cache the galaxy center world position once (used by camera-based UI overlays)
+    if (!hasSetCenterRef.current && groupRef.current) {
+      const p = new THREE.Vector3();
+      groupRef.current.getWorldPosition(p);
+      setObjectWorldPosition('milkyWay_center', [p.x, p.y, p.z]);
+      hasSetCenterRef.current = true;
+    }
     
     if (pulseRef.current) {
       const phase = (t * 2) % 1;
