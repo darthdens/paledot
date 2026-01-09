@@ -101,14 +101,14 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
   const gs = UNITS.KM_PER_LY * visualScale;
 
   // Get celestial objects for click handlers
-  const sunObject = useMemo(() => getObjectById('sun'), []);
+  const earthObject = useMemo(() => getObjectById('earth'), []);
   const proximaObject = useMemo(() => getObjectById('proxima-centauri'), []);
 
-  // Click handlers
-  const handleSunClick = useCallback((e: { stopPropagation: () => void }) => {
+  // Click handlers - "You are here" marker goes to Earth (our home!)
+  const handleYouAreHereClick = useCallback((e: { stopPropagation: () => void }) => {
     e.stopPropagation();
-    if (sunObject) setSelectedObject(sunObject);
-  }, [sunObject, setSelectedObject]);
+    if (earthObject) setSelectedObject(earthObject);
+  }, [earthObject, setSelectedObject]);
 
   const handleProximaClick = useCallback((e: { stopPropagation: () => void }) => {
     e.stopPropagation();
@@ -116,10 +116,10 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
   }, [proximaObject, setSelectedObject]);
 
   // Click handlers for HTML labels (DOM events)
-  const handleSunLabelClick = useCallback((e: ReactMouseEvent<HTMLDivElement>) => {
+  const handleYouAreHereLabelClick = useCallback((e: ReactMouseEvent<HTMLDivElement>) => {
     e.stopPropagation();
-    if (sunObject) setSelectedObject(sunObject);
-  }, [sunObject, setSelectedObject]);
+    if (earthObject) setSelectedObject(earthObject);
+  }, [earthObject, setSelectedObject]);
 
   const handleProximaLabelClick = useCallback((e: ReactMouseEvent<HTMLDivElement>) => {
     e.stopPropagation();
@@ -604,8 +604,8 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
           
           {/* Invisible click target for star point - large size for easy clicking at galaxy scale */}
           <mesh 
-            onClick={handleSunClick} 
-            onPointerDown={handleSunClick}
+            onClick={handleYouAreHereClick} 
+            onPointerDown={handleYouAreHereClick}
             onPointerOver={(e) => { e.stopPropagation(); document.body.style.cursor = 'pointer'; }}
             onPointerOut={() => { document.body.style.cursor = 'auto'; }}
           >
@@ -626,7 +626,7 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
             >
               <div
                 className="bg-black/80 backdrop-blur-sm px-3 py-1.5 rounded-lg border border-emerald-500/50 whitespace-nowrap shadow-lg cursor-pointer"
-                onClick={handleSunLabelClick}
+                onClick={handleYouAreHereLabelClick}
               >
                 <span className="text-emerald-400 text-sm font-semibold drop-shadow-md">
                   {language === 'fr' ? 'Nous sommes ici' : 'We are here'}
@@ -635,12 +635,12 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
             </Html>
           )}
           
-          <mesh onClick={handleSunClick} onPointerDown={handleSunClick}>
+          <mesh onClick={handleYouAreHereClick} onPointerDown={handleYouAreHereClick}>
             <sphereGeometry args={[baseMarkerSize, 16, 16]} />
             <meshBasicMaterial color="#00ff44" />
           </mesh>
           
-          <mesh onClick={handleSunClick} onPointerDown={handleSunClick}>
+          <mesh onClick={handleYouAreHereClick} onPointerDown={handleYouAreHereClick}>
             <sphereGeometry args={[baseMarkerSize * 1.5, 16, 16]} />
             <meshBasicMaterial
               color="#00ff44"
@@ -650,7 +650,7 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
             />
           </mesh>
           
-          <mesh onClick={handleSunClick} onPointerDown={handleSunClick}>
+          <mesh onClick={handleYouAreHereClick} onPointerDown={handleYouAreHereClick}>
             <sphereGeometry args={[baseMarkerSize * 3, 16, 16]} />
             <meshBasicMaterial
               color="#00ff44"
@@ -660,7 +660,7 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
             />
           </mesh>
           
-          <mesh ref={pulseRef} rotation={[Math.PI / 2, 0, 0]} onClick={handleSunClick} onPointerDown={handleSunClick}>
+          <mesh ref={pulseRef} rotation={[Math.PI / 2, 0, 0]} onClick={handleYouAreHereClick} onPointerDown={handleYouAreHereClick}>
             <ringGeometry args={[baseMarkerSize * 1.5, baseMarkerSize * 2.5, 32]} />
             <meshBasicMaterial
               color="#00ff44"
@@ -671,7 +671,7 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
             />
           </mesh>
           
-          <mesh ref={pulseRef2} rotation={[Math.PI / 2, 0, 0]} onClick={handleSunClick} onPointerDown={handleSunClick}>
+          <mesh ref={pulseRef2} rotation={[Math.PI / 2, 0, 0]} onClick={handleYouAreHereClick} onPointerDown={handleYouAreHereClick}>
             <ringGeometry args={[baseMarkerSize * 1.5, baseMarkerSize * 2.5, 32]} />
             <meshBasicMaterial
               color="#00ff44"
