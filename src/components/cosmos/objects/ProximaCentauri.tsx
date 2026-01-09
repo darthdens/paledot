@@ -56,14 +56,20 @@ export const ProximaCentauri = ({ visualScale = 0.001 }: ProximaCentauriProps) =
   const gs = UNITS.KM_PER_LY * visualScale;
   
   // Position: 4.24 light years away (position in light-years, scaled to scene units)
-  const position: [number, number, number] = [
+  // Memoized to prevent recalculation on every render
+  const position = useMemo<[number, number, number]>(() => [
     4.24 * gs,
     0.5 * gs,
     0
-  ];
+  ], [gs]);
+
+  // Throttle world position updates to reduce state churn
+  const lastUpdateTime = useRef(0);
+  const UPDATE_INTERVAL = 0.1; // seconds
 
   useFrame((state) => {
     const time = state.clock.getElapsedTime();
+    
     if (starRef.current) {
       starRef.current.rotation.y += 0.0005; // Slower rotation for red dwarf
     }
@@ -74,12 +80,13 @@ export const ProximaCentauri = ({ visualScale = 0.001 }: ProximaCentauriProps) =
       glowRef.current.scale.setScalar(1 + Math.sin(time * 0.4) * 0.04);
     }
 
-    // Update world position for camera targeting
-    if (groupRef.current) {
+    // Throttled world position update for camera targeting
+    if (groupRef.current && time - lastUpdateTime.current > UPDATE_INTERVAL) {
+      lastUpdateTime.current = time;
       groupRef.current.getWorldPosition(worldPos.current);
       setObjectWorldPosition('proxima-centauri', [worldPos.current.x, worldPos.current.y, worldPos.current.z]);
     }
-  }, -1);
+  });
 
   // Visual boost for visibility at stellar distances (similar to nebula approach)
   // Real size is 214,550 km, but at 4.24 ly away it would be invisible
