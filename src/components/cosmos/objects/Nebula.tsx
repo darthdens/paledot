@@ -51,8 +51,8 @@ export const Nebula = ({ nebula, visualScale }: NebulaProps) => {
   ], [nebula.position, gs]);
   
   // Size in scene units - nebula.size is the diameter in light-years
-  // Multiply by a visual scale factor to make nebulae more visible at galactic scales
-  const nebulaSize = nebula.size * gs * 10; // 10x visual boost for visibility
+  // True scale: 24 ly nebula vs 52,500 ly galaxy radius = correctly tiny
+  const nebulaSize = nebula.size * gs;
   
   // Parse the hex color
   const color = useMemo(() => new THREE.Color(nebula.color), [nebula.color]);
