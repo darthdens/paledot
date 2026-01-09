@@ -103,6 +103,8 @@ export const GalacticOrbitRing = ({ visualScale, visible = true }: GalacticOrbit
         position={[markerX, markerRadius * 12, markerZ]}
         center
         occlude={false}
+        // Keep this label beneath app modals/overlays (e.g., Help & Controls)
+        zIndexRange={[0, 0]}
         style={{ pointerEvents: 'none' }}
       >
         <div className="bg-black/80 backdrop-blur-sm px-3 py-1.5 rounded-lg border border-emerald-500/50 whitespace-nowrap">
