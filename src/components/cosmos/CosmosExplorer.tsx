@@ -43,8 +43,10 @@ export const CosmosExplorer = () => {
   const isFollowing = useCosmosStore(state => state.isFollowing);
   const currentScale = useCosmosStore(state => state.currentScale);
   
-  // Show Milky Way only at stellar scale or larger (not visible in solar system view)
+  // Show Milky Way only at stellar scale or larger
+  // Solar system follows galactic Sun position only at milkyWay scale or beyond (when zoomed out enough)
   const showMilkyWay = currentScale === 'stellar' || currentScale === 'milkyWay' || currentScale === 'localGroup' || currentScale === 'universe';
+  const solarSystemFollowsGalactic = currentScale === 'milkyWay' || currentScale === 'localGroup' || currentScale === 'universe';
   
   // Force cursor none on canvas - OrbitControls tries to set cursor styles
   useEffect(() => {
@@ -172,7 +174,7 @@ export const CosmosExplorer = () => {
           {showMilkyWay && (
             <OrbitalTrail
               objectId="sun_galactic"
-              color="#00ff44"
+              color="#ffffff"
               enabled={showTrails}
               maxPoints={200}
               opacity={0.4}
@@ -180,7 +182,7 @@ export const CosmosExplorer = () => {
           )}
           
           {/* Solar System - all objects grouped together, follows galactic position when at galaxy scale */}
-          <SolarSystemGroup followGalacticSun={showMilkyWay}>
+          <SolarSystemGroup followGalacticSun={solarSystemFollowsGalactic}>
             {/* The Sun at center - same unified scale as planets */}
             <Sun position={[0, 0, 0]} visualScale={UNIFIED_SCALE} />
             
