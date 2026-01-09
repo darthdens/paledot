@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { X, ChevronRight, Clock } from 'lucide-react';
 import { useCosmosStore } from '../store/useCosmosStore';
 import { useFullscreenStore } from '../store/useFullscreenStore';
-import { quickJumpCategories, getObjectById } from '../data/celestialObjects';
+import { getObjectById } from '../data/celestialObjects';
 import { useState } from 'react';
 
 const translations = {
@@ -11,16 +11,54 @@ const translations = {
     title: 'Quick Jump',
     recentJumps: 'Recent',
     comingSoon: 'Coming Soon',
+    starsGalaxies: 'Stars & Galaxies',
   },
   fr: {
     title: 'Saut Rapide',
     recentJumps: 'Récents',
     comingSoon: 'Bientôt',
+    starsGalaxies: 'Étoiles et Galaxies',
   },
 };
 
-// Categories that are fully implemented (Solar System only for now)
-const IMPLEMENTED_CATEGORIES = ['solarSystem'];
+// Categories that are fully implemented
+const IMPLEMENTED_CATEGORIES = ['solarSystem', 'starsGalaxies'];
+
+// Objects that are implemented within the starsGalaxies category
+const IMPLEMENTED_STARS_GALAXIES = ['sun', 'milky-way-center'];
+
+// Custom categories for quick jump menu (combining stars and galaxies into one)
+const menuCategories = [
+  {
+    id: 'solarSystem',
+    name: { en: 'Solar System', fr: 'Système Solaire' },
+    locations: [
+      'sun', 'mercury', 'venus', 'earth', 'moon', 
+      'mars', 'phobos', 'deimos', 
+      'ceres',
+      'jupiter', 'io', 'europa', 'ganymede', 'callisto', 
+      'saturn', 'mimas', 'enceladus', 'tethys', 'dione', 'rhea', 'titan', 'iapetus',
+      'uranus', 'miranda', 'ariel', 'umbriel', 'titania', 'oberon',
+      'neptune', 'triton',
+      'pluto'
+    ],
+  },
+  {
+    id: 'starsGalaxies',
+    name: { en: 'Stars & Galaxies', fr: 'Étoiles et Galaxies' },
+    locations: ['sun', 'milky-way-center', 'alpha-centauri', 'proxima-centauri', 'sirius', 'betelgeuse', 'polaris', 'andromeda', 'triangulum'],
+  },
+  {
+    id: 'nebulae',
+    name: { en: 'Nebulae', fr: 'Nébuleuses' },
+    locations: ['orion-nebula', 'crab-nebula', 'eagle-nebula', 'ring-nebula'],
+  },
+  {
+    id: 'deepSpace',
+    name: { en: 'Deep Space', fr: 'Espace Profond' },
+    locations: ['virgo-cluster', 'coma-cluster', 'hubble-deep-field', 'observable-universe-edge'],
+  },
+];
 
 export const QuickJumpMenu = () => {
   const { language } = useLanguage();
@@ -50,6 +88,12 @@ export const QuickJumpMenu = () => {
   };
 
   const isComingSoon = (categoryId: string) => !IMPLEMENTED_CATEGORIES.includes(categoryId);
+  
+  const isItemImplemented = (categoryId: string, locationId: string) => {
+    if (categoryId === 'solarSystem') return true;
+    if (categoryId === 'starsGalaxies') return IMPLEMENTED_STARS_GALAXIES.includes(locationId);
+    return false;
+  };
 
   const gap = 8;
 
@@ -113,7 +157,7 @@ export const QuickJumpMenu = () => {
 
         {/* Categories */}
         <div className="p-1 sm:p-2">
-          {quickJumpCategories.map(category => {
+          {menuCategories.map(category => {
             const comingSoon = isComingSoon(category.id);
             
             return (
@@ -154,19 +198,31 @@ export const QuickJumpMenu = () => {
                     {category.locations.map(locationId => {
                       const obj = getObjectById(locationId);
                       if (!obj) return null;
+                      const implemented = isItemImplemented(category.id, locationId);
+                      
                       return (
                         <button
                           key={locationId}
-                          onClick={() => handleJump(locationId)}
-                          className="w-full flex items-center gap-2 p-1.5 rounded hover:bg-white/10 transition-colors text-left"
+                          onClick={() => implemented && handleJump(locationId)}
+                          disabled={!implemented}
+                          className={`w-full flex items-center gap-2 p-1.5 rounded transition-colors text-left ${
+                            implemented 
+                              ? 'hover:bg-white/10 cursor-pointer' 
+                              : 'opacity-50 cursor-not-allowed'
+                          }`}
                         >
                           <span
                             className="w-2 h-2 rounded-full shrink-0"
                             style={{ backgroundColor: obj.color }}
                           />
-                          <span className="text-white/70 hover:text-white text-xs truncate">
+                          <span className={`text-xs truncate ${implemented ? 'text-white/70 hover:text-white' : 'text-white/40'}`}>
                             {obj.name[language]}
                           </span>
+                          {!implemented && (
+                            <span className="flex items-center gap-0.5 px-1 py-0.5 bg-amber-500/20 border border-amber-500/30 rounded text-[8px] text-amber-400 ml-auto shrink-0">
+                              <Clock className="w-2 h-2" />
+                            </span>
+                          )}
                         </button>
                       );
                     })}
