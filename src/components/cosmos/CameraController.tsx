@@ -114,10 +114,9 @@ export const CameraController = () => {
         visualSize = selectedObject.size * UNITS.KM_PER_LY * UNIFIED_SCALE;
         flyToDistance.current = Math.max(visualSize * 3, 1e9);
       } else if (selectedObject.category === 'galaxies') {
-        // Galaxy size is in light-years (stored as km in celestialObjects but actually ly)
-        // View from closer (0.8x size) so the galaxy fills more of the screen
+        // Galaxy size is in light-years - view from close (0.4x size) to fill the screen
         visualSize = selectedObject.size * UNIFIED_SCALE;
-        flyToDistance.current = Math.max(visualSize * 0.8, 1e8);
+        flyToDistance.current = Math.max(visualSize * 0.4, 1e8);
       } else if (selectedObject.category === 'stars' && selectedObject.id !== 'sun') {
         // Distant stars have 500x visual boost applied in their component
         // Use boosted size for camera distance calculation
