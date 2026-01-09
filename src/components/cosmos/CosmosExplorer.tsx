@@ -21,7 +21,6 @@ import { KeyboardShortcuts } from './ui/KeyboardShortcuts';
 import { SizeComparison } from './ui/SizeComparison';
 import { ScaleBarUI } from './ui/ScaleBar';
 import { YouAreHereLabel } from './ui/YouAreHereLabel';
-import { GalacticBackGlowOverlay, GalacticBackGlowTracker } from './ui/GalacticBackGlow';
 import { CameraController } from './CameraController';
 import { ScaleTracker } from './ScaleTracker';
 import { celestialObjects } from './data/celestialObjects';
@@ -143,9 +142,6 @@ export const CosmosExplorer = () => {
           
           {/* Scale tracker - updates store with current scale level */}
           <ScaleTracker />
-
-          {/* Tracks whether the galaxy center is behind the camera (for back-glow overlay) */}
-          <GalacticBackGlowTracker />
           
           {/* Lighting - Sun as primary light source */}
           <ambientLight intensity={0.02} />
@@ -254,8 +250,6 @@ export const CosmosExplorer = () => {
           <PerformanceHUD />
         </Suspense>
       </Canvas>
-      
-      <GalacticBackGlowOverlay />
       
       {/* UI Overlays */}
       <CosmosUI />
