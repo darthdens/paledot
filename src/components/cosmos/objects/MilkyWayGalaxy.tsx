@@ -602,6 +602,12 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
             />
           </points>
           
+          {/* Invisible click target for star point */}
+          <mesh onClick={handleSunClick}>
+            <sphereGeometry args={[baseMarkerSize * 8, 8, 8]} />
+            <meshBasicMaterial transparent opacity={0} />
+          </mesh>
+          
           {/* "We are here" label */}
           {showLabel && (
             <Html
@@ -704,6 +710,12 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
               depthTest={false}
             />
           </points>
+          
+          {/* Invisible click target for star point */}
+          <mesh onClick={handleProximaClick}>
+            <sphereGeometry args={[baseMarkerSize * 8, 8, 8]} />
+            <meshBasicMaterial transparent opacity={0} />
+          </mesh>
           
           {/* "Proxima Centauri" label */}
           <Html
