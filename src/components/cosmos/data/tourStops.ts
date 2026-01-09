@@ -11,6 +11,7 @@ const OBJECT_RADII: Record<string, number> = {
   mars: 3390,
   sun: 696350,
   jupiter: 69911,
+  europa: 1561,
   saturn: 58232,
   titan: 2575,
   uranus: 25362,
@@ -154,6 +155,23 @@ export const tourStops: TourStop[] = [
     duration: 8,
     // Consistent zoom: ~4x Jupiter radius
     cameraPosition: [0, OBJECT_RADII.jupiter * 0.5, OBJECT_RADII.jupiter * ZOOM_MULTIPLIER],
+    lookAt: [0, 0, 0],
+    scaleLevel: 'solarSystem',
+  },
+  {
+    id: 'europa',
+    locationId: 'europa',
+    title: {
+      en: 'Europa - Ocean Moon',
+      fr: 'Europe - La Lune Océan',
+    },
+    narration: {
+      en: 'Beneath Europa\'s icy crust lies a global ocean containing more water than all of Earth\'s oceans combined. This makes it one of the most promising places to search for extraterrestrial life in our solar system.',
+      fr: 'Sous la croûte glacée d\'Europe se trouve un océan global contenant plus d\'eau que tous les océans de la Terre réunis. Cela en fait l\'un des endroits les plus prometteurs pour rechercher la vie extraterrestre dans notre système solaire.',
+    },
+    duration: 7,
+    // Consistent zoom: ~4x Europa radius
+    cameraPosition: [0, OBJECT_RADII.europa * 0.5, OBJECT_RADII.europa * ZOOM_MULTIPLIER],
     lookAt: [0, 0, 0],
     scaleLevel: 'solarSystem',
   },
