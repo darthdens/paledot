@@ -34,6 +34,10 @@ export const CosmosExplorer = () => {
   const selectedObject = useCosmosStore(state => state.selectedObject);
   const showOrbits = useCosmosStore(state => state.showOrbits);
   const showTrails = useCosmosStore(state => state.showTrails);
+  const currentScale = useCosmosStore(state => state.currentScale);
+  
+  // Hide Andromeda when within solar system or Proxima Centauri system
+  const showAndromeda = currentScale !== 'earth' && currentScale !== 'solarSystem' && currentScale !== 'stellar';
   
   // Force cursor none on canvas - OrbitControls tries to set cursor styles
   useEffect(() => {
@@ -181,8 +185,8 @@ export const CosmosExplorer = () => {
           </GalaxyRotator>
           
           {/* Andromeda Galaxy - OUTSIDE the GalaxyRotator so it doesn't rotate with Milky Way */}
-          {/* Each galaxy rotates its own stars around its own center independently */}
-          <AndromedaGalaxy visualScale={UNIFIED_SCALE} />
+          {/* Hidden when within solar system or Proxima Centauri system for performance */}
+          {showAndromeda && <AndromedaGalaxy visualScale={UNIFIED_SCALE} />}
           
           {/* Performance stats */}
           <PerformanceHUD />
