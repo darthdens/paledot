@@ -20,12 +20,13 @@ const translations = {
 };
 
 // Categories that are expandable (have at least one implemented item)
-const EXPANDABLE_CATEGORIES = ['solarSystem', 'stars', 'galaxies'];
+const EXPANDABLE_CATEGORIES = ['solarSystem', 'stars', 'nebulae', 'galaxies'];
 
 // Specific objects that are implemented per category (empty array = all implemented)
 const IMPLEMENTED_OBJECTS: Record<string, string[]> = {
   solarSystem: [], // empty means all are implemented
   stars: ['sun'],
+  nebulae: ['orion-nebula', 'crab-nebula', 'eagle-nebula', 'ring-nebula'],
   galaxies: ['milky-way-center'],
 };
 
