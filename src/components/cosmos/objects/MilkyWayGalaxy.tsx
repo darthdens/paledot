@@ -1,8 +1,10 @@
 import { useRef, useMemo } from 'react';
 import { useFrame } from '@react-three/fiber';
+import { Html } from '@react-three/drei';
 import * as THREE from 'three';
 import { UNITS } from '../types';
 import { useCosmosStore } from '../store/useCosmosStore';
+import { useLanguage } from '@/i18n/LanguageContext';
 
 interface MilkyWayGalaxyProps {
   visualScale: number;
@@ -79,8 +81,14 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
   const markerGroupRef = useRef<THREE.Group>(null);
   const centerWorldPos = useRef(new THREE.Vector3());
   const markerWorldPos = useRef(new THREE.Vector3());
+  
+  const { language } = useLanguage();
 
   const setObjectWorldPosition = useCosmosStore((s) => s.setObjectWorldPosition);
+  const currentScale = useCosmosStore((s) => s.currentScale);
+  
+  // Only show label at galaxy-scale views
+  const showLabel = currentScale === 'stellar' || currentScale === 'milkyWay' || currentScale === 'localGroup' || currentScale === 'universe';
 
   const gs = UNITS.KM_PER_LY * visualScale;
 
@@ -526,6 +534,21 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
               depthTest={false}
             />
           </points>
+          
+          {/* "We are here" label */}
+          {showLabel && (
+            <Html
+              position={[0, baseMarkerSize * 8, 0]}
+              center
+              style={{ pointerEvents: 'none' }}
+            >
+              <div className="bg-black/80 backdrop-blur-sm px-3 py-1.5 rounded-lg border border-emerald-500/50 whitespace-nowrap">
+                <span className="text-emerald-400 text-sm font-semibold">
+                  {language === 'fr' ? 'Nous sommes ici' : 'We are here'}
+                </span>
+              </div>
+            </Html>
+          )}
           
           <mesh>
             <sphereGeometry args={[baseMarkerSize, 16, 16]} />
