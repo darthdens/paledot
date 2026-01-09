@@ -693,7 +693,9 @@ export const celestialObjects: CelestialObject[] = [
     id: 'orion-nebula',
     name: { en: 'Orion Nebula', fr: 'Nébuleuse d\'Orion' },
     type: 'nebula',
-    position: [1344 * UNITS.KM_PER_LY, 0, 500 * UNITS.KM_PER_LY],
+    // Galactic coordinates: l=209°, b=-19°, d=1344 ly
+    // x = d*cos(b)*cos(l), y = d*sin(b), z = d*cos(b)*sin(l)
+    position: [-1112 * UNITS.KM_PER_LY, -438 * UNITS.KM_PER_LY, -617 * UNITS.KM_PER_LY],
     size: 24 * UNITS.KM_PER_LY,
     color: '#ff69b4',
     distanceFromEarth: 1344,

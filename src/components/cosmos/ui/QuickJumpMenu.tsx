@@ -26,7 +26,7 @@ const EXPANDABLE_CATEGORIES = ['solarSystem', 'stars', 'nebulae', 'galaxies'];
 const IMPLEMENTED_OBJECTS: Record<string, string[]> = {
   solarSystem: [], // empty means all are implemented
   stars: ['sun'],
-  nebulae: ['orion-nebula', 'crab-nebula', 'eagle-nebula', 'ring-nebula'],
+  nebulae: ['orion-nebula'],
   galaxies: ['milky-way-center'],
 };
 
