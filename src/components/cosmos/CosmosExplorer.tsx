@@ -245,14 +245,17 @@ export const CosmosExplorer = () => {
             ))}
             
             {/* Distant stars - tiny point-like spheres */}
-            {stars.map((star) => (
-              <WorldPositionTracker key={star.id} objectId={star.id} updateInterval={0.1}>
-                <mesh position={star.position.map((p) => p * UNIFIED_SCALE) as [number, number, number]}>
-                  <sphereGeometry args={[200, 6, 6]} />
-                  <meshBasicMaterial color={star.color} transparent opacity={0.5} />
-                </mesh>
-              </WorldPositionTracker>
-            ))}
+            {stars.map((star) => {
+              const starPos = star.position.map((p) => p * UNIFIED_SCALE) as [number, number, number];
+              return (
+                <WorldPositionTracker key={star.id} objectId={star.id} position={starPos} updateInterval={0.15}>
+                  <mesh position={[0, 0, 0]}>
+                    <sphereGeometry args={[200, 6, 6]} />
+                    <meshBasicMaterial color={star.color} transparent opacity={0.5} />
+                  </mesh>
+                </WorldPositionTracker>
+              );
+            })}
           </GalaxyRotator>
           
           {/* Performance stats */}
