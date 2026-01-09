@@ -1,4 +1,4 @@
-import { useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { useFrame, useThree } from "@react-three/fiber";
 import * as THREE from "three";
 import { useCosmosStore } from "../store/useCosmosStore";
@@ -28,15 +28,15 @@ export const GalaxySkyGlow = () => {
   const material = useMemo(() => {
     return new THREE.ShaderMaterial({
       transparent: true,
-      depthTest: true,
+      depthTest: false,
       depthWrite: false,
       blending: THREE.AdditiveBlending,
       side: THREE.BackSide,
       toneMapped: false,
       uniforms: {
         uCenterDirView: { value: new THREE.Vector3(0, 0, -1) },
-        uMin: { value: 0.06 },
-        uMax: { value: 0.22 },
+        uMin: { value: 0.12 },
+        uMax: { value: 0.28 },
       },
       vertexShader: `
         varying vec3 vViewDir;
@@ -81,9 +81,10 @@ export const GalaxySkyGlow = () => {
           vec3 dir = normalize(vViewDir);
           vec3 cdir = normalize(uCenterDirView);
 
-          // When the center is behind, the sky-dome still glows (scatter), so we use abs(dot)
+          // Sky-dome should still glow when the center is behind the camera,
+          // so we drive intensity from abs(dot).
           float d = clamp(dot(dir, cdir), -1.0, 1.0);
-          float facing = clamp((d + 1.0) * 0.5, 0.0, 1.0);
+          float facing = clamp(abs(d), 0.0, 1.0);
 
           // Angular distance to the (possibly behind) galactic center axis
           float ad = acos(clamp(abs(d), 0.0, 1.0));
@@ -103,19 +104,25 @@ export const GalaxySkyGlow = () => {
     });
   }, []);
 
-  useFrame(() => {
+  useEffect(() => {
     const m = meshRef.current;
     if (!m) return;
 
-    // Keep the dome centered on the camera (no parallax)
-    m.position.copy(camera.position);
+    // Attach to the camera so the glow is rendered in camera-local space.
+    // This avoids huge world-coordinate precision issues at cosmic distances.
+    camera.add(m);
+    m.position.set(0, 0, 0);
+    m.scale.setScalar(1);
 
+    return () => {
+      camera.remove(m);
+    };
+  }, [camera]);
+
+  useFrame(() => {
     // Update uniform direction (world -> view)
     if (centerPos) {
-      tmpDir.current
-        .set(centerPos[0], centerPos[1], centerPos[2])
-        .sub(camera.position)
-        .normalize();
+      tmpDir.current.set(centerPos[0], centerPos[1], centerPos[2]).sub(camera.position).normalize();
 
       tmpMat3.current.setFromMatrix4(camera.matrixWorldInverse);
       centerDirView.current.copy(tmpDir.current).applyMatrix3(tmpMat3.current).normalize();
@@ -128,7 +135,7 @@ export const GalaxySkyGlow = () => {
 
   return (
     <mesh ref={meshRef} frustumCulled={false} renderOrder={-200}>
-      <sphereGeometry args={[1, 64, 64]} />
+      <sphereGeometry args={[10, 64, 64]} />
       <primitive object={material} attach="material" />
     </mesh>
   );
