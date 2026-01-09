@@ -133,14 +133,19 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
 
       const angle = branchAngle + spinAngle + armJitter + interArmJitter;
 
-      positions[i3] = Math.cos(angle) * radius;
+      // Radial spread to make arms thicker horizontally (not just angular)
+      const radialSpread = (0.03 + t * 0.06) * maxRadius;
+      const radialJitter = (Math.random() + Math.random() - 1) * radialSpread;
+      const finalRadius = radius + radialJitter;
+
+      positions[i3] = Math.cos(angle) * finalRadius;
 
       // Thicker vertical distribution
       const thickness = 0.045 * (1 - t) + 0.015;
       const yJitter = (Math.random() + Math.random() + Math.random() - 1.5) * maxRadius * thickness;
       positions[i3 + 1] = yJitter;
 
-      positions[i3 + 2] = Math.sin(angle) * radius;
+      positions[i3 + 2] = Math.sin(angle) * finalRadius;
 
       // Star colors with diversity: yellow center → yellow+orange → yellow+orange+purple → purple+blue → blue
       // More saturated colors (less white), with mixing in transition zones
