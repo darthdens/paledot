@@ -58,10 +58,35 @@ export const TourOverlay = () => {
       setSelectedObject(targetObject);
     }
     
+    // Get live world position if available (for orbiting bodies)
+    const livePos = useCosmosStore.getState().objectWorldPositions[stop.locationId];
+    
+    // Calculate camera position relative to the object
+    // For solar system objects, use live position; otherwise use static tour positions
+    let lookAtPos: [number, number, number];
+    let cameraPos: [number, number, number];
+    
+    if (livePos && (targetObject?.category === 'solarSystem')) {
+      // Use live position as lookAt target
+      lookAtPos = livePos;
+      // Add camera offset relative to object position
+      const objectSize = targetObject?.size || 10000;
+      const viewDistance = Math.max(objectSize * 5, 50000);
+      cameraPos = [
+        livePos[0] + viewDistance * 0.5,
+        livePos[1] + viewDistance * 0.3,
+        livePos[2] + viewDistance,
+      ];
+    } else {
+      // Use static positions from tour stop (scaled in CameraController)
+      cameraPos = stop.cameraPosition as [number, number, number];
+      lookAtPos = stop.lookAt as [number, number, number];
+    }
+    
     // Set tour camera target for the CameraController
     setTourCameraTarget({
-      position: stop.cameraPosition as [number, number, number],
-      lookAt: stop.lookAt as [number, number, number],
+      position: cameraPos,
+      lookAt: lookAtPos,
     });
   }, [setTourIndex, setSelectedObject, setTourCameraTarget]);
   
