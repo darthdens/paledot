@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { useLanguage } from '@/i18n/LanguageContext';
 import { useCosmosStore } from '../store/useCosmosStore';
-import { MapPin, ChevronDown, ChevronUp } from 'lucide-react';
+import { Globe, Sun, Star, Sparkles, Circle, Infinity, ChevronDown, ChevronUp } from 'lucide-react';
+import type { ScaleLevel } from '../types';
 
 const translations = {
   en: {
@@ -99,6 +100,25 @@ export const YouAreHereLabel = () => {
     }
   };
   
+  const getScaleIcon = (scale: ScaleLevel) => {
+    switch (scale) {
+      case 'earth':
+        return <Globe className="w-4 h-4" />;
+      case 'solarSystem':
+        return <Sun className="w-4 h-4" />;
+      case 'stellar':
+        return <Star className="w-4 h-4" />;
+      case 'milkyWay':
+        return <Sparkles className="w-4 h-4" />;
+      case 'localGroup':
+        return <Circle className="w-4 h-4" />;
+      case 'universe':
+        return <Infinity className="w-4 h-4" />;
+      default:
+        return <Sun className="w-4 h-4" />;
+    }
+  };
+  
   const locationInfo = getLocationInfo();
   
   return (
@@ -109,7 +129,7 @@ export const YouAreHereLabel = () => {
           className="w-full flex items-center justify-between gap-2 px-3 py-2 hover:bg-white/5 transition-colors"
         >
           <div className="flex items-center gap-2 text-emerald-400">
-            <MapPin className="w-4 h-4" />
+            {getScaleIcon(currentScale)}
             <span className="text-sm font-semibold">{locationInfo.title}</span>
           </div>
           {isMinimized ? (
