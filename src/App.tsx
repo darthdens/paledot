@@ -22,7 +22,6 @@ const App = () => (
           <CookieBanner />
           <Routes>
             <Route path="/" element={<Cosmos />} />
-            <Route path="/cosmos" element={<Cosmos />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </TooltipProvider>
