@@ -99,7 +99,7 @@ export const CosmosExplorer = () => {
             panSpeed={1}
             rotateSpeed={0.5}
             minDistance={1}
-            maxDistance={1e15}
+            maxDistance={1e18}
           />
           
           {/* Camera fly-to controller */}
