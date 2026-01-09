@@ -28,6 +28,7 @@ import { KeyboardShortcuts } from './ui/KeyboardShortcuts';
 import { SizeComparison } from './ui/SizeComparison';
 import { ScaleBarUI } from './ui/ScaleBar';
 import { YouAreHereLabel } from './ui/YouAreHereLabel';
+import { GlowDebugOverlay } from './ui/GlowDebugOverlay';
 import { CameraController } from './CameraController';
 import { ScaleTracker } from './ScaleTracker';
 import { celestialObjects } from './data/celestialObjects';
@@ -157,6 +158,10 @@ export const CosmosExplorer = () => {
           
           {/* Galactic ambient glow (camera-centered sky-dome; always present) */}
           <GalaxySkyGlow />
+          
+          {/* Debug overlay for glow diagnostics */}
+          <GlowDebugOverlay />
+          
           {/* Everything that should rotate together at galaxy scale */}
           <GalaxyRotator visualScale={UNIFIED_SCALE}>
             {/* Star background - rotates with the rest so the view never "sticks" to it */}
