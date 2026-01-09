@@ -58,12 +58,6 @@ export const TourOverlay = () => {
 
   const UNIFIED_SCALE = 0.001;
 
-  const normalize3 = (v: [number, number, number]): [number, number, number] => {
-    const len = Math.hypot(v[0], v[1], v[2]);
-    if (!len) return [1, 0, 0];
-    return [v[0] / len, v[1] / len, v[2] / len];
-  };
-
   // Navigate to a tour stop
   const goToStop = useCallback(
     (index: number) => {
@@ -96,6 +90,16 @@ export const TourOverlay = () => {
           ];
         }
 
+        // Stars (like Proxima Centauri) positions are also in light-years
+        if (targetObject.category === 'stars') {
+          const gs = UNITS.KM_PER_LY * UNIFIED_SCALE;
+          return [
+            targetObject.position[0] * gs,
+            targetObject.position[1] * gs,
+            targetObject.position[2] * gs,
+          ];
+        }
+
         // Most other objects store positions in km
         return [
           targetObject.position[0] * UNIFIED_SCALE,
@@ -105,7 +109,20 @@ export const TourOverlay = () => {
       };
 
       const targetPos: [number, number, number] = livePos ?? fallbackTargetPos();
-      const lookAtPos: [number, number, number] = targetPos;
+      
+      // For stops that look at a specific point (like Milky Way looking at Sun's position),
+      // use the stop's lookAt directly if it's not [0,0,0] and scale level is milkyWay
+      let lookAtPos: [number, number, number];
+      if (stop.scaleLevel === 'milkyWay' && (stop.lookAt[0] !== 0 || stop.lookAt[1] !== 0 || stop.lookAt[2] !== 0)) {
+        // Milky Way scale lookAt is in km
+        lookAtPos = [
+          stop.lookAt[0] * UNIFIED_SCALE,
+          stop.lookAt[1] * UNIFIED_SCALE,
+          stop.lookAt[2] * UNIFIED_SCALE,
+        ];
+      } else {
+        lookAtPos = targetPos;
+      }
 
       // Tour stop cameraPosition is treated as an offset vector in km
       const offsetScene: [number, number, number] = [
@@ -116,21 +133,51 @@ export const TourOverlay = () => {
 
       let cameraPos: [number, number, number];
 
-      // For solar system bodies, place the camera on the sun-facing side so the lit hemisphere is visible
-      if (targetObject?.category === 'solarSystem') {
+      // For solar system bodies (except the sun itself), place the camera on the sun-facing side
+      if (targetObject?.category === 'solarSystem' && targetObject.id !== 'sun') {
         const sunPos = store.objectWorldPositions['sun'] ?? ([0, 0, 0] as [number, number, number]);
-        const dirToSun = normalize3([
-          sunPos[0] - targetPos[0],
-          sunPos[1] - targetPos[1],
-          sunPos[2] - targetPos[2],
-        ]);
-
-        const dist = Math.hypot(offsetScene[0], offsetScene[1], offsetScene[2]) || 1;
-
+        
+        // Direction from object to sun
+        const dx = sunPos[0] - targetPos[0];
+        const dy = sunPos[1] - targetPos[1];
+        const dz = sunPos[2] - targetPos[2];
+        const len = Math.hypot(dx, dy, dz);
+        
+        if (len > 0) {
+          const dirToSun = [dx / len, dy / len, dz / len];
+          
+          // Calculate camera distance from offset
+          const dist = Math.hypot(offsetScene[0], offsetScene[1], offsetScene[2]) || 1;
+          
+          // Position camera between object and sun, with a slight elevation
+          cameraPos = [
+            targetPos[0] + dirToSun[0] * dist,
+            targetPos[1] + Math.abs(offsetScene[1]) * 0.5, // Add some height
+            targetPos[2] + dirToSun[2] * dist,
+          ];
+        } else {
+          // Fallback if somehow at sun's position
+          cameraPos = [
+            targetPos[0] + offsetScene[0],
+            targetPos[1] + offsetScene[1],
+            targetPos[2] + offsetScene[2],
+          ];
+        }
+      } else if (stop.scaleLevel === 'milkyWay') {
+        // For milky way scale, use absolute positions from the stop
         cameraPos = [
-          targetPos[0] + dirToSun[0] * dist,
-          targetPos[1] + dirToSun[1] * dist + offsetScene[1] * 0.35,
-          targetPos[2] + dirToSun[2] * dist,
+          stop.cameraPosition[0] * UNIFIED_SCALE,
+          stop.cameraPosition[1] * UNIFIED_SCALE,
+          stop.cameraPosition[2] * UNIFIED_SCALE,
+        ];
+      } else if (targetObject?.category === 'stars' && targetObject.id !== 'sun') {
+        // For distant stars like Proxima Centauri, position camera relative to the star
+        // The cameraPosition offset is in km but scaled for stellar distances
+        const starViewDist = Math.hypot(offsetScene[0], offsetScene[1], offsetScene[2]);
+        cameraPos = [
+          targetPos[0] + starViewDist * 0.3,
+          targetPos[1] + starViewDist * 0.2,
+          targetPos[2] + starViewDist,
         ];
       } else {
         // Default: apply the offset directly in scene space
