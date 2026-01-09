@@ -6,6 +6,7 @@ import { TourStop, UNITS } from '../types';
 const OBJECT_RADII: Record<string, number> = {
   earth: 6371,
   moon: 1737,
+  mars: 3390,
   sun: 696350,
   jupiter: 69911,
   saturn: 58232,
@@ -49,6 +50,23 @@ export const tourStops: TourStop[] = [
     cameraPosition: [0, OBJECT_RADII.moon * 0.5, OBJECT_RADII.moon * ZOOM_MULTIPLIER],
     lookAt: [0, 0, 0],
     scaleLevel: 'earth',
+  },
+  {
+    id: 'red-planet',
+    locationId: 'mars',
+    title: {
+      en: 'Mars - The Red Planet',
+      fr: 'Mars - La Planète Rouge',
+    },
+    narration: {
+      en: 'Mars, the Red Planet, has captivated humanity for centuries. Its rusty color comes from iron oxide on its surface. Home to Olympus Mons, the largest volcano in the solar system, Mars remains our best candidate for future human colonization.',
+      fr: 'Mars, la Planète Rouge, fascine l\'humanité depuis des siècles. Sa couleur rouille provient de l\'oxyde de fer à sa surface. Abritant Olympus Mons, le plus grand volcan du système solaire, Mars reste notre meilleur candidat pour une future colonisation humaine.',
+    },
+    duration: 8,
+    // Consistent zoom: ~4x Mars radius
+    cameraPosition: [0, OBJECT_RADII.mars * 0.5, OBJECT_RADII.mars * ZOOM_MULTIPLIER],
+    lookAt: [0, 0, 0],
+    scaleLevel: 'solarSystem',
   },
   {
     id: 'inner-planets',
