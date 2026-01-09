@@ -40,8 +40,8 @@ export const GalaxyFadeWrapper = ({ children }: GalaxyFadeWrapperProps) => {
 
     const opacity = currentOpacity.current;
     
-    // Update visibility based on opacity
-    groupRef.current.visible = opacity > 0.001;
+    // Note: We don't set visible=false because that disables raycasting (clicks)
+    // Instead we just fade opacity to 0 which still allows interaction
 
     // Traverse and update all materials
     groupRef.current.traverse((child) => {

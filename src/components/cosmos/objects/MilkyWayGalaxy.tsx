@@ -104,15 +104,23 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
   const sunObject = useMemo(() => getObjectById('sun'), []);
   const proximaObject = useMemo(() => getObjectById('proxima-centauri'), []);
 
-  // Click handlers
+  // Click handlers - using ThreeEvent type from R3F
   const handleSunClick = useCallback((e: { stopPropagation: () => void }) => {
+    console.log('Sun marker clicked!', sunObject);
     e.stopPropagation();
-    if (sunObject) setSelectedObject(sunObject);
+    if (sunObject) {
+      console.log('Setting selected object to Sun');
+      setSelectedObject(sunObject);
+    }
   }, [sunObject, setSelectedObject]);
 
   const handleProximaClick = useCallback((e: { stopPropagation: () => void }) => {
+    console.log('Proxima marker clicked!', proximaObject);
     e.stopPropagation();
-    if (proximaObject) setSelectedObject(proximaObject);
+    if (proximaObject) {
+      console.log('Setting selected object to Proxima');
+      setSelectedObject(proximaObject);
+    }
   }, [proximaObject, setSelectedObject]);
 
   // Offset to position the galaxy so the solar system (Sun) stays at scene origin (0,0,0)
