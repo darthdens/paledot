@@ -2,6 +2,7 @@ import { useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { UNITS } from '../types';
+import { useCosmosStore } from '../store/useCosmosStore';
 
 interface GalaxyRotatorProps {
   children: React.ReactNode;
@@ -16,11 +17,16 @@ const MILKY_WAY = {
 
 /**
  * Rotates children around the galactic center.
- * The pivot point is offset so the solar system (at 0,0,0) orbits the galaxy center.
+ * Only rotates when zoomed out to galaxy scale - stays static when viewing solar system.
  */
 export const GalaxyRotator = ({ children, visualScale }: GalaxyRotatorProps) => {
-  const pivotRef = useRef<THREE.Group>(null);
   const rotatorRef = useRef<THREE.Group>(null);
+  const currentRotation = useRef(0);
+  
+  const currentScale = useCosmosStore(state => state.currentScale);
+  
+  // Only rotate when at galaxy scale or larger
+  const shouldRotate = currentScale === 'milkyWay' || currentScale === 'localGroup' || currentScale === 'universe';
   
   const gs = UNITS.KM_PER_LY * visualScale;
   
@@ -28,12 +34,11 @@ export const GalaxyRotator = ({ children, visualScale }: GalaxyRotatorProps) => 
   const galaxyCenterX = -Math.cos(MILKY_WAY.sunAngle) * MILKY_WAY.sunDistance * gs;
   const galaxyCenterZ = -Math.sin(MILKY_WAY.sunAngle) * MILKY_WAY.sunDistance * gs;
   
-  useFrame(({ clock }) => {
-    const t = clock.getElapsedTime();
-    
-    // Slow rotation - one full rotation every ~4 minutes
-    if (rotatorRef.current) {
-      rotatorRef.current.rotation.y = t * 0.025;
+  useFrame((_, delta) => {
+    if (rotatorRef.current && shouldRotate) {
+      // Slow rotation - accumulate based on delta time
+      currentRotation.current += delta * 0.025;
+      rotatorRef.current.rotation.y = currentRotation.current;
     }
   });
   
