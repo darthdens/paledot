@@ -248,15 +248,15 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
   const spiralArmGlows = useMemo(() => {
     const { branches, spinTurns } = MILKY_WAY;
     const maxRadius = MILKY_WAY.diskRadius * gs;
-    const glowPoints: { x: number; z: number; radius: number; color: string }[] = [];
+    const glowPoints: { x: number; z: number; radius: number; color: string; opacity: number }[] = [];
 
-    // Generate glow points along each arm
+    // Generate glow points along each arm - more points for better coverage
     for (let arm = 0; arm < branches; arm++) {
       const branchAngle = (arm / branches) * Math.PI * 2;
       
-      // Points along the arm from 20% to 95% of radius
-      for (let i = 0; i < 12; i++) {
-        const t = 0.2 + (i / 11) * 0.75;
+      // Points along the arm from 15% to 98% of radius - more dense
+      for (let i = 0; i < 20; i++) {
+        const t = 0.15 + (i / 19) * 0.83;
         const radius = t * maxRadius;
         const spinAngle = t * spinTurns * Math.PI * 2;
         const angle = branchAngle + spinAngle;
@@ -264,22 +264,30 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
         const x = Math.cos(angle) * radius;
         const z = Math.sin(angle) * radius;
 
-        // Color based on distance from center
+        // Color based on distance from center - brighter colors
         let color: string;
-        if (t < 0.35) {
-          color = '#FF9944'; // Orange/warm inner
-        } else if (t < 0.55) {
-          color = '#CC66AA'; // Purple transition
-        } else if (t < 0.75) {
-          color = '#6688DD'; // Blue
+        let opacity: number;
+        if (t < 0.30) {
+          color = '#FFAA55'; // Bright orange/warm inner
+          opacity = 0.55;
+        } else if (t < 0.45) {
+          color = '#FF8866'; // Orange-pink
+          opacity = 0.5;
+        } else if (t < 0.60) {
+          color = '#DD77BB'; // Purple transition
+          opacity = 0.45;
+        } else if (t < 0.78) {
+          color = '#7799EE'; // Bright blue
+          opacity = 0.4;
         } else {
-          color = '#4477CC'; // Darker blue outer
+          color = '#5588DD'; // Blue outer
+          opacity = 0.35;
         }
 
-        // Glow size gets smaller as we go outward
-        const glowSize = maxRadius * (0.18 - t * 0.08);
+        // Larger glow sizes for visibility
+        const glowSize = maxRadius * (0.28 - t * 0.1);
 
-        glowPoints.push({ x, z, radius: glowSize, color });
+        glowPoints.push({ x, z, radius: glowSize, color, opacity });
       }
     }
 
@@ -373,7 +381,7 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
             map={glowTexture}
             color={glow.color}
             transparent
-            opacity={0.25}
+            opacity={glow.opacity}
             blending={THREE.AdditiveBlending}
             depthWrite={false}
             depthTest={false}
