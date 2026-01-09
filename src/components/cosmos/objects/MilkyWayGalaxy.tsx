@@ -41,6 +41,7 @@ const createDotTexture = () => {
   const tex = new THREE.CanvasTexture(canvas);
   tex.minFilter = THREE.LinearFilter;
   tex.magFilter = THREE.LinearFilter;
+  tex.colorSpace = THREE.SRGBColorSpace;
   return tex;
 };
 
@@ -54,7 +55,7 @@ const createGalaxyGlowTexture = () => {
 
   // Create radial gradient with color progression
   const gradient = ctx.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2);
-  
+
   // Yellow center → Orange → Purple → Blue → Fade to transparent
   gradient.addColorStop(0, 'rgba(255, 220, 80, 0.9)');      // Bright yellow center
   gradient.addColorStop(0.12, 'rgba(255, 180, 40, 0.7)');   // Yellow-orange
@@ -71,8 +72,10 @@ const createGalaxyGlowTexture = () => {
   const tex = new THREE.CanvasTexture(canvas);
   tex.minFilter = THREE.LinearFilter;
   tex.magFilter = THREE.LinearFilter;
+  tex.colorSpace = THREE.SRGBColorSpace;
   return tex;
 };
+
 
 export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayGalaxyProps) => {
   const rotatingGroupRef = useRef<THREE.Group>(null);
