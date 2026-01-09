@@ -140,8 +140,8 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
 
       positions[i3] = Math.cos(angle) * finalRadius;
 
-      // Thicker vertical distribution
-      const thickness = 0.045 * (1 - t) + 0.015;
+      // Vertical thickness: keep the very center tighter to avoid a visible "needle"
+      const thickness = 0.012 + t * 0.03;
       const yJitter = (Math.random() + Math.random() + Math.random() - 1.5) * maxRadius * thickness;
       positions[i3 + 1] = yJitter;
 
@@ -333,8 +333,9 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
       positions[i3] = Math.cos(angle) * radius;
       positions[i3 + 2] = Math.sin(angle) * radius;
 
-      // Vertical position: smooth distribution above/below, decreases with radius
-      const heightScale = 1 - t * 0.6;
+      // Vertical position: avoid a bright "needle" at the very center by
+      // compressing height when radius is near 0.
+      const heightScale = 0.25 + t * 0.75;
       const y = (Math.random() * 2 - 1) * maxHeight * heightScale;
       positions[i3 + 1] = y;
 
