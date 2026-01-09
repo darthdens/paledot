@@ -431,7 +431,7 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
     <>
       {/* Rotating galaxy group - offset so the solar system stays at origin */}
       <group ref={rotatingGroupRef} position={galaxyOffset}>
-        <points geometry={coreGeo}>
+        <points geometry={coreGeo} frustumCulled={false}>
           <pointsMaterial
             size={gs * 100}
             map={dotTexture}
@@ -446,7 +446,7 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
         </points>
 
         {/* Main stars - spiral structure */}
-        <points geometry={starsGeo}>
+        <points geometry={starsGeo} frustumCulled={false}>
           <pointsMaterial
             size={gs * 60}
             map={dotTexture}
@@ -461,7 +461,7 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
         </points>
 
         {/* Volume stars - add height so it feels "full" */}
-        <points geometry={volumeGeo}>
+        <points geometry={volumeGeo} frustumCulled={false}>
           <pointsMaterial
             size={gs * 55}
             map={dotTexture}
@@ -476,7 +476,7 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
         </points>
 
         {/* Halo stars - scattered above/below the disk */}
-        <points geometry={haloGeo}>
+        <points geometry={haloGeo} frustumCulled={false}>
           <pointsMaterial
             size={gs * 45}
             map={dotTexture}
