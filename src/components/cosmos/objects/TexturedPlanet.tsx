@@ -4,6 +4,7 @@ import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { CelestialObject } from '../types';
 import { useCosmosStore } from '../store/useCosmosStore';
+import { celestialObjects } from '../data/celestialObjects';
 
 interface TexturedPlanetProps {
   object: CelestialObject;
@@ -443,15 +444,35 @@ export const TexturedPlanet = ({
     };
 
     // Moons: orbit around their parent planet's world position
+    // Note: We read parent position directly from store which was updated this frame (planets render first)
     if (isMoon && moonOrbitRadius > 0) {
       const parentPosArr = useCosmosStore.getState().objectWorldPositions[object.parentId!];
       if (parentPosArr) {
         const periodDays = object.orbitPeriodDays || 27.32; // Default to Moon's period
         const orbitalVelocity = getOrbitalAngularVelocity(periodDays);
         const angle = time * orbitalVelocity;
-        groupRef.current.position.x = parentPosArr[0] + Math.cos(angle) * moonOrbitRadius;
+        // Position relative to parent - add orbital offset to parent's world position
+        const orbitalX = Math.cos(angle) * moonOrbitRadius;
+        const orbitalZ = Math.sin(angle) * moonOrbitRadius;
+        groupRef.current.position.x = parentPosArr[0] + orbitalX;
         groupRef.current.position.y = parentPosArr[1];
-        groupRef.current.position.z = parentPosArr[2] + Math.sin(angle) * moonOrbitRadius;
+        groupRef.current.position.z = parentPosArr[2] + orbitalZ;
+      } else {
+        // Fallback: if parent position not yet available, place at initial position
+        // This can happen on the first frame before parent has updated
+        const periodDays = object.orbitPeriodDays || 27.32;
+        const orbitalVelocity = getOrbitalAngularVelocity(periodDays);
+        const angle = time * orbitalVelocity;
+        // Use object's initial position as a fallback reference point
+        const parentOrbitRadius = (celestialObjects.find(o => o.id === object.parentId)?.orbitRadius || 0) * distanceScale;
+        const parentAngle = time * getOrbitalAngularVelocity(
+          celestialObjects.find(o => o.id === object.parentId)?.orbitPeriodDays || 365.25
+        );
+        const estimatedParentX = Math.cos(parentAngle) * parentOrbitRadius;
+        const estimatedParentZ = Math.sin(parentAngle) * parentOrbitRadius;
+        groupRef.current.position.x = estimatedParentX + Math.cos(angle) * moonOrbitRadius;
+        groupRef.current.position.y = 0;
+        groupRef.current.position.z = estimatedParentZ + Math.sin(angle) * moonOrbitRadius;
       }
     }
     // Planets: orbit around the Sun (origin) with real Keplerian proportions
