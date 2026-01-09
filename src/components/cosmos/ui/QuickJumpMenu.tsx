@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { X, ChevronRight, Clock } from 'lucide-react';
 import { useCosmosStore } from '../store/useCosmosStore';
 import { useFullscreenStore } from '../store/useFullscreenStore';
-import { getObjectById } from '../data/celestialObjects';
+import { quickJumpCategories, getObjectById } from '../data/celestialObjects';
 import { useState } from 'react';
 
 const translations = {
@@ -11,54 +11,23 @@ const translations = {
     title: 'Quick Jump',
     recentJumps: 'Recent',
     comingSoon: 'Coming Soon',
-    starsGalaxies: 'Stars & Galaxies',
   },
   fr: {
     title: 'Saut Rapide',
     recentJumps: 'Récents',
     comingSoon: 'Bientôt',
-    starsGalaxies: 'Étoiles et Galaxies',
   },
 };
 
-// Categories that are fully implemented
-const IMPLEMENTED_CATEGORIES = ['solarSystem', 'starsGalaxies'];
+// Categories that are expandable (have at least one implemented item)
+const EXPANDABLE_CATEGORIES = ['solarSystem', 'stars', 'galaxies'];
 
-// Objects that are implemented within the starsGalaxies category
-const IMPLEMENTED_STARS_GALAXIES = ['sun', 'milky-way-center'];
-
-// Custom categories for quick jump menu (combining stars and galaxies into one)
-const menuCategories = [
-  {
-    id: 'solarSystem',
-    name: { en: 'Solar System', fr: 'Système Solaire' },
-    locations: [
-      'sun', 'mercury', 'venus', 'earth', 'moon', 
-      'mars', 'phobos', 'deimos', 
-      'ceres',
-      'jupiter', 'io', 'europa', 'ganymede', 'callisto', 
-      'saturn', 'mimas', 'enceladus', 'tethys', 'dione', 'rhea', 'titan', 'iapetus',
-      'uranus', 'miranda', 'ariel', 'umbriel', 'titania', 'oberon',
-      'neptune', 'triton',
-      'pluto'
-    ],
-  },
-  {
-    id: 'starsGalaxies',
-    name: { en: 'Stars & Galaxies', fr: 'Étoiles et Galaxies' },
-    locations: ['sun', 'milky-way-center', 'alpha-centauri', 'proxima-centauri', 'sirius', 'betelgeuse', 'polaris', 'andromeda', 'triangulum'],
-  },
-  {
-    id: 'nebulae',
-    name: { en: 'Nebulae', fr: 'Nébuleuses' },
-    locations: ['orion-nebula', 'crab-nebula', 'eagle-nebula', 'ring-nebula'],
-  },
-  {
-    id: 'deepSpace',
-    name: { en: 'Deep Space', fr: 'Espace Profond' },
-    locations: ['virgo-cluster', 'coma-cluster', 'hubble-deep-field', 'observable-universe-edge'],
-  },
-];
+// Specific objects that are implemented per category (empty array = all implemented)
+const IMPLEMENTED_OBJECTS: Record<string, string[]> = {
+  solarSystem: [], // empty means all are implemented
+  stars: ['sun'],
+  galaxies: ['milky-way-center'],
+};
 
 export const QuickJumpMenu = () => {
   const { language } = useLanguage();
@@ -82,17 +51,19 @@ export const QuickJumpMenu = () => {
   };
 
   const toggleCategory = (categoryId: string) => {
-    // Only allow expanding implemented categories
-    if (!IMPLEMENTED_CATEGORIES.includes(categoryId)) return;
+    // Only allow expanding categories that have implemented items
+    if (!EXPANDABLE_CATEGORIES.includes(categoryId)) return;
     setExpandedCategory(expandedCategory === categoryId ? null : categoryId);
   };
 
-  const isComingSoon = (categoryId: string) => !IMPLEMENTED_CATEGORIES.includes(categoryId);
+  const isCategoryExpandable = (categoryId: string) => EXPANDABLE_CATEGORIES.includes(categoryId);
   
   const isItemImplemented = (categoryId: string, locationId: string) => {
-    if (categoryId === 'solarSystem') return true;
-    if (categoryId === 'starsGalaxies') return IMPLEMENTED_STARS_GALAXIES.includes(locationId);
-    return false;
+    const implemented = IMPLEMENTED_OBJECTS[categoryId];
+    if (!implemented) return false;
+    // Empty array means all items are implemented
+    if (implemented.length === 0) return true;
+    return implemented.includes(locationId);
   };
 
   const gap = 8;
@@ -139,8 +110,8 @@ export const QuickJumpMenu = () => {
               {recentJumps.map(id => {
                 const obj = getObjectById(id);
                 if (!obj) return null;
-                // Only show recent jumps from implemented categories
-                if (!IMPLEMENTED_CATEGORIES.includes(obj.category || '')) return null;
+                // Only show recent jumps from expandable categories
+                if (!EXPANDABLE_CATEGORIES.includes(obj.category || '')) return null;
                 return (
                   <button
                     key={id}
@@ -157,8 +128,8 @@ export const QuickJumpMenu = () => {
 
         {/* Categories */}
         <div className="p-1 sm:p-2">
-          {menuCategories.map(category => {
-            const comingSoon = isComingSoon(category.id);
+          {quickJumpCategories.map(category => {
+            const expandable = isCategoryExpandable(category.id);
             
             return (
               <div key={category.id} className="mb-1">
@@ -166,24 +137,24 @@ export const QuickJumpMenu = () => {
                 <button
                   onClick={() => toggleCategory(category.id)}
                   className={`w-full flex items-center justify-between p-1.5 sm:p-2 rounded transition-colors ${
-                    comingSoon 
+                    !expandable 
                       ? 'opacity-60 cursor-not-allowed' 
                       : 'hover:bg-white/10'
                   }`}
-                  disabled={comingSoon}
+                  disabled={!expandable}
                 >
                   <div className="flex items-center gap-2">
-                    <span className={`text-xs sm:text-sm font-medium ${comingSoon ? 'text-white/50' : 'text-white/90'}`}>
+                    <span className={`text-xs sm:text-sm font-medium ${!expandable ? 'text-white/50' : 'text-white/90'}`}>
                       {category.name[language]}
                     </span>
-                    {comingSoon && (
+                    {!expandable && (
                       <span className="flex items-center gap-1 px-1.5 py-0.5 bg-amber-500/20 border border-amber-500/30 rounded text-[10px] text-amber-400">
                         <Clock className="w-2.5 h-2.5" />
                         {t.comingSoon}
                       </span>
                     )}
                   </div>
-                  {!comingSoon && (
+                  {expandable && (
                     <ChevronRight 
                       className={`w-3.5 h-3.5 text-white/50 transition-transform ${
                         expandedCategory === category.id ? 'rotate-90' : ''
@@ -192,8 +163,8 @@ export const QuickJumpMenu = () => {
                   )}
                 </button>
 
-                {/* Category items - only for implemented categories */}
-                {!comingSoon && expandedCategory === category.id && (
+                {/* Category items - only for expandable categories */}
+                {expandable && expandedCategory === category.id && (
                   <div className="ml-2 sm:ml-3 mt-0.5 space-y-0.5 border-l border-white/10 pl-2">
                     {category.locations.map(locationId => {
                       const obj = getObjectById(locationId);
@@ -238,4 +209,3 @@ export const QuickJumpMenu = () => {
 
   return menu;
 };
-
