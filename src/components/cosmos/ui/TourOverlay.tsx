@@ -205,22 +205,36 @@ export const TourOverlay = () => {
       const getHasSunPos = (s: typeof store) =>
         !!(s.objectWorldPositions['sun'] || s.objectWorldPositions['solar-system-marker']);
 
+      const isValidLivePos = (pos: [number, number, number] | undefined) => {
+        if (!pos) return false;
+        // For most objects, any vector is fine.
+        // For solar-system bodies (except the Sun), an initial [0,0,0] can appear briefly on mount
+        // before their orbital position is applied, which would incorrectly aim the camera at the Sun.
+        if (targetObject?.category === 'solarSystem' && targetObject.id !== 'sun') {
+          const dist = Math.hypot(pos[0], pos[1], pos[2]);
+          const expectedOrbit = (targetObject.orbitRadius ?? 0) * UNIFIED_SCALE;
+          const minDist = expectedOrbit > 0 ? expectedOrbit * 0.2 : 1;
+          return dist > minDist;
+        }
+        return true;
+      };
+
       // For solar system bodies, we need both the object's live position AND the sun's position
       // to correctly calculate sun-facing camera placement
       const needsSunPos = targetObject?.category === 'solarSystem' && targetObject?.id !== 'sun';
       const hasSunPos = getHasSunPos(store);
 
-      if (livePos && (!needsSunPos || hasSunPos)) {
+      if (isValidLivePos(livePos) && (!needsSunPos || hasSunPos)) {
         // We have all positions we need, compute immediately
         computeAndSetCamera(livePos);
       } else {
-        // Wait for live positions to become available
+        // Wait for live positions to become available (and be non-zero/valid)
         let done = false;
         const unsubscribe = useCosmosStore.subscribe((state) => {
           if (done) return;
           const objPos = state.objectWorldPositions[stop.locationId];
           const sunOk = !needsSunPos || getHasSunPos(state);
-          if (objPos && sunOk) {
+          if (isValidLivePos(objPos) && sunOk) {
             done = true;
             unsubscribe();
             computeAndSetCamera(objPos);
@@ -234,7 +248,7 @@ export const TourOverlay = () => {
             unsubscribe();
             computeAndSetCamera(undefined);
           }
-        }, 800);
+        }, 1200);
       }
     },
     [setTourIndex, setSelectedObject, setTourCameraTarget]
