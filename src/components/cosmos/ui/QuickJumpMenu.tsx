@@ -27,7 +27,7 @@ const IMPLEMENTED_OBJECTS: Record<string, string[]> = {
   solarSystem: [], // empty means all are implemented
   stars: ['sun', 'proxima-centauri'], // Sun has full visuals, Proxima is in the tour
   nebulae: ['orion-nebula'], // only Orion has proper nebula visuals
-  galaxies: ['milky-way-center'], // only Milky Way has proper galaxy visuals
+  galaxies: ['milky-way-center', 'andromeda', 'm32', 'm110'], // Milky Way and Andromeda with satellites
   // deepSpace not listed = entire category shows "Coming Soon"
 };
 
