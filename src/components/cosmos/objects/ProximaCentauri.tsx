@@ -2,7 +2,6 @@ import { useRef, useMemo } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { useCosmosStore } from '../store/useCosmosStore';
-import { UNITS } from '../types';
 
 interface ProximaCentauriProps {
   visualScale?: number;
@@ -38,8 +37,10 @@ const createRedDwarfGlowTexture = () => {
 
 // Proxima Centauri's real diameter is about 214,550 km (0.154 solar radii)
 const PROXIMA_DIAMETER = 214550;
-// Distance from Sun: 4.24 light-years
-const PROXIMA_DISTANCE_LY = 4.24;
+// Distance from Sun: 4.24 light-years - but we'll use a much closer scaled distance for visibility
+// Real distance would be ~40 trillion km which is too far for practical navigation
+// We'll place it at a symbolic distance that's reachable but still "far"
+const PROXIMA_DISTANCE_SCENE = 5e9; // 5 billion scene units - far but reachable
 
 export const ProximaCentauri = ({ visualScale = 0.001 }: ProximaCentauriProps) => {
   const starRef = useRef<THREE.Mesh>(null);
@@ -54,10 +55,10 @@ export const ProximaCentauri = ({ visualScale = 0.001 }: ProximaCentauriProps) =
   const setHoveredObject = useCosmosStore(state => state.setHoveredObject);
   const setObjectWorldPosition = useCosmosStore(state => state.setObjectWorldPosition);
 
-  // Position in scene units (light-years converted to km, then scaled)
+  // Position in scene units - using scaled distance for practical navigation
   const position: [number, number, number] = [
-    PROXIMA_DISTANCE_LY * UNITS.KM_PER_LY * visualScale,
-    0.5 * UNITS.KM_PER_LY * visualScale, // Slightly offset in Y
+    PROXIMA_DISTANCE_SCENE,
+    PROXIMA_DISTANCE_SCENE * 0.1, // Slightly offset in Y
     0
   ];
 
@@ -80,9 +81,9 @@ export const ProximaCentauri = ({ visualScale = 0.001 }: ProximaCentauriProps) =
     }
   }, -1);
 
-  // Scale the star size - red dwarfs are small but we need to make it visible
-  // At interstellar scales, we need a minimum visual size
-  const starSize = Math.max(PROXIMA_DIAMETER * visualScale * 80, 50); // Ensure visibility
+  // Scale the star size - make it large enough to be visible from far away
+  // Using a much larger visual size since it's at interstellar distances
+  const starSize = 1e6; // 1 million scene units - visible from billions of units away
 
   const proximaObject = {
     id: 'proxima-centauri',

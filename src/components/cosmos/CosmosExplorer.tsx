@@ -270,10 +270,8 @@ export const CosmosExplorer = () => {
               );
             })}
             
-            {/* Proxima Centauri - nearest star with proper visuals */}
-            {showMilkyWay && (
-              <ProximaCentauri visualScale={UNIFIED_SCALE} />
-            )}
+            {/* Proxima Centauri - nearest star with proper visuals (always rendered for navigation) */}
+            <ProximaCentauri visualScale={UNIFIED_SCALE} />
             
             {/* Nebulae - visible at stellar scale and above */}
             {showMilkyWay && nebulae.map((nebula) => (
