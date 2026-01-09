@@ -6,6 +6,8 @@ import { TourStop, UNITS } from '../types';
 const OBJECT_RADII: Record<string, number> = {
   earth: 6371,
   moon: 1737,
+  venus: 6052,
+  mercury: 2440,
   mars: 3390,
   sun: 696350,
   jupiter: 69911,
@@ -50,6 +52,40 @@ export const tourStops: TourStop[] = [
     cameraPosition: [0, OBJECT_RADII.moon * 0.5, OBJECT_RADII.moon * ZOOM_MULTIPLIER],
     lookAt: [0, 0, 0],
     scaleLevel: 'earth',
+  },
+  {
+    id: 'venus',
+    locationId: 'venus',
+    title: {
+      en: 'Venus - Earth\'s Twin',
+      fr: 'Vénus - La Jumelle de la Terre',
+    },
+    narration: {
+      en: 'Venus, our closest planetary neighbor, is often called Earth\'s twin due to its similar size. But beneath its thick clouds lies a hellish world - with surface temperatures of 465°C and crushing atmospheric pressure 90 times that of Earth.',
+      fr: 'Vénus, notre plus proche voisine planétaire, est souvent appelée la jumelle de la Terre en raison de sa taille similaire. Mais sous ses épais nuages se cache un monde infernal - avec des températures de surface de 465°C et une pression atmosphérique écrasante 90 fois supérieure à celle de la Terre.',
+    },
+    duration: 7,
+    // Consistent zoom: ~4x Venus radius
+    cameraPosition: [0, OBJECT_RADII.venus * 0.5, OBJECT_RADII.venus * ZOOM_MULTIPLIER],
+    lookAt: [0, 0, 0],
+    scaleLevel: 'solarSystem',
+  },
+  {
+    id: 'mercury',
+    locationId: 'mercury',
+    title: {
+      en: 'Mercury - The Swift Planet',
+      fr: 'Mercure - La Planète Rapide',
+    },
+    narration: {
+      en: 'Mercury, the smallest planet, races around the Sun in just 88 days. Its surface is scarred by countless craters and experiences extreme temperature swings - from 430°C in sunlight to -180°C in shadow.',
+      fr: 'Mercure, la plus petite planète, fait le tour du Soleil en seulement 88 jours. Sa surface est marquée par d\'innombrables cratères et connaît des variations de température extrêmes - de 430°C au soleil à -180°C dans l\'ombre.',
+    },
+    duration: 7,
+    // Consistent zoom: ~4x Mercury radius
+    cameraPosition: [0, OBJECT_RADII.mercury * 0.5, OBJECT_RADII.mercury * ZOOM_MULTIPLIER],
+    lookAt: [0, 0, 0],
+    scaleLevel: 'solarSystem',
   },
   {
     id: 'red-planet',
