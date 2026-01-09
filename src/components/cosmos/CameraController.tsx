@@ -104,6 +104,7 @@ export const CameraController = () => {
 
       // Desired distance based on visual size
       // For nebulae (category 'nebulae'), size is in light-years, need larger distance
+      // For stars, size is in km but they're very far - need appropriate viewing distance
       // For other objects, size is in km
       let visualSize = selectedObject.size * UNIFIED_SCALE;
       
@@ -111,11 +112,15 @@ export const CameraController = () => {
         // Nebula size is in light-years - use a much larger viewing distance
         visualSize = selectedObject.size * UNITS.KM_PER_LY * UNIFIED_SCALE;
         flyToDistance.current = Math.max(visualSize * 3, 1e9);
+      } else if (selectedObject.category === 'stars' && selectedObject.id !== 'sun') {
+        // Distant stars - size in km, position in km (already scaled in celestialObjects)
+        flyToDistance.current = Math.max(visualSize * 8, 5000);
       } else {
         flyToDistance.current = Math.max(visualSize * 5, 50);
       }
 
-      // Use live world position when available (for moving solar-system bodies)
+      // Use live world position when available (for moving solar-system bodies and stars)
+      // Positions in celestialObjects for stars are already in km
       const fallbackPos: [number, number, number] =
         selectedObject.category === 'solarSystem'
           ? [
@@ -129,7 +134,13 @@ export const CameraController = () => {
                 selectedObject.position[1] * UNITS.KM_PER_LY * UNIFIED_SCALE,
                 selectedObject.position[2] * UNITS.KM_PER_LY * UNIFIED_SCALE,
               ]
-            : selectedObject.position;
+            : selectedObject.category === 'stars'
+              ? [
+                  selectedObject.position[0] * UNIFIED_SCALE,
+                  selectedObject.position[1] * UNIFIED_SCALE,
+                  selectedObject.position[2] * UNIFIED_SCALE,
+                ]
+              : selectedObject.position;
 
       const targetPos = liveTargetPos ?? fallbackPos;
 
@@ -152,8 +163,9 @@ export const CameraController = () => {
     const getLivePos = () => useCosmosStore.getState().objectWorldPositions[selectedObject.id];
     const currentLivePos = getLivePos();
 
-    // For solar system bodies, wait until we have a runtime world position to avoid repeated re-fly.
-    if (selectedObject.category === 'solarSystem' && !currentLivePos) {
+    // For solar system bodies and stars, wait until we have a runtime world position to avoid repeated re-fly.
+    const needsLivePos = selectedObject.category === 'solarSystem' || selectedObject.category === 'stars';
+    if (needsLivePos && !currentLivePos) {
       let done = false;
       const unsubscribe = useCosmosStore.subscribe((state) => {
         if (done) return;
