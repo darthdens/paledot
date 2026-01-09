@@ -1,7 +1,6 @@
 import { useMemo } from 'react';
 import * as THREE from 'three';
 import { UNITS } from '../types';
-import { useCosmosStore } from '../store/useCosmosStore';
 
 interface OortCloudProps {
   visualScale: number;
@@ -12,11 +11,6 @@ const OORT_INNER = 2000 * UNITS.KM_PER_AU;  // ~2,000 AU
 const OORT_OUTER = 50000 * UNITS.KM_PER_AU; // ~50,000 AU (reduced for performance)
 
 export const OortCloud = ({ visualScale }: OortCloudProps) => {
-  const currentScale = useCosmosStore(state => state.currentScale);
-  
-  // At galaxy scale, render as a single bright white star
-  const isGalaxyScale = currentScale === 'stellar' || currentScale === 'milkyWay' || currentScale === 'localGroup' || currentScale === 'universe';
-  
   // Generate static Oort Cloud particles
   const geometry = useMemo(() => {
     const particleCount = 4000;
@@ -42,32 +36,6 @@ export const OortCloud = ({ visualScale }: OortCloudProps) => {
     return geo;
   }, [visualScale]);
   
-  // At galaxy scale, show as a bright white star point
-  if (isGalaxyScale) {
-    return (
-      <points>
-        <bufferGeometry>
-          <bufferAttribute
-            attach="attributes-position"
-            count={1}
-            array={new Float32Array([0, 0, 0])}
-            itemSize={3}
-          />
-        </bufferGeometry>
-        <pointsMaterial
-          color="#ffffff"
-          size={6}
-          sizeAttenuation={false}
-          transparent
-          opacity={1}
-          blending={THREE.AdditiveBlending}
-          depthWrite={false}
-        />
-      </points>
-    );
-  }
-  
-  // At solar system scale, show the full particle cloud
   return (
     <points geometry={geometry}>
       <pointsMaterial
