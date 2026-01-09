@@ -13,6 +13,8 @@ const OBJECT_RADII: Record<string, number> = {
   jupiter: 69911,
   saturn: 58232,
   uranus: 25362,
+  neptune: 24622,
+  pluto: 1188,
 };
 
 // Consistent zoom multiplier: camera distance = radius * ZOOM_MULTIPLIER
@@ -168,6 +170,40 @@ export const tourStops: TourStop[] = [
     duration: 7,
     // Consistent zoom: ~4x Uranus radius
     cameraPosition: [0, OBJECT_RADII.uranus * 0.5, OBJECT_RADII.uranus * ZOOM_MULTIPLIER],
+    lookAt: [0, 0, 0],
+    scaleLevel: 'solarSystem',
+  },
+  {
+    id: 'neptune',
+    locationId: 'neptune',
+    title: {
+      en: 'Neptune - The Windiest Planet',
+      fr: 'Neptune - La Planète la Plus Venteuse',
+    },
+    narration: {
+      en: 'Neptune, the most distant planet, was discovered through mathematics before it was ever seen. Its deep blue color comes from methane in its atmosphere, and it hosts the fastest winds in the solar system - reaching 2,100 km/h.',
+      fr: 'Neptune, la planète la plus éloignée, a été découverte par les mathématiques avant d\'être observée. Sa couleur bleu profond provient du méthane dans son atmosphère, et elle abrite les vents les plus rapides du système solaire - atteignant 2 100 km/h.',
+    },
+    duration: 7,
+    // Consistent zoom: ~4x Neptune radius
+    cameraPosition: [0, OBJECT_RADII.neptune * 0.5, OBJECT_RADII.neptune * ZOOM_MULTIPLIER],
+    lookAt: [0, 0, 0],
+    scaleLevel: 'solarSystem',
+  },
+  {
+    id: 'pluto',
+    locationId: 'pluto',
+    title: {
+      en: 'Pluto - The Dwarf Planet',
+      fr: 'Pluton - La Planète Naine',
+    },
+    narration: {
+      en: 'At the edge of our solar system lies Pluto, reclassified as a dwarf planet in 2006. Despite its small size, it has five moons and a heart-shaped nitrogen glacier larger than Texas. It marks the gateway to the Kuiper Belt.',
+      fr: 'Aux confins de notre système solaire se trouve Pluton, reclassifiée planète naine en 2006. Malgré sa petite taille, elle possède cinq lunes et un glacier d\'azote en forme de cœur plus grand que le Texas. Elle marque la porte d\'entrée de la ceinture de Kuiper.',
+    },
+    duration: 7,
+    // Consistent zoom: ~4x Pluto radius
+    cameraPosition: [0, OBJECT_RADII.pluto * 0.5, OBJECT_RADII.pluto * ZOOM_MULTIPLIER],
     lookAt: [0, 0, 0],
     scaleLevel: 'solarSystem',
   },
