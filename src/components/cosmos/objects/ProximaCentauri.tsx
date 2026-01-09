@@ -37,10 +37,13 @@ const createRedDwarfGlowTexture = () => {
 
 // Proxima Centauri's real diameter is about 214,550 km (0.154 solar radii)
 const PROXIMA_DIAMETER = 214550;
-// Distance from Sun: 4.24 light-years - but we'll use a much closer scaled distance for visibility
-// Real distance would be ~40 trillion km which is too far for practical navigation
-// We'll place it at a symbolic distance that's reachable but still "far"
-const PROXIMA_DISTANCE_SCENE = 5e9; // 5 billion scene units - far but reachable
+// Place at a manageable distance beyond the Oort Cloud for navigation
+// Oort Cloud outer edge is ~15 trillion km = 15e9 scene units at 0.001 scale
+// We place Proxima at 50 billion scene units - far beyond Oort but reachable
+const PROXIMA_DISTANCE_SCENE = 5e10;
+
+// Visual star size - proportional to Sun but scaled for visibility at distance
+const STAR_SIZE = 1e7; // 10 million scene units for good visibility
 
 export const ProximaCentauri = ({ visualScale = 0.001 }: ProximaCentauriProps) => {
   const starRef = useRef<THREE.Mesh>(null);
@@ -55,11 +58,11 @@ export const ProximaCentauri = ({ visualScale = 0.001 }: ProximaCentauriProps) =
   const setHoveredObject = useCosmosStore(state => state.setHoveredObject);
   const setObjectWorldPosition = useCosmosStore(state => state.setObjectWorldPosition);
 
-  // Position in scene units - using scaled distance for practical navigation
+  // Position in scene units
   const position: [number, number, number] = [
     PROXIMA_DISTANCE_SCENE,
-    PROXIMA_DISTANCE_SCENE * 0.1, // Slightly offset in Y
-    0
+    PROXIMA_DISTANCE_SCENE * 0.05, // Slight Y offset
+    PROXIMA_DISTANCE_SCENE * 0.02  // Slight Z offset
   ];
 
   useFrame((state) => {
@@ -81,20 +84,17 @@ export const ProximaCentauri = ({ visualScale = 0.001 }: ProximaCentauriProps) =
     }
   }, -1);
 
-  // Scale the star size - make it large enough to be visible from far away
-  // Using a much larger visual size since it's at interstellar distances
-  const starSize = 1e6; // 1 million scene units - visible from billions of units away
-
   const proximaObject = {
     id: 'proxima-centauri',
     name: { en: 'Proxima Centauri', fr: 'Proxima du Centaure' },
     type: 'star' as const,
-    position: position,
-    size: PROXIMA_DIAMETER,
+    position: position, // Already in scene units
+    size: STAR_SIZE, // Use visual size for camera distance calc
     color: '#ffcccb',
     distanceFromEarth: 4.24,
     distanceUnit: 'ly' as const,
     category: 'stars' as const,
+    sceneUnits: true, // Flag to tell CameraController position is already in scene units
     facts: {
       en: ['Closest star to the Sun', 'Red dwarf star', 'Has at least 2 exoplanets'],
       fr: ['Étoile la plus proche du Soleil', 'Naine rouge', 'Au moins 2 exoplanètes'],
@@ -124,7 +124,7 @@ export const ProximaCentauri = ({ visualScale = 0.001 }: ProximaCentauriProps) =
         onPointerOver={handlePointerOver}
         onPointerOut={handlePointerOut}
       >
-        <sphereGeometry args={[starSize, 48, 48]} />
+        <sphereGeometry args={[STAR_SIZE, 48, 48]} />
         <shaderMaterial
           uniforms={{
             time: { value: 0 },
@@ -179,7 +179,7 @@ export const ProximaCentauri = ({ visualScale = 0.001 }: ProximaCentauriProps) =
 
       {/* Inner corona - subtle red glow */}
       <mesh ref={coronaRef}>
-        <sphereGeometry args={[starSize * 1.1, 48, 48]} />
+        <sphereGeometry args={[STAR_SIZE * 1.1, 48, 48]} />
         <meshBasicMaterial
           color="#FF8888"
           transparent
@@ -190,7 +190,7 @@ export const ProximaCentauri = ({ visualScale = 0.001 }: ProximaCentauriProps) =
 
       {/* Middle glow layer */}
       <mesh>
-        <sphereGeometry args={[starSize * 1.25, 32, 32]} />
+        <sphereGeometry args={[STAR_SIZE * 1.25, 32, 32]} />
         <meshBasicMaterial
           color="#FF6666"
           transparent
@@ -201,7 +201,7 @@ export const ProximaCentauri = ({ visualScale = 0.001 }: ProximaCentauriProps) =
 
       {/* Outer glow - soft red */}
       <mesh ref={glowRef}>
-        <sphereGeometry args={[starSize * 1.6, 32, 32]} />
+        <sphereGeometry args={[STAR_SIZE * 1.6, 32, 32]} />
         <shaderMaterial
           transparent
           depthWrite={false}
@@ -229,7 +229,7 @@ export const ProximaCentauri = ({ visualScale = 0.001 }: ProximaCentauriProps) =
 
       {/* Far outer glow */}
       <mesh>
-        <sphereGeometry args={[starSize * 2.2, 24, 24]} />
+        <sphereGeometry args={[STAR_SIZE * 2.2, 24, 24]} />
         <shaderMaterial
           transparent
           depthWrite={false}
@@ -256,7 +256,7 @@ export const ProximaCentauri = ({ visualScale = 0.001 }: ProximaCentauriProps) =
       </mesh>
 
       {/* Sprite-based gradient glow */}
-      <sprite renderOrder={-5} scale={[starSize * 6, starSize * 6, 1]}>
+      <sprite renderOrder={-5} scale={[STAR_SIZE * 6, STAR_SIZE * 6, 1]}>
         <spriteMaterial
           map={glowTexture}
           transparent

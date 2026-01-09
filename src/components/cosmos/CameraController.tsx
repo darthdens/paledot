@@ -103,33 +103,52 @@ export const CameraController = () => {
       startTarget.current.copy(orbitControls.target);
 
       // Desired distance based on visual size
-      // For nebulae (category 'nebulae'), size is in light-years, need larger distance
-      // For other objects, size is in km
-      let visualSize = selectedObject.size * UNIFIED_SCALE;
+      // Check if object has sceneUnits flag (position already in scene units)
+      const hasSceneUnits = (selectedObject as any).sceneUnits === true;
       
-      if (selectedObject.category === 'nebulae') {
-        // Nebula size is in light-years - use a much larger viewing distance
+      let visualSize: number;
+      if (hasSceneUnits) {
+        // Size is already the visual size in scene units
+        visualSize = selectedObject.size;
+      } else if (selectedObject.category === 'nebulae') {
+        // Nebula size is in light-years
         visualSize = selectedObject.size * UNITS.KM_PER_LY * UNIFIED_SCALE;
+      } else {
+        visualSize = selectedObject.size * UNIFIED_SCALE;
+      }
+      
+      // Calculate fly-to distance based on object type
+      if (selectedObject.category === 'nebulae') {
         flyToDistance.current = Math.max(visualSize * 3, 1e9);
+      } else if (hasSceneUnits) {
+        // For objects already in scene units, use a multiplier of the size
+        flyToDistance.current = Math.max(visualSize * 5, 1e6);
       } else {
         flyToDistance.current = Math.max(visualSize * 5, 50);
       }
 
       // Use live world position when available (for moving solar-system bodies)
-      const fallbackPos: [number, number, number] =
-        selectedObject.category === 'solarSystem'
-          ? [
-              selectedObject.position[0] * UNIFIED_SCALE,
-              selectedObject.position[1] * UNIFIED_SCALE,
-              selectedObject.position[2] * UNIFIED_SCALE,
-            ]
-          : selectedObject.category === 'nebulae'
-            ? [
-                selectedObject.position[0] * UNITS.KM_PER_LY * UNIFIED_SCALE,
-                selectedObject.position[1] * UNITS.KM_PER_LY * UNIFIED_SCALE,
-                selectedObject.position[2] * UNITS.KM_PER_LY * UNIFIED_SCALE,
-              ]
-            : selectedObject.position;
+      // For objects with sceneUnits, position is already correct
+      let fallbackPos: [number, number, number];
+      
+      if (hasSceneUnits) {
+        // Position is already in scene units
+        fallbackPos = selectedObject.position as [number, number, number];
+      } else if (selectedObject.category === 'solarSystem') {
+        fallbackPos = [
+          selectedObject.position[0] * UNIFIED_SCALE,
+          selectedObject.position[1] * UNIFIED_SCALE,
+          selectedObject.position[2] * UNIFIED_SCALE,
+        ];
+      } else if (selectedObject.category === 'nebulae') {
+        fallbackPos = [
+          selectedObject.position[0] * UNITS.KM_PER_LY * UNIFIED_SCALE,
+          selectedObject.position[1] * UNITS.KM_PER_LY * UNIFIED_SCALE,
+          selectedObject.position[2] * UNITS.KM_PER_LY * UNIFIED_SCALE,
+        ];
+      } else {
+        fallbackPos = selectedObject.position as [number, number, number];
+      }
 
       const targetPos = liveTargetPos ?? fallbackPos;
 
