@@ -147,47 +147,47 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
       const rand = Math.random();
       
       if (t < 0.15) {
-        // Center: mostly yellow, some orange
+        // Center: mostly yellow, some orange - VIBRANT
         if (rand < 0.85) {
           // Yellow
-          color.setHSL(0.12 + Math.random() * 0.04, 0.85 + Math.random() * 0.1, 0.6 + Math.random() * 0.15);
+          color.setHSL(0.12 + Math.random() * 0.04, 0.95 + Math.random() * 0.05, 0.55 + Math.random() * 0.1);
         } else {
           // Orange
-          color.setHSL(0.06 + Math.random() * 0.04, 0.9, 0.55 + Math.random() * 0.15);
+          color.setHSL(0.06 + Math.random() * 0.04, 1.0, 0.5 + Math.random() * 0.12);
         }
       } else if (t < 0.3) {
-        // Yellow and orange mix
+        // Yellow and orange mix - VIBRANT
         if (rand < 0.5) {
           // Yellow
-          color.setHSL(0.11 + Math.random() * 0.04, 0.85, 0.58 + Math.random() * 0.15);
+          color.setHSL(0.11 + Math.random() * 0.04, 0.95, 0.52 + Math.random() * 0.1);
         } else {
           // Orange
-          color.setHSL(0.05 + Math.random() * 0.04, 0.88, 0.55 + Math.random() * 0.12);
+          color.setHSL(0.05 + Math.random() * 0.04, 1.0, 0.48 + Math.random() * 0.1);
         }
       } else if (t < 0.5) {
-        // Yellow, orange, and purple mix
+        // Yellow, orange, and purple mix - VIBRANT
         if (rand < 0.33) {
           // Yellow
-          color.setHSL(0.12 + Math.random() * 0.03, 0.8, 0.58 + Math.random() * 0.12);
+          color.setHSL(0.12 + Math.random() * 0.03, 0.92, 0.52 + Math.random() * 0.1);
         } else if (rand < 0.66) {
           // Orange
-          color.setHSL(0.04 + Math.random() * 0.04, 0.85, 0.52 + Math.random() * 0.12);
+          color.setHSL(0.04 + Math.random() * 0.04, 1.0, 0.45 + Math.random() * 0.1);
         } else {
           // Purple
-          color.setHSL(0.78 + Math.random() * 0.08, 0.7, 0.5 + Math.random() * 0.15);
+          color.setHSL(0.78 + Math.random() * 0.08, 0.9, 0.45 + Math.random() * 0.12);
         }
       } else if (t < 0.7) {
-        // Purple and blue mix
+        // Purple and blue mix - VIBRANT
         if (rand < 0.5) {
           // Purple
-          color.setHSL(0.76 + Math.random() * 0.08, 0.7, 0.5 + Math.random() * 0.12);
+          color.setHSL(0.76 + Math.random() * 0.08, 0.88, 0.45 + Math.random() * 0.1);
         } else {
           // Blue
-          color.setHSL(0.6 + Math.random() * 0.08, 0.75, 0.5 + Math.random() * 0.12);
+          color.setHSL(0.6 + Math.random() * 0.08, 0.92, 0.45 + Math.random() * 0.1);
         }
       } else {
-        // Outer: mostly blue
-        color.setHSL(0.58 + Math.random() * 0.08, 0.8, 0.45 + Math.random() * 0.15);
+        // Outer: mostly blue - VIBRANT
+        color.setHSL(0.58 + Math.random() * 0.08, 0.95, 0.4 + Math.random() * 0.12);
       }
 
       colors[i3] = color.r;
@@ -221,17 +221,17 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
       positions[i3 + 1] = r * Math.cos(phi) * 0.55;
       positions[i3 + 2] = r * Math.sin(phi) * Math.sin(theta);
 
-      // Core: mostly yellow with some orange, more saturated
+      // Core: mostly yellow with some orange - VIBRANT
       const rand = Math.random();
       if (t < 0.4) {
         // Inner core: bright yellow
-        color.setHSL(0.12 + Math.random() * 0.03, 0.9, 0.65 + Math.random() * 0.1);
+        color.setHSL(0.12 + Math.random() * 0.03, 1.0, 0.55 + Math.random() * 0.08);
       } else if (rand < 0.7) {
         // Yellow
-        color.setHSL(0.11 + Math.random() * 0.04, 0.85, 0.6 + Math.random() * 0.12);
+        color.setHSL(0.11 + Math.random() * 0.04, 0.95, 0.52 + Math.random() * 0.1);
       } else {
         // Orange
-        color.setHSL(0.06 + Math.random() * 0.04, 0.88, 0.55 + Math.random() * 0.12);
+        color.setHSL(0.06 + Math.random() * 0.04, 1.0, 0.48 + Math.random() * 0.1);
       }
 
       colors[i3] = color.r;
@@ -270,31 +270,31 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
       const rand = Math.random();
       
       if (regionT < 0.25) {
-        // Yellow/orange mix
+        // Yellow/orange mix - VIBRANT
         if (rand < 0.6) {
-          color.setHSL(0.11 + Math.random() * 0.04, 0.85, 0.58 + Math.random() * 0.12);
+          color.setHSL(0.11 + Math.random() * 0.04, 0.95, 0.52 + Math.random() * 0.1);
         } else {
-          color.setHSL(0.05 + Math.random() * 0.04, 0.85, 0.55 + Math.random() * 0.12);
+          color.setHSL(0.05 + Math.random() * 0.04, 1.0, 0.48 + Math.random() * 0.1);
         }
       } else if (regionT < 0.5) {
-        // Yellow, orange, purple mix
+        // Yellow, orange, purple mix - VIBRANT
         if (rand < 0.33) {
-          color.setHSL(0.11 + Math.random() * 0.03, 0.8, 0.55 + Math.random() * 0.12);
+          color.setHSL(0.11 + Math.random() * 0.03, 0.92, 0.52 + Math.random() * 0.1);
         } else if (rand < 0.66) {
-          color.setHSL(0.04 + Math.random() * 0.04, 0.82, 0.52 + Math.random() * 0.12);
+          color.setHSL(0.04 + Math.random() * 0.04, 1.0, 0.45 + Math.random() * 0.1);
         } else {
-          color.setHSL(0.78 + Math.random() * 0.08, 0.7, 0.5 + Math.random() * 0.12);
+          color.setHSL(0.78 + Math.random() * 0.08, 0.9, 0.45 + Math.random() * 0.1);
         }
       } else if (regionT < 0.75) {
-        // Purple/blue mix
+        // Purple/blue mix - VIBRANT
         if (rand < 0.5) {
-          color.setHSL(0.76 + Math.random() * 0.08, 0.7, 0.5 + Math.random() * 0.1);
+          color.setHSL(0.76 + Math.random() * 0.08, 0.88, 0.45 + Math.random() * 0.1);
         } else {
-          color.setHSL(0.6 + Math.random() * 0.08, 0.75, 0.5 + Math.random() * 0.1);
+          color.setHSL(0.6 + Math.random() * 0.08, 0.92, 0.45 + Math.random() * 0.1);
         }
       } else {
-        // Outer: blue
-        color.setHSL(0.58 + Math.random() * 0.08, 0.8, 0.45 + Math.random() * 0.12);
+        // Outer: blue - VIBRANT
+        color.setHSL(0.58 + Math.random() * 0.08, 0.95, 0.4 + Math.random() * 0.1);
       }
 
       colors[i3] = color.r;
