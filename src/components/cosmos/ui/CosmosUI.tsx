@@ -5,7 +5,6 @@ import { HelpCircle, Compass, Maximize, Minimize, CircleDot, CircleOff, Clock, T
 import { useCosmosStore } from '../store/useCosmosStore';
 import { useFullscreenStore } from '../store/useFullscreenStore';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { createPortal } from 'react-dom';
 import { ObjectSearch } from './ObjectSearch';
 import { useIsMobile } from '@/hooks/use-mobile';
 
@@ -472,87 +471,83 @@ export const CosmosUI = () => {
   return (
     <>
       {/* Welcome overlay for first visit */}
-      {showControlHints &&
-        typeof document !== 'undefined' &&
-        createPortal(
-          <div className="fixed inset-0 flex items-center justify-center bg-black/90 z-[2147483647] p-3">
-            <div className="text-center space-y-3 sm:space-y-5 max-w-sm sm:max-w-lg px-4">
-              <h1 className="text-xl sm:text-3xl md:text-4xl font-bold text-white leading-tight">{t.welcome}</h1>
-              <p className="text-sm sm:text-base text-white/70">{t.subtitle}</p>
+      {showControlHints && (
+        <div className="absolute inset-0 flex items-center justify-center bg-black z-[20000] p-3">
+          <div className="text-center space-y-3 sm:space-y-5 max-w-sm sm:max-w-lg px-4">
+            <h1 className="text-xl sm:text-3xl md:text-4xl font-bold text-white leading-tight">{t.welcome}</h1>
+            <p className="text-sm sm:text-base text-white/70">{t.subtitle}</p>
 
-              <div className={`grid gap-3 text-left ${isMobile ? 'grid-cols-1' : 'grid-cols-1 sm:grid-cols-2'}`}>
+            <div className={`grid gap-3 text-left ${isMobile ? 'grid-cols-1' : 'grid-cols-1 sm:grid-cols-2'}`}>
+              <div className="bg-white/10 rounded-lg p-3 sm:p-4 space-y-1.5">
+                <p className="text-white/90 font-medium text-sm sm:text-base">{t.controls}:</p>
+                {isMobile ? (
+                  <>
+                    <p className="text-white/70 text-xs sm:text-sm">• {t.pinchZoom}</p>
+                    <p className="text-white/70 text-xs sm:text-sm">• {t.dragRotateTouch}</p>
+                    <p className="text-white/70 text-xs sm:text-sm">• {t.twoFingerPan}</p>
+                    <p className="text-white/70 text-xs sm:text-sm">• {t.tapSelect}</p>
+                  </>
+                ) : (
+                  <>
+                    <p className="text-white/70 text-xs sm:text-sm">• {t.scrollZoom}</p>
+                    <p className="text-white/70 text-xs sm:text-sm">• {t.dragRotate}</p>
+                    <p className="text-white/70 text-xs sm:text-sm">• {t.rightDragPan}</p>
+                    <p className="text-white/70 text-xs sm:text-sm">• {t.clickSelect}</p>
+                  </>
+                )}
+              </div>
+
+              {/* Keyboard shortcuts - only on desktop */}
+              {!isMobile && (
                 <div className="bg-white/10 rounded-lg p-3 sm:p-4 space-y-1.5">
-                  <p className="text-white/90 font-medium text-sm sm:text-base">{t.controls}:</p>
-                  {isMobile ? (
-                    <>
-                      <p className="text-white/70 text-xs sm:text-sm">• {t.pinchZoom}</p>
-                      <p className="text-white/70 text-xs sm:text-sm">• {t.dragRotateTouch}</p>
-                      <p className="text-white/70 text-xs sm:text-sm">• {t.twoFingerPan}</p>
-                      <p className="text-white/70 text-xs sm:text-sm">• {t.tapSelect}</p>
-                    </>
-                  ) : (
-                    <>
-                      <p className="text-white/70 text-xs sm:text-sm">• {t.scrollZoom}</p>
-                      <p className="text-white/70 text-xs sm:text-sm">• {t.dragRotate}</p>
-                      <p className="text-white/70 text-xs sm:text-sm">• {t.rightDragPan}</p>
-                      <p className="text-white/70 text-xs sm:text-sm">• {t.clickSelect}</p>
-                    </>
-                  )}
+                  <p className="text-white/90 font-medium text-sm sm:text-base">
+                    {language === 'fr' ? 'Raccourcis:' : 'Shortcuts:'}
+                  </p>
+                  <p className="text-white/70 text-xs sm:text-sm">• 1-9: {language === 'fr' ? 'Planètes' : 'Planets'}</p>
+                  <p className="text-white/70 text-xs sm:text-sm">• 0/S: {language === 'fr' ? 'Soleil' : 'Sun'}</p>
+                  <p className="text-white/70 text-xs sm:text-sm">• ←/→: {language === 'fr' ? 'Naviguer' : 'Navigate'}</p>
+                  <p className="text-white/70 text-xs sm:text-sm">• +/-: {language === 'fr' ? 'Vitesse' : 'Speed'}</p>
+                  <p className="text-white/70 text-xs sm:text-sm">• {language === 'fr' ? 'Espace' : 'Space'}: {language === 'fr' ? 'Pause' : 'Pause'}</p>
                 </div>
+              )}
 
-                {/* Keyboard shortcuts - only on desktop */}
-                {!isMobile && (
-                  <div className="bg-white/10 rounded-lg p-3 sm:p-4 space-y-1.5">
-                    <p className="text-white/90 font-medium text-sm sm:text-base">
-                      {language === 'fr' ? 'Raccourcis:' : 'Shortcuts:'}
-                    </p>
-                    <p className="text-white/70 text-xs sm:text-sm">• 1-9: {language === 'fr' ? 'Planètes' : 'Planets'}</p>
-                    <p className="text-white/70 text-xs sm:text-sm">• 0/S: {language === 'fr' ? 'Soleil' : 'Sun'}</p>
-                    <p className="text-white/70 text-xs sm:text-sm">• ←/→: {language === 'fr' ? 'Naviguer' : 'Navigate'}</p>
-                    <p className="text-white/70 text-xs sm:text-sm">• +/-: {language === 'fr' ? 'Vitesse' : 'Speed'}</p>
-                    <p className="text-white/70 text-xs sm:text-sm">• {language === 'fr' ? 'Espace' : 'Space'}: {language === 'fr' ? 'Pause' : 'Pause'}</p>
-                  </div>
-                )}
-
-                {/* Mobile tip - use UI buttons */}
-                {isMobile && (
-                  <div className="bg-white/10 rounded-lg p-3 sm:p-4 space-y-1.5">
-                    <p className="text-white/90 font-medium text-sm sm:text-base">
-                      {language === 'fr' ? 'Astuce:' : 'Tip:'}
-                    </p>
-                    <p className="text-white/70 text-xs sm:text-sm">• {t.useButtons}</p>
-                  </div>
-                )}
-              </div>
-
-              <div className="flex gap-2 sm:gap-3 justify-center flex-wrap">
-                <Button
-                  size="sm"
-                  onClick={() => {
-                    setShowControlHints(false);
-                    startTour();
-                  }}
-                  className="text-xs sm:text-sm bg-blue-600 hover:bg-blue-700 text-white border-0"
-                >
-                  {t.startTour}
-                </Button>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => {
-                    setShowControlHints(false);
-                    goHome();
-                  }}
-                  className="text-xs sm:text-sm bg-transparent border-white/30 text-white hover:bg-white/10 hover:text-white"
-                >
-                  {t.explore}
-                </Button>
-              </div>
+              {/* Mobile tip - use UI buttons */}
+              {isMobile && (
+                <div className="bg-white/10 rounded-lg p-3 sm:p-4 space-y-1.5">
+                  <p className="text-white/90 font-medium text-sm sm:text-base">
+                    {language === 'fr' ? 'Astuce:' : 'Tip:'}
+                  </p>
+                  <p className="text-white/70 text-xs sm:text-sm">• {t.useButtons}</p>
+                </div>
+              )}
             </div>
-          </div>,
-          document.body
-        )}
 
+            <div className="flex gap-2 sm:gap-3 justify-center flex-wrap">
+              <Button
+                size="sm"
+                onClick={() => {
+                  setShowControlHints(false);
+                  startTour();
+                }}
+                className="text-xs sm:text-sm bg-blue-600 hover:bg-blue-700 text-white border-0"
+              >
+                {t.startTour}
+              </Button>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => {
+                  setShowControlHints(false);
+                  goHome();
+                }}
+                className="text-xs sm:text-sm bg-transparent border-white/30 text-white hover:bg-white/10 hover:text-white"
+              >
+                {t.explore}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Search bar */}
       <ObjectSearch isFullscreen={isFullscreen} />
