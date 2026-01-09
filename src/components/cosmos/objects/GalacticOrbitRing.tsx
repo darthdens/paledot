@@ -33,9 +33,10 @@ export const GalacticOrbitRing = ({ visualScale, visible = true }: GalacticOrbit
   const markerMaterialRef = useRef<THREE.MeshBasicMaterial>(null);
   const lineMaterialRef = useRef<THREE.LineBasicMaterial>(null);
   
-  // Only show at stellar scale and above
+  // Only show at stellar scale and above, and NOT when inside any star system
   const currentScale = useCosmosStore((s) => s.currentScale);
-  const showAtScale = currentScale === 'stellar' || currentScale === 'milkyWay' || currentScale === 'localGroup' || currentScale === 'universe';
+  const isInStarSystem = useCosmosStore((s) => s.isInStarSystem);
+  const showAtScale = (currentScale === 'stellar' || currentScale === 'milkyWay' || currentScale === 'localGroup' || currentScale === 'universe') && !isInStarSystem;
   
   // Target opacity based on visibility and scale
   const targetOpacity = (visible && showAtScale) ? 1 : 0;

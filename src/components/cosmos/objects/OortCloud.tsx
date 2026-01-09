@@ -17,9 +17,14 @@ const OORT_OUTER = 50000 * UNITS.KM_PER_AU; // ~50,000 AU (reduced for performan
 
 export const OortCloud = ({ visualScale, parentStarId }: OortCloudProps) => {
   const setSelectedObject = useCosmosStore((s) => s.setSelectedObject);
+  const currentStarSystem = useCosmosStore((s) => s.currentStarSystem);
   const [isHovered, setIsHovered] = useState(false);
   const hoverGlowRef = useRef<THREE.Mesh>(null);
   const currentOpacity = useRef(0);
+  
+  // Only show this Oort Cloud when we're in its parent star's system
+  // If no parentStarId, always show (backward compat)
+  const shouldShow = !parentStarId || currentStarSystem === parentStarId;
   
   // Get the parent star object for click handling
   const parentStar = useMemo(() => 
@@ -83,6 +88,9 @@ export const OortCloud = ({ visualScale, parentStarId }: OortCloudProps) => {
   
   // Click target radius - use the outer Oort Cloud radius
   const clickTargetRadius = OORT_OUTER * visualScale;
+  
+  // Don't render if we're in a different star system
+  if (!shouldShow) return null;
   
   return (
     <group>
