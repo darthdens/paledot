@@ -12,7 +12,7 @@ import { KuiperBelt } from './objects/KuiperBelt';
 import { TrojanAsteroids } from './objects/TrojanAsteroids';
 import { Comets } from './objects/Comet';
 import { MilkyWayGalaxy } from './objects/MilkyWayGalaxy';
-import { GalaxyAmbientGlow } from './objects/GalaxyAmbientGlow';
+import { GalaxyDirectionalGlow } from './objects/GalaxyDirectionalGlow';
 import { GalaxyRotator } from './objects/GalaxyRotator';
 import { WorldPositionTracker } from './objects/WorldPositionTracker';
 import { SolarSystemTracker } from './objects/SolarSystemTracker';
@@ -162,9 +162,8 @@ export const CosmosExplorer = () => {
           <ambientLight intensity={0.02} />
           <hemisphereLight args={['#ffffff', '#444466', 0.15]} />
           
-          {/* Persistent ambient glow from galaxy - always visible regardless of camera orientation */}
-          <GalaxyAmbientGlow />
-          
+          {/* Directional ambient glow from galactic center (screen-space, always visible) */}
+          <GalaxyDirectionalGlow />
           {/* Everything that should rotate together at galaxy scale */}
           <GalaxyRotator visualScale={UNIFIED_SCALE}>
             {/* Star background - rotates with the rest so the view never "sticks" to it */}
