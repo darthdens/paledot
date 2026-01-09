@@ -3,6 +3,9 @@ import { useFrame, useThree } from "@react-three/fiber";
 import * as THREE from "three";
 import { useCosmosStore } from "../store/useCosmosStore";
 
+// Fade duration in seconds
+const FADE_DURATION = 1.2;
+
 /**
  * Galaxy ambient glow rendered in screen-space.
  *
@@ -12,27 +15,25 @@ import { useCosmosStore } from "../store/useCosmosStore";
  */
 export const GalaxySkyGlow = () => {
   const meshRef = useRef<THREE.Mesh>(null);
+  const currentOpacity = useRef(0);
 
   const tmpDirWorld = useRef(new THREE.Vector3());
   const tmpCenterView = useRef(new THREE.Vector3());
   const tmpMat3 = useRef(new THREE.Matrix3());
 
   const { camera } = useThree();
-  const currentScale = useCosmosStore((s) => s.currentScale);
+  const isInStarSystem = useCosmosStore((s) => s.isInStarSystem);
   const centerPos = useCosmosStore((s) => s.objectWorldPositions["milky-way-center"]);
 
-  const visible =
-    currentScale === "stellar" ||
-    currentScale === "milkyWay" ||
-    currentScale === "localGroup" ||
-    currentScale === "universe";
+  // Target opacity: 0 when in star system, 1 when outside
+  const targetOpacity = isInStarSystem ? 0 : 1;
 
   const material = useMemo(() => {
     return new THREE.ShaderMaterial({
-      transparent: false,
+      transparent: true,
       depthTest: false,
       depthWrite: false,
-      blending: THREE.NoBlending,
+      blending: THREE.NormalBlending,
       toneMapped: false,
       uniforms: {
         uCenterDirView: { value: new THREE.Vector3(0, 0, -1) },
@@ -40,6 +41,7 @@ export const GalaxySkyGlow = () => {
         // Tuned to be clearly visible but not overpowering.
         uBase: { value: 0.18 },
         uPeak: { value: 0.55 },
+        uOpacity: { value: 0 },
       },
       vertexShader: `
         varying vec2 vUv;
@@ -58,6 +60,7 @@ export const GalaxySkyGlow = () => {
         uniform mat4 uInvProjection;
         uniform float uBase;
         uniform float uPeak;
+        uniform float uOpacity;
 
         vec3 toLinear(vec3 c) { return pow(c, vec3(2.2)); }
 
@@ -101,9 +104,10 @@ export const GalaxySkyGlow = () => {
           float base = 1.0 - smoothstep(0.35, 1.0, t);
           float core = exp(-pow(t * 1.15, 2.0));
 
-          float intensity = uBase * base + uPeak * core;
+          float intensity = (uBase * base + uPeak * core) * uOpacity;
 
-          gl_FragColor = vec4(col * intensity, 1.0);
+          // Use opacity for alpha as well for proper fade
+          gl_FragColor = vec4(col * intensity, uOpacity);
         }
       `,
     });
@@ -123,7 +127,19 @@ export const GalaxySkyGlow = () => {
     };
   }, [camera]);
 
-  useFrame(() => {
+  useFrame((_, delta) => {
+    // Smooth opacity transition
+    const diff = targetOpacity - currentOpacity.current;
+    const step = delta / FADE_DURATION;
+    
+    if (Math.abs(diff) > 0.001) {
+      currentOpacity.current += Math.sign(diff) * Math.min(Math.abs(diff), step);
+    } else {
+      currentOpacity.current = targetOpacity;
+    }
+    
+    material.uniforms.uOpacity.value = currentOpacity.current;
+    
     // Keep inverse projection up to date (FOV/resize).
     (material.uniforms.uInvProjection.value as THREE.Matrix4).copy(camera.projectionMatrixInverse);
 
@@ -141,8 +157,7 @@ export const GalaxySkyGlow = () => {
     }
   });
 
-  if (!visible) return null;
-
+  // Always render, but with opacity controlling visibility
   return (
     <mesh ref={meshRef} frustumCulled={false} renderOrder={-1000}>
       <planeGeometry args={[2, 2]} />
