@@ -41,21 +41,26 @@ const createDotTexture = () => {
   return tex;
 };
 
-// Big smooth glow texture (used on sprites) - avoids hard layer edges
-const createGlowTexture = () => {
-  const size = 512;
+// Galaxy glow texture with color gradient: yellow (center) → orange → purple → blue → fade
+const createGalaxyGlowTexture = () => {
+  const size = 1024;
   const canvas = document.createElement('canvas');
   canvas.width = size;
   canvas.height = size;
   const ctx = canvas.getContext('2d')!;
 
+  // Create radial gradient with color progression
   const gradient = ctx.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2);
-  gradient.addColorStop(0, 'rgba(255, 255, 255, 0.95)');
-  gradient.addColorStop(0.08, 'rgba(255, 255, 255, 0.6)');
-  gradient.addColorStop(0.22, 'rgba(255, 255, 255, 0.28)');
-  gradient.addColorStop(0.45, 'rgba(255, 255, 255, 0.1)');
-  gradient.addColorStop(0.75, 'rgba(255, 255, 255, 0.03)');
-  gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
+  
+  // Yellow center → Orange → Purple → Blue → Fade to transparent
+  gradient.addColorStop(0, 'rgba(255, 220, 80, 0.9)');      // Bright yellow center
+  gradient.addColorStop(0.12, 'rgba(255, 180, 40, 0.7)');   // Yellow-orange
+  gradient.addColorStop(0.25, 'rgba(255, 120, 30, 0.5)');   // Orange
+  gradient.addColorStop(0.4, 'rgba(200, 80, 140, 0.35)');   // Orange-purple
+  gradient.addColorStop(0.55, 'rgba(140, 70, 200, 0.25)');  // Purple
+  gradient.addColorStop(0.7, 'rgba(80, 100, 220, 0.15)');   // Purple-blue
+  gradient.addColorStop(0.85, 'rgba(50, 80, 180, 0.08)');   // Blue
+  gradient.addColorStop(1, 'rgba(30, 50, 150, 0)');         // Fade to transparent
 
   ctx.fillStyle = gradient;
   ctx.fillRect(0, 0, size, size);
@@ -81,7 +86,7 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
   ), [gs]);
   
   const dotTexture = useMemo(() => createDotTexture(), []);
-  const glowTexture = useMemo(() => createGlowTexture(), []);
+  const glowTexture = useMemo(() => createGalaxyGlowTexture(), []);
   
   // Generate ONLY stars - crisp dots with colors matching glow regions
   const starsGeo = useMemo(() => {
@@ -319,67 +324,12 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
         />
       </points>
 
-      {/* Single smooth gradient: yellow (center) → orange → purple → blue → fade */}
-      
-      {/* Blue fade at edges - largest, fades to nothing */}
-      <sprite renderOrder={-12} scale={[diskR * 6.0, diskR * 6.0, 1]}>
+      {/* Single smooth gradient glow: yellow → orange → purple → blue → fade */}
+      <sprite renderOrder={-10} scale={[diskR * 5.5, diskR * 5.5, 1]}>
         <spriteMaterial
           map={glowTexture}
-          color="#1133AA"
           transparent
-          opacity={0.08}
-          blending={THREE.AdditiveBlending}
-          depthWrite={false}
-          depthTest={false}
-        />
-      </sprite>
-
-      {/* Blue */}
-      <sprite renderOrder={-11} scale={[diskR * 4.5, diskR * 4.5, 1]}>
-        <spriteMaterial
-          map={glowTexture}
-          color="#3366EE"
-          transparent
-          opacity={0.15}
-          blending={THREE.AdditiveBlending}
-          depthWrite={false}
-          depthTest={false}
-        />
-      </sprite>
-
-      {/* Purple */}
-      <sprite renderOrder={-10} scale={[diskR * 3.2, diskR * 3.2, 1]}>
-        <spriteMaterial
-          map={glowTexture}
-          color="#8855DD"
-          transparent
-          opacity={0.2}
-          blending={THREE.AdditiveBlending}
-          depthWrite={false}
-          depthTest={false}
-        />
-      </sprite>
-
-      {/* Orange */}
-      <sprite renderOrder={-9} scale={[diskR * 2.0, diskR * 2.0, 1]}>
-        <spriteMaterial
-          map={glowTexture}
-          color="#FF7722"
-          transparent
-          opacity={0.28}
-          blending={THREE.AdditiveBlending}
-          depthWrite={false}
-          depthTest={false}
-        />
-      </sprite>
-
-      {/* Yellow center */}
-      <sprite renderOrder={-8} scale={[diskR * 1.0, diskR * 1.0, 1]}>
-        <spriteMaterial
-          map={glowTexture}
-          color="#FFCC22"
-          transparent
-          opacity={0.4}
+          opacity={1}
           blending={THREE.AdditiveBlending}
           depthWrite={false}
           depthTest={false}
