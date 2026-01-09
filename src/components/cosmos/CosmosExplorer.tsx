@@ -209,8 +209,8 @@ export const CosmosExplorer = () => {
               scale={UNIFIED_SCALE}
             />
             
-            {/* Oort Cloud - outermost boundary of Solar System */}
-            <OortCloud visualScale={UNIFIED_SCALE} />
+            {/* Oort Cloud - outermost boundary of Solar System - click to select Sun */}
+            <OortCloud visualScale={UNIFIED_SCALE} parentStarId="sun" />
             
             {/* Famous comets with tails */}
             <Comets scale={UNIFIED_SCALE} />
