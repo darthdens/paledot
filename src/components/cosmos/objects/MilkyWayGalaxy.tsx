@@ -332,7 +332,7 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
       </points>
 
       {/* Single smooth gradient glow: yellow → orange → purple → blue → fade */}
-      <sprite renderOrder={-10} scale={[diskR * 2.2, diskR * 2.2, 1]}>
+      <sprite renderOrder={1} scale={[diskR * 2.2, diskR * 2.2, 1]}>
         <spriteMaterial
           map={glowTexture}
           transparent
@@ -340,6 +340,7 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
           blending={THREE.AdditiveBlending}
           depthWrite={false}
           depthTest={false}
+          side={THREE.DoubleSide}
         />
       </sprite>
       {showYouAreHere && (
