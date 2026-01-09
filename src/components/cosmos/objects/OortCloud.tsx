@@ -1,4 +1,5 @@
-import { useMemo, useCallback } from 'react';
+import { useMemo, useCallback, useState, useRef } from 'react';
+import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { UNITS } from '../types';
 import { useCosmosStore } from '../store/useCosmosStore';
@@ -16,6 +17,9 @@ const OORT_OUTER = 50000 * UNITS.KM_PER_AU; // ~50,000 AU (reduced for performan
 
 export const OortCloud = ({ visualScale, parentStarId }: OortCloudProps) => {
   const setSelectedObject = useCosmosStore((s) => s.setSelectedObject);
+  const [isHovered, setIsHovered] = useState(false);
+  const hoverGlowRef = useRef<THREE.Mesh>(null);
+  const currentOpacity = useRef(0);
   
   // Get the parent star object for click handling
   const parentStar = useMemo(() => 
@@ -29,6 +33,28 @@ export const OortCloud = ({ visualScale, parentStarId }: OortCloudProps) => {
       setSelectedObject(parentStar);
     }
   }, [parentStar, setSelectedObject]);
+  
+  const handlePointerOver = useCallback((e: { stopPropagation: () => void }) => {
+    e.stopPropagation();
+    setIsHovered(true);
+  }, []);
+  
+  const handlePointerOut = useCallback(() => {
+    setIsHovered(false);
+  }, []);
+  
+  // Animate hover glow opacity
+  useFrame((_, delta) => {
+    if (!hoverGlowRef.current) return;
+    
+    const targetOpacity = isHovered ? 0.15 : 0;
+    const speed = 4; // Transition speed
+    
+    currentOpacity.current += (targetOpacity - currentOpacity.current) * Math.min(delta * speed, 1);
+    
+    const material = hoverGlowRef.current.material as THREE.MeshBasicMaterial;
+    material.opacity = currentOpacity.current;
+  });
   
   // Generate static Oort Cloud particles
   const geometry = useMemo(() => {
@@ -74,10 +100,30 @@ export const OortCloud = ({ visualScale, parentStarId }: OortCloudProps) => {
       
       {/* Large invisible click target sphere for selecting the parent star */}
       {parentStarId && (
-        <mesh onClick={handleClick} onPointerDown={handleClick}>
-          <sphereGeometry args={[clickTargetRadius, 16, 16]} />
-          <meshBasicMaterial transparent opacity={0.001} depthWrite={false} />
-        </mesh>
+        <>
+          <mesh 
+            onClick={handleClick} 
+            onPointerDown={handleClick}
+            onPointerOver={handlePointerOver}
+            onPointerOut={handlePointerOut}
+          >
+            <sphereGeometry args={[clickTargetRadius, 16, 16]} />
+            <meshBasicMaterial transparent opacity={0.001} depthWrite={false} />
+          </mesh>
+          
+          {/* Hover glow effect - subtle shell highlight */}
+          <mesh ref={hoverGlowRef}>
+            <sphereGeometry args={[clickTargetRadius * 0.98, 32, 32]} />
+            <meshBasicMaterial 
+              color="#66aaff"
+              transparent 
+              opacity={0} 
+              depthWrite={false}
+              side={THREE.BackSide}
+              blending={THREE.AdditiveBlending}
+            />
+          </mesh>
+        </>
       )}
     </group>
   );
