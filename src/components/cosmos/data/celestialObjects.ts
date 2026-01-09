@@ -753,7 +753,7 @@ export const celestialObjects: CelestialObject[] = [
   // ==================== GALAXIES ====================
   {
     id: 'milky-way-center',
-    name: { en: 'Milky Way Center', fr: 'Centre de la Voie Lactée' },
+    name: { en: 'Milky Way', fr: 'Voie Lactée' },
     type: 'galaxy',
     position: [26000 * UNITS.KM_PER_LY, 0, 0],
     size: 100000 * UNITS.KM_PER_LY,
@@ -908,7 +908,7 @@ export const quickJumpCategories = [
   {
     id: 'stars',
     name: { en: 'Stars', fr: 'Étoiles' },
-    locations: ['alpha-centauri', 'proxima-centauri', 'sirius', 'betelgeuse', 'polaris'],
+    locations: ['sun', 'alpha-centauri', 'proxima-centauri', 'sirius', 'betelgeuse', 'polaris'],
   },
   {
     id: 'nebulae',
