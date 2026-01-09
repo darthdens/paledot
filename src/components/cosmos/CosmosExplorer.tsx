@@ -1,7 +1,7 @@
 // Cosmos Explorer - Solar System visualization with fly-to navigation
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls, Stars, PerspectiveCamera } from '@react-three/drei';
-import * as THREE from 'three';
+
 import { Suspense, useMemo, useEffect, useRef } from 'react';
 import { Sun } from './objects/Sun';
 import { TexturedPlanet } from './objects/TexturedPlanet';
@@ -12,7 +12,7 @@ import { KuiperBelt } from './objects/KuiperBelt';
 import { TrojanAsteroids } from './objects/TrojanAsteroids';
 import { Comets } from './objects/Comet';
 import { MilkyWayGalaxy } from './objects/MilkyWayGalaxy';
-import { GalaxyDirectionalGlow } from './objects/GalaxyDirectionalGlow';
+import { GalaxySkyGlow } from './objects/GalaxySkyGlow';
 import { GalaxyRotator } from './objects/GalaxyRotator';
 import { WorldPositionTracker } from './objects/WorldPositionTracker';
 import { SolarSystemTracker } from './objects/SolarSystemTracker';
@@ -124,14 +124,7 @@ export const CosmosExplorer = () => {
 
   return (
     <div ref={containerRef} className="relative w-full h-full">
-      <Canvas
-        gl={{ alpha: false }}
-        onCreated={({ gl }) => {
-          // Keep additive glows saturated and consistent across camera angles
-          gl.toneMapping = THREE.NoToneMapping;
-          gl.outputColorSpace = THREE.SRGBColorSpace;
-        }}
-      >
+      <Canvas gl={{ alpha: false }}>
         <Suspense fallback={null}>
           <PerspectiveCamera 
             makeDefault 
@@ -162,8 +155,8 @@ export const CosmosExplorer = () => {
           <ambientLight intensity={0.02} />
           <hemisphereLight args={['#ffffff', '#444466', 0.15]} />
           
-          {/* Directional ambient glow from galactic center (screen-space, always visible) */}
-          <GalaxyDirectionalGlow />
+          {/* Galactic ambient glow (camera-centered sky-dome; always present) */}
+          <GalaxySkyGlow />
           {/* Everything that should rotate together at galaxy scale */}
           <GalaxyRotator visualScale={UNIFIED_SCALE}>
             {/* Star background - rotates with the rest so the view never "sticks" to it */}
