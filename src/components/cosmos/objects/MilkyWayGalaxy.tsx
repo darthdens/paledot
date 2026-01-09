@@ -83,11 +83,11 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
   const dotTexture = useMemo(() => createDotTexture(), []);
   const glowTexture = useMemo(() => createGlowTexture(), []);
   
-  // Generate ONLY stars - crisp dots with colors
+  // Generate ONLY stars - crisp dots with colors matching glow regions
   const starsGeo = useMemo(() => {
     const { branches, spinTurns } = MILKY_WAY;
     const maxRadius = MILKY_WAY.diskRadius * gs;
-    const starCount = 260000;
+    const starCount = 280000;
 
     const positions = new Float32Array(starCount * 3);
     const colors = new Float32Array(starCount * 3);
@@ -100,18 +100,18 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
       const t = Math.pow(Math.random(), 0.55);
       const radius = t * maxRadius;
 
-      // Pick an arm (random, not i%branches) so it doesn't look "striped"
+      // Pick an arm
       const branchIndex = Math.floor(Math.random() * branches);
       const branchAngle = (branchIndex / branches) * Math.PI * 2;
 
       // Turn the arms as radius increases
       const spinAngle = t * spinTurns * Math.PI * 2;
 
-      // Arm thickness in radians (narrower near core, wider outward)
+      // Arm thickness in radians
       const armWidth = (0.06 + t * 0.12);
       const armJitter = (Math.random() + Math.random() + Math.random() - 1.5) * armWidth;
 
-      // Inter-arm fill (keeps it "full")
+      // Inter-arm fill
       const isInterArm = Math.random() < 0.35;
       const interArmJitter = isInterArm ? (Math.random() - 0.5) * (0.8 + t * 0.6) : 0;
 
@@ -119,27 +119,35 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
 
       positions[i3] = Math.cos(angle) * radius;
 
-      // Thicker vertical distribution (what you asked for):
-      // near center thicker, outer disk thinner
+      // Thicker vertical distribution
       const thickness = (0.045 * (1 - t) + 0.015);
       const yJitter = (Math.random() + Math.random() + Math.random() - 1.5) * maxRadius * thickness;
       positions[i3 + 1] = yJitter;
 
       positions[i3 + 2] = Math.sin(angle) * radius;
 
-      // Color gradient: core gold → pink → purple → blue
-      if (t < 0.12) {
-        color.setHSL(0.11 + Math.random() * 0.02, 0.7, 0.86 + Math.random() * 0.14);
-      } else if (t < 0.25) {
-        color.setHSL(0.08 + Math.random() * 0.04, 0.6, 0.8 + Math.random() * 0.15);
-      } else if (t < 0.4) {
-        color.setHSL(0.95 + Math.random() * 0.05, 0.52, 0.74 + Math.random() * 0.16);
-      } else if (t < 0.6) {
-        color.setHSL(0.8 + Math.random() * 0.08, 0.48, 0.7 + Math.random() * 0.16);
-      } else if (t < 0.8) {
-        color.setHSL(0.68 + Math.random() * 0.08, 0.42, 0.64 + Math.random() * 0.16);
+      // Color gradient matching glow regions: core gold → orange → pink → purple → blue (outer)
+      if (t < 0.08) {
+        // Bright white/yellow core
+        color.setHSL(0.12 + Math.random() * 0.02, 0.4, 0.92 + Math.random() * 0.08);
+      } else if (t < 0.18) {
+        // Golden/orange
+        color.setHSL(0.09 + Math.random() * 0.03, 0.65, 0.82 + Math.random() * 0.12);
+      } else if (t < 0.32) {
+        // Orange/peach
+        color.setHSL(0.06 + Math.random() * 0.04, 0.55, 0.78 + Math.random() * 0.14);
+      } else if (t < 0.48) {
+        // Pink/salmon
+        color.setHSL(0.97 + Math.random() * 0.04, 0.48, 0.74 + Math.random() * 0.14);
+      } else if (t < 0.65) {
+        // Purple/lavender
+        color.setHSL(0.78 + Math.random() * 0.08, 0.42, 0.68 + Math.random() * 0.14);
+      } else if (t < 0.82) {
+        // Blue-purple
+        color.setHSL(0.62 + Math.random() * 0.08, 0.45, 0.62 + Math.random() * 0.14);
       } else {
-        color.setHSL(0.58 + Math.random() * 0.08, 0.42, 0.6 + Math.random() * 0.16);
+        // Deep blue (outer)
+        color.setHSL(0.58 + Math.random() * 0.06, 0.5, 0.55 + Math.random() * 0.14);
       }
 
       colors[i3] = color.r;
@@ -153,13 +161,13 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
     return geo;
   }, [gs]);
   
-  // Core bulge stars - denser center
+  // Core bulge stars - denser center with golden color
   const coreGeo = useMemo(() => {
-    const coreCount = 80000;
+    const coreCount = 90000;
     const positions = new Float32Array(coreCount * 3);
     const colors = new Float32Array(coreCount * 3);
     const color = new THREE.Color();
-    const coreRadius = MILKY_WAY.bulgeRadius * gs * 0.75;
+    const coreRadius = MILKY_WAY.bulgeRadius * gs * 0.8;
 
     for (let i = 0; i < coreCount; i++) {
       const i3 = i * 3;
@@ -167,13 +175,21 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
       const r = Math.pow(Math.random(), 1.25) * coreRadius;
       const theta = Math.random() * Math.PI * 2;
       const phi = Math.acos(2 * Math.random() - 1);
+      const t = r / coreRadius; // 0 at center, 1 at edge
 
       positions[i3] = r * Math.sin(phi) * Math.cos(theta);
-      // thicker bulge in Y than the disk
       positions[i3 + 1] = r * Math.cos(phi) * 0.55;
       positions[i3 + 2] = r * Math.sin(phi) * Math.sin(theta);
 
-      color.setHSL(0.10 + Math.random() * 0.03, 0.65, 0.86 + Math.random() * 0.14);
+      // Color matches glow: white center → golden
+      if (t < 0.25) {
+        color.setHSL(0.12 + Math.random() * 0.02, 0.25, 0.92 + Math.random() * 0.08);
+      } else if (t < 0.6) {
+        color.setHSL(0.11 + Math.random() * 0.03, 0.55, 0.85 + Math.random() * 0.12);
+      } else {
+        color.setHSL(0.08 + Math.random() * 0.04, 0.6, 0.8 + Math.random() * 0.12);
+      }
+
       colors[i3] = color.r;
       colors[i3 + 1] = color.g;
       colors[i3 + 2] = color.b;
@@ -185,9 +201,9 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
     return geo;
   }, [gs]);
 
-  // Extra "volume" stars above/below disk (makes it feel full)
+  // Extra "volume" stars above/below disk - colored by region
   const volumeGeo = useMemo(() => {
-    const count = 60000;
+    const count = 70000;
     const maxRadius = MILKY_WAY.diskRadius * gs;
     const positions = new Float32Array(count * 3);
     const colors = new Float32Array(count * 3);
@@ -205,11 +221,17 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
       const ySpread = (0.12 + (1 - t) * 0.22) * maxRadius;
       positions[i3 + 1] = (Math.random() + Math.random() + Math.random() - 1.5) * ySpread * 0.08;
 
-      // mostly faint blue/purple/white
-      const huePick = Math.random();
-      if (huePick < 0.5) color.setHSL(0.62 + Math.random() * 0.08, 0.25, 0.55 + Math.random() * 0.18);
-      else if (huePick < 0.85) color.setHSL(0.78 + Math.random() * 0.08, 0.22, 0.55 + Math.random() * 0.18);
-      else color.setHSL(0.12 + Math.random() * 0.06, 0.18, 0.6 + Math.random() * 0.18);
+      // Match star colors to glow regions
+      const regionT = 0.15 + t * 0.85; // corresponds to radius from center
+      if (regionT < 0.35) {
+        color.setHSL(0.06 + Math.random() * 0.04, 0.4, 0.7 + Math.random() * 0.15);
+      } else if (regionT < 0.55) {
+        color.setHSL(0.92 + Math.random() * 0.06, 0.35, 0.65 + Math.random() * 0.15);
+      } else if (regionT < 0.75) {
+        color.setHSL(0.72 + Math.random() * 0.08, 0.38, 0.6 + Math.random() * 0.15);
+      } else {
+        color.setHSL(0.58 + Math.random() * 0.08, 0.45, 0.55 + Math.random() * 0.15);
+      }
 
       colors[i3] = color.r;
       colors[i3 + 1] = color.g;
@@ -297,114 +319,173 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
         />
       </points>
 
-      {/* Smooth glow layers (no flicker, less visible "bands") */}
-      <mesh renderOrder={-10}>
-        <sphereGeometry args={[diskR * 0.95, 48, 48]} />
-        <meshBasicMaterial
-          color="#4E7BAA"
+      {/* Smooth gradient glow using sprites - blends into darkness */}
+      {/* Outer blue glow - extends far out, fades to black */}
+      <sprite renderOrder={-20} scale={[diskR * 3.5, diskR * 3.5, 1]}>
+        <spriteMaterial
+          map={glowTexture}
+          color="#3366AA"
           transparent
-          opacity={0.03}
+          opacity={0.12}
           blending={THREE.AdditiveBlending}
           depthWrite={false}
           depthTest={false}
         />
-      </mesh>
+      </sprite>
 
-      <mesh renderOrder={-9}>
-        <sphereGeometry args={[diskR * 0.8, 48, 48]} />
-        <meshBasicMaterial
-          color="#5C6DB8"
+      <sprite renderOrder={-19} scale={[diskR * 2.8, diskR * 2.8, 1]}>
+        <spriteMaterial
+          map={glowTexture}
+          color="#4477BB"
           transparent
-          opacity={0.035}
+          opacity={0.14}
           blending={THREE.AdditiveBlending}
           depthWrite={false}
           depthTest={false}
         />
-      </mesh>
+      </sprite>
 
-      <mesh renderOrder={-8}>
-        <sphereGeometry args={[diskR * 0.65, 48, 48]} />
-        <meshBasicMaterial
-          color="#7A60B8"
+      <sprite renderOrder={-18} scale={[diskR * 2.2, diskR * 2.2, 1]}>
+        <spriteMaterial
+          map={glowTexture}
+          color="#5588CC"
           transparent
-          opacity={0.045}
+          opacity={0.15}
           blending={THREE.AdditiveBlending}
           depthWrite={false}
           depthTest={false}
         />
-      </mesh>
+      </sprite>
 
-      <mesh renderOrder={-7}>
-        <sphereGeometry args={[diskR * 0.5, 48, 48]} />
-        <meshBasicMaterial
-          color="#B76DAA"
+      {/* Blue-purple transition */}
+      <sprite renderOrder={-17} scale={[diskR * 1.8, diskR * 1.8, 1]}>
+        <spriteMaterial
+          map={glowTexture}
+          color="#6666BB"
           transparent
-          opacity={0.055}
+          opacity={0.16}
           blending={THREE.AdditiveBlending}
           depthWrite={false}
           depthTest={false}
         />
-      </mesh>
+      </sprite>
 
-      <mesh renderOrder={-6}>
-        <sphereGeometry args={[diskR * 0.38, 48, 48]} />
-        <meshBasicMaterial
-          color="#D58B8B"
+      {/* Purple region */}
+      <sprite renderOrder={-16} scale={[diskR * 1.5, diskR * 1.5, 1]}>
+        <spriteMaterial
+          map={glowTexture}
+          color="#8866AA"
           transparent
-          opacity={0.065}
+          opacity={0.17}
           blending={THREE.AdditiveBlending}
           depthWrite={false}
           depthTest={false}
         />
-      </mesh>
+      </sprite>
 
-      <mesh renderOrder={-5}>
-        <sphereGeometry args={[bulgeR * 1.35, 32, 32]} />
-        <meshBasicMaterial
-          color="#DDAA66"
-          transparent
-          opacity={0.11}
-          blending={THREE.AdditiveBlending}
-          depthWrite={false}
-          depthTest={false}
-        />
-      </mesh>
-
-      <mesh renderOrder={-4}>
-        <sphereGeometry args={[bulgeR * 0.9, 32, 32]} />
-        <meshBasicMaterial
-          color="#FFCC77"
+      {/* Purple-pink transition */}
+      <sprite renderOrder={-15} scale={[diskR * 1.25, diskR * 1.25, 1]}>
+        <spriteMaterial
+          map={glowTexture}
+          color="#AA6699"
           transparent
           opacity={0.18}
           blending={THREE.AdditiveBlending}
           depthWrite={false}
           depthTest={false}
         />
-      </mesh>
+      </sprite>
 
-      <mesh renderOrder={-3}>
-        <sphereGeometry args={[bulgeR * 0.45, 32, 32]} />
-        <meshBasicMaterial
-          color="#FFEEAA"
+      {/* Pink region */}
+      <sprite renderOrder={-14} scale={[diskR * 1.0, diskR * 1.0, 1]}>
+        <spriteMaterial
+          map={glowTexture}
+          color="#CC7788"
+          transparent
+          opacity={0.2}
+          blending={THREE.AdditiveBlending}
+          depthWrite={false}
+          depthTest={false}
+        />
+      </sprite>
+
+      {/* Pink-orange transition */}
+      <sprite renderOrder={-13} scale={[diskR * 0.75, diskR * 0.75, 1]}>
+        <spriteMaterial
+          map={glowTexture}
+          color="#DD9977"
+          transparent
+          opacity={0.22}
+          blending={THREE.AdditiveBlending}
+          depthWrite={false}
+          depthTest={false}
+        />
+      </sprite>
+
+      {/* Orange region */}
+      <sprite renderOrder={-12} scale={[diskR * 0.55, diskR * 0.55, 1]}>
+        <spriteMaterial
+          map={glowTexture}
+          color="#DDAA66"
+          transparent
+          opacity={0.25}
+          blending={THREE.AdditiveBlending}
+          depthWrite={false}
+          depthTest={false}
+        />
+      </sprite>
+
+      {/* Orange-gold transition */}
+      <sprite renderOrder={-11} scale={[diskR * 0.38, diskR * 0.38, 1]}>
+        <spriteMaterial
+          map={glowTexture}
+          color="#EEBB55"
           transparent
           opacity={0.3}
           blending={THREE.AdditiveBlending}
           depthWrite={false}
           depthTest={false}
         />
-      </mesh>
+      </sprite>
 
-      <mesh renderOrder={-2}>
-        <sphereGeometry args={[bulgeR * 0.14, 32, 32]} />
-        <meshBasicMaterial
-          color="#FFFFEE"
+      {/* Golden core */}
+      <sprite renderOrder={-10} scale={[diskR * 0.25, diskR * 0.25, 1]}>
+        <spriteMaterial
+          map={glowTexture}
+          color="#FFCC55"
           transparent
-          opacity={0.45}
+          opacity={0.38}
           blending={THREE.AdditiveBlending}
           depthWrite={false}
           depthTest={false}
         />
-      </mesh>
+      </sprite>
+
+      {/* Bright center */}
+      <sprite renderOrder={-9} scale={[diskR * 0.14, diskR * 0.14, 1]}>
+        <spriteMaterial
+          map={glowTexture}
+          color="#FFDDAA"
+          transparent
+          opacity={0.5}
+          blending={THREE.AdditiveBlending}
+          depthWrite={false}
+          depthTest={false}
+        />
+      </sprite>
+
+      {/* White hot core */}
+      <sprite renderOrder={-8} scale={[diskR * 0.06, diskR * 0.06, 1]}>
+        <spriteMaterial
+          map={glowTexture}
+          color="#FFFFEE"
+          transparent
+          opacity={0.7}
+          blending={THREE.AdditiveBlending}
+          depthWrite={false}
+          depthTest={false}
+        />
+      </sprite>
       
       {/* "You Are Here" marker */}
       {showYouAreHere && (
