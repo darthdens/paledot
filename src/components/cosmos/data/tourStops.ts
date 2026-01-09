@@ -151,8 +151,8 @@ export const tourStops: TourStop[] = [
       fr: 'Sous la croûte glacée d\'Europe se trouve un océan global contenant plus d\'eau que tous les océans de la Terre réunis. Cela en fait l\'un des endroits les plus prometteurs pour rechercher la vie extraterrestre dans notre système solaire.',
     },
     duration: 7,
-    // Europa radius is 1561 km - similar to Moon
-    cameraPosition: [0, 5000, 14000],
+    // Europa radius is 1561 km - use larger offset similar to Moon (7-8x radius)
+    cameraPosition: [0, 4000, 12000],
     lookAt: [0, 0, 0],
     scaleLevel: 'solarSystem',
   },
@@ -185,8 +185,8 @@ export const tourStops: TourStop[] = [
       fr: 'Titan est la seule lune de notre système solaire avec une atmosphère dense - encore plus épaisse que celle de la Terre. Sous sa brume orange se trouvent des lacs et des mers de méthane liquide, en faisant l\'un des mondes les plus semblables à la Terre que nous ayons découverts.',
     },
     duration: 7,
-    // Titan radius is 2575 km - larger moon
-    cameraPosition: [0, 7500, 22000],
+    // Titan radius is 2575 km - use 7-8x radius for good view
+    cameraPosition: [0, 6000, 18000],
     lookAt: [0, 0, 0],
     scaleLevel: 'solarSystem',
   },
@@ -236,8 +236,8 @@ export const tourStops: TourStop[] = [
       fr: 'Aux confins de notre système solaire se trouve Pluton, reclassifiée planète naine en 2006. Malgré sa petite taille, elle possède cinq lunes et un glacier d\'azote en forme de cœur plus grand que le Texas. Elle marque la porte d\'entrée de la ceinture de Kuiper.',
     },
     duration: 7,
-    // Pluto radius is 1188 km - small dwarf planet
-    cameraPosition: [0, 4000, 12000],
+    // Pluto radius is 1188 km - use 7-8x radius for good view
+    cameraPosition: [0, 3000, 9000],
     lookAt: [0, 0, 0],
     scaleLevel: 'solarSystem',
   },
@@ -287,9 +287,9 @@ export const tourStops: TourStop[] = [
       fr: 'À seulement 4,24 années-lumière, Proxima du Centaure est l\'étoile la plus proche de notre Soleil. Cette naine rouge abrite au moins deux planètes, dont Proxima b, qui orbite dans la zone habitable où l\'eau liquide pourrait exister.',
     },
     duration: 8,
-    // Close view of Proxima Centauri - zoom in to the star like quick jump does
-    // Proxima has radius ~0.1545 solar radii = ~107,500 km, use similar multiplier as planets
-    cameraPosition: [0, 200000, 600000],
+    // Much wider view to see Proxima Centauri's star system with potential planets
+    // Use 50 million km offset (similar to Mercury-Sun distance) for a system overview
+    cameraPosition: [0, 20000000, 60000000],
     lookAt: [0, 0, 0],
     scaleLevel: 'stellar',
   },
