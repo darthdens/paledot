@@ -50,7 +50,7 @@ export const ProximaSystem = ({
         />
         
         <ProximaCentauri visualScale={visualScale} />
-        {showOortCloud && <OortCloud visualScale={visualScale} />}
+        {showOortCloud && <OortCloud visualScale={visualScale} parentStarId="proxima-centauri" />}
       </group>
     </WorldPositionTracker>
   );
