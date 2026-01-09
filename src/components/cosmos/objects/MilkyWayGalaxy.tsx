@@ -244,55 +244,59 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
     return geo;
   }, [gs]);
 
-  // Spiral arm glow positions - generate points along the arms for glow sprites
-  const spiralArmGlows = useMemo(() => {
+  // Spiral arm tube geometries - continuous glowing arms
+  const spiralArmTubes = useMemo(() => {
     const { branches, spinTurns } = MILKY_WAY;
     const maxRadius = MILKY_WAY.diskRadius * gs;
-    const glowPoints: { x: number; z: number; radius: number; color: string; opacity: number }[] = [];
+    const tubes: { geometry: THREE.TubeGeometry; color: string; opacity: number }[] = [];
 
-    // Generate glow points along each arm - more points for better coverage
+    // Create a tube for each arm with multiple color segments
     for (let arm = 0; arm < branches; arm++) {
       const branchAngle = (arm / branches) * Math.PI * 2;
+
+      // Create curve points for this arm
+      const curvePoints: THREE.Vector3[] = [];
+      const segments = 80;
       
-      // Points along the arm from 15% to 98% of radius - more dense
-      for (let i = 0; i < 20; i++) {
-        const t = 0.15 + (i / 19) * 0.83;
+      for (let i = 0; i < segments; i++) {
+        const t = 0.08 + (i / (segments - 1)) * 0.9;
         const radius = t * maxRadius;
         const spinAngle = t * spinTurns * Math.PI * 2;
         const angle = branchAngle + spinAngle;
 
         const x = Math.cos(angle) * radius;
         const z = Math.sin(angle) * radius;
-
-        // Color based on distance from center - brighter colors
-        let color: string;
-        let opacity: number;
-        if (t < 0.30) {
-          color = '#FFAA55'; // Bright orange/warm inner
-          opacity = 0.55;
-        } else if (t < 0.45) {
-          color = '#FF8866'; // Orange-pink
-          opacity = 0.5;
-        } else if (t < 0.60) {
-          color = '#DD77BB'; // Purple transition
-          opacity = 0.45;
-        } else if (t < 0.78) {
-          color = '#7799EE'; // Bright blue
-          opacity = 0.4;
-        } else {
-          color = '#5588DD'; // Blue outer
-          opacity = 0.35;
-        }
-
-        // Larger glow sizes for visibility
-        const glowSize = maxRadius * (0.28 - t * 0.1);
-
-        glowPoints.push({ x, z, radius: glowSize, color, opacity });
+        curvePoints.push(new THREE.Vector3(x, 0, z));
       }
+
+      // Create a smooth curve through the points
+      const curve = new THREE.CatmullRomCurve3(curvePoints);
+      
+      // Tube radius tapers from thick inner to thin outer
+      const tubeRadius = maxRadius * 0.025;
+      const geometry = new THREE.TubeGeometry(curve, 64, tubeRadius, 8, false);
+
+      tubes.push({
+        geometry,
+        color: '#FF9966',
+        opacity: 0.35
+      });
     }
 
-    return glowPoints;
+    return tubes;
   }, [gs]);
+
+  // Create glow texture for arm tubes
+  const armGlowMaterial = useMemo(() => {
+    return new THREE.MeshBasicMaterial({
+      color: '#FFAA77',
+      transparent: true,
+      opacity: 0.4,
+      blending: THREE.AdditiveBlending,
+      side: THREE.DoubleSide,
+      depthWrite: false,
+    });
+  }, []);
   
   useFrame(({ clock, camera }) => {
     const t = clock.getElapsedTime();
@@ -369,25 +373,54 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
         />
       </points>
 
-      {/* Spiral arm glows - glow sprites positioned along each arm */}
-      {spiralArmGlows.map((glow, idx) => (
-        <sprite 
-          key={`arm-glow-${idx}`} 
-          position={[glow.x, 0, glow.z]} 
-          renderOrder={-30}
-          scale={[glow.radius, glow.radius, 1]}
-        >
-          <spriteMaterial
-            map={glowTexture}
-            color={glow.color}
+      {/* Spiral arm glows - continuous tubes along each arm */}
+      {spiralArmTubes.map((tube, idx) => (
+        <mesh key={`arm-tube-${idx}`} geometry={tube.geometry} renderOrder={-30}>
+          <meshBasicMaterial
+            color={tube.color}
             transparent
-            opacity={glow.opacity}
+            opacity={tube.opacity}
             blending={THREE.AdditiveBlending}
             depthWrite={false}
-            depthTest={false}
+            side={THREE.DoubleSide}
           />
-        </sprite>
+        </mesh>
       ))}
+      
+      {/* Secondary wider glow layer for arm tubes */}
+      {spiralArmTubes.map((tube, idx) => {
+        // Create a wider version for outer glow
+        const { branches, spinTurns } = MILKY_WAY;
+        const maxRadius = MILKY_WAY.diskRadius * gs;
+        const branchAngle = (idx / branches) * Math.PI * 2;
+        
+        const curvePoints: THREE.Vector3[] = [];
+        const segments = 80;
+        
+        for (let i = 0; i < segments; i++) {
+          const t = 0.08 + (i / (segments - 1)) * 0.9;
+          const radius = t * maxRadius;
+          const spinAngle = t * spinTurns * Math.PI * 2;
+          const angle = branchAngle + spinAngle;
+          curvePoints.push(new THREE.Vector3(Math.cos(angle) * radius, 0, Math.sin(angle) * radius));
+        }
+        
+        const curve = new THREE.CatmullRomCurve3(curvePoints);
+        const outerGeo = new THREE.TubeGeometry(curve, 64, maxRadius * 0.06, 8, false);
+        
+        return (
+          <mesh key={`arm-outer-${idx}`} geometry={outerGeo} renderOrder={-31}>
+            <meshBasicMaterial
+              color="#9977DD"
+              transparent
+              opacity={0.18}
+              blending={THREE.AdditiveBlending}
+              depthWrite={false}
+              side={THREE.DoubleSide}
+            />
+          </mesh>
+        );
+      })}
 
       {/* Smooth gradient glow - white → yellow → orange → purple → blue → dark blue */}
       {/* Glow reaches to galaxy edges (diskR * 2 = galaxy edge) */}
