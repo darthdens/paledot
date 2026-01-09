@@ -17,6 +17,9 @@ export const GalaxySkyGlow = () => {
   const meshRef = useRef<THREE.Mesh>(null);
   const currentOpacity = useRef(0);
 
+  // This background plane should never intercept clicks meant for scene objects.
+  const disableRaycast = useMemo(() => ((_: any, __: any) => {}) as any, []);
+
   const tmpDirWorld = useRef(new THREE.Vector3());
   const tmpCenterView = useRef(new THREE.Vector3());
   const tmpMat3 = useRef(new THREE.Matrix3());
@@ -159,7 +162,7 @@ export const GalaxySkyGlow = () => {
 
   // Always render, but with opacity controlling visibility
   return (
-    <mesh ref={meshRef} frustumCulled={false} renderOrder={-1000}>
+    <mesh ref={meshRef} frustumCulled={false} renderOrder={-1000} raycast={disableRaycast}>
       <planeGeometry args={[2, 2]} />
       <primitive object={material} attach="material" />
     </mesh>
