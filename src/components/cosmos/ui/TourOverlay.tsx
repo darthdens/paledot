@@ -75,6 +75,12 @@ export const TourOverlay = () => {
       const computeAndSetCamera = (livePos: [number, number, number] | undefined) => {
         const store = useCosmosStore.getState();
 
+        const getSunPos = (s: typeof store): [number, number, number] | null => {
+          // In our scene, the Sun is at the solar system origin, so the solar-system-marker
+          // is a valid fallback if the Sun mesh isn't currently reporting positions yet.
+          return s.objectWorldPositions['sun'] ?? s.objectWorldPositions['solar-system-marker'] ?? null;
+        };
+
         const fallbackTargetPos = (): [number, number, number] => {
           if (!targetObject) return [0, 0, 0];
 
@@ -107,7 +113,7 @@ export const TourOverlay = () => {
         };
 
         const targetPos: [number, number, number] = livePos ?? fallbackTargetPos();
-        
+
         // For stops that look at a specific point (like Milky Way looking at Sun's position),
         // use the stop's lookAt directly if it's not [0,0,0] and scale level is milkyWay
         let lookAtPos: [number, number, number];
@@ -133,20 +139,20 @@ export const TourOverlay = () => {
 
         // For solar system bodies (except the sun itself), place the camera on the sun-facing side
         if (targetObject?.category === 'solarSystem' && targetObject.id !== 'sun') {
-          const sunPos = store.objectWorldPositions['sun'] ?? ([0, 0, 0] as [number, number, number]);
-          
+          const sunPos = getSunPos(store) ?? ([0, 0, 0] as [number, number, number]);
+
           // Direction from object to sun
           const dx = sunPos[0] - targetPos[0];
           const dy = sunPos[1] - targetPos[1];
           const dz = sunPos[2] - targetPos[2];
           const len = Math.hypot(dx, dy, dz);
-          
+
           if (len > 0) {
             const dirToSun = [dx / len, dy / len, dz / len];
-            
+
             // Calculate camera distance from offset
             const dist = Math.hypot(offsetScene[0], offsetScene[1], offsetScene[2]) || 1;
-            
+
             // Position camera between object and sun, with a slight elevation
             cameraPos = [
               targetPos[0] + dirToSun[0] * dist,
@@ -196,10 +202,13 @@ export const TourOverlay = () => {
       const store = useCosmosStore.getState();
       const livePos = store.objectWorldPositions[stop.locationId];
 
+      const getHasSunPos = (s: typeof store) =>
+        !!(s.objectWorldPositions['sun'] || s.objectWorldPositions['solar-system-marker']);
+
       // For solar system bodies, we need both the object's live position AND the sun's position
       // to correctly calculate sun-facing camera placement
       const needsSunPos = targetObject?.category === 'solarSystem' && targetObject?.id !== 'sun';
-      const hasSunPos = !!store.objectWorldPositions['sun'];
+      const hasSunPos = getHasSunPos(store);
 
       if (livePos && (!needsSunPos || hasSunPos)) {
         // We have all positions we need, compute immediately
@@ -210,7 +219,7 @@ export const TourOverlay = () => {
         const unsubscribe = useCosmosStore.subscribe((state) => {
           if (done) return;
           const objPos = state.objectWorldPositions[stop.locationId];
-          const sunOk = !needsSunPos || !!state.objectWorldPositions['sun'];
+          const sunOk = !needsSunPos || getHasSunPos(state);
           if (objPos && sunOk) {
             done = true;
             unsubscribe();
@@ -225,7 +234,7 @@ export const TourOverlay = () => {
             unsubscribe();
             computeAndSetCamera(undefined);
           }
-        }, 100);
+        }, 800);
       }
     },
     [setTourIndex, setSelectedObject, setTourCameraTarget]
