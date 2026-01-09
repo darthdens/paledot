@@ -156,7 +156,17 @@ export const CosmosExplorer = () => {
 
             {/* Milky Way Galaxy - visible at larger scales */}
             {showMilkyWay && (
-              <MilkyWayGalaxy visualScale={UNIFIED_SCALE} showYouAreHere={true} />
+              <>
+                <MilkyWayGalaxy visualScale={UNIFIED_SCALE} showYouAreHere={true} />
+                {/* Trail showing solar system's orbit around the galaxy */}
+                <OrbitalTrail
+                  objectId="sun"
+                  color="#00ff44"
+                  enabled={showTrails}
+                  maxPoints={300}
+                  opacity={0.5}
+                />
+              </>
             )}
             
             {/* Sun's light - moves with the solar system */}
