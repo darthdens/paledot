@@ -1,5 +1,7 @@
 import { TourStop, UNITS } from '../types';
 
+// Tour stops now use relative camera offsets from the target object
+// The CameraController will compute actual positions based on live world positions
 export const tourStops: TourStop[] = [
   {
     id: 'intro',
@@ -13,7 +15,9 @@ export const tourStops: TourStop[] = [
       fr: 'Bienvenue dans l\'Explorateur du Cosmos. Nous commençons notre voyage sur Terre, notre planète dans l\'immense univers. Embarquons pour un voyage incroyable d\'ici jusqu\'aux confins de l\'univers observable.',
     },
     duration: 8,
-    cameraPosition: [0, 0, 50000],
+    // These are now relative offsets from the object, not absolute positions
+    // [distance multiplier, height multiplier, side offset multiplier] relative to object size
+    cameraPosition: [0, 0, 50000], // Will be computed dynamically
     lookAt: [0, 0, 0],
     scaleLevel: 'earth',
   },
@@ -29,8 +33,8 @@ export const tourStops: TourStop[] = [
       fr: 'En s\'élevant au-dessus de l\'atmosphère terrestre, nous voyons notre Lune - le seul corps céleste que les humains ont visité. Elle est à 384 400 km, une distance que la lumière traverse en seulement 1,3 seconde.',
     },
     duration: 7,
-    cameraPosition: [500000, 100000, 200000],
-    lookAt: [384400, 0, 0],
+    cameraPosition: [0, 0, 20000], // Relative to moon
+    lookAt: [0, 0, 0],
     scaleLevel: 'earth',
   },
   {
@@ -61,41 +65,41 @@ export const tourStops: TourStop[] = [
       fr: 'Au-delà de la ceinture d\'astéroïdes, nous trouvons les géantes gazeuses. Jupiter, la plus grande planète, pourrait contenir toutes les autres. Les anneaux de Saturne s\'étendent sur 282 000 km mais n\'ont que 10 mètres d\'épaisseur!',
     },
     duration: 8,
-    cameraPosition: [5.2 * UNITS.KM_PER_AU, 0.5 * UNITS.KM_PER_AU, 2 * UNITS.KM_PER_AU],
-    lookAt: [5.2 * UNITS.KM_PER_AU, 0, 0],
+    cameraPosition: [0, 200000, 500000], // Relative to Jupiter
+    lookAt: [0, 0, 0],
     scaleLevel: 'solarSystem',
   },
   {
-    id: 'interstellar',
-    locationId: 'proxima-centauri',
+    id: 'saturn-rings',
+    locationId: 'saturn',
     title: {
-      en: 'Into Interstellar Space',
-      fr: 'Vers l\'Espace Interstellaire',
+      en: 'Saturn\'s Magnificent Rings',
+      fr: 'Les Anneaux Magnifiques de Saturne',
     },
     narration: {
-      en: 'Leaving our solar system, we enter interstellar space. Voyager 1, launched in 1977, is now 24 billion km from Earth - yet Proxima Centauri, our nearest star, is still 4.24 light-years away.',
-      fr: 'Quittant notre système solaire, nous entrons dans l\'espace interstellaire. Voyager 1, lancée en 1977, est maintenant à 24 milliards de km de la Terre - pourtant Proxima Centauri, notre étoile la plus proche, est encore à 4,24 années-lumière.',
-    },
-    duration: 8,
-    cameraPosition: [2 * UNITS.KM_PER_LY, 0.5 * UNITS.KM_PER_LY, 2 * UNITS.KM_PER_LY],
-    lookAt: [4.24 * UNITS.KM_PER_LY, 0.5 * UNITS.KM_PER_LY, 0],
-    scaleLevel: 'stellar',
-  },
-  {
-    id: 'stellar-neighborhood',
-    locationId: 'sirius',
-    title: {
-      en: 'Our Stellar Neighborhood',
-      fr: 'Notre Voisinage Stellaire',
-    },
-    narration: {
-      en: 'Within 10 light-years, we find about a dozen star systems. Sirius, the brightest star in our night sky, shines 25 times more luminously than our Sun from 8.6 light-years away.',
-      fr: 'Dans un rayon de 10 années-lumière, nous trouvons une douzaine de systèmes stellaires. Sirius, l\'étoile la plus brillante de notre ciel nocturne, brille 25 fois plus que notre Soleil depuis 8,6 années-lumière.',
+      en: 'Saturn\'s iconic rings are made of billions of ice and rock particles. Despite spanning 282,000 km, they\'re incredibly thin - averaging just 10 meters thick.',
+      fr: 'Les anneaux emblématiques de Saturne sont composés de milliards de particules de glace et de roche. Malgré leurs 282 000 km d\'envergure, ils sont incroyablement fins - en moyenne seulement 10 mètres d\'épaisseur.',
     },
     duration: 7,
-    cameraPosition: [5 * UNITS.KM_PER_LY, 0, 5 * UNITS.KM_PER_LY],
-    lookAt: [8.6 * UNITS.KM_PER_LY, 0, 2 * UNITS.KM_PER_LY],
-    scaleLevel: 'stellar',
+    cameraPosition: [0, 150000, 400000], // Relative to Saturn
+    lookAt: [0, 0, 0],
+    scaleLevel: 'solarSystem',
+  },
+  {
+    id: 'outer-planets',
+    locationId: 'neptune',
+    title: {
+      en: 'The Ice Giants',
+      fr: 'Les Géantes de Glace',
+    },
+    narration: {
+      en: 'Uranus and Neptune are the ice giants, composed mainly of water, ammonia, and methane. Neptune, the farthest planet, takes 165 years to orbit the Sun once.',
+      fr: 'Uranus et Neptune sont les géantes de glace, composées principalement d\'eau, d\'ammoniac et de méthane. Neptune, la planète la plus éloignée, met 165 ans pour orbiter une fois autour du Soleil.',
+    },
+    duration: 7,
+    cameraPosition: [0, 100000, 250000], // Relative to Neptune
+    lookAt: [0, 0, 0],
+    scaleLevel: 'solarSystem',
   },
   {
     id: 'milky-way',
@@ -108,57 +112,41 @@ export const tourStops: TourStop[] = [
       en: 'Rising above the galactic plane, our Milky Way reveals its spiral structure. Our Sun is located on the Orion Arm, about 26,000 light-years from the supermassive black hole at the center.',
       fr: 'En s\'élevant au-dessus du plan galactique, notre Voie Lactée révèle sa structure spirale. Notre Soleil est situé sur le Bras d\'Orion, à environ 26 000 années-lumière du trou noir supermassif au centre.',
     },
-    duration: 8,
+    duration: 10,
     cameraPosition: [0, 50000 * UNITS.KM_PER_LY, 0],
     lookAt: [26000 * UNITS.KM_PER_LY, 0, 0],
     scaleLevel: 'milkyWay',
   },
   {
-    id: 'local-group',
-    locationId: 'andromeda',
+    id: 'orion-nebula',
+    locationId: 'orion-nebula',
     title: {
-      en: 'The Local Group',
-      fr: 'Le Groupe Local',
+      en: 'The Orion Nebula',
+      fr: 'La Nébuleuse d\'Orion',
     },
     narration: {
-      en: 'The Milky Way is just one of over 80 galaxies in our Local Group. Andromeda, our nearest major neighbor, is approaching us at 110 km/s. In 4.5 billion years, our galaxies will merge.',
-      fr: 'La Voie Lactée n\'est qu\'une des plus de 80 galaxies de notre Groupe Local. Andromède, notre plus proche voisine majeure, s\'approche de nous à 110 km/s. Dans 4,5 milliards d\'années, nos galaxies fusionneront.',
+      en: 'The Orion Nebula is one of the brightest nebulae visible to the naked eye. Located 1,344 light-years away, it\'s a stellar nursery where new stars are being born.',
+      fr: 'La Nébuleuse d\'Orion est l\'une des nébuleuses les plus brillantes visibles à l\'œil nu. Située à 1 344 années-lumière, c\'est une pouponnière stellaire où de nouvelles étoiles naissent.',
     },
     duration: 8,
-    cameraPosition: [1.5e6 * UNITS.KM_PER_LY, 0.5e6 * UNITS.KM_PER_LY, 1e6 * UNITS.KM_PER_LY],
-    lookAt: [2.537e6 * UNITS.KM_PER_LY, 0, 0],
-    scaleLevel: 'localGroup',
+    cameraPosition: [0, 50 * UNITS.KM_PER_LY, 100 * UNITS.KM_PER_LY],
+    lookAt: [0, 0, 0],
+    scaleLevel: 'stellar',
   },
   {
-    id: 'cosmic-web',
-    locationId: 'virgo-cluster',
+    id: 'conclusion',
+    locationId: 'earth',
     title: {
-      en: 'The Cosmic Web',
-      fr: 'La Toile Cosmique',
+      en: 'Home Again',
+      fr: 'De Retour à la Maison',
     },
     narration: {
-      en: 'Zooming out further, galaxies form a cosmic web of filaments and voids. The Virgo Cluster contains 2,000 galaxies and is the gravitational center of our Laniakea Supercluster.',
-      fr: 'En zoomant encore, les galaxies forment une toile cosmique de filaments et de vides. L\'Amas de la Vierge contient 2 000 galaxies et est le centre gravitationnel de notre Superamas Laniakea.',
-    },
-    duration: 8,
-    cameraPosition: [30e6 * UNITS.KM_PER_LY, 20e6 * UNITS.KM_PER_LY, 30e6 * UNITS.KM_PER_LY],
-    lookAt: [54e6 * UNITS.KM_PER_LY, 0, 20e6 * UNITS.KM_PER_LY],
-    scaleLevel: 'universe',
-  },
-  {
-    id: 'edge-of-universe',
-    locationId: 'observable-universe-edge',
-    title: {
-      en: 'The Edge of Everything',
-      fr: 'La Limite de Tout',
-    },
-    narration: {
-      en: 'We\'ve reached the edge of the observable universe - 46.5 billion light-years away. Beyond this boundary lies the Cosmic Microwave Background, light from 380,000 years after the Big Bang. What lies beyond? The universe continues, but its light hasn\'t reached us yet.',
-      fr: 'Nous avons atteint la limite de l\'univers observable - à 46,5 milliards d\'années-lumière. Au-delà de cette frontière se trouve le Fond Diffus Cosmologique, lumière de 380 000 ans après le Big Bang. Qu\'y a-t-il au-delà? L\'univers continue, mais sa lumière ne nous a pas encore atteints.',
+      en: 'Our journey through the cosmos comes to an end, returning to our pale blue dot. In the vastness of space, Earth remains our only home - a precious oasis of life in the cosmic desert.',
+      fr: 'Notre voyage à travers le cosmos touche à sa fin, de retour sur notre point bleu pâle. Dans l\'immensité de l\'espace, la Terre reste notre seule maison - une précieuse oasis de vie dans le désert cosmique.',
     },
     duration: 10,
-    cameraPosition: [20e9 * UNITS.KM_PER_LY, 10e9 * UNITS.KM_PER_LY, 20e9 * UNITS.KM_PER_LY],
-    lookAt: [46.5e9 * UNITS.KM_PER_LY, 0, 0],
-    scaleLevel: 'universe',
+    cameraPosition: [0, 0, 50000],
+    lookAt: [0, 0, 0],
+    scaleLevel: 'earth',
   },
 ];

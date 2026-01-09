@@ -36,6 +36,7 @@ interface CosmosStore {
   tourSpeed: number;
   isPaused: boolean;
   tourCameraTarget: TourCameraTarget | null;
+  preTourTimeSpeed: number | null; // Store time speed before tour started
 
   // UI
   showControlHints: boolean;
@@ -122,6 +123,7 @@ export const useCosmosStore = create<CosmosStore>()(
       tourSpeed: 1,
       isPaused: false,
       tourCameraTarget: null,
+      preTourTimeSpeed: null,
       
       showControlHints: true,
       showQuickJump: false,
@@ -169,9 +171,28 @@ export const useCosmosStore = create<CosmosStore>()(
 
       toggleFollowing: () => set((state) => ({ isFollowing: !state.isFollowing })),
       
-      startTour: () => set({ isTouring: true, tourIndex: 0, isPaused: false, tourCameraTarget: null }),
+      startTour: () => {
+        const currentSpeed = get().timeSpeed;
+        set({
+          isTouring: true,
+          tourIndex: 0,
+          isPaused: false,
+          tourCameraTarget: null,
+          preTourTimeSpeed: currentSpeed,
+          timeSpeed: 0, // Pause time during tour for easier navigation
+        });
+      },
       
-      stopTour: () => set({ isTouring: false, tourIndex: 0, tourCameraTarget: null }),
+      stopTour: () => {
+        const preTourSpeed = get().preTourTimeSpeed;
+        set({
+          isTouring: false,
+          tourIndex: 0,
+          tourCameraTarget: null,
+          timeSpeed: preTourSpeed ?? 1,
+          preTourTimeSpeed: null,
+        });
+      },
       
       setTourIndex: (index) => set({ tourIndex: index }),
       

@@ -49,18 +49,42 @@ export const CameraController = () => {
     startPosition.current.copy(camera.position);
     startTarget.current.copy(orbitControls.target);
 
-    // Tour positions are in real km - scale them to scene units
-    endPosition.current.set(
-      tourCameraTarget.position[0] * UNIFIED_SCALE,
-      tourCameraTarget.position[1] * UNIFIED_SCALE,
-      tourCameraTarget.position[2] * UNIFIED_SCALE
+    // Check if the position values are in scene units (small) or km (large)
+    // If values are already small (< 1e6), they're in scene units from live positions
+    // If values are large, they're in km and need scaling
+    const positionMagnitude = Math.sqrt(
+      tourCameraTarget.position[0] ** 2 +
+      tourCameraTarget.position[1] ** 2 +
+      tourCameraTarget.position[2] ** 2
     );
-
-    endTarget.current.set(
-      tourCameraTarget.lookAt[0] * UNIFIED_SCALE,
-      tourCameraTarget.lookAt[1] * UNIFIED_SCALE,
-      tourCameraTarget.lookAt[2] * UNIFIED_SCALE
-    );
+    
+    const isAlreadyScaled = positionMagnitude < 1e9; // Live positions are already in scene units
+    
+    if (isAlreadyScaled) {
+      // Positions are already in scene units (from live world positions)
+      endPosition.current.set(
+        tourCameraTarget.position[0],
+        tourCameraTarget.position[1],
+        tourCameraTarget.position[2]
+      );
+      endTarget.current.set(
+        tourCameraTarget.lookAt[0],
+        tourCameraTarget.lookAt[1],
+        tourCameraTarget.lookAt[2]
+      );
+    } else {
+      // Tour positions are in real km - scale them to scene units
+      endPosition.current.set(
+        tourCameraTarget.position[0] * UNIFIED_SCALE,
+        tourCameraTarget.position[1] * UNIFIED_SCALE,
+        tourCameraTarget.position[2] * UNIFIED_SCALE
+      );
+      endTarget.current.set(
+        tourCameraTarget.lookAt[0] * UNIFIED_SCALE,
+        tourCameraTarget.lookAt[1] * UNIFIED_SCALE,
+        tourCameraTarget.lookAt[2] * UNIFIED_SCALE
+      );
+    }
 
     // Initialize follow smoothing
     smoothedTarget.current.copy(orbitControls.target);
