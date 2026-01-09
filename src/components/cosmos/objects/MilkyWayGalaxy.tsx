@@ -74,9 +74,10 @@ const createGalaxyGlowTexture = () => {
   return tex;
 };
 
-// Sun's orbital period around galactic center: ~225-250 million years
-// We'll speed it up visually but keep it proportional - one visual orbit takes ~600 seconds
-const SUN_GALACTIC_ORBIT_PERIOD = 600;
+// Sun's orbital period around galactic center.
+// We keep it EXACTLY the same as the galaxy rotation speed so we move like the other stars.
+// One full visual orbit takes ~1200 seconds.
+const SUN_GALACTIC_ORBIT_PERIOD = 1200;
 
 export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true, showSunOrbit = false, showSunTrail = false }: MilkyWayGalaxyProps) => {
   const groupRef = useRef<THREE.Group>(null);
@@ -91,11 +92,9 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true, showSunOrbi
   
   const gs = UNITS.KM_PER_LY * visualScale;
   
-  const galaxyOffset = useMemo(() => new THREE.Vector3(
-    -Math.cos(MILKY_WAY.sunAngle) * MILKY_WAY.sunDistance * gs,
-    0,
-    -Math.sin(MILKY_WAY.sunAngle) * MILKY_WAY.sunDistance * gs
-  ), [gs]);
+  // Keep the galaxy centered at the scene origin.
+  // The solar system will orbit around the galactic center just like the other stars.
+  const galaxyOffset = useMemo(() => new THREE.Vector3(0, 0, 0), []);
   
   const dotTexture = useMemo(() => createDotTexture(), []);
   const glowTexture = useMemo(() => createGalaxyGlowTexture(), []);
