@@ -10,13 +10,14 @@ interface GalaxyRotatorProps {
 
 /**
  * Rotates its children in-place (around the scene origin) when zoomed out to galaxy scale.
- * This keeps the solar system + galaxy + marker moving together without the camera target drifting.
+ * Uses the global timeSpeed so the galaxy rotation syncs with planetary orbits.
  */
 export const GalaxyRotator = ({ children }: GalaxyRotatorProps) => {
   const rotatorRef = useRef<THREE.Group>(null);
   const currentRotation = useRef(0);
 
   const currentScale = useCosmosStore((state) => state.currentScale);
+  const timeSpeed = useCosmosStore((state) => state.timeSpeed);
 
   // Only rotate when at galaxy scale or larger
   const shouldRotate =
@@ -29,8 +30,9 @@ export const GalaxyRotator = ({ children }: GalaxyRotatorProps) => {
     if (!rotatorRef.current) return;
     if (!shouldRotate) return;
 
-    // Slow rotation - accumulate based on delta time
-    currentRotation.current += delta * 0.025;
+    // Base rotation speed * timeSpeed multiplier
+    // 0.025 rad/s base = one full rotation every ~4 minutes at 1x speed
+    currentRotation.current += delta * 0.025 * timeSpeed;
     rotatorRef.current.rotation.y = currentRotation.current;
   });
 
