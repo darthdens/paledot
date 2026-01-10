@@ -341,7 +341,8 @@ export const TexturedPlanet = ({
   const ringMaterialRef = useRef<THREE.ShaderMaterial>(null);
   const worldPos = useRef(new THREE.Vector3());
   const parentPos = useRef(new THREE.Vector3());
-  const lastWorldPosUpdate = useRef(0);
+  // Throttle world-position writes using real frame time so it still works when timeSpeed is 0 (tour pauses time).
+  const worldPosUpdateAccumulator = useRef(0);
   const rotationAngle = useRef(0);
   const simTime = useRef(0);
   const simTimeInitialized = useRef(false);
@@ -523,14 +524,17 @@ export const TexturedPlanet = ({
       ringMaterialRef.current.uniforms.planetRadius.value = planetSize;
     }
 
-    // Keep a live world-position for camera targeting (planets/moons move)
+    // Keep a live world-position for camera targeting (planets/moons move).
+    // Use frame delta (not simulated time) so positions still update when timeSpeed is 0 during the tour.
+    worldPosUpdateAccumulator.current += delta;
+
     const shouldUpdateNow =
       object.id === selectedObjectId ||
       (selectedParentId && object.id === selectedParentId) ||
-      time - lastWorldPosUpdate.current > 0.03;
+      worldPosUpdateAccumulator.current > 0.05;
 
     if (shouldUpdateNow) {
-      lastWorldPosUpdate.current = time;
+      worldPosUpdateAccumulator.current = 0;
       setObjectWorldPosition(object.id, [worldPos.current.x, worldPos.current.y, worldPos.current.z]);
     }
 
