@@ -995,25 +995,26 @@ export const TexturedPlanet = ({
                     
                     // === ENHANCED CITY LIGHTS from NASA night texture ===
                     // The NASA Earth at Night texture already has accurate city positions
-                    // Boost brightness and add characteristic warm glow of city lights
                     float cityBrightness = dot(nightColor, vec3(0.299, 0.587, 0.114));
 
-                    // Emphasize actual light pixels and boost with a soft threshold
-                    float cityMask = smoothstep(0.04, 0.18, cityBrightness);
-                    float cityBoost = pow(max(cityBrightness, 0.0), 0.65);
-
-                    // City lights have warm sodium-vapor orange and LED white mix
-                    vec3 cityWarmth = vec3(1.0, 0.82, 0.55);
-                    vec3 cityLights = nightColor * (10.0 * cityBoost) * cityWarmth;
-
-                    // Add glow around bright city areas
-                    float bloomIntensity = pow(cityBrightness, 1.15) * 8.0;
-                    cityLights += vec3(1.0, 0.9, 0.7) * bloomIntensity;
+                    // Boost all city light pixels significantly
+                    float cityMask = smoothstep(0.02, 0.12, cityBrightness);
+                    
+                    // Use gamma correction to bring out dimmer lights
+                    vec3 correctedNight = pow(nightColor, vec3(0.55));
+                    
+                    // Strong brightness multiplier
+                    vec3 cityWarmth = vec3(1.0, 0.85, 0.6);
+                    vec3 cityLights = correctedNight * 18.0 * cityWarmth;
+                    
+                    // Extra bloom/glow for bright metropolitan areas
+                    float bloomIntensity = pow(cityBrightness, 0.8) * 12.0;
+                    cityLights += vec3(1.0, 0.92, 0.75) * bloomIntensity;
 
                     // Only show city lights on night side with smooth transition
                     float nightSide = 1.0 - dayNightBlend;
                     // Fade in city lights as sun sets
-                    float cityFade = smoothstep(0.25, -0.08, sunFacing);
+                    float cityFade = smoothstep(0.2, -0.1, sunFacing);
                     cityLights *= cityFade * cityMask;
                     
                     // === AURORA BOREALIS & AUSTRALIS ===
@@ -1422,6 +1423,74 @@ export const TexturedPlanet = ({
                     litCloud += sunsetOrange * terminatorZone * 0.15;
                     
                     gl_FragColor = vec4(litCloud, cloudCoverage * 0.6 * max(NdotL, terminatorZone * 0.3) * shadow);
+                  }
+                `}
+              />
+            </mesh>
+          )}
+
+          {/* Earth's Blue Limb - Rayleigh scattering rim effect */}
+          {object.id === 'earth' && (
+            <mesh>
+              <sphereGeometry args={[planetSize * 1.012, 64, 64]} />
+              <shaderMaterial
+                transparent
+                depthWrite={false}
+                side={THREE.FrontSide}
+                uniforms={{
+                  time: { value: 0 },
+                }}
+                vertexShader={`
+                  varying vec3 vWorldNormal;
+                  varying vec3 vWorldPosition;
+                  varying vec3 vViewPosition;
+                  
+                  void main() {
+                    vWorldNormal = normalize((modelMatrix * vec4(normal, 0.0)).xyz);
+                    vec4 worldPos = modelMatrix * vec4(position, 1.0);
+                    vWorldPosition = worldPos.xyz;
+                    vViewPosition = (modelViewMatrix * vec4(position, 1.0)).xyz;
+                    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+                  }
+                `}
+                fragmentShader={`
+                  varying vec3 vWorldNormal;
+                  varying vec3 vWorldPosition;
+                  varying vec3 vViewPosition;
+                  
+                  void main() {
+                    vec3 worldNormal = normalize(vWorldNormal);
+                    vec3 viewDir = normalize(cameraPosition - vWorldPosition);
+                    vec3 sunDir = normalize(-vWorldPosition);
+                    
+                    // Fresnel effect - stronger at grazing angles (limb)
+                    float fresnel = 1.0 - abs(dot(worldNormal, viewDir));
+                    
+                    // Sharp limb effect - only visible at the very edge
+                    float limb = pow(fresnel, 4.0);
+                    
+                    // Rayleigh scattering colors - blue dominant, slight cyan
+                    vec3 rayleighBlue = vec3(0.4, 0.65, 1.0);
+                    vec3 deepBlue = vec3(0.2, 0.4, 0.9);
+                    
+                    // Mix colors based on limb intensity
+                    vec3 limbColor = mix(deepBlue, rayleighBlue, limb);
+                    
+                    // Sun-facing enhancement
+                    float sunFacing = max(dot(worldNormal, sunDir), 0.0);
+                    float dayMask = smoothstep(-0.1, 0.3, sunFacing);
+                    
+                    // Terminator enhancement - limb is most visible at terminator
+                    float terminatorBoost = smoothstep(-0.2, 0.0, sunFacing) * smoothstep(0.4, 0.1, sunFacing);
+                    
+                    // Final intensity
+                    float intensity = limb * (dayMask * 0.6 + terminatorBoost * 0.8);
+                    
+                    // Add slight glow even on night side (earthshine from moon perspective)
+                    float nightGlow = (1.0 - dayMask) * limb * 0.15;
+                    intensity += nightGlow;
+                    
+                    gl_FragColor = vec4(limbColor, intensity * 0.7);
                   }
                 `}
               />
