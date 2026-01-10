@@ -265,51 +265,55 @@ export const SombreroGalaxy = ({ visualScale }: SombreroGalaxyProps) => {
   }, [gs]);
 
   // Dark dust lane - the iconic feature that creates the "brim" silhouette
-  // This is what makes the Sombrero look like a hat
+  // This is what makes the Sombrero look like a hat - enhanced for prominence
   const dustLaneGeo = useMemo(() => {
-    const dustCount = 80000;
+    const dustCount = 180000; // Increased density for darker appearance
     const positions = new Float32Array(dustCount * 3);
     const colors = new Float32Array(dustCount * 3);
     const color = new THREE.Color();
     const maxRadius = SOMBRERO.diskRadius * gs;
-    const laneY = -SOMBRERO.dustLaneThickness * gs * 0.5; // Slightly below center
-    const laneThickness = SOMBRERO.dustLaneThickness * gs * 0.8;
+    const laneY = -SOMBRERO.dustLaneThickness * gs * 0.3; // Position in front of bulge
+    const laneThickness = SOMBRERO.dustLaneThickness * gs * 1.2; // Thicker lane
 
     for (let i = 0; i < dustCount; i++) {
       const i3 = i * 3;
 
-      // Dust lane spans most of the disk
-      const innerRadius = maxRadius * 0.15;
-      const t = Math.pow(Math.random(), 0.7);
-      const radius = innerRadius + t * (maxRadius * 0.95 - innerRadius);
+      // Dust lane spans most of the disk with higher density
+      const innerRadius = maxRadius * 0.08; // Start closer to center
+      const t = Math.pow(Math.random(), 0.5); // More even distribution
+      const radius = innerRadius + t * (maxRadius * 1.0 - innerRadius);
       const rt = radius / maxRadius;
 
       const angle = Math.random() * Math.PI * 2;
 
       positions[i3] = Math.cos(angle) * radius;
       
-      // Dust concentrated in a thin lane
-      const yOffset = laneY + (Math.random() * 2 - 1) * laneThickness * 0.5;
-      // Add some clumpiness
-      const clump = Math.sin(angle * 5 + radius * 0.0001) * laneThickness * 0.3;
-      positions[i3 + 1] = yOffset + clump;
+      // Dust concentrated in a defined lane with clumpy structure
+      const baseY = laneY;
+      const ySpread = laneThickness * (0.3 + rt * 0.4);
+      const yOffset = baseY + (Math.random() * 2 - 1) * ySpread;
+      // Add clumpiness for realistic dust clouds
+      const clump = Math.sin(angle * 7 + radius * 0.00015) * laneThickness * 0.25;
+      const clump2 = Math.cos(angle * 11 - radius * 0.0001) * laneThickness * 0.15;
+      positions[i3 + 1] = yOffset + clump + clump2;
       
       positions[i3 + 2] = Math.sin(angle) * radius;
 
-      // Dust colors: dark brown to reddish-brown
+      // Dust colors: very dark brown/black for true silhouette
       const rand = Math.random();
-      if (rand < 0.4) {
-        // Dark brown
-        color.setHSL(0.05 + Math.random() * 0.03, 0.6 + Math.random() * 0.2, 0.15 + Math.random() * 0.08);
-      } else if (rand < 0.7) {
-        // Reddish brown
-        color.setHSL(0.03 + Math.random() * 0.04, 0.7 + Math.random() * 0.2, 0.2 + Math.random() * 0.1);
+      if (rand < 0.5) {
+        // Very dark brown - nearly black
+        color.setHSL(0.04 + Math.random() * 0.02, 0.7 + Math.random() * 0.2, 0.05 + Math.random() * 0.04);
+      } else if (rand < 0.75) {
+        // Dark reddish-brown
+        color.setHSL(0.02 + Math.random() * 0.03, 0.8 + Math.random() * 0.15, 0.08 + Math.random() * 0.05);
       } else if (rand < 0.9) {
-        // Orange-brown (illuminated dust)
-        color.setHSL(0.06 + Math.random() * 0.04, 0.8 + Math.random() * 0.15, 0.28 + Math.random() * 0.1 * rt);
+        // Slightly illuminated edge dust (orange-brown)
+        const edgeFactor = Math.abs(Math.sin(angle * 2)) * 0.5;
+        color.setHSL(0.05 + Math.random() * 0.03, 0.85 + Math.random() * 0.1, 0.12 + edgeFactor * 0.08);
       } else {
-        // Darker clumps
-        color.setHSL(0.04 + Math.random() * 0.02, 0.5 + Math.random() * 0.2, 0.1 + Math.random() * 0.05);
+        // Pure dark clumps
+        color.setHSL(0.03 + Math.random() * 0.02, 0.6 + Math.random() * 0.2, 0.03 + Math.random() * 0.03);
       }
 
       colors[i3] = color.r;
@@ -474,16 +478,16 @@ export const SombreroGalaxy = ({ visualScale }: SombreroGalaxyProps) => {
           />
         </points>
 
-        {/* Dark dust lane - the iconic feature */}
-        <points frustumCulled={false} renderOrder={4}>
+        {/* Dark dust lane - the iconic feature - rendered with multiply blending for dark silhouette */}
+        <points frustumCulled={false} renderOrder={6}>
           <bufferGeometry attach="geometry" {...dustLaneGeo} />
           <pointsMaterial
-            size={gs * 35}
+            size={gs * 55}
             map={dustTexture}
             vertexColors
             transparent
-            opacity={0.85}
-            blending={THREE.NormalBlending}
+            opacity={0.95}
+            blending={THREE.MultiplyBlending}
             depthWrite={false}
             sizeAttenuation
           />
