@@ -916,7 +916,7 @@ export const TexturedPlanet = ({
                     surfaceColor = mix(baseColor, secondaryColor, swirl * 0.4);
                     surfaceColor = mix(surfaceColor, tertiaryColor, bands * 0.2);
                   }
-                  // === EARTH (4) - NASA texture map with aurora and bump mapping ===
+                  // === EARTH (4) - NASA texture map with aurora, bump mapping, and ocean specular ===
                   else if (surfaceType > 3.5 && surfaceType < 4.5) {
                     // Sample NASA Earth day texture
                     vec3 dayColor = texture2D(earthDayMap, vUv).rgb;
@@ -924,7 +924,6 @@ export const TexturedPlanet = ({
                     vec3 nightColor = texture2D(earthNightMap, vUv).rgb;
                     
                     // === PROCEDURAL BUMP MAPPING ===
-                    // Calculate height from texture luminance for relief effect
                     float texelSize = 0.002;
                     float heightC = dot(dayColor, vec3(0.299, 0.587, 0.114));
                     float heightL = dot(texture2D(earthDayMap, vUv + vec2(-texelSize, 0.0)).rgb, vec3(0.299, 0.587, 0.114));
@@ -932,7 +931,6 @@ export const TexturedPlanet = ({
                     float heightU = dot(texture2D(earthDayMap, vUv + vec2(0.0, texelSize)).rgb, vec3(0.299, 0.587, 0.114));
                     float heightD = dot(texture2D(earthDayMap, vUv + vec2(0.0, -texelSize)).rgb, vec3(0.299, 0.587, 0.114));
                     
-                    // Calculate normal perturbation from height differences
                     float bumpStrength = 1.5;
                     vec3 bumpNormal = normalize(vec3(
                       (heightL - heightR) * bumpStrength,
@@ -940,7 +938,6 @@ export const TexturedPlanet = ({
                       1.0
                     ));
                     
-                    // Perturb the world normal with bump
                     vec3 worldNormal = normalize(vWorldNormal);
                     vec3 tangent = normalize(cross(worldNormal, vec3(0.0, 1.0, 0.0)));
                     vec3 bitangent = normalize(cross(worldNormal, tangent));
@@ -953,21 +950,51 @@ export const TexturedPlanet = ({
                     vec3 sunDir = normalize(-vWorldPosition);
                     float sunFacing = dot(perturbedNormal, sunDir);
                     
-                    // Blend between day and night based on sun position
+                    // Day/night blend
                     float dayNightBlend = smoothstep(-0.1, 0.2, sunFacing);
-                    
-                    // City lights are boosted on the night side
-                    vec3 cityLights = nightColor * 2.5;
-                    
-                    // === AURORA BOREALIS EFFECT ===
-                    float latitude = abs(vUv.y - 0.5) * 2.0;
-                    // Aurora appears in auroral zones (~60-75 degrees latitude)
-                    float auroraZone = smoothstep(0.55, 0.65, latitude) * smoothstep(0.85, 0.72, latitude);
-                    
-                    // Only show aurora on night side
                     float nightSide = 1.0 - dayNightBlend;
                     
-                    // Animated aurora curtains using noise
+                    // === DETECT OCEAN vs LAND ===
+                    // Oceans are darker blue, land is brighter/greener
+                    float blueChannel = dayColor.b;
+                    float greenChannel = dayColor.g;
+                    float redChannel = dayColor.r;
+                    // Ocean detection: high blue relative to red/green, darker overall
+                    float oceanMask = smoothstep(0.1, 0.25, blueChannel - redChannel * 0.8) * 
+                                      smoothstep(0.05, 0.15, blueChannel - greenChannel * 0.6);
+                    // Exclude ice (very bright areas)
+                    float brightness = (redChannel + greenChannel + blueChannel) / 3.0;
+                    oceanMask *= 1.0 - smoothstep(0.6, 0.8, brightness);
+                    
+                    // === OCEAN SPECULAR HIGHLIGHTS ===
+                    vec3 viewDir = normalize(cameraPosition - vWorldPosition);
+                    vec3 reflectDir = reflect(-sunDir, perturbedNormal);
+                    float specAngle = max(dot(viewDir, reflectDir), 0.0);
+                    // Sharp specular for water
+                    float oceanSpecular = pow(specAngle, 128.0) * oceanMask * 2.0;
+                    // Broader glint for larger sun reflection
+                    float oceanGlint = pow(specAngle, 32.0) * oceanMask * 0.4;
+                    vec3 specularColor = vec3(1.0, 0.98, 0.95) * (oceanSpecular + oceanGlint);
+                    
+                    // === ENHANCED CITY LIGHTS ===
+                    // Boost city lights and make them warmer/more visible
+                    float cityBrightness = dot(nightColor, vec3(0.299, 0.587, 0.114));
+                    vec3 cityWarmth = vec3(1.0, 0.85, 0.6); // Warm orange-yellow glow
+                    vec3 cityLights = nightColor * 3.0 * cityWarmth;
+                    // Add bloom effect for brighter cities
+                    cityLights += vec3(1.0, 0.9, 0.7) * pow(cityBrightness, 2.0) * 2.0;
+                    // Only show on actual night side
+                    cityLights *= nightSide;
+                    
+                    // === AURORA BOREALIS (Northern Lights) ===
+                    float latitudeNorth = (vUv.y - 0.5) * 2.0; // -1 to 1, positive is north
+                    float latitudeSouth = -latitudeNorth; // Inverted for south
+                    
+                    // Northern aurora zone (~60-75 degrees north)
+                    float auroraNorthZone = smoothstep(0.55, 0.68, latitudeNorth) * smoothstep(0.88, 0.72, latitudeNorth);
+                    // Southern aurora zone (~60-75 degrees south) 
+                    float auroraSouthZone = smoothstep(0.55, 0.68, latitudeSouth) * smoothstep(0.88, 0.72, latitudeSouth);
+                    
                     float auroraTime = time * 0.3;
                     float lon = vUv.x * 6.28318;
                     
@@ -979,29 +1006,48 @@ export const TexturedPlanet = ({
                     float auroraPattern = curtain1 * 0.4 + curtain2 * 0.35 + curtain3 * 0.25;
                     auroraPattern = pow(auroraPattern, 1.5);
                     
-                    // Flickering intensity
-                    float flicker = 0.7 + 0.3 * sin(auroraTime * 4.0 + lon * 2.0);
+                    // Slightly different pattern for south (phase offset)
+                    float curtainS1 = sin(lon * 8.0 - auroraTime * 1.1 + sin(lon * 3.0 - auroraTime * 0.9) * 2.0) * 0.5 + 0.5;
+                    float curtainS2 = sin(lon * 11.0 + auroraTime * 0.7 + sin(lon * 4.0 + auroraTime * 0.4) * 1.5) * 0.5 + 0.5;
+                    float curtainS3 = sin(lon * 7.0 - auroraTime * 0.6 + cos(lon * 5.0 - auroraTime * 0.2) * 1.8) * 0.5 + 0.5;
+                    float auroraSouthPattern = curtainS1 * 0.4 + curtainS2 * 0.35 + curtainS3 * 0.25;
+                    auroraSouthPattern = pow(auroraSouthPattern, 1.5);
                     
-                    // Aurora colors - green dominant with hints of purple and pink
+                    // Flickering
+                    float flickerN = 0.7 + 0.3 * sin(auroraTime * 4.0 + lon * 2.0);
+                    float flickerS = 0.7 + 0.3 * sin(auroraTime * 3.8 - lon * 2.2);
+                    
+                    // Aurora colors
                     vec3 auroraGreen = vec3(0.2, 1.0, 0.4);
                     vec3 auroraPurple = vec3(0.6, 0.2, 0.9);
                     vec3 auroraPink = vec3(1.0, 0.3, 0.5);
+                    vec3 auroraBlue = vec3(0.3, 0.5, 1.0);
                     
-                    // Color varies with intensity and position
-                    float colorMix = sin(lon * 4.0 + auroraTime * 0.7) * 0.5 + 0.5;
-                    vec3 auroraColor = mix(auroraGreen, auroraPurple, colorMix * 0.4);
-                    auroraColor = mix(auroraColor, auroraPink, pow(auroraPattern, 2.0) * 0.3);
+                    // Northern aurora colors (more green/purple)
+                    float colorMixN = sin(lon * 4.0 + auroraTime * 0.7) * 0.5 + 0.5;
+                    vec3 auroraNorthColor = mix(auroraGreen, auroraPurple, colorMixN * 0.4);
+                    auroraNorthColor = mix(auroraNorthColor, auroraPink, pow(auroraPattern, 2.0) * 0.3);
                     
-                    // Final aurora intensity
-                    float auroraIntensity = auroraZone * auroraPattern * flicker * nightSide * 0.8;
-                    vec3 aurora = auroraColor * auroraIntensity;
+                    // Southern aurora colors (slightly more blue/pink variation)
+                    float colorMixS = sin(lon * 3.5 - auroraTime * 0.6) * 0.5 + 0.5;
+                    vec3 auroraSouthColor = mix(auroraGreen, auroraBlue, colorMixS * 0.3);
+                    auroraSouthColor = mix(auroraSouthColor, auroraPink, pow(auroraSouthPattern, 2.0) * 0.35);
+                    
+                    // Final aurora intensities
+                    float auroraNorthIntensity = auroraNorthZone * auroraPattern * flickerN * nightSide * 0.9;
+                    float auroraSouthIntensity = auroraSouthZone * auroraSouthPattern * flickerS * nightSide * 0.85;
+                    
+                    vec3 aurora = auroraNorthColor * auroraNorthIntensity + auroraSouthColor * auroraSouthIntensity;
                     
                     // Apply bump-enhanced lighting to day texture
                     float bumpLighting = max(0.0, dot(perturbedNormal, sunDir));
                     dayColor *= 0.85 + bumpLighting * 0.3;
                     
-                    // Final blend with aurora
-                    surfaceColor = mix(cityLights + aurora, dayColor, dayNightBlend);
+                    // Add ocean specular to day side only
+                    vec3 dayWithSpecular = dayColor + specularColor * dayNightBlend;
+                    
+                    // Final blend: night side shows city lights + aurora, day side shows terrain + specular
+                    surfaceColor = mix(cityLights + aurora, dayWithSpecular, dayNightBlend);
                   }
                   // === MOON (5) - NASA texture map with bump mapping ===
                   else if (surfaceType > 4.5 && surfaceType < 5.5) {
