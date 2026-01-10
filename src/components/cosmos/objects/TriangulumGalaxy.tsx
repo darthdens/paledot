@@ -14,12 +14,14 @@ interface TriangulumGalaxyProps {
 // Distance: 2.73 million light-years from Milky Way (slightly farther than Andromeda)
 // Diameter: ~60,000 light-years (about half the size of Milky Way)
 // Third-largest galaxy in the Local Group
-// Distinctive features: blue core, prominent pink HII regions, loose spiral arms
+// Distinctive features: blue core, prominent pink HII regions, TWO clear spiral arms
+// Position: Forms a rough triangle with Milky Way and Andromeda
+// Real sky position: RA ~1h 33m, Dec ~30° (near Andromeda but offset)
 const TRIANGULUM = {
   diskRadius: 30000, // Half of 60,000 ly diameter
   bulgeRadius: 4000, // Smaller, less prominent bulge than Andromeda
-  branches: 2, // Two main spiral arms (loose structure)
-  spinTurns: 1.2, // Looser spiral than Milky Way
+  branches: 2, // Two main spiral arms (clearly visible)
+  spinTurns: 1.6, // More defined spiral than before
   inclination: (55 * Math.PI) / 180, // ~55° inclination (more face-on than Andromeda)
   distanceFromMilkyWay: 2.73e6, // 2.73 million light-years
 };
@@ -89,12 +91,14 @@ export const TriangulumGalaxy = ({ visualScale }: TriangulumGalaxyProps) => {
 
   const gs = UNITS.KM_PER_LY * visualScale;
   
-  // Position: Triangulum is in a different direction from Andromeda
-  // It forms a rough triangle with the Milky Way and Andromeda
+  // Position: Triangulum forms a triangle with Milky Way (origin) and Andromeda
+  // Andromeda is at: [2.537e6 * 0.7, 2.537e6 * 0.15, 2.537e6 * 0.7] (northeast-ish)
+  // Triangulum should be offset to form the triangle - it's actually close to Andromeda in the sky
+  // but at a different angle from Earth's perspective
   const triangulumPosition = useMemo<[number, number, number]>(() => [
-    -TRIANGULUM.distanceFromMilkyWay * gs * 0.5,  // Opposite X from Andromeda
-    TRIANGULUM.distanceFromMilkyWay * gs * 0.1,   // Slight Y offset
-    TRIANGULUM.distanceFromMilkyWay * gs * 0.85,  // Different Z angle
+    TRIANGULUM.distanceFromMilkyWay * gs * 0.3,   // Slightly positive X (between MW and Andromeda direction)
+    TRIANGULUM.distanceFromMilkyWay * gs * 0.05,  // Slight Y offset
+    TRIANGULUM.distanceFromMilkyWay * gs * 0.95,  // More along Z axis (different angle)
   ], [gs]);
 
   const triangulumObject = useMemo(() => getObjectById('triangulum'), []);
@@ -135,13 +139,13 @@ export const TriangulumGalaxy = ({ visualScale }: TriangulumGalaxyProps) => {
       const branchAngle = (branchIndex / branches) * Math.PI * 2;
       const spinAngle = rt * spinTurns * Math.PI * 2;
 
-      // Looser arms for Triangulum
-      const armWidth = 0.1 + rt * 0.2;
+      // Tighter arms for more visible spiral structure
+      const armWidth = 0.04 + rt * 0.08;
       const armJitter = (Math.random() + Math.random() + Math.random() - 1.5) * armWidth;
 
-      // More inter-arm fill (loose structure)
-      const isInterArm = Math.random() < 0.45;
-      const interArmJitter = isInterArm ? (Math.random() - 0.5) * (1.0 + rt * 0.8) : 0;
+      // Less inter-arm fill for clearer spiral definition
+      const isInterArm = Math.random() < 0.25;
+      const interArmJitter = isInterArm ? (Math.random() - 0.5) * (0.4 + rt * 0.3) : 0;
 
       const angle = branchAngle + spinAngle + armJitter + interArmJitter;
 
