@@ -16,6 +16,8 @@ import venusTexture from '@/assets/textures/venus.jpg';
 import marsTexture from '@/assets/textures/mars.jpg';
 import jupiterTexture from '@/assets/textures/jupiter.jpg';
 import saturnTexture from '@/assets/textures/saturn.jpg';
+import uranusTexture from '@/assets/textures/uranus.jpg';
+import neptuneTexture from '@/assets/textures/neptune.jpg';
 import phobosTexture from '@/assets/textures/phobos.jpg';
 import deimosTexture from '@/assets/textures/deimos.jpg';
 
@@ -392,17 +394,19 @@ export const TexturedPlanet = ({
   const marsMap = useLoader(THREE.TextureLoader, marsTexture);
   const jupiterMap = useLoader(THREE.TextureLoader, jupiterTexture);
   const saturnMap = useLoader(THREE.TextureLoader, saturnTexture);
+  const uranusMap = useLoader(THREE.TextureLoader, uranusTexture);
+  const neptuneMap = useLoader(THREE.TextureLoader, neptuneTexture);
   const phobosMap = useLoader(THREE.TextureLoader, phobosTexture);
   const deimosMap = useLoader(THREE.TextureLoader, deimosTexture);
   
   // Configure texture properties for proper spherical mapping
   useMemo(() => {
-    [earthDayMap, earthNightMap, earthCloudsMap, moonMap, mercuryMap, venusMap, marsMap, jupiterMap, saturnMap, phobosMap, deimosMap].forEach(tex => {
+    [earthDayMap, earthNightMap, earthCloudsMap, moonMap, mercuryMap, venusMap, marsMap, jupiterMap, saturnMap, uranusMap, neptuneMap, phobosMap, deimosMap].forEach(tex => {
       tex.wrapS = THREE.RepeatWrapping;
       tex.wrapT = THREE.ClampToEdgeWrapping;
       tex.colorSpace = THREE.SRGBColorSpace;
     });
-  }, [earthDayMap, earthNightMap, earthCloudsMap, moonMap, mercuryMap, venusMap, marsMap, jupiterMap, saturnMap, phobosMap, deimosMap]);
+  }, [earthDayMap, earthNightMap, earthCloudsMap, moonMap, mercuryMap, venusMap, marsMap, jupiterMap, saturnMap, uranusMap, neptuneMap, phobosMap, deimosMap]);
   
   const visuals = PLANET_VISUALS[object.id] || {
     baseColor: object.color,
@@ -701,6 +705,8 @@ export const TexturedPlanet = ({
                 marsMap: { value: marsMap },
                 jupiterMap: { value: jupiterMap },
                 saturnMap: { value: saturnMap },
+                uranusMap: { value: uranusMap },
+                neptuneMap: { value: neptuneMap },
                 phobosMap: { value: phobosMap },
                 deimosMap: { value: deimosMap },
               }}
@@ -753,6 +759,8 @@ export const TexturedPlanet = ({
                 uniform sampler2D marsMap;
                 uniform sampler2D jupiterMap;
                 uniform sampler2D saturnMap;
+                uniform sampler2D uranusMap;
+                uniform sampler2D neptuneMap;
                 uniform sampler2D phobosMap;
                 uniform sampler2D deimosMap;
                 varying vec3 vNormal;
@@ -1317,25 +1325,61 @@ export const TexturedPlanet = ({
                     
                     surfaceColor = saturnColor;
                   }
-                  // === URANUS (9) - Pale cyan with very subtle bands ===
+                  // === URANUS (9) - NASA texture with subtle banding ===
                   else if (surfaceType > 8.5 && surfaceType < 9.5) {
-                    float lat = vUv.y;
-                    float band = sin(lat * 12.0) * 0.1 + 0.5;
-                    surfaceColor = mix(baseColor, secondaryColor, band + surfaceNoise * 0.05);
-                    surfaceColor = mix(surfaceColor, tertiaryColor, 0.2);
+                    // Slow cloud rotation
+                    float cloudSpeed = time * 0.002;
+                    vec2 animatedUv = vUv;
+                    animatedUv.x = fract(animatedUv.x + cloudSpeed);
+                    
+                    // Sample NASA Uranus texture
+                    vec3 uranusColor = texture2D(uranusMap, animatedUv).rgb;
+                    
+                    // Enhance the cyan-green ice giant color
+                    vec3 icyTint = vec3(0.85, 1.0, 1.0);
+                    uranusColor *= icyTint;
+                    
+                    // Subtle polar darkening
+                    float polarLat = abs(vUv.y - 0.5) * 2.0;
+                    float polarDark = smoothstep(0.7, 0.95, polarLat) * 0.15;
+                    uranusColor *= (1.0 - polarDark);
+                    
+                    // Very subtle limb brightening (methane haze)
+                    float limbBright = pow(1.0 - abs(dot(worldNormal, normalize(cameraPosition - vWorldPosition))), 2.0) * 0.1;
+                    uranusColor += vec3(0.7, 0.9, 0.95) * limbBright;
+                    
+                    surfaceColor = uranusColor;
                   }
-                  // === NEPTUNE (10) - Deep blue with white clouds ===
+                  // === NEPTUNE (10) - NASA texture with dynamic storms ===
                   else if (surfaceType > 9.5 && surfaceType < 10.5) {
-                    float lat = vUv.y;
-                    float bands = sin(lat * 20.0) * 0.15 + 0.5;
-                    surfaceColor = mix(baseColor, secondaryColor, bands + surfaceNoise * 0.1);
-                    // White cirrus clouds
-                    float clouds = smoothstep(0.7, 0.85, fineNoise) * 0.5;
-                    surfaceColor = mix(surfaceColor, tertiaryColor, clouds);
-                    // Great Dark Spot
-                    vec2 darkSpotCenter = vec2(0.3, 0.4);
-                    float darkSpot = 1.0 - smoothstep(0.06, 0.1, length(vUv - darkSpotCenter));
-                    surfaceColor = mix(surfaceColor, secondaryColor * 0.7, darkSpot * 0.6);
+                    // Faster cloud rotation (Neptune has strong winds)
+                    float lat = vUv.y - 0.5;
+                    float differentialSpeed = 0.006 * (1.0 + abs(lat) * 0.5);
+                    vec2 animatedUv = vUv;
+                    animatedUv.x = fract(animatedUv.x + time * differentialSpeed);
+                    
+                    // Sample NASA Neptune texture
+                    vec3 neptuneColor = texture2D(neptuneMap, animatedUv).rgb;
+                    
+                    // Enhance the deep azure blue
+                    vec3 deepBlue = vec3(0.9, 0.95, 1.1);
+                    neptuneColor *= deepBlue;
+                    
+                    // Add bright methane ice clouds
+                    float clouds = smoothstep(0.65, 0.8, fineNoise);
+                    vec3 cloudWhite = vec3(1.0, 1.0, 1.0);
+                    neptuneColor = mix(neptuneColor, cloudWhite, clouds * 0.4);
+                    
+                    // Great Dark Spot (ephemeral storm)
+                    vec2 darkSpotCenter = vec2(0.3 + sin(time * 0.01) * 0.05, 0.35);
+                    float darkSpot = 1.0 - smoothstep(0.05, 0.09, length(vUv - darkSpotCenter));
+                    neptuneColor = mix(neptuneColor, neptuneColor * 0.6, darkSpot * 0.5);
+                    
+                    // Limb darkening
+                    float limbDarkening = 1.0 - pow(1.0 - abs(dot(worldNormal, normalize(cameraPosition - vWorldPosition))), 0.3) * 0.1;
+                    neptuneColor *= limbDarkening;
+                    
+                    surfaceColor = neptuneColor;
                   }
                   // === IO (11) - Enhanced volcanic moon with lava flows ===
                   else if (surfaceType > 10.5 && surfaceType < 11.5) {
