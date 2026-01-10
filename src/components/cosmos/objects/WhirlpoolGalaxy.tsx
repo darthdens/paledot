@@ -707,22 +707,6 @@ export const WhirlpoolGalaxy = ({ visualScale }: WhirlpoolGalaxyProps) => {
           renderOrder={3}
         />
 
-        {/* Tidal bridge to companion - positioned dynamically in useFrame */}
-        <group ref={bridgeGroupRef}>
-          <points frustumCulled={false} renderOrder={1} scale={[bridgeLength, bridgeLength * 0.4, bridgeLength * 0.4]}>
-            <bufferGeometry attach="geometry" {...tidalBridgeGeo} />
-            <pointsMaterial
-              size={gs * 42}
-              map={dotTexture}
-              vertexColors
-              transparent
-              opacity={0.55}
-              blending={THREE.AdditiveBlending}
-              depthWrite={false}
-              sizeAttenuation
-            />
-          </points>
-        </group>
 
         {/* Center glow */}
         <sprite renderOrder={4} frustumCulled={false} scale={[diskR * 2.0, diskR * 2.0, 1]}>
