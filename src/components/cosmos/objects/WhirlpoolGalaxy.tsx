@@ -28,12 +28,13 @@ const WHIRLPOOL = {
   distanceFromMilkyWay: 23e6, // 23 million light-years
 };
 
-// Companion galaxy NGC 5195 parameters
+// Companion galaxy NGC 5195 parameters - positioned at the end of one spiral arm
 const NGC5195 = {
   radius: 10000, // Smaller irregular companion
-  offsetX: 50000, // Distance from M51 center
-  offsetY: 8000,
-  offsetZ: 5000,
+  // Position at the tip of the northern arm (end of spiral)
+  offsetX: 32000, // Along the arm extension
+  offsetY: 6000,  // Slight vertical offset
+  offsetZ: -25000, // At the end of the arm
 };
 
 // Whirlpool glow texture: warm cream core → pink HII → blue outer
@@ -151,7 +152,7 @@ export const WhirlpoolGalaxy = ({ visualScale }: WhirlpoolGalaxyProps) => {
   const starsGeo = useMemo(() => {
     const { branches, spinTurns } = WHIRLPOOL;
     const maxRadius = WHIRLPOOL.diskRadius * gs;
-    const starCount = 380000;
+    const starCount = 480000; // Increased for denser arms and inter-arm region
 
     const positions = new Float32Array(starCount * 3);
     const colors = new Float32Array(starCount * 3);
@@ -174,13 +175,13 @@ export const WhirlpoolGalaxy = ({ visualScale }: WhirlpoolGalaxyProps) => {
       const branchAngle = (branchIndex / branches) * Math.PI * 2;
       const spinAngle = rt * spinTurns * Math.PI * 2;
 
-      // Very tight arms - Whirlpool is famous for its well-defined spiral
-      const armWidth = 0.06 + rt * 0.12;
+      // Tight but filled arms - Whirlpool's well-defined spiral with visible inter-arm stars
+      const armWidth = 0.08 + rt * 0.15;
       const armJitter = (Math.random() + Math.random() + Math.random() - 1.5) * armWidth;
 
-      // Less inter-arm fill (tight, clean spiral)
-      const isInterArm = Math.random() < 0.25;
-      const interArmJitter = isInterArm ? (Math.random() - 0.5) * (0.6 + rt * 0.5) : 0;
+      // More inter-arm stars for a fuller look
+      const isInterArm = Math.random() < 0.45;
+      const interArmJitter = isInterArm ? (Math.random() - 0.5) * (0.7 + rt * 0.6) : 0;
 
       const angle = branchAngle + spinAngle + armJitter + interArmJitter;
 
@@ -426,16 +427,18 @@ export const WhirlpoolGalaxy = ({ visualScale }: WhirlpoolGalaxyProps) => {
     return geo;
   }, [gs]);
 
-  // Tidal bridge between M51 and NGC 5195
+  // Tidal bridge between M51 and NGC 5195 - connecting the arm tip to companion
   const tidalBridgeGeo = useMemo(() => {
-    const count = 15000;
+    const count = 20000;
     const positions = new Float32Array(count * 3);
     const colors = new Float32Array(count * 3);
     const color = new THREE.Color();
 
-    // Bridge from outer arm to companion
-    const startX = WHIRLPOOL.diskRadius * gs * 0.8;
-    const startZ = 0;
+    // Bridge starts from the tip of the spiral arm (following the arm curve)
+    const armTipAngle = 1.8 * Math.PI * 2 * 0.85; // End of spiral at ~85% radius
+    const armTipRadius = WHIRLPOOL.diskRadius * gs * 0.85;
+    const startX = Math.cos(armTipAngle) * armTipRadius;
+    const startZ = Math.sin(armTipAngle) * armTipRadius;
     const endX = NGC5195.offsetX * gs;
     const endY = NGC5195.offsetY * gs;
     const endZ = NGC5195.offsetZ * gs;
