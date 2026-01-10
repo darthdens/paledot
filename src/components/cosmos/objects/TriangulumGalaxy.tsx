@@ -11,16 +11,15 @@ interface TriangulumGalaxyProps {
 }
 
 // Triangulum Galaxy (M33) parameters - based on real astronomical data
-// Distance: 2.73 million light-years from Milky Way (slightly farther than Andromeda)
+// Distance: 2.73 million light-years from Milky Way
 // Diameter: ~60,000 light-years (about half the size of Milky Way)
-// Third-largest galaxy in the Local Group
-// Distinctive features: blue-purple core, FOUR spiral arms, yellow-green outer regions, pink HII regions
+// Distinctive features: blue-purple core, TWO loose spiral arms, yellow-green outer regions, pink HII regions
 const TRIANGULUM = {
-  diskRadius: 30000, // Half of 60,000 ly diameter
-  bulgeRadius: 4000, // Smaller, less prominent bulge than Andromeda
-  branches: 4, // FOUR spiral arms as seen in reference images
-  spinTurns: 1.8, // Well-defined spiral
-  inclination: (55 * Math.PI) / 180, // ~55° inclination (more face-on than Andromeda)
+  diskRadius: 30000, // Half of 60,000 ly diameter - HALF of Milky Way
+  bulgeRadius: 4000, // Smaller bulge than Andromeda
+  branches: 2, // TWO spiral arms as seen in reference image
+  spinTurns: 1.4, // Loose, flowing spiral
+  inclination: (55 * Math.PI) / 180, // ~55° inclination
   distanceFromMilkyWay: 2.73e6, // 2.73 million light-years
 };
 
@@ -137,13 +136,13 @@ export const TriangulumGalaxy = ({ visualScale }: TriangulumGalaxyProps) => {
       const branchAngle = (branchIndex / branches) * Math.PI * 2;
       const spinAngle = rt * spinTurns * Math.PI * 2;
 
-      // Tighter arms for more visible spiral structure
-      const armWidth = 0.04 + rt * 0.08;
+      // Loose, flowing arms matching reference image
+      const armWidth = 0.06 + rt * 0.12;
       const armJitter = (Math.random() + Math.random() + Math.random() - 1.5) * armWidth;
 
-      // Less inter-arm fill for clearer spiral definition
-      const isInterArm = Math.random() < 0.25;
-      const interArmJitter = isInterArm ? (Math.random() - 0.5) * (0.4 + rt * 0.3) : 0;
+      // Some inter-arm fill but keep arms visible
+      const isInterArm = Math.random() < 0.3;
+      const interArmJitter = isInterArm ? (Math.random() - 0.5) * (0.5 + rt * 0.4) : 0;
 
       const angle = branchAngle + spinAngle + armJitter + interArmJitter;
 
