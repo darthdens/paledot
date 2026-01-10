@@ -69,24 +69,24 @@ const PLANET_VISUALS: Record<string, {
     surfaceDetail: 'venus',
   },
   earth: {
-    baseColor: '#1E4D7C',        // Deep ocean blue
-    secondaryColor: '#2D5016',   // Land green
-    tertiaryColor: '#8B7355',    // Desert/brown
-    roughness: 0.35,
-    metalness: 0.05,
+    baseColor: '#0A2463',        // Deep ocean blue (darker, more realistic)
+    secondaryColor: '#1B4D1B',   // Forest green land
+    tertiaryColor: '#C4A55A',    // Desert/sandy brown
+    roughness: 0.25,             // Smoother for ocean specular
+    metalness: 0.02,
     hasAtmosphere: true,
-    atmosphereColor: '#87CEEB',
-    atmosphereIntensity: 0.5,
+    atmosphereColor: '#6BA3D6',  // More realistic atmospheric blue
+    atmosphereIntensity: 0.6,
     hasClouds: true,
     cloudColor: '#FFFFFF',
     tilt: 23.4,
     surfaceDetail: 'earth',
   },
   moon: {
-    baseColor: '#A9A9A9',        // Bright highlands
-    secondaryColor: '#404040',   // Dark maria (basaltic)
-    tertiaryColor: '#707070',    // Mid-tone
-    roughness: 0.99,
+    baseColor: '#C8C8C8',        // Bright highlands (lighter)
+    secondaryColor: '#3A3A3A',   // Dark maria (basaltic plains)
+    tertiaryColor: '#8A8A8A',    // Mid-tone transitional areas
+    roughness: 0.95,
     metalness: 0,
     surfaceDetail: 'moon',
   },
@@ -888,24 +888,123 @@ export const TexturedPlanet = ({
                     surfaceColor = mix(baseColor, secondaryColor, swirl * 0.4);
                     surfaceColor = mix(surfaceColor, tertiaryColor, bands * 0.2);
                   }
-                  // === EARTH (4) - Oceans, continents, ice caps ===
+                  // === EARTH (4) - Realistic oceans, continents, ice caps with proper shapes ===
                   else if (surfaceType > 3.5 && surfaceType < 4.5) {
-                    float continent = smoothstep(0.45, 0.55, surfaceNoise);
-                    float desert = smoothstep(0.6, 0.7, fineNoise);
+                    // Multi-octave noise for realistic continent shapes
+                    float continentNoise = fbm(noiseCoord * 0.8);
+                    float detailNoise = fbm(noiseCoord * 2.5);
+                    float fineDetail = noise(noiseCoord * 8.0);
+                    
+                    // Create more interesting continent shapes with varied thresholds
+                    float continent = smoothstep(0.42, 0.52, continentNoise + detailNoise * 0.15);
+                    
+                    // Mountain/highland regions within continents
+                    float mountains = smoothstep(0.55, 0.65, continentNoise) * continent;
+                    
+                    // Desert regions (typically around 20-30 degrees latitude)
+                    float latNorm = abs(vUv.y - 0.5) * 2.0;
+                    float desertBelt = smoothstep(0.2, 0.35, latNorm) * (1.0 - smoothstep(0.35, 0.5, latNorm));
+                    float desert = desertBelt * smoothstep(0.5, 0.6, detailNoise) * continent;
+                    
+                    // Tropical forests near equator
+                    float tropicalBelt = 1.0 - smoothstep(0.0, 0.25, latNorm);
+                    float tropical = tropicalBelt * continent * (1.0 - desert);
+                    
+                    // Polar ice caps with realistic extent
                     float polarLat = abs(vUv.y - 0.5) * 2.0;
-                    float iceCap = smoothstep(0.85, 0.95, polarLat);
-                    surfaceColor = baseColor; // Ocean
-                    surfaceColor = mix(surfaceColor, secondaryColor, continent); // Land
-                    surfaceColor = mix(surfaceColor, tertiaryColor, continent * desert); // Desert
-                    surfaceColor = mix(surfaceColor, vec3(1.0), iceCap); // Ice
+                    float iceCap = smoothstep(0.82, 0.92, polarLat);
+                    // Southern ice cap slightly larger
+                    float southIce = vUv.y < 0.5 ? smoothstep(0.78, 0.88, polarLat) : 0.0;
+                    iceCap = max(iceCap, southIce * 0.7);
+                    
+                    // Ocean with depth variation
+                    vec3 deepOcean = vec3(0.02, 0.08, 0.22);
+                    vec3 shallowOcean = vec3(0.06, 0.20, 0.40);
+                    float oceanDepth = 1.0 - continent;
+                    float shallowZone = smoothstep(0.38, 0.45, continentNoise) * (1.0 - continent);
+                    vec3 oceanColor = mix(deepOcean, shallowOcean, shallowZone + fineDetail * 0.2);
+                    
+                    // Land colors with variation
+                    vec3 forestGreen = vec3(0.08, 0.25, 0.08);
+                    vec3 grassGreen = vec3(0.15, 0.35, 0.12);
+                    vec3 mountainBrown = vec3(0.35, 0.28, 0.20);
+                    vec3 desertTan = vec3(0.78, 0.65, 0.42);
+                    vec3 snowWhite = vec3(0.95, 0.97, 1.0);
+                    
+                    // Build up land color
+                    vec3 landColor = mix(grassGreen, forestGreen, tropical);
+                    landColor = mix(landColor, mountainBrown, mountains * 0.6);
+                    landColor = mix(landColor, desertTan, desert);
+                    
+                    // Combine ocean and land
+                    surfaceColor = mix(oceanColor, landColor, continent);
+                    
+                    // Apply ice caps on top of everything
+                    surfaceColor = mix(surfaceColor, snowWhite, iceCap);
+                    
+                    // Add slight color variation for realism
+                    surfaceColor *= 0.9 + fineDetail * 0.2;
                   }
-                  // === MOON (5) - Dark maria, bright highlands ===
+                  // === MOON (5) - Realistic maria, highlands, and crater detail ===
                   else if (surfaceType > 4.5 && surfaceType < 5.5) {
-                    float maria = smoothstep(0.4, 0.6, surfaceNoise);
-                    float craters = 1.0 - smoothstep(0.6, 0.7, fineNoise) * 0.35;
-                    surfaceColor = mix(secondaryColor, baseColor, maria);
-                    surfaceColor = mix(surfaceColor, tertiaryColor, microNoise * 0.2);
-                    surfaceColor *= craters;
+                    // Create distinctive maria (dark basaltic plains)
+                    // Use specific positions for major maria
+                    float mariaNoise = fbm(noiseCoord * 0.6);
+                    float mariaDetail = fbm(noiseCoord * 1.2);
+                    
+                    // Major maria regions (near side of moon)
+                    float longPos = vUv.x;
+                    float latPos = vUv.y;
+                    
+                    // Mare Imbrium (Sea of Rains) - large northern mare
+                    vec2 imbriumCenter = vec2(0.35, 0.65);
+                    float imbrium = 1.0 - smoothstep(0.0, 0.18, length((vUv - imbriumCenter) * vec2(1.0, 1.2)));
+                    
+                    // Mare Serenitatis (Sea of Serenity)
+                    vec2 serenitatis = vec2(0.45, 0.6);
+                    float serenitatisM = 1.0 - smoothstep(0.0, 0.12, length((vUv - serenitatis) * vec2(1.1, 1.0)));
+                    
+                    // Mare Tranquillitatis (Sea of Tranquility)
+                    vec2 tranquillitatis = vec2(0.52, 0.48);
+                    float tranquillitasM = 1.0 - smoothstep(0.0, 0.14, length((vUv - tranquillitatis) * vec2(1.0, 1.3)));
+                    
+                    // Mare Crisium (Sea of Crises) - isolated
+                    vec2 crisium = vec2(0.7, 0.55);
+                    float crisiumM = 1.0 - smoothstep(0.0, 0.08, length((vUv - crisium) * vec2(1.3, 1.0)));
+                    
+                    // Oceanus Procellarum (Ocean of Storms) - largest mare
+                    vec2 procellarum = vec2(0.2, 0.45);
+                    float procellarumM = 1.0 - smoothstep(0.0, 0.22, length((vUv - procellarum) * vec2(0.7, 1.0)));
+                    
+                    // Combine maria
+                    float maria = max(max(max(imbrium, serenitatisM), max(tranquillitasM, crisiumM)), procellarumM);
+                    maria = clamp(maria + mariaNoise * 0.15, 0.0, 1.0);
+                    
+                    // Crater patterns at multiple scales
+                    float largeCraters = 1.0 - smoothstep(0.55, 0.65, surfaceNoise) * 0.4;
+                    float mediumCraters = 1.0 - smoothstep(0.58, 0.68, fineNoise) * 0.3;
+                    float smallCraters = 1.0 - smoothstep(0.6, 0.7, microNoise) * 0.2;
+                    float craterDetail = largeCraters * mediumCraters * smallCraters;
+                    
+                    // Some bright ray craters
+                    float rays = smoothstep(0.85, 0.95, fineNoise) * 0.4;
+                    
+                    // Highland color (bright, grayish-white)
+                    vec3 highlandColor = vec3(0.78, 0.76, 0.73);
+                    // Maria color (dark gray, slightly brownish)
+                    vec3 mariaColor = vec3(0.22, 0.21, 0.20);
+                    
+                    // Mix based on maria coverage
+                    surfaceColor = mix(highlandColor, mariaColor, maria * 0.85);
+                    
+                    // Apply crater darkening
+                    surfaceColor *= craterDetail;
+                    
+                    // Add bright ray systems
+                    surfaceColor = mix(surfaceColor, vec3(0.9, 0.88, 0.85), rays * (1.0 - maria * 0.5));
+                    
+                    // Subtle color variation
+                    surfaceColor *= 0.92 + mariaDetail * 0.16;
                   }
                   // === MARS (6) - Red with dark regions and white polar caps ===
                   else if (surfaceType > 5.5 && surfaceType < 6.5) {
@@ -1247,11 +1346,26 @@ export const TexturedPlanet = ({
                     float shadow = calculateShadow(vWorldPosition, sunDir);
                     
                     vec3 viewDir = normalize(cameraPosition - vWorldPosition);
-                    float rim = pow(1.0 - abs(dot(worldNormal, viewDir)), 2.5);
                     
-                    float sunGlow = smoothstep(-0.1, 0.3, NdotL) * shadow;
+                    // Enhanced rim lighting for atmosphere
+                    float rim = pow(1.0 - abs(dot(worldNormal, viewDir)), 3.0);
                     
-                    gl_FragColor = vec4(glowColor, rim * intensity * sunGlow);
+                    // Rayleigh scattering approximation - stronger blue at limb
+                    float scattering = pow(1.0 - abs(dot(worldNormal, viewDir)), 4.0);
+                    
+                    // Sun-facing glow with softer falloff
+                    float sunGlow = smoothstep(-0.2, 0.4, NdotL) * shadow;
+                    
+                    // Terminator glow (visible atmosphere at day/night boundary)
+                    float terminator = smoothstep(-0.1, 0.1, NdotL) * smoothstep(0.3, 0.0, NdotL);
+                    
+                    // Combine effects
+                    float totalGlow = (rim * sunGlow + scattering * 0.3 + terminator * 0.15) * intensity;
+                    
+                    // Color shift towards warmer at terminator (sunset effect)
+                    vec3 finalColor = mix(glowColor, vec3(0.9, 0.6, 0.4), terminator * 0.4);
+                    
+                    gl_FragColor = vec4(finalColor, totalGlow * shadow);
                   }
                 `}
               />
