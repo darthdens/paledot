@@ -17,8 +17,8 @@ interface TriangulumGalaxyProps {
 const TRIANGULUM = {
   diskRadius: 30000, // Half of 60,000 ly diameter (do not change size)
   bulgeRadius: 4000, // Smaller bulge than Andromeda
-  branches: 4, // Four main arms
-  spinTurns: 0.55, // Gentle curl: four arms that barely form a spiral
+  branches: 4, // Four main arms - nearly straight, radiating outward
+  spinTurns: 0.15, // Almost no curl - arms are nearly straight spokes
   inclination: (55 * Math.PI) / 180, // ~55° inclination
   distanceFromMilkyWay: 2.73e6, // 2.73 million light-years
 };
@@ -135,9 +135,8 @@ export const TriangulumGalaxy = ({ visualScale }: TriangulumGalaxyProps) => {
       const branchIndex = Math.floor(Math.random() * branches);
       const branchAngle = (branchIndex / branches) * Math.PI * 2;
 
-      // Keep the arms mostly arm-like; only curl noticeably near the edge
-      const spiralT = Math.pow(rt, 2.6);
-      const spinAngle = spiralT * spinTurns * Math.PI * 2;
+      // Arms are almost straight - very minimal spiral
+      const spinAngle = rt * spinTurns * Math.PI * 2;
 
       // Keep arms crisp (avoid "too many spirals" look)
       // This jitter is in ANGLE space, so keep it small.
