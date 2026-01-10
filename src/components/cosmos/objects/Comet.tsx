@@ -140,7 +140,7 @@ const Comet = ({ comet, scale }: CometProps) => {
   useFrame((state) => {
     if (!groupRef.current) return;
     
-    const time = state.clock.getElapsedTime() * timeSpeed * 0.01;
+    const time = state.clock.getElapsedTime() * timeSpeed * 0.0025;
     
     // Elliptical orbit calculation
     const a = comet.semiMajorAxis * scale;

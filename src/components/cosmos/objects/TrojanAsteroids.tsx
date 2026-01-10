@@ -146,8 +146,8 @@ export const TrojanAsteroids = ({
   }), [scale]);
   
   // Jupiter's orbital period is about 11.86 years
-  // Angular velocity = 2π / (11.86 * 365.25 * 60) at 1x speed
-  const jupiterAngularVelocity = (2 * Math.PI * 365.25) / (4332.59 * 60);
+  // Angular velocity = 2π / (11.86 * 365.25 * 240) at 1x speed (slower for better viewing)
+  const jupiterAngularVelocity = (2 * Math.PI * 365.25) / (4332.59 * 240);
   
   useFrame((_, delta) => {
     simTime.current += delta * timeSpeed;

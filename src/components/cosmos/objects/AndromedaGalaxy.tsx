@@ -342,7 +342,7 @@ export const AndromedaGalaxy = ({ visualScale }: AndromedaGalaxyProps) => {
     
     // Rotate Andromeda's stars around its own center (same speed as Milky Way)
     if (rotatingGroupRef.current) {
-      rotatingGroupRef.current.rotation.y += delta * 0.025 * timeSpeed;
+      rotatingGroupRef.current.rotation.y += delta * 0.00625 * timeSpeed;
     }
   });
 

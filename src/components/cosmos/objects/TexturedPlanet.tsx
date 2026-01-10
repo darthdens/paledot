@@ -410,9 +410,9 @@ export const TexturedPlanet = ({
     };
     
     const periodHours = rotationPeriodsHours[object.id] || 24;
-    // Scale: 1 Earth day (24h) = 60 seconds at 1x speed
-    // radians per second = 2π / (periodHours * 2.5)
-    const radiansPerSecond = (2 * Math.PI) / (Math.abs(periodHours) * 2.5);
+    // Scale: 1 Earth day (24h) = 240 seconds at 1x speed (slower for better viewing)
+    // radians per second = 2π / (periodHours * 10)
+    const radiansPerSecond = (2 * Math.PI) / (Math.abs(periodHours) * 10);
     return periodHours < 0 ? -radiansPerSecond : radiansPerSecond;
   };
   
@@ -437,10 +437,10 @@ export const TexturedPlanet = ({
     if (!groupRef.current) return;
 
     // Calculate orbital angular velocity from real orbital period
-    // Scale: 1 Earth year (365.25 days) = 60 seconds at 1x speed
-    // angular velocity = 2π / (periodDays / 365.25 * 60) = 2π * 365.25 / (periodDays * 60)
+    // Scale: 1 Earth year (365.25 days) = 240 seconds at 1x speed (slower for better viewing)
+    // angular velocity = 2π / (periodDays / 365.25 * 240) = 2π * 365.25 / (periodDays * 240)
     const getOrbitalAngularVelocity = (periodDays: number) => {
-      return (2 * Math.PI * 365.25) / (periodDays * 60);
+      return (2 * Math.PI * 365.25) / (periodDays * 240);
     };
 
     // Moons: orbit around their parent planet's world position

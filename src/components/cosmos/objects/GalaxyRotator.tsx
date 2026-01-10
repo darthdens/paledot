@@ -29,8 +29,8 @@ export const GalaxyRotator = ({ children }: GalaxyRotatorProps) => {
     if (isInStarSystem) return;
 
     // Base rotation speed * timeSpeed multiplier
-    // 0.025 rad/s base = one full rotation every ~4 minutes at 1x speed
-    currentRotation.current += delta * 0.025 * timeSpeed;
+    // 0.00625 rad/s base = one full rotation every ~16 minutes at 1x speed (slower for better viewing)
+    currentRotation.current += delta * 0.00625 * timeSpeed;
     groupRef.current.rotation.y = currentRotation.current;
   });
 
