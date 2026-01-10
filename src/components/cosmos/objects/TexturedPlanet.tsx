@@ -18,6 +18,7 @@ import jupiterTexture from '@/assets/textures/jupiter.jpg';
 import saturnTexture from '@/assets/textures/saturn.jpg';
 import uranusTexture from '@/assets/textures/uranus.jpg';
 import neptuneTexture from '@/assets/textures/neptune.jpg';
+import plutoTexture from '@/assets/textures/pluto.jpg';
 import phobosTexture from '@/assets/textures/phobos.jpg';
 import deimosTexture from '@/assets/textures/deimos.jpg';
 
@@ -396,17 +397,18 @@ export const TexturedPlanet = ({
   const saturnMap = useLoader(THREE.TextureLoader, saturnTexture);
   const uranusMap = useLoader(THREE.TextureLoader, uranusTexture);
   const neptuneMap = useLoader(THREE.TextureLoader, neptuneTexture);
+  const plutoMap = useLoader(THREE.TextureLoader, plutoTexture);
   const phobosMap = useLoader(THREE.TextureLoader, phobosTexture);
   const deimosMap = useLoader(THREE.TextureLoader, deimosTexture);
   
   // Configure texture properties for proper spherical mapping
   useMemo(() => {
-    [earthDayMap, earthNightMap, earthCloudsMap, moonMap, mercuryMap, venusMap, marsMap, jupiterMap, saturnMap, uranusMap, neptuneMap, phobosMap, deimosMap].forEach(tex => {
+    [earthDayMap, earthNightMap, earthCloudsMap, moonMap, mercuryMap, venusMap, marsMap, jupiterMap, saturnMap, uranusMap, neptuneMap, plutoMap, phobosMap, deimosMap].forEach(tex => {
       tex.wrapS = THREE.RepeatWrapping;
       tex.wrapT = THREE.ClampToEdgeWrapping;
       tex.colorSpace = THREE.SRGBColorSpace;
     });
-  }, [earthDayMap, earthNightMap, earthCloudsMap, moonMap, mercuryMap, venusMap, marsMap, jupiterMap, saturnMap, uranusMap, neptuneMap, phobosMap, deimosMap]);
+  }, [earthDayMap, earthNightMap, earthCloudsMap, moonMap, mercuryMap, venusMap, marsMap, jupiterMap, saturnMap, uranusMap, neptuneMap, plutoMap, phobosMap, deimosMap]);
   
   const visuals = PLANET_VISUALS[object.id] || {
     baseColor: object.color,
@@ -707,6 +709,7 @@ export const TexturedPlanet = ({
                 saturnMap: { value: saturnMap },
                 uranusMap: { value: uranusMap },
                 neptuneMap: { value: neptuneMap },
+                plutoMap: { value: plutoMap },
                 phobosMap: { value: phobosMap },
                 deimosMap: { value: deimosMap },
               }}
@@ -761,6 +764,7 @@ export const TexturedPlanet = ({
                 uniform sampler2D saturnMap;
                 uniform sampler2D uranusMap;
                 uniform sampler2D neptuneMap;
+                uniform sampler2D plutoMap;
                 uniform sampler2D phobosMap;
                 uniform sampler2D deimosMap;
                 varying vec3 vNormal;
@@ -1508,16 +1512,65 @@ export const TexturedPlanet = ({
                     float streaks = smoothstep(0.7, 0.85, fineNoise) * 0.5;
                     surfaceColor = mix(surfaceColor, tertiaryColor, streaks);
                   }
-                  // === PLUTO (19) - Tan/charcoal with white heart ===
+                  // === PLUTO (19) - NASA texture with Sputnik Planitia heart ===
                   else if (surfaceType > 18.5 && surfaceType < 19.5) {
-                    float terrain = surfaceNoise * 0.5 + fineNoise * 0.5;
-                    float darkRegions = smoothstep(0.4, 0.6, terrain);
-                    surfaceColor = mix(baseColor, secondaryColor, darkRegions);
-                    // Heart-shaped Sputnik Planitia
-                    vec2 heartCenter = vec2(0.4, 0.5);
-                    float heartDist = length((vUv - heartCenter) * vec2(1.2, 1.0));
-                    float heart = 1.0 - smoothstep(0.12, 0.18, heartDist);
-                    surfaceColor = mix(surfaceColor, tertiaryColor, heart * 0.9);
+                    // Sample base texture
+                    vec3 plutoColor = texture2D(plutoMap, vUv).rgb;
+                    
+                    // Procedural bump mapping
+                    float texelSize = 0.003;
+                    float heightC = dot(plutoColor, vec3(0.299, 0.587, 0.114));
+                    float heightL = dot(texture2D(plutoMap, vUv + vec2(-texelSize, 0.0)).rgb, vec3(0.299, 0.587, 0.114));
+                    float heightR = dot(texture2D(plutoMap, vUv + vec2(texelSize, 0.0)).rgb, vec3(0.299, 0.587, 0.114));
+                    float heightU = dot(texture2D(plutoMap, vUv + vec2(0.0, texelSize)).rgb, vec3(0.299, 0.587, 0.114));
+                    float heightD = dot(texture2D(plutoMap, vUv + vec2(0.0, -texelSize)).rgb, vec3(0.299, 0.587, 0.114));
+                    
+                    float bumpStrength = 2.0;
+                    vec3 bumpNormal = normalize(vec3(
+                      (heightL - heightR) * bumpStrength,
+                      (heightD - heightU) * bumpStrength,
+                      1.0
+                    ));
+                    
+                    vec3 tangent = normalize(cross(worldNormal, vec3(0.0, 1.0, 0.0)));
+                    vec3 bitangent = normalize(cross(worldNormal, tangent));
+                    vec3 perturbedNormal = normalize(tangent * bumpNormal.x + bitangent * bumpNormal.y + worldNormal * bumpNormal.z);
+                    float bumpedNdotL = max(dot(perturbedNormal, sunDir), 0.0);
+                    
+                    // Add the famous heart-shaped Sputnik Planitia (nitrogen ice plain)
+                    // Left lobe of heart
+                    vec2 heartLeft = vec2(0.38, 0.48);
+                    float leftLobe = length((vUv - heartLeft) * vec2(1.4, 1.0));
+                    float leftHeart = 1.0 - smoothstep(0.06, 0.1, leftLobe);
+                    
+                    // Right lobe of heart
+                    vec2 heartRight = vec2(0.46, 0.48);
+                    float rightLobe = length((vUv - heartRight) * vec2(1.4, 1.0));
+                    float rightHeart = 1.0 - smoothstep(0.06, 0.1, rightLobe);
+                    
+                    // Bottom point of heart
+                    vec2 heartBottom = vec2(0.42, 0.38);
+                    float bottomPoint = length((vUv - heartBottom) * vec2(1.0, 1.5));
+                    float bottomHeart = 1.0 - smoothstep(0.05, 0.09, bottomPoint);
+                    
+                    float heartShape = max(max(leftHeart, rightHeart), bottomHeart);
+                    
+                    // Bright nitrogen ice for Sputnik Planitia
+                    vec3 nitrogenIce = vec3(0.95, 0.92, 0.85);
+                    plutoColor = mix(plutoColor, nitrogenIce, heartShape * 0.85);
+                    
+                    // Dark equatorial band (Cthulhu Macula)
+                    float equator = smoothstep(0.4, 0.5, vUv.y) * smoothstep(0.6, 0.5, vUv.y);
+                    float darkBand = equator * smoothstep(0.2, 0.35, vUv.x) * smoothstep(0.55, 0.4, vUv.x);
+                    vec3 tholinDark = vec3(0.25, 0.18, 0.12);
+                    plutoColor = mix(plutoColor, tholinDark, darkBand * 0.6 * (1.0 - heartShape));
+                    
+                    // Tan/reddish tholins color enhancement
+                    vec3 tholinTint = vec3(1.0, 0.9, 0.8);
+                    plutoColor *= tholinTint;
+                    
+                    surfaceColor = plutoColor;
+                    NdotL = mix(NdotL, bumpedNdotL, 0.6);
                   }
                   // === CERES (20) - Gray with bright spots ===
                   else if (surfaceType > 19.5 && surfaceType < 20.5) {
