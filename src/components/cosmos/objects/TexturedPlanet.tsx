@@ -25,6 +25,7 @@ import enceladusTexture from '@/assets/textures/enceladus.jpg';
 import phobosTexture from '@/assets/textures/phobos.jpg';
 import deimosTexture from '@/assets/textures/deimos.jpg';
 import tritonTexture from '@/assets/textures/triton.jpg';
+import iapetusTexture from '@/assets/textures/iapetus.jpg';
 
 interface TexturedPlanetProps {
   object: CelestialObject;
@@ -408,15 +409,16 @@ export const TexturedPlanet = ({
   const phobosMap = useLoader(THREE.TextureLoader, phobosTexture);
   const deimosMap = useLoader(THREE.TextureLoader, deimosTexture);
   const tritonMap = useLoader(THREE.TextureLoader, tritonTexture);
+  const iapetusMap = useLoader(THREE.TextureLoader, iapetusTexture);
   
   // Configure texture properties for proper spherical mapping
   useMemo(() => {
-    [earthDayMap, earthNightMap, earthCloudsMap, moonMap, mercuryMap, venusMap, marsMap, jupiterMap, saturnMap, uranusMap, neptuneMap, plutoMap, ceresMap, titanMap, enceladusMap, phobosMap, deimosMap, tritonMap].forEach(tex => {
+    [earthDayMap, earthNightMap, earthCloudsMap, moonMap, mercuryMap, venusMap, marsMap, jupiterMap, saturnMap, uranusMap, neptuneMap, plutoMap, ceresMap, titanMap, enceladusMap, phobosMap, deimosMap, tritonMap, iapetusMap].forEach(tex => {
       tex.wrapS = THREE.RepeatWrapping;
       tex.wrapT = THREE.ClampToEdgeWrapping;
       tex.colorSpace = THREE.SRGBColorSpace;
     });
-  }, [earthDayMap, earthNightMap, earthCloudsMap, moonMap, mercuryMap, venusMap, marsMap, jupiterMap, saturnMap, uranusMap, neptuneMap, plutoMap, ceresMap, titanMap, enceladusMap, phobosMap, deimosMap, tritonMap]);
+  }, [earthDayMap, earthNightMap, earthCloudsMap, moonMap, mercuryMap, venusMap, marsMap, jupiterMap, saturnMap, uranusMap, neptuneMap, plutoMap, ceresMap, titanMap, enceladusMap, phobosMap, deimosMap, tritonMap, iapetusMap]);
   
   const visuals = PLANET_VISUALS[object.id] || {
     baseColor: object.color,
@@ -724,6 +726,7 @@ export const TexturedPlanet = ({
                 phobosMap: { value: phobosMap },
                 deimosMap: { value: deimosMap },
                 tritonMap: { value: tritonMap },
+                iapetusMap: { value: iapetusMap },
               }}
               vertexShader={`
                 varying vec3 vNormal;
@@ -783,6 +786,7 @@ export const TexturedPlanet = ({
                 uniform sampler2D phobosMap;
                 uniform sampler2D deimosMap;
                 uniform sampler2D tritonMap;
+                uniform sampler2D iapetusMap;
                 varying vec3 vNormal;
                 varying vec3 vPosition;
                 varying vec2 vUv;
@@ -1587,12 +1591,63 @@ export const TexturedPlanet = ({
                     surfaceColor = enceladusColor;
                     NdotL = mix(NdotL, bumpedNdotL, 0.5);
                   }
-                  // === IAPETUS (17) - Two-toned: bright and dark hemispheres ===
+                  // === IAPETUS (17) - NASA texture with two-toned dark/bright hemispheres ===
                   else if (surfaceType > 16.5 && surfaceType < 17.5) {
-                    // Sharp transition between hemispheres
-                    float hemisphere = smoothstep(0.4, 0.6, vUv.x);
-                    surfaceColor = mix(secondaryColor, baseColor, hemisphere);
-                    surfaceColor = mix(surfaceColor, tertiaryColor, surfaceNoise * 0.15);
+                    // Sample base texture
+                    vec3 iapetusColor = texture2D(iapetusMap, vUv).rgb;
+                    
+                    // Procedural bump mapping for craters
+                    float texelSize = 0.004;
+                    float heightC = dot(iapetusColor, vec3(0.299, 0.587, 0.114));
+                    float heightL = dot(texture2D(iapetusMap, vUv + vec2(-texelSize, 0.0)).rgb, vec3(0.299, 0.587, 0.114));
+                    float heightR = dot(texture2D(iapetusMap, vUv + vec2(texelSize, 0.0)).rgb, vec3(0.299, 0.587, 0.114));
+                    float heightU = dot(texture2D(iapetusMap, vUv + vec2(0.0, texelSize)).rgb, vec3(0.299, 0.587, 0.114));
+                    float heightD = dot(texture2D(iapetusMap, vUv + vec2(0.0, -texelSize)).rgb, vec3(0.299, 0.587, 0.114));
+                    
+                    float bumpStrength = 2.5;
+                    vec3 bumpNormal = normalize(vec3(
+                      (heightL - heightR) * bumpStrength,
+                      (heightD - heightU) * bumpStrength,
+                      1.0
+                    ));
+                    
+                    vec3 tangent = normalize(cross(worldNormal, vec3(0.0, 1.0, 0.0)));
+                    vec3 bitangent = normalize(cross(worldNormal, tangent));
+                    vec3 perturbedNormal = normalize(tangent * bumpNormal.x + bitangent * bumpNormal.y + worldNormal * bumpNormal.z);
+                    float bumpedNdotL = max(dot(perturbedNormal, sunDir), 0.0);
+                    
+                    // Iapetus famous two-toned coloring - dark leading hemisphere, bright trailing
+                    // The dark region is called Cassini Regio
+                    float hemisphere = vUv.x; // 0 = leading (dark), 1 = trailing (bright)
+                    
+                    // Very dark leading hemisphere - Cassini Regio (carbonaceous material)
+                    vec3 darkSide = vec3(0.04, 0.035, 0.03); // Almost black
+                    // Bright trailing hemisphere - clean water ice
+                    vec3 brightSide = vec3(0.9, 0.88, 0.85); // Bright white/cream
+                    
+                    // Sharp but natural transition at the boundary
+                    float transition = smoothstep(0.35, 0.65, hemisphere);
+                    
+                    // Apply the two-tone coloring over the texture
+                    vec3 twoTone = mix(darkSide, brightSide, transition);
+                    iapetusColor = mix(iapetusColor * 0.3, iapetusColor, transition);
+                    iapetusColor = mix(twoTone, iapetusColor, 0.5);
+                    
+                    // Add equatorial ridge (unique feature - makes Iapetus look like a walnut)
+                    float equator = smoothstep(0.48, 0.5, vUv.y) * smoothstep(0.52, 0.5, vUv.y);
+                    vec3 ridgeColor = mix(darkSide, brightSide, transition) * 1.1;
+                    iapetusColor = mix(iapetusColor, ridgeColor, equator * 0.4);
+                    
+                    // Crater impacts on both hemispheres
+                    float craterNoise = fineNoise * 0.15;
+                    iapetusColor *= (1.0 - craterNoise * 0.3);
+                    
+                    // Slight reddish tint on dark side from tholins
+                    vec3 tholinTint = vec3(1.0, 0.92, 0.88);
+                    iapetusColor = mix(iapetusColor, iapetusColor * tholinTint, (1.0 - transition) * 0.3);
+                    
+                    surfaceColor = iapetusColor;
+                    NdotL = mix(NdotL, bumpedNdotL, 0.6);
                   }
                   // === TRITON (18) - NASA texture with cantaloupe terrain and nitrogen geyser streaks ===
                   else if (surfaceType > 17.5 && surfaceType < 18.5) {
