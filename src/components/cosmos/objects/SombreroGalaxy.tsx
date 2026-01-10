@@ -22,8 +22,8 @@ interface SombreroGalaxyProps {
 // 4. Colors: bright white/cream bulge, orange-brown dust lane, blue outer regions
 const SOMBRERO = {
   diskRadius: 25000, // Half of 50,000 ly diameter
-  bulgeRadius: 12000, // Central bulge width (slightly narrower for more elongated look)
-  bulgeHeight: 18000, // Much taller elliptical bulge - the iconic "hat crown"
+  bulgeRadius: 8000, // Central bulge - compact core
+  bulgeHeight: 6000, // Bulge extends perpendicular to disk (will use glow for the spread)
   dustLaneThickness: 1000, // Prominent dust lane
   inclination: (84 * Math.PI) / 180, // Nearly edge-on (84° from face-on)
   distanceFromMilkyWay: 29.3e6, // 29.3 million light-years
@@ -137,81 +137,59 @@ export const SombreroGalaxy = ({ visualScale }: SombreroGalaxyProps) => {
   const glowTexture = useMemo(() => createSombreroGlowTexture(), []);
 
   // Large central bulge - the distinctive "sombrero crown"
-  // This is the most prominent feature - massive bright elliptical bulge
-  // Based on reference: very bright white center, elongated vertically, smooth gradient to golden edges
+  // Compact core of stars - the glow sprite will create the visual spread
+  // IMPORTANT: After 84° X-rotation, Y becomes nearly horizontal, so bulge height goes in Z
   const bulgeGeo = useMemo(() => {
-    const bulgeCount = 350000; // Very dense for bright, smooth appearance
+    const bulgeCount = 120000; // Reduced - glow handles the spread
     const positions = new Float32Array(bulgeCount * 3);
     const colors = new Float32Array(bulgeCount * 3);
     const color = new THREE.Color();
-    const bulgeRadiusXZ = SOMBRERO.bulgeRadius * gs;
-    const bulgeRadiusY = SOMBRERO.bulgeHeight * gs;
+    const bulgeRadiusXY = SOMBRERO.bulgeRadius * gs; // Width in X and Y (after rotation: X and horizontal)
+    const bulgeRadiusZ = SOMBRERO.bulgeHeight * gs;  // Height in Z (after rotation: vertical)
 
     for (let i = 0; i < bulgeCount; i++) {
       const i3 = i * 3;
 
-      // Create an ellipsoidal distribution with concentration toward center
-      const r = Math.pow(Math.random(), 1.6); // More concentration in center
+      // Create an ellipsoidal distribution concentrated at center
+      const r = Math.pow(Math.random(), 1.8);
       const theta = Math.random() * Math.PI * 2;
       const phi = Math.acos(2 * Math.random() - 1);
       
-      // Distance from center (0 to 1)
       const t = r;
 
-      // Ellipsoidal coordinates - much taller than wide (the sombrero crown shape)
-      const x = r * Math.sin(phi) * Math.cos(theta) * bulgeRadiusXZ;
-      const y = r * Math.cos(phi) * bulgeRadiusY;
-      const z = r * Math.sin(phi) * Math.sin(theta) * bulgeRadiusXZ;
+      // Ellipsoidal coordinates - taller in Z (will be vertical after X-rotation)
+      const x = r * Math.sin(phi) * Math.cos(theta) * bulgeRadiusXY;
+      const y = r * Math.sin(phi) * Math.sin(theta) * bulgeRadiusXY; // Thin in Y
+      const z = r * Math.cos(phi) * bulgeRadiusZ; // Tall in Z → vertical after rotation
 
       positions[i3] = x;
       positions[i3 + 1] = y;
       positions[i3 + 2] = z;
 
-      // Colors based on reference images:
-      // - Brilliant white/cream center that's very bright
-      // - Gradual transition to golden/orange at edges
-      // - Overall warm tone
+      // Colors: bright white center → cream → golden
       const rand = Math.random();
-      if (t < 0.08) {
-        // Very center: brilliant pure white - maximum brightness
-        color.setHSL(0.14 + Math.random() * 0.02, 0.05 + Math.random() * 0.03, 0.97 + Math.random() * 0.03);
-      } else if (t < 0.18) {
+      if (t < 0.12) {
+        // Very center: brilliant white
+        color.setHSL(0.13 + Math.random() * 0.02, 0.06 + Math.random() * 0.04, 0.96 + Math.random() * 0.04);
+      } else if (t < 0.25) {
         // Inner core: warm white
-        color.setHSL(0.12 + Math.random() * 0.03, 0.08 + Math.random() * 0.05, 0.94 + Math.random() * 0.05);
-      } else if (t < 0.3) {
-        // Inner bulge: cream white
-        color.setHSL(0.11 + Math.random() * 0.03, 0.12 + Math.random() * 0.06, 0.90 + Math.random() * 0.06);
+        color.setHSL(0.11 + Math.random() * 0.03, 0.1 + Math.random() * 0.06, 0.92 + Math.random() * 0.06);
       } else if (t < 0.45) {
-        // Mid-inner bulge: light cream
-        if (rand < 0.8) {
-          color.setHSL(0.10 + Math.random() * 0.03, 0.18 + Math.random() * 0.08, 0.84 + Math.random() * 0.08);
-        } else {
-          color.setHSL(0.09 + Math.random() * 0.03, 0.22 + Math.random() * 0.1, 0.80 + Math.random() * 0.08);
-        }
-      } else if (t < 0.6) {
-        // Middle bulge: cream/golden
+        // Inner bulge: cream
+        color.setHSL(0.10 + Math.random() * 0.03, 0.15 + Math.random() * 0.08, 0.85 + Math.random() * 0.08);
+      } else if (t < 0.65) {
+        // Middle bulge: light golden
         if (rand < 0.7) {
-          color.setHSL(0.09 + Math.random() * 0.03, 0.25 + Math.random() * 0.12, 0.76 + Math.random() * 0.1);
+          color.setHSL(0.09 + Math.random() * 0.03, 0.22 + Math.random() * 0.1, 0.78 + Math.random() * 0.1);
         } else {
-          color.setHSL(0.08 + Math.random() * 0.03, 0.32 + Math.random() * 0.12, 0.70 + Math.random() * 0.1);
+          color.setHSL(0.08 + Math.random() * 0.03, 0.28 + Math.random() * 0.12, 0.72 + Math.random() * 0.1);
         }
-      } else if (t < 0.75) {
-        // Outer-mid bulge: golden
-        if (rand < 0.6) {
-          color.setHSL(0.08 + Math.random() * 0.03, 0.38 + Math.random() * 0.15, 0.65 + Math.random() * 0.1);
-        } else {
-          color.setHSL(0.07 + Math.random() * 0.03, 0.45 + Math.random() * 0.15, 0.58 + Math.random() * 0.1);
-        }
-      } else if (t < 0.88) {
-        // Outer bulge: golden/orange
-        if (rand < 0.5) {
-          color.setHSL(0.07 + Math.random() * 0.03, 0.48 + Math.random() * 0.18, 0.52 + Math.random() * 0.1);
-        } else {
-          color.setHSL(0.06 + Math.random() * 0.03, 0.52 + Math.random() * 0.18, 0.48 + Math.random() * 0.1);
-        }
+      } else if (t < 0.82) {
+        // Outer bulge: golden
+        color.setHSL(0.08 + Math.random() * 0.03, 0.35 + Math.random() * 0.15, 0.65 + Math.random() * 0.12);
       } else {
-        // Edge: orange fading
-        color.setHSL(0.06 + Math.random() * 0.03, 0.5 + Math.random() * 0.2, 0.42 + Math.random() * 0.12);
+        // Edge: golden/orange
+        color.setHSL(0.07 + Math.random() * 0.03, 0.45 + Math.random() * 0.18, 0.55 + Math.random() * 0.12);
       }
 
       colors[i3] = color.r;
@@ -226,51 +204,73 @@ export const SombreroGalaxy = ({ visualScale }: SombreroGalaxyProps) => {
     return geo;
   }, [gs]);
 
-  // Disk stars - the thin disk with spiral structure (seen edge-on)
+  // Disk stars - the thin disk with subtle spiral arm structure (seen edge-on)
   const diskGeo = useMemo(() => {
-    const diskCount = 150000;
+    const diskCount = 180000;
     const positions = new Float32Array(diskCount * 3);
     const colors = new Float32Array(diskCount * 3);
     const color = new THREE.Color();
     const maxRadius = SOMBRERO.diskRadius * gs;
-    const diskThickness = maxRadius * 0.015; // Very thin disk
+    const diskThickness = maxRadius * 0.012; // Very thin disk
+
+    // Spiral arm parameters
+    const numArms = 4;
+    const armTightness = 0.3;
 
     for (let i = 0; i < diskCount; i++) {
       const i3 = i * 3;
 
       // Exponential disk profile
       const u = Math.random();
-      const k = 3.5;
+      const k = 3.0;
       const t = -Math.log(1 - u * (1 - Math.exp(-k))) / k;
       
-      const innerRadius = maxRadius * 0.25; // Start after bulge
+      const innerRadius = maxRadius * 0.2;
       const radius = innerRadius + t * (maxRadius - innerRadius);
       const rt = (radius - innerRadius) / (maxRadius - innerRadius);
 
-      const angle = Math.random() * Math.PI * 2;
+      // Base angle with spiral arm modulation
+      let angle = Math.random() * Math.PI * 2;
+      
+      // Add spiral arm concentration - 60% of stars follow arms
+      if (Math.random() < 0.6) {
+        const armIndex = Math.floor(Math.random() * numArms);
+        const armBaseAngle = (armIndex / numArms) * Math.PI * 2;
+        const spiralAngle = armBaseAngle + armTightness * Math.log(radius / innerRadius + 1);
+        // Concentrate around spiral arm with some spread
+        const armSpread = 0.15 + rt * 0.1;
+        angle = spiralAngle + (Math.random() * 2 - 1) * armSpread;
+      }
 
       positions[i3] = Math.cos(angle) * radius;
       
-      // Very thin disk
-      const yJitter = (Math.random() * 2 - 1) * diskThickness * (1 + rt * 0.5);
+      // Very thin disk with slight flaring at edges
+      const thickness = diskThickness * (0.8 + rt * 0.4);
+      const yJitter = (Math.random() * 2 - 1) * thickness;
       positions[i3 + 1] = yJitter;
       
       positions[i3 + 2] = Math.sin(angle) * radius;
 
-      // Disk colors: mix of older yellow/orange stars and some blue regions
+      // Disk colors with spiral arm structure visible
       const rand = Math.random();
-      if (rt < 0.3) {
-        // Inner disk near bulge: golden/orange
-        color.setHSL(0.08 + Math.random() * 0.04, 0.4 + Math.random() * 0.2, 0.55 + Math.random() * 0.15);
-      } else if (rand < 0.15) {
-        // Blue star-forming regions (sparse)
-        color.setHSL(0.58 + Math.random() * 0.08, 0.7 + Math.random() * 0.2, 0.55 + Math.random() * 0.15);
-      } else if (rand < 0.5) {
-        // White/cream stars
-        color.setHSL(0.1 + Math.random() * 0.04, 0.15 + Math.random() * 0.1, 0.7 + Math.random() * 0.15);
+      // Determine if in arm (brighter) or inter-arm (dimmer)
+      const inArm = Math.random() < 0.5;
+      
+      if (rt < 0.25) {
+        // Inner disk near bulge: golden/cream
+        color.setHSL(0.09 + Math.random() * 0.03, 0.3 + Math.random() * 0.15, 0.6 + Math.random() * 0.15);
+      } else if (inArm && rand < 0.2) {
+        // Blue star-forming regions in arms
+        color.setHSL(0.58 + Math.random() * 0.08, 0.75 + Math.random() * 0.2, 0.55 + Math.random() * 0.15);
+      } else if (inArm && rand < 0.5) {
+        // Bright white/cream arm stars
+        color.setHSL(0.1 + Math.random() * 0.03, 0.12 + Math.random() * 0.08, 0.75 + Math.random() * 0.15);
+      } else if (rand < 0.6) {
+        // Golden/cream disk stars
+        color.setHSL(0.09 + Math.random() * 0.04, 0.25 + Math.random() * 0.15, 0.65 + Math.random() * 0.15);
       } else {
         // Yellow/orange older stars
-        color.setHSL(0.07 + Math.random() * 0.05, 0.5 + Math.random() * 0.25, 0.5 + Math.random() * 0.15);
+        color.setHSL(0.07 + Math.random() * 0.04, 0.45 + Math.random() * 0.2, 0.52 + Math.random() * 0.15);
       }
 
       colors[i3] = color.r;
@@ -514,34 +514,49 @@ export const SombreroGalaxy = ({ visualScale }: SombreroGalaxyProps) => {
           />
         </points>
 
-        {/* Central bulge - the bright "crown" - enhanced brightness */}
+        {/* Central bulge - compact core stars */}
         <points frustumCulled={false} renderOrder={5}>
           <bufferGeometry attach="geometry" {...bulgeGeo} />
           <pointsMaterial
-            size={gs * 80}
+            size={gs * 60}
             map={dotTexture}
             vertexColors
             transparent
-            opacity={0.95}
+            opacity={0.92}
             blending={THREE.AdditiveBlending}
             depthWrite={false}
             sizeAttenuation
           />
         </points>
 
-        {/* Center glow (billboard) - brilliant bright core with elongated shape */}
-        <sprite renderOrder={7} frustumCulled={false} scale={[bulgeR * 2.2, bulgeR * 4.0, 1]}>
-          <spriteMaterial
+        {/* Center glow - using a plane mesh that rotates with the galaxy, not a billboard */}
+        {/* This creates the elongated sombrero crown appearance perpendicular to the disk */}
+        <mesh renderOrder={7} rotation={[Math.PI / 2, 0, 0]}>
+          <planeGeometry args={[bulgeR * 5.0, bulgeR * 2.5]} />
+          <meshBasicMaterial
             map={glowTexture}
             transparent
-            opacity={1.0}
+            opacity={0.95}
             blending={THREE.AdditiveBlending}
             depthWrite={false}
-            depthTest={false}
             side={THREE.DoubleSide}
             toneMapped={false}
           />
-        </sprite>
+        </mesh>
+        
+        {/* Secondary inner glow for brighter core */}
+        <mesh renderOrder={8} rotation={[Math.PI / 2, 0, 0]}>
+          <planeGeometry args={[bulgeR * 2.5, bulgeR * 1.5]} />
+          <meshBasicMaterial
+            map={glowTexture}
+            transparent
+            opacity={0.85}
+            blending={THREE.AdditiveBlending}
+            depthWrite={false}
+            side={THREE.DoubleSide}
+            toneMapped={false}
+          />
+        </mesh>
       </group>
 
       {/* Click target */}
