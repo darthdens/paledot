@@ -34,9 +34,9 @@ const translations = {
       details: ['~80+ galaxies', 'Andromeda is our neighbor', '~10 million light-years across'],
     },
     deepSpace: {
-      title: 'Deep Space',
-      subtitle: 'Beyond the Local Group',
-      details: ['Distant galaxy clusters', 'Hundreds of millions of light-years away', 'The cosmic web'],
+      title: 'Virgo Supercluster',
+      subtitle: 'Laniakea Supercluster',
+      details: ['Contains ~100 galaxy groups', '~110 million light-years across', 'Our cosmic neighborhood'],
     },
     universe: {
       title: 'Observable Universe',
@@ -72,9 +72,9 @@ const translations = {
       details: ['~80+ galaxies', 'Andromède est notre voisine', '~10 millions d\'années-lumière'],
     },
     deepSpace: {
-      title: 'Espace Lointain',
-      subtitle: 'Au-delà du Groupe Local',
-      details: ['Amas de galaxies lointains', 'À des centaines de millions d\'années-lumière', 'La toile cosmique'],
+      title: 'Superamas de la Vierge',
+      subtitle: 'Superamas Laniakea',
+      details: ['Contient ~100 groupes de galaxies', '~110 millions d\'années-lumière', 'Notre voisinage cosmique'],
     },
     universe: {
       title: 'Univers Observable',
