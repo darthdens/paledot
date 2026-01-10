@@ -9,7 +9,6 @@ export const ORBITAL_PERIODS: Record<string, number> = {
   mars: 686.98,
   phobos: 0.32,       // Around Mars
   deimos: 1.26,       // Around Mars
-  ceres: 1680,        // In asteroid belt
   jupiter: 4332.59,
   io: 1.77,           // Around Jupiter
   europa: 3.55,       // Around Jupiter
@@ -171,24 +170,6 @@ export const celestialObjects: CelestialObject[] = [
     facts: {
       en: ['Smaller of Mars\' two moons', 'Smoothest surface in solar system', 'Only 12 km in diameter'],
       fr: ['Plus petite lune de Mars', 'Surface la plus lisse', 'Seulement 12 km de diamètre'],
-    },
-  },
-  // Ceres (Dwarf planet in asteroid belt)
-  {
-    id: 'ceres',
-    name: { en: 'Ceres', fr: 'Cérès' },
-    type: 'dwarf-planet',
-    position: [2.77 * UNITS.KM_PER_AU, 0, 0],
-    size: 939,
-    color: '#a0a0a0',
-    distanceFromEarth: 1.77 * UNITS.KM_PER_AU,
-    distanceUnit: 'AU',
-    category: 'solarSystem',
-    orbitRadius: 2.77 * UNITS.KM_PER_AU,
-    orbitPeriodDays: ORBITAL_PERIODS.ceres,
-    facts: {
-      en: ['Largest object in asteroid belt', 'Only dwarf planet in inner solar system', 'Contains 1/3 of asteroid belt mass'],
-      fr: ['Plus gros objet de la ceinture', 'Seule planète naine interne', 'Contient 1/3 de la masse de la ceinture'],
     },
   },
   // Jupiter

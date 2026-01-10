@@ -36,7 +36,6 @@ import plutoTexture from '@/assets/textures/pluto.jpg';
 import titanTexture from '@/assets/textures/titan.jpg';
 import europaTexture from '@/assets/textures/europa.jpg';
 // These are only loaded on desktop
-import ceresTexture from '@/assets/textures/ceres.jpg';
 import enceladusTexture from '@/assets/textures/enceladus.jpg';
 import phobosTexture from '@/assets/textures/phobos.jpg';
 import deimosTexture from '@/assets/textures/deimos.jpg';
@@ -263,14 +262,6 @@ const PLANET_VISUALS: Record<string, {
     metalness: 0.05,
     surfaceDetail: 'deimos',
   },
-  ceres: {
-    baseColor: '#808080',
-    secondaryColor: '#505050',
-    tertiaryColor: '#FFFFFF',    // Bright spots (Occator crater)
-    roughness: 0.88,
-    metalness: 0.1,
-    surfaceDetail: 'ceres',
-  },
   enceladus: {
     baseColor: '#FFFFFF',        // Brightest object - pure white ice
     secondaryColor: '#E8E8F0',
@@ -363,7 +354,6 @@ export const TexturedPlanet = ({
   const europaMap = useLoader(THREE.TextureLoader, europaTexture);
   
   // Secondary textures - only load on desktop
-  const ceresMap = useLoader(THREE.TextureLoader, isMobile ? moonTexture : ceresTexture);
   const enceladusMap = useLoader(THREE.TextureLoader, isMobile ? moonTexture : enceladusTexture);
   const phobosMap = useLoader(THREE.TextureLoader, isMobile ? moonTexture : phobosTexture);
   const deimosMap = useLoader(THREE.TextureLoader, isMobile ? moonTexture : deimosTexture);
@@ -379,13 +369,13 @@ export const TexturedPlanet = ({
     });
     // Only configure secondary textures on desktop
     if (!isMobile) {
-      [ceresMap, enceladusMap, phobosMap, deimosMap, tritonMap, iapetusMap].forEach(tex => {
+      [enceladusMap, phobosMap, deimosMap, tritonMap, iapetusMap].forEach(tex => {
         tex.wrapS = THREE.RepeatWrapping;
         tex.wrapT = THREE.ClampToEdgeWrapping;
         tex.colorSpace = THREE.SRGBColorSpace;
       });
     }
-  }, [earthDayMap, earthNightMap, earthCloudsMap, moonMap, mercuryMap, venusMap, marsMap, jupiterMap, saturnMap, uranusMap, neptuneMap, plutoMap, titanMap, europaMap, ceresMap, enceladusMap, phobosMap, deimosMap, tritonMap, iapetusMap, isMobile]);
+  }, [earthDayMap, earthNightMap, earthCloudsMap, moonMap, mercuryMap, venusMap, marsMap, jupiterMap, saturnMap, uranusMap, neptuneMap, plutoMap, titanMap, europaMap, enceladusMap, phobosMap, deimosMap, tritonMap, iapetusMap, isMobile]);
 
   const visuals = PLANET_VISUALS[object.id] || {
     baseColor: object.color,
@@ -421,18 +411,17 @@ export const TexturedPlanet = ({
       titan: { primary: titanMap, secondary: null },
       europa: { primary: europaMap, secondary: null },
       // Desktop-only textures
-      ceres: { primary: isMobile ? null : ceresMap, secondary: null },
       enceladus: { primary: isMobile ? null : enceladusMap, secondary: null },
       phobos: { primary: isMobile ? null : phobosMap, secondary: null },
       deimos: { primary: isMobile ? null : deimosMap, secondary: null },
       triton: { primary: isMobile ? null : tritonMap, secondary: null },
       iapetus: { primary: isMobile ? null : iapetusMap, secondary: null },
-      // Io, Ganymede, Callisto use procedural rendering (no textures available)
+      // Io, Ganymede, Callisto, Ceres use procedural rendering
     };
     
     const result = textureMap[surfaceDetail];
     return result ? { ...result, useProcedural: false } : { primary: null, secondary: null, useProcedural: false };
-  }, [visuals?.surfaceDetail, earthDayMap, earthNightMap, moonMap, mercuryMap, venusMap, marsMap, jupiterMap, saturnMap, uranusMap, neptuneMap, plutoMap, titanMap, europaMap, ceresMap, enceladusMap, phobosMap, deimosMap, tritonMap, iapetusMap, isMobile]);
+  }, [visuals?.surfaceDetail, earthDayMap, earthNightMap, moonMap, mercuryMap, venusMap, marsMap, jupiterMap, saturnMap, uranusMap, neptuneMap, plutoMap, titanMap, europaMap, enceladusMap, phobosMap, deimosMap, tritonMap, iapetusMap, isMobile]);
   
   // Create a placeholder texture for unused slots
   const placeholderTexture = useMemo(() => {
