@@ -395,21 +395,33 @@ export const SombreroGalaxy = ({ visualScale }: SombreroGalaxyProps) => {
           renderOrder={5}
         />
 
-        {/* Global smooth glow - extends to full galaxy edges */}
-        <mesh renderOrder={1} rotation={[0, 0, 0]}>
-          <planeGeometry args={[diskR * 2.2, diskR * 2.2]} />
-          <meshBasicMaterial
-            map={glowTexture}
-            transparent
-            opacity={0.9}
-            blending={THREE.AdditiveBlending}
-            depthWrite={false}
-            depthTest={false}
-            side={THREE.DoubleSide}
-            toneMapped={false}
-          />
-        </mesh>
       </group>
+
+      {/* Global smooth glow - SPRITE (billboard) so it looks good from all angles */}
+      <sprite renderOrder={1} frustumCulled={false} scale={[diskR * 2.4, diskR * 2.4, 1]}>
+        <spriteMaterial
+          map={glowTexture}
+          transparent
+          opacity={0.85}
+          blending={THREE.AdditiveBlending}
+          depthWrite={false}
+          depthTest={false}
+          toneMapped={false}
+        />
+      </sprite>
+
+      {/* Edge glow ring - outlines the galaxy */}
+      <sprite renderOrder={0} frustumCulled={false} scale={[diskR * 2.6, diskR * 2.6, 1]}>
+        <spriteMaterial
+          map={glowTexture}
+          transparent
+          opacity={0.25}
+          blending={THREE.AdditiveBlending}
+          depthWrite={false}
+          depthTest={false}
+          toneMapped={false}
+        />
+      </sprite>
 
       {/* Click target */}
       <mesh 
