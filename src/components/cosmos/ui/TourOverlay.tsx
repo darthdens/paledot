@@ -114,18 +114,22 @@ export const TourOverlay = () => {
 
         const targetPos: [number, number, number] = livePos ?? fallbackTargetPos();
 
-        // For stops that look at a specific point (like Milky Way looking at Sun's position),
-        // use the stop's lookAt directly if it's not [0,0,0] and scale level is milkyWay
+        // If lookAt is not defined, look at the target object
+        // If lookAt is defined and not [0,0,0], use it (for milky way scale etc)
         let lookAtPos: [number, number, number];
-        if (stop.scaleLevel === 'milkyWay' && (stop.lookAt[0] !== 0 || stop.lookAt[1] !== 0 || stop.lookAt[2] !== 0)) {
-          // Milky Way scale lookAt is in km
+        if (stop.lookAt && (stop.lookAt[0] !== 0 || stop.lookAt[1] !== 0 || stop.lookAt[2] !== 0)) {
+          // lookAt is in km
           lookAtPos = [
             stop.lookAt[0] * UNIFIED_SCALE,
             stop.lookAt[1] * UNIFIED_SCALE,
             stop.lookAt[2] * UNIFIED_SCALE,
           ];
-        } else {
+        } else if (!stop.lookAt) {
+          // No lookAt defined - look at the object itself
           lookAtPos = targetPos;
+        } else {
+          // lookAt is [0,0,0] - look at the origin (Sun for solar system)
+          lookAtPos = [0, 0, 0];
         }
 
         // Tour stop cameraPosition is treated as an offset vector in km

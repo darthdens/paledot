@@ -40,7 +40,7 @@ export interface TourStop {
   };
   duration: number; // seconds
   cameraPosition: [number, number, number];
-  lookAt: [number, number, number];
+  lookAt?: [number, number, number]; // Optional - if not set, camera looks at the object
   scaleLevel: ScaleLevel;
 }
 
