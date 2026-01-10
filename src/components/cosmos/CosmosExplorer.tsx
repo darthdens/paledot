@@ -1,7 +1,7 @@
 // Cosmos Explorer - Solar System visualization with fly-to navigation
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls, Stars, PerspectiveCamera } from '@react-three/drei';
-
+import { EffectComposer, Bloom } from '@react-three/postprocessing';
 import { Suspense, useEffect, useRef } from 'react';
 import { ProximaSystem } from './objects/ProximaSystem';
 import { MilkyWayGalaxy } from './objects/MilkyWayGalaxy';
@@ -197,6 +197,16 @@ export const CosmosExplorer = () => {
               <SombreroGalaxy visualScale={UNIFIED_SCALE} />
             </>
           )}
+          
+          {/* Bloom post-processing for sun glow */}
+          <EffectComposer>
+            <Bloom 
+              intensity={1.2}
+              luminanceThreshold={0.8}
+              luminanceSmoothing={0.5}
+              mipmapBlur
+            />
+          </EffectComposer>
           
           {/* Performance stats */}
           <PerformanceHUD />
