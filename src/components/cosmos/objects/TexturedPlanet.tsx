@@ -19,6 +19,7 @@ import saturnTexture from '@/assets/textures/saturn.jpg';
 import uranusTexture from '@/assets/textures/uranus.jpg';
 import neptuneTexture from '@/assets/textures/neptune.jpg';
 import plutoTexture from '@/assets/textures/pluto.jpg';
+import ceresTexture from '@/assets/textures/ceres.jpg';
 import phobosTexture from '@/assets/textures/phobos.jpg';
 import deimosTexture from '@/assets/textures/deimos.jpg';
 
@@ -398,17 +399,18 @@ export const TexturedPlanet = ({
   const uranusMap = useLoader(THREE.TextureLoader, uranusTexture);
   const neptuneMap = useLoader(THREE.TextureLoader, neptuneTexture);
   const plutoMap = useLoader(THREE.TextureLoader, plutoTexture);
+  const ceresMap = useLoader(THREE.TextureLoader, ceresTexture);
   const phobosMap = useLoader(THREE.TextureLoader, phobosTexture);
   const deimosMap = useLoader(THREE.TextureLoader, deimosTexture);
   
   // Configure texture properties for proper spherical mapping
   useMemo(() => {
-    [earthDayMap, earthNightMap, earthCloudsMap, moonMap, mercuryMap, venusMap, marsMap, jupiterMap, saturnMap, uranusMap, neptuneMap, plutoMap, phobosMap, deimosMap].forEach(tex => {
+    [earthDayMap, earthNightMap, earthCloudsMap, moonMap, mercuryMap, venusMap, marsMap, jupiterMap, saturnMap, uranusMap, neptuneMap, plutoMap, ceresMap, phobosMap, deimosMap].forEach(tex => {
       tex.wrapS = THREE.RepeatWrapping;
       tex.wrapT = THREE.ClampToEdgeWrapping;
       tex.colorSpace = THREE.SRGBColorSpace;
     });
-  }, [earthDayMap, earthNightMap, earthCloudsMap, moonMap, mercuryMap, venusMap, marsMap, jupiterMap, saturnMap, uranusMap, neptuneMap, plutoMap, phobosMap, deimosMap]);
+  }, [earthDayMap, earthNightMap, earthCloudsMap, moonMap, mercuryMap, venusMap, marsMap, jupiterMap, saturnMap, uranusMap, neptuneMap, plutoMap, ceresMap, phobosMap, deimosMap]);
   
   const visuals = PLANET_VISUALS[object.id] || {
     baseColor: object.color,
@@ -710,6 +712,7 @@ export const TexturedPlanet = ({
                 uranusMap: { value: uranusMap },
                 neptuneMap: { value: neptuneMap },
                 plutoMap: { value: plutoMap },
+                ceresMap: { value: ceresMap },
                 phobosMap: { value: phobosMap },
                 deimosMap: { value: deimosMap },
               }}
@@ -765,6 +768,7 @@ export const TexturedPlanet = ({
                 uniform sampler2D uranusMap;
                 uniform sampler2D neptuneMap;
                 uniform sampler2D plutoMap;
+                uniform sampler2D ceresMap;
                 uniform sampler2D phobosMap;
                 uniform sampler2D deimosMap;
                 varying vec3 vNormal;
@@ -1572,14 +1576,62 @@ export const TexturedPlanet = ({
                     surfaceColor = plutoColor;
                     NdotL = mix(NdotL, bumpedNdotL, 0.6);
                   }
-                  // === CERES (20) - Gray with bright spots ===
+                  // === CERES (20) - NASA texture with Occator crater bright spots ===
                   else if (surfaceType > 19.5 && surfaceType < 20.5) {
-                    float craters = 1.0 - smoothstep(0.55, 0.65, surfaceNoise) * 0.3;
-                    surfaceColor = mix(baseColor, secondaryColor, fineNoise * 0.4);
-                    surfaceColor *= craters;
-                    // Bright spots (Occator crater)
-                    float brightSpot = smoothstep(0.85, 0.95, fineNoise);
-                    surfaceColor = mix(surfaceColor, tertiaryColor, brightSpot * 0.8);
+                    // Sample base texture
+                    vec3 ceresColor = texture2D(ceresMap, vUv).rgb;
+                    
+                    // Procedural bump mapping for craters
+                    float texelSize = 0.003;
+                    float heightC = dot(ceresColor, vec3(0.299, 0.587, 0.114));
+                    float heightL = dot(texture2D(ceresMap, vUv + vec2(-texelSize, 0.0)).rgb, vec3(0.299, 0.587, 0.114));
+                    float heightR = dot(texture2D(ceresMap, vUv + vec2(texelSize, 0.0)).rgb, vec3(0.299, 0.587, 0.114));
+                    float heightU = dot(texture2D(ceresMap, vUv + vec2(0.0, texelSize)).rgb, vec3(0.299, 0.587, 0.114));
+                    float heightD = dot(texture2D(ceresMap, vUv + vec2(0.0, -texelSize)).rgb, vec3(0.299, 0.587, 0.114));
+                    
+                    float bumpStrength = 2.5;
+                    vec3 bumpNormal = normalize(vec3(
+                      (heightL - heightR) * bumpStrength,
+                      (heightD - heightU) * bumpStrength,
+                      1.0
+                    ));
+                    
+                    vec3 tangent = normalize(cross(worldNormal, vec3(0.0, 1.0, 0.0)));
+                    vec3 bitangent = normalize(cross(worldNormal, tangent));
+                    vec3 perturbedNormal = normalize(tangent * bumpNormal.x + bitangent * bumpNormal.y + worldNormal * bumpNormal.z);
+                    float bumpedNdotL = max(dot(perturbedNormal, sunDir), 0.0);
+                    
+                    // Occator crater with famous bright spots (sodium carbonate deposits)
+                    vec2 occatorCenter = vec2(0.55, 0.52);
+                    float occatorDist = length((vUv - occatorCenter) * vec2(1.0, 1.2));
+                    float occatorCrater = smoothstep(0.08, 0.03, occatorDist);
+                    
+                    // Cerealia Facula (central bright spot)
+                    vec2 cerealiaCenter = vec2(0.55, 0.52);
+                    float cerealiaDist = length(vUv - cerealiaCenter);
+                    float cerealiaBright = smoothstep(0.025, 0.01, cerealiaDist);
+                    
+                    // Vinalia Faculae (secondary bright spots)
+                    vec2 vinaliaCenter = vec2(0.52, 0.49);
+                    float vinaliaDist = length(vUv - vinaliaCenter);
+                    float vinaliaBright = smoothstep(0.015, 0.005, vinaliaDist);
+                    
+                    // Bright white sodium carbonate color
+                    vec3 brightSpotColor = vec3(1.0, 0.98, 0.95);
+                    
+                    // Slightly darken the crater floor
+                    ceresColor = mix(ceresColor, ceresColor * 0.85, occatorCrater * 0.5);
+                    
+                    // Add the bright spots
+                    ceresColor = mix(ceresColor, brightSpotColor, cerealiaBright * 0.9);
+                    ceresColor = mix(ceresColor, brightSpotColor, vinaliaBright * 0.8);
+                    
+                    // Gray rocky surface tint
+                    vec3 grayTint = vec3(0.95, 0.95, 0.97);
+                    ceresColor *= grayTint;
+                    
+                    surfaceColor = ceresColor;
+                    NdotL = mix(NdotL, bumpedNdotL, 0.6);
                   }
                   // === PHOBOS (21) - Texture-based dark rocky moon ===
                   else if (surfaceType > 20.5 && surfaceType < 21.5) {
