@@ -15,6 +15,7 @@ import mercuryTexture from '@/assets/textures/mercury.jpg';
 import venusTexture from '@/assets/textures/venus.jpg';
 import marsTexture from '@/assets/textures/mars.jpg';
 import jupiterTexture from '@/assets/textures/jupiter.jpg';
+import saturnTexture from '@/assets/textures/saturn.jpg';
 import phobosTexture from '@/assets/textures/phobos.jpg';
 import deimosTexture from '@/assets/textures/deimos.jpg';
 
@@ -390,17 +391,18 @@ export const TexturedPlanet = ({
   const venusMap = useLoader(THREE.TextureLoader, venusTexture);
   const marsMap = useLoader(THREE.TextureLoader, marsTexture);
   const jupiterMap = useLoader(THREE.TextureLoader, jupiterTexture);
+  const saturnMap = useLoader(THREE.TextureLoader, saturnTexture);
   const phobosMap = useLoader(THREE.TextureLoader, phobosTexture);
   const deimosMap = useLoader(THREE.TextureLoader, deimosTexture);
   
   // Configure texture properties for proper spherical mapping
   useMemo(() => {
-    [earthDayMap, earthNightMap, earthCloudsMap, moonMap, mercuryMap, venusMap, marsMap, jupiterMap, phobosMap, deimosMap].forEach(tex => {
+    [earthDayMap, earthNightMap, earthCloudsMap, moonMap, mercuryMap, venusMap, marsMap, jupiterMap, saturnMap, phobosMap, deimosMap].forEach(tex => {
       tex.wrapS = THREE.RepeatWrapping;
       tex.wrapT = THREE.ClampToEdgeWrapping;
       tex.colorSpace = THREE.SRGBColorSpace;
     });
-  }, [earthDayMap, earthNightMap, earthCloudsMap, moonMap, mercuryMap, venusMap, marsMap, jupiterMap, phobosMap, deimosMap]);
+  }, [earthDayMap, earthNightMap, earthCloudsMap, moonMap, mercuryMap, venusMap, marsMap, jupiterMap, saturnMap, phobosMap, deimosMap]);
   
   const visuals = PLANET_VISUALS[object.id] || {
     baseColor: object.color,
@@ -698,6 +700,7 @@ export const TexturedPlanet = ({
                 venusMap: { value: venusMap },
                 marsMap: { value: marsMap },
                 jupiterMap: { value: jupiterMap },
+                saturnMap: { value: saturnMap },
                 phobosMap: { value: phobosMap },
                 deimosMap: { value: deimosMap },
               }}
@@ -749,6 +752,7 @@ export const TexturedPlanet = ({
                 uniform sampler2D venusMap;
                 uniform sampler2D marsMap;
                 uniform sampler2D jupiterMap;
+                uniform sampler2D saturnMap;
                 uniform sampler2D phobosMap;
                 uniform sampler2D deimosMap;
                 varying vec3 vNormal;
@@ -1280,14 +1284,38 @@ export const TexturedPlanet = ({
                     
                     surfaceColor = jupiterColor;
                   }
-                  // === SATURN (8) - Pale gold subtle bands ===
+                  // === SATURN (8) - NASA texture with animated cloud bands ===
                   else if (surfaceType > 7.5 && surfaceType < 8.5) {
-                    float lat = vUv.y;
-                    float band1 = sin(lat * 18.0) * 0.25 + 0.5;
-                    float band2 = sin(lat * 40.0 + 0.3) * 0.15 + 0.5;
-                    float bands = band1 * 0.6 + band2 * 0.4 + surfaceNoise * 0.08;
-                    surfaceColor = mix(tertiaryColor, secondaryColor, clamp(bands, 0.0, 1.0));
-                    surfaceColor = mix(surfaceColor, baseColor, 0.5);
+                    // Animate cloud bands with differential rotation (slower than Jupiter)
+                    float lat = vUv.y - 0.5;
+                    float differentialSpeed = 0.005 * (1.0 - abs(lat) * 0.3);
+                    vec2 animatedUv = vUv;
+                    animatedUv.x = fract(animatedUv.x + time * differentialSpeed);
+                    
+                    // Sample NASA Saturn texture
+                    vec3 saturnColor = texture2D(saturnMap, animatedUv).rgb;
+                    
+                    // Add subtle turbulence for cloud dynamics
+                    float turbulence = sin(vUv.y * 60.0 + time * 0.03 + surfaceNoise * 2.0) * 0.015;
+                    vec2 turbUv = animatedUv;
+                    turbUv.x = fract(turbUv.x + turbulence);
+                    vec3 turbColor = texture2D(saturnMap, turbUv).rgb;
+                    saturnColor = mix(saturnColor, turbColor, 0.25);
+                    
+                    // Enhance the golden/butterscotch tones
+                    vec3 warmTint = vec3(1.0, 0.97, 0.92);
+                    saturnColor *= warmTint;
+                    
+                    // Hexagonal polar vortex hint at north pole
+                    float polarLat = abs(vUv.y - 0.5) * 2.0;
+                    float hexVortex = smoothstep(0.85, 0.95, polarLat) * 0.1;
+                    saturnColor = mix(saturnColor, vec3(0.6, 0.5, 0.3), hexVortex);
+                    
+                    // Limb darkening for gas giant atmosphere
+                    float limbDarkening = 1.0 - pow(1.0 - abs(dot(worldNormal, normalize(cameraPosition - vWorldPosition))), 0.25) * 0.12;
+                    saturnColor *= limbDarkening;
+                    
+                    surfaceColor = saturnColor;
                   }
                   // === URANUS (9) - Pale cyan with very subtle bands ===
                   else if (surfaceType > 8.5 && surfaceType < 9.5) {
