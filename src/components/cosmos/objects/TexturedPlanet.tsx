@@ -419,12 +419,53 @@ export const TexturedPlanet = ({
       tex.colorSpace = THREE.SRGBColorSpace;
     });
   }, [earthDayMap, earthNightMap, earthCloudsMap, moonMap, mercuryMap, venusMap, marsMap, jupiterMap, saturnMap, uranusMap, neptuneMap, plutoMap, ceresMap, titanMap, enceladusMap, phobosMap, deimosMap, tritonMap, iapetusMap]);
-  
+
   const visuals = PLANET_VISUALS[object.id] || {
     baseColor: object.color,
     roughness: 0.7,
     metalness: 0.1,
   };
+
+  // Select only the textures needed for this specific planet (max 4 to stay under GPU limit)
+  const planetTextures = useMemo(() => {
+    const surfaceDetail = visuals?.surfaceDetail || '';
+    
+    // Map each planet to its required textures
+    const textureMap: Record<string, { primary: THREE.Texture | null; secondary: THREE.Texture | null }> = {
+      earth: { primary: earthDayMap, secondary: earthNightMap },
+      moon: { primary: moonMap, secondary: null },
+      mercury: { primary: mercuryMap, secondary: null },
+      venus: { primary: venusMap, secondary: null },
+      mars: { primary: marsMap, secondary: null },
+      jupiter: { primary: jupiterMap, secondary: null },
+      saturn: { primary: saturnMap, secondary: null },
+      uranus: { primary: uranusMap, secondary: null },
+      neptune: { primary: neptuneMap, secondary: null },
+      pluto: { primary: plutoMap, secondary: null },
+      ceres: { primary: ceresMap, secondary: null },
+      titan: { primary: titanMap, secondary: null },
+      enceladus: { primary: enceladusMap, secondary: null },
+      phobos: { primary: phobosMap, secondary: null },
+      deimos: { primary: deimosMap, secondary: null },
+      triton: { primary: tritonMap, secondary: null },
+      iapetus: { primary: iapetusMap, secondary: null },
+    };
+    
+    return textureMap[surfaceDetail] || { primary: null, secondary: null };
+  }, [visuals?.surfaceDetail, earthDayMap, earthNightMap, moonMap, mercuryMap, venusMap, marsMap, jupiterMap, saturnMap, uranusMap, neptuneMap, plutoMap, ceresMap, titanMap, enceladusMap, phobosMap, deimosMap, tritonMap, iapetusMap]);
+  
+  // Create a placeholder texture for unused slots
+  const placeholderTexture = useMemo(() => {
+    const canvas = document.createElement('canvas');
+    canvas.width = 1;
+    canvas.height = 1;
+    const ctx = canvas.getContext('2d');
+    if (ctx) {
+      ctx.fillStyle = '#808080';
+      ctx.fillRect(0, 0, 1, 1);
+    }
+    return new THREE.CanvasTexture(canvas);
+  }, []);
   
   const planetSize = object.size * visualScale;
   const orbitRadius = (object.orbitRadius || 0) * distanceScale;
@@ -708,25 +749,10 @@ export const TexturedPlanet = ({
                 planetTilt: { value: tiltRadians },
                 ringOpacity: { value: visuals.ringOpacity ?? 0.8 },
                 ringStyle: { value: ringStyle },
-                // NASA texture maps
-                earthDayMap: { value: earthDayMap },
-                earthNightMap: { value: earthNightMap },
-                moonMap: { value: moonMap },
-                mercuryMap: { value: mercuryMap },
-                venusMap: { value: venusMap },
-                marsMap: { value: marsMap },
-                jupiterMap: { value: jupiterMap },
-                saturnMap: { value: saturnMap },
-                uranusMap: { value: uranusMap },
-                neptuneMap: { value: neptuneMap },
-                plutoMap: { value: plutoMap },
-                ceresMap: { value: ceresMap },
-                titanMap: { value: titanMap },
-                enceladusMap: { value: enceladusMap },
-                phobosMap: { value: phobosMap },
-                deimosMap: { value: deimosMap },
-                tritonMap: { value: tritonMap },
-                iapetusMap: { value: iapetusMap },
+                // Planet-specific texture maps (only 2 needed per planet to stay under GPU limit)
+                planetMap: { value: planetTextures.primary || placeholderTexture },
+                planetMapSecondary: { value: planetTextures.secondary || placeholderTexture },
+                cloudMap: { value: earthCloudsMap },
               }}
               vertexShader={`
                 varying vec3 vNormal;
@@ -768,25 +794,10 @@ export const TexturedPlanet = ({
                 uniform float planetTilt;
                 uniform float ringOpacity;
                 uniform float ringStyle;
-                // NASA texture maps
-                uniform sampler2D earthDayMap;
-                uniform sampler2D earthNightMap;
-                uniform sampler2D moonMap;
-                uniform sampler2D mercuryMap;
-                uniform sampler2D venusMap;
-                uniform sampler2D marsMap;
-                uniform sampler2D jupiterMap;
-                uniform sampler2D saturnMap;
-                uniform sampler2D uranusMap;
-                uniform sampler2D neptuneMap;
-                uniform sampler2D plutoMap;
-                uniform sampler2D ceresMap;
-                uniform sampler2D titanMap;
-                uniform sampler2D enceladusMap;
-                uniform sampler2D phobosMap;
-                uniform sampler2D deimosMap;
-                uniform sampler2D tritonMap;
-                uniform sampler2D iapetusMap;
+                // Planet-specific texture maps (reduced to stay under GPU texture unit limit)
+                uniform sampler2D planetMap;
+                uniform sampler2D planetMapSecondary;
+                uniform sampler2D cloudMap;
                 varying vec3 vNormal;
                 varying vec3 vPosition;
                 varying vec2 vUv;
@@ -965,15 +976,15 @@ export const TexturedPlanet = ({
                   // === MERCURY (2) - NASA texture with enhanced craters ===
                   else if (surfaceType > 1.5 && surfaceType < 2.5) {
                     // Sample NASA Mercury texture
-                    vec3 mercuryColor = texture2D(mercuryMap, vUv).rgb;
+                    vec3 mercuryColor = texture2D(planetMap, vUv).rgb;
                     
                     // Procedural bump mapping from texture for enhanced crater depth
                     float texelSize = 0.002;
                     float heightC = dot(mercuryColor, vec3(0.299, 0.587, 0.114));
-                    float heightL = dot(texture2D(mercuryMap, vUv + vec2(-texelSize, 0.0)).rgb, vec3(0.299, 0.587, 0.114));
-                    float heightR = dot(texture2D(mercuryMap, vUv + vec2(texelSize, 0.0)).rgb, vec3(0.299, 0.587, 0.114));
-                    float heightU = dot(texture2D(mercuryMap, vUv + vec2(0.0, texelSize)).rgb, vec3(0.299, 0.587, 0.114));
-                    float heightD = dot(texture2D(mercuryMap, vUv + vec2(0.0, -texelSize)).rgb, vec3(0.299, 0.587, 0.114));
+                    float heightL = dot(texture2D(planetMap, vUv + vec2(-texelSize, 0.0)).rgb, vec3(0.299, 0.587, 0.114));
+                    float heightR = dot(texture2D(planetMap, vUv + vec2(texelSize, 0.0)).rgb, vec3(0.299, 0.587, 0.114));
+                    float heightU = dot(texture2D(planetMap, vUv + vec2(0.0, texelSize)).rgb, vec3(0.299, 0.587, 0.114));
+                    float heightD = dot(texture2D(planetMap, vUv + vec2(0.0, -texelSize)).rgb, vec3(0.299, 0.587, 0.114));
                     
                     float bumpStrength = 2.0;
                     vec3 bumpNormal = normalize(vec3(
@@ -1008,7 +1019,7 @@ export const TexturedPlanet = ({
                     animatedUv.x = fract(animatedUv.x + cloudSpeed);
                     
                     // Sample NASA Venus atmosphere texture
-                    vec3 venusColor = texture2D(venusMap, animatedUv).rgb;
+                    vec3 venusColor = texture2D(planetMap, animatedUv).rgb;
                     
                     // Add subtle swirling motion overlay
                     float swirl = sin(vUv.y * 12.0 + time * 0.02 + vUv.x * 5.0) * 0.5 + 0.5;
@@ -1031,18 +1042,18 @@ export const TexturedPlanet = ({
                   // === EARTH (4) - NASA texture maps with city lights, auroras, and terminator scattering ===
                   else if (surfaceType > 3.5 && surfaceType < 4.5) {
                     // Sample NASA Earth day texture
-                    vec3 dayColor = texture2D(earthDayMap, vUv).rgb;
+                    vec3 dayColor = texture2D(planetMap, vUv).rgb;
                     
                     // Sample NASA Earth night texture (city lights) - this texture shows real city locations
-                    vec3 nightColor = texture2D(earthNightMap, vUv).rgb;
+                    vec3 nightColor = texture2D(planetMapSecondary, vUv).rgb;
                     
                     // === PROCEDURAL BUMP MAPPING from texture ===
                     float texelSize = 0.002;
                     float heightC = dot(dayColor, vec3(0.299, 0.587, 0.114));
-                    float heightL = dot(texture2D(earthDayMap, vUv + vec2(-texelSize, 0.0)).rgb, vec3(0.299, 0.587, 0.114));
-                    float heightR = dot(texture2D(earthDayMap, vUv + vec2(texelSize, 0.0)).rgb, vec3(0.299, 0.587, 0.114));
-                    float heightU = dot(texture2D(earthDayMap, vUv + vec2(0.0, texelSize)).rgb, vec3(0.299, 0.587, 0.114));
-                    float heightD = dot(texture2D(earthDayMap, vUv + vec2(0.0, -texelSize)).rgb, vec3(0.299, 0.587, 0.114));
+                    float heightL = dot(texture2D(planetMap, vUv + vec2(-texelSize, 0.0)).rgb, vec3(0.299, 0.587, 0.114));
+                    float heightR = dot(texture2D(planetMap, vUv + vec2(texelSize, 0.0)).rgb, vec3(0.299, 0.587, 0.114));
+                    float heightU = dot(texture2D(planetMap, vUv + vec2(0.0, texelSize)).rgb, vec3(0.299, 0.587, 0.114));
+                    float heightD = dot(texture2D(planetMap, vUv + vec2(0.0, -texelSize)).rgb, vec3(0.299, 0.587, 0.114));
                     
                     float bumpStrength = 1.5;
                     vec3 bumpNormal = normalize(vec3(
@@ -1210,15 +1221,15 @@ export const TexturedPlanet = ({
                   // === MOON (5) - NASA texture map with bump mapping ===
                   else if (surfaceType > 4.5 && surfaceType < 5.5) {
                     // Sample NASA Moon texture (LROC)
-                    vec3 moonColor = texture2D(moonMap, vUv).rgb;
+                    vec3 moonColor = texture2D(planetMap, vUv).rgb;
                     
                     // === PROCEDURAL BUMP MAPPING for craters ===
                     float texelSize = 0.003;
                     float heightC = dot(moonColor, vec3(0.299, 0.587, 0.114));
-                    float heightL = dot(texture2D(moonMap, vUv + vec2(-texelSize, 0.0)).rgb, vec3(0.299, 0.587, 0.114));
-                    float heightR = dot(texture2D(moonMap, vUv + vec2(texelSize, 0.0)).rgb, vec3(0.299, 0.587, 0.114));
-                    float heightU = dot(texture2D(moonMap, vUv + vec2(0.0, texelSize)).rgb, vec3(0.299, 0.587, 0.114));
-                    float heightD = dot(texture2D(moonMap, vUv + vec2(0.0, -texelSize)).rgb, vec3(0.299, 0.587, 0.114));
+                    float heightL = dot(texture2D(planetMap, vUv + vec2(-texelSize, 0.0)).rgb, vec3(0.299, 0.587, 0.114));
+                    float heightR = dot(texture2D(planetMap, vUv + vec2(texelSize, 0.0)).rgb, vec3(0.299, 0.587, 0.114));
+                    float heightU = dot(texture2D(planetMap, vUv + vec2(0.0, texelSize)).rgb, vec3(0.299, 0.587, 0.114));
+                    float heightD = dot(texture2D(planetMap, vUv + vec2(0.0, -texelSize)).rgb, vec3(0.299, 0.587, 0.114));
                     
                     // Stronger bump for Moon's cratered surface
                     float bumpStrength = 2.5;
@@ -1248,15 +1259,15 @@ export const TexturedPlanet = ({
                   // === MARS (6) - NASA texture with polar ice caps and dust effects ===
                   else if (surfaceType > 5.5 && surfaceType < 6.5) {
                     // Sample NASA Mars texture
-                    vec3 marsColor = texture2D(marsMap, vUv).rgb;
+                    vec3 marsColor = texture2D(planetMap, vUv).rgb;
                     
                     // Procedural bump mapping for terrain depth
                     float texelSize = 0.002;
                     float heightC = dot(marsColor, vec3(0.299, 0.587, 0.114));
-                    float heightL = dot(texture2D(marsMap, vUv + vec2(-texelSize, 0.0)).rgb, vec3(0.299, 0.587, 0.114));
-                    float heightR = dot(texture2D(marsMap, vUv + vec2(texelSize, 0.0)).rgb, vec3(0.299, 0.587, 0.114));
-                    float heightU = dot(texture2D(marsMap, vUv + vec2(0.0, texelSize)).rgb, vec3(0.299, 0.587, 0.114));
-                    float heightD = dot(texture2D(marsMap, vUv + vec2(0.0, -texelSize)).rgb, vec3(0.299, 0.587, 0.114));
+                    float heightL = dot(texture2D(planetMap, vUv + vec2(-texelSize, 0.0)).rgb, vec3(0.299, 0.587, 0.114));
+                    float heightR = dot(texture2D(planetMap, vUv + vec2(texelSize, 0.0)).rgb, vec3(0.299, 0.587, 0.114));
+                    float heightU = dot(texture2D(planetMap, vUv + vec2(0.0, texelSize)).rgb, vec3(0.299, 0.587, 0.114));
+                    float heightD = dot(texture2D(planetMap, vUv + vec2(0.0, -texelSize)).rgb, vec3(0.299, 0.587, 0.114));
                     
                     float bumpStrength = 2.5;
                     vec3 bumpNormal = normalize(vec3(
@@ -1297,13 +1308,13 @@ export const TexturedPlanet = ({
                     animatedUv.x = fract(animatedUv.x + time * differentialSpeed);
                     
                     // Sample NASA Jupiter texture
-                    vec3 jupiterColor = texture2D(jupiterMap, animatedUv).rgb;
+                    vec3 jupiterColor = texture2D(planetMap, animatedUv).rgb;
                     
                     // Add subtle turbulence to cloud edges
                     float turbulence = sin(vUv.y * 80.0 + time * 0.05 + surfaceNoise * 3.0) * 0.02;
                     vec2 turbUv = animatedUv;
                     turbUv.x = fract(turbUv.x + turbulence);
-                    vec3 turbColor = texture2D(jupiterMap, turbUv).rgb;
+                    vec3 turbColor = texture2D(planetMap, turbUv).rgb;
                     jupiterColor = mix(jupiterColor, turbColor, 0.3);
                     
                     // Enhance the warm tones
@@ -1325,13 +1336,13 @@ export const TexturedPlanet = ({
                     animatedUv.x = fract(animatedUv.x + time * differentialSpeed);
                     
                     // Sample NASA Saturn texture
-                    vec3 saturnColor = texture2D(saturnMap, animatedUv).rgb;
+                    vec3 saturnColor = texture2D(planetMap, animatedUv).rgb;
                     
                     // Add subtle turbulence for cloud dynamics
                     float turbulence = sin(vUv.y * 60.0 + time * 0.03 + surfaceNoise * 2.0) * 0.015;
                     vec2 turbUv = animatedUv;
                     turbUv.x = fract(turbUv.x + turbulence);
-                    vec3 turbColor = texture2D(saturnMap, turbUv).rgb;
+                    vec3 turbColor = texture2D(planetMap, turbUv).rgb;
                     saturnColor = mix(saturnColor, turbColor, 0.25);
                     
                     // Enhance the golden/butterscotch tones
@@ -1357,7 +1368,7 @@ export const TexturedPlanet = ({
                     animatedUv.x = fract(animatedUv.x + cloudSpeed);
                     
                     // Sample NASA Uranus texture
-                    vec3 uranusColor = texture2D(uranusMap, animatedUv).rgb;
+                    vec3 uranusColor = texture2D(planetMap, animatedUv).rgb;
                     
                     // Enhance the cyan-green ice giant color
                     vec3 icyTint = vec3(0.85, 1.0, 1.0);
@@ -1383,7 +1394,7 @@ export const TexturedPlanet = ({
                     animatedUv.x = fract(animatedUv.x + time * differentialSpeed);
                     
                     // Sample NASA Neptune texture
-                    vec3 neptuneColor = texture2D(neptuneMap, animatedUv).rgb;
+                    vec3 neptuneColor = texture2D(planetMap, animatedUv).rgb;
                     
                     // Enhance the deep azure blue
                     vec3 deepBlue = vec3(0.9, 0.95, 1.1);
@@ -1504,7 +1515,7 @@ export const TexturedPlanet = ({
                   // === TITAN (15) - NASA texture with thick orange atmospheric haze ===
                   else if (surfaceType > 14.5 && surfaceType < 15.5) {
                     // Sample base texture
-                    vec3 titanColor = texture2D(titanMap, vUv).rgb;
+                    vec3 titanColor = texture2D(planetMap, vUv).rgb;
                     
                     // Titan's thick orange atmosphere completely obscures surface
                     // Animate slow atmospheric circulation
@@ -1544,7 +1555,7 @@ export const TexturedPlanet = ({
                   // === ENCELADUS (16) - NASA texture with tiger stripe geysers ===
                   else if (surfaceType > 15.5 && surfaceType < 16.5) {
                     // Sample base texture
-                    vec3 enceladusColor = texture2D(enceladusMap, vUv).rgb;
+                    vec3 enceladusColor = texture2D(planetMap, vUv).rgb;
                     
                     // Brightest object in solar system - very high albedo ice
                     vec3 pureIce = vec3(1.0, 1.0, 1.0);
@@ -1553,10 +1564,10 @@ export const TexturedPlanet = ({
                     // Procedural bump mapping
                     float texelSize = 0.004;
                     float heightC = dot(enceladusColor, vec3(0.299, 0.587, 0.114));
-                    float heightL = dot(texture2D(enceladusMap, vUv + vec2(-texelSize, 0.0)).rgb, vec3(0.299, 0.587, 0.114));
-                    float heightR = dot(texture2D(enceladusMap, vUv + vec2(texelSize, 0.0)).rgb, vec3(0.299, 0.587, 0.114));
-                    float heightU = dot(texture2D(enceladusMap, vUv + vec2(0.0, texelSize)).rgb, vec3(0.299, 0.587, 0.114));
-                    float heightD = dot(texture2D(enceladusMap, vUv + vec2(0.0, -texelSize)).rgb, vec3(0.299, 0.587, 0.114));
+                    float heightL = dot(texture2D(planetMap, vUv + vec2(-texelSize, 0.0)).rgb, vec3(0.299, 0.587, 0.114));
+                    float heightR = dot(texture2D(planetMap, vUv + vec2(texelSize, 0.0)).rgb, vec3(0.299, 0.587, 0.114));
+                    float heightU = dot(texture2D(planetMap, vUv + vec2(0.0, texelSize)).rgb, vec3(0.299, 0.587, 0.114));
+                    float heightD = dot(texture2D(planetMap, vUv + vec2(0.0, -texelSize)).rgb, vec3(0.299, 0.587, 0.114));
                     
                     float bumpStrength = 1.5;
                     vec3 bumpNormal = normalize(vec3(
@@ -1594,15 +1605,15 @@ export const TexturedPlanet = ({
                   // === IAPETUS (17) - NASA texture with two-toned dark/bright hemispheres ===
                   else if (surfaceType > 16.5 && surfaceType < 17.5) {
                     // Sample base texture
-                    vec3 iapetusColor = texture2D(iapetusMap, vUv).rgb;
+                    vec3 iapetusColor = texture2D(planetMap, vUv).rgb;
                     
                     // Procedural bump mapping for craters
                     float texelSize = 0.004;
                     float heightC = dot(iapetusColor, vec3(0.299, 0.587, 0.114));
-                    float heightL = dot(texture2D(iapetusMap, vUv + vec2(-texelSize, 0.0)).rgb, vec3(0.299, 0.587, 0.114));
-                    float heightR = dot(texture2D(iapetusMap, vUv + vec2(texelSize, 0.0)).rgb, vec3(0.299, 0.587, 0.114));
-                    float heightU = dot(texture2D(iapetusMap, vUv + vec2(0.0, texelSize)).rgb, vec3(0.299, 0.587, 0.114));
-                    float heightD = dot(texture2D(iapetusMap, vUv + vec2(0.0, -texelSize)).rgb, vec3(0.299, 0.587, 0.114));
+                    float heightL = dot(texture2D(planetMap, vUv + vec2(-texelSize, 0.0)).rgb, vec3(0.299, 0.587, 0.114));
+                    float heightR = dot(texture2D(planetMap, vUv + vec2(texelSize, 0.0)).rgb, vec3(0.299, 0.587, 0.114));
+                    float heightU = dot(texture2D(planetMap, vUv + vec2(0.0, texelSize)).rgb, vec3(0.299, 0.587, 0.114));
+                    float heightD = dot(texture2D(planetMap, vUv + vec2(0.0, -texelSize)).rgb, vec3(0.299, 0.587, 0.114));
                     
                     float bumpStrength = 2.5;
                     vec3 bumpNormal = normalize(vec3(
@@ -1652,15 +1663,15 @@ export const TexturedPlanet = ({
                   // === TRITON (18) - NASA texture with cantaloupe terrain and nitrogen geyser streaks ===
                   else if (surfaceType > 17.5 && surfaceType < 18.5) {
                     // Sample base texture
-                    vec3 tritonColor = texture2D(tritonMap, vUv).rgb;
+                    vec3 tritonColor = texture2D(planetMap, vUv).rgb;
                     
                     // Procedural bump mapping for cantaloupe terrain
                     float texelSize = 0.004;
                     float heightC = dot(tritonColor, vec3(0.299, 0.587, 0.114));
-                    float heightL = dot(texture2D(tritonMap, vUv + vec2(-texelSize, 0.0)).rgb, vec3(0.299, 0.587, 0.114));
-                    float heightR = dot(texture2D(tritonMap, vUv + vec2(texelSize, 0.0)).rgb, vec3(0.299, 0.587, 0.114));
-                    float heightU = dot(texture2D(tritonMap, vUv + vec2(0.0, texelSize)).rgb, vec3(0.299, 0.587, 0.114));
-                    float heightD = dot(texture2D(tritonMap, vUv + vec2(0.0, -texelSize)).rgb, vec3(0.299, 0.587, 0.114));
+                    float heightL = dot(texture2D(planetMap, vUv + vec2(-texelSize, 0.0)).rgb, vec3(0.299, 0.587, 0.114));
+                    float heightR = dot(texture2D(planetMap, vUv + vec2(texelSize, 0.0)).rgb, vec3(0.299, 0.587, 0.114));
+                    float heightU = dot(texture2D(planetMap, vUv + vec2(0.0, texelSize)).rgb, vec3(0.299, 0.587, 0.114));
+                    float heightD = dot(texture2D(planetMap, vUv + vec2(0.0, -texelSize)).rgb, vec3(0.299, 0.587, 0.114));
                     
                     float bumpStrength = 2.0;
                     vec3 bumpNormal = normalize(vec3(
@@ -1717,15 +1728,15 @@ export const TexturedPlanet = ({
                   // === PLUTO (19) - NASA texture with Sputnik Planitia heart ===
                   else if (surfaceType > 18.5 && surfaceType < 19.5) {
                     // Sample base texture
-                    vec3 plutoColor = texture2D(plutoMap, vUv).rgb;
+                    vec3 plutoColor = texture2D(planetMap, vUv).rgb;
                     
                     // Procedural bump mapping
                     float texelSize = 0.003;
                     float heightC = dot(plutoColor, vec3(0.299, 0.587, 0.114));
-                    float heightL = dot(texture2D(plutoMap, vUv + vec2(-texelSize, 0.0)).rgb, vec3(0.299, 0.587, 0.114));
-                    float heightR = dot(texture2D(plutoMap, vUv + vec2(texelSize, 0.0)).rgb, vec3(0.299, 0.587, 0.114));
-                    float heightU = dot(texture2D(plutoMap, vUv + vec2(0.0, texelSize)).rgb, vec3(0.299, 0.587, 0.114));
-                    float heightD = dot(texture2D(plutoMap, vUv + vec2(0.0, -texelSize)).rgb, vec3(0.299, 0.587, 0.114));
+                    float heightL = dot(texture2D(planetMap, vUv + vec2(-texelSize, 0.0)).rgb, vec3(0.299, 0.587, 0.114));
+                    float heightR = dot(texture2D(planetMap, vUv + vec2(texelSize, 0.0)).rgb, vec3(0.299, 0.587, 0.114));
+                    float heightU = dot(texture2D(planetMap, vUv + vec2(0.0, texelSize)).rgb, vec3(0.299, 0.587, 0.114));
+                    float heightD = dot(texture2D(planetMap, vUv + vec2(0.0, -texelSize)).rgb, vec3(0.299, 0.587, 0.114));
                     
                     float bumpStrength = 2.0;
                     vec3 bumpNormal = normalize(vec3(
@@ -1777,15 +1788,15 @@ export const TexturedPlanet = ({
                   // === CERES (20) - NASA texture with Occator crater bright spots ===
                   else if (surfaceType > 19.5 && surfaceType < 20.5) {
                     // Sample base texture
-                    vec3 ceresColor = texture2D(ceresMap, vUv).rgb;
+                    vec3 ceresColor = texture2D(planetMap, vUv).rgb;
                     
                     // Procedural bump mapping for craters
                     float texelSize = 0.003;
                     float heightC = dot(ceresColor, vec3(0.299, 0.587, 0.114));
-                    float heightL = dot(texture2D(ceresMap, vUv + vec2(-texelSize, 0.0)).rgb, vec3(0.299, 0.587, 0.114));
-                    float heightR = dot(texture2D(ceresMap, vUv + vec2(texelSize, 0.0)).rgb, vec3(0.299, 0.587, 0.114));
-                    float heightU = dot(texture2D(ceresMap, vUv + vec2(0.0, texelSize)).rgb, vec3(0.299, 0.587, 0.114));
-                    float heightD = dot(texture2D(ceresMap, vUv + vec2(0.0, -texelSize)).rgb, vec3(0.299, 0.587, 0.114));
+                    float heightL = dot(texture2D(planetMap, vUv + vec2(-texelSize, 0.0)).rgb, vec3(0.299, 0.587, 0.114));
+                    float heightR = dot(texture2D(planetMap, vUv + vec2(texelSize, 0.0)).rgb, vec3(0.299, 0.587, 0.114));
+                    float heightU = dot(texture2D(planetMap, vUv + vec2(0.0, texelSize)).rgb, vec3(0.299, 0.587, 0.114));
+                    float heightD = dot(texture2D(planetMap, vUv + vec2(0.0, -texelSize)).rgb, vec3(0.299, 0.587, 0.114));
                     
                     float bumpStrength = 2.5;
                     vec3 bumpNormal = normalize(vec3(
@@ -1833,15 +1844,15 @@ export const TexturedPlanet = ({
                   }
                   // === PHOBOS (21) - Texture-based dark rocky moon ===
                   else if (surfaceType > 20.5 && surfaceType < 21.5) {
-                    vec3 phobosColor = texture2D(phobosMap, vUv).rgb;
+                    vec3 phobosColor = texture2D(planetMap, vUv).rgb;
                     
                     // Add bump mapping for craters
                     float texelSize = 0.005;
                     float heightC = dot(phobosColor, vec3(0.299, 0.587, 0.114));
-                    float heightL = dot(texture2D(phobosMap, vUv + vec2(-texelSize, 0.0)).rgb, vec3(0.299, 0.587, 0.114));
-                    float heightR = dot(texture2D(phobosMap, vUv + vec2(texelSize, 0.0)).rgb, vec3(0.299, 0.587, 0.114));
-                    float heightU = dot(texture2D(phobosMap, vUv + vec2(0.0, texelSize)).rgb, vec3(0.299, 0.587, 0.114));
-                    float heightD = dot(texture2D(phobosMap, vUv + vec2(0.0, -texelSize)).rgb, vec3(0.299, 0.587, 0.114));
+                    float heightL = dot(texture2D(planetMap, vUv + vec2(-texelSize, 0.0)).rgb, vec3(0.299, 0.587, 0.114));
+                    float heightR = dot(texture2D(planetMap, vUv + vec2(texelSize, 0.0)).rgb, vec3(0.299, 0.587, 0.114));
+                    float heightU = dot(texture2D(planetMap, vUv + vec2(0.0, texelSize)).rgb, vec3(0.299, 0.587, 0.114));
+                    float heightD = dot(texture2D(planetMap, vUv + vec2(0.0, -texelSize)).rgb, vec3(0.299, 0.587, 0.114));
                     
                     float bumpStrength = 3.0;
                     vec3 bumpNormal = normalize(vec3(
@@ -1863,15 +1874,15 @@ export const TexturedPlanet = ({
                   }
                   // === DEIMOS (22) - Texture-based smoother dark moon ===
                   else if (surfaceType > 21.5 && surfaceType < 22.5) {
-                    vec3 deimosColor = texture2D(deimosMap, vUv).rgb;
+                    vec3 deimosColor = texture2D(planetMap, vUv).rgb;
                     
                     // Lighter bump for smoother surface
                     float texelSize = 0.005;
                     float heightC = dot(deimosColor, vec3(0.299, 0.587, 0.114));
-                    float heightL = dot(texture2D(deimosMap, vUv + vec2(-texelSize, 0.0)).rgb, vec3(0.299, 0.587, 0.114));
-                    float heightR = dot(texture2D(deimosMap, vUv + vec2(texelSize, 0.0)).rgb, vec3(0.299, 0.587, 0.114));
-                    float heightU = dot(texture2D(deimosMap, vUv + vec2(0.0, texelSize)).rgb, vec3(0.299, 0.587, 0.114));
-                    float heightD = dot(texture2D(deimosMap, vUv + vec2(0.0, -texelSize)).rgb, vec3(0.299, 0.587, 0.114));
+                    float heightL = dot(texture2D(planetMap, vUv + vec2(-texelSize, 0.0)).rgb, vec3(0.299, 0.587, 0.114));
+                    float heightR = dot(texture2D(planetMap, vUv + vec2(texelSize, 0.0)).rgb, vec3(0.299, 0.587, 0.114));
+                    float heightU = dot(texture2D(planetMap, vUv + vec2(0.0, texelSize)).rgb, vec3(0.299, 0.587, 0.114));
+                    float heightD = dot(texture2D(planetMap, vUv + vec2(0.0, -texelSize)).rgb, vec3(0.299, 0.587, 0.114));
                     
                     float bumpStrength = 2.0;
                     vec3 bumpNormal = normalize(vec3(
