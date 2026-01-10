@@ -291,7 +291,8 @@ export const Sun = ({ position = [0, 0, 0], visualScale = 80 }: SunProps) => {
             varying vec3 vNormal;
             uniform vec3 glowColor;
             void main() {
-              float intensity = pow(0.65 - dot(vNormal, vec3(0.0, 0.0, 1.0)), 1.5);
+              float d = max(0.0, 0.65 - dot(vNormal, vec3(0.0, 0.0, 1.0)));
+              float intensity = pow(d, 1.5);
               gl_FragColor = vec4(glowColor, intensity * 0.8);
             }
           `}
@@ -319,7 +320,8 @@ export const Sun = ({ position = [0, 0, 0], visualScale = 80 }: SunProps) => {
             varying vec3 vNormal;
             uniform vec3 glowColor;
             void main() {
-              float intensity = pow(0.5 - dot(vNormal, vec3(0.0, 0.0, 1.0)), 2.0);
+              float d = max(0.0, 0.5 - dot(vNormal, vec3(0.0, 0.0, 1.0)));
+              float intensity = pow(d, 2.0);
               gl_FragColor = vec4(glowColor, intensity * 0.4);
             }
           `}
