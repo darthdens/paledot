@@ -34,6 +34,7 @@ import uranusTexture from '@/assets/textures/uranus.jpg';
 import neptuneTexture from '@/assets/textures/neptune.jpg';
 import plutoTexture from '@/assets/textures/pluto.jpg';
 import titanTexture from '@/assets/textures/titan.jpg';
+import europaTexture from '@/assets/textures/europa.jpg';
 // These are only loaded on desktop
 import ceresTexture from '@/assets/textures/ceres.jpg';
 import enceladusTexture from '@/assets/textures/enceladus.jpg';
@@ -422,6 +423,7 @@ export const TexturedPlanet = ({
   const neptuneMap = useLoader(THREE.TextureLoader, neptuneTexture);
   const plutoMap = useLoader(THREE.TextureLoader, plutoTexture);
   const titanMap = useLoader(THREE.TextureLoader, titanTexture);
+  const europaMap = useLoader(THREE.TextureLoader, europaTexture);
   
   // Secondary textures - only load on desktop
   const ceresMap = useLoader(THREE.TextureLoader, isMobile ? moonTexture : ceresTexture);
@@ -433,7 +435,7 @@ export const TexturedPlanet = ({
   
   // Configure texture properties for proper spherical mapping
   useMemo(() => {
-    [earthDayMap, earthNightMap, earthCloudsMap, moonMap, mercuryMap, venusMap, marsMap, jupiterMap, saturnMap, uranusMap, neptuneMap, plutoMap, titanMap].forEach(tex => {
+    [earthDayMap, earthNightMap, earthCloudsMap, moonMap, mercuryMap, venusMap, marsMap, jupiterMap, saturnMap, uranusMap, neptuneMap, plutoMap, titanMap, europaMap].forEach(tex => {
       tex.wrapS = THREE.RepeatWrapping;
       tex.wrapT = THREE.ClampToEdgeWrapping;
       tex.colorSpace = THREE.SRGBColorSpace;
@@ -446,7 +448,7 @@ export const TexturedPlanet = ({
         tex.colorSpace = THREE.SRGBColorSpace;
       });
     }
-  }, [earthDayMap, earthNightMap, earthCloudsMap, moonMap, mercuryMap, venusMap, marsMap, jupiterMap, saturnMap, uranusMap, neptuneMap, plutoMap, titanMap, ceresMap, enceladusMap, phobosMap, deimosMap, tritonMap, iapetusMap, isMobile]);
+  }, [earthDayMap, earthNightMap, earthCloudsMap, moonMap, mercuryMap, venusMap, marsMap, jupiterMap, saturnMap, uranusMap, neptuneMap, plutoMap, titanMap, europaMap, ceresMap, enceladusMap, phobosMap, deimosMap, tritonMap, iapetusMap, isMobile]);
 
   const visuals = PLANET_VISUALS[object.id] || {
     baseColor: object.color,
@@ -480,6 +482,7 @@ export const TexturedPlanet = ({
       neptune: { primary: neptuneMap, secondary: null },
       pluto: { primary: plutoMap, secondary: null },
       titan: { primary: titanMap, secondary: null },
+      europa: { primary: europaMap, secondary: null },
       // Desktop-only textures
       ceres: { primary: isMobile ? null : ceresMap, secondary: null },
       enceladus: { primary: isMobile ? null : enceladusMap, secondary: null },
@@ -491,7 +494,7 @@ export const TexturedPlanet = ({
     
     const result = textureMap[surfaceDetail];
     return result ? { ...result, useProcedural: false } : { primary: null, secondary: null, useProcedural: false };
-  }, [visuals?.surfaceDetail, earthDayMap, earthNightMap, moonMap, mercuryMap, venusMap, marsMap, jupiterMap, saturnMap, uranusMap, neptuneMap, plutoMap, titanMap, ceresMap, enceladusMap, phobosMap, deimosMap, tritonMap, iapetusMap, isMobile]);
+  }, [visuals?.surfaceDetail, earthDayMap, earthNightMap, moonMap, mercuryMap, venusMap, marsMap, jupiterMap, saturnMap, uranusMap, neptuneMap, plutoMap, titanMap, europaMap, ceresMap, enceladusMap, phobosMap, deimosMap, tritonMap, iapetusMap, isMobile]);
   
   // Create a placeholder texture for unused slots
   const placeholderTexture = useMemo(() => {
@@ -1484,27 +1487,37 @@ export const TexturedPlanet = ({
                     float nightSide = 1.0 - smoothstep(-0.1, 0.1, dot(worldNormal, sunDir));
                     surfaceColor += vec3(0.4, 0.15, 0.0) * hotSpots * nightSide;
                   }
-                  // === EUROPA (12) - Enhanced ice shell with chaos terrain ===
+                  // === EUROPA (12) - NASA texture with ice shell and lineae cracks ===
                   else if (surfaceType > 11.5 && surfaceType < 12.5) {
-                    // Base ice with slight blue tint
-                    vec3 iceColor = vec3(0.95, 0.97, 1.0);
+                    // Sample base texture
+                    vec3 europaColor = texture2D(planetMap, vUv).rgb;
                     
-                    // Complex crack network (lineae)
-                    float crack1 = smoothstep(0.48, 0.52, sin(vUv.x * 80.0 + vUv.y * 25.0 + surfaceNoise * 4.0));
-                    float crack2 = smoothstep(0.48, 0.52, sin(vUv.y * 70.0 - vUv.x * 20.0 + fineNoise * 3.0));
-                    float crack3 = smoothstep(0.49, 0.51, sin(vUv.x * 45.0 - vUv.y * 55.0 + microNoise * 2.0));
-                    float cracks = max(max(crack1, crack2), crack3) * 0.7;
+                    // Enhance the characteristic features from the texture
+                    // Procedural bump mapping from texture grayscale
+                    float texelSize = 0.004;
+                    float h1 = dot(texture2D(planetMap, vUv + vec2(texelSize, 0.0)).rgb, vec3(0.33));
+                    float h2 = dot(texture2D(planetMap, vUv - vec2(texelSize, 0.0)).rgb, vec3(0.33));
+                    float h3 = dot(texture2D(planetMap, vUv + vec2(0.0, texelSize)).rgb, vec3(0.33));
+                    float h4 = dot(texture2D(planetMap, vUv - vec2(0.0, texelSize)).rgb, vec3(0.33));
+                    vec3 texBump = normalize(vec3(h1 - h2, h3 - h4, 0.5));
                     
-                    // Chaos terrain (jumbled ice blocks)
-                    float chaos = smoothstep(0.55, 0.7, surfaceNoise) * smoothstep(0.8, 0.65, surfaceNoise);
+                    // Blend procedural cracks on top for extra detail
+                    float crack1 = smoothstep(0.48, 0.52, sin(vUv.x * 60.0 + vUv.y * 20.0 + surfaceNoise * 3.0));
+                    float crack2 = smoothstep(0.48, 0.52, sin(vUv.y * 50.0 - vUv.x * 15.0 + fineNoise * 2.0));
+                    float cracks = max(crack1, crack2) * 0.4;
                     
-                    // Reddish-brown material in cracks (salt/sulfur)
+                    // Reddish-brown material in cracks (salt/sulfur from subsurface ocean)
                     vec3 crackColor = vec3(0.55, 0.35, 0.25);
                     
-                    surfaceColor = iceColor;
-                    surfaceColor = mix(surfaceColor, crackColor, cracks);
-                    surfaceColor = mix(surfaceColor, vec3(0.7, 0.6, 0.5), chaos * 0.3);
-                    surfaceColor = mix(surfaceColor, vec3(0.9, 0.92, 0.95), microNoise * 0.15);
+                    // Slightly blue-white ice enhancement
+                    europaColor = mix(europaColor, vec3(0.95, 0.97, 1.0), 0.15);
+                    europaColor = mix(europaColor, crackColor, cracks);
+                    
+                    // Apply subtle bump lighting
+                    float bumpLight = dot(texBump, normalize(vec3(0.5, 0.5, 1.0)));
+                    europaColor *= 0.9 + bumpLight * 0.2;
+                    
+                    surfaceColor = europaColor;
                   }
                   // === GANYMEDE (13) - Enhanced with dark/light terrain contrast ===
                   else if (surfaceType > 12.5 && surfaceType < 13.5) {
