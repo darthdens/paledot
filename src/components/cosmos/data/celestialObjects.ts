@@ -789,17 +789,18 @@ export const celestialObjects: CelestialObject[] = [
   },
   {
     id: 'triangulum',
-    name: { en: 'Triangulum Galaxy', fr: 'Galaxie du Triangle' },
+    name: { en: 'Triangulum Galaxy (M33)', fr: 'Galaxie du Triangle (M33)' },
     type: 'galaxy',
-    position: [2.73e6 * UNITS.KM_PER_LY, 1e6 * UNITS.KM_PER_LY, 0],
+    // Position matches TriangulumGalaxy.tsx component
+    position: [-2.73e6 * UNITS.KM_PER_LY * 0.5, 2.73e6 * UNITS.KM_PER_LY * 0.1, 2.73e6 * UNITS.KM_PER_LY * 0.85],
     size: 60000 * UNITS.KM_PER_LY,
-    color: '#b8d4e3',
+    color: '#7ecfff', // Blue with pink tints
     distanceFromEarth: 2.73,
     distanceUnit: 'Mly',
     category: 'galaxies',
     facts: {
-      en: ['Third-largest in Local Group', 'Spiral galaxy like Milky Way', '40 billion stars'],
-      fr: ['3ème plus grande du Groupe Local', 'Galaxie spirale', '40 milliards d\'étoiles'],
+      en: ['Third-largest in Local Group at 2.73M ly', '~60,000 light-years diameter (half of Milky Way)', '~40 billion stars with prominent HII regions'],
+      fr: ['3ème plus grande du Groupe Local à 2,73M al', '~60 000 années-lumière de diamètre', '~40 milliards d\'étoiles avec régions HII'],
     },
   },
   {

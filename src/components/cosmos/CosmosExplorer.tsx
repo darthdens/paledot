@@ -6,6 +6,7 @@ import { Suspense, useEffect, useRef } from 'react';
 import { ProximaSystem } from './objects/ProximaSystem';
 import { MilkyWayGalaxy } from './objects/MilkyWayGalaxy';
 import { AndromedaGalaxy } from './objects/AndromedaGalaxy';
+import { TriangulumGalaxy } from './objects/TriangulumGalaxy';
 import { GalaxySkyGlow } from './objects/GalaxySkyGlow';
 import { GalaxyRotator } from './objects/GalaxyRotator';
 import { GalaxyFadeWrapper } from './GalaxyFadeWrapper';
@@ -36,8 +37,8 @@ export const CosmosExplorer = () => {
   const showTrails = useCosmosStore(state => state.showTrails);
   const currentScale = useCosmosStore(state => state.currentScale);
   
-  // Hide Andromeda when within solar system or Proxima Centauri system
-  const showAndromeda = currentScale !== 'earth' && currentScale !== 'solarSystem' && currentScale !== 'stellar';
+  // Hide distant galaxies when within solar system or Proxima Centauri system
+  const showDistantGalaxies = currentScale !== 'earth' && currentScale !== 'solarSystem' && currentScale !== 'stellar';
   
   // Force cursor none on canvas - OrbitControls tries to set cursor styles
   useEffect(() => {
@@ -184,9 +185,14 @@ export const CosmosExplorer = () => {
             </GalaxyFadeWrapper>
           </GalaxyRotator>
           
-          {/* Andromeda Galaxy - OUTSIDE the GalaxyRotator so it doesn't rotate with Milky Way */}
+          {/* Distant Galaxies - OUTSIDE the GalaxyRotator so they don't rotate with Milky Way */}
           {/* Hidden when within solar system or Proxima Centauri system for performance */}
-          {showAndromeda && <AndromedaGalaxy visualScale={UNIFIED_SCALE} />}
+          {showDistantGalaxies && (
+            <>
+              <AndromedaGalaxy visualScale={UNIFIED_SCALE} />
+              <TriangulumGalaxy visualScale={UNIFIED_SCALE} />
+            </>
+          )}
           
           {/* Performance stats */}
           <PerformanceHUD />
