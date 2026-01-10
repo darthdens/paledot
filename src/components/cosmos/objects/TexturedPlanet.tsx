@@ -14,6 +14,7 @@ import moonTexture from '@/assets/textures/moon.jpg';
 import mercuryTexture from '@/assets/textures/mercury.jpg';
 import venusTexture from '@/assets/textures/venus.jpg';
 import marsTexture from '@/assets/textures/mars.jpg';
+import jupiterTexture from '@/assets/textures/jupiter.jpg';
 
 interface TexturedPlanetProps {
   object: CelestialObject;
@@ -386,15 +387,16 @@ export const TexturedPlanet = ({
   const mercuryMap = useLoader(THREE.TextureLoader, mercuryTexture);
   const venusMap = useLoader(THREE.TextureLoader, venusTexture);
   const marsMap = useLoader(THREE.TextureLoader, marsTexture);
+  const jupiterMap = useLoader(THREE.TextureLoader, jupiterTexture);
   
   // Configure texture properties for proper spherical mapping
   useMemo(() => {
-    [earthDayMap, earthNightMap, earthCloudsMap, moonMap, mercuryMap, venusMap, marsMap].forEach(tex => {
+    [earthDayMap, earthNightMap, earthCloudsMap, moonMap, mercuryMap, venusMap, marsMap, jupiterMap].forEach(tex => {
       tex.wrapS = THREE.RepeatWrapping;
       tex.wrapT = THREE.ClampToEdgeWrapping;
       tex.colorSpace = THREE.SRGBColorSpace;
     });
-  }, [earthDayMap, earthNightMap, earthCloudsMap, moonMap, mercuryMap, venusMap, marsMap]);
+  }, [earthDayMap, earthNightMap, earthCloudsMap, moonMap, mercuryMap, venusMap, marsMap, jupiterMap]);
   
   const visuals = PLANET_VISUALS[object.id] || {
     baseColor: object.color,
@@ -689,6 +691,7 @@ export const TexturedPlanet = ({
                 mercuryMap: { value: mercuryMap },
                 venusMap: { value: venusMap },
                 marsMap: { value: marsMap },
+                jupiterMap: { value: jupiterMap },
               }}
               vertexShader={`
                 varying vec3 vNormal;
@@ -737,6 +740,7 @@ export const TexturedPlanet = ({
                 uniform sampler2D mercuryMap;
                 uniform sampler2D venusMap;
                 uniform sampler2D marsMap;
+                uniform sampler2D jupiterMap;
                 varying vec3 vNormal;
                 varying vec3 vPosition;
                 varying vec2 vUv;
@@ -1238,20 +1242,33 @@ export const TexturedPlanet = ({
                     surfaceColor = marsColor;
                     NdotL = mix(NdotL, bumpedNdotL, 0.7);
                   }
-                  // === JUPITER (7) - Tan/brown bands with Great Red Spot ===
+                  // === JUPITER (7) - NASA texture with animated cloud bands ===
                   else if (surfaceType > 6.5 && surfaceType < 7.5) {
-                    float lat = vUv.y;
-                    float band1 = sin(lat * 25.0) * 0.5 + 0.5;
-                    float band2 = sin(lat * 55.0 + 0.5) * 0.3 + 0.5;
-                    float band3 = sin(lat * 90.0 + surfaceNoise * 1.5) * 0.2 + 0.5;
-                    float bands = band1 * 0.5 + band2 * 0.3 + band3 * 0.2 + surfaceNoise * 0.15;
-                    surfaceColor = mix(tertiaryColor, secondaryColor, clamp(bands, 0.0, 1.0));
-                    surfaceColor = mix(surfaceColor, baseColor, 0.3);
-                    // Great Red Spot
-                    vec2 spotCenter = vec2(0.6, 0.35);
-                    vec2 spotDist = (vUv - spotCenter) / vec2(0.08, 0.05);
-                    float spot = 1.0 - smoothstep(0.8, 1.0, length(spotDist));
-                    surfaceColor = mix(surfaceColor, vec3(0.7, 0.25, 0.2), spot * 0.8);
+                    // Animate cloud band rotation (differential rotation - equator faster)
+                    float lat = vUv.y - 0.5;
+                    float differentialSpeed = 0.008 * (1.0 - abs(lat) * 0.4);
+                    vec2 animatedUv = vUv;
+                    animatedUv.x = fract(animatedUv.x + time * differentialSpeed);
+                    
+                    // Sample NASA Jupiter texture
+                    vec3 jupiterColor = texture2D(jupiterMap, animatedUv).rgb;
+                    
+                    // Add subtle turbulence to cloud edges
+                    float turbulence = sin(vUv.y * 80.0 + time * 0.05 + surfaceNoise * 3.0) * 0.02;
+                    vec2 turbUv = animatedUv;
+                    turbUv.x = fract(turbUv.x + turbulence);
+                    vec3 turbColor = texture2D(jupiterMap, turbUv).rgb;
+                    jupiterColor = mix(jupiterColor, turbColor, 0.3);
+                    
+                    // Enhance the warm tones
+                    vec3 warmTint = vec3(1.0, 0.95, 0.9);
+                    jupiterColor *= warmTint;
+                    
+                    // Subtle limb darkening for gas giant atmosphere
+                    float limbDarkening = 1.0 - pow(1.0 - abs(dot(worldNormal, normalize(cameraPosition - vWorldPosition))), 0.3) * 0.15;
+                    jupiterColor *= limbDarkening;
+                    
+                    surfaceColor = jupiterColor;
                   }
                   // === SATURN (8) - Pale gold subtle bands ===
                   else if (surfaceType > 7.5 && surfaceType < 8.5) {
