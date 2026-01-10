@@ -233,13 +233,13 @@ export const Sun = ({ position = [0, 0, 0], visualScale = 80 }: SunProps) => {
               vec2 uv = vUv * 8.0;
               float n = noise(uv) * 0.5 + noise(uv * 2.0) * 0.25 + noise(uv * 4.0) * 0.125;
               
-              // Bright yellow-orange core
-              vec3 coreColor = vec3(1.0, 0.95, 0.7);
-              vec3 hotColor = vec3(1.0, 0.8, 0.3);
+              // Brighter, warmer core colors
+              vec3 coreColor = vec3(1.0, 0.98, 0.85);
+              vec3 hotColor = vec3(1.0, 0.85, 0.5);
               vec3 surfaceColor = mix(hotColor, coreColor, n);
               
               // Make it very bright (HDR-like)
-              surfaceColor *= 2.5;
+              surfaceColor *= 3.0;
               
               gl_FragColor = vec4(surfaceColor, 1.0);
             }
@@ -247,13 +247,13 @@ export const Sun = ({ position = [0, 0, 0], visualScale = 80 }: SunProps) => {
         />
       </mesh>
 
-      {/* Inner corona - bright yellow */}
+      {/* Inner corona - bright warm yellow */}
       <mesh ref={coronaRef}>
-        <sphereGeometry args={[sunSize * 1.08, 64, 64]} />
+        <sphereGeometry args={[sunSize * 1.1, 64, 64]} />
         <meshBasicMaterial
-          color="#FFE566"
+          color="#FFF0A0"
           transparent
-          opacity={0.6}
+          opacity={0.5}
           depthWrite={false}
         />
       </mesh>
@@ -326,11 +326,11 @@ export const Sun = ({ position = [0, 0, 0], visualScale = 80 }: SunProps) => {
       </mesh>
 
       {/* Core glow sprite - bright center */}
-      <sprite renderOrder={-5} scale={[sunSize * 5, sunSize * 5, 1]}>
+      <sprite renderOrder={-5} scale={[sunSize * 7, sunSize * 7, 1]}>
         <spriteMaterial
           map={glowTexture}
           transparent
-          opacity={0.7}
+          opacity={0.75}
           blending={THREE.AdditiveBlending}
           depthWrite={false}
           depthTest={false}
@@ -338,24 +338,23 @@ export const Sun = ({ position = [0, 0, 0], visualScale = 80 }: SunProps) => {
       </sprite>
 
       {/* Medium glow sprite - extended corona */}
-      <sprite ref={outerGlowRef} renderOrder={-6} scale={[sunSize * 10, sunSize * 10, 1]}>
+      <sprite ref={outerGlowRef} renderOrder={-6} scale={[sunSize * 14, sunSize * 14, 1]}>
         <spriteMaterial
           map={outerGlowTexture}
           transparent
-          opacity={0.35}
+          opacity={0.3}
           blending={THREE.AdditiveBlending}
           depthWrite={false}
           depthTest={false}
         />
       </sprite>
 
-
       {/* Large outer glow sprite - far reaching halo */}
-      <sprite renderOrder={-8} scale={[sunSize * 20, sunSize * 20, 1]}>
+      <sprite renderOrder={-8} scale={[sunSize * 28, sunSize * 28, 1]}>
         <spriteMaterial
           map={outerGlowTexture}
           transparent
-          opacity={0.12}
+          opacity={0.1}
           blending={THREE.AdditiveBlending}
           depthWrite={false}
           depthTest={false}
