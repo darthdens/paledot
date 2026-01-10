@@ -15,7 +15,7 @@ const WHIRLPOOL = {
   diskRadius: 38000, // Half of 76,000 ly diameter
   bulgeRadius: 5000, // Prominent central bulge
   branches: 2, // Two beautifully defined spiral arms
-  spinTurns: 2.2, // Arms wrap ~240° around
+  spinTurns: 2.35, // Arms wrap ~250° around
   inclination: (20 * Math.PI) / 180, // ~20° inclination (nearly face-on)
   distanceFromMilkyWay: 23e6, // 23 million light-years
 };
@@ -24,10 +24,10 @@ const WHIRLPOOL = {
 // Position is calculated dynamically to stay at arm tip
 const NGC5195 = {
   radius: 12000,
-  // Distance from center - closer to disk edge where arm ends
-  distanceFromCenter: 42000,
-  // Vertical offset
-  yOffset: 2500,
+  // Distance from center - at the arm tip
+  distanceFromCenter: 40000,
+  // Vertical offset - slightly above disk plane
+  yOffset: 2000,
 };
 
 // Whirlpool glow texture: warm cream core → pink HII → blue outer
@@ -421,12 +421,12 @@ export const WhirlpoolGalaxy = ({ visualScale }: WhirlpoolGalaxyProps) => {
       const spiralFactor = Math.pow(rt, 0.5);
       const spinAngle = spiralFactor * spinTurns * Math.PI * 2;
 
-      // Offset slightly to trailing edge of arm
-      const trailingOffset = -0.04;
+      // Blend into arms - wider spread and more variation
+      const trailingOffset = -0.02 + (Math.random() - 0.5) * 0.04;
       
-      // Tight lane along arm edge
-      const laneWidth = 0.015 + rt * 0.025;
-      const laneJitter = (Math.random() + Math.random() - 1) * laneWidth;
+      // Much wider lane spread to blend with arm stars
+      const laneWidth = 0.04 + rt * 0.08;
+      const laneJitter = (Math.random() + Math.random() + Math.random() - 1.5) * laneWidth;
 
       const angle = branchAngle + spinAngle + trailingOffset + laneJitter;
 
