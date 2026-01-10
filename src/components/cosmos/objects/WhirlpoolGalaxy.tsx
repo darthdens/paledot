@@ -116,6 +116,7 @@ const createDotTexture = () => {
 export const WhirlpoolGalaxy = ({ visualScale }: WhirlpoolGalaxyProps) => {
   const groupRef = useRef<THREE.Group>(null);
   const companionGroupRef = useRef<THREE.Group>(null);
+  const bridgeGroupRef = useRef<THREE.Group>(null);
   const centerWorldPos = useRef(new THREE.Vector3());
   const rotationTimeRef = useRef(0);
 
@@ -512,21 +513,16 @@ export const WhirlpoolGalaxy = ({ visualScale }: WhirlpoolGalaxyProps) => {
   }, [gs]);
 
   // Tidal bridge geometry - connects arm tip to companion with color/density transition
+  // Uses normalized coordinates (0-1) that will be transformed by the bridge group
   const tidalBridgeGeo = useMemo(() => {
     const count = 50000; // Dense bridge
     const positions = new Float32Array(count * 3);
     const colors = new Float32Array(count * 3);
     const color = new THREE.Color();
 
-    // Bridge starts at the actual arm tip (use full spiral calculation for rt=1)
-    const armTipRt = 1.0;
-    const armTipSpiral = Math.pow(armTipRt, 0.5) * WHIRLPOOL.spinTurns * Math.PI * 2;
-    const armTipRadius = WHIRLPOOL.diskRadius * gs * 0.98; // Near edge
-    
-    // Companion position (relative to center)
-    const companionDist = NGC5195.distanceFromCenter * gs;
-    // Companion is positioned at the arm tip angle
-    const companionAngle = armTipSpiral;
+    // Bridge is generated as a straight strip from (0,0,0) to (1,0,0)
+    // and then positioned/rotated in the render to connect arm tip to companion
+    const bridgeLength = 1.0;
 
     for (let i = 0; i < count; i++) {
       const i3 = i * 3;
@@ -535,24 +531,16 @@ export const WhirlpoolGalaxy = ({ visualScale }: WhirlpoolGalaxyProps) => {
       const rawT = Math.random();
       const t = rawT < 0.5 ? Math.pow(rawT * 2, 1.5) * 0.5 : 0.5 + Math.pow((rawT - 0.5) * 2, 0.7) * 0.5;
       
-      // Wider at ends, narrower in middle
-      const spread = 0.08 + Math.abs(t - 0.5) * 0.2;
+      // Wider at ends, narrower in middle (normalized spread)
+      const spread = 0.08 + Math.abs(t - 0.5) * 0.15;
 
-      // Interpolate from arm tip position to companion position
-      const startX = Math.cos(armTipSpiral) * armTipRadius;
-      const startZ = Math.sin(armTipSpiral) * armTipRadius;
-      const endX = Math.cos(companionAngle) * companionDist;
-      const endZ = Math.sin(companionAngle) * companionDist;
-      
-      // Linear interpolation with spread
-      const baseX = startX + (endX - startX) * t;
-      const baseZ = startZ + (endZ - startZ) * t;
-      
-      const x = baseX + (Math.random() - 0.5) * spread * WHIRLPOOL.diskRadius * gs * 0.35;
-      const z = baseZ + (Math.random() - 0.5) * spread * WHIRLPOOL.diskRadius * gs * 0.35;
+      // Generate along X axis from 0 to bridgeLength
+      const x = t * bridgeLength;
+      const y = (Math.random() - 0.5) * spread * 0.3;
+      const z = (Math.random() - 0.5) * spread;
       
       positions[i3] = x;
-      positions[i3 + 1] = NGC5195.yOffset * gs * t + (Math.random() - 0.5) * spread * WHIRLPOOL.diskRadius * gs * 0.12;
+      positions[i3 + 1] = y;
       positions[i3 + 2] = z;
 
       // Color transition: blue/pink at arm end → yellow/orange near companion
@@ -611,6 +599,13 @@ export const WhirlpoolGalaxy = ({ visualScale }: WhirlpoolGalaxyProps) => {
     geo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
     geo.boundingSphere = new THREE.Sphere(new THREE.Vector3(0, 0, 0), Infinity);
     return geo;
+  }, []);
+
+  // Calculate bridge length for scaling
+  const bridgeLength = useMemo(() => {
+    const armTipRadius = WHIRLPOOL.diskRadius * gs * 0.98;
+    const companionDist = NGC5195.distanceFromCenter * gs;
+    return companionDist - armTipRadius + 5000 * gs; // Bridge from arm tip to companion
   }, [gs]);
 
   // Update companion position to match arm rotation
@@ -631,13 +626,25 @@ export const WhirlpoolGalaxy = ({ visualScale }: WhirlpoolGalaxyProps) => {
     }
 
     // Update companion position to follow arm tip
+    const armAngle = getArmTipAngle(rotationTimeRef.current);
+    const companionDist = NGC5195.distanceFromCenter * gs;
+    const armTipRadius = WHIRLPOOL.diskRadius * gs * 0.98;
+    
     if (companionGroupRef.current) {
-      const armAngle = getArmTipAngle(rotationTimeRef.current);
-      const companionDist = NGC5195.distanceFromCenter * gs;
-      
       companionGroupRef.current.position.x = Math.cos(armAngle) * companionDist;
       companionGroupRef.current.position.y = NGC5195.yOffset * gs;
       companionGroupRef.current.position.z = Math.sin(armAngle) * companionDist;
+    }
+    
+    // Update bridge position and rotation to connect arm tip to companion
+    if (bridgeGroupRef.current) {
+      // Position bridge at arm tip
+      bridgeGroupRef.current.position.x = Math.cos(armAngle) * armTipRadius;
+      bridgeGroupRef.current.position.y = 0;
+      bridgeGroupRef.current.position.z = Math.sin(armAngle) * armTipRadius;
+      
+      // Rotate bridge to point toward companion
+      bridgeGroupRef.current.rotation.y = -armAngle;
     }
   });
 
@@ -700,18 +707,22 @@ export const WhirlpoolGalaxy = ({ visualScale }: WhirlpoolGalaxyProps) => {
           renderOrder={3}
         />
 
-        {/* Tidal bridge to companion - rotates with galaxy */}
-        <DifferentialRotationPoints
-          key="whirlpool-bridge"
-          geometry={tidalBridgeGeo}
-          size={gs * 42}
-          map={dotTexture}
-          opacity={0.55}
-          maxRadius={NGC5195.distanceFromCenter * gs}
-          rotationMultiplier={1}
-          differentialStrength={0.04}
-          renderOrder={1}
-        />
+        {/* Tidal bridge to companion - positioned dynamically in useFrame */}
+        <group ref={bridgeGroupRef}>
+          <points frustumCulled={false} renderOrder={1} scale={[bridgeLength, bridgeLength * 0.4, bridgeLength * 0.4]}>
+            <bufferGeometry attach="geometry" {...tidalBridgeGeo} />
+            <pointsMaterial
+              size={gs * 42}
+              map={dotTexture}
+              vertexColors
+              transparent
+              opacity={0.55}
+              blending={THREE.AdditiveBlending}
+              depthWrite={false}
+              sizeAttenuation
+            />
+          </points>
+        </group>
 
         {/* Center glow */}
         <sprite renderOrder={4} frustumCulled={false} scale={[diskR * 2.0, diskR * 2.0, 1]}>
