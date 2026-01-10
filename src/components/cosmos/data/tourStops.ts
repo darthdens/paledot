@@ -132,7 +132,7 @@ export const tourStops: TourStop[] = [
     duration: 8,
     // Jupiter radius is 69911 km - much larger, scale accordingly
     cameraPosition: [0, 175000, 525000],
-    lookAt: [0, 0, 0],
+    // No lookAt - center on Jupiter
     scaleLevel: 'solarSystem',
   },
   {
@@ -165,7 +165,7 @@ export const tourStops: TourStop[] = [
     duration: 7,
     // Saturn radius is 58232 km - large gas giant
     cameraPosition: [0, 145000, 440000],
-    lookAt: [0, 0, 0],
+    // No lookAt - center on Saturn
     scaleLevel: 'solarSystem',
   },
   {
@@ -198,7 +198,7 @@ export const tourStops: TourStop[] = [
     duration: 7,
     // Uranus radius is 25362 km - ice giant
     cameraPosition: [0, 65000, 190000],
-    lookAt: [0, 0, 0],
+    // No lookAt - center on Uranus
     scaleLevel: 'solarSystem',
   },
   {
@@ -215,7 +215,7 @@ export const tourStops: TourStop[] = [
     duration: 7,
     // Neptune radius is 24622 km - similar to Uranus
     cameraPosition: [0, 62000, 185000],
-    lookAt: [0, 0, 0],
+    // No lookAt - center on Neptune
     scaleLevel: 'solarSystem',
   },
   {
@@ -280,9 +280,9 @@ export const tourStops: TourStop[] = [
       fr: 'À seulement 4,24 années-lumière, Proxima du Centaure est l\'étoile la plus proche de notre Soleil. Cette naine rouge abrite au moins deux planètes, dont Proxima b, qui orbite dans la zone habitable où l\'eau liquide pourrait exister.',
     },
     duration: 8,
-    // Match Quick Jump: CameraController uses a 500x visual boost for distant stars and flies to ~5x boosted size.
-    cameraPosition: [268187500, 160912500, 536375000],
-    lookAt: [0, 0, 0],
+    // Offset from star position - smaller offset for closer view
+    cameraPosition: [50000, 30000, 100000],
+    // No lookAt - center on Proxima Centauri
     scaleLevel: 'stellar',
   },
   {
@@ -297,9 +297,9 @@ export const tourStops: TourStop[] = [
       fr: 'La Nébuleuse d\'Orion est l\'une des nébuleuses les plus brillantes visibles à l\'œil nu. Située à 1 344 années-lumière, c\'est une pouponnière stellaire où de nouvelles étoiles naissent.',
     },
     duration: 8,
-    // Much closer to see the nebula details (offset from the nebula center)
+    // Offset from the nebula center
     cameraPosition: [0, 40 * UNITS.KM_PER_LY, 120 * UNITS.KM_PER_LY],
-    lookAt: [0, 0, 0],
+    // No lookAt - center on nebula
     scaleLevel: 'stellar',
   },
   {
@@ -333,7 +333,7 @@ export const tourStops: TourStop[] = [
     duration: 10,
     // Close-up tilted view to see the spiral structure - Andromeda is ~220,000 ly diameter
     cameraPosition: [120000 * UNITS.KM_PER_LY, 80000 * UNITS.KM_PER_LY, 180000 * UNITS.KM_PER_LY],
-    lookAt: [0, 0, 0],
+    // No lookAt - center on Andromeda
     scaleLevel: 'localGroup',
   },
   {
@@ -350,7 +350,7 @@ export const tourStops: TourStop[] = [
     duration: 10,
     // Tilted view to see spiral structure with depth - closer zoom
     cameraPosition: [60000 * UNITS.KM_PER_LY, 50000 * UNITS.KM_PER_LY, 80000 * UNITS.KM_PER_LY],
-    lookAt: [0, 0, 0],
+    // No lookAt - center on Triangulum
     scaleLevel: 'localGroup',
   },
   {
@@ -367,7 +367,7 @@ export const tourStops: TourStop[] = [
     duration: 10,
     // Tilted view to see spiral arms with depth and companion - close zoom
     cameraPosition: [50000 * UNITS.KM_PER_LY, 60000 * UNITS.KM_PER_LY, 70000 * UNITS.KM_PER_LY],
-    lookAt: [0, 0, 0],
+    // No lookAt - center on Whirlpool
     scaleLevel: 'localGroup',
   },
   {
@@ -384,7 +384,7 @@ export const tourStops: TourStop[] = [
     duration: 10,
     // Classic sombrero edge-on view - see the hat shape with dust lane
     cameraPosition: [60000 * UNITS.KM_PER_LY, 12000 * UNITS.KM_PER_LY, 40000 * UNITS.KM_PER_LY],
-    lookAt: [0, 0, 0],
+    // No lookAt - center on Sombrero
     scaleLevel: 'localGroup',
   },
   {

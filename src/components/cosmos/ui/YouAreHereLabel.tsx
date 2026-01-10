@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useLanguage } from '@/i18n/LanguageContext';
 import { useCosmosStore } from '../store/useCosmosStore';
-import { Globe, Sun, Star, Sparkles, Circle, Infinity, Telescope, ChevronDown, ChevronUp } from 'lucide-react';
+import { Globe, Sun, Star, Sparkles, Circle, Infinity, ChevronDown, ChevronUp } from 'lucide-react';
 import type { ScaleLevel } from '../types';
 
 const translations = {
@@ -91,17 +91,20 @@ export const YouAreHereLabel = () => {
   const selectedObject = useCosmosStore((state) => state.selectedObject);
   const [isMinimized, setIsMinimized] = useState(false);
 
-  // Check if we're viewing a distant galaxy (not in local group)
-  const isDistantGalaxy = selectedObject?.type === 'galaxy' && 
-    !['milky-way-center', 'andromeda', 'triangulum'].includes(selectedObject.id);
+  // Local Group galaxies (Milky Way, Andromeda, Triangulum)
+  const localGroupGalaxies = ['milky-way-center', 'andromeda', 'triangulum'];
   
-  // Get location info based on current scale and selected object
+  // Check if we're viewing a galaxy outside the Local Group (Virgo Supercluster galaxies)
+  const isDistantGalaxy = selectedObject?.type === 'galaxy' && 
+    !localGroupGalaxies.includes(selectedObject.id);
+  
+  // Hide the label entirely when viewing non-Local Group galaxies
+  if (isDistantGalaxy) {
+    return null;
+  }
+  
+  // Get location info based on current scale
   const getLocationInfo = () => {
-    // If viewing a distant galaxy, show deep space info
-    if (isDistantGalaxy) {
-      return t.deepSpace;
-    }
-    
     switch (currentScale) {
       case 'earth':
         return t.earth;
@@ -121,11 +124,6 @@ export const YouAreHereLabel = () => {
   };
   
   const getScaleIcon = (scale: ScaleLevel) => {
-    // If viewing distant galaxy, show telescope icon
-    if (isDistantGalaxy) {
-      return <Telescope className="w-4 h-4" />;
-    }
-    
     switch (scale) {
       case 'earth':
         return <Globe className="w-4 h-4" />;
