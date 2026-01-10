@@ -387,8 +387,8 @@ export const TourOverlay = () => {
       <div 
         className={`${isFullscreen ? 'fixed' : 'absolute'} z-[10001] bg-black/90 backdrop-blur-md rounded-lg border border-white/20 overflow-hidden cursor-pointer
           bottom-2 left-2 right-2 
-          sm:bottom-auto sm:top-4 sm:left-4 sm:right-auto sm:w-auto`}
-        style={isFullscreen ? { 
+          sm:bottom-4 sm:top-auto sm:left-auto sm:right-4 sm:w-auto`}
+        style={isFullscreen ? {
           bottom: 'calc(0.5rem + env(safe-area-inset-bottom))',
           left: 'calc(0.5rem + env(safe-area-inset-left))',
           right: 'calc(0.5rem + env(safe-area-inset-right))',
@@ -474,7 +474,7 @@ export const TourOverlay = () => {
     <div 
       className={`${isFullscreen ? 'fixed' : 'absolute'} z-[10001] bg-black/90 backdrop-blur-md rounded-lg border border-white/20 overflow-hidden
         bottom-2 left-2 right-2 max-h-[45vh]
-        sm:bottom-auto sm:top-4 sm:left-4 sm:right-auto sm:w-80 sm:max-h-none
+        sm:bottom-4 sm:top-auto sm:left-auto sm:right-4 sm:w-80 sm:max-h-none
         md:w-96`}
       style={isFullscreen ? { 
         bottom: 'calc(0.5rem + env(safe-area-inset-bottom))',
