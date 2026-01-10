@@ -7,8 +7,6 @@ export const ORBITAL_PERIODS: Record<string, number> = {
   earth: 365.25,
   moon: 27.32,        // Around Earth
   mars: 686.98,
-  phobos: 0.32,       // Around Mars
-  deimos: 1.26,       // Around Mars
   ceres: 1680,        // In asteroid belt
   jupiter: 4332.59,
   io: 1.77,           // Around Jupiter
@@ -131,46 +129,8 @@ export const celestialObjects: CelestialObject[] = [
     orbitRadius: 1.52 * UNITS.KM_PER_AU,
     orbitPeriodDays: ORBITAL_PERIODS.mars,
     facts: {
-      en: ['The Red Planet', 'Has the largest volcano (Olympus Mons)', 'Two moons: Phobos and Deimos'],
-      fr: ['La planète rouge', 'Possède le plus grand volcan (Olympus Mons)', 'Deux lunes: Phobos et Déimos'],
-    },
-  },
-  // Phobos (Mars moon)
-  {
-    id: 'phobos',
-    name: { en: 'Phobos', fr: 'Phobos' },
-    type: 'moon',
-    position: [1.52 * UNITS.KM_PER_AU + 9376, 0, 0],
-    size: 22.4,
-    color: '#8b7d6b',
-    distanceFromEarth: 0.52 * UNITS.KM_PER_AU,
-    distanceUnit: 'AU',
-    category: 'solarSystem',
-    orbitRadius: 9376,
-    orbitPeriodDays: ORBITAL_PERIODS.phobos,
-    parentId: 'mars',
-    facts: {
-      en: ['Larger of Mars\' two moons', 'Orbits Mars 3 times per day', 'Will crash into Mars in 50M years'],
-      fr: ['Plus grande lune de Mars', 'Orbite Mars 3 fois par jour', 'S\'écrasera sur Mars dans 50M ans'],
-    },
-  },
-  // Deimos (Mars moon)
-  {
-    id: 'deimos',
-    name: { en: 'Deimos', fr: 'Déimos' },
-    type: 'moon',
-    position: [1.52 * UNITS.KM_PER_AU + 23463, 0, 0],
-    size: 12.4,
-    color: '#9e8b7d',
-    distanceFromEarth: 0.52 * UNITS.KM_PER_AU,
-    distanceUnit: 'AU',
-    category: 'solarSystem',
-    orbitRadius: 23463,
-    orbitPeriodDays: ORBITAL_PERIODS.deimos,
-    parentId: 'mars',
-    facts: {
-      en: ['Smaller of Mars\' two moons', 'Smoothest surface in solar system', 'Only 12 km in diameter'],
-      fr: ['Plus petite lune de Mars', 'Surface la plus lisse', 'Seulement 12 km de diamètre'],
+      en: ['The Red Planet', 'Has the largest volcano (Olympus Mons)', 'Fourth planet from the Sun'],
+      fr: ['La planète rouge', 'Possède le plus grand volcan (Olympus Mons)', 'Quatrième planète du Soleil'],
     },
   },
   // Ceres (Dwarf planet in asteroid belt)

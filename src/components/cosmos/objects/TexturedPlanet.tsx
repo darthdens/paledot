@@ -38,8 +38,6 @@ import europaTexture from '@/assets/textures/europa.jpg';
 // These are only loaded on desktop
 import ceresTexture from '@/assets/textures/ceres.jpg';
 import enceladusTexture from '@/assets/textures/enceladus.jpg';
-import phobosTexture from '@/assets/textures/phobos.jpg';
-import deimosTexture from '@/assets/textures/deimos.jpg';
 import tritonTexture from '@/assets/textures/triton.jpg';
 import iapetusTexture from '@/assets/textures/iapetus.jpg';
 
@@ -71,7 +69,7 @@ const PLANET_VISUALS: Record<string, {
   tilt?: number;
   hasClouds?: boolean;
   cloudColor?: string;
-  surfaceDetail?: 'rocky' | 'gaseous' | 'icy' | 'volcanic' | 'sun' | 'mercury' | 'venus' | 'earth' | 'moon' | 'mars' | 'jupiter' | 'saturn' | 'uranus' | 'neptune' | 'io' | 'europa' | 'ganymede' | 'callisto' | 'titan' | 'iapetus' | 'triton' | 'enceladus' | 'pluto' | 'ceres' | 'phobos' | 'deimos';
+  surfaceDetail?: 'rocky' | 'gaseous' | 'icy' | 'volcanic' | 'sun' | 'mercury' | 'venus' | 'earth' | 'moon' | 'mars' | 'jupiter' | 'saturn' | 'uranus' | 'neptune' | 'io' | 'europa' | 'ganymede' | 'callisto' | 'titan' | 'iapetus' | 'triton' | 'enceladus' | 'pluto' | 'ceres';
   uniqueFeature?: string;
 }> = {
   sun: {
@@ -248,21 +246,6 @@ const PLANET_VISUALS: Record<string, {
     metalness: 0,
     surfaceDetail: 'pluto',
   },
-  // Mars moons - small, dark, potato-shaped
-  phobos: {
-    baseColor: '#605850',
-    secondaryColor: '#403830',
-    roughness: 0.98,
-    metalness: 0.05,
-    surfaceDetail: 'phobos',
-  },
-  deimos: {
-    baseColor: '#706860',
-    secondaryColor: '#504840',
-    roughness: 0.98,
-    metalness: 0.05,
-    surfaceDetail: 'deimos',
-  },
   ceres: {
     baseColor: '#808080',
     secondaryColor: '#505050',
@@ -365,8 +348,6 @@ export const TexturedPlanet = ({
   // Secondary textures - only load on desktop
   const ceresMap = useLoader(THREE.TextureLoader, isMobile ? moonTexture : ceresTexture);
   const enceladusMap = useLoader(THREE.TextureLoader, isMobile ? moonTexture : enceladusTexture);
-  const phobosMap = useLoader(THREE.TextureLoader, isMobile ? moonTexture : phobosTexture);
-  const deimosMap = useLoader(THREE.TextureLoader, isMobile ? moonTexture : deimosTexture);
   const tritonMap = useLoader(THREE.TextureLoader, isMobile ? moonTexture : tritonTexture);
   const iapetusMap = useLoader(THREE.TextureLoader, isMobile ? moonTexture : iapetusTexture);
   
@@ -379,13 +360,13 @@ export const TexturedPlanet = ({
     });
     // Only configure secondary textures on desktop
     if (!isMobile) {
-      [ceresMap, enceladusMap, phobosMap, deimosMap, tritonMap, iapetusMap].forEach(tex => {
+      [ceresMap, enceladusMap, tritonMap, iapetusMap].forEach(tex => {
         tex.wrapS = THREE.RepeatWrapping;
         tex.wrapT = THREE.ClampToEdgeWrapping;
         tex.colorSpace = THREE.SRGBColorSpace;
       });
     }
-  }, [earthDayMap, earthNightMap, earthCloudsMap, moonMap, mercuryMap, venusMap, marsMap, jupiterMap, saturnMap, uranusMap, neptuneMap, plutoMap, titanMap, europaMap, ceresMap, enceladusMap, phobosMap, deimosMap, tritonMap, iapetusMap, isMobile]);
+  }, [earthDayMap, earthNightMap, earthCloudsMap, moonMap, mercuryMap, venusMap, marsMap, jupiterMap, saturnMap, uranusMap, neptuneMap, plutoMap, titanMap, europaMap, ceresMap, enceladusMap, tritonMap, iapetusMap, isMobile]);
 
   const visuals = PLANET_VISUALS[object.id] || {
     baseColor: object.color,
@@ -423,8 +404,6 @@ export const TexturedPlanet = ({
       // Desktop-only textures
       ceres: { primary: isMobile ? null : ceresMap, secondary: null },
       enceladus: { primary: isMobile ? null : enceladusMap, secondary: null },
-      phobos: { primary: isMobile ? null : phobosMap, secondary: null },
-      deimos: { primary: isMobile ? null : deimosMap, secondary: null },
       triton: { primary: isMobile ? null : tritonMap, secondary: null },
       iapetus: { primary: isMobile ? null : iapetusMap, secondary: null },
       // Io, Ganymede, Callisto use procedural rendering
@@ -432,7 +411,7 @@ export const TexturedPlanet = ({
     
     const result = textureMap[surfaceDetail];
     return result ? { ...result, useProcedural: false } : { primary: null, secondary: null, useProcedural: false };
-  }, [visuals?.surfaceDetail, earthDayMap, earthNightMap, moonMap, mercuryMap, venusMap, marsMap, jupiterMap, saturnMap, uranusMap, neptuneMap, plutoMap, titanMap, europaMap, ceresMap, enceladusMap, phobosMap, deimosMap, tritonMap, iapetusMap, isMobile]);
+  }, [visuals?.surfaceDetail, earthDayMap, earthNightMap, moonMap, mercuryMap, venusMap, marsMap, jupiterMap, saturnMap, uranusMap, neptuneMap, plutoMap, titanMap, europaMap, ceresMap, enceladusMap, tritonMap, iapetusMap, isMobile]);
   
   // Create a placeholder texture for unused slots
   const placeholderTexture = useMemo(() => {
@@ -711,9 +690,7 @@ export const TexturedPlanet = ({
                   visuals.surfaceDetail === 'triton' ? 18.0 :
                   visuals.surfaceDetail === 'pluto' ? 19.0 :
                   visuals.surfaceDetail === 'ceres' ? 20.0 :
-                  visuals.surfaceDetail === 'phobos' ? 21.0 :
-                  visuals.surfaceDetail === 'deimos' ? 22.0 :
-                  visuals.surfaceDetail === 'gaseous' ? 50.0 : 
+                  visuals.surfaceDetail === 'gaseous' ? 50.0 :
                   visuals.surfaceDetail === 'icy' ? 51.0 : 
                   visuals.surfaceDetail === 'volcanic' ? 52.0 : 
                   visuals.surfaceDetail === 'rocky' ? 53.0 : 0.0
@@ -1746,18 +1723,6 @@ export const TexturedPlanet = ({
                   // === CERES (20) - Real texture from Dawn mission ===
                   else if (surfaceType > 19.5 && surfaceType < 20.5) {
                     surfaceColor = texture2D(planetMap, vUv).rgb;
-                  }
-                  // === PHOBOS (21) - Procedural dark rocky ===
-                  else if (surfaceType > 20.5 && surfaceType < 21.5) {
-                    vec3 darkRock = vec3(0.35, 0.32, 0.3);
-                    float craters = 1.0 - smoothstep(0.5, 0.6, surfaceNoise) * 0.4;
-                    surfaceColor = darkRock * craters;
-                  }
-                  // === DEIMOS (22) - Procedural smooth dark ===
-                  else if (surfaceType > 21.5 && surfaceType < 22.5) {
-                    vec3 darkRock = vec3(0.4, 0.38, 0.35);
-                    float terrain = fineNoise * 0.2;
-                    surfaceColor = mix(darkRock, darkRock * 0.85, terrain);
                   }
                   // === Generic gaseous (50) ===
                   else if (surfaceType > 49.5 && surfaceType < 50.5) {
