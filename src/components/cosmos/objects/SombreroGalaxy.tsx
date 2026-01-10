@@ -111,56 +111,61 @@ export const SombreroGalaxy = ({ visualScale }: SombreroGalaxyProps) => {
   const dotTexture = useMemo(() => createDotTexture(), []);
   const glowTexture = useMemo(() => createSombreroGlowTexture(), []);
 
-  // Central bulge - SOMBRERO shape: cone-like but ROUNDED/FLAT at top and bottom
-  // More centered, not starting from edge
+  // Central bulge - SOMBRERO shape: shorter, especially at bottom
+  // Top ~50% lower, bottom much lower
   const bulgeGeo = useMemo(() => {
-    const count = 350000; // Very dense at core
+    const count = 500000; // Very high density at core to hide vertical bar
     const positions = new Float32Array(count * 3);
     const colors = new Float32Array(count * 3);
     const color = new THREE.Color();
-    const maxR = SOMBRERO.bulgeRadius * gs * 0.85; // More centered
-    const maxHeight = SOMBRERO.bulgeRadius * gs * 0.5; // Height of the "hat"
+    const maxR = SOMBRERO.bulgeRadius * gs * 0.8; // More centered
+    const maxHeightTop = SOMBRERO.bulgeRadius * gs * 0.22; // 50% lower top
+    const maxHeightBottom = SOMBRERO.bulgeRadius * gs * 0.12; // Much lower bottom
 
     for (let i = 0; i < count; i++) {
       const i3 = i * 3;
       
       // Very concentrated toward center
-      const r = Math.pow(Math.random(), 1.8) * maxR;
+      const r = Math.pow(Math.random(), 2.0) * maxR;
       const theta = Math.random() * Math.PI * 2;
       const rt = r / maxR;
 
       positions[i3] = r * Math.cos(theta);
       positions[i3 + 2] = r * Math.sin(theta);
       
-      // SOMBRERO SHAPE: Like a cone but with rounded/flat top
-      // Uses smooth transition: tall at center, tapers down, but the top is flat
-      // Height envelope that's flat at center then tapers with rounded edges
+      // SOMBRERO SHAPE with asymmetric top/bottom
       let heightEnvelope: number;
       if (rt < 0.15) {
-        // Flat top region - maximum height, uniform
         heightEnvelope = 1.0;
       } else if (rt < 0.4) {
-        // Transition region - starts to round down
         const localT = (rt - 0.15) / 0.25;
-        heightEnvelope = 1.0 - 0.15 * localT * localT; // Gentle curve
+        heightEnvelope = 1.0 - 0.12 * localT * localT;
       } else {
-        // Taper region - cone-like but with smooth curve
         const localT = (rt - 0.4) / 0.6;
-        heightEnvelope = 0.85 * Math.pow(1 - localT, 1.2); // Smooth taper
+        heightEnvelope = 0.88 * Math.pow(1 - localT, 1.3);
       }
       
-      const heightAtRadius = maxHeight * heightEnvelope;
-      positions[i3 + 1] = (Math.random() * 2 - 1) * heightAtRadius;
+      // Asymmetric: top vs bottom
+      const yRand = Math.random();
+      let yPos: number;
+      if (yRand < 0.5) {
+        // Top half - shorter
+        yPos = Math.random() * maxHeightTop * heightEnvelope;
+      } else {
+        // Bottom half - much shorter
+        yPos = -Math.random() * maxHeightBottom * heightEnvelope;
+      }
+      positions[i3 + 1] = yPos;
 
       // Colors: bright white center → cream/golden
-      if (rt < 0.1) {
-        color.setHSL(0.12 + Math.random() * 0.02, 0.04, 0.98 + Math.random() * 0.02);
-      } else if (rt < 0.25) {
-        color.setHSL(0.11 + Math.random() * 0.02, 0.06, 0.94 + Math.random() * 0.04);
-      } else if (rt < 0.5) {
-        color.setHSL(0.1 + Math.random() * 0.02, 0.12, 0.88 + Math.random() * 0.06);
+      if (rt < 0.08) {
+        color.setHSL(0.12 + Math.random() * 0.02, 0.03, 0.99 + Math.random() * 0.01);
+      } else if (rt < 0.2) {
+        color.setHSL(0.11 + Math.random() * 0.02, 0.05, 0.95 + Math.random() * 0.03);
+      } else if (rt < 0.45) {
+        color.setHSL(0.1 + Math.random() * 0.02, 0.1, 0.89 + Math.random() * 0.06);
       } else {
-        color.setHSL(0.09 + Math.random() * 0.02, 0.18, 0.78 + Math.random() * 0.1);
+        color.setHSL(0.09 + Math.random() * 0.02, 0.16, 0.8 + Math.random() * 0.1);
       }
 
       colors[i3] = color.r;
@@ -175,34 +180,34 @@ export const SombreroGalaxy = ({ visualScale }: SombreroGalaxyProps) => {
     return geo;
   }, [gs]);
 
-  // Disk stars - HIGH density at center, LOWER in middle, HIGH again at edges
+  // Disk stars - thicker disk, density: HIGH center → fades to middle → HIGH at edges
   const diskGeo = useMemo(() => {
-    const count = 350000;
+    const count = 400000;
     const positions = new Float32Array(count * 3);
     const colors = new Float32Array(count * 3);
     const color = new THREE.Color();
     const maxRadius = SOMBRERO.diskRadius * gs;
-    const diskThickness = maxRadius * 0.005;
+    const diskThickness = maxRadius * 0.012; // Thicker disk
 
     for (let i = 0; i < count; i++) {
       const i3 = i * 3;
 
-      // Bimodal distribution: high at center, low in middle, high at edges
+      // Distribution: HIGH at center → fades to almost none → HIGH at edges
       const rand = Math.random();
       let radius: number;
       
-      if (rand < 0.35) {
-        // Inner region - high density (center)
-        const t = Math.pow(Math.random(), 1.5);
-        radius = t * maxRadius * 0.35;
+      if (rand < 0.45) {
+        // Center region - very high density
+        const t = Math.pow(Math.random(), 1.8);
+        radius = t * maxRadius * 0.3;
       } else if (rand < 0.55) {
-        // Middle region - lower density
+        // Middle region - sparse (fades away)
         const t = Math.random();
-        radius = maxRadius * 0.35 + t * maxRadius * 0.35;
+        radius = maxRadius * 0.3 + t * maxRadius * 0.35;
       } else {
         // Outer region - high density (edges)
-        const t = Math.pow(Math.random(), 0.6);
-        radius = maxRadius * 0.7 + t * maxRadius * 0.3;
+        const t = Math.pow(Math.random(), 0.5);
+        radius = maxRadius * 0.65 + t * maxRadius * 0.35;
       }
       
       const rt = radius / maxRadius;
@@ -212,13 +217,13 @@ export const SombreroGalaxy = ({ visualScale }: SombreroGalaxyProps) => {
       positions[i3 + 1] = (Math.random() * 2 - 1) * diskThickness;
       positions[i3 + 2] = Math.sin(angle) * radius;
 
-      // Disk colors: brighter at center, golden in middle, slightly dimmer at edges
+      // Colors: brighter at center, fades, then dimmer at edges
       if (rt < 0.25) {
-        color.setHSL(0.1 + Math.random() * 0.02, 0.15, 0.82 + Math.random() * 0.1);
-      } else if (rt < 0.6) {
-        color.setHSL(0.09 + Math.random() * 0.03, 0.22, 0.72 + Math.random() * 0.1);
+        color.setHSL(0.1 + Math.random() * 0.02, 0.12, 0.85 + Math.random() * 0.1);
+      } else if (rt < 0.55) {
+        color.setHSL(0.09 + Math.random() * 0.03, 0.2, 0.72 + Math.random() * 0.1);
       } else {
-        color.setHSL(0.08 + Math.random() * 0.03, 0.28, 0.68 + Math.random() * 0.1);
+        color.setHSL(0.08 + Math.random() * 0.03, 0.26, 0.65 + Math.random() * 0.1);
       }
 
       colors[i3] = color.r;
