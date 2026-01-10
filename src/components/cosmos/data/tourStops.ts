@@ -389,8 +389,8 @@ export const tourStops: TourStop[] = [
       fr: 'La Galaxie du Sombrero, à 29 millions d\'années-lumière, est célèbre pour son apparence distinctive de chapeau mexicain. Son noyau brillant, son bulbe central exceptionnellement grand et sa bande de poussière sombre créent l\'une des silhouettes de galaxie les plus emblématiques. Elle contient environ 100 milliards d\'étoiles et possiblement un trou noir supermassif en son centre.',
     },
     duration: 10,
-    // Edge-on flat view with subtle tilt - left low, right high, inner galaxy visible
-    cameraPosition: [85000 * UNITS.KM_PER_LY, 5000 * UNITS.KM_PER_LY, 25000 * UNITS.KM_PER_LY],
+    // Edge-on flat view - balanced position, slight inner galaxy visibility
+    cameraPosition: [45000 * UNITS.KM_PER_LY, 6000 * UNITS.KM_PER_LY, 55000 * UNITS.KM_PER_LY],
     lookAt: [0, 0, 0],
     scaleLevel: 'localGroup',
   },
