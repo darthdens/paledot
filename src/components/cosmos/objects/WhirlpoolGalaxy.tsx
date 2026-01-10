@@ -23,7 +23,7 @@ const WHIRLPOOL = {
   diskRadius: 38000, // Half of 76,000 ly diameter
   bulgeRadius: 5000, // Prominent central bulge
   branches: 2, // Two beautifully defined spiral arms
-  spinTurns: 0.9, // Single turn - arms don't wrap around twice
+  spinTurns: 1.1, // Slightly more than one turn for proper spiral shape
   inclination: (20 * Math.PI) / 180, // ~20° inclination (nearly face-on)
   distanceFromMilkyWay: 23e6, // 23 million light-years
 };
@@ -175,13 +175,13 @@ export const WhirlpoolGalaxy = ({ visualScale }: WhirlpoolGalaxyProps) => {
       const branchAngle = (branchIndex / branches) * Math.PI * 2;
       const spinAngle = rt * spinTurns * Math.PI * 2;
 
-      // Fuller arms with lots of inter-arm stars
-      const armWidth = 0.1 + rt * 0.18;
+      // Tighter arms - less space between them
+      const armWidth = 0.12 + rt * 0.1;
       const armJitter = (Math.random() + Math.random() + Math.random() - 1.5) * armWidth;
 
-      // Much more inter-arm stars for a filled galaxy look
-      const isInterArm = Math.random() < 0.6;
-      const interArmJitter = isInterArm ? (Math.random() - 0.5) * (0.9 + rt * 0.7) : 0;
+      // Moderate inter-arm stars, but keeping spiral definition
+      const isInterArm = Math.random() < 0.4;
+      const interArmJitter = isInterArm ? (Math.random() - 0.5) * (0.4 + rt * 0.3) : 0;
 
       const angle = branchAngle + spinAngle + armJitter + interArmJitter;
 
@@ -377,11 +377,11 @@ export const WhirlpoolGalaxy = ({ visualScale }: WhirlpoolGalaxyProps) => {
     return geo;
   }, [gs]);
 
-  // Dust lanes - dark regions between spiral arms
+  // Dust lanes - dark regions along the inner edge of spiral arms
   const dustLanesGeo = useMemo(() => {
     const { branches, spinTurns } = WHIRLPOOL;
     const maxRadius = WHIRLPOOL.diskRadius * gs;
-    const dustCount = 120000;
+    const dustCount = 180000;
 
     const positions = new Float32Array(dustCount * 3);
     const colors = new Float32Array(dustCount * 3);
@@ -390,41 +390,41 @@ export const WhirlpoolGalaxy = ({ visualScale }: WhirlpoolGalaxyProps) => {
     for (let i = 0; i < dustCount; i++) {
       const i3 = i * 3;
 
-      // Distribute along the inner edge of spiral arms (dust lanes)
-      const t = 0.12 + Math.pow(Math.random(), 0.8) * 0.75;
+      // Distribute along the inner/trailing edge of spiral arms
+      const t = 0.15 + Math.pow(Math.random(), 0.7) * 0.7;
       const radius = t * maxRadius;
       const rt = radius / maxRadius;
 
       const branchIndex = Math.floor(Math.random() * branches);
-      // Offset slightly from the arm center to create the dark lane effect
-      const branchAngle = (branchIndex / branches) * Math.PI * 2 + 0.15; // Offset from arm
+      // Offset to the trailing edge of each arm (where dust lanes appear)
+      const branchAngle = (branchIndex / branches) * Math.PI * 2 - 0.12;
       const spinAngle = rt * spinTurns * Math.PI * 2;
 
-      // Tight to the arm edge
-      const armWidth = 0.04 + rt * 0.06;
-      const armJitter = (Math.random() + Math.random() - 1) * armWidth;
+      // Very tight lane along arm edge
+      const laneWidth = 0.03 + rt * 0.04;
+      const laneJitter = (Math.random() + Math.random() - 1) * laneWidth;
 
-      const angle = branchAngle + spinAngle + armJitter;
+      const angle = branchAngle + spinAngle + laneJitter;
 
       positions[i3] = Math.cos(angle) * radius;
       
-      const thickness = 0.008;
+      const thickness = 0.006;
       const yJitter = (Math.random() - 0.5) * maxRadius * thickness;
       positions[i3 + 1] = yJitter;
       
       positions[i3 + 2] = Math.sin(angle) * radius;
 
-      // Very dark reddish-brown dust color
+      // Darker, more visible dust - reddish-brown to black
       const dustVariation = Math.random();
-      if (dustVariation < 0.6) {
-        // Dark brown dust
-        color.setHSL(0.05 + Math.random() * 0.03, 0.4 + Math.random() * 0.2, 0.08 + Math.random() * 0.06);
-      } else if (dustVariation < 0.85) {
-        // Darker reddish
-        color.setHSL(0.02 + Math.random() * 0.03, 0.5 + Math.random() * 0.2, 0.06 + Math.random() * 0.04);
+      if (dustVariation < 0.5) {
+        // Dark reddish-brown
+        color.setHSL(0.03 + Math.random() * 0.02, 0.6 + Math.random() * 0.2, 0.04 + Math.random() * 0.03);
+      } else if (dustVariation < 0.8) {
+        // Very dark brown
+        color.setHSL(0.05 + Math.random() * 0.02, 0.5 + Math.random() * 0.2, 0.03 + Math.random() * 0.02);
       } else {
         // Near black
-        color.setHSL(0.0, 0.3 + Math.random() * 0.2, 0.03 + Math.random() * 0.03);
+        color.setHSL(0.0, 0.2 + Math.random() * 0.15, 0.015 + Math.random() * 0.015);
       }
 
       colors[i3] = color.r;
@@ -584,14 +584,14 @@ export const WhirlpoolGalaxy = ({ visualScale }: WhirlpoolGalaxyProps) => {
         />
 
         {/* Dust lanes between arms */}
-        <points frustumCulled={false} renderOrder={1}>
+        <points frustumCulled={false} renderOrder={0}>
           <bufferGeometry attach="geometry" {...dustLanesGeo} />
           <pointsMaterial
-            size={gs * 65}
+            size={gs * 80}
             map={dotTexture}
             vertexColors
             transparent
-            opacity={0.7}
+            opacity={0.9}
             blending={THREE.NormalBlending}
             depthWrite={false}
             sizeAttenuation
