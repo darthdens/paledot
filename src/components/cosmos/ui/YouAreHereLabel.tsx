@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useLanguage } from '@/i18n/LanguageContext';
 import { useCosmosStore } from '../store/useCosmosStore';
-import { Globe, Sun, Star, Sparkles, Circle, Infinity, ChevronDown, ChevronUp } from 'lucide-react';
+import { Globe, Sun, Star, Sparkles, Circle, Infinity, Telescope, ChevronDown, ChevronUp } from 'lucide-react';
 import type { ScaleLevel } from '../types';
 
 const translations = {
@@ -32,6 +32,11 @@ const translations = {
       title: 'Local Group',
       subtitle: 'Our galaxy cluster',
       details: ['~80+ galaxies', 'Andromeda is our neighbor', '~10 million light-years across'],
+    },
+    deepSpace: {
+      title: 'Deep Space',
+      subtitle: 'Beyond the Local Group',
+      details: ['Distant galaxy clusters', 'Hundreds of millions of light-years away', 'The cosmic web'],
     },
     universe: {
       title: 'Observable Universe',
@@ -66,6 +71,11 @@ const translations = {
       subtitle: 'Notre amas de galaxies',
       details: ['~80+ galaxies', 'Andromède est notre voisine', '~10 millions d\'années-lumière'],
     },
+    deepSpace: {
+      title: 'Espace Lointain',
+      subtitle: 'Au-delà du Groupe Local',
+      details: ['Amas de galaxies lointains', 'À des centaines de millions d\'années-lumière', 'La toile cosmique'],
+    },
     universe: {
       title: 'Univers Observable',
       subtitle: 'La toile cosmique',
@@ -78,13 +88,20 @@ export const YouAreHereLabel = () => {
   const { language } = useLanguage();
   const t = translations[language];
   const currentScale: ScaleLevel = useCosmosStore((state) => state.currentScale as ScaleLevel);
+  const selectedObject = useCosmosStore((state) => state.selectedObject);
   const [isMinimized, setIsMinimized] = useState(false);
 
-  // Hide this panel only at universe scale
-  if (currentScale === 'universe') return null;
+  // Check if we're viewing a distant galaxy (not in local group)
+  const isDistantGalaxy = selectedObject?.type === 'galaxy' && 
+    !['milky-way-center', 'andromeda', 'triangulum'].includes(selectedObject.id);
   
-  // Get location info based on current scale
+  // Get location info based on current scale and selected object
   const getLocationInfo = () => {
+    // If viewing a distant galaxy, show deep space info
+    if (isDistantGalaxy) {
+      return t.deepSpace;
+    }
+    
     switch (currentScale) {
       case 'earth':
         return t.earth;
@@ -96,12 +113,19 @@ export const YouAreHereLabel = () => {
         return t.milkyWay;
       case 'localGroup':
         return t.localGroup;
+      case 'universe':
+        return t.universe;
       default:
         return t.solarSystem;
     }
   };
   
   const getScaleIcon = (scale: ScaleLevel) => {
+    // If viewing distant galaxy, show telescope icon
+    if (isDistantGalaxy) {
+      return <Telescope className="w-4 h-4" />;
+    }
+    
     switch (scale) {
       case 'earth':
         return <Globe className="w-4 h-4" />;
