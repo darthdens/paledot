@@ -15,7 +15,7 @@ const WHIRLPOOL = {
   diskRadius: 38000, // Half of 76,000 ly diameter
   bulgeRadius: 5000, // Prominent central bulge
   branches: 2, // Two beautifully defined spiral arms
-  spinTurns: 2.5, // More turns - arms wrap ~270° around (almost back to start)
+  spinTurns: 2.2, // Arms wrap ~240° around
   inclination: (20 * Math.PI) / 180, // ~20° inclination (nearly face-on)
   distanceFromMilkyWay: 23e6, // 23 million light-years
 };
@@ -408,8 +408,8 @@ export const WhirlpoolGalaxy = ({ visualScale }: WhirlpoolGalaxyProps) => {
     for (let i = 0; i < dustCount; i++) {
       const i3 = i * 3;
 
-      // Distribute along the inner/trailing edge of spiral arms
-      const t = 0.12 + Math.pow(Math.random(), 0.7) * 0.75;
+      // Distribute along the inner/trailing edge of spiral arms - stay within disk
+      const t = 0.12 + Math.pow(Math.random(), 0.8) * 0.65; // Max 77% radius
       const radius = t * maxRadius;
       const rt = radius / maxRadius;
 
