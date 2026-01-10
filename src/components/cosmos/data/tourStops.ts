@@ -101,8 +101,8 @@ export const tourStops: TourStop[] = [
       fr: 'Entre Mars et Jupiter se trouve la ceinture d\'astéroïdes, abritant des millions de vestiges rocheux de la formation du système solaire. Cérès, le plus gros objet ici, est une planète naine contenant environ un tiers de la masse totale de la ceinture.',
     },
     duration: 7,
-    // Ceres radius is 473 km - increased significantly for better mobile visibility
-    cameraPosition: [0, 6000, 18000],
+    // Zoom out to show the asteroid belt, not just Ceres
+    cameraPosition: [0, 0.8 * UNITS.KM_PER_AU, 1.2 * UNITS.KM_PER_AU],
     lookAt: [0, 0, 0],
     scaleLevel: 'solarSystem',
   },
