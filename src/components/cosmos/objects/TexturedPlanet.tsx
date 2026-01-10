@@ -20,6 +20,8 @@ import uranusTexture from '@/assets/textures/uranus.jpg';
 import neptuneTexture from '@/assets/textures/neptune.jpg';
 import plutoTexture from '@/assets/textures/pluto.jpg';
 import ceresTexture from '@/assets/textures/ceres.jpg';
+import titanTexture from '@/assets/textures/titan.jpg';
+import enceladusTexture from '@/assets/textures/enceladus.jpg';
 import phobosTexture from '@/assets/textures/phobos.jpg';
 import deimosTexture from '@/assets/textures/deimos.jpg';
 
@@ -400,17 +402,19 @@ export const TexturedPlanet = ({
   const neptuneMap = useLoader(THREE.TextureLoader, neptuneTexture);
   const plutoMap = useLoader(THREE.TextureLoader, plutoTexture);
   const ceresMap = useLoader(THREE.TextureLoader, ceresTexture);
+  const titanMap = useLoader(THREE.TextureLoader, titanTexture);
+  const enceladusMap = useLoader(THREE.TextureLoader, enceladusTexture);
   const phobosMap = useLoader(THREE.TextureLoader, phobosTexture);
   const deimosMap = useLoader(THREE.TextureLoader, deimosTexture);
   
   // Configure texture properties for proper spherical mapping
   useMemo(() => {
-    [earthDayMap, earthNightMap, earthCloudsMap, moonMap, mercuryMap, venusMap, marsMap, jupiterMap, saturnMap, uranusMap, neptuneMap, plutoMap, ceresMap, phobosMap, deimosMap].forEach(tex => {
+    [earthDayMap, earthNightMap, earthCloudsMap, moonMap, mercuryMap, venusMap, marsMap, jupiterMap, saturnMap, uranusMap, neptuneMap, plutoMap, ceresMap, titanMap, enceladusMap, phobosMap, deimosMap].forEach(tex => {
       tex.wrapS = THREE.RepeatWrapping;
       tex.wrapT = THREE.ClampToEdgeWrapping;
       tex.colorSpace = THREE.SRGBColorSpace;
     });
-  }, [earthDayMap, earthNightMap, earthCloudsMap, moonMap, mercuryMap, venusMap, marsMap, jupiterMap, saturnMap, uranusMap, neptuneMap, plutoMap, ceresMap, phobosMap, deimosMap]);
+  }, [earthDayMap, earthNightMap, earthCloudsMap, moonMap, mercuryMap, venusMap, marsMap, jupiterMap, saturnMap, uranusMap, neptuneMap, plutoMap, ceresMap, titanMap, enceladusMap, phobosMap, deimosMap]);
   
   const visuals = PLANET_VISUALS[object.id] || {
     baseColor: object.color,
@@ -713,6 +717,8 @@ export const TexturedPlanet = ({
                 neptuneMap: { value: neptuneMap },
                 plutoMap: { value: plutoMap },
                 ceresMap: { value: ceresMap },
+                titanMap: { value: titanMap },
+                enceladusMap: { value: enceladusMap },
                 phobosMap: { value: phobosMap },
                 deimosMap: { value: deimosMap },
               }}
@@ -769,6 +775,8 @@ export const TexturedPlanet = ({
                 uniform sampler2D neptuneMap;
                 uniform sampler2D plutoMap;
                 uniform sampler2D ceresMap;
+                uniform sampler2D titanMap;
+                uniform sampler2D enceladusMap;
                 uniform sampler2D phobosMap;
                 uniform sampler2D deimosMap;
                 varying vec3 vNormal;
@@ -1485,20 +1493,95 @@ export const TexturedPlanet = ({
                     surfaceColor = mix(surfaceColor, brightIce * 0.8, tinyCraters * 0.3);
                     surfaceColor += vec3(0.15, 0.14, 0.13) * valhallaEffect;
                   }
-                  // === TITAN (15) - Orange haze, no surface visible ===
+                  // === TITAN (15) - NASA texture with thick orange atmospheric haze ===
                   else if (surfaceType > 14.5 && surfaceType < 15.5) {
-                    float haze = surfaceNoise * 0.2 + 0.4;
-                    surfaceColor = mix(baseColor, secondaryColor, haze);
-                    surfaceColor = mix(surfaceColor, tertiaryColor, fineNoise * 0.15);
+                    // Sample base texture
+                    vec3 titanColor = texture2D(titanMap, vUv).rgb;
+                    
+                    // Titan's thick orange atmosphere completely obscures surface
+                    // Animate slow atmospheric circulation
+                    float hazeSpeed = time * 0.003;
+                    vec2 hazeUv = vUv;
+                    hazeUv.x = fract(hazeUv.x + hazeSpeed);
+                    
+                    // Multi-layer haze
+                    float haze1 = surfaceNoise * 0.3 + 0.35;
+                    float haze2 = fineNoise * 0.2 + 0.4;
+                    float combinedHaze = haze1 * 0.6 + haze2 * 0.4;
+                    
+                    // Bright orange upper atmosphere
+                    vec3 upperHaze = vec3(1.0, 0.65, 0.25);
+                    // Deeper orange-brown lower layers
+                    vec3 lowerHaze = vec3(0.85, 0.5, 0.2);
+                    // Methane blue tint at limb
+                    vec3 limbBlue = vec3(0.6, 0.75, 0.9);
+                    
+                    titanColor = mix(lowerHaze, upperHaze, combinedHaze);
+                    
+                    // Subtle banding from atmospheric circulation
+                    float bands = sin(vUv.y * 25.0 + time * 0.01) * 0.08 + 0.92;
+                    titanColor *= bands;
+                    
+                    // Limb brightening with slight blue from methane scattering
+                    float limb = pow(1.0 - abs(dot(worldNormal, normalize(cameraPosition - vWorldPosition))), 2.5);
+                    titanColor = mix(titanColor, limbBlue, limb * 0.25);
+                    titanColor += upperHaze * limb * 0.15;
+                    
+                    // North polar vortex (darker region)
+                    float northPole = smoothstep(0.85, 0.95, vUv.y);
+                    titanColor = mix(titanColor, lowerHaze * 0.8, northPole * 0.4);
+                    
+                    surfaceColor = titanColor;
                   }
-                  // === ENCELADUS (16) - Bright white with tiger stripes ===
+                  // === ENCELADUS (16) - NASA texture with tiger stripe geysers ===
                   else if (surfaceType > 15.5 && surfaceType < 16.5) {
-                    surfaceColor = baseColor; // Pure white
-                    surfaceColor = mix(surfaceColor, secondaryColor, microNoise * 0.1);
-                    // Tiger stripes at south pole
-                    float southPole = smoothstep(0.15, 0.0, vUv.y);
-                    float stripes = sin(vUv.x * 40.0 + surfaceNoise * 3.0) * 0.5 + 0.5;
-                    surfaceColor = mix(surfaceColor, tertiaryColor, southPole * stripes * 0.6);
+                    // Sample base texture
+                    vec3 enceladusColor = texture2D(enceladusMap, vUv).rgb;
+                    
+                    // Brightest object in solar system - very high albedo ice
+                    vec3 pureIce = vec3(1.0, 1.0, 1.0);
+                    enceladusColor = mix(enceladusColor, pureIce, 0.7);
+                    
+                    // Procedural bump mapping
+                    float texelSize = 0.004;
+                    float heightC = dot(enceladusColor, vec3(0.299, 0.587, 0.114));
+                    float heightL = dot(texture2D(enceladusMap, vUv + vec2(-texelSize, 0.0)).rgb, vec3(0.299, 0.587, 0.114));
+                    float heightR = dot(texture2D(enceladusMap, vUv + vec2(texelSize, 0.0)).rgb, vec3(0.299, 0.587, 0.114));
+                    float heightU = dot(texture2D(enceladusMap, vUv + vec2(0.0, texelSize)).rgb, vec3(0.299, 0.587, 0.114));
+                    float heightD = dot(texture2D(enceladusMap, vUv + vec2(0.0, -texelSize)).rgb, vec3(0.299, 0.587, 0.114));
+                    
+                    float bumpStrength = 1.5;
+                    vec3 bumpNormal = normalize(vec3(
+                      (heightL - heightR) * bumpStrength,
+                      (heightD - heightU) * bumpStrength,
+                      1.0
+                    ));
+                    
+                    vec3 tangent = normalize(cross(worldNormal, vec3(0.0, 1.0, 0.0)));
+                    vec3 bitangent = normalize(cross(worldNormal, tangent));
+                    vec3 perturbedNormal = normalize(tangent * bumpNormal.x + bitangent * bumpNormal.y + worldNormal * bumpNormal.z);
+                    float bumpedNdotL = max(dot(perturbedNormal, sunDir), 0.0);
+                    
+                    // Famous tiger stripes at south pole (Damascus, Baghdad, Cairo, Alexandria)
+                    float southPole = smoothstep(0.2, 0.0, vUv.y);
+                    
+                    // Four main tiger stripes
+                    float stripe1 = smoothstep(0.48, 0.5, sin(vUv.x * 50.0 + 0.0)) * smoothstep(0.52, 0.5, sin(vUv.x * 50.0 + 0.0));
+                    float stripe2 = smoothstep(0.48, 0.5, sin(vUv.x * 50.0 + 1.57)) * smoothstep(0.52, 0.5, sin(vUv.x * 50.0 + 1.57));
+                    float stripe3 = smoothstep(0.48, 0.5, sin(vUv.x * 50.0 + 3.14)) * smoothstep(0.52, 0.5, sin(vUv.x * 50.0 + 3.14));
+                    float stripe4 = smoothstep(0.48, 0.5, sin(vUv.x * 50.0 + 4.71)) * smoothstep(0.52, 0.5, sin(vUv.x * 50.0 + 4.71));
+                    float tigerStripes = max(max(stripe1, stripe2), max(stripe3, stripe4));
+                    
+                    // Blue-green color for tiger stripes (exposed fresh ice)
+                    vec3 stripeColor = vec3(0.5, 0.75, 0.85);
+                    enceladusColor = mix(enceladusColor, stripeColor, tigerStripes * southPole * 0.7);
+                    
+                    // Slight blue tint to fresh ice
+                    vec3 iceTint = vec3(0.98, 0.99, 1.0);
+                    enceladusColor *= iceTint;
+                    
+                    surfaceColor = enceladusColor;
+                    NdotL = mix(NdotL, bumpedNdotL, 0.5);
                   }
                   // === IAPETUS (17) - Two-toned: bright and dark hemispheres ===
                   else if (surfaceType > 16.5 && surfaceType < 17.5) {
