@@ -99,38 +99,36 @@ export const SombreroGalaxy = ({ visualScale }: SombreroGalaxyProps) => {
   const dotTexture = useMemo(() => createDotTexture(), []);
   const glowTexture = useMemo(() => createSombreroGlowTexture(), []);
 
-  // Central bulge - large elliptical distribution of older stars
+  // Central bulge - smaller core of stars, glow handles the visual spread
   const bulgeGeo = useMemo(() => {
-    const count = 150000;
+    const count = 80000; // Reduced - glow handles the spread
     const positions = new Float32Array(count * 3);
     const colors = new Float32Array(count * 3);
     const color = new THREE.Color();
-    const maxR = SOMBRERO.bulgeRadius * gs;
+    const maxR = SOMBRERO.bulgeRadius * gs * 0.6; // Smaller core
 
     for (let i = 0; i < count; i++) {
       const i3 = i * 3;
       
       // Spheroidal distribution, flattened slightly
-      const r = Math.pow(Math.random(), 1.5) * maxR;
+      const r = Math.pow(Math.random(), 1.6) * maxR;
       const theta = Math.random() * Math.PI * 2;
       const phi = Math.acos(2 * Math.random() - 1);
       const t = r / maxR;
 
       positions[i3] = r * Math.sin(phi) * Math.cos(theta);
-      positions[i3 + 1] = r * Math.cos(phi) * 0.7; // Slightly flattened
+      positions[i3 + 1] = r * Math.cos(phi) * 0.65; // Slightly flattened
       positions[i3 + 2] = r * Math.sin(phi) * Math.sin(theta);
 
-      // Colors: bright white center → cream → golden outer
-      if (t < 0.15) {
-        color.setHSL(0.12 + Math.random() * 0.02, 0.08, 0.95 + Math.random() * 0.05);
-      } else if (t < 0.35) {
-        color.setHSL(0.11 + Math.random() * 0.03, 0.12, 0.88 + Math.random() * 0.08);
-      } else if (t < 0.55) {
-        color.setHSL(0.1 + Math.random() * 0.03, 0.18, 0.80 + Math.random() * 0.1);
-      } else if (t < 0.75) {
-        color.setHSL(0.09 + Math.random() * 0.03, 0.28, 0.70 + Math.random() * 0.1);
+      // Colors: bright white center → cream
+      if (t < 0.2) {
+        color.setHSL(0.12 + Math.random() * 0.02, 0.06, 0.96 + Math.random() * 0.04);
+      } else if (t < 0.45) {
+        color.setHSL(0.11 + Math.random() * 0.02, 0.1, 0.90 + Math.random() * 0.06);
+      } else if (t < 0.7) {
+        color.setHSL(0.1 + Math.random() * 0.02, 0.15, 0.82 + Math.random() * 0.08);
       } else {
-        color.setHSL(0.08 + Math.random() * 0.03, 0.38, 0.58 + Math.random() * 0.12);
+        color.setHSL(0.09 + Math.random() * 0.02, 0.22, 0.72 + Math.random() * 0.1);
       }
 
       colors[i3] = color.r;
@@ -241,11 +239,63 @@ export const SombreroGalaxy = ({ visualScale }: SombreroGalaxyProps) => {
     return geo;
   }, [gs]);
 
-  // Stellar halo
+  // Dark gas/dust around the disk edges - creates the dark halo effect
+  const darkGasGeo = useMemo(() => {
+    const count = 80000;
+    const positions = new Float32Array(count * 3);
+    const colors = new Float32Array(count * 3);
+    const color = new THREE.Color();
+    const maxRadius = SOMBRERO.diskRadius * gs;
+    const diskThickness = maxRadius * 0.025;
+
+    for (let i = 0; i < count; i++) {
+      const i3 = i * 3;
+
+      // Concentrate around outer disk edges
+      const t = Math.pow(Math.random(), 0.4);
+      const innerRadius = maxRadius * 0.4;
+      const radius = innerRadius + t * (maxRadius * 1.05 - innerRadius);
+      const rt = radius / maxRadius;
+      const angle = Math.random() * Math.PI * 2;
+
+      positions[i3] = Math.cos(angle) * radius;
+      
+      // Spread around disk plane, more at edges
+      const heightSpread = diskThickness * (0.5 + rt * 1.5);
+      positions[i3 + 1] = (Math.random() * 2 - 1) * heightSpread;
+      
+      positions[i3 + 2] = Math.sin(angle) * radius;
+
+      // Very dark colors - almost black gas
+      const rand = Math.random();
+      if (rand < 0.6) {
+        // Near black
+        color.setHSL(0.05 + Math.random() * 0.03, 0.4, 0.03 + Math.random() * 0.02);
+      } else if (rand < 0.85) {
+        // Very dark brown
+        color.setHSL(0.04 + Math.random() * 0.02, 0.5, 0.05 + Math.random() * 0.03);
+      } else {
+        // Slightly lighter edge dust
+        color.setHSL(0.05 + Math.random() * 0.02, 0.45, 0.08 + Math.random() * 0.04);
+      }
+
+      colors[i3] = color.r;
+      colors[i3 + 1] = color.g;
+      colors[i3 + 2] = color.b;
+    }
+
+    const geo = new THREE.BufferGeometry();
+    geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    geo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+    geo.boundingSphere = new THREE.Sphere(new THREE.Vector3(0, 0, 0), Infinity);
+    return geo;
+  }, [gs]);
+
+  // Stellar halo - reduced since glow handles most of the visual
   const haloGeo = useMemo(() => {
-    const count = 20000;
-    const maxRadius = SOMBRERO.bulgeRadius * gs * 0.8;
-    const maxHeight = SOMBRERO.bulgeRadius * gs * 0.5;
+    const count = 15000;
+    const maxRadius = SOMBRERO.bulgeRadius * gs * 0.6;
+    const maxHeight = SOMBRERO.bulgeRadius * gs * 0.4;
     const positions = new Float32Array(count * 3);
     const colors = new Float32Array(count * 3);
     const color = new THREE.Color();
@@ -265,7 +315,7 @@ export const SombreroGalaxy = ({ visualScale }: SombreroGalaxyProps) => {
       positions[i3 + 1] = y;
 
       // Halo: golden/cream
-      color.setHSL(0.09 + Math.random() * 0.04, 0.3 + Math.random() * 0.15, 0.55 + Math.random() * 0.15);
+      color.setHSL(0.09 + Math.random() * 0.04, 0.25 + Math.random() * 0.12, 0.6 + Math.random() * 0.15);
 
       colors[i3] = color.r;
       colors[i3 + 1] = color.g;
@@ -343,12 +393,23 @@ export const SombreroGalaxy = ({ visualScale }: SombreroGalaxyProps) => {
           renderOrder={3}
         />
 
-        {/* Center glow */}
-        <sprite renderOrder={5} frustumCulled={false} scale={[bulgeR * 2.5, bulgeR * 2.5, 1]}>
+        {/* Dark gas around disk edges */}
+        <DifferentialRotationPoints
+          geometry={darkGasGeo}
+          size={gs * 50}
+          map={dotTexture}
+          opacity={0.85}
+          maxRadius={diskR}
+          rotationMultiplier={0.9}
+          renderOrder={5}
+        />
+
+        {/* Large center glow - extends to disk edges like in the reference images */}
+        <sprite renderOrder={6} frustumCulled={false} scale={[diskR * 2.2, diskR * 2.2, 1]}>
           <spriteMaterial
             map={glowTexture}
             transparent
-            opacity={0.85}
+            opacity={0.9}
             blending={THREE.AdditiveBlending}
             depthWrite={false}
             depthTest={false}
