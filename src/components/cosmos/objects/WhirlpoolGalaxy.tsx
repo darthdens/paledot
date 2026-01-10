@@ -166,7 +166,7 @@ export const WhirlpoolGalaxy = ({ visualScale }: WhirlpoolGalaxyProps) => {
   const starsGeo = useMemo(() => {
     const { branches, spinTurns } = WHIRLPOOL;
     const maxRadius = WHIRLPOOL.diskRadius * gs;
-    const starCount = 480000; // Increased for denser arms and inter-arm region
+    const starCount = 600000; // More stars to fill gaps
 
     const positions = new Float32Array(starCount * 3);
     const colors = new Float32Array(starCount * 3);
@@ -193,17 +193,17 @@ export const WhirlpoolGalaxy = ({ visualScale }: WhirlpoolGalaxyProps) => {
       const spiralFactor = Math.pow(rt, 0.5); // Square root = hard turn at center
       const spinAngle = spiralFactor * spinTurns * Math.PI * 2;
 
-      // Wider arms - less empty space between them
-      const armWidth = 0.08 + rt * 0.15;
+      // Much wider arms to fill space between them
+      const armWidth = 0.12 + rt * 0.2;
       const armJitter = (Math.random() + Math.random() + Math.random() - 1.5) * armWidth;
 
-      // More inter-arm stars to fill gaps
-      const isInterArm = Math.random() < 0.55;
-      const interArmJitter = isInterArm ? (Math.random() - 0.5) * (0.45 + rt * 0.5) : 0;
+      // Even more inter-arm stars - almost continuous disk with spiral enhancement
+      const isInterArm = Math.random() < 0.65;
+      const interArmJitter = isInterArm ? (Math.random() - 0.5) * (0.55 + rt * 0.55) : 0;
 
       const angle = branchAngle + spinAngle + armJitter + interArmJitter;
 
-      const radialSpread = (0.04 + rt * 0.08) * maxRadius;
+      const radialSpread = (0.06 + rt * 0.1) * maxRadius;
       const radialJitter = (Math.random() + Math.random() - 1) * radialSpread;
       const finalRadius = radius + radialJitter;
 
@@ -414,18 +414,21 @@ export const WhirlpoolGalaxy = ({ visualScale }: WhirlpoolGalaxyProps) => {
       const rt = radius / maxRadius;
 
       const branchIndex = Math.floor(Math.random() * branches);
-      // Offset to the trailing edge of each arm
-      const branchAngle = (branchIndex / branches) * Math.PI * 2 - 0.06;
+      // Dust lanes follow the arms exactly (same branchAngle as stars)
+      const branchAngle = (branchIndex / branches) * Math.PI * 2;
       
       // Use same hard turn spiral as stars
       const spiralFactor = Math.pow(rt, 0.5);
       const spinAngle = spiralFactor * spinTurns * Math.PI * 2;
 
+      // Offset slightly to trailing edge of arm
+      const trailingOffset = -0.04;
+      
       // Tight lane along arm edge
-      const laneWidth = 0.02 + rt * 0.035;
+      const laneWidth = 0.015 + rt * 0.025;
       const laneJitter = (Math.random() + Math.random() - 1) * laneWidth;
 
-      const angle = branchAngle + spinAngle + laneJitter;
+      const angle = branchAngle + spinAngle + trailingOffset + laneJitter;
 
       positions[i3] = Math.cos(angle) * radius;
       
@@ -510,15 +513,15 @@ export const WhirlpoolGalaxy = ({ visualScale }: WhirlpoolGalaxyProps) => {
     return geo;
   }, [gs]);
 
-  // Tidal bridge geometry - connects arm tip to companion
+  // Tidal bridge geometry - connects arm tip to companion with color/density transition
   const tidalBridgeGeo = useMemo(() => {
-    const count = 25000;
+    const count = 40000; // More stars for denser bridge
     const positions = new Float32Array(count * 3);
     const colors = new Float32Array(count * 3);
     const color = new THREE.Color();
 
     // Bridge starts at the outer edge of the disk (arm tip) and goes to companion
-    const armTipRadius = WHIRLPOOL.diskRadius * gs * 0.95; // Start at arm edge
+    const armTipRadius = WHIRLPOOL.diskRadius * gs * 0.92;
     const companionDist = NGC5195.distanceFromCenter * gs;
     
     // Calculate the arm tip angle at rt=1 using same spiral formula
@@ -527,35 +530,71 @@ export const WhirlpoolGalaxy = ({ visualScale }: WhirlpoolGalaxyProps) => {
     for (let i = 0; i < count; i++) {
       const i3 = i * 3;
 
-      const t = Math.random();
-      // Narrower at arm tip, wider near companion
-      const spread = 0.08 + t * 0.18;
+      // Use exponential distribution - more stars near arm tip and near companion
+      const rawT = Math.random();
+      const t = rawT < 0.5 ? Math.pow(rawT * 2, 1.5) * 0.5 : 0.5 + Math.pow((rawT - 0.5) * 2, 0.7) * 0.5;
+      
+      // Wider at ends, narrower in middle
+      const spread = 0.1 + Math.abs(t - 0.5) * 0.25;
 
       // Interpolate radius from arm tip to companion distance
       const radius = armTipRadius + (companionDist - armTipRadius) * t;
       
       // Follow a slight curve from arm tip angle toward companion
-      const curveAngle = armTipSpiral * (1 - t * 0.15);
+      const curveAngle = armTipSpiral * (1 - t * 0.12);
       
       // Position along the bridge with some spread
-      const x = Math.cos(curveAngle) * radius + (Math.random() - 0.5) * spread * WHIRLPOOL.diskRadius * gs * 0.25;
-      const z = Math.sin(curveAngle) * radius + (Math.random() - 0.5) * spread * WHIRLPOOL.diskRadius * gs * 0.25;
+      const x = Math.cos(curveAngle) * radius + (Math.random() - 0.5) * spread * WHIRLPOOL.diskRadius * gs * 0.3;
+      const z = Math.sin(curveAngle) * radius + (Math.random() - 0.5) * spread * WHIRLPOOL.diskRadius * gs * 0.3;
       
       positions[i3] = x;
-      positions[i3 + 1] = NGC5195.yOffset * gs * t + (Math.random() - 0.5) * spread * WHIRLPOOL.diskRadius * gs * 0.15;
+      positions[i3 + 1] = NGC5195.yOffset * gs * t + (Math.random() - 0.5) * spread * WHIRLPOOL.diskRadius * gs * 0.12;
       positions[i3 + 2] = z;
 
-      // Bridge colors - mix of disturbed gas, dust, and stars
+      // Color transition: blue/pink at arm end → yellow/orange near companion
       const rand = Math.random();
-      if (rand < 0.35) {
-        // Blue stars
-        color.setHSL(0.58 + Math.random() * 0.1, 0.5 + Math.random() * 0.25, 0.45 + Math.random() * 0.15);
-      } else if (rand < 0.6) {
-        // Pink/red HII
-        color.setHSL(0.95 + Math.random() * 0.05, 0.55 + Math.random() * 0.25, 0.4 + Math.random() * 0.15);
+      if (t < 0.4) {
+        // Near arm tip: blue and pink like the spiral arms
+        if (rand < 0.45) {
+          // Blue stars
+          color.setHSL(0.56 + Math.random() * 0.1, 0.6 + Math.random() * 0.25, 0.5 + Math.random() * 0.15);
+        } else if (rand < 0.75) {
+          // Pink HII
+          color.setHSL(0.94 + Math.random() * 0.05, 0.65 + Math.random() * 0.2, 0.5 + Math.random() * 0.12);
+        } else {
+          // Dust
+          color.setHSL(0.03 + Math.random() * 0.03, 0.5 + Math.random() * 0.2, 0.2 + Math.random() * 0.1);
+        }
+      } else if (t < 0.7) {
+        // Middle: transitional colors
+        if (rand < 0.35) {
+          // Blue fading
+          color.setHSL(0.55 + Math.random() * 0.1, 0.45 + Math.random() * 0.2, 0.45 + Math.random() * 0.12);
+        } else if (rand < 0.55) {
+          // Pink fading
+          color.setHSL(0.95 + Math.random() * 0.04, 0.5 + Math.random() * 0.2, 0.45 + Math.random() * 0.1);
+        } else if (rand < 0.75) {
+          // Cream transitioning
+          color.setHSL(0.1 + Math.random() * 0.04, 0.4 + Math.random() * 0.15, 0.55 + Math.random() * 0.12);
+        } else {
+          // Dust
+          color.setHSL(0.04 + Math.random() * 0.03, 0.5 + Math.random() * 0.2, 0.15 + Math.random() * 0.1);
+        }
       } else {
-        // Dark dust
-        color.setHSL(0.03 + Math.random() * 0.03, 0.5 + Math.random() * 0.2, 0.18 + Math.random() * 0.12);
+        // Near companion: warm yellow/orange like NGC 5195
+        if (rand < 0.4) {
+          // Yellow-cream
+          color.setHSL(0.11 + Math.random() * 0.04, 0.45 + Math.random() * 0.2, 0.65 + Math.random() * 0.12);
+        } else if (rand < 0.7) {
+          // Orange-gold
+          color.setHSL(0.08 + Math.random() * 0.04, 0.55 + Math.random() * 0.2, 0.55 + Math.random() * 0.12);
+        } else if (rand < 0.85) {
+          // Light gold
+          color.setHSL(0.1 + Math.random() * 0.03, 0.4 + Math.random() * 0.15, 0.7 + Math.random() * 0.1);
+        } else {
+          // Dust
+          color.setHSL(0.04 + Math.random() * 0.02, 0.45 + Math.random() * 0.2, 0.2 + Math.random() * 0.1);
+        }
       }
 
       colors[i3] = color.r;
