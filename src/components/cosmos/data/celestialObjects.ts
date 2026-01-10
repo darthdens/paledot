@@ -805,7 +805,7 @@ export const celestialObjects: CelestialObject[] = [
   },
   {
     id: 'whirlpool',
-    name: { en: 'Whirlpool Galaxy (M51)', fr: 'Galaxie du Tourbillon (M51)' },
+    name: { en: 'Whirlpool', fr: 'Tourbillon' },
     type: 'galaxy',
     position: [23e6 * UNITS.KM_PER_LY, 5e6 * UNITS.KM_PER_LY, 10e6 * UNITS.KM_PER_LY],
     size: 76000 * UNITS.KM_PER_LY,
