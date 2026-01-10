@@ -147,20 +147,21 @@ export const TourOverlay = () => {
           const dz = sunPos[2] - targetPos[2];
           const len = Math.hypot(dx, dy, dz);
 
+          // Calculate camera distance from offset
+          const dist = Math.hypot(offsetScene[0], offsetScene[1], offsetScene[2]) || 1;
+
           if (len > 0) {
             const dirToSun = [dx / len, dy / len, dz / len];
 
-            // Calculate camera distance from offset
-            const dist = Math.hypot(offsetScene[0], offsetScene[1], offsetScene[2]) || 1;
-
-            // Position camera between object and sun, with a slight elevation
+            // Position camera on the sun-facing side with proper elevation
+            // Use both the direction to sun AND the offset height for better framing
             cameraPos = [
-              targetPos[0] + dirToSun[0] * dist,
-              targetPos[1] + Math.abs(offsetScene[1]) * 0.5, // Add some height
-              targetPos[2] + dirToSun[2] * dist,
+              targetPos[0] + dirToSun[0] * dist * 0.8,
+              targetPos[1] + dist * 0.4, // Consistent elevation relative to distance
+              targetPos[2] + dirToSun[2] * dist * 0.8,
             ];
           } else {
-            // Fallback if somehow at sun's position
+            // Fallback if somehow at sun's position - use simple offset
             cameraPos = [
               targetPos[0] + offsetScene[0],
               targetPos[1] + offsetScene[1],
