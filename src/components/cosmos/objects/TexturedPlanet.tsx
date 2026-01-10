@@ -12,6 +12,7 @@ import earthNightTexture from '@/assets/textures/earth-night.jpg';
 import earthCloudsTexture from '@/assets/textures/earth-clouds.jpg';
 import moonTexture from '@/assets/textures/moon.jpg';
 import mercuryTexture from '@/assets/textures/mercury.jpg';
+import venusTexture from '@/assets/textures/venus.jpg';
 
 interface TexturedPlanetProps {
   object: CelestialObject;
@@ -376,21 +377,22 @@ export const TexturedPlanet = ({
     return (planetSizes[object.parentId] || 0) * visualScale;
   }, [isMoon, object.parentId, visualScale]);
 
-  // Load NASA textures for Earth, Moon, and Mercury
+  // Load NASA textures for planets
   const earthDayMap = useLoader(THREE.TextureLoader, earthDayTexture);
   const earthNightMap = useLoader(THREE.TextureLoader, earthNightTexture);
   const earthCloudsMap = useLoader(THREE.TextureLoader, earthCloudsTexture);
   const moonMap = useLoader(THREE.TextureLoader, moonTexture);
   const mercuryMap = useLoader(THREE.TextureLoader, mercuryTexture);
+  const venusMap = useLoader(THREE.TextureLoader, venusTexture);
   
   // Configure texture properties for proper spherical mapping
   useMemo(() => {
-    [earthDayMap, earthNightMap, earthCloudsMap, moonMap, mercuryMap].forEach(tex => {
+    [earthDayMap, earthNightMap, earthCloudsMap, moonMap, mercuryMap, venusMap].forEach(tex => {
       tex.wrapS = THREE.RepeatWrapping;
       tex.wrapT = THREE.ClampToEdgeWrapping;
       tex.colorSpace = THREE.SRGBColorSpace;
     });
-  }, [earthDayMap, earthNightMap, earthCloudsMap, moonMap, mercuryMap]);
+  }, [earthDayMap, earthNightMap, earthCloudsMap, moonMap, mercuryMap, venusMap]);
   
   const visuals = PLANET_VISUALS[object.id] || {
     baseColor: object.color,
@@ -683,6 +685,7 @@ export const TexturedPlanet = ({
                 earthNightMap: { value: earthNightMap },
                 moonMap: { value: moonMap },
                 mercuryMap: { value: mercuryMap },
+                venusMap: { value: venusMap },
               }}
               vertexShader={`
                 varying vec3 vNormal;
@@ -729,6 +732,7 @@ export const TexturedPlanet = ({
                 uniform sampler2D earthNightMap;
                 uniform sampler2D moonMap;
                 uniform sampler2D mercuryMap;
+                uniform sampler2D venusMap;
                 varying vec3 vNormal;
                 varying vec3 vPosition;
                 varying vec2 vUv;
@@ -942,12 +946,33 @@ export const TexturedPlanet = ({
                     surfaceColor = mercuryColor;
                     NdotL = mix(NdotL, bumpedNdotL, 0.7);
                   }
-                  // === VENUS (3) - Swirling yellowish clouds ===
+                  // === VENUS (3) - NASA texture with animated cloud bands ===
                   else if (surfaceType > 2.5 && surfaceType < 3.5) {
-                    float swirl = sin(vUv.y * 15.0 + surfaceNoise * 4.0 + vUv.x * 3.0) * 0.5 + 0.5;
-                    float bands = sin(vUv.y * 8.0) * 0.3 + 0.5;
-                    surfaceColor = mix(baseColor, secondaryColor, swirl * 0.4);
-                    surfaceColor = mix(surfaceColor, tertiaryColor, bands * 0.2);
+                    // Animate cloud rotation (Venus has super-rotation of atmosphere)
+                    float cloudSpeed = time * 0.015;
+                    vec2 animatedUv = vUv;
+                    animatedUv.x = fract(animatedUv.x + cloudSpeed);
+                    
+                    // Sample NASA Venus atmosphere texture
+                    vec3 venusColor = texture2D(venusMap, animatedUv).rgb;
+                    
+                    // Add subtle swirling motion overlay
+                    float swirl = sin(vUv.y * 12.0 + time * 0.02 + vUv.x * 5.0) * 0.5 + 0.5;
+                    float bands = sin(vUv.y * 20.0 + time * 0.01) * 0.15 + 0.85;
+                    
+                    // Enhance the yellowish sulfuric haze
+                    vec3 sulfurHaze = vec3(1.0, 0.92, 0.7);
+                    venusColor = mix(venusColor, venusColor * sulfurHaze, 0.3);
+                    
+                    // Apply band variation
+                    venusColor *= bands;
+                    
+                    // Add atmospheric scattering at terminator
+                    float terminatorZone = smoothstep(-0.1, 0.1, dot(worldNormal, sunDir)) * smoothstep(0.3, 0.1, dot(worldNormal, sunDir));
+                    vec3 venusGlow = vec3(1.0, 0.85, 0.5);
+                    venusColor += venusGlow * terminatorZone * 0.15;
+                    
+                    surfaceColor = venusColor;
                   }
                   // === EARTH (4) - NASA texture maps with city lights, auroras, and terminator scattering ===
                   else if (surfaceType > 3.5 && surfaceType < 4.5) {
