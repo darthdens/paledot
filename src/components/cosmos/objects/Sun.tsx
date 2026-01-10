@@ -333,11 +333,11 @@ export const Sun = ({ position = [0, 0, 0], visualScale = 80 }: SunProps) => {
       </mesh>
 
       {/* Core glow sprite - bright center */}
-      <sprite renderOrder={-5} scale={[sunSize * 8, sunSize * 8, 1]}>
+      <sprite renderOrder={-5} scale={[sunSize * 5, sunSize * 5, 1]}>
         <spriteMaterial
           map={glowTexture}
           transparent
-          opacity={0.9}
+          opacity={0.7}
           blending={THREE.AdditiveBlending}
           depthWrite={false}
           depthTest={false}
@@ -345,11 +345,11 @@ export const Sun = ({ position = [0, 0, 0], visualScale = 80 }: SunProps) => {
       </sprite>
 
       {/* Medium glow sprite - extended corona */}
-      <sprite ref={outerGlowRef} renderOrder={-6} scale={[sunSize * 16, sunSize * 16, 1]}>
+      <sprite ref={outerGlowRef} renderOrder={-6} scale={[sunSize * 10, sunSize * 10, 1]}>
         <spriteMaterial
           map={outerGlowTexture}
           transparent
-          opacity={0.6}
+          opacity={0.35}
           blending={THREE.AdditiveBlending}
           depthWrite={false}
           depthTest={false}
@@ -357,11 +357,11 @@ export const Sun = ({ position = [0, 0, 0], visualScale = 80 }: SunProps) => {
       </sprite>
 
       {/* Corona rays - animated pulsing */}
-      <sprite ref={coronaRaysRef} renderOrder={-7} scale={[sunSize * 22, sunSize * 22, 1]}>
+      <sprite ref={coronaRaysRef} renderOrder={-7} scale={[sunSize * 14, sunSize * 14, 1]}>
         <spriteMaterial
           map={coronaRaysTexture}
           transparent
-          opacity={0.4}
+          opacity={0.2}
           blending={THREE.AdditiveBlending}
           depthWrite={false}
           depthTest={false}
@@ -369,11 +369,11 @@ export const Sun = ({ position = [0, 0, 0], visualScale = 80 }: SunProps) => {
       </sprite>
 
       {/* Large outer glow sprite - far reaching halo */}
-      <sprite renderOrder={-8} scale={[sunSize * 30, sunSize * 30, 1]}>
+      <sprite renderOrder={-8} scale={[sunSize * 20, sunSize * 20, 1]}>
         <spriteMaterial
           map={outerGlowTexture}
           transparent
-          opacity={0.25}
+          opacity={0.12}
           blending={THREE.AdditiveBlending}
           depthWrite={false}
           depthTest={false}
