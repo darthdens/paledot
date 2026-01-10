@@ -22,9 +22,9 @@ interface SombreroGalaxyProps {
 // 4. Colors: bright white/cream bulge, orange-brown dust lane, blue outer regions
 const SOMBRERO = {
   diskRadius: 25000, // Half of 50,000 ly diameter
-  bulgeRadius: 15000, // Large central bulge (proportionally bigger than typical spirals)
-  bulgeHeight: 12000, // Tall elliptical bulge
-  dustLaneThickness: 800, // Prominent dust lane
+  bulgeRadius: 12000, // Central bulge width (slightly narrower for more elongated look)
+  bulgeHeight: 18000, // Much taller elliptical bulge - the iconic "hat crown"
+  dustLaneThickness: 1000, // Prominent dust lane
   inclination: (84 * Math.PI) / 180, // Nearly edge-on (84° from face-on)
   distanceFromMilkyWay: 29.3e6, // 29.3 million light-years
 };
@@ -137,9 +137,10 @@ export const SombreroGalaxy = ({ visualScale }: SombreroGalaxyProps) => {
   const glowTexture = useMemo(() => createSombreroGlowTexture(), []);
 
   // Large central bulge - the distinctive "sombrero crown"
-  // This is the most prominent feature - massive elliptical bulge
+  // This is the most prominent feature - massive bright elliptical bulge
+  // Based on reference: very bright white center, elongated vertically, smooth gradient to golden edges
   const bulgeGeo = useMemo(() => {
-    const bulgeCount = 200000; // Dense bulge
+    const bulgeCount = 350000; // Very dense for bright, smooth appearance
     const positions = new Float32Array(bulgeCount * 3);
     const colors = new Float32Array(bulgeCount * 3);
     const color = new THREE.Color();
@@ -149,15 +150,15 @@ export const SombreroGalaxy = ({ visualScale }: SombreroGalaxyProps) => {
     for (let i = 0; i < bulgeCount; i++) {
       const i3 = i * 3;
 
-      // Create an ellipsoidal distribution
-      const r = Math.pow(Math.random(), 1.3);
+      // Create an ellipsoidal distribution with concentration toward center
+      const r = Math.pow(Math.random(), 1.6); // More concentration in center
       const theta = Math.random() * Math.PI * 2;
       const phi = Math.acos(2 * Math.random() - 1);
       
       // Distance from center (0 to 1)
       const t = r;
 
-      // Ellipsoidal coordinates - taller than wide
+      // Ellipsoidal coordinates - much taller than wide (the sombrero crown shape)
       const x = r * Math.sin(phi) * Math.cos(theta) * bulgeRadiusXZ;
       const y = r * Math.cos(phi) * bulgeRadiusY;
       const z = r * Math.sin(phi) * Math.sin(theta) * bulgeRadiusXZ;
@@ -166,31 +167,51 @@ export const SombreroGalaxy = ({ visualScale }: SombreroGalaxyProps) => {
       positions[i3 + 1] = y;
       positions[i3 + 2] = z;
 
-      // Colors: bright white center → cream → golden outer
+      // Colors based on reference images:
+      // - Brilliant white/cream center that's very bright
+      // - Gradual transition to golden/orange at edges
+      // - Overall warm tone
       const rand = Math.random();
-      if (t < 0.15) {
-        // Very center: brilliant white
-        color.setHSL(0.12 + Math.random() * 0.03, 0.08 + Math.random() * 0.05, 0.92 + Math.random() * 0.08);
-      } else if (t < 0.35) {
-        // Inner bulge: warm white/cream
-        color.setHSL(0.1 + Math.random() * 0.04, 0.12 + Math.random() * 0.08, 0.85 + Math.random() * 0.1);
-      } else if (t < 0.55) {
+      if (t < 0.08) {
+        // Very center: brilliant pure white - maximum brightness
+        color.setHSL(0.14 + Math.random() * 0.02, 0.05 + Math.random() * 0.03, 0.97 + Math.random() * 0.03);
+      } else if (t < 0.18) {
+        // Inner core: warm white
+        color.setHSL(0.12 + Math.random() * 0.03, 0.08 + Math.random() * 0.05, 0.94 + Math.random() * 0.05);
+      } else if (t < 0.3) {
+        // Inner bulge: cream white
+        color.setHSL(0.11 + Math.random() * 0.03, 0.12 + Math.random() * 0.06, 0.90 + Math.random() * 0.06);
+      } else if (t < 0.45) {
+        // Mid-inner bulge: light cream
+        if (rand < 0.8) {
+          color.setHSL(0.10 + Math.random() * 0.03, 0.18 + Math.random() * 0.08, 0.84 + Math.random() * 0.08);
+        } else {
+          color.setHSL(0.09 + Math.random() * 0.03, 0.22 + Math.random() * 0.1, 0.80 + Math.random() * 0.08);
+        }
+      } else if (t < 0.6) {
         // Middle bulge: cream/golden
         if (rand < 0.7) {
-          color.setHSL(0.09 + Math.random() * 0.04, 0.2 + Math.random() * 0.12, 0.75 + Math.random() * 0.12);
+          color.setHSL(0.09 + Math.random() * 0.03, 0.25 + Math.random() * 0.12, 0.76 + Math.random() * 0.1);
         } else {
-          color.setHSL(0.07 + Math.random() * 0.03, 0.3 + Math.random() * 0.15, 0.68 + Math.random() * 0.12);
+          color.setHSL(0.08 + Math.random() * 0.03, 0.32 + Math.random() * 0.12, 0.70 + Math.random() * 0.1);
         }
       } else if (t < 0.75) {
-        // Outer bulge: golden/orange
+        // Outer-mid bulge: golden
         if (rand < 0.6) {
-          color.setHSL(0.08 + Math.random() * 0.04, 0.35 + Math.random() * 0.2, 0.62 + Math.random() * 0.12);
+          color.setHSL(0.08 + Math.random() * 0.03, 0.38 + Math.random() * 0.15, 0.65 + Math.random() * 0.1);
         } else {
-          color.setHSL(0.06 + Math.random() * 0.03, 0.45 + Math.random() * 0.2, 0.55 + Math.random() * 0.12);
+          color.setHSL(0.07 + Math.random() * 0.03, 0.45 + Math.random() * 0.15, 0.58 + Math.random() * 0.1);
+        }
+      } else if (t < 0.88) {
+        // Outer bulge: golden/orange
+        if (rand < 0.5) {
+          color.setHSL(0.07 + Math.random() * 0.03, 0.48 + Math.random() * 0.18, 0.52 + Math.random() * 0.1);
+        } else {
+          color.setHSL(0.06 + Math.random() * 0.03, 0.52 + Math.random() * 0.18, 0.48 + Math.random() * 0.1);
         }
       } else {
-        // Edge: darker golden/orange
-        color.setHSL(0.06 + Math.random() * 0.04, 0.5 + Math.random() * 0.25, 0.45 + Math.random() * 0.15);
+        // Edge: orange fading
+        color.setHSL(0.06 + Math.random() * 0.03, 0.5 + Math.random() * 0.2, 0.42 + Math.random() * 0.12);
       }
 
       colors[i3] = color.r;
@@ -493,27 +514,27 @@ export const SombreroGalaxy = ({ visualScale }: SombreroGalaxyProps) => {
           />
         </points>
 
-        {/* Central bulge - the bright "crown" */}
+        {/* Central bulge - the bright "crown" - enhanced brightness */}
         <points frustumCulled={false} renderOrder={5}>
           <bufferGeometry attach="geometry" {...bulgeGeo} />
           <pointsMaterial
-            size={gs * 65}
+            size={gs * 80}
             map={dotTexture}
             vertexColors
             transparent
-            opacity={0.9}
+            opacity={0.95}
             blending={THREE.AdditiveBlending}
             depthWrite={false}
             sizeAttenuation
           />
         </points>
 
-        {/* Center glow (billboard) - bright core */}
-        <sprite renderOrder={6} frustumCulled={false} scale={[bulgeR * 2.5, bulgeR * 3.2, 1]}>
+        {/* Center glow (billboard) - brilliant bright core with elongated shape */}
+        <sprite renderOrder={7} frustumCulled={false} scale={[bulgeR * 2.2, bulgeR * 4.0, 1]}>
           <spriteMaterial
             map={glowTexture}
             transparent
-            opacity={0.95}
+            opacity={1.0}
             blending={THREE.AdditiveBlending}
             depthWrite={false}
             depthTest={false}
