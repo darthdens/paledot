@@ -345,6 +345,23 @@ export const tourStops: TourStop[] = [
     scaleLevel: 'localGroup',
   },
   {
+    id: 'triangulum',
+    locationId: 'triangulum',
+    title: {
+      en: 'Triangulum Galaxy (M33)',
+      fr: 'La Galaxie du Triangle (M33)',
+    },
+    narration: {
+      en: 'The Triangulum Galaxy is the third-largest member of our Local Group, about 2.73 million light-years away. With around 40 billion stars, it\'s roughly half the size of our Milky Way. Notice its distinctive blue spiral arms dotted with pink star-forming regions.',
+      fr: 'La Galaxie du Triangle est le troisième plus grand membre de notre Groupe Local, à environ 2,73 millions d\'années-lumière. Avec environ 40 milliards d\'étoiles, elle fait environ la moitié de la taille de notre Voie Lactée. Remarquez ses bras spiraux bleus distinctifs parsemés de régions roses de formation d\'étoiles.',
+    },
+    duration: 10,
+    // Position camera to see Triangulum nicely
+    cameraPosition: [-100000 * UNITS.KM_PER_LY, 60000 * UNITS.KM_PER_LY, 200000 * UNITS.KM_PER_LY],
+    lookAt: [0, 0, 0],
+    scaleLevel: 'localGroup',
+  },
+  {
     id: 'conclusion',
     locationId: 'earth',
     title: {
