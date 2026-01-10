@@ -820,7 +820,7 @@ export const celestialObjects: CelestialObject[] = [
   },
   {
     id: 'sombrero',
-    name: { en: 'Sombrero Galaxy', fr: 'Galaxie du Sombrero' },
+    name: { en: 'Sombrero', fr: 'Sombrero' },
     type: 'galaxy',
     position: [29.3e6 * UNITS.KM_PER_LY, -10e6 * UNITS.KM_PER_LY, 15e6 * UNITS.KM_PER_LY],
     size: 50000 * UNITS.KM_PER_LY,
