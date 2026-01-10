@@ -333,7 +333,7 @@ export const Sun = ({ position = [0, 0, 0], visualScale = 80 }: SunProps) => {
           opacity={1.0}
           blending={THREE.AdditiveBlending}
           depthWrite={false}
-          depthTest={false}
+          depthTest={true}
         />
       </sprite>
 
@@ -345,7 +345,7 @@ export const Sun = ({ position = [0, 0, 0], visualScale = 80 }: SunProps) => {
           opacity={0.6}
           blending={THREE.AdditiveBlending}
           depthWrite={false}
-          depthTest={false}
+          depthTest={true}
         />
       </sprite>
 
@@ -357,7 +357,7 @@ export const Sun = ({ position = [0, 0, 0], visualScale = 80 }: SunProps) => {
           opacity={0.25}
           blending={THREE.AdditiveBlending}
           depthWrite={false}
-          depthTest={false}
+          depthTest={true}
         />
       </sprite>
 
