@@ -916,14 +916,15 @@ export const TexturedPlanet = ({
                     surfaceColor = mix(baseColor, secondaryColor, swirl * 0.4);
                     surfaceColor = mix(surfaceColor, tertiaryColor, bands * 0.2);
                   }
-                  // === EARTH (4) - NASA texture map with aurora, bump mapping, and ocean specular ===
+                  // === EARTH (4) - NASA texture maps with city lights, auroras, and terminator scattering ===
                   else if (surfaceType > 3.5 && surfaceType < 4.5) {
                     // Sample NASA Earth day texture
                     vec3 dayColor = texture2D(earthDayMap, vUv).rgb;
-                    // Sample NASA Earth night texture (city lights)
+                    
+                    // Sample NASA Earth night texture (city lights) - this texture shows real city locations
                     vec3 nightColor = texture2D(earthNightMap, vUv).rgb;
                     
-                    // === PROCEDURAL BUMP MAPPING ===
+                    // === PROCEDURAL BUMP MAPPING from texture ===
                     float texelSize = 0.002;
                     float heightC = dot(dayColor, vec3(0.299, 0.587, 0.114));
                     float heightL = dot(texture2D(earthDayMap, vUv + vec2(-texelSize, 0.0)).rgb, vec3(0.299, 0.587, 0.114));
@@ -938,7 +939,7 @@ export const TexturedPlanet = ({
                       1.0
                     ));
                     
-                    vec3 worldNormal = normalize(vWorldNormal);
+                    // Perturb the world normal
                     vec3 tangent = normalize(cross(worldNormal, vec3(0.0, 1.0, 0.0)));
                     vec3 bitangent = normalize(cross(worldNormal, tangent));
                     vec3 perturbedNormal = normalize(
@@ -947,56 +948,82 @@ export const TexturedPlanet = ({
                       worldNormal * bumpNormal.z
                     );
                     
-                    vec3 sunDir = normalize(-vWorldPosition);
+                    // Recalculate lighting with perturbed normal
                     float sunFacing = dot(perturbedNormal, sunDir);
+                    float dayNightBlend = smoothstep(-0.15, 0.15, sunFacing);
                     
-                    // Day/night blend
-                    float dayNightBlend = smoothstep(-0.1, 0.2, sunFacing);
-                    float nightSide = 1.0 - dayNightBlend;
+                    // === ATMOSPHERIC SCATTERING AT TERMINATOR (Sunset/Sunrise colors) ===
+                    // The terminator is the day/night boundary where we see orange/red sunset colors
+                    float terminatorZone = smoothstep(-0.2, 0.0, sunFacing) * smoothstep(0.25, 0.0, sunFacing);
                     
-                    // === DETECT OCEAN vs LAND ===
-                    // Oceans are darker blue, land is brighter/greener
-                    float blueChannel = dayColor.b;
-                    float greenChannel = dayColor.g;
-                    float redChannel = dayColor.r;
-                    // Ocean detection: high blue relative to red/green, darker overall
-                    float oceanMask = smoothstep(0.1, 0.25, blueChannel - redChannel * 0.8) * 
-                                      smoothstep(0.05, 0.15, blueChannel - greenChannel * 0.6);
-                    // Exclude ice (very bright areas)
-                    float brightness = (redChannel + greenChannel + blueChannel) / 3.0;
-                    oceanMask *= 1.0 - smoothstep(0.6, 0.8, brightness);
+                    // Rayleigh scattering - red/orange light passes through more atmosphere at terminator
+                    vec3 sunsetOrange = vec3(1.0, 0.45, 0.15);
+                    vec3 sunsetRed = vec3(0.9, 0.25, 0.1);
+                    vec3 sunsetPink = vec3(1.0, 0.5, 0.4);
+                    
+                    // Mix sunset colors based on how deep into terminator we are
+                    float deepTerminator = smoothstep(-0.15, 0.0, sunFacing) * smoothstep(0.1, 0.0, sunFacing);
+                    vec3 terminatorColor = mix(sunsetOrange, sunsetRed, deepTerminator);
+                    terminatorColor = mix(terminatorColor, sunsetPink, pow(terminatorZone, 2.0) * 0.4);
+                    
+                    // Apply scattering to the surface (tints land/ocean with sunset colors)
+                    float scatterIntensity = terminatorZone * 0.6;
+                    vec3 scatteredDayColor = mix(dayColor, dayColor * terminatorColor * 1.5, scatterIntensity);
                     
                     // === OCEAN SPECULAR HIGHLIGHTS ===
+                    float redChannel = dayColor.r;
+                    float greenChannel = dayColor.g;
+                    float blueChannel = dayColor.b;
+                    
+                    // Ocean mask: areas where blue dominates and it's darker (ocean is dark blue)
+                    float oceanMask = smoothstep(0.1, 0.25, blueChannel - redChannel * 0.8) * 
+                                      smoothstep(0.05, 0.15, blueChannel - greenChannel * 0.6);
+                    
+                    // Specular calculation for ocean
                     vec3 viewDir = normalize(cameraPosition - vWorldPosition);
                     vec3 reflectDir = reflect(-sunDir, perturbedNormal);
                     float specAngle = max(dot(viewDir, reflectDir), 0.0);
-                    // Sharp specular for water
+                    
+                    // Sharp specular for sun reflection on water
                     float oceanSpecular = pow(specAngle, 128.0) * oceanMask * 2.0;
-                    // Broader glint for larger sun reflection
-                    float oceanGlint = pow(specAngle, 32.0) * oceanMask * 0.4;
-                    vec3 specularColor = vec3(1.0, 0.98, 0.95) * (oceanSpecular + oceanGlint);
+                    // Broader glint
+                    float oceanGlint = pow(specAngle, 32.0) * oceanMask * 0.3;
                     
-                    // === ENHANCED CITY LIGHTS ===
-                    // Boost city lights and make them warmer/more visible
+                    // Sunset tints the specular highlights too
+                    vec3 specColor = mix(vec3(1.0, 0.98, 0.95), terminatorColor, terminatorZone * 0.5);
+                    vec3 specularColor = specColor * (oceanSpecular + oceanGlint);
+                    
+                    // === ENHANCED CITY LIGHTS from NASA night texture ===
+                    // The NASA Earth at Night texture already has accurate city positions
+                    // Boost brightness and add characteristic warm glow of city lights
                     float cityBrightness = dot(nightColor, vec3(0.299, 0.587, 0.114));
-                    vec3 cityWarmth = vec3(1.0, 0.85, 0.6); // Warm orange-yellow glow
-                    vec3 cityLights = nightColor * 3.0 * cityWarmth;
-                    // Add bloom effect for brighter cities
-                    cityLights += vec3(1.0, 0.9, 0.7) * pow(cityBrightness, 2.0) * 2.0;
-                    // Only show on actual night side
-                    cityLights *= nightSide;
                     
-                    // === AURORA BOREALIS (Northern Lights) ===
-                    float latitudeNorth = (vUv.y - 0.5) * 2.0; // -1 to 1, positive is north
-                    float latitudeSouth = -latitudeNorth; // Inverted for south
+                    // City lights have warm sodium-vapor orange and LED white mix
+                    vec3 cityWarmth = vec3(1.0, 0.8, 0.5); // Warm orange tint
+                    vec3 cityLights = nightColor * 4.0 * cityWarmth;
                     
-                    // Northern aurora zone (~60-75 degrees north)
-                    float auroraNorthZone = smoothstep(0.55, 0.68, latitudeNorth) * smoothstep(0.88, 0.72, latitudeNorth);
-                    // Southern aurora zone (~60-75 degrees south) 
-                    float auroraSouthZone = smoothstep(0.55, 0.68, latitudeSouth) * smoothstep(0.88, 0.72, latitudeSouth);
+                    // Add bloom/glow effect around bright city areas
+                    float bloomIntensity = pow(cityBrightness, 1.5) * 3.0;
+                    cityLights += vec3(1.0, 0.85, 0.6) * bloomIntensity;
                     
-                    float auroraTime = time * 0.3;
+                    // Only show city lights on night side with smooth transition
+                    float nightSide = 1.0 - dayNightBlend;
+                    // Fade in city lights as sun sets
+                    float cityFade = smoothstep(0.3, -0.1, sunFacing);
+                    cityLights *= cityFade;
+                    
+                    // === AURORA BOREALIS & AUSTRALIS ===
                     float lon = vUv.x * 6.28318;
+                    float auroraTime = time * 0.3;
+                    
+                    // Aurora zones - both poles with smooth transitions
+                    float latitudeNorth = (vUv.y - 0.5) * 2.0; // -1 at south, +1 at north
+                    float latitudeSouth = -latitudeNorth;
+                    
+                    // Northern aurora (around 65-75 degrees latitude)
+                    float auroraNorthZone = smoothstep(0.55, 0.68, latitudeNorth) * smoothstep(0.88, 0.72, latitudeNorth);
+                    // Southern aurora (mirrored)
+                    float auroraSouthZone = smoothstep(0.55, 0.68, latitudeSouth) * smoothstep(0.88, 0.72, latitudeSouth);
                     
                     // Multi-layer aurora curtains
                     float curtain1 = sin(lon * 8.0 + auroraTime * 1.2 + sin(lon * 3.0 + auroraTime) * 2.0) * 0.5 + 0.5;
@@ -1041,13 +1068,18 @@ export const TexturedPlanet = ({
                     
                     // Apply bump-enhanced lighting to day texture
                     float bumpLighting = max(0.0, dot(perturbedNormal, sunDir));
-                    dayColor *= 0.85 + bumpLighting * 0.3;
+                    scatteredDayColor *= 0.85 + bumpLighting * 0.3;
                     
                     // Add ocean specular to day side only
-                    vec3 dayWithSpecular = dayColor + specularColor * dayNightBlend;
+                    vec3 dayWithSpecular = scatteredDayColor + specularColor * dayNightBlend;
                     
-                    // Final blend: night side shows city lights + aurora, day side shows terrain + specular
+                    // === TERMINATOR ATMOSPHERIC GLOW ===
+                    // Add atmospheric glow at the terminator edge (visible from space)
+                    vec3 atmosphericGlow = terminatorColor * terminatorZone * 0.25;
+                    
+                    // Final blend: night side shows city lights + aurora, day side shows terrain + specular + scattering
                     surfaceColor = mix(cityLights + aurora, dayWithSpecular, dayNightBlend);
+                    surfaceColor += atmosphericGlow;
                   }
                   // === MOON (5) - NASA texture map with bump mapping ===
                   else if (surfaceType > 4.5 && surfaceType < 5.5) {
@@ -1269,7 +1301,7 @@ export const TexturedPlanet = ({
             />
           </mesh>
 
-          {/* Cloud layer for planets with clouds */}
+          {/* Cloud layer for planets with clouds - Earth clouds rotate independently */}
           {visuals.hasClouds && (
             <mesh>
               <sphereGeometry args={[planetSize * 1.02, 64, 64]} />
@@ -1336,19 +1368,47 @@ export const TexturedPlanet = ({
                     
                     float cloudCoverage;
                     if (isEarth > 0.5) {
-                      // Use NASA cloud texture for Earth
-                      vec3 cloudSample = texture2D(cloudMap, vUv).rgb;
+                      // === ANIMATED CLOUD ROTATION ===
+                      // Clouds rotate slightly faster than Earth's surface (jet streams)
+                      // This creates realistic independent cloud movement
+                      float cloudRotationSpeed = 0.008; // Radians per time unit (faster than surface)
+                      float cloudOffset = time * cloudRotationSpeed;
+                      
+                      // Apply rotation offset to UV (longitude only)
+                      vec2 animatedUv = vUv;
+                      animatedUv.x = fract(animatedUv.x + cloudOffset);
+                      
+                      // Sample NASA cloud texture with animated UVs
+                      vec3 cloudSample = texture2D(cloudMap, animatedUv).rgb;
                       cloudCoverage = cloudSample.r;
+                      
+                      // Add subtle cloud evolution over time (morphing)
+                      float cloudEvolve = sin(time * 0.02 + vUv.x * 10.0 + vUv.y * 8.0) * 0.08;
+                      cloudCoverage = clamp(cloudCoverage + cloudEvolve, 0.0, 1.0);
                     } else {
-                      // Procedural clouds for other planets
-                      float hash = fract(sin(dot(vUv * 15.0 + time * 0.01, vec2(127.1, 311.7))) * 43758.5453);
+                      // Procedural clouds for other planets with animation
+                      float animatedTime = time * 0.02;
+                      vec2 animatedUv = vUv;
+                      animatedUv.x = fract(animatedUv.x + animatedTime);
+                      float hash = fract(sin(dot(animatedUv * 15.0, vec2(127.1, 311.7))) * 43758.5453);
                       cloudCoverage = smoothstep(0.35, 0.65, hash);
                     }
                     
-                    float lighting = 0.02 + NdotL * 0.98 * shadow;
-                    vec3 litCloud = cloudColor * lighting;
+                    // === TERMINATOR SCATTERING ON CLOUDS ===
+                    // Clouds at the terminator catch sunset/sunrise colors
+                    float sunFacing = dot(worldNormal, sunDir);
+                    float terminatorZone = smoothstep(-0.2, 0.0, sunFacing) * smoothstep(0.25, 0.0, sunFacing);
                     
-                    gl_FragColor = vec4(litCloud, cloudCoverage * 0.6 * NdotL * shadow);
+                    vec3 sunsetOrange = vec3(1.0, 0.5, 0.2);
+                    vec3 cloudWithScatter = mix(cloudColor, sunsetOrange, terminatorZone * 0.4);
+                    
+                    float lighting = 0.02 + NdotL * 0.98 * shadow;
+                    vec3 litCloud = cloudWithScatter * lighting;
+                    
+                    // Clouds glow slightly at terminator
+                    litCloud += sunsetOrange * terminatorZone * 0.15;
+                    
+                    gl_FragColor = vec4(litCloud, cloudCoverage * 0.6 * max(NdotL, terminatorZone * 0.3) * shadow);
                   }
                 `}
               />
