@@ -36,7 +36,7 @@ const createSunGlowTexture = () => {
   return tex;
 };
 
-// Outer glow texture - larger and softer
+// Outer glow texture - softer, more natural
 const createOuterGlowTexture = () => {
   const size = 512;
   const canvas = document.createElement('canvas');
@@ -46,12 +46,13 @@ const createOuterGlowTexture = () => {
 
   const gradient = ctx.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2);
   
-  gradient.addColorStop(0, 'rgba(255, 200, 100, 0.8)');
-  gradient.addColorStop(0.15, 'rgba(255, 160, 60, 0.5)');
-  gradient.addColorStop(0.3, 'rgba(255, 120, 40, 0.3)');
-  gradient.addColorStop(0.5, 'rgba(255, 90, 20, 0.15)');
-  gradient.addColorStop(0.7, 'rgba(255, 60, 10, 0.05)');
-  gradient.addColorStop(1, 'rgba(255, 40, 0, 0)');
+  // More subtle, natural gradient
+  gradient.addColorStop(0, 'rgba(255, 240, 200, 0.6)');
+  gradient.addColorStop(0.1, 'rgba(255, 210, 130, 0.4)');
+  gradient.addColorStop(0.25, 'rgba(255, 180, 80, 0.2)');
+  gradient.addColorStop(0.45, 'rgba(255, 140, 50, 0.08)');
+  gradient.addColorStop(0.7, 'rgba(255, 100, 30, 0.02)');
+  gradient.addColorStop(1, 'rgba(255, 80, 20, 0)');
 
   ctx.fillStyle = gradient;
   ctx.fillRect(0, 0, size, size);
@@ -62,7 +63,7 @@ const createOuterGlowTexture = () => {
   return tex;
 };
 
-// Corona rays texture
+// Corona rays texture - soft rays emanating from center
 const createCoronaRaysTexture = () => {
   const size = 512;
   const canvas = document.createElement('canvas');
@@ -73,10 +74,10 @@ const createCoronaRaysTexture = () => {
   const centerX = size / 2;
   const centerY = size / 2;
 
-  // Draw radial rays
-  for (let i = 0; i < 64; i++) {
-    const angle = (i / 64) * Math.PI * 2;
-    const length = size / 2 * (0.7 + Math.random() * 0.3);
+  // Soft radial rays
+  for (let i = 0; i < 48; i++) {
+    const angle = (i / 48) * Math.PI * 2;
+    const length = size / 2 * (0.6 + Math.random() * 0.4);
     
     const gradient = ctx.createLinearGradient(
       centerX, centerY,
@@ -84,19 +85,19 @@ const createCoronaRaysTexture = () => {
       centerY + Math.sin(angle) * length
     );
     
-    gradient.addColorStop(0, 'rgba(255, 220, 150, 0.4)');
-    gradient.addColorStop(0.5, 'rgba(255, 180, 80, 0.15)');
-    gradient.addColorStop(1, 'rgba(255, 140, 40, 0)');
+    gradient.addColorStop(0, 'rgba(255, 230, 180, 0.25)');
+    gradient.addColorStop(0.4, 'rgba(255, 190, 100, 0.08)');
+    gradient.addColorStop(1, 'rgba(255, 150, 60, 0)');
 
     ctx.beginPath();
     ctx.moveTo(centerX, centerY);
     ctx.lineTo(
-      centerX + Math.cos(angle - 0.03) * length,
-      centerY + Math.sin(angle - 0.03) * length
+      centerX + Math.cos(angle - 0.04) * length,
+      centerY + Math.sin(angle - 0.04) * length
     );
     ctx.lineTo(
-      centerX + Math.cos(angle + 0.03) * length,
-      centerY + Math.sin(angle + 0.03) * length
+      centerX + Math.cos(angle + 0.04) * length,
+      centerY + Math.sin(angle + 0.04) * length
     );
     ctx.closePath();
     ctx.fillStyle = gradient;
@@ -116,6 +117,8 @@ export const Sun = ({ position = [0, 0, 0], visualScale = 80 }: SunProps) => {
   const sunRef = useRef<THREE.Mesh>(null);
   const coronaRef = useRef<THREE.Mesh>(null);
   const glowRef = useRef<THREE.Mesh>(null);
+  const coronaRaysRef = useRef<THREE.Sprite>(null);
+  const outerGlowRef = useRef<THREE.Sprite>(null);
   const groupRef = useRef<THREE.Group>(null);
   const worldPos = useRef(new THREE.Vector3());
   
@@ -137,6 +140,16 @@ export const Sun = ({ position = [0, 0, 0], visualScale = 80 }: SunProps) => {
     }
     if (glowRef.current) {
       glowRef.current.scale.setScalar(1 + Math.sin(time * 0.5) * 0.05);
+    }
+    // Animate corona rays - slow rotation and pulsing
+    if (coronaRaysRef.current) {
+      coronaRaysRef.current.material.rotation += 0.0003;
+      coronaRaysRef.current.material.opacity = 0.35 + Math.sin(time * 0.8) * 0.1;
+    }
+    // Animate outer glow - gentle pulse
+    if (outerGlowRef.current) {
+      const pulseScale = 1 + Math.sin(time * 0.3) * 0.03;
+      outerGlowRef.current.scale.setScalar(pulseScale);
     }
 
     // Update world position for camera targeting
@@ -320,21 +333,9 @@ export const Sun = ({ position = [0, 0, 0], visualScale = 80 }: SunProps) => {
       </mesh>
 
       {/* Core glow sprite - bright center */}
-      <sprite renderOrder={-5} scale={[sunSize * 10, sunSize * 10, 1]}>
+      <sprite renderOrder={-5} scale={[sunSize * 8, sunSize * 8, 1]}>
         <spriteMaterial
           map={glowTexture}
-          transparent
-          opacity={1}
-          blending={THREE.AdditiveBlending}
-          depthWrite={false}
-          depthTest={false}
-        />
-      </sprite>
-
-      {/* Medium glow sprite - extended corona */}
-      <sprite renderOrder={-6} scale={[sunSize * 20, sunSize * 20, 1]}>
-        <spriteMaterial
-          map={outerGlowTexture}
           transparent
           opacity={0.9}
           blending={THREE.AdditiveBlending}
@@ -343,32 +344,32 @@ export const Sun = ({ position = [0, 0, 0], visualScale = 80 }: SunProps) => {
         />
       </sprite>
 
-      {/* Large outer glow sprite - far reaching halo */}
-      <sprite renderOrder={-7} scale={[sunSize * 35, sunSize * 35, 1]}>
+      {/* Medium glow sprite - extended corona */}
+      <sprite ref={outerGlowRef} renderOrder={-6} scale={[sunSize * 16, sunSize * 16, 1]}>
         <spriteMaterial
           map={outerGlowTexture}
           transparent
-          opacity={0.5}
+          opacity={0.6}
           blending={THREE.AdditiveBlending}
           depthWrite={false}
           depthTest={false}
         />
       </sprite>
 
-      {/* Corona rays - like galaxy arms */}
-      <sprite renderOrder={-8} scale={[sunSize * 25, sunSize * 25, 1]}>
+      {/* Corona rays - animated pulsing */}
+      <sprite ref={coronaRaysRef} renderOrder={-7} scale={[sunSize * 22, sunSize * 22, 1]}>
         <spriteMaterial
           map={coronaRaysTexture}
           transparent
-          opacity={0.7}
+          opacity={0.4}
           blending={THREE.AdditiveBlending}
           depthWrite={false}
           depthTest={false}
         />
       </sprite>
 
-      {/* Extra far glow for dramatic effect */}
-      <sprite renderOrder={-9} scale={[sunSize * 50, sunSize * 50, 1]}>
+      {/* Large outer glow sprite - far reaching halo */}
+      <sprite renderOrder={-8} scale={[sunSize * 30, sunSize * 30, 1]}>
         <spriteMaterial
           map={outerGlowTexture}
           transparent
