@@ -15,7 +15,7 @@ const WHIRLPOOL = {
   diskRadius: 38000, // Half of 76,000 ly diameter
   bulgeRadius: 5000, // Prominent central bulge
   branches: 2, // Two beautifully defined spiral arms
-  spinTurns: 1.6, // Total spiral turns
+  spinTurns: 1.8, // More turns for tighter winding from center
   inclination: (20 * Math.PI) / 180, // ~20° inclination (nearly face-on)
   distanceFromMilkyWay: 23e6, // 23 million light-years
 };
@@ -24,10 +24,10 @@ const WHIRLPOOL = {
 // Position is calculated dynamically to stay at arm tip
 const NGC5195 = {
   radius: 12000,
-  // Distance from center (at arm tip)
-  distanceFromCenter: 40000,
+  // Distance from center - closer to disk edge where arm ends
+  distanceFromCenter: 42000,
   // Vertical offset
-  yOffset: 3000,
+  yOffset: 2500,
 };
 
 // Whirlpool glow texture: warm cream core → pink HII → blue outer
@@ -149,12 +149,13 @@ export const WhirlpoolGalaxy = ({ visualScale }: WhirlpoolGalaxyProps) => {
   // This is where the companion should be positioned
   const getArmTipAngle = useCallback((time: number) => {
     const rt = 1.0; // At the edge
-    const logSpiral = Math.log(1 + rt * 2) / Math.log(3);
+    // Use same spiral formula as stars - hard turn from center
+    const logSpiral = Math.pow(rt, 0.5); // Square root gives hard turn at center
     const spinAngle = logSpiral * WHIRLPOOL.spinTurns * Math.PI * 2;
     const branchAngle = 0; // First arm
     
     // Add rotation based on time (same as shader)
-    const omega = 1.0; // Same as rotationMultiplier
+    const omega = 1.0;
     const rotationAngle = time * omega;
     
     return branchAngle + spinAngle + rotationAngle;
@@ -187,22 +188,22 @@ export const WhirlpoolGalaxy = ({ visualScale }: WhirlpoolGalaxyProps) => {
       const branchIndex = Math.floor(Math.random() * branches);
       const branchAngle = (branchIndex / branches) * Math.PI * 2;
       
-      // Tighter logarithmic spiral - very tight at base, opens gradually
-      // Lower multiplier = tighter at center
-      const logSpiral = Math.log(1 + rt * 2) / Math.log(3);
-      const spinAngle = logSpiral * spinTurns * Math.PI * 2;
+      // Hard turn spiral - sqrt gives very tight winding at center that opens outward
+      // This matches the Whirlpool's distinctive tight inner spiral
+      const spiralFactor = Math.pow(rt, 0.5); // Square root = hard turn at center
+      const spinAngle = spiralFactor * spinTurns * Math.PI * 2;
 
-      // Arms very tight near core, widen outward
-      const armWidth = 0.03 + rt * 0.1;
+      // Wider arms - less empty space between them
+      const armWidth = 0.08 + rt * 0.15;
       const armJitter = (Math.random() + Math.random() + Math.random() - 1.5) * armWidth;
 
-      // More inter-arm stars for fuller look
-      const isInterArm = Math.random() < 0.5;
-      const interArmJitter = isInterArm ? (Math.random() - 0.5) * (0.35 + rt * 0.4) : 0;
+      // More inter-arm stars to fill gaps
+      const isInterArm = Math.random() < 0.55;
+      const interArmJitter = isInterArm ? (Math.random() - 0.5) * (0.45 + rt * 0.5) : 0;
 
       const angle = branchAngle + spinAngle + armJitter + interArmJitter;
 
-      const radialSpread = (0.02 + rt * 0.05) * maxRadius;
+      const radialSpread = (0.04 + rt * 0.08) * maxRadius;
       const radialJitter = (Math.random() + Math.random() - 1) * radialSpread;
       const finalRadius = radius + radialJitter;
 
@@ -414,14 +415,14 @@ export const WhirlpoolGalaxy = ({ visualScale }: WhirlpoolGalaxyProps) => {
 
       const branchIndex = Math.floor(Math.random() * branches);
       // Offset to the trailing edge of each arm
-      const branchAngle = (branchIndex / branches) * Math.PI * 2 - 0.08;
+      const branchAngle = (branchIndex / branches) * Math.PI * 2 - 0.06;
       
-      // Use same tighter logarithmic spiral as stars
-      const logSpiral = Math.log(1 + rt * 2) / Math.log(3);
-      const spinAngle = logSpiral * spinTurns * Math.PI * 2;
+      // Use same hard turn spiral as stars
+      const spiralFactor = Math.pow(rt, 0.5);
+      const spinAngle = spiralFactor * spinTurns * Math.PI * 2;
 
-      // Very tight lane along arm edge
-      const laneWidth = 0.025 + rt * 0.04;
+      // Tight lane along arm edge
+      const laneWidth = 0.02 + rt * 0.035;
       const laneJitter = (Math.random() + Math.random() - 1) * laneWidth;
 
       const angle = branchAngle + spinAngle + laneJitter;
@@ -509,39 +510,52 @@ export const WhirlpoolGalaxy = ({ visualScale }: WhirlpoolGalaxyProps) => {
     return geo;
   }, [gs]);
 
-  // Tidal bridge geometry - will be updated each frame to follow rotation
+  // Tidal bridge geometry - connects arm tip to companion
   const tidalBridgeGeo = useMemo(() => {
-    const count = 20000;
+    const count = 25000;
     const positions = new Float32Array(count * 3);
     const colors = new Float32Array(count * 3);
     const color = new THREE.Color();
 
-    // Initial positions - will be rotated in useFrame
-    const armTipRadius = WHIRLPOOL.diskRadius * gs * 0.9;
+    // Bridge starts at the outer edge of the disk (arm tip) and goes to companion
+    const armTipRadius = WHIRLPOOL.diskRadius * gs * 0.95; // Start at arm edge
     const companionDist = NGC5195.distanceFromCenter * gs;
+    
+    // Calculate the arm tip angle at rt=1 using same spiral formula
+    const armTipSpiral = Math.pow(1.0, 0.5) * WHIRLPOOL.spinTurns * Math.PI * 2;
 
     for (let i = 0; i < count; i++) {
       const i3 = i * 3;
 
       const t = Math.random();
-      const spread = 0.12 + t * 0.2;
+      // Narrower at arm tip, wider near companion
+      const spread = 0.08 + t * 0.18;
 
-      // Interpolate from arm tip to companion
+      // Interpolate radius from arm tip to companion distance
       const radius = armTipRadius + (companionDist - armTipRadius) * t;
-      const angle = t * 0.3; // Slight curve
       
-      positions[i3] = radius + (Math.random() - 0.5) * spread * WHIRLPOOL.diskRadius * gs * 0.3;
-      positions[i3 + 1] = NGC5195.yOffset * gs * t + (Math.random() - 0.5) * spread * WHIRLPOOL.diskRadius * gs * 0.2;
-      positions[i3 + 2] = angle * WHIRLPOOL.diskRadius * gs + (Math.random() - 0.5) * spread * WHIRLPOOL.diskRadius * gs * 0.3;
+      // Follow a slight curve from arm tip angle toward companion
+      const curveAngle = armTipSpiral * (1 - t * 0.15);
+      
+      // Position along the bridge with some spread
+      const x = Math.cos(curveAngle) * radius + (Math.random() - 0.5) * spread * WHIRLPOOL.diskRadius * gs * 0.25;
+      const z = Math.sin(curveAngle) * radius + (Math.random() - 0.5) * spread * WHIRLPOOL.diskRadius * gs * 0.25;
+      
+      positions[i3] = x;
+      positions[i3 + 1] = NGC5195.yOffset * gs * t + (Math.random() - 0.5) * spread * WHIRLPOOL.diskRadius * gs * 0.15;
+      positions[i3 + 2] = z;
 
-      // Bridge colors
+      // Bridge colors - mix of disturbed gas, dust, and stars
       const rand = Math.random();
-      if (rand < 0.4) {
+      if (rand < 0.35) {
+        // Blue stars
         color.setHSL(0.58 + Math.random() * 0.1, 0.5 + Math.random() * 0.25, 0.45 + Math.random() * 0.15);
-      } else if (rand < 0.7) {
-        color.setHSL(0.95 + Math.random() * 0.05, 0.5 + Math.random() * 0.25, 0.45 + Math.random() * 0.15);
+      } else if (rand < 0.6) {
+        // Pink/red HII
+        color.setHSL(0.95 + Math.random() * 0.05, 0.55 + Math.random() * 0.25, 0.4 + Math.random() * 0.15);
       } else {
-        color.setHSL(0.03 + Math.random() * 0.03, 0.55 + Math.random() * 0.2, 0.25 + Math.random() * 0.15);
+        // Dark dust
+        color.setHSL(0.03 + Math.random() * 0.03, 0.5 + Math.random() * 0.2, 0.18 + Math.random() * 0.12);
       }
 
       colors[i3] = color.r;
