@@ -22,8 +22,8 @@ const SOMBRERO = {
   distanceFromMilkyWay: 29.3e6, // 29.3 million light-years
 };
 
-// Sombrero glow texture - LENS shaped like the top of a sombrero hat
-// Flat and wide at center, curving up/down like an eye/lens shape
+// Sombrero glow texture - SMOOTH GLOBAL glow extending to full edges
+// This is the ambient glow that spans the entire galaxy
 const createSombreroGlowTexture = () => {
   const size = 1024;
   const canvas = document.createElement('canvas');
@@ -37,56 +37,22 @@ const createSombreroGlowTexture = () => {
   // Clear with transparent
   ctx.clearRect(0, 0, size, size);
   
-  // Draw lens/eye shape by using ellipse - wide horizontally, narrow vertically
-  // This creates the sombrero hat top shape
-  const radiusX = size * 0.48; // Wide
-  const radiusY = size * 0.22; // Narrow - lens shape
+  // Smooth radial gradient - extends to full edges
+  const gradient = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, size / 2);
   
-  // Multiple gradient layers for the lens glow
-  // Layer 1: Bright inner core
-  const innerGrad = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, radiusY * 0.5);
-  innerGrad.addColorStop(0, 'rgba(255, 255, 250, 1)');
-  innerGrad.addColorStop(0.5, 'rgba(255, 250, 235, 0.95)');
-  innerGrad.addColorStop(1, 'rgba(255, 240, 210, 0.85)');
-  
-  ctx.save();
-  ctx.scale(radiusX / radiusY, 1); // Scale to create ellipse
+  // Warm cream/golden glow - smooth and global
+  gradient.addColorStop(0, 'rgba(255, 252, 245, 0.85)');
+  gradient.addColorStop(0.1, 'rgba(255, 248, 235, 0.7)');
+  gradient.addColorStop(0.25, 'rgba(255, 240, 215, 0.5)');
+  gradient.addColorStop(0.4, 'rgba(255, 225, 190, 0.32)');
+  gradient.addColorStop(0.55, 'rgba(250, 210, 165, 0.18)');
+  gradient.addColorStop(0.7, 'rgba(240, 195, 145, 0.1)');
+  gradient.addColorStop(0.85, 'rgba(225, 175, 125, 0.04)');
+  gradient.addColorStop(1, 'rgba(210, 160, 115, 0)');
+
+  ctx.fillStyle = gradient;
   ctx.beginPath();
-  ctx.arc(centerX * radiusY / radiusX, centerY, radiusY, 0, Math.PI * 2);
-  ctx.restore();
-  ctx.fillStyle = innerGrad;
-  ctx.fill();
-  
-  // Layer 2: Mid glow - the main hat bulge
-  const midGrad = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, radiusY * 0.8);
-  midGrad.addColorStop(0, 'rgba(255, 248, 230, 0.9)');
-  midGrad.addColorStop(0.3, 'rgba(255, 238, 205, 0.7)');
-  midGrad.addColorStop(0.6, 'rgba(255, 225, 180, 0.45)');
-  midGrad.addColorStop(1, 'rgba(245, 205, 155, 0.2)');
-  
-  ctx.save();
-  ctx.globalCompositeOperation = 'screen';
-  ctx.scale(radiusX / radiusY, 1);
-  ctx.beginPath();
-  ctx.arc(centerX * radiusY / radiusX, centerY, radiusY, 0, Math.PI * 2);
-  ctx.restore();
-  ctx.fillStyle = midGrad;
-  ctx.fill();
-  
-  // Layer 3: Outer glow - fading edges
-  const outerGrad = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, radiusY);
-  outerGrad.addColorStop(0, 'rgba(255, 235, 200, 0.5)');
-  outerGrad.addColorStop(0.4, 'rgba(250, 218, 170, 0.3)');
-  outerGrad.addColorStop(0.7, 'rgba(240, 200, 150, 0.15)');
-  outerGrad.addColorStop(0.9, 'rgba(225, 180, 130, 0.05)');
-  outerGrad.addColorStop(1, 'rgba(210, 165, 115, 0)');
-  
-  ctx.save();
-  ctx.scale(radiusX / radiusY, 1);
-  ctx.beginPath();
-  ctx.arc(centerX * radiusY / radiusX, centerY, radiusY, 0, Math.PI * 2);
-  ctx.restore();
-  ctx.fillStyle = outerGrad;
+  ctx.arc(centerX, centerY, size / 2, 0, Math.PI * 2);
   ctx.fill();
 
   const tex = new THREE.CanvasTexture(canvas);
@@ -145,37 +111,42 @@ export const SombreroGalaxy = ({ visualScale }: SombreroGalaxyProps) => {
   const dotTexture = useMemo(() => createDotTexture(), []);
   const glowTexture = useMemo(() => createSombreroGlowTexture(), []);
 
-  // Central bulge - FLAT disk of stars, NOT spherical
-  // The "sombrero hat" effect comes from the GLOW, not from stars going up/down
+  // Central bulge - LENS-SHAPED dense region of stars creating the sombrero hat effect
+  // Wide and flat at center, curving up/down like an eye/lens shape
   const bulgeGeo = useMemo(() => {
-    const count = 120000;
+    const count = 200000; // Dense stars
     const positions = new Float32Array(count * 3);
     const colors = new Float32Array(count * 3);
     const color = new THREE.Color();
-    const maxR = SOMBRERO.bulgeRadius * gs;
+    const maxR = SOMBRERO.bulgeRadius * gs * 1.2; // Wider reach
+    const maxHeight = SOMBRERO.bulgeRadius * gs * 0.5; // Height of the "hat"
 
     for (let i = 0; i < count; i++) {
       const i3 = i * 3;
       
-      // FLAT distribution - concentrated toward center
-      const r = Math.pow(Math.random(), 1.2) * maxR;
+      // Radial distribution - concentrated toward center
+      const r = Math.pow(Math.random(), 1.4) * maxR;
       const theta = Math.random() * Math.PI * 2;
       const rt = r / maxR;
 
       positions[i3] = r * Math.cos(theta);
-      // Very thin - minimal vertical spread
-      positions[i3 + 1] = (Math.random() * 2 - 1) * maxR * 0.015;
       positions[i3 + 2] = r * Math.sin(theta);
+      
+      // LENS SHAPE: height decreases with radius (forms the sombrero hat curve)
+      // At center (r=0): maximum height spread
+      // At edges (r=maxR): minimal height (flattens to disk)
+      const heightAtRadius = maxHeight * Math.pow(1 - rt, 1.5);
+      positions[i3 + 1] = (Math.random() * 2 - 1) * heightAtRadius;
 
-      // Colors: bright white center → cream
+      // Colors: bright white center → cream/golden
       if (rt < 0.15) {
-        color.setHSL(0.12 + Math.random() * 0.02, 0.06, 0.96 + Math.random() * 0.04);
+        color.setHSL(0.12 + Math.random() * 0.02, 0.05, 0.97 + Math.random() * 0.03);
       } else if (rt < 0.35) {
-        color.setHSL(0.11 + Math.random() * 0.02, 0.1, 0.90 + Math.random() * 0.06);
+        color.setHSL(0.11 + Math.random() * 0.02, 0.08, 0.92 + Math.random() * 0.05);
       } else if (rt < 0.6) {
-        color.setHSL(0.1 + Math.random() * 0.02, 0.18, 0.82 + Math.random() * 0.08);
+        color.setHSL(0.1 + Math.random() * 0.02, 0.14, 0.85 + Math.random() * 0.08);
       } else {
-        color.setHSL(0.09 + Math.random() * 0.02, 0.25, 0.72 + Math.random() * 0.1);
+        color.setHSL(0.09 + Math.random() * 0.02, 0.2, 0.75 + Math.random() * 0.1);
       }
 
       colors[i3] = color.r;
@@ -411,14 +382,13 @@ export const SombreroGalaxy = ({ visualScale }: SombreroGalaxyProps) => {
           renderOrder={5}
         />
 
-        {/* Central glow - LENS shaped like sombrero hat top */}
-        {/* Wide horizontally, narrow vertically - creates the iconic shape */}
+        {/* Global smooth glow - extends to full galaxy edges */}
         <mesh renderOrder={1} rotation={[0, 0, 0]}>
-          <planeGeometry args={[diskR * 1.6, bulgeR * 1.4]} />
+          <planeGeometry args={[diskR * 2.2, diskR * 2.2]} />
           <meshBasicMaterial
             map={glowTexture}
             transparent
-            opacity={1}
+            opacity={0.9}
             blending={THREE.AdditiveBlending}
             depthWrite={false}
             depthTest={false}
