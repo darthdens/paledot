@@ -197,10 +197,19 @@ export const TourOverlay = () => {
         }
 
         // Set tour camera target for the CameraController
+        const followObjectId = stop.lookAt ? undefined : stop.locationId;
+        const offset: [number, number, number] = [
+          cameraPos[0] - targetPos[0],
+          cameraPos[1] - targetPos[1],
+          cameraPos[2] - targetPos[2],
+        ];
+
         setTourCameraTarget({
           position: cameraPos,
           lookAt: lookAtPos,
           space: 'scene',
+          followObjectId,
+          offset,
         });
       };
 

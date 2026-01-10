@@ -26,6 +26,7 @@ export const CameraController = () => {
 
   const flyToDistance = useRef(1000);
   const cameraOffset = useRef(new THREE.Vector3());
+  const tourOffset = useRef(new THREE.Vector3());
 
   // Follow smoothing (avoid jitter + avoid per-frame allocations)
   const smoothedTarget = useRef(new THREE.Vector3());
@@ -74,6 +75,15 @@ export const CameraController = () => {
         tourCameraTarget.lookAt[0] * UNIFIED_SCALE,
         tourCameraTarget.lookAt[1] * UNIFIED_SCALE,
         tourCameraTarget.lookAt[2] * UNIFIED_SCALE
+      );
+    }
+
+    // Capture the intended tour offset so we can keep the stop centered even if the scene rotates/moves.
+    if (tourCameraTarget.followObjectId && tourCameraTarget.offset) {
+      tourOffset.current.set(
+        tourCameraTarget.offset[0],
+        tourCameraTarget.offset[1],
+        tourCameraTarget.offset[2]
       );
     }
 
@@ -202,22 +212,51 @@ export const CameraController = () => {
       const t = animationProgress.current;
       const eased = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
 
-      // For non-tour animations, track moving objects during animation
-      if (
-        !isTourAnimation.current &&
-        selectedObject &&
-        (selectedObject.category === 'solarSystem' || selectedObject.category === 'stars')
-      ) {
-        const livePos = useCosmosStore.getState().objectWorldPositions[selectedObject.id];
-        if (livePos) {
-          endTarget.current.set(livePos[0], livePos[1], livePos[2]);
-          endPosition.current.copy(endTarget.current).add(cameraOffset.current);
+      // Track moving/rotating targets during animation so the stop stays centered
+      if (selectedObject) {
+        const shouldTrackTourTarget =
+          isTourAnimation.current &&
+          isTouring &&
+          tourCameraTarget?.followObjectId;
+
+        if (shouldTrackTourTarget) {
+          const livePos = useCosmosStore.getState().objectWorldPositions[tourCameraTarget!.followObjectId!];
+          if (livePos) {
+            endTarget.current.set(livePos[0], livePos[1], livePos[2]);
+            endPosition.current.copy(endTarget.current).add(tourOffset.current);
+          }
+        } else if (
+          !isTourAnimation.current &&
+          (selectedObject.category === 'solarSystem' || selectedObject.category === 'stars')
+        ) {
+          const livePos = useCosmosStore.getState().objectWorldPositions[selectedObject.id];
+          if (livePos) {
+            endTarget.current.set(livePos[0], livePos[1], livePos[2]);
+            endPosition.current.copy(endTarget.current).add(cameraOffset.current);
+          }
         }
       }
 
       camera.position.lerpVectors(startPosition.current, endPosition.current, eased);
       orbitControls.target.lerpVectors(startTarget.current, endTarget.current, eased);
       orbitControls.update();
+      return;
+    }
+
+    // During tour: keep the current stop centered even if the scene rotates/moves.
+    if (isTouring && tourCameraTarget?.followObjectId) {
+      const livePos = useCosmosStore.getState().objectWorldPositions[tourCameraTarget.followObjectId];
+      if (livePos) {
+        const currentTarget = orbitControls.target as THREE.Vector3;
+
+        tmpTarget.current.set(livePos[0], livePos[1], livePos[2]);
+        tmpDelta.current.subVectors(tmpTarget.current, currentTarget);
+
+        currentTarget.copy(tmpTarget.current);
+        camera.position.add(tmpDelta.current);
+
+        orbitControls.update();
+      }
       return;
     }
 

@@ -14,6 +14,10 @@ interface TourCameraTarget {
   lookAt: [number, number, number];
   /** Explicitly declare which coordinate space these vectors are in. */
   space?: 'scene' | 'km';
+  /** When set, the camera controller will keep the tour centered on this object's live world position (handles scene rotation / motion). */
+  followObjectId?: string;
+  /** Scene-space offset from the followed object's position to the camera position. */
+  offset?: [number, number, number];
 }
 
 interface CosmosStore {
