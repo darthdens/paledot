@@ -1743,14 +1743,9 @@ export const TexturedPlanet = ({
                     surfaceColor = plutoColor;
                     NdotL = mix(NdotL, bumpedNdotL, 0.6);
                   }
-                  // === CERES (20) - Procedural gray rocky with bright spots ===
+                  // === CERES (20) - Real texture from Dawn mission ===
                   else if (surfaceType > 19.5 && surfaceType < 20.5) {
-                    vec3 grayRock = vec3(0.5, 0.5, 0.52);
-                    surfaceColor = mix(grayRock, grayRock * 0.8, surfaceNoise * 0.4);
-                    // Occator bright spots
-                    vec2 occatorCenter = vec2(0.55, 0.52);
-                    float cerealiaBright = smoothstep(0.025, 0.01, length(vUv - occatorCenter));
-                    surfaceColor = mix(surfaceColor, vec3(1.0, 0.98, 0.95), cerealiaBright * 0.9);
+                    surfaceColor = texture2D(planetMap, vUv).rgb;
                   }
                   // === PHOBOS (21) - Procedural dark rocky ===
                   else if (surfaceType > 20.5 && surfaceType < 21.5) {
