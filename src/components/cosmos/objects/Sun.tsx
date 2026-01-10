@@ -36,6 +36,79 @@ const createSunGlowTexture = () => {
   return tex;
 };
 
+// Outer glow texture - larger and softer
+const createOuterGlowTexture = () => {
+  const size = 512;
+  const canvas = document.createElement('canvas');
+  canvas.width = size;
+  canvas.height = size;
+  const ctx = canvas.getContext('2d')!;
+
+  const gradient = ctx.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2);
+  
+  gradient.addColorStop(0, 'rgba(255, 200, 100, 0.8)');
+  gradient.addColorStop(0.15, 'rgba(255, 160, 60, 0.5)');
+  gradient.addColorStop(0.3, 'rgba(255, 120, 40, 0.3)');
+  gradient.addColorStop(0.5, 'rgba(255, 90, 20, 0.15)');
+  gradient.addColorStop(0.7, 'rgba(255, 60, 10, 0.05)');
+  gradient.addColorStop(1, 'rgba(255, 40, 0, 0)');
+
+  ctx.fillStyle = gradient;
+  ctx.fillRect(0, 0, size, size);
+
+  const tex = new THREE.CanvasTexture(canvas);
+  tex.minFilter = THREE.LinearFilter;
+  tex.magFilter = THREE.LinearFilter;
+  return tex;
+};
+
+// Corona rays texture
+const createCoronaRaysTexture = () => {
+  const size = 512;
+  const canvas = document.createElement('canvas');
+  canvas.width = size;
+  canvas.height = size;
+  const ctx = canvas.getContext('2d')!;
+
+  const centerX = size / 2;
+  const centerY = size / 2;
+
+  // Draw radial rays
+  for (let i = 0; i < 64; i++) {
+    const angle = (i / 64) * Math.PI * 2;
+    const length = size / 2 * (0.7 + Math.random() * 0.3);
+    
+    const gradient = ctx.createLinearGradient(
+      centerX, centerY,
+      centerX + Math.cos(angle) * length,
+      centerY + Math.sin(angle) * length
+    );
+    
+    gradient.addColorStop(0, 'rgba(255, 220, 150, 0.4)');
+    gradient.addColorStop(0.5, 'rgba(255, 180, 80, 0.15)');
+    gradient.addColorStop(1, 'rgba(255, 140, 40, 0)');
+
+    ctx.beginPath();
+    ctx.moveTo(centerX, centerY);
+    ctx.lineTo(
+      centerX + Math.cos(angle - 0.03) * length,
+      centerY + Math.sin(angle - 0.03) * length
+    );
+    ctx.lineTo(
+      centerX + Math.cos(angle + 0.03) * length,
+      centerY + Math.sin(angle + 0.03) * length
+    );
+    ctx.closePath();
+    ctx.fillStyle = gradient;
+    ctx.fill();
+  }
+
+  const tex = new THREE.CanvasTexture(canvas);
+  tex.minFilter = THREE.LinearFilter;
+  tex.magFilter = THREE.LinearFilter;
+  return tex;
+};
+
 // Sun's real diameter is 1,392,700 km
 const SUN_DIAMETER = 1392700;
 
@@ -47,6 +120,8 @@ export const Sun = ({ position = [0, 0, 0], visualScale = 80 }: SunProps) => {
   const worldPos = useRef(new THREE.Vector3());
   
   const glowTexture = useMemo(() => createSunGlowTexture(), []);
+  const outerGlowTexture = useMemo(() => createOuterGlowTexture(), []);
+  const coronaRaysTexture = useMemo(() => createCoronaRaysTexture(), []);
   
   const setSelectedObject = useCosmosStore(state => state.setSelectedObject);
   const setHoveredObject = useCosmosStore(state => state.setHoveredObject);
@@ -244,12 +319,60 @@ export const Sun = ({ position = [0, 0, 0], visualScale = 80 }: SunProps) => {
         />
       </mesh>
 
-      {/* Sprite-based gradient glow - like galaxy center */}
-      <sprite renderOrder={-5} scale={[sunSize * 8, sunSize * 8, 1]}>
+      {/* Core glow sprite - bright center */}
+      <sprite renderOrder={-5} scale={[sunSize * 10, sunSize * 10, 1]}>
         <spriteMaterial
           map={glowTexture}
           transparent
           opacity={1}
+          blending={THREE.AdditiveBlending}
+          depthWrite={false}
+          depthTest={false}
+        />
+      </sprite>
+
+      {/* Medium glow sprite - extended corona */}
+      <sprite renderOrder={-6} scale={[sunSize * 20, sunSize * 20, 1]}>
+        <spriteMaterial
+          map={outerGlowTexture}
+          transparent
+          opacity={0.9}
+          blending={THREE.AdditiveBlending}
+          depthWrite={false}
+          depthTest={false}
+        />
+      </sprite>
+
+      {/* Large outer glow sprite - far reaching halo */}
+      <sprite renderOrder={-7} scale={[sunSize * 35, sunSize * 35, 1]}>
+        <spriteMaterial
+          map={outerGlowTexture}
+          transparent
+          opacity={0.5}
+          blending={THREE.AdditiveBlending}
+          depthWrite={false}
+          depthTest={false}
+        />
+      </sprite>
+
+      {/* Corona rays - like galaxy arms */}
+      <sprite renderOrder={-8} scale={[sunSize * 25, sunSize * 25, 1]}>
+        <spriteMaterial
+          map={coronaRaysTexture}
+          transparent
+          opacity={0.7}
+          blending={THREE.AdditiveBlending}
+          depthWrite={false}
+          depthTest={false}
+        />
+      </sprite>
+
+      {/* Extra far glow for dramatic effect */}
+      <sprite renderOrder={-9} scale={[sunSize * 50, sunSize * 50, 1]}>
+        <spriteMaterial
+          map={outerGlowTexture}
+          transparent
+          opacity={0.25}
           blending={THREE.AdditiveBlending}
           depthWrite={false}
           depthTest={false}
