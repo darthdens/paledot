@@ -116,7 +116,6 @@ const createDotTexture = () => {
 export const WhirlpoolGalaxy = ({ visualScale }: WhirlpoolGalaxyProps) => {
   const groupRef = useRef<THREE.Group>(null);
   const companionGroupRef = useRef<THREE.Group>(null);
-  const bridgeRef = useRef<THREE.Points>(null);
   const centerWorldPos = useRef(new THREE.Vector3());
   const rotationTimeRef = useRef(0);
 
@@ -395,11 +394,11 @@ export const WhirlpoolGalaxy = ({ visualScale }: WhirlpoolGalaxyProps) => {
     return geo;
   }, [gs]);
 
-  // Dust lanes - dark regions along the inner edge of spiral arms
+  // Dust lanes - diffuse dark regions blended throughout spiral arms
   const dustLanesGeo = useMemo(() => {
     const { branches, spinTurns } = WHIRLPOOL;
     const maxRadius = WHIRLPOOL.diskRadius * gs;
-    const dustCount = 180000;
+    const dustCount = 120000; // Fewer but larger particles
 
     const positions = new Float32Array(dustCount * 3);
     const colors = new Float32Array(dustCount * 3);
@@ -408,47 +407,46 @@ export const WhirlpoolGalaxy = ({ visualScale }: WhirlpoolGalaxyProps) => {
     for (let i = 0; i < dustCount; i++) {
       const i3 = i * 3;
 
-      // Distribute along the inner/trailing edge of spiral arms - stay within disk
-      const t = 0.12 + Math.pow(Math.random(), 0.8) * 0.65; // Max 77% radius
+      // Distribute throughout the arms - stay within disk
+      const t = 0.15 + Math.pow(Math.random(), 0.9) * 0.6; // Max 75% radius
       const radius = t * maxRadius;
       const rt = radius / maxRadius;
 
       const branchIndex = Math.floor(Math.random() * branches);
-      // Dust lanes follow the arms exactly (same branchAngle as stars)
       const branchAngle = (branchIndex / branches) * Math.PI * 2;
       
       // Use same hard turn spiral as stars
       const spiralFactor = Math.pow(rt, 0.5);
       const spinAngle = spiralFactor * spinTurns * Math.PI * 2;
 
-      // Blend into arms - wider spread and more variation
-      const trailingOffset = -0.02 + (Math.random() - 0.5) * 0.04;
+      // Blend throughout arms - very wide spread
+      const trailingOffset = (Math.random() - 0.5) * 0.12;
       
-      // Much wider lane spread to blend with arm stars
-      const laneWidth = 0.04 + rt * 0.08;
+      // Very wide lane spread to blend naturally with arm stars
+      const laneWidth = 0.08 + rt * 0.12;
       const laneJitter = (Math.random() + Math.random() + Math.random() - 1.5) * laneWidth;
 
       const angle = branchAngle + spinAngle + trailingOffset + laneJitter;
 
       positions[i3] = Math.cos(angle) * radius;
       
-      const thickness = 0.006;
+      const thickness = 0.012;
       const yJitter = (Math.random() - 0.5) * maxRadius * thickness;
       positions[i3 + 1] = yJitter;
       
       positions[i3 + 2] = Math.sin(angle) * radius;
 
-      // Darker, more visible dust - reddish-brown to black
+      // Softer dust colors - more transparent browns
       const dustVariation = Math.random();
-      if (dustVariation < 0.5) {
+      if (dustVariation < 0.4) {
         // Dark reddish-brown
-        color.setHSL(0.03 + Math.random() * 0.02, 0.6 + Math.random() * 0.2, 0.04 + Math.random() * 0.03);
-      } else if (dustVariation < 0.8) {
-        // Very dark brown
-        color.setHSL(0.05 + Math.random() * 0.02, 0.5 + Math.random() * 0.2, 0.03 + Math.random() * 0.02);
+        color.setHSL(0.03 + Math.random() * 0.03, 0.5 + Math.random() * 0.2, 0.06 + Math.random() * 0.04);
+      } else if (dustVariation < 0.7) {
+        // Medium brown
+        color.setHSL(0.05 + Math.random() * 0.03, 0.4 + Math.random() * 0.2, 0.08 + Math.random() * 0.04);
       } else {
-        // Near black
-        color.setHSL(0.0, 0.2 + Math.random() * 0.15, 0.015 + Math.random() * 0.015);
+        // Faint brown
+        color.setHSL(0.04 + Math.random() * 0.02, 0.35 + Math.random() * 0.15, 0.05 + Math.random() * 0.03);
       }
 
       colors[i3] = color.r;
@@ -615,7 +613,7 @@ export const WhirlpoolGalaxy = ({ visualScale }: WhirlpoolGalaxyProps) => {
     return geo;
   }, [gs]);
 
-  // Update companion and bridge rotation to match arm rotation
+  // Update companion position to match arm rotation
   useFrame((_, delta) => {
     if (groupRef.current) {
       groupRef.current.getWorldPosition(centerWorldPos.current);
@@ -640,11 +638,6 @@ export const WhirlpoolGalaxy = ({ visualScale }: WhirlpoolGalaxyProps) => {
       companionGroupRef.current.position.x = Math.cos(armAngle) * companionDist;
       companionGroupRef.current.position.y = NGC5195.yOffset * gs;
       companionGroupRef.current.position.z = Math.sin(armAngle) * companionDist;
-    }
-
-    // Update bridge rotation
-    if (bridgeRef.current) {
-      bridgeRef.current.rotation.y = rotationTimeRef.current;
     }
   });
 
@@ -681,13 +674,13 @@ export const WhirlpoolGalaxy = ({ visualScale }: WhirlpoolGalaxyProps) => {
           renderOrder={2}
         />
 
-        {/* Dust lanes between arms - using DifferentialRotationPoints to rotate with galaxy */}
+        {/* Dust lanes - larger, softer particles blended with arms */}
         <DifferentialRotationPoints
           key="whirlpool-dust"
           geometry={dustLanesGeo}
-          size={gs * 75}
+          size={gs * 140}
           map={dotTexture}
-          opacity={0.85}
+          opacity={0.55}
           maxRadius={diskR}
           rotationMultiplier={1}
           differentialStrength={0.06}
@@ -708,19 +701,17 @@ export const WhirlpoolGalaxy = ({ visualScale }: WhirlpoolGalaxyProps) => {
         />
 
         {/* Tidal bridge to companion - rotates with galaxy */}
-        <points ref={bridgeRef} frustumCulled={false} renderOrder={1}>
-          <bufferGeometry attach="geometry" {...tidalBridgeGeo} />
-          <pointsMaterial
-            size={gs * 35}
-            map={dotTexture}
-            vertexColors
-            transparent
-            opacity={0.45}
-            blending={THREE.AdditiveBlending}
-            depthWrite={false}
-            sizeAttenuation
-          />
-        </points>
+        <DifferentialRotationPoints
+          key="whirlpool-bridge"
+          geometry={tidalBridgeGeo}
+          size={gs * 42}
+          map={dotTexture}
+          opacity={0.55}
+          maxRadius={NGC5195.distanceFromCenter * gs}
+          rotationMultiplier={1}
+          differentialStrength={0.04}
+          renderOrder={1}
+        />
 
         {/* Center glow */}
         <sprite renderOrder={4} frustumCulled={false} scale={[diskR * 2.0, diskR * 2.0, 1]}>
