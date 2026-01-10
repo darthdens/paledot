@@ -31,10 +31,10 @@ const WHIRLPOOL = {
 // Companion galaxy NGC 5195 parameters - positioned at the end of one spiral arm
 const NGC5195 = {
   radius: 10000, // Smaller irregular companion
-  // Position at the tip of the northern arm (end of spiral)
-  offsetX: 32000, // Along the arm extension
-  offsetY: 6000,  // Slight vertical offset
-  offsetZ: -25000, // At the end of the arm
+  // Position directly at the northern arm tip
+  offsetX: 38000,
+  offsetY: 4000,
+  offsetZ: 8000,
 };
 
 // Whirlpool glow texture: warm cream core → pink HII → blue outer
@@ -175,13 +175,13 @@ export const WhirlpoolGalaxy = ({ visualScale }: WhirlpoolGalaxyProps) => {
       const branchAngle = (branchIndex / branches) * Math.PI * 2;
       const spinAngle = rt * spinTurns * Math.PI * 2;
 
-      // Tight but filled arms - Whirlpool's well-defined spiral with visible inter-arm stars
-      const armWidth = 0.08 + rt * 0.15;
+      // Fuller arms with lots of inter-arm stars
+      const armWidth = 0.1 + rt * 0.18;
       const armJitter = (Math.random() + Math.random() + Math.random() - 1.5) * armWidth;
 
-      // More inter-arm stars for a fuller look
-      const isInterArm = Math.random() < 0.45;
-      const interArmJitter = isInterArm ? (Math.random() - 0.5) * (0.7 + rt * 0.6) : 0;
+      // Much more inter-arm stars for a filled galaxy look
+      const isInterArm = Math.random() < 0.6;
+      const interArmJitter = isInterArm ? (Math.random() - 0.5) * (0.9 + rt * 0.7) : 0;
 
       const angle = branchAngle + spinAngle + armJitter + interArmJitter;
 
@@ -427,18 +427,16 @@ export const WhirlpoolGalaxy = ({ visualScale }: WhirlpoolGalaxyProps) => {
     return geo;
   }, [gs]);
 
-  // Tidal bridge between M51 and NGC 5195 - connecting the arm tip to companion
+  // Tidal bridge between M51 and NGC 5195 - direct connection
   const tidalBridgeGeo = useMemo(() => {
-    const count = 20000;
+    const count = 18000;
     const positions = new Float32Array(count * 3);
     const colors = new Float32Array(count * 3);
     const color = new THREE.Color();
 
-    // Bridge starts from the tip of the spiral arm (following the arm curve)
-    const armTipAngle = 1.8 * Math.PI * 2 * 0.85; // End of spiral at ~85% radius
-    const armTipRadius = WHIRLPOOL.diskRadius * gs * 0.85;
-    const startX = Math.cos(armTipAngle) * armTipRadius;
-    const startZ = Math.sin(armTipAngle) * armTipRadius;
+    // Bridge starts from outer disk edge toward companion
+    const startX = WHIRLPOOL.diskRadius * gs * 0.75;
+    const startZ = WHIRLPOOL.diskRadius * gs * 0.2;
     const endX = NGC5195.offsetX * gs;
     const endY = NGC5195.offsetY * gs;
     const endZ = NGC5195.offsetZ * gs;
