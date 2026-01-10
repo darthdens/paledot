@@ -1,12 +1,26 @@
 // TexturedPlanet - Renders planets with realistic lighting and shadows
-import { useRef, useMemo, useEffect } from 'react';
+import { useRef, useMemo, useEffect, useState } from 'react';
 import { useFrame, useLoader } from '@react-three/fiber';
 import * as THREE from 'three';
 import { CelestialObject } from '../types';
 import { useCosmosStore } from '../store/useCosmosStore';
 import { celestialObjects } from '../data/celestialObjects';
 
-// Import NASA texture maps
+// Detect mobile device for texture optimization
+const isMobileDevice = () => {
+  if (typeof window === 'undefined') return false;
+  return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
+    window.innerWidth < 768;
+};
+
+// Essential textures for mobile (main planets + key moons)
+const MOBILE_TEXTURE_WHITELIST = [
+  'earth', 'moon', 'mercury', 'venus', 'mars', 
+  'jupiter', 'saturn', 'uranus', 'neptune', 
+  'pluto', 'titan', 'europa'
+];
+
+// Import NASA texture maps - only essential ones are used on mobile
 import earthDayTexture from '@/assets/textures/earth-day.jpg';
 import earthNightTexture from '@/assets/textures/earth-night.jpg';
 import earthCloudsTexture from '@/assets/textures/earth-clouds.jpg';
@@ -19,8 +33,9 @@ import saturnTexture from '@/assets/textures/saturn.jpg';
 import uranusTexture from '@/assets/textures/uranus.jpg';
 import neptuneTexture from '@/assets/textures/neptune.jpg';
 import plutoTexture from '@/assets/textures/pluto.jpg';
-import ceresTexture from '@/assets/textures/ceres.jpg';
 import titanTexture from '@/assets/textures/titan.jpg';
+// These are only loaded on desktop
+import ceresTexture from '@/assets/textures/ceres.jpg';
 import enceladusTexture from '@/assets/textures/enceladus.jpg';
 import phobosTexture from '@/assets/textures/phobos.jpg';
 import deimosTexture from '@/assets/textures/deimos.jpg';
@@ -390,7 +405,10 @@ export const TexturedPlanet = ({
     return (planetSizes[object.parentId] || 0) * visualScale;
   }, [isMoon, object.parentId, visualScale]);
 
-  // Load NASA textures for planets
+  // Check if we're on mobile
+  const isMobile = useMemo(() => isMobileDevice(), []);
+
+  // Load NASA textures for planets - essential ones for all devices
   const earthDayMap = useLoader(THREE.TextureLoader, earthDayTexture);
   const earthNightMap = useLoader(THREE.TextureLoader, earthNightTexture);
   const earthCloudsMap = useLoader(THREE.TextureLoader, earthCloudsTexture);
@@ -403,22 +421,32 @@ export const TexturedPlanet = ({
   const uranusMap = useLoader(THREE.TextureLoader, uranusTexture);
   const neptuneMap = useLoader(THREE.TextureLoader, neptuneTexture);
   const plutoMap = useLoader(THREE.TextureLoader, plutoTexture);
-  const ceresMap = useLoader(THREE.TextureLoader, ceresTexture);
   const titanMap = useLoader(THREE.TextureLoader, titanTexture);
-  const enceladusMap = useLoader(THREE.TextureLoader, enceladusTexture);
-  const phobosMap = useLoader(THREE.TextureLoader, phobosTexture);
-  const deimosMap = useLoader(THREE.TextureLoader, deimosTexture);
-  const tritonMap = useLoader(THREE.TextureLoader, tritonTexture);
-  const iapetusMap = useLoader(THREE.TextureLoader, iapetusTexture);
+  
+  // Secondary textures - only load on desktop
+  const ceresMap = useLoader(THREE.TextureLoader, isMobile ? moonTexture : ceresTexture);
+  const enceladusMap = useLoader(THREE.TextureLoader, isMobile ? moonTexture : enceladusTexture);
+  const phobosMap = useLoader(THREE.TextureLoader, isMobile ? moonTexture : phobosTexture);
+  const deimosMap = useLoader(THREE.TextureLoader, isMobile ? moonTexture : deimosTexture);
+  const tritonMap = useLoader(THREE.TextureLoader, isMobile ? moonTexture : tritonTexture);
+  const iapetusMap = useLoader(THREE.TextureLoader, isMobile ? moonTexture : iapetusTexture);
   
   // Configure texture properties for proper spherical mapping
   useMemo(() => {
-    [earthDayMap, earthNightMap, earthCloudsMap, moonMap, mercuryMap, venusMap, marsMap, jupiterMap, saturnMap, uranusMap, neptuneMap, plutoMap, ceresMap, titanMap, enceladusMap, phobosMap, deimosMap, tritonMap, iapetusMap].forEach(tex => {
+    [earthDayMap, earthNightMap, earthCloudsMap, moonMap, mercuryMap, venusMap, marsMap, jupiterMap, saturnMap, uranusMap, neptuneMap, plutoMap, titanMap].forEach(tex => {
       tex.wrapS = THREE.RepeatWrapping;
       tex.wrapT = THREE.ClampToEdgeWrapping;
       tex.colorSpace = THREE.SRGBColorSpace;
     });
-  }, [earthDayMap, earthNightMap, earthCloudsMap, moonMap, mercuryMap, venusMap, marsMap, jupiterMap, saturnMap, uranusMap, neptuneMap, plutoMap, ceresMap, titanMap, enceladusMap, phobosMap, deimosMap, tritonMap, iapetusMap]);
+    // Only configure secondary textures on desktop
+    if (!isMobile) {
+      [ceresMap, enceladusMap, phobosMap, deimosMap, tritonMap, iapetusMap].forEach(tex => {
+        tex.wrapS = THREE.RepeatWrapping;
+        tex.wrapT = THREE.ClampToEdgeWrapping;
+        tex.colorSpace = THREE.SRGBColorSpace;
+      });
+    }
+  }, [earthDayMap, earthNightMap, earthCloudsMap, moonMap, mercuryMap, venusMap, marsMap, jupiterMap, saturnMap, uranusMap, neptuneMap, plutoMap, titanMap, ceresMap, enceladusMap, phobosMap, deimosMap, tritonMap, iapetusMap, isMobile]);
 
   const visuals = PLANET_VISUALS[object.id] || {
     baseColor: object.color,
@@ -426,9 +454,18 @@ export const TexturedPlanet = ({
     metalness: 0.1,
   };
 
-  // Select only the textures needed for this specific planet (max 4 to stay under GPU limit)
+  // Select only the textures needed for this specific planet
+  // On mobile, only essential planets/moons get real textures
   const planetTextures = useMemo(() => {
     const surfaceDetail = visuals?.surfaceDetail || '';
+    
+    // On mobile, check if this planet is in the whitelist
+    const useRealTexture = !isMobile || MOBILE_TEXTURE_WHITELIST.includes(surfaceDetail);
+    
+    if (!useRealTexture) {
+      // Use procedural rendering for non-essential bodies on mobile
+      return { primary: null, secondary: null, useProcedural: true };
+    }
     
     // Map each planet to its required textures
     const textureMap: Record<string, { primary: THREE.Texture | null; secondary: THREE.Texture | null }> = {
@@ -442,17 +479,19 @@ export const TexturedPlanet = ({
       uranus: { primary: uranusMap, secondary: null },
       neptune: { primary: neptuneMap, secondary: null },
       pluto: { primary: plutoMap, secondary: null },
-      ceres: { primary: ceresMap, secondary: null },
       titan: { primary: titanMap, secondary: null },
-      enceladus: { primary: enceladusMap, secondary: null },
-      phobos: { primary: phobosMap, secondary: null },
-      deimos: { primary: deimosMap, secondary: null },
-      triton: { primary: tritonMap, secondary: null },
-      iapetus: { primary: iapetusMap, secondary: null },
+      // Desktop-only textures
+      ceres: { primary: isMobile ? null : ceresMap, secondary: null },
+      enceladus: { primary: isMobile ? null : enceladusMap, secondary: null },
+      phobos: { primary: isMobile ? null : phobosMap, secondary: null },
+      deimos: { primary: isMobile ? null : deimosMap, secondary: null },
+      triton: { primary: isMobile ? null : tritonMap, secondary: null },
+      iapetus: { primary: isMobile ? null : iapetusMap, secondary: null },
     };
     
-    return textureMap[surfaceDetail] || { primary: null, secondary: null };
-  }, [visuals?.surfaceDetail, earthDayMap, earthNightMap, moonMap, mercuryMap, venusMap, marsMap, jupiterMap, saturnMap, uranusMap, neptuneMap, plutoMap, ceresMap, titanMap, enceladusMap, phobosMap, deimosMap, tritonMap, iapetusMap]);
+    const result = textureMap[surfaceDetail];
+    return result ? { ...result, useProcedural: false } : { primary: null, secondary: null, useProcedural: false };
+  }, [visuals?.surfaceDetail, earthDayMap, earthNightMap, moonMap, mercuryMap, venusMap, marsMap, jupiterMap, saturnMap, uranusMap, neptuneMap, plutoMap, titanMap, ceresMap, enceladusMap, phobosMap, deimosMap, tritonMap, iapetusMap, isMobile]);
   
   // Create a placeholder texture for unused slots
   const placeholderTexture = useMemo(() => {
@@ -753,6 +792,7 @@ export const TexturedPlanet = ({
                 planetMap: { value: planetTextures.primary || placeholderTexture },
                 planetMapSecondary: { value: planetTextures.secondary || placeholderTexture },
                 cloudMap: { value: earthCloudsMap },
+                useProcedural: { value: planetTextures.useProcedural ? 1.0 : 0.0 },
               }}
               vertexShader={`
                 varying vec3 vNormal;
@@ -798,6 +838,7 @@ export const TexturedPlanet = ({
                 uniform sampler2D planetMap;
                 uniform sampler2D planetMapSecondary;
                 uniform sampler2D cloudMap;
+                uniform float useProcedural;
                 varying vec3 vNormal;
                 varying vec3 vPosition;
                 varying vec2 vUv;
@@ -1552,178 +1593,144 @@ export const TexturedPlanet = ({
                     
                     surfaceColor = titanColor;
                   }
-                  // === ENCELADUS (16) - NASA texture with tiger stripe geysers ===
+                  // === ENCELADUS (16) - NASA texture with tiger stripe geysers (desktop) / procedural (mobile) ===
                   else if (surfaceType > 15.5 && surfaceType < 16.5) {
-                    // Sample base texture
-                    vec3 enceladusColor = texture2D(planetMap, vUv).rgb;
-                    
-                    // Brightest object in solar system - very high albedo ice
-                    vec3 pureIce = vec3(1.0, 1.0, 1.0);
-                    enceladusColor = mix(enceladusColor, pureIce, 0.7);
-                    
-                    // Procedural bump mapping
-                    float texelSize = 0.004;
-                    float heightC = dot(enceladusColor, vec3(0.299, 0.587, 0.114));
-                    float heightL = dot(texture2D(planetMap, vUv + vec2(-texelSize, 0.0)).rgb, vec3(0.299, 0.587, 0.114));
-                    float heightR = dot(texture2D(planetMap, vUv + vec2(texelSize, 0.0)).rgb, vec3(0.299, 0.587, 0.114));
-                    float heightU = dot(texture2D(planetMap, vUv + vec2(0.0, texelSize)).rgb, vec3(0.299, 0.587, 0.114));
-                    float heightD = dot(texture2D(planetMap, vUv + vec2(0.0, -texelSize)).rgb, vec3(0.299, 0.587, 0.114));
-                    
-                    float bumpStrength = 1.5;
-                    vec3 bumpNormal = normalize(vec3(
-                      (heightL - heightR) * bumpStrength,
-                      (heightD - heightU) * bumpStrength,
-                      1.0
-                    ));
-                    
-                    vec3 tangent = normalize(cross(worldNormal, vec3(0.0, 1.0, 0.0)));
-                    vec3 bitangent = normalize(cross(worldNormal, tangent));
-                    vec3 perturbedNormal = normalize(tangent * bumpNormal.x + bitangent * bumpNormal.y + worldNormal * bumpNormal.z);
-                    float bumpedNdotL = max(dot(perturbedNormal, sunDir), 0.0);
-                    
-                    // Famous tiger stripes at south pole (Damascus, Baghdad, Cairo, Alexandria)
-                    float southPole = smoothstep(0.2, 0.0, vUv.y);
-                    
-                    // Four main tiger stripes
-                    float stripe1 = smoothstep(0.48, 0.5, sin(vUv.x * 50.0 + 0.0)) * smoothstep(0.52, 0.5, sin(vUv.x * 50.0 + 0.0));
-                    float stripe2 = smoothstep(0.48, 0.5, sin(vUv.x * 50.0 + 1.57)) * smoothstep(0.52, 0.5, sin(vUv.x * 50.0 + 1.57));
-                    float stripe3 = smoothstep(0.48, 0.5, sin(vUv.x * 50.0 + 3.14)) * smoothstep(0.52, 0.5, sin(vUv.x * 50.0 + 3.14));
-                    float stripe4 = smoothstep(0.48, 0.5, sin(vUv.x * 50.0 + 4.71)) * smoothstep(0.52, 0.5, sin(vUv.x * 50.0 + 4.71));
-                    float tigerStripes = max(max(stripe1, stripe2), max(stripe3, stripe4));
-                    
-                    // Blue-green color for tiger stripes (exposed fresh ice)
-                    vec3 stripeColor = vec3(0.5, 0.75, 0.85);
-                    enceladusColor = mix(enceladusColor, stripeColor, tigerStripes * southPole * 0.7);
-                    
-                    // Slight blue tint to fresh ice
-                    vec3 iceTint = vec3(0.98, 0.99, 1.0);
-                    enceladusColor *= iceTint;
-                    
-                    surfaceColor = enceladusColor;
-                    NdotL = mix(NdotL, bumpedNdotL, 0.5);
+                    if (useProcedural > 0.5) {
+                      // Procedural icy surface for mobile
+                      vec3 iceColor = vec3(1.0, 1.0, 1.0);
+                      float cracks = smoothstep(0.42, 0.48, fineNoise);
+                      surfaceColor = mix(iceColor, iceColor * 0.9, cracks * 0.3);
+                      // Tiger stripes procedural
+                      float southPole = smoothstep(0.2, 0.0, vUv.y);
+                      float stripes = smoothstep(0.48, 0.5, sin(vUv.x * 50.0)) * smoothstep(0.52, 0.5, sin(vUv.x * 50.0));
+                      vec3 stripeColor = vec3(0.5, 0.75, 0.85);
+                      surfaceColor = mix(surfaceColor, stripeColor, stripes * southPole * 0.7);
+                    } else {
+                      // Sample base texture
+                      vec3 enceladusColor = texture2D(planetMap, vUv).rgb;
+                      
+                      // Brightest object in solar system - very high albedo ice
+                      vec3 pureIce = vec3(1.0, 1.0, 1.0);
+                      enceladusColor = mix(enceladusColor, pureIce, 0.7);
+                      
+                      // Procedural bump mapping
+                      float texelSize = 0.004;
+                      float heightC = dot(enceladusColor, vec3(0.299, 0.587, 0.114));
+                      float heightL = dot(texture2D(planetMap, vUv + vec2(-texelSize, 0.0)).rgb, vec3(0.299, 0.587, 0.114));
+                      float heightR = dot(texture2D(planetMap, vUv + vec2(texelSize, 0.0)).rgb, vec3(0.299, 0.587, 0.114));
+                      float heightU = dot(texture2D(planetMap, vUv + vec2(0.0, texelSize)).rgb, vec3(0.299, 0.587, 0.114));
+                      float heightD = dot(texture2D(planetMap, vUv + vec2(0.0, -texelSize)).rgb, vec3(0.299, 0.587, 0.114));
+                      
+                      float bumpStrength = 1.5;
+                      vec3 bumpNormal = normalize(vec3(
+                        (heightL - heightR) * bumpStrength,
+                        (heightD - heightU) * bumpStrength,
+                        1.0
+                      ));
+                      
+                      vec3 tangent = normalize(cross(worldNormal, vec3(0.0, 1.0, 0.0)));
+                      vec3 bitangent = normalize(cross(worldNormal, tangent));
+                      vec3 perturbedNormal = normalize(tangent * bumpNormal.x + bitangent * bumpNormal.y + worldNormal * bumpNormal.z);
+                      float bumpedNdotL = max(dot(perturbedNormal, sunDir), 0.0);
+                      
+                      // Famous tiger stripes at south pole
+                      float southPole = smoothstep(0.2, 0.0, vUv.y);
+                      float stripe1 = smoothstep(0.48, 0.5, sin(vUv.x * 50.0 + 0.0)) * smoothstep(0.52, 0.5, sin(vUv.x * 50.0 + 0.0));
+                      float stripe2 = smoothstep(0.48, 0.5, sin(vUv.x * 50.0 + 1.57)) * smoothstep(0.52, 0.5, sin(vUv.x * 50.0 + 1.57));
+                      float stripe3 = smoothstep(0.48, 0.5, sin(vUv.x * 50.0 + 3.14)) * smoothstep(0.52, 0.5, sin(vUv.x * 50.0 + 3.14));
+                      float stripe4 = smoothstep(0.48, 0.5, sin(vUv.x * 50.0 + 4.71)) * smoothstep(0.52, 0.5, sin(vUv.x * 50.0 + 4.71));
+                      float tigerStripes = max(max(stripe1, stripe2), max(stripe3, stripe4));
+                      
+                      vec3 stripeColor = vec3(0.5, 0.75, 0.85);
+                      enceladusColor = mix(enceladusColor, stripeColor, tigerStripes * southPole * 0.7);
+                      
+                      vec3 iceTint = vec3(0.98, 0.99, 1.0);
+                      enceladusColor *= iceTint;
+                      
+                      surfaceColor = enceladusColor;
+                      NdotL = mix(NdotL, bumpedNdotL, 0.5);
+                    }
                   }
-                  // === IAPETUS (17) - NASA texture with two-toned dark/bright hemispheres ===
+                  // === IAPETUS (17) - NASA texture with two-toned dark/bright hemispheres (desktop) / procedural (mobile) ===
                   else if (surfaceType > 16.5 && surfaceType < 17.5) {
-                    // Sample base texture
-                    vec3 iapetusColor = texture2D(planetMap, vUv).rgb;
-                    
-                    // Procedural bump mapping for craters
-                    float texelSize = 0.004;
-                    float heightC = dot(iapetusColor, vec3(0.299, 0.587, 0.114));
-                    float heightL = dot(texture2D(planetMap, vUv + vec2(-texelSize, 0.0)).rgb, vec3(0.299, 0.587, 0.114));
-                    float heightR = dot(texture2D(planetMap, vUv + vec2(texelSize, 0.0)).rgb, vec3(0.299, 0.587, 0.114));
-                    float heightU = dot(texture2D(planetMap, vUv + vec2(0.0, texelSize)).rgb, vec3(0.299, 0.587, 0.114));
-                    float heightD = dot(texture2D(planetMap, vUv + vec2(0.0, -texelSize)).rgb, vec3(0.299, 0.587, 0.114));
-                    
-                    float bumpStrength = 2.5;
-                    vec3 bumpNormal = normalize(vec3(
-                      (heightL - heightR) * bumpStrength,
-                      (heightD - heightU) * bumpStrength,
-                      1.0
-                    ));
-                    
-                    vec3 tangent = normalize(cross(worldNormal, vec3(0.0, 1.0, 0.0)));
-                    vec3 bitangent = normalize(cross(worldNormal, tangent));
-                    vec3 perturbedNormal = normalize(tangent * bumpNormal.x + bitangent * bumpNormal.y + worldNormal * bumpNormal.z);
-                    float bumpedNdotL = max(dot(perturbedNormal, sunDir), 0.0);
-                    
-                    // Iapetus famous two-toned coloring - dark leading hemisphere, bright trailing
-                    // The dark region is called Cassini Regio
-                    float hemisphere = vUv.x; // 0 = leading (dark), 1 = trailing (bright)
-                    
-                    // Very dark leading hemisphere - Cassini Regio (carbonaceous material)
-                    vec3 darkSide = vec3(0.04, 0.035, 0.03); // Almost black
-                    // Bright trailing hemisphere - clean water ice
-                    vec3 brightSide = vec3(0.9, 0.88, 0.85); // Bright white/cream
-                    
-                    // Sharp but natural transition at the boundary
+                    // Iapetus famous two-toned coloring - works for both procedural and textured
+                    float hemisphere = vUv.x;
+                    vec3 darkSide = vec3(0.04, 0.035, 0.03);
+                    vec3 brightSide = vec3(0.9, 0.88, 0.85);
                     float transition = smoothstep(0.35, 0.65, hemisphere);
-                    
-                    // Apply the two-tone coloring over the texture
                     vec3 twoTone = mix(darkSide, brightSide, transition);
-                    iapetusColor = mix(iapetusColor * 0.3, iapetusColor, transition);
-                    iapetusColor = mix(twoTone, iapetusColor, 0.5);
                     
-                    // Add equatorial ridge (unique feature - makes Iapetus look like a walnut)
-                    float equator = smoothstep(0.48, 0.5, vUv.y) * smoothstep(0.52, 0.5, vUv.y);
-                    vec3 ridgeColor = mix(darkSide, brightSide, transition) * 1.1;
-                    iapetusColor = mix(iapetusColor, ridgeColor, equator * 0.4);
-                    
-                    // Crater impacts on both hemispheres
-                    float craterNoise = fineNoise * 0.15;
-                    iapetusColor *= (1.0 - craterNoise * 0.3);
-                    
-                    // Slight reddish tint on dark side from tholins
-                    vec3 tholinTint = vec3(1.0, 0.92, 0.88);
-                    iapetusColor = mix(iapetusColor, iapetusColor * tholinTint, (1.0 - transition) * 0.3);
-                    
-                    surfaceColor = iapetusColor;
-                    NdotL = mix(NdotL, bumpedNdotL, 0.6);
+                    if (useProcedural > 0.5) {
+                      // Procedural two-toned surface for mobile
+                      surfaceColor = twoTone;
+                      // Add equatorial ridge
+                      float equator = smoothstep(0.48, 0.5, vUv.y) * smoothstep(0.52, 0.5, vUv.y);
+                      surfaceColor = mix(surfaceColor, surfaceColor * 1.1, equator * 0.4);
+                      // Crater noise
+                      surfaceColor *= (1.0 - fineNoise * 0.15 * 0.3);
+                    } else {
+                      vec3 iapetusColor = texture2D(planetMap, vUv).rgb;
+                      
+                      float texelSize = 0.004;
+                      float heightC = dot(iapetusColor, vec3(0.299, 0.587, 0.114));
+                      float heightL = dot(texture2D(planetMap, vUv + vec2(-texelSize, 0.0)).rgb, vec3(0.299, 0.587, 0.114));
+                      float heightR = dot(texture2D(planetMap, vUv + vec2(texelSize, 0.0)).rgb, vec3(0.299, 0.587, 0.114));
+                      float heightU = dot(texture2D(planetMap, vUv + vec2(0.0, texelSize)).rgb, vec3(0.299, 0.587, 0.114));
+                      float heightD = dot(texture2D(planetMap, vUv + vec2(0.0, -texelSize)).rgb, vec3(0.299, 0.587, 0.114));
+                      
+                      float bumpStrength = 2.5;
+                      vec3 bumpNormal = normalize(vec3(
+                        (heightL - heightR) * bumpStrength,
+                        (heightD - heightU) * bumpStrength,
+                        1.0
+                      ));
+                      
+                      vec3 tangent = normalize(cross(worldNormal, vec3(0.0, 1.0, 0.0)));
+                      vec3 bitangent = normalize(cross(worldNormal, tangent));
+                      vec3 perturbedNormal = normalize(tangent * bumpNormal.x + bitangent * bumpNormal.y + worldNormal * bumpNormal.z);
+                      float bumpedNdotL = max(dot(perturbedNormal, sunDir), 0.0);
+                      
+                      iapetusColor = mix(iapetusColor * 0.3, iapetusColor, transition);
+                      iapetusColor = mix(twoTone, iapetusColor, 0.5);
+                      
+                      float equator = smoothstep(0.48, 0.5, vUv.y) * smoothstep(0.52, 0.5, vUv.y);
+                      vec3 ridgeColor = mix(darkSide, brightSide, transition) * 1.1;
+                      iapetusColor = mix(iapetusColor, ridgeColor, equator * 0.4);
+                      iapetusColor *= (1.0 - fineNoise * 0.15 * 0.3);
+                      
+                      vec3 tholinTint = vec3(1.0, 0.92, 0.88);
+                      iapetusColor = mix(iapetusColor, iapetusColor * tholinTint, (1.0 - transition) * 0.3);
+                      
+                      surfaceColor = iapetusColor;
+                      NdotL = mix(NdotL, bumpedNdotL, 0.6);
+                    }
                   }
-                  // === TRITON (18) - NASA texture with cantaloupe terrain and nitrogen geyser streaks ===
+                  // === TRITON (18) - Procedural cantaloupe terrain and geyser streaks ===
                   else if (surfaceType > 17.5 && surfaceType < 18.5) {
-                    // Sample base texture
-                    vec3 tritonColor = texture2D(planetMap, vUv).rgb;
-                    
-                    // Procedural bump mapping for cantaloupe terrain
-                    float texelSize = 0.004;
-                    float heightC = dot(tritonColor, vec3(0.299, 0.587, 0.114));
-                    float heightL = dot(texture2D(planetMap, vUv + vec2(-texelSize, 0.0)).rgb, vec3(0.299, 0.587, 0.114));
-                    float heightR = dot(texture2D(planetMap, vUv + vec2(texelSize, 0.0)).rgb, vec3(0.299, 0.587, 0.114));
-                    float heightU = dot(texture2D(planetMap, vUv + vec2(0.0, texelSize)).rgb, vec3(0.299, 0.587, 0.114));
-                    float heightD = dot(texture2D(planetMap, vUv + vec2(0.0, -texelSize)).rgb, vec3(0.299, 0.587, 0.114));
-                    
-                    float bumpStrength = 2.0;
-                    vec3 bumpNormal = normalize(vec3(
-                      (heightL - heightR) * bumpStrength,
-                      (heightD - heightU) * bumpStrength,
-                      1.0
-                    ));
-                    
-                    vec3 tangent = normalize(cross(worldNormal, vec3(0.0, 1.0, 0.0)));
-                    vec3 bitangent = normalize(cross(worldNormal, tangent));
-                    vec3 perturbedNormal = normalize(tangent * bumpNormal.x + bitangent * bumpNormal.y + worldNormal * bumpNormal.z);
-                    float bumpedNdotL = max(dot(perturbedNormal, sunDir), 0.0);
-                    
-                    // Cantaloupe terrain - distinctive dimpled/crisscross pattern unique to Triton
+                    // Cantaloupe terrain pattern - works for both
                     float cantaloupe1 = sin(vUv.x * 80.0 + vUv.y * 40.0) * sin(vUv.y * 80.0 - vUv.x * 40.0);
                     float cantaloupe2 = sin(vUv.x * 60.0 - vUv.y * 30.0) * sin(vUv.y * 60.0 + vUv.x * 30.0);
                     float cantaloupePattern = (cantaloupe1 + cantaloupe2) * 0.5 * 0.15 + 0.85;
                     
-                    // Apply cantaloupe pattern - gives wrinkled/dimpled appearance
-                    vec3 cantaloupeColor = vec3(0.85, 0.78, 0.68); // Tan/pinkish
-                    tritonColor = mix(tritonColor, cantaloupeColor, 0.4);
-                    tritonColor *= cantaloupePattern;
+                    vec3 cantaloupeColor = vec3(0.85, 0.78, 0.68);
+                    vec3 nitrogenIce = vec3(0.95, 0.9, 0.88);
                     
-                    // Nitrogen ice regions - bright white/pink areas
+                    surfaceColor = mix(baseColor, cantaloupeColor, 0.5);
+                    surfaceColor *= cantaloupePattern;
+                    
+                    // Ice regions
                     float iceRegions = smoothstep(0.55, 0.7, surfaceNoise);
-                    vec3 nitrogenIce = vec3(0.95, 0.9, 0.88); // Pinkish-white nitrogen ice
-                    tritonColor = mix(tritonColor, nitrogenIce, iceRegions * 0.5);
+                    surfaceColor = mix(surfaceColor, nitrogenIce, iceRegions * 0.5);
                     
-                    // South polar cap (nitrogen/methane ice - Triton's south faces the Sun)
+                    // South polar cap
                     float southPole = smoothstep(0.25, 0.0, vUv.y);
-                    vec3 polarIce = vec3(0.92, 0.88, 0.85);
-                    tritonColor = mix(tritonColor, polarIce, southPole * 0.6);
+                    surfaceColor = mix(surfaceColor, vec3(0.92, 0.88, 0.85), southPole * 0.6);
                     
-                    // Dark nitrogen geyser streaks - blown by winds from south pole geysers
-                    // These are the famous dark streaks from cryovolcanic activity
+                    // Geyser streaks
                     float geyserAngle = vUv.x * 40.0 + vUv.y * 5.0;
-                    float geyser1 = smoothstep(0.48, 0.5, sin(geyserAngle)) * smoothstep(0.52, 0.5, sin(geyserAngle));
-                    float geyser2 = smoothstep(0.48, 0.5, sin(geyserAngle + 1.5)) * smoothstep(0.52, 0.5, sin(geyserAngle + 1.5));
-                    float geyser3 = smoothstep(0.48, 0.5, sin(geyserAngle + 3.0)) * smoothstep(0.52, 0.5, sin(geyserAngle + 3.0));
-                    float geyserStreaks = max(max(geyser1, geyser2), geyser3);
-                    
-                    // Streaks emanate from south polar region and trail northward
+                    float geyserStreaks = smoothstep(0.48, 0.5, sin(geyserAngle)) * smoothstep(0.52, 0.5, sin(geyserAngle));
                     float streakFade = smoothstep(0.0, 0.4, vUv.y) * smoothstep(0.6, 0.3, vUv.y);
-                    vec3 darkStreak = vec3(0.2, 0.18, 0.15); // Dark carbonaceous material from geysers
-                    tritonColor = mix(tritonColor, darkStreak, geyserStreaks * streakFade * 0.7);
-                    
-                    // Subtle pink/tan tint from tholins
-                    vec3 tholinTint = vec3(1.0, 0.95, 0.9);
-                    tritonColor *= tholinTint;
-                    
-                    surfaceColor = tritonColor;
-                    NdotL = mix(NdotL, bumpedNdotL, 0.6);
+                    surfaceColor = mix(surfaceColor, vec3(0.2, 0.18, 0.15), geyserStreaks * streakFade * 0.5);
                   }
                   // === PLUTO (19) - NASA texture with Sputnik Planitia heart ===
                   else if (surfaceType > 18.5 && surfaceType < 19.5) {
@@ -1785,122 +1792,26 @@ export const TexturedPlanet = ({
                     surfaceColor = plutoColor;
                     NdotL = mix(NdotL, bumpedNdotL, 0.6);
                   }
-                  // === CERES (20) - NASA texture with Occator crater bright spots ===
+                  // === CERES (20) - Procedural gray rocky with bright spots ===
                   else if (surfaceType > 19.5 && surfaceType < 20.5) {
-                    // Sample base texture
-                    vec3 ceresColor = texture2D(planetMap, vUv).rgb;
-                    
-                    // Procedural bump mapping for craters
-                    float texelSize = 0.003;
-                    float heightC = dot(ceresColor, vec3(0.299, 0.587, 0.114));
-                    float heightL = dot(texture2D(planetMap, vUv + vec2(-texelSize, 0.0)).rgb, vec3(0.299, 0.587, 0.114));
-                    float heightR = dot(texture2D(planetMap, vUv + vec2(texelSize, 0.0)).rgb, vec3(0.299, 0.587, 0.114));
-                    float heightU = dot(texture2D(planetMap, vUv + vec2(0.0, texelSize)).rgb, vec3(0.299, 0.587, 0.114));
-                    float heightD = dot(texture2D(planetMap, vUv + vec2(0.0, -texelSize)).rgb, vec3(0.299, 0.587, 0.114));
-                    
-                    float bumpStrength = 2.5;
-                    vec3 bumpNormal = normalize(vec3(
-                      (heightL - heightR) * bumpStrength,
-                      (heightD - heightU) * bumpStrength,
-                      1.0
-                    ));
-                    
-                    vec3 tangent = normalize(cross(worldNormal, vec3(0.0, 1.0, 0.0)));
-                    vec3 bitangent = normalize(cross(worldNormal, tangent));
-                    vec3 perturbedNormal = normalize(tangent * bumpNormal.x + bitangent * bumpNormal.y + worldNormal * bumpNormal.z);
-                    float bumpedNdotL = max(dot(perturbedNormal, sunDir), 0.0);
-                    
-                    // Occator crater with famous bright spots (sodium carbonate deposits)
+                    vec3 grayRock = vec3(0.5, 0.5, 0.52);
+                    surfaceColor = mix(grayRock, grayRock * 0.8, surfaceNoise * 0.4);
+                    // Occator bright spots
                     vec2 occatorCenter = vec2(0.55, 0.52);
-                    float occatorDist = length((vUv - occatorCenter) * vec2(1.0, 1.2));
-                    float occatorCrater = smoothstep(0.08, 0.03, occatorDist);
-                    
-                    // Cerealia Facula (central bright spot)
-                    vec2 cerealiaCenter = vec2(0.55, 0.52);
-                    float cerealiaDist = length(vUv - cerealiaCenter);
-                    float cerealiaBright = smoothstep(0.025, 0.01, cerealiaDist);
-                    
-                    // Vinalia Faculae (secondary bright spots)
-                    vec2 vinaliaCenter = vec2(0.52, 0.49);
-                    float vinaliaDist = length(vUv - vinaliaCenter);
-                    float vinaliaBright = smoothstep(0.015, 0.005, vinaliaDist);
-                    
-                    // Bright white sodium carbonate color
-                    vec3 brightSpotColor = vec3(1.0, 0.98, 0.95);
-                    
-                    // Slightly darken the crater floor
-                    ceresColor = mix(ceresColor, ceresColor * 0.85, occatorCrater * 0.5);
-                    
-                    // Add the bright spots
-                    ceresColor = mix(ceresColor, brightSpotColor, cerealiaBright * 0.9);
-                    ceresColor = mix(ceresColor, brightSpotColor, vinaliaBright * 0.8);
-                    
-                    // Gray rocky surface tint
-                    vec3 grayTint = vec3(0.95, 0.95, 0.97);
-                    ceresColor *= grayTint;
-                    
-                    surfaceColor = ceresColor;
-                    NdotL = mix(NdotL, bumpedNdotL, 0.6);
+                    float cerealiaBright = smoothstep(0.025, 0.01, length(vUv - occatorCenter));
+                    surfaceColor = mix(surfaceColor, vec3(1.0, 0.98, 0.95), cerealiaBright * 0.9);
                   }
-                  // === PHOBOS (21) - Texture-based dark rocky moon ===
+                  // === PHOBOS (21) - Procedural dark rocky ===
                   else if (surfaceType > 20.5 && surfaceType < 21.5) {
-                    vec3 phobosColor = texture2D(planetMap, vUv).rgb;
-                    
-                    // Add bump mapping for craters
-                    float texelSize = 0.005;
-                    float heightC = dot(phobosColor, vec3(0.299, 0.587, 0.114));
-                    float heightL = dot(texture2D(planetMap, vUv + vec2(-texelSize, 0.0)).rgb, vec3(0.299, 0.587, 0.114));
-                    float heightR = dot(texture2D(planetMap, vUv + vec2(texelSize, 0.0)).rgb, vec3(0.299, 0.587, 0.114));
-                    float heightU = dot(texture2D(planetMap, vUv + vec2(0.0, texelSize)).rgb, vec3(0.299, 0.587, 0.114));
-                    float heightD = dot(texture2D(planetMap, vUv + vec2(0.0, -texelSize)).rgb, vec3(0.299, 0.587, 0.114));
-                    
-                    float bumpStrength = 3.0;
-                    vec3 bumpNormal = normalize(vec3(
-                      (heightL - heightR) * bumpStrength,
-                      (heightD - heightU) * bumpStrength,
-                      1.0
-                    ));
-                    
-                    vec3 tangent = normalize(cross(worldNormal, vec3(0.0, 1.0, 0.0)));
-                    vec3 bitangent = normalize(cross(worldNormal, tangent));
-                    vec3 perturbedNormal = normalize(tangent * bumpNormal.x + bitangent * bumpNormal.y + worldNormal * bumpNormal.z);
-                    float bumpedNdotL = max(dot(perturbedNormal, sunDir), 0.0);
-                    
-                    // Darken to match Phobos's very low albedo
-                    phobosColor *= 0.6;
-                    
-                    surfaceColor = phobosColor;
-                    NdotL = mix(NdotL, bumpedNdotL, 0.7);
+                    vec3 darkRock = vec3(0.35, 0.32, 0.3);
+                    float craters = 1.0 - smoothstep(0.5, 0.6, surfaceNoise) * 0.4;
+                    surfaceColor = darkRock * craters;
                   }
-                  // === DEIMOS (22) - Texture-based smoother dark moon ===
+                  // === DEIMOS (22) - Procedural smooth dark ===
                   else if (surfaceType > 21.5 && surfaceType < 22.5) {
-                    vec3 deimosColor = texture2D(planetMap, vUv).rgb;
-                    
-                    // Lighter bump for smoother surface
-                    float texelSize = 0.005;
-                    float heightC = dot(deimosColor, vec3(0.299, 0.587, 0.114));
-                    float heightL = dot(texture2D(planetMap, vUv + vec2(-texelSize, 0.0)).rgb, vec3(0.299, 0.587, 0.114));
-                    float heightR = dot(texture2D(planetMap, vUv + vec2(texelSize, 0.0)).rgb, vec3(0.299, 0.587, 0.114));
-                    float heightU = dot(texture2D(planetMap, vUv + vec2(0.0, texelSize)).rgb, vec3(0.299, 0.587, 0.114));
-                    float heightD = dot(texture2D(planetMap, vUv + vec2(0.0, -texelSize)).rgb, vec3(0.299, 0.587, 0.114));
-                    
-                    float bumpStrength = 2.0;
-                    vec3 bumpNormal = normalize(vec3(
-                      (heightL - heightR) * bumpStrength,
-                      (heightD - heightU) * bumpStrength,
-                      1.0
-                    ));
-                    
-                    vec3 tangent = normalize(cross(worldNormal, vec3(0.0, 1.0, 0.0)));
-                    vec3 bitangent = normalize(cross(worldNormal, tangent));
-                    vec3 perturbedNormal = normalize(tangent * bumpNormal.x + bitangent * bumpNormal.y + worldNormal * bumpNormal.z);
-                    float bumpedNdotL = max(dot(perturbedNormal, sunDir), 0.0);
-                    
-                    // Slightly lighter than Phobos
-                    deimosColor *= 0.7;
-                    
-                    surfaceColor = deimosColor;
-                    NdotL = mix(NdotL, bumpedNdotL, 0.6);
+                    vec3 darkRock = vec3(0.4, 0.38, 0.35);
+                    float terrain = fineNoise * 0.2;
+                    surfaceColor = mix(darkRock, darkRock * 0.85, terrain);
                   }
                   // === Generic gaseous (50) ===
                   else if (surfaceType > 49.5 && surfaceType < 50.5) {
