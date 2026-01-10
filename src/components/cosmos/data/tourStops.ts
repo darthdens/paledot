@@ -355,8 +355,8 @@ export const tourStops: TourStop[] = [
       fr: 'La Galaxie du Triangle est le troisième plus grand membre de notre Groupe Local, à environ 2,73 millions d\'années-lumière. Avec environ 40 milliards d\'étoiles, elle fait environ la moitié de la taille de notre Voie Lactée. Remarquez ses bras spiraux bleus distinctifs parsemés de régions roses de formation d\'étoiles.',
     },
     duration: 10,
-    // Close face-on view to see spiral arms - Triangulum is ~60,000 ly diameter
-    cameraPosition: [0, 100000 * UNITS.KM_PER_LY, 60000 * UNITS.KM_PER_LY],
+    // Tilted view to see spiral structure with depth - closer zoom
+    cameraPosition: [60000 * UNITS.KM_PER_LY, 50000 * UNITS.KM_PER_LY, 80000 * UNITS.KM_PER_LY],
     lookAt: [0, 0, 0],
     scaleLevel: 'localGroup',
   },
@@ -372,8 +372,8 @@ export const tourStops: TourStop[] = [
       fr: 'La Galaxie du Tourbillon, à 23 millions d\'années-lumière, fut la première galaxie où la structure spirale fut observée en 1845. Ses bras spectaculaires sont étirés par l\'interaction gravitationnelle avec sa petite compagne NGC 5195, créant l\'une des paires les plus photogéniques du cosmos.',
     },
     duration: 10,
-    // Face-on view to see the iconic spiral arms and companion - Whirlpool is ~76,000 ly diameter
-    cameraPosition: [20000 * UNITS.KM_PER_LY, 120000 * UNITS.KM_PER_LY, 40000 * UNITS.KM_PER_LY],
+    // Tilted view to see spiral arms with depth and companion - close zoom
+    cameraPosition: [50000 * UNITS.KM_PER_LY, 60000 * UNITS.KM_PER_LY, 70000 * UNITS.KM_PER_LY],
     lookAt: [0, 0, 0],
     scaleLevel: 'localGroup',
   },
@@ -389,8 +389,8 @@ export const tourStops: TourStop[] = [
       fr: 'La Galaxie du Sombrero, à 29 millions d\'années-lumière, est célèbre pour son apparence distinctive de chapeau mexicain. Son noyau brillant, son bulbe central exceptionnellement grand et sa bande de poussière sombre créent l\'une des silhouettes de galaxie les plus emblématiques. Elle contient environ 100 milliards d\'étoiles et possiblement un trou noir supermassif en son centre.',
     },
     duration: 10,
-    // Edge-on view to see the iconic sombrero shape with dust lane - ~50,000 ly diameter
-    cameraPosition: [80000 * UNITS.KM_PER_LY, 15000 * UNITS.KM_PER_LY, 30000 * UNITS.KM_PER_LY],
+    // Tilted edge-on view to see the sombrero shape - close zoom
+    cameraPosition: [55000 * UNITS.KM_PER_LY, 25000 * UNITS.KM_PER_LY, 60000 * UNITS.KM_PER_LY],
     lookAt: [0, 0, 0],
     scaleLevel: 'localGroup',
   },
