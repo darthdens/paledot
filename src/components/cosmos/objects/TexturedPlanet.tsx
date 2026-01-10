@@ -997,20 +997,24 @@ export const TexturedPlanet = ({
                     // The NASA Earth at Night texture already has accurate city positions
                     // Boost brightness and add characteristic warm glow of city lights
                     float cityBrightness = dot(nightColor, vec3(0.299, 0.587, 0.114));
-                    
+
+                    // Emphasize actual light pixels and boost with a soft threshold
+                    float cityMask = smoothstep(0.04, 0.18, cityBrightness);
+                    float cityBoost = pow(max(cityBrightness, 0.0), 0.65);
+
                     // City lights have warm sodium-vapor orange and LED white mix
-                    vec3 cityWarmth = vec3(1.0, 0.8, 0.5); // Warm orange tint
-                    vec3 cityLights = nightColor * 4.0 * cityWarmth;
-                    
-                    // Add bloom/glow effect around bright city areas
-                    float bloomIntensity = pow(cityBrightness, 1.5) * 3.0;
-                    cityLights += vec3(1.0, 0.85, 0.6) * bloomIntensity;
-                    
+                    vec3 cityWarmth = vec3(1.0, 0.82, 0.55);
+                    vec3 cityLights = nightColor * (10.0 * cityBoost) * cityWarmth;
+
+                    // Add glow around bright city areas
+                    float bloomIntensity = pow(cityBrightness, 1.15) * 8.0;
+                    cityLights += vec3(1.0, 0.9, 0.7) * bloomIntensity;
+
                     // Only show city lights on night side with smooth transition
                     float nightSide = 1.0 - dayNightBlend;
                     // Fade in city lights as sun sets
-                    float cityFade = smoothstep(0.3, -0.1, sunFacing);
-                    cityLights *= cityFade;
+                    float cityFade = smoothstep(0.25, -0.08, sunFacing);
+                    cityLights *= cityFade * cityMask;
                     
                     // === AURORA BOREALIS & AUSTRALIS ===
                     float lon = vUv.x * 6.28318;
@@ -1369,11 +1373,6 @@ export const TexturedPlanet = ({
                     return 1.0;
                   }
                   
-                  // Hash function for lightning randomization
-                  float hash(vec2 p) {
-                    return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453);
-                  }
-                  
                   void main() {
                     vec3 worldNormal = normalize(vWorldNormal);
                     vec3 sunDir = normalize(-vWorldPosition);
@@ -1381,13 +1380,11 @@ export const TexturedPlanet = ({
                     float shadow = calculateShadow(vWorldPosition, sunDir);
                     
                     float cloudCoverage;
-                    vec3 lightningFlash = vec3(0.0);
                     
                     if (isEarth > 0.5) {
                       // === ANIMATED CLOUD ROTATION ===
                       // Clouds rotate slightly faster than Earth's surface (jet streams)
-                      // This creates realistic independent cloud movement
-                      float cloudRotationSpeed = 0.008; // Radians per time unit (faster than surface)
+                      float cloudRotationSpeed = 0.008;
                       float cloudOffset = time * cloudRotationSpeed;
                       
                       // Apply rotation offset to UV (longitude only)
@@ -1398,60 +1395,9 @@ export const TexturedPlanet = ({
                       vec3 cloudSample = texture2D(cloudMap, animatedUv).rgb;
                       cloudCoverage = cloudSample.r;
                       
-                      // Add subtle cloud evolution over time (morphing)
+                      // Subtle cloud evolution over time
                       float cloudEvolve = sin(time * 0.02 + vUv.x * 10.0 + vUv.y * 8.0) * 0.08;
                       cloudCoverage = clamp(cloudCoverage + cloudEvolve, 0.0, 1.0);
-                      
-                      // === LIGHTNING FLASHES on night side ===
-                      float sunFacingRaw = dot(worldNormal, sunDir);
-                      float nightSide = smoothstep(0.1, -0.2, sunFacingRaw);
-                      
-                      // Only generate lightning in areas with significant cloud cover
-                      float stormPotential = smoothstep(0.4, 0.7, cloudCoverage);
-                      
-                      // Create multiple lightning cells across the globe
-                      // Each cell has independent timing
-                      float lightningIntensity = 0.0;
-                      
-                      // Generate several lightning storm cells
-                      for (int i = 0; i < 8; i++) {
-                        // Random position for this storm cell
-                        float cellSeed = float(i) * 1.37;
-                        vec2 cellCenter = vec2(
-                          fract(sin(cellSeed * 127.1) * 43758.5453),
-                          fract(sin(cellSeed * 311.7) * 43758.5453) * 0.6 + 0.2 // Avoid poles
-                        );
-                        
-                        // Distance from this cell
-                        vec2 toCell = animatedUv - cellCenter;
-                        toCell.x = min(abs(toCell.x), 1.0 - abs(toCell.x)); // Wrap around
-                        float distToCell = length(toCell);
-                        
-                        // Cell activity radius
-                        float cellRadius = 0.08 + hash(vec2(cellSeed, 0.5)) * 0.06;
-                        float inCell = smoothstep(cellRadius, cellRadius * 0.3, distToCell);
-                        
-                        // Lightning timing - random flashes with variable frequency
-                        float flashSpeed = 8.0 + hash(vec2(cellSeed, 1.0)) * 12.0;
-                        float flashPhase = hash(vec2(cellSeed, 2.0)) * 6.28318;
-                        float flashTime = time * flashSpeed + flashPhase;
-                        
-                        // Create sharp flash pulse
-                        float flashPulse = pow(max(0.0, sin(flashTime)), 40.0);
-                        // Add secondary flash (afterglow)
-                        float afterFlash = pow(max(0.0, sin(flashTime + 0.3)), 60.0) * 0.4;
-                        
-                        // Random flash intensity variation
-                        float flashStrength = 0.6 + hash(vec2(cellSeed, floor(flashTime / 6.28318))) * 0.4;
-                        
-                        lightningIntensity += inCell * (flashPulse + afterFlash) * flashStrength;
-                      }
-                      
-                      // Lightning color - bright blue-white
-                      vec3 lightningColor = vec3(0.8, 0.85, 1.0);
-                      
-                      // Apply lightning only on night side in stormy areas
-                      lightningFlash = lightningColor * lightningIntensity * nightSide * stormPotential * 2.0;
                     } else {
                       // Procedural clouds for other planets with animation
                       float animatedTime = time * 0.02;
@@ -1475,10 +1421,7 @@ export const TexturedPlanet = ({
                     // Clouds glow slightly at terminator
                     litCloud += sunsetOrange * terminatorZone * 0.15;
                     
-                    // Add lightning flashes
-                    litCloud += lightningFlash;
-                    
-                    gl_FragColor = vec4(litCloud, cloudCoverage * 0.6 * max(NdotL, terminatorZone * 0.3) * shadow + length(lightningFlash) * 0.3);
+                    gl_FragColor = vec4(litCloud, cloudCoverage * 0.6 * max(NdotL, terminatorZone * 0.3) * shadow);
                   }
                 `}
               />
