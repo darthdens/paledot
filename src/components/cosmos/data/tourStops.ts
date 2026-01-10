@@ -338,9 +338,8 @@ export const tourStops: TourStop[] = [
       fr: 'La galaxie d\'Andromède, également connue sous le nom de M31, est la grande galaxie la plus proche de la Voie Lactée à 2,5 millions d\'années-lumière. Elle contient environ mille milliards d\'étoiles et est en trajectoire de collision avec notre galaxie - mais ne vous inquiétez pas, la fusion n\'aura lieu que dans 4,5 milliards d\'années.',
     },
     duration: 10,
-    // Position camera closer to Andromeda for a better view of the galaxy structure
-    // Andromeda is at ~2.5M ly, position camera offset to see it nicely
-    cameraPosition: [150000 * UNITS.KM_PER_LY, 80000 * UNITS.KM_PER_LY, 250000 * UNITS.KM_PER_LY],
+    // Close-up tilted view to see the spiral structure - Andromeda is ~220,000 ly diameter
+    cameraPosition: [120000 * UNITS.KM_PER_LY, 80000 * UNITS.KM_PER_LY, 180000 * UNITS.KM_PER_LY],
     lookAt: [0, 0, 0],
     scaleLevel: 'localGroup',
   },
@@ -356,8 +355,8 @@ export const tourStops: TourStop[] = [
       fr: 'La Galaxie du Triangle est le troisième plus grand membre de notre Groupe Local, à environ 2,73 millions d\'années-lumière. Avec environ 40 milliards d\'étoiles, elle fait environ la moitié de la taille de notre Voie Lactée. Remarquez ses bras spiraux bleus distinctifs parsemés de régions roses de formation d\'étoiles.',
     },
     duration: 10,
-    // Position camera to see Triangulum nicely
-    cameraPosition: [-100000 * UNITS.KM_PER_LY, 60000 * UNITS.KM_PER_LY, 200000 * UNITS.KM_PER_LY],
+    // Close face-on view to see spiral arms - Triangulum is ~60,000 ly diameter
+    cameraPosition: [0, 100000 * UNITS.KM_PER_LY, 60000 * UNITS.KM_PER_LY],
     lookAt: [0, 0, 0],
     scaleLevel: 'localGroup',
   },
@@ -373,8 +372,8 @@ export const tourStops: TourStop[] = [
       fr: 'La Galaxie du Tourbillon, à 23 millions d\'années-lumière, fut la première galaxie où la structure spirale fut observée en 1845. Ses bras spectaculaires sont étirés par l\'interaction gravitationnelle avec sa petite compagne NGC 5195, créant l\'une des paires les plus photogéniques du cosmos.',
     },
     duration: 10,
-    // Position camera to see Whirlpool nicely
-    cameraPosition: [80000 * UNITS.KM_PER_LY, 50000 * UNITS.KM_PER_LY, 180000 * UNITS.KM_PER_LY],
+    // Face-on view to see the iconic spiral arms and companion - Whirlpool is ~76,000 ly diameter
+    cameraPosition: [20000 * UNITS.KM_PER_LY, 120000 * UNITS.KM_PER_LY, 40000 * UNITS.KM_PER_LY],
     lookAt: [0, 0, 0],
     scaleLevel: 'localGroup',
   },
@@ -390,8 +389,8 @@ export const tourStops: TourStop[] = [
       fr: 'La Galaxie du Sombrero, à 29 millions d\'années-lumière, est célèbre pour son apparence distinctive de chapeau mexicain. Son noyau brillant, son bulbe central exceptionnellement grand et sa bande de poussière sombre créent l\'une des silhouettes de galaxie les plus emblématiques. Elle contient environ 100 milliards d\'étoiles et possiblement un trou noir supermassif en son centre.',
     },
     duration: 10,
-    // Position camera to see Sombrero from a slight angle to appreciate the edge-on view
-    cameraPosition: [100000 * UNITS.KM_PER_LY, 40000 * UNITS.KM_PER_LY, 200000 * UNITS.KM_PER_LY],
+    // Edge-on view to see the iconic sombrero shape with dust lane - ~50,000 ly diameter
+    cameraPosition: [80000 * UNITS.KM_PER_LY, 15000 * UNITS.KM_PER_LY, 30000 * UNITS.KM_PER_LY],
     lookAt: [0, 0, 0],
     scaleLevel: 'localGroup',
   },
