@@ -16,19 +16,10 @@ export const ORBITAL_PERIODS: Record<string, number> = {
   ganymede: 7.15,     // Around Jupiter
   callisto: 16.69,    // Around Jupiter
   saturn: 10759.22,
-  mimas: 0.94,        // Around Saturn
   enceladus: 1.37,    // Around Saturn
-  tethys: 1.89,       // Around Saturn
-  dione: 2.74,        // Around Saturn
-  rhea: 4.52,         // Around Saturn
   titan: 15.95,       // Around Saturn
   iapetus: 79.32,     // Around Saturn
   uranus: 30688.5,
-  miranda: 1.41,      // Around Uranus
-  ariel: 2.52,        // Around Uranus
-  umbriel: 4.14,      // Around Uranus
-  titania: 8.71,      // Around Uranus
-  oberon: 13.46,      // Around Uranus
   neptune: 60182,
   triton: 5.88,       // Around Neptune (retrograde)
   pluto: 90560,
@@ -309,25 +300,6 @@ export const celestialObjects: CelestialObject[] = [
       fr: ['Célèbre pour ses anneaux', 'Pourrait flotter sur l\'eau', '146 lunes connues'],
     },
   },
-  // Mimas (Saturn moon)
-  {
-    id: 'mimas',
-    name: { en: 'Mimas', fr: 'Mimas' },
-    type: 'moon',
-    position: [9.5 * UNITS.KM_PER_AU + 185539, 0, 0],
-    size: 396,
-    color: '#c8c8c8',
-    distanceFromEarth: 8.5 * UNITS.KM_PER_AU,
-    distanceUnit: 'AU',
-    category: 'solarSystem',
-    orbitRadius: 185539,
-    orbitPeriodDays: ORBITAL_PERIODS.mimas,
-    parentId: 'saturn',
-    facts: {
-      en: ['Looks like Death Star', 'Herschel crater covers 1/3 of surface', 'Smallest round moon of Saturn'],
-      fr: ['Ressemble à l\'Étoile de la Mort', 'Cratère Herschel couvre 1/3', 'Plus petite lune ronde de Saturne'],
-    },
-  },
   // Enceladus (Saturn moon)
   {
     id: 'enceladus',
@@ -345,63 +317,6 @@ export const celestialObjects: CelestialObject[] = [
     facts: {
       en: ['Brightest object in solar system', 'Has water geysers', 'Possible conditions for life'],
       fr: ['Objet le plus brillant', 'Geysers d\'eau', 'Conditions possibles pour la vie'],
-    },
-  },
-  // Tethys (Saturn moon)
-  {
-    id: 'tethys',
-    name: { en: 'Tethys', fr: 'Téthys' },
-    type: 'moon',
-    position: [9.5 * UNITS.KM_PER_AU + 294672, 0, 0],
-    size: 1066,
-    color: '#e0e0e0',
-    distanceFromEarth: 8.5 * UNITS.KM_PER_AU,
-    distanceUnit: 'AU',
-    category: 'solarSystem',
-    orbitRadius: 294672,
-    orbitPeriodDays: ORBITAL_PERIODS.tethys,
-    parentId: 'saturn',
-    facts: {
-      en: ['Made almost entirely of ice', 'Has giant Odysseus crater', 'Ithaca Chasma spans 3/4 of surface'],
-      fr: ['Presque entièrement de glace', 'Cratère Odyssée géant', 'Ithaca Chasma couvre 3/4'],
-    },
-  },
-  // Dione (Saturn moon)
-  {
-    id: 'dione',
-    name: { en: 'Dione', fr: 'Dioné' },
-    type: 'moon',
-    position: [9.5 * UNITS.KM_PER_AU + 377415, 0, 0],
-    size: 1123,
-    color: '#d8d8d8',
-    distanceFromEarth: 8.5 * UNITS.KM_PER_AU,
-    distanceUnit: 'AU',
-    category: 'solarSystem',
-    orbitRadius: 377415,
-    orbitPeriodDays: ORBITAL_PERIODS.dione,
-    parentId: 'saturn',
-    facts: {
-      en: ['Fourth largest moon of Saturn', 'Has wispy terrain of ice cliffs', 'May have subsurface ocean'],
-      fr: ['4ème plus grande lune de Saturne', 'Falaises de glace', 'Océan souterrain possible'],
-    },
-  },
-  // Rhea (Saturn moon)
-  {
-    id: 'rhea',
-    name: { en: 'Rhea', fr: 'Rhéa' },
-    type: 'moon',
-    position: [9.5 * UNITS.KM_PER_AU + 527068, 0, 0],
-    size: 1528,
-    color: '#c0c0c0',
-    distanceFromEarth: 8.5 * UNITS.KM_PER_AU,
-    distanceUnit: 'AU',
-    category: 'solarSystem',
-    orbitRadius: 527068,
-    orbitPeriodDays: ORBITAL_PERIODS.rhea,
-    parentId: 'saturn',
-    facts: {
-      en: ['Second largest moon of Saturn', 'May have its own ring system', 'Heavily cratered surface'],
-      fr: ['2ème plus grande lune de Saturne', 'Possible système d\'anneaux', 'Surface très cratérisée'],
     },
   },
   // Titan (Saturn moon)
@@ -458,101 +373,6 @@ export const celestialObjects: CelestialObject[] = [
     facts: {
       en: ['Rotates on its side', 'Ice giant', 'Coldest atmosphere (-224°C)'],
       fr: ['Tourne sur le côté', 'Géante de glace', 'Atmosphère la plus froide (-224°C)'],
-    },
-  },
-  // Miranda (Uranus moon)
-  {
-    id: 'miranda',
-    name: { en: 'Miranda', fr: 'Miranda' },
-    type: 'moon',
-    position: [19.2 * UNITS.KM_PER_AU + 129390, 0, 0],
-    size: 472,
-    color: '#b0b0b0',
-    distanceFromEarth: 18.2 * UNITS.KM_PER_AU,
-    distanceUnit: 'AU',
-    category: 'solarSystem',
-    orbitRadius: 129390,
-    orbitPeriodDays: ORBITAL_PERIODS.miranda,
-    parentId: 'uranus',
-    facts: {
-      en: ['Most geologically diverse moon', 'Has 20km high cliff Verona Rupes', 'Smallest of major Uranian moons'],
-      fr: ['Lune la plus diverse géologiquement', 'Falaise Verona Rupes de 20km', 'Plus petite des grandes lunes'],
-    },
-  },
-  // Ariel (Uranus moon)
-  {
-    id: 'ariel',
-    name: { en: 'Ariel', fr: 'Ariel' },
-    type: 'moon',
-    position: [19.2 * UNITS.KM_PER_AU + 190900, 0, 0],
-    size: 1158,
-    color: '#c8c8c8',
-    distanceFromEarth: 18.2 * UNITS.KM_PER_AU,
-    distanceUnit: 'AU',
-    category: 'solarSystem',
-    orbitRadius: 190900,
-    orbitPeriodDays: ORBITAL_PERIODS.ariel,
-    parentId: 'uranus',
-    facts: {
-      en: ['Brightest of Uranian moons', 'Has many canyons and valleys', 'Fourth largest Uranian moon'],
-      fr: ['Plus brillante des lunes d\'Uranus', 'Nombreux canyons et vallées', '4ème plus grande lune'],
-    },
-  },
-  // Umbriel (Uranus moon)
-  {
-    id: 'umbriel',
-    name: { en: 'Umbriel', fr: 'Umbriel' },
-    type: 'moon',
-    position: [19.2 * UNITS.KM_PER_AU + 266000, 0, 0],
-    size: 1169,
-    color: '#606060',
-    distanceFromEarth: 18.2 * UNITS.KM_PER_AU,
-    distanceUnit: 'AU',
-    category: 'solarSystem',
-    orbitRadius: 266000,
-    orbitPeriodDays: ORBITAL_PERIODS.umbriel,
-    parentId: 'uranus',
-    facts: {
-      en: ['Darkest of major Uranian moons', 'Ancient, heavily cratered surface', 'Named after sprite in Pope\'s poem'],
-      fr: ['Plus sombre des grandes lunes', 'Surface ancienne cratérisée', 'Nommée d\'après un poème de Pope'],
-    },
-  },
-  // Titania (Uranus moon)
-  {
-    id: 'titania',
-    name: { en: 'Titania', fr: 'Titania' },
-    type: 'moon',
-    position: [19.2 * UNITS.KM_PER_AU + 436300, 0, 0],
-    size: 1578,
-    color: '#a8a8a8',
-    distanceFromEarth: 18.2 * UNITS.KM_PER_AU,
-    distanceUnit: 'AU',
-    category: 'solarSystem',
-    orbitRadius: 436300,
-    orbitPeriodDays: ORBITAL_PERIODS.titania,
-    parentId: 'uranus',
-    facts: {
-      en: ['Largest moon of Uranus', 'Eighth largest moon in solar system', 'May have carbon dioxide atmosphere'],
-      fr: ['Plus grande lune d\'Uranus', '8ème plus grande lune', 'Possible atmosphère de CO2'],
-    },
-  },
-  // Oberon (Uranus moon)
-  {
-    id: 'oberon',
-    name: { en: 'Oberon', fr: 'Obéron' },
-    type: 'moon',
-    position: [19.2 * UNITS.KM_PER_AU + 583519, 0, 0],
-    size: 1523,
-    color: '#909090',
-    distanceFromEarth: 18.2 * UNITS.KM_PER_AU,
-    distanceUnit: 'AU',
-    category: 'solarSystem',
-    orbitRadius: 583519,
-    orbitPeriodDays: ORBITAL_PERIODS.oberon,
-    parentId: 'uranus',
-    facts: {
-      en: ['Second largest moon of Uranus', 'Outermost major moon', 'Has 6km high mountain'],
-      fr: ['2ème plus grande lune d\'Uranus', 'Lune majeure la plus éloignée', 'Montagne de 6km de haut'],
     },
   },
   // Neptune
