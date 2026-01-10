@@ -22,8 +22,7 @@ const SOMBRERO = {
   distanceFromMilkyWay: 29.3e6, // 29.3 million light-years
 };
 
-// Sombrero glow texture - OVAL shape, bright center, smooth edges (no square!)
-// This is what makes it look like a sombrero - NOT the stars going up/down
+// Sombrero glow texture - warm cream/golden gradient like the real galaxy
 const createSombreroGlowTexture = () => {
   const size = 1024;
   const canvas = document.createElement('canvas');
@@ -37,49 +36,24 @@ const createSombreroGlowTexture = () => {
   // Clear with transparent
   ctx.clearRect(0, 0, size, size);
   
-  // Draw elliptical glow by scaling the context
-  // Make it wider than tall (aspect ratio ~2.5:1 for edge-on view)
-  ctx.save();
-  ctx.translate(centerX, centerY);
-  ctx.scale(1, 0.4); // Flatten vertically to create oval
-  ctx.translate(-centerX, -centerY);
+  // Create radial gradient - bright cream center fading outward
+  const gradient = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, size / 2);
   
-  // Bright inner core
-  const innerGrad = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, size * 0.12);
-  innerGrad.addColorStop(0, 'rgba(255, 255, 255, 1)');
-  innerGrad.addColorStop(0.4, 'rgba(255, 252, 240, 0.98)');
-  innerGrad.addColorStop(1, 'rgba(255, 245, 220, 0.9)');
-  ctx.fillStyle = innerGrad;
-  ctx.beginPath();
-  ctx.arc(centerX, centerY, size * 0.5, 0, Math.PI * 2);
-  ctx.fill();
+  // Warm cream/golden colors matching the Sombrero's iconic look
+  gradient.addColorStop(0, 'rgba(255, 255, 250, 1)');        // Bright white center
+  gradient.addColorStop(0.08, 'rgba(255, 252, 240, 0.95)');  // Cream
+  gradient.addColorStop(0.18, 'rgba(255, 245, 220, 0.85)');  // Light cream
+  gradient.addColorStop(0.3, 'rgba(255, 235, 200, 0.65)');   // Golden cream
+  gradient.addColorStop(0.45, 'rgba(255, 220, 175, 0.45)');  // Warm golden
+  gradient.addColorStop(0.6, 'rgba(245, 200, 150, 0.28)');   // Fading golden
+  gradient.addColorStop(0.75, 'rgba(230, 180, 130, 0.12)');  // Faint
+  gradient.addColorStop(0.9, 'rgba(210, 160, 120, 0.04)');   // Very faint
+  gradient.addColorStop(1, 'rgba(200, 150, 110, 0)');        // Transparent
 
-  // Mid glow - the "hat" bulge
-  const midGrad = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, size * 0.35);
-  midGrad.addColorStop(0, 'rgba(255, 250, 230, 0.9)');
-  midGrad.addColorStop(0.25, 'rgba(255, 240, 210, 0.75)');
-  midGrad.addColorStop(0.5, 'rgba(255, 225, 190, 0.5)');
-  midGrad.addColorStop(0.75, 'rgba(245, 210, 170, 0.25)');
-  midGrad.addColorStop(1, 'rgba(235, 195, 150, 0)');
-  ctx.globalCompositeOperation = 'screen';
-  ctx.fillStyle = midGrad;
+  ctx.fillStyle = gradient;
   ctx.beginPath();
-  ctx.arc(centerX, centerY, size * 0.5, 0, Math.PI * 2);
+  ctx.arc(centerX, centerY, size / 2, 0, Math.PI * 2);
   ctx.fill();
-
-  // Outer extended glow - spans full width
-  const outerGrad = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, size * 0.48);
-  outerGrad.addColorStop(0, 'rgba(255, 240, 210, 0.4)');
-  outerGrad.addColorStop(0.35, 'rgba(245, 220, 185, 0.25)');
-  outerGrad.addColorStop(0.6, 'rgba(235, 200, 160, 0.12)');
-  outerGrad.addColorStop(0.85, 'rgba(220, 185, 145, 0.04)');
-  outerGrad.addColorStop(1, 'rgba(200, 170, 140, 0)');
-  ctx.fillStyle = outerGrad;
-  ctx.beginPath();
-  ctx.arc(centerX, centerY, size * 0.5, 0, Math.PI * 2);
-  ctx.fill();
-  
-  ctx.restore();
 
   const tex = new THREE.CanvasTexture(canvas);
   tex.minFilter = THREE.LinearFilter;
@@ -111,7 +85,6 @@ const createDotTexture = () => {
   tex.colorSpace = THREE.SRGBColorSpace;
   return tex;
 };
-
 export const SombreroGalaxy = ({ visualScale }: SombreroGalaxyProps) => {
   const groupRef = useRef<THREE.Group>(null);
   const centerWorldPos = useRef(new THREE.Vector3());
@@ -398,18 +371,21 @@ export const SombreroGalaxy = ({ visualScale }: SombreroGalaxyProps) => {
           renderOrder={5}
         />
 
-        {/* LARGE oval glow - creates the "sombrero hat" effect, spans full disk width */}
-        <sprite renderOrder={1} frustumCulled={false} scale={[diskR * 2.4, diskR * 2.4, 1]}>
-          <spriteMaterial
+        {/* Central glow on a MESH plane - rotates with the galaxy (not a billboard sprite) */}
+        {/* This creates the "sombrero hat" bulge effect */}
+        <mesh renderOrder={1} rotation={[0, 0, 0]}>
+          <planeGeometry args={[bulgeR * 3.5, bulgeR * 3.5]} />
+          <meshBasicMaterial
             map={glowTexture}
             transparent
             opacity={1}
             blending={THREE.AdditiveBlending}
             depthWrite={false}
             depthTest={false}
+            side={THREE.DoubleSide}
             toneMapped={false}
           />
-        </sprite>
+        </mesh>
       </group>
 
       {/* Click target */}
