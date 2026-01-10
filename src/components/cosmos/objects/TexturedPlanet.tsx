@@ -916,32 +916,130 @@ export const TexturedPlanet = ({
                     surfaceColor = mix(baseColor, secondaryColor, swirl * 0.4);
                     surfaceColor = mix(surfaceColor, tertiaryColor, bands * 0.2);
                   }
-                  // === EARTH (4) - NASA texture map ===
+                  // === EARTH (4) - NASA texture map with aurora and bump mapping ===
                   else if (surfaceType > 3.5 && surfaceType < 4.5) {
                     // Sample NASA Earth day texture
                     vec3 dayColor = texture2D(earthDayMap, vUv).rgb;
                     // Sample NASA Earth night texture (city lights)
                     vec3 nightColor = texture2D(earthNightMap, vUv).rgb;
                     
-                    // Calculate sun-facing based on world normal
+                    // === PROCEDURAL BUMP MAPPING ===
+                    // Calculate height from texture luminance for relief effect
+                    float texelSize = 0.002;
+                    float heightC = dot(dayColor, vec3(0.299, 0.587, 0.114));
+                    float heightL = dot(texture2D(earthDayMap, vUv + vec2(-texelSize, 0.0)).rgb, vec3(0.299, 0.587, 0.114));
+                    float heightR = dot(texture2D(earthDayMap, vUv + vec2(texelSize, 0.0)).rgb, vec3(0.299, 0.587, 0.114));
+                    float heightU = dot(texture2D(earthDayMap, vUv + vec2(0.0, texelSize)).rgb, vec3(0.299, 0.587, 0.114));
+                    float heightD = dot(texture2D(earthDayMap, vUv + vec2(0.0, -texelSize)).rgb, vec3(0.299, 0.587, 0.114));
+                    
+                    // Calculate normal perturbation from height differences
+                    float bumpStrength = 1.5;
+                    vec3 bumpNormal = normalize(vec3(
+                      (heightL - heightR) * bumpStrength,
+                      (heightD - heightU) * bumpStrength,
+                      1.0
+                    ));
+                    
+                    // Perturb the world normal with bump
                     vec3 worldNormal = normalize(vWorldNormal);
+                    vec3 tangent = normalize(cross(worldNormal, vec3(0.0, 1.0, 0.0)));
+                    vec3 bitangent = normalize(cross(worldNormal, tangent));
+                    vec3 perturbedNormal = normalize(
+                      tangent * bumpNormal.x + 
+                      bitangent * bumpNormal.y + 
+                      worldNormal * bumpNormal.z
+                    );
+                    
                     vec3 sunDir = normalize(-vWorldPosition);
-                    float sunFacing = dot(worldNormal, sunDir);
+                    float sunFacing = dot(perturbedNormal, sunDir);
                     
                     // Blend between day and night based on sun position
-                    // Night side shows city lights, day side shows the surface
                     float dayNightBlend = smoothstep(-0.1, 0.2, sunFacing);
                     
                     // City lights are boosted on the night side
                     vec3 cityLights = nightColor * 2.5;
                     
-                    // Final blend
-                    surfaceColor = mix(cityLights, dayColor, dayNightBlend);
+                    // === AURORA BOREALIS EFFECT ===
+                    float latitude = abs(vUv.y - 0.5) * 2.0;
+                    // Aurora appears in auroral zones (~60-75 degrees latitude)
+                    float auroraZone = smoothstep(0.55, 0.65, latitude) * smoothstep(0.85, 0.72, latitude);
+                    
+                    // Only show aurora on night side
+                    float nightSide = 1.0 - dayNightBlend;
+                    
+                    // Animated aurora curtains using noise
+                    float auroraTime = time * 0.3;
+                    float lon = vUv.x * 6.28318;
+                    
+                    // Multi-layer aurora curtains
+                    float curtain1 = sin(lon * 8.0 + auroraTime * 1.2 + sin(lon * 3.0 + auroraTime) * 2.0) * 0.5 + 0.5;
+                    float curtain2 = sin(lon * 12.0 - auroraTime * 0.8 + sin(lon * 5.0 - auroraTime * 0.5) * 1.5) * 0.5 + 0.5;
+                    float curtain3 = sin(lon * 6.0 + auroraTime * 0.5 + cos(lon * 4.0 + auroraTime * 0.3) * 1.8) * 0.5 + 0.5;
+                    
+                    float auroraPattern = curtain1 * 0.4 + curtain2 * 0.35 + curtain3 * 0.25;
+                    auroraPattern = pow(auroraPattern, 1.5);
+                    
+                    // Flickering intensity
+                    float flicker = 0.7 + 0.3 * sin(auroraTime * 4.0 + lon * 2.0);
+                    
+                    // Aurora colors - green dominant with hints of purple and pink
+                    vec3 auroraGreen = vec3(0.2, 1.0, 0.4);
+                    vec3 auroraPurple = vec3(0.6, 0.2, 0.9);
+                    vec3 auroraPink = vec3(1.0, 0.3, 0.5);
+                    
+                    // Color varies with intensity and position
+                    float colorMix = sin(lon * 4.0 + auroraTime * 0.7) * 0.5 + 0.5;
+                    vec3 auroraColor = mix(auroraGreen, auroraPurple, colorMix * 0.4);
+                    auroraColor = mix(auroraColor, auroraPink, pow(auroraPattern, 2.0) * 0.3);
+                    
+                    // Final aurora intensity
+                    float auroraIntensity = auroraZone * auroraPattern * flicker * nightSide * 0.8;
+                    vec3 aurora = auroraColor * auroraIntensity;
+                    
+                    // Apply bump-enhanced lighting to day texture
+                    float bumpLighting = max(0.0, dot(perturbedNormal, sunDir));
+                    dayColor *= 0.85 + bumpLighting * 0.3;
+                    
+                    // Final blend with aurora
+                    surfaceColor = mix(cityLights + aurora, dayColor, dayNightBlend);
                   }
-                  // === MOON (5) - NASA texture map ===
+                  // === MOON (5) - NASA texture map with bump mapping ===
                   else if (surfaceType > 4.5 && surfaceType < 5.5) {
                     // Sample NASA Moon texture (LROC)
-                    surfaceColor = texture2D(moonMap, vUv).rgb;
+                    vec3 moonColor = texture2D(moonMap, vUv).rgb;
+                    
+                    // === PROCEDURAL BUMP MAPPING for craters ===
+                    float texelSize = 0.003;
+                    float heightC = dot(moonColor, vec3(0.299, 0.587, 0.114));
+                    float heightL = dot(texture2D(moonMap, vUv + vec2(-texelSize, 0.0)).rgb, vec3(0.299, 0.587, 0.114));
+                    float heightR = dot(texture2D(moonMap, vUv + vec2(texelSize, 0.0)).rgb, vec3(0.299, 0.587, 0.114));
+                    float heightU = dot(texture2D(moonMap, vUv + vec2(0.0, texelSize)).rgb, vec3(0.299, 0.587, 0.114));
+                    float heightD = dot(texture2D(moonMap, vUv + vec2(0.0, -texelSize)).rgb, vec3(0.299, 0.587, 0.114));
+                    
+                    // Stronger bump for Moon's cratered surface
+                    float bumpStrength = 2.5;
+                    vec3 bumpNormal = normalize(vec3(
+                      (heightL - heightR) * bumpStrength,
+                      (heightD - heightU) * bumpStrength,
+                      1.0
+                    ));
+                    
+                    // Perturb the world normal
+                    vec3 worldNormal = normalize(vWorldNormal);
+                    vec3 tangent = normalize(cross(worldNormal, vec3(0.0, 1.0, 0.0)));
+                    vec3 bitangent = normalize(cross(worldNormal, tangent));
+                    vec3 perturbedNormal = normalize(
+                      tangent * bumpNormal.x + 
+                      bitangent * bumpNormal.y + 
+                      worldNormal * bumpNormal.z
+                    );
+                    
+                    // Apply bump-enhanced lighting
+                    vec3 sunDir = normalize(-vWorldPosition);
+                    float bumpLighting = max(0.0, dot(perturbedNormal, sunDir));
+                    
+                    // Enhanced crater shadows and highlights
+                    surfaceColor = moonColor * (0.7 + bumpLighting * 0.5);
                   }
                   // === MARS (6) - Red with dark regions and white polar caps ===
                   else if (surfaceType > 5.5 && surfaceType < 6.5) {
