@@ -9,6 +9,11 @@ interface DifferentialRotationMaterialProps {
   opacity?: number;
   maxRadius: number; // The maximum radius of the galaxy for normalization
   rotationMultiplier?: number; // Base rotation speed multiplier
+  /**
+   * 0 = rigid rotation (preserves spiral shape), 1 = fully differential.
+   * Using a small value prevents spiral arms from shearing over time.
+   */
+  differentialStrength?: number;
 }
 
 /**
@@ -24,6 +29,7 @@ export const useDifferentialRotationMaterial = ({
   opacity = 1,
   maxRadius,
   rotationMultiplier = 1,
+  differentialStrength = 1,
 }: DifferentialRotationMaterialProps) => {
   const timeRef = useRef(0);
   const isInStarSystem = useCosmosStore((s) => s.isInStarSystem);
@@ -42,12 +48,14 @@ export const useDifferentialRotationMaterial = ({
         uOpacity: { value: opacity },
         uMaxRadius: { value: maxRadius },
         uRotationMultiplier: { value: rotationMultiplier },
+        uDifferentialStrength: { value: differentialStrength },
       },
       vertexShader: `
         uniform float uTime;
         uniform float uSize;
         uniform float uMaxRadius;
         uniform float uRotationMultiplier;
+        uniform float uDifferentialStrength;
         
         attribute vec3 color;
         varying vec3 vColor;
@@ -61,14 +69,15 @@ export const useDifferentialRotationMaterial = ({
           // Normalize distance (0 = center, 1 = edge)
           float normalizedDist = clamp(dist / uMaxRadius, 0.01, 1.0);
           
-          // Differential rotation: angular velocity decreases with distance
-          // Using a flat rotation curve model: v(r) ≈ constant, so ω(r) ∝ 1/r
-          // But we blend with sqrt for a more realistic curve
-          // Inner regions rotate faster, outer regions rotate slower
-          float angularVelocity = uRotationMultiplier / (0.3 + normalizedDist * 0.7);
-          
-          // Calculate rotation angle based on time and angular velocity
-          float angle = uTime * angularVelocity;
+          // Differential rotation: inner stars rotate faster than outer stars.
+          float differentialOmega = uRotationMultiplier / (0.3 + normalizedDist * 0.7);
+
+          // Rigid rotation: preserves the initial spiral-arm geometry.
+          float rigidOmega = uRotationMultiplier;
+
+          // Blend between rigid and differential rotation to avoid arm "shearing".
+          float omega = mix(rigidOmega, differentialOmega, clamp(uDifferentialStrength, 0.0, 1.0));
+          float angle = uTime * omega;
           
           // Rotate position around Y axis
           float cosA = cos(angle);
@@ -99,7 +108,7 @@ export const useDifferentialRotationMaterial = ({
         }
       `,
     });
-  }, [size, map, opacity, maxRadius, rotationMultiplier]);
+  }, [size, map, opacity, maxRadius, rotationMultiplier, differentialStrength]);
 
   // Update time uniform each frame
   useFrame((_, delta) => {
@@ -123,6 +132,7 @@ export const DifferentialRotationPoints = ({
   opacity = 1,
   maxRadius,
   rotationMultiplier = 1,
+  differentialStrength = 1,
   frustumCulled = false,
   renderOrder = 0,
 }: {
@@ -132,6 +142,7 @@ export const DifferentialRotationPoints = ({
   opacity?: number;
   maxRadius: number;
   rotationMultiplier?: number;
+  differentialStrength?: number;
   frustumCulled?: boolean;
   renderOrder?: number;
 }) => {
@@ -141,6 +152,7 @@ export const DifferentialRotationPoints = ({
     opacity,
     maxRadius,
     rotationMultiplier,
+    differentialStrength,
   });
 
   return (

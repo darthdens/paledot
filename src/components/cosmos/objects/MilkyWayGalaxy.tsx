@@ -516,6 +516,7 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
           opacity={0.95}
           maxRadius={MILKY_WAY.bulgeRadius * gs}
           rotationMultiplier={1.5}
+          differentialStrength={0.12}
         />
 
         {/* Main stars - spiral structure */}
@@ -527,6 +528,7 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
           opacity={0.9}
           maxRadius={diskR}
           rotationMultiplier={1}
+          differentialStrength={0.08}
         />
 
         {/* Volume stars - add height so it feels "full" */}
@@ -538,6 +540,7 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
           opacity={0.45}
           maxRadius={diskR}
           rotationMultiplier={1}
+          differentialStrength={0.08}
         />
 
         {/* Halo stars - scattered above/below the disk */}
@@ -549,6 +552,7 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
           opacity={0.35}
           maxRadius={diskR * 1.2}
           rotationMultiplier={0.8}
+          differentialStrength={0.06}
         />
 
         {/* Center glow (billboard) - does not rotate with stars */}
