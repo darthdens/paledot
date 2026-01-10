@@ -362,6 +362,40 @@ export const tourStops: TourStop[] = [
     scaleLevel: 'localGroup',
   },
   {
+    id: 'whirlpool',
+    locationId: 'whirlpool',
+    title: {
+      en: 'Whirlpool Galaxy (M51)',
+      fr: 'La Galaxie du Tourbillon (M51)',
+    },
+    narration: {
+      en: 'The Whirlpool Galaxy, 23 million light-years away, was the first galaxy where spiral structure was observed in 1845. Its dramatic arms are being pulled by gravitational interaction with its smaller companion galaxy NGC 5195, creating one of the most photogenic pairs in the cosmos.',
+      fr: 'La Galaxie du Tourbillon, à 23 millions d\'années-lumière, fut la première galaxie où la structure spirale fut observée en 1845. Ses bras spectaculaires sont étirés par l\'interaction gravitationnelle avec sa petite compagne NGC 5195, créant l\'une des paires les plus photogéniques du cosmos.',
+    },
+    duration: 10,
+    // Position camera to see Whirlpool nicely
+    cameraPosition: [80000 * UNITS.KM_PER_LY, 50000 * UNITS.KM_PER_LY, 180000 * UNITS.KM_PER_LY],
+    lookAt: [0, 0, 0],
+    scaleLevel: 'localGroup',
+  },
+  {
+    id: 'sombrero',
+    locationId: 'sombrero',
+    title: {
+      en: 'Sombrero Galaxy (M104)',
+      fr: 'La Galaxie du Sombrero (M104)',
+    },
+    narration: {
+      en: 'The Sombrero Galaxy, at 29 million light-years, is famous for its distinctive hat-like appearance. Its bright nucleus, unusually large central bulge, and dark dust lane create one of the most iconic galaxy silhouettes. It contains around 100 billion stars and possibly a supermassive black hole at its center.',
+      fr: 'La Galaxie du Sombrero, à 29 millions d\'années-lumière, est célèbre pour son apparence distinctive de chapeau mexicain. Son noyau brillant, son bulbe central exceptionnellement grand et sa bande de poussière sombre créent l\'une des silhouettes de galaxie les plus emblématiques. Elle contient environ 100 milliards d\'étoiles et possiblement un trou noir supermassif en son centre.',
+    },
+    duration: 10,
+    // Position camera to see Sombrero from a slight angle to appreciate the edge-on view
+    cameraPosition: [100000 * UNITS.KM_PER_LY, 40000 * UNITS.KM_PER_LY, 200000 * UNITS.KM_PER_LY],
+    lookAt: [0, 0, 0],
+    scaleLevel: 'localGroup',
+  },
+  {
     id: 'conclusion',
     locationId: 'earth',
     title: {
