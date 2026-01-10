@@ -29,12 +29,13 @@ const WHIRLPOOL = {
 };
 
 // Companion galaxy NGC 5195 parameters - positioned at the end of one spiral arm
+// In the reference image, it's at roughly "2 o'clock" position from center
 const NGC5195 = {
-  radius: 10000, // Smaller irregular companion
-  // Position directly at the northern arm tip
-  offsetX: 38000,
-  offsetY: 4000,
-  offsetZ: 8000,
+  radius: 12000, // Slightly larger companion
+  // Position at the end of the right/upper arm tip (like in the Hubble image)
+  offsetX: 42000,  // To the right
+  offsetY: 3000,   // Slightly above
+  offsetZ: -5000,  // Slight offset toward viewer
 };
 
 // Whirlpool glow texture: warm cream core → pink HII → blue outer
