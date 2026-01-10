@@ -13,12 +13,12 @@ interface TriangulumGalaxyProps {
 // Triangulum Galaxy (M33) parameters - based on real astronomical data
 // Distance: 2.73 million light-years from Milky Way
 // Diameter: ~60,000 light-years (about half the size of Milky Way)
-// Distinctive features: blue-purple core, TWO loose spiral arms, yellow-green outer regions, pink HII regions
+// Distinctive features (visual): blue-purple core, FOUR arms with ~one spiral turn, yellow-green outer regions, pink HII regions
 const TRIANGULUM = {
-  diskRadius: 30000, // Half of 60,000 ly diameter - HALF of Milky Way
+  diskRadius: 30000, // Half of 60,000 ly diameter (do not change size)
   bulgeRadius: 4000, // Smaller bulge than Andromeda
-  branches: 2, // TWO spiral arms as seen in reference image
-  spinTurns: 1.4, // Loose, flowing spiral
+  branches: 4, // Four main arms
+  spinTurns: 0.95, // ~one spiral wrap from center to edge
   inclination: (55 * Math.PI) / 180, // ~55° inclination
   distanceFromMilkyWay: 2.73e6, // 2.73 million light-years
 };
@@ -136,19 +136,21 @@ export const TriangulumGalaxy = ({ visualScale }: TriangulumGalaxyProps) => {
       const branchAngle = (branchIndex / branches) * Math.PI * 2;
       const spinAngle = rt * spinTurns * Math.PI * 2;
 
-      // Loose, flowing arms matching reference image
-      const armWidth = 0.06 + rt * 0.12;
+      // Keep arms crisp (avoid "too many spirals" look)
+      // This jitter is in ANGLE space, so keep it small.
+      const armWidth = 0.03 + rt * 0.05;
       const armJitter = (Math.random() + Math.random() + Math.random() - 1.5) * armWidth;
 
-      // Some inter-arm fill but keep arms visible
-      const isInterArm = Math.random() < 0.3;
-      const interArmJitter = isInterArm ? (Math.random() - 0.5) * (0.5 + rt * 0.4) : 0;
+      // Minimal inter-arm fill so the four arms read clearly
+      const isInterArm = Math.random() < 0.12;
+      const interArmJitter = isInterArm ? (Math.random() - 0.5) * (0.18 + rt * 0.12) : 0;
 
       const angle = branchAngle + spinAngle + armJitter + interArmJitter;
 
       const radialSpread = (0.04 + rt * 0.08) * maxRadius;
       const radialJitter = (Math.random() + Math.random() - 1) * radialSpread;
-      const finalRadius = radius + radialJitter;
+      // Prevent stars from spilling past the intended disk size (keeps perceived size consistent)
+      const finalRadius = THREE.MathUtils.clamp(radius + radialJitter, innerRadius, maxRadius);
 
       positions[i3] = Math.cos(angle) * finalRadius;
 
