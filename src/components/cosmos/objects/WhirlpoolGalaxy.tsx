@@ -23,7 +23,7 @@ const WHIRLPOOL = {
   diskRadius: 38000, // Half of 76,000 ly diameter
   bulgeRadius: 5000, // Prominent central bulge
   branches: 2, // Two beautifully defined spiral arms
-  spinTurns: 1.1, // Slightly more than one turn for proper spiral shape
+  spinTurns: 1.4, // Total spiral turns (logarithmic, so tighter at base)
   inclination: (20 * Math.PI) / 180, // ~20° inclination (nearly face-on)
   distanceFromMilkyWay: 23e6, // 23 million light-years
 };
@@ -173,15 +173,18 @@ export const WhirlpoolGalaxy = ({ visualScale }: WhirlpoolGalaxyProps) => {
 
       const branchIndex = Math.floor(Math.random() * branches);
       const branchAngle = (branchIndex / branches) * Math.PI * 2;
-      const spinAngle = rt * spinTurns * Math.PI * 2;
+      // Logarithmic spiral - tighter at base, opens up gradually
+      // This creates the tight winding near the core that opens outward
+      const logSpiral = Math.log(1 + rt * 3) / Math.log(4); // Logarithmic scaling
+      const spinAngle = logSpiral * spinTurns * Math.PI * 2;
 
-      // Tighter arms - less space between them
-      const armWidth = 0.12 + rt * 0.1;
+      // Arms very tight near core, widen slightly outward
+      const armWidth = 0.04 + rt * 0.12;
       const armJitter = (Math.random() + Math.random() + Math.random() - 1.5) * armWidth;
 
-      // Moderate inter-arm stars, but keeping spiral definition
-      const isInterArm = Math.random() < 0.4;
-      const interArmJitter = isInterArm ? (Math.random() - 0.5) * (0.4 + rt * 0.3) : 0;
+      // Moderate inter-arm stars
+      const isInterArm = Math.random() < 0.35;
+      const interArmJitter = isInterArm ? (Math.random() - 0.5) * (0.25 + rt * 0.35) : 0;
 
       const angle = branchAngle + spinAngle + armJitter + interArmJitter;
 
@@ -391,17 +394,20 @@ export const WhirlpoolGalaxy = ({ visualScale }: WhirlpoolGalaxyProps) => {
       const i3 = i * 3;
 
       // Distribute along the inner/trailing edge of spiral arms
-      const t = 0.15 + Math.pow(Math.random(), 0.7) * 0.7;
+      const t = 0.12 + Math.pow(Math.random(), 0.7) * 0.75;
       const radius = t * maxRadius;
       const rt = radius / maxRadius;
 
       const branchIndex = Math.floor(Math.random() * branches);
       // Offset to the trailing edge of each arm (where dust lanes appear)
-      const branchAngle = (branchIndex / branches) * Math.PI * 2 - 0.12;
-      const spinAngle = rt * spinTurns * Math.PI * 2;
+      const branchAngle = (branchIndex / branches) * Math.PI * 2 - 0.1;
+      
+      // Use same logarithmic spiral as stars
+      const logSpiral = Math.log(1 + rt * 3) / Math.log(4);
+      const spinAngle = logSpiral * spinTurns * Math.PI * 2;
 
       // Very tight lane along arm edge
-      const laneWidth = 0.03 + rt * 0.04;
+      const laneWidth = 0.025 + rt * 0.04;
       const laneJitter = (Math.random() + Math.random() - 1) * laneWidth;
 
       const angle = branchAngle + spinAngle + laneJitter;
@@ -583,20 +589,18 @@ export const WhirlpoolGalaxy = ({ visualScale }: WhirlpoolGalaxyProps) => {
           renderOrder={2}
         />
 
-        {/* Dust lanes between arms */}
-        <points frustumCulled={false} renderOrder={0}>
-          <bufferGeometry attach="geometry" {...dustLanesGeo} />
-          <pointsMaterial
-            size={gs * 80}
-            map={dotTexture}
-            vertexColors
-            transparent
-            opacity={0.9}
-            blending={THREE.NormalBlending}
-            depthWrite={false}
-            sizeAttenuation
-          />
-        </points>
+        {/* Dust lanes between arms - using DifferentialRotationPoints to rotate with galaxy */}
+        <DifferentialRotationPoints
+          key="whirlpool-dust"
+          geometry={dustLanesGeo}
+          size={gs * 75}
+          map={dotTexture}
+          opacity={0.85}
+          maxRadius={diskR}
+          rotationMultiplier={1}
+          differentialStrength={0.06}
+          renderOrder={0}
+        />
 
         {/* Core bulge */}
         <DifferentialRotationPoints
