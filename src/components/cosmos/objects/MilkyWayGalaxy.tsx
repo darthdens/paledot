@@ -569,6 +569,32 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
           />
         </sprite>
 
+        {/* Inner core glow - bright center boost */}
+        <sprite renderOrder={11} frustumCulled={false} scale={[diskR * 0.6, diskR * 0.6, 1]}>
+          <spriteMaterial
+            map={glowTexture}
+            transparent
+            opacity={0.9}
+            blending={THREE.AdditiveBlending}
+            depthWrite={false}
+            depthTest={false}
+            toneMapped={false}
+          />
+        </sprite>
+
+        {/* Hot center core - intense glow */}
+        <sprite renderOrder={12} frustumCulled={false} scale={[diskR * 0.25, diskR * 0.25, 1]}>
+          <spriteMaterial
+            map={glowTexture}
+            transparent
+            opacity={1}
+            blending={THREE.AdditiveBlending}
+            depthWrite={false}
+            depthTest={false}
+            toneMapped={false}
+          />
+        </sprite>
+
         {/* Invisible click target for the galaxy (visible at local group scale) */}
         <mesh 
           onClick={handleMilkyWayClick}
