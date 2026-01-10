@@ -24,6 +24,7 @@ import titanTexture from '@/assets/textures/titan.jpg';
 import enceladusTexture from '@/assets/textures/enceladus.jpg';
 import phobosTexture from '@/assets/textures/phobos.jpg';
 import deimosTexture from '@/assets/textures/deimos.jpg';
+import tritonTexture from '@/assets/textures/triton.jpg';
 
 interface TexturedPlanetProps {
   object: CelestialObject;
@@ -406,15 +407,16 @@ export const TexturedPlanet = ({
   const enceladusMap = useLoader(THREE.TextureLoader, enceladusTexture);
   const phobosMap = useLoader(THREE.TextureLoader, phobosTexture);
   const deimosMap = useLoader(THREE.TextureLoader, deimosTexture);
+  const tritonMap = useLoader(THREE.TextureLoader, tritonTexture);
   
   // Configure texture properties for proper spherical mapping
   useMemo(() => {
-    [earthDayMap, earthNightMap, earthCloudsMap, moonMap, mercuryMap, venusMap, marsMap, jupiterMap, saturnMap, uranusMap, neptuneMap, plutoMap, ceresMap, titanMap, enceladusMap, phobosMap, deimosMap].forEach(tex => {
+    [earthDayMap, earthNightMap, earthCloudsMap, moonMap, mercuryMap, venusMap, marsMap, jupiterMap, saturnMap, uranusMap, neptuneMap, plutoMap, ceresMap, titanMap, enceladusMap, phobosMap, deimosMap, tritonMap].forEach(tex => {
       tex.wrapS = THREE.RepeatWrapping;
       tex.wrapT = THREE.ClampToEdgeWrapping;
       tex.colorSpace = THREE.SRGBColorSpace;
     });
-  }, [earthDayMap, earthNightMap, earthCloudsMap, moonMap, mercuryMap, venusMap, marsMap, jupiterMap, saturnMap, uranusMap, neptuneMap, plutoMap, ceresMap, titanMap, enceladusMap, phobosMap, deimosMap]);
+  }, [earthDayMap, earthNightMap, earthCloudsMap, moonMap, mercuryMap, venusMap, marsMap, jupiterMap, saturnMap, uranusMap, neptuneMap, plutoMap, ceresMap, titanMap, enceladusMap, phobosMap, deimosMap, tritonMap]);
   
   const visuals = PLANET_VISUALS[object.id] || {
     baseColor: object.color,
@@ -721,6 +723,7 @@ export const TexturedPlanet = ({
                 enceladusMap: { value: enceladusMap },
                 phobosMap: { value: phobosMap },
                 deimosMap: { value: deimosMap },
+                tritonMap: { value: tritonMap },
               }}
               vertexShader={`
                 varying vec3 vNormal;
@@ -779,6 +782,7 @@ export const TexturedPlanet = ({
                 uniform sampler2D enceladusMap;
                 uniform sampler2D phobosMap;
                 uniform sampler2D deimosMap;
+                uniform sampler2D tritonMap;
                 varying vec3 vNormal;
                 varying vec3 vPosition;
                 varying vec2 vUv;
@@ -1590,14 +1594,70 @@ export const TexturedPlanet = ({
                     surfaceColor = mix(secondaryColor, baseColor, hemisphere);
                     surfaceColor = mix(surfaceColor, tertiaryColor, surfaceNoise * 0.15);
                   }
-                  // === TRITON (18) - Pinkish with cantaloupe texture and dark streaks ===
+                  // === TRITON (18) - NASA texture with cantaloupe terrain and nitrogen geyser streaks ===
                   else if (surfaceType > 17.5 && surfaceType < 18.5) {
-                    // Cantaloupe terrain (dimpled appearance)
-                    float cantaloupe = sin(noiseCoord.x * 15.0) * sin(noiseCoord.y * 15.0) * 0.5 + 0.5;
-                    surfaceColor = mix(baseColor, secondaryColor, cantaloupe * 0.4 + surfaceNoise * 0.3);
-                    // Dark geyser streaks
-                    float streaks = smoothstep(0.7, 0.85, fineNoise) * 0.5;
-                    surfaceColor = mix(surfaceColor, tertiaryColor, streaks);
+                    // Sample base texture
+                    vec3 tritonColor = texture2D(tritonMap, vUv).rgb;
+                    
+                    // Procedural bump mapping for cantaloupe terrain
+                    float texelSize = 0.004;
+                    float heightC = dot(tritonColor, vec3(0.299, 0.587, 0.114));
+                    float heightL = dot(texture2D(tritonMap, vUv + vec2(-texelSize, 0.0)).rgb, vec3(0.299, 0.587, 0.114));
+                    float heightR = dot(texture2D(tritonMap, vUv + vec2(texelSize, 0.0)).rgb, vec3(0.299, 0.587, 0.114));
+                    float heightU = dot(texture2D(tritonMap, vUv + vec2(0.0, texelSize)).rgb, vec3(0.299, 0.587, 0.114));
+                    float heightD = dot(texture2D(tritonMap, vUv + vec2(0.0, -texelSize)).rgb, vec3(0.299, 0.587, 0.114));
+                    
+                    float bumpStrength = 2.0;
+                    vec3 bumpNormal = normalize(vec3(
+                      (heightL - heightR) * bumpStrength,
+                      (heightD - heightU) * bumpStrength,
+                      1.0
+                    ));
+                    
+                    vec3 tangent = normalize(cross(worldNormal, vec3(0.0, 1.0, 0.0)));
+                    vec3 bitangent = normalize(cross(worldNormal, tangent));
+                    vec3 perturbedNormal = normalize(tangent * bumpNormal.x + bitangent * bumpNormal.y + worldNormal * bumpNormal.z);
+                    float bumpedNdotL = max(dot(perturbedNormal, sunDir), 0.0);
+                    
+                    // Cantaloupe terrain - distinctive dimpled/crisscross pattern unique to Triton
+                    float cantaloupe1 = sin(vUv.x * 80.0 + vUv.y * 40.0) * sin(vUv.y * 80.0 - vUv.x * 40.0);
+                    float cantaloupe2 = sin(vUv.x * 60.0 - vUv.y * 30.0) * sin(vUv.y * 60.0 + vUv.x * 30.0);
+                    float cantaloupePattern = (cantaloupe1 + cantaloupe2) * 0.5 * 0.15 + 0.85;
+                    
+                    // Apply cantaloupe pattern - gives wrinkled/dimpled appearance
+                    vec3 cantaloupeColor = vec3(0.85, 0.78, 0.68); // Tan/pinkish
+                    tritonColor = mix(tritonColor, cantaloupeColor, 0.4);
+                    tritonColor *= cantaloupePattern;
+                    
+                    // Nitrogen ice regions - bright white/pink areas
+                    float iceRegions = smoothstep(0.55, 0.7, surfaceNoise);
+                    vec3 nitrogenIce = vec3(0.95, 0.9, 0.88); // Pinkish-white nitrogen ice
+                    tritonColor = mix(tritonColor, nitrogenIce, iceRegions * 0.5);
+                    
+                    // South polar cap (nitrogen/methane ice - Triton's south faces the Sun)
+                    float southPole = smoothstep(0.25, 0.0, vUv.y);
+                    vec3 polarIce = vec3(0.92, 0.88, 0.85);
+                    tritonColor = mix(tritonColor, polarIce, southPole * 0.6);
+                    
+                    // Dark nitrogen geyser streaks - blown by winds from south pole geysers
+                    // These are the famous dark streaks from cryovolcanic activity
+                    float geyserAngle = vUv.x * 40.0 + vUv.y * 5.0;
+                    float geyser1 = smoothstep(0.48, 0.5, sin(geyserAngle)) * smoothstep(0.52, 0.5, sin(geyserAngle));
+                    float geyser2 = smoothstep(0.48, 0.5, sin(geyserAngle + 1.5)) * smoothstep(0.52, 0.5, sin(geyserAngle + 1.5));
+                    float geyser3 = smoothstep(0.48, 0.5, sin(geyserAngle + 3.0)) * smoothstep(0.52, 0.5, sin(geyserAngle + 3.0));
+                    float geyserStreaks = max(max(geyser1, geyser2), geyser3);
+                    
+                    // Streaks emanate from south polar region and trail northward
+                    float streakFade = smoothstep(0.0, 0.4, vUv.y) * smoothstep(0.6, 0.3, vUv.y);
+                    vec3 darkStreak = vec3(0.2, 0.18, 0.15); // Dark carbonaceous material from geysers
+                    tritonColor = mix(tritonColor, darkStreak, geyserStreaks * streakFade * 0.7);
+                    
+                    // Subtle pink/tan tint from tholins
+                    vec3 tholinTint = vec3(1.0, 0.95, 0.9);
+                    tritonColor *= tholinTint;
+                    
+                    surfaceColor = tritonColor;
+                    NdotL = mix(NdotL, bumpedNdotL, 0.6);
                   }
                   // === PLUTO (19) - NASA texture with Sputnik Planitia heart ===
                   else if (surfaceType > 18.5 && surfaceType < 19.5) {
