@@ -7,6 +7,7 @@ import { ProximaSystem } from './objects/ProximaSystem';
 import { MilkyWayGalaxy } from './objects/MilkyWayGalaxy';
 import { AndromedaGalaxy } from './objects/AndromedaGalaxy';
 import { TriangulumGalaxy } from './objects/TriangulumGalaxy';
+import { WhirlpoolGalaxy } from './objects/WhirlpoolGalaxy';
 import { GalaxySkyGlow } from './objects/GalaxySkyGlow';
 import { GalaxyRotator } from './objects/GalaxyRotator';
 import { GalaxyFadeWrapper } from './GalaxyFadeWrapper';
@@ -191,6 +192,7 @@ export const CosmosExplorer = () => {
             <>
               <AndromedaGalaxy visualScale={UNIFIED_SCALE} />
               <TriangulumGalaxy visualScale={UNIFIED_SCALE} />
+              <WhirlpoolGalaxy visualScale={UNIFIED_SCALE} />
             </>
           )}
           

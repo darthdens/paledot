@@ -805,7 +805,7 @@ export const celestialObjects: CelestialObject[] = [
   },
   {
     id: 'whirlpool',
-    name: { en: 'Whirlpool Galaxy', fr: 'Galaxie du Tourbillon' },
+    name: { en: 'Whirlpool Galaxy (M51)', fr: 'Galaxie du Tourbillon (M51)' },
     type: 'galaxy',
     position: [23e6 * UNITS.KM_PER_LY, 5e6 * UNITS.KM_PER_LY, 10e6 * UNITS.KM_PER_LY],
     size: 76000 * UNITS.KM_PER_LY,
@@ -814,8 +814,8 @@ export const celestialObjects: CelestialObject[] = [
     distanceUnit: 'Mly',
     category: 'galaxies',
     facts: {
-      en: ['Classic spiral galaxy', 'Interacting with companion', 'First spiral identified'],
-      fr: ['Galaxie spirale classique', 'Interagit avec compagnon', 'Première spirale identifiée'],
+      en: ['Grand-design spiral at 23M ly with 2 iconic arms', 'First galaxy with spiral structure identified (1845)', 'Interacting with companion NGC 5195'],
+      fr: ['Spirale majestueuse à 23M al avec 2 bras iconiques', 'Première galaxie spirale identifiée (1845)', 'Interagit avec NGC 5195'],
     },
   },
   {
