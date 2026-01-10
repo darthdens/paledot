@@ -182,28 +182,37 @@ export const TriangulumGalaxy = ({ visualScale }: TriangulumGalaxyProps) => {
           color.setHSL(0.92 + Math.random() * 0.06, 0.8 + Math.random() * 0.15, 0.6 + Math.random() * 0.1);
         }
       } else if (rt < 0.6) {
-        // Middle region: mix of blue, pink HII regions, some yellow
-        if (rand < 0.45) {
+        // Middle region: mix of blue, pink HII regions, more yellow
+        if (rand < 0.3) {
           // Blue
           color.setHSL(0.58 + Math.random() * 0.08, 0.75 + Math.random() * 0.2, 0.5 + Math.random() * 0.15);
-        } else if (rand < 0.7) {
+        } else if (rand < 0.5) {
           // Pink/magenta HII
           color.setHSL(0.9 + Math.random() * 0.08, 0.85 + Math.random() * 0.1, 0.55 + Math.random() * 0.12);
-        } else if (rand < 0.85) {
+        } else if (rand < 0.65) {
           // Cyan
           color.setHSL(0.5 + Math.random() * 0.06, 0.8 + Math.random() * 0.15, 0.5 + Math.random() * 0.1);
+        } else if (rand < 0.85) {
+          // Yellow stars
+          color.setHSL(0.12 + Math.random() * 0.06, 0.85 + Math.random() * 0.1, 0.55 + Math.random() * 0.12);
         } else {
-          // Yellow-orange older stars
-          color.setHSL(0.1 + Math.random() * 0.06, 0.9 + Math.random() * 0.1, 0.55 + Math.random() * 0.1);
+          // Golden-orange older stars
+          color.setHSL(0.08 + Math.random() * 0.04, 0.9 + Math.random() * 0.1, 0.5 + Math.random() * 0.1);
         }
       } else {
-        // Outer region: blue, pink, some green tints
-        if (rand < 0.5) {
+        // Outer region: blue, pink, more yellow tones
+        if (rand < 0.35) {
           // Blue
           color.setHSL(0.58 + Math.random() * 0.1, 0.7 + Math.random() * 0.25, 0.45 + Math.random() * 0.15);
-        } else if (rand < 0.75) {
+        } else if (rand < 0.55) {
           // Pink HII
           color.setHSL(0.92 + Math.random() * 0.06, 0.75 + Math.random() * 0.2, 0.5 + Math.random() * 0.15);
+        } else if (rand < 0.75) {
+          // Yellow stars
+          color.setHSL(0.13 + Math.random() * 0.05, 0.8 + Math.random() * 0.15, 0.55 + Math.random() * 0.12);
+        } else if (rand < 0.9) {
+          // Golden-yellow
+          color.setHSL(0.1 + Math.random() * 0.04, 0.9 + Math.random() * 0.1, 0.5 + Math.random() * 0.1);
         } else {
           // Cyan-green
           color.setHSL(0.45 + Math.random() * 0.1, 0.6 + Math.random() * 0.2, 0.45 + Math.random() * 0.1);
