@@ -26,10 +26,13 @@ export const GalaxySkyGlow = () => {
 
   const { camera } = useThree();
   const isInStarSystem = useCosmosStore((s) => s.isInStarSystem);
+  const currentScale = useCosmosStore((s) => s.currentScale);
   const centerPos = useCosmosStore((s) => s.objectWorldPositions["milky-way-center"]);
 
-  // Target opacity: 0 when in star system, 1 when outside
-  const targetOpacity = isInStarSystem ? 0 : 1;
+  // Target opacity: 0 when in star system OR when zoomed out to local group/universe scale
+  // The glow should only be visible when we're in the Milky Way but outside a star system
+  const isZoomedOutTooFar = currentScale === 'localGroup' || currentScale === 'universe';
+  const targetOpacity = (isInStarSystem || isZoomedOutTooFar) ? 0 : 1;
 
   const material = useMemo(() => {
     return new THREE.ShaderMaterial({
