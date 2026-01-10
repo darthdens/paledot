@@ -791,8 +791,8 @@ export const celestialObjects: CelestialObject[] = [
     id: 'triangulum',
     name: { en: 'Triangulum', fr: 'Triangle' },
     type: 'galaxy',
-    // Position matches TriangulumGalaxy.tsx - forms triangle with Milky Way and Andromeda
-    position: [2.73e6 * UNITS.KM_PER_LY * 0.3, 2.73e6 * UNITS.KM_PER_LY * 0.05, 2.73e6 * UNITS.KM_PER_LY * 0.95],
+    // Position matches TriangulumGalaxy.tsx component
+    position: [-2.73e6 * UNITS.KM_PER_LY * 0.5, 2.73e6 * UNITS.KM_PER_LY * 0.1, 2.73e6 * UNITS.KM_PER_LY * 0.85],
     size: 60000 * UNITS.KM_PER_LY,
     color: '#7ecfff', // Blue with pink tints
     distanceFromEarth: 2.73,
