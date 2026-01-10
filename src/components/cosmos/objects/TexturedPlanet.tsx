@@ -11,6 +11,7 @@ import earthDayTexture from '@/assets/textures/earth-day.jpg';
 import earthNightTexture from '@/assets/textures/earth-night.jpg';
 import earthCloudsTexture from '@/assets/textures/earth-clouds.jpg';
 import moonTexture from '@/assets/textures/moon.jpg';
+import mercuryTexture from '@/assets/textures/mercury.jpg';
 
 interface TexturedPlanetProps {
   object: CelestialObject;
@@ -375,20 +376,21 @@ export const TexturedPlanet = ({
     return (planetSizes[object.parentId] || 0) * visualScale;
   }, [isMoon, object.parentId, visualScale]);
 
-  // Load NASA textures for Earth and Moon
+  // Load NASA textures for Earth, Moon, and Mercury
   const earthDayMap = useLoader(THREE.TextureLoader, earthDayTexture);
   const earthNightMap = useLoader(THREE.TextureLoader, earthNightTexture);
   const earthCloudsMap = useLoader(THREE.TextureLoader, earthCloudsTexture);
   const moonMap = useLoader(THREE.TextureLoader, moonTexture);
+  const mercuryMap = useLoader(THREE.TextureLoader, mercuryTexture);
   
   // Configure texture properties for proper spherical mapping
   useMemo(() => {
-    [earthDayMap, earthNightMap, earthCloudsMap, moonMap].forEach(tex => {
+    [earthDayMap, earthNightMap, earthCloudsMap, moonMap, mercuryMap].forEach(tex => {
       tex.wrapS = THREE.RepeatWrapping;
       tex.wrapT = THREE.ClampToEdgeWrapping;
       tex.colorSpace = THREE.SRGBColorSpace;
     });
-  }, [earthDayMap, earthNightMap, earthCloudsMap, moonMap]);
+  }, [earthDayMap, earthNightMap, earthCloudsMap, moonMap, mercuryMap]);
   
   const visuals = PLANET_VISUALS[object.id] || {
     baseColor: object.color,
@@ -680,6 +682,7 @@ export const TexturedPlanet = ({
                 earthDayMap: { value: earthDayMap },
                 earthNightMap: { value: earthNightMap },
                 moonMap: { value: moonMap },
+                mercuryMap: { value: mercuryMap },
               }}
               vertexShader={`
                 varying vec3 vNormal;
@@ -725,6 +728,7 @@ export const TexturedPlanet = ({
                 uniform sampler2D earthDayMap;
                 uniform sampler2D earthNightMap;
                 uniform sampler2D moonMap;
+                uniform sampler2D mercuryMap;
                 varying vec3 vNormal;
                 varying vec3 vPosition;
                 varying vec2 vUv;
@@ -900,14 +904,43 @@ export const TexturedPlanet = ({
                     float flare = smoothstep(0.85, 0.95, surfaceNoise) * 0.4;
                     surfaceColor += vec3(flare, flare * 0.5, 0.0);
                   }
-                  // === MERCURY (2) - Heavily cratered gray ===
+                  // === MERCURY (2) - NASA texture with enhanced craters ===
                   else if (surfaceType > 1.5 && surfaceType < 2.5) {
-                    float craters = 1.0 - smoothstep(0.5, 0.65, surfaceNoise) * 0.5;
-                    float smallCraters = 1.0 - smoothstep(0.55, 0.65, fineNoise) * 0.3;
-                    float highlands = smoothstep(0.6, 0.75, surfaceNoise);
-                    surfaceColor = mix(baseColor, secondaryColor, 0.3 + fineNoise * 0.2);
-                    surfaceColor = mix(surfaceColor, tertiaryColor, highlands * 0.4);
-                    surfaceColor *= craters * smallCraters;
+                    // Sample NASA Mercury texture
+                    vec3 mercuryColor = texture2D(mercuryMap, vUv).rgb;
+                    
+                    // Procedural bump mapping from texture for enhanced crater depth
+                    float texelSize = 0.002;
+                    float heightC = dot(mercuryColor, vec3(0.299, 0.587, 0.114));
+                    float heightL = dot(texture2D(mercuryMap, vUv + vec2(-texelSize, 0.0)).rgb, vec3(0.299, 0.587, 0.114));
+                    float heightR = dot(texture2D(mercuryMap, vUv + vec2(texelSize, 0.0)).rgb, vec3(0.299, 0.587, 0.114));
+                    float heightU = dot(texture2D(mercuryMap, vUv + vec2(0.0, texelSize)).rgb, vec3(0.299, 0.587, 0.114));
+                    float heightD = dot(texture2D(mercuryMap, vUv + vec2(0.0, -texelSize)).rgb, vec3(0.299, 0.587, 0.114));
+                    
+                    float bumpStrength = 2.0;
+                    vec3 bumpNormal = normalize(vec3(
+                      (heightL - heightR) * bumpStrength,
+                      (heightD - heightU) * bumpStrength,
+                      1.0
+                    ));
+                    
+                    // Apply bump to lighting
+                    vec3 tangent = normalize(cross(worldNormal, vec3(0.0, 1.0, 0.0)));
+                    vec3 bitangent = normalize(cross(worldNormal, tangent));
+                    vec3 perturbedNormal = normalize(
+                      tangent * bumpNormal.x + 
+                      bitangent * bumpNormal.y + 
+                      worldNormal * bumpNormal.z
+                    );
+                    
+                    // Recalculate lighting with bump
+                    float bumpedNdotL = max(dot(perturbedNormal, sunDir), 0.0);
+                    
+                    // Slightly enhance contrast for more defined craters
+                    mercuryColor = pow(mercuryColor, vec3(1.1));
+                    
+                    surfaceColor = mercuryColor;
+                    NdotL = mix(NdotL, bumpedNdotL, 0.7);
                   }
                   // === VENUS (3) - Swirling yellowish clouds ===
                   else if (surfaceType > 2.5 && surfaceType < 3.5) {
