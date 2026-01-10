@@ -14,19 +14,17 @@ interface TriangulumGalaxyProps {
 // Distance: 2.73 million light-years from Milky Way (slightly farther than Andromeda)
 // Diameter: ~60,000 light-years (about half the size of Milky Way)
 // Third-largest galaxy in the Local Group
-// Distinctive features: blue core, prominent pink HII regions, TWO clear spiral arms
-// Position: Forms a rough triangle with Milky Way and Andromeda
-// Real sky position: RA ~1h 33m, Dec ~30° (near Andromeda but offset)
+// Distinctive features: blue-purple core, FOUR spiral arms, yellow-green outer regions, pink HII regions
 const TRIANGULUM = {
   diskRadius: 30000, // Half of 60,000 ly diameter
   bulgeRadius: 4000, // Smaller, less prominent bulge than Andromeda
-  branches: 2, // Two main spiral arms (clearly visible)
-  spinTurns: 1.6, // More defined spiral than before
+  branches: 4, // FOUR spiral arms as seen in reference images
+  spinTurns: 1.8, // Well-defined spiral
   inclination: (55 * Math.PI) / 180, // ~55° inclination (more face-on than Andromeda)
   distanceFromMilkyWay: 2.73e6, // 2.73 million light-years
 };
 
-// Triangulum glow texture: white-blue center with pink/magenta tones for HII regions
+// Triangulum glow texture: blue-purple center → yellow-green outer (matching reference)
 const createTriangulumGlowTexture = () => {
   const size = 1024;
   const canvas = document.createElement('canvas');
@@ -36,17 +34,17 @@ const createTriangulumGlowTexture = () => {
 
   const gradient = ctx.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2);
 
-  // White-blue core → pink/magenta HII regions → blue outer haze
-  gradient.addColorStop(0, 'rgba(255, 255, 255, 0.95)');     // Bright white center
-  gradient.addColorStop(0.08, 'rgba(200, 220, 255, 0.85)');  // White-blue
-  gradient.addColorStop(0.15, 'rgba(150, 180, 255, 0.65)');  // Light blue
-  gradient.addColorStop(0.25, 'rgba(100, 150, 255, 0.45)');  // Blue
-  gradient.addColorStop(0.35, 'rgba(255, 150, 200, 0.35)');  // Pink (HII regions)
-  gradient.addColorStop(0.45, 'rgba(200, 120, 180, 0.28)');  // Pink-magenta
-  gradient.addColorStop(0.55, 'rgba(150, 100, 200, 0.2)');   // Purple-pink
-  gradient.addColorStop(0.7, 'rgba(80, 120, 200, 0.12)');    // Blue haze
-  gradient.addColorStop(0.85, 'rgba(60, 100, 180, 0.06)');   // Fading blue
-  gradient.addColorStop(1, 'rgba(40, 80, 160, 0)');          // Transparent
+  // Blue-purple core → pink → yellow-green outer arms
+  gradient.addColorStop(0, 'rgba(200, 180, 255, 0.95)');     // Light purple-white center
+  gradient.addColorStop(0.08, 'rgba(150, 140, 255, 0.85)');  // Purple-blue
+  gradient.addColorStop(0.15, 'rgba(120, 140, 255, 0.7)');   // Blue-purple
+  gradient.addColorStop(0.25, 'rgba(100, 150, 255, 0.55)');  // Blue
+  gradient.addColorStop(0.35, 'rgba(255, 150, 180, 0.4)');   // Pink (HII regions)
+  gradient.addColorStop(0.45, 'rgba(200, 200, 100, 0.35)');  // Yellow-green transition
+  gradient.addColorStop(0.55, 'rgba(180, 200, 80, 0.28)');   // Yellow-green
+  gradient.addColorStop(0.7, 'rgba(150, 180, 60, 0.18)');    // Green-yellow
+  gradient.addColorStop(0.85, 'rgba(120, 160, 50, 0.08)');   // Fading green
+  gradient.addColorStop(1, 'rgba(100, 140, 40, 0)');         // Transparent
 
   ctx.fillStyle = gradient;
   ctx.fillRect(0, 0, size, size);
@@ -161,56 +159,62 @@ export const TriangulumGalaxy = ({ visualScale }: TriangulumGalaxyProps) => {
 
       positions[i3 + 2] = Math.sin(angle) * finalRadius;
 
-      // Triangulum colors: blue young stars, pink HII regions, white-blue core
+      // Triangulum colors: blue-purple core, yellow-green outer arms, pink HII regions throughout
       const rand = Math.random();
 
       if (rt < 0.15) {
-        // Core: white-blue
-        if (rand < 0.7) {
-          // White-blue
-          color.setHSL(0.6 + Math.random() * 0.05, 0.3 + Math.random() * 0.2, 0.85 + Math.random() * 0.1);
-        } else {
+        // Core: blue-purple (matching reference image)
+        if (rand < 0.5) {
+          // Blue-purple
+          color.setHSL(0.7 + Math.random() * 0.1, 0.5 + Math.random() * 0.3, 0.7 + Math.random() * 0.15);
+        } else if (rand < 0.8) {
           // Light blue
-          color.setHSL(0.58 + Math.random() * 0.08, 0.5 + Math.random() * 0.2, 0.7 + Math.random() * 0.15);
+          color.setHSL(0.58 + Math.random() * 0.08, 0.5 + Math.random() * 0.25, 0.75 + Math.random() * 0.12);
+        } else {
+          // White
+          color.setHSL(0.6 + Math.random() * 0.1, 0.15 + Math.random() * 0.15, 0.88 + Math.random() * 0.08);
         }
       } else if (rt < 0.35) {
-        // Inner region: blue stars with some pink
-        if (rand < 0.6) {
-          // Blue
-          color.setHSL(0.58 + Math.random() * 0.08, 0.7 + Math.random() * 0.2, 0.55 + Math.random() * 0.15);
-        } else if (rand < 0.85) {
-          // Cyan
-          color.setHSL(0.52 + Math.random() * 0.06, 0.8 + Math.random() * 0.15, 0.5 + Math.random() * 0.12);
-        } else {
-          // Pink HII region
-          color.setHSL(0.92 + Math.random() * 0.06, 0.8 + Math.random() * 0.15, 0.6 + Math.random() * 0.1);
-        }
-      } else if (rt < 0.6) {
-        // Middle region: mix of blue, pink HII regions, some yellow
-        if (rand < 0.45) {
-          // Blue
-          color.setHSL(0.58 + Math.random() * 0.08, 0.75 + Math.random() * 0.2, 0.5 + Math.random() * 0.15);
-        } else if (rand < 0.7) {
-          // Pink/magenta HII
-          color.setHSL(0.9 + Math.random() * 0.08, 0.85 + Math.random() * 0.1, 0.55 + Math.random() * 0.12);
-        } else if (rand < 0.85) {
-          // Cyan
-          color.setHSL(0.5 + Math.random() * 0.06, 0.8 + Math.random() * 0.15, 0.5 + Math.random() * 0.1);
-        } else {
-          // Yellow-orange older stars
-          color.setHSL(0.1 + Math.random() * 0.06, 0.9 + Math.random() * 0.1, 0.55 + Math.random() * 0.1);
-        }
-      } else {
-        // Outer region: blue, pink, some green tints
+        // Inner region: blue with pink HII regions
         if (rand < 0.5) {
           // Blue
-          color.setHSL(0.58 + Math.random() * 0.1, 0.7 + Math.random() * 0.25, 0.45 + Math.random() * 0.15);
+          color.setHSL(0.58 + Math.random() * 0.1, 0.7 + Math.random() * 0.2, 0.5 + Math.random() * 0.15);
         } else if (rand < 0.75) {
-          // Pink HII
-          color.setHSL(0.92 + Math.random() * 0.06, 0.75 + Math.random() * 0.2, 0.5 + Math.random() * 0.15);
+          // Purple-blue
+          color.setHSL(0.68 + Math.random() * 0.08, 0.6 + Math.random() * 0.2, 0.5 + Math.random() * 0.12);
         } else {
-          // Cyan-green
-          color.setHSL(0.45 + Math.random() * 0.1, 0.6 + Math.random() * 0.2, 0.45 + Math.random() * 0.1);
+          // Pink HII region
+          color.setHSL(0.92 + Math.random() * 0.06, 0.85 + Math.random() * 0.1, 0.55 + Math.random() * 0.1);
+        }
+      } else if (rt < 0.6) {
+        // Middle region: transition - blue, yellow-green, pink
+        if (rand < 0.35) {
+          // Blue
+          color.setHSL(0.55 + Math.random() * 0.1, 0.65 + Math.random() * 0.2, 0.45 + Math.random() * 0.15);
+        } else if (rand < 0.55) {
+          // Yellow-green (prominent in reference)
+          color.setHSL(0.18 + Math.random() * 0.08, 0.85 + Math.random() * 0.1, 0.5 + Math.random() * 0.12);
+        } else if (rand < 0.75) {
+          // Pink/magenta HII
+          color.setHSL(0.92 + Math.random() * 0.06, 0.8 + Math.random() * 0.15, 0.55 + Math.random() * 0.1);
+        } else {
+          // Orange-yellow
+          color.setHSL(0.1 + Math.random() * 0.06, 0.9 + Math.random() * 0.1, 0.52 + Math.random() * 0.1);
+        }
+      } else {
+        // Outer region: predominantly yellow-green with pink HII
+        if (rand < 0.45) {
+          // Yellow-green (very prominent in outer arms)
+          color.setHSL(0.2 + Math.random() * 0.1, 0.8 + Math.random() * 0.15, 0.5 + Math.random() * 0.12);
+        } else if (rand < 0.7) {
+          // Yellow-orange
+          color.setHSL(0.12 + Math.random() * 0.08, 0.85 + Math.random() * 0.1, 0.52 + Math.random() * 0.1);
+        } else if (rand < 0.85) {
+          // Pink HII
+          color.setHSL(0.92 + Math.random() * 0.06, 0.75 + Math.random() * 0.2, 0.5 + Math.random() * 0.12);
+        } else {
+          // Green tint
+          color.setHSL(0.28 + Math.random() * 0.08, 0.6 + Math.random() * 0.2, 0.45 + Math.random() * 0.1);
         }
       }
 
