@@ -42,6 +42,9 @@ import phobosTexture from '@/assets/textures/phobos.jpg';
 import deimosTexture from '@/assets/textures/deimos.jpg';
 import tritonTexture from '@/assets/textures/triton.jpg';
 import iapetusTexture from '@/assets/textures/iapetus.jpg';
+import ioTexture from '@/assets/textures/io.jpg';
+import ganymedeTexture from '@/assets/textures/ganymede.jpg';
+import callistoTexture from '@/assets/textures/callisto.jpg';
 
 interface TexturedPlanetProps {
   object: CelestialObject;
@@ -271,13 +274,6 @@ const PLANET_VISUALS: Record<string, {
     metalness: 0.1,
     surfaceDetail: 'ceres',
   },
-  mimas: {
-    baseColor: '#E0E0E0',
-    secondaryColor: '#A0A0A0',
-    roughness: 0.75,
-    metalness: 0.15,
-    surfaceDetail: 'icy',
-  },
   enceladus: {
     baseColor: '#FFFFFF',        // Brightest object - pure white ice
     secondaryColor: '#E8E8F0',
@@ -286,27 +282,6 @@ const PLANET_VISUALS: Record<string, {
     metalness: 0.25,
     surfaceDetail: 'enceladus',
   },
-  tethys: {
-    baseColor: '#D8D8D8',
-    secondaryColor: '#A8A8A8',
-    roughness: 0.65,
-    metalness: 0.15,
-    surfaceDetail: 'icy',
-  },
-  dione: {
-    baseColor: '#C8C8C8',
-    secondaryColor: '#888888',
-    roughness: 0.7,
-    metalness: 0.1,
-    surfaceDetail: 'icy',
-  },
-  rhea: {
-    baseColor: '#D0D0D0',
-    secondaryColor: '#909090',
-    roughness: 0.8,
-    metalness: 0.1,
-    surfaceDetail: 'icy',
-  },
   iapetus: {
     baseColor: '#FFFFFF',        // Bright trailing hemisphere
     secondaryColor: '#201008',   // Very dark leading hemisphere
@@ -314,41 +289,6 @@ const PLANET_VISUALS: Record<string, {
     roughness: 0.85,
     metalness: 0.05,
     surfaceDetail: 'iapetus',
-  },
-  miranda: {
-    baseColor: '#B8B8B8',
-    secondaryColor: '#686868',
-    roughness: 0.8,
-    metalness: 0.1,
-    surfaceDetail: 'icy',
-  },
-  ariel: {
-    baseColor: '#C8C8C8',
-    secondaryColor: '#989898',
-    roughness: 0.55,
-    metalness: 0.15,
-    surfaceDetail: 'icy',
-  },
-  umbriel: {
-    baseColor: '#484848',        // Very dark
-    secondaryColor: '#282828',
-    roughness: 0.9,
-    metalness: 0.05,
-    surfaceDetail: 'rocky',
-  },
-  titania: {
-    baseColor: '#A8A8A8',
-    secondaryColor: '#787878',
-    roughness: 0.75,
-    metalness: 0.1,
-    surfaceDetail: 'icy',
-  },
-  oberon: {
-    baseColor: '#908888',        // Gray with red tint
-    secondaryColor: '#605858',
-    roughness: 0.8,
-    metalness: 0.1,
-    surfaceDetail: 'icy',
   },
   triton: {
     baseColor: '#FFE4C4',        // Pinkish-tan nitrogen ice
@@ -432,6 +372,9 @@ export const TexturedPlanet = ({
   const deimosMap = useLoader(THREE.TextureLoader, isMobile ? moonTexture : deimosTexture);
   const tritonMap = useLoader(THREE.TextureLoader, isMobile ? moonTexture : tritonTexture);
   const iapetusMap = useLoader(THREE.TextureLoader, isMobile ? moonTexture : iapetusTexture);
+  const ioMap = useLoader(THREE.TextureLoader, isMobile ? moonTexture : ioTexture);
+  const ganymedeMap = useLoader(THREE.TextureLoader, isMobile ? moonTexture : ganymedeTexture);
+  const callistoMap = useLoader(THREE.TextureLoader, isMobile ? moonTexture : callistoTexture);
   
   // Configure texture properties for proper spherical mapping
   useMemo(() => {
@@ -442,13 +385,13 @@ export const TexturedPlanet = ({
     });
     // Only configure secondary textures on desktop
     if (!isMobile) {
-      [ceresMap, enceladusMap, phobosMap, deimosMap, tritonMap, iapetusMap].forEach(tex => {
+      [ceresMap, enceladusMap, phobosMap, deimosMap, tritonMap, iapetusMap, ioMap, ganymedeMap, callistoMap].forEach(tex => {
         tex.wrapS = THREE.RepeatWrapping;
         tex.wrapT = THREE.ClampToEdgeWrapping;
         tex.colorSpace = THREE.SRGBColorSpace;
       });
     }
-  }, [earthDayMap, earthNightMap, earthCloudsMap, moonMap, mercuryMap, venusMap, marsMap, jupiterMap, saturnMap, uranusMap, neptuneMap, plutoMap, titanMap, europaMap, ceresMap, enceladusMap, phobosMap, deimosMap, tritonMap, iapetusMap, isMobile]);
+  }, [earthDayMap, earthNightMap, earthCloudsMap, moonMap, mercuryMap, venusMap, marsMap, jupiterMap, saturnMap, uranusMap, neptuneMap, plutoMap, titanMap, europaMap, ceresMap, enceladusMap, phobosMap, deimosMap, tritonMap, iapetusMap, ioMap, ganymedeMap, callistoMap, isMobile]);
 
   const visuals = PLANET_VISUALS[object.id] || {
     baseColor: object.color,
@@ -490,11 +433,14 @@ export const TexturedPlanet = ({
       deimos: { primary: isMobile ? null : deimosMap, secondary: null },
       triton: { primary: isMobile ? null : tritonMap, secondary: null },
       iapetus: { primary: isMobile ? null : iapetusMap, secondary: null },
+      io: { primary: isMobile ? null : ioMap, secondary: null },
+      ganymede: { primary: isMobile ? null : ganymedeMap, secondary: null },
+      callisto: { primary: isMobile ? null : callistoMap, secondary: null },
     };
     
     const result = textureMap[surfaceDetail];
     return result ? { ...result, useProcedural: false } : { primary: null, secondary: null, useProcedural: false };
-  }, [visuals?.surfaceDetail, earthDayMap, earthNightMap, moonMap, mercuryMap, venusMap, marsMap, jupiterMap, saturnMap, uranusMap, neptuneMap, plutoMap, titanMap, europaMap, ceresMap, enceladusMap, phobosMap, deimosMap, tritonMap, iapetusMap, isMobile]);
+  }, [visuals?.surfaceDetail, earthDayMap, earthNightMap, moonMap, mercuryMap, venusMap, marsMap, jupiterMap, saturnMap, uranusMap, neptuneMap, plutoMap, titanMap, europaMap, ceresMap, enceladusMap, phobosMap, deimosMap, tritonMap, iapetusMap, ioMap, ganymedeMap, callistoMap, isMobile]);
   
   // Create a placeholder texture for unused slots
   const placeholderTexture = useMemo(() => {
