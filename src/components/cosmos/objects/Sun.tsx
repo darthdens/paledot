@@ -361,9 +361,9 @@ export const Sun = ({ position = [0, 0, 0], visualScale = 80 }: SunProps) => {
         />
       </sprite>
 
-      {/* Point light from sun - balanced intensity */}
+      {/* Point light from sun - strong intensity */}
       <pointLight
-        intensity={5}
+        intensity={12}
         distance={0}
         decay={1}
         color="#FFF8E7"

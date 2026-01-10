@@ -16,8 +16,8 @@ export const tourStops: TourStop[] = [
       fr: 'Bienvenue dans l\'Explorateur du Cosmos. Nous commençons notre voyage sur Terre, notre planète dans l\'immense univers. Embarquons pour un voyage incroyable d\'ici jusqu\'aux confins de l\'univers observable.',
     },
     duration: 8,
-    // Earth radius is 6371 km - increased distance for mobile visibility
-    cameraPosition: [0, 25000, 75000],
+    // Earth radius is 6371 km
+    cameraPosition: [0, 16000, 48000],
     lookAt: [0, 0, 0],
     scaleLevel: 'earth',
   },
@@ -406,8 +406,8 @@ export const tourStops: TourStop[] = [
       fr: 'Notre voyage à travers le cosmos touche à sa fin, de retour sur notre point bleu pâle. Dans l\'immensité de l\'espace, la Terre reste notre seule maison - une précieuse oasis de vie dans le désert cosmique.',
     },
     duration: 10,
-    // Same view as intro - increased distance for mobile
-    cameraPosition: [0, 25000, 75000],
+    // Same view as intro - Earth radius is 6371 km
+    cameraPosition: [0, 16000, 48000],
     lookAt: [0, 0, 0],
     scaleLevel: 'earth',
   },
