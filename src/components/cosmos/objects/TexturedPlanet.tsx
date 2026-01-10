@@ -15,6 +15,8 @@ import mercuryTexture from '@/assets/textures/mercury.jpg';
 import venusTexture from '@/assets/textures/venus.jpg';
 import marsTexture from '@/assets/textures/mars.jpg';
 import jupiterTexture from '@/assets/textures/jupiter.jpg';
+import phobosTexture from '@/assets/textures/phobos.jpg';
+import deimosTexture from '@/assets/textures/deimos.jpg';
 
 interface TexturedPlanetProps {
   object: CelestialObject;
@@ -44,7 +46,7 @@ const PLANET_VISUALS: Record<string, {
   tilt?: number;
   hasClouds?: boolean;
   cloudColor?: string;
-  surfaceDetail?: 'rocky' | 'gaseous' | 'icy' | 'volcanic' | 'sun' | 'mercury' | 'venus' | 'earth' | 'moon' | 'mars' | 'jupiter' | 'saturn' | 'uranus' | 'neptune' | 'io' | 'europa' | 'ganymede' | 'callisto' | 'titan' | 'iapetus' | 'triton' | 'enceladus' | 'pluto' | 'ceres';
+  surfaceDetail?: 'rocky' | 'gaseous' | 'icy' | 'volcanic' | 'sun' | 'mercury' | 'venus' | 'earth' | 'moon' | 'mars' | 'jupiter' | 'saturn' | 'uranus' | 'neptune' | 'io' | 'europa' | 'ganymede' | 'callisto' | 'titan' | 'iapetus' | 'triton' | 'enceladus' | 'pluto' | 'ceres' | 'phobos' | 'deimos';
   uniqueFeature?: string;
 }> = {
   sun: {
@@ -227,14 +229,14 @@ const PLANET_VISUALS: Record<string, {
     secondaryColor: '#403830',
     roughness: 0.98,
     metalness: 0.05,
-    surfaceDetail: 'rocky',
+    surfaceDetail: 'phobos',
   },
   deimos: {
     baseColor: '#706860',
     secondaryColor: '#504840',
     roughness: 0.98,
     metalness: 0.05,
-    surfaceDetail: 'rocky',
+    surfaceDetail: 'deimos',
   },
   ceres: {
     baseColor: '#808080',
@@ -388,15 +390,17 @@ export const TexturedPlanet = ({
   const venusMap = useLoader(THREE.TextureLoader, venusTexture);
   const marsMap = useLoader(THREE.TextureLoader, marsTexture);
   const jupiterMap = useLoader(THREE.TextureLoader, jupiterTexture);
+  const phobosMap = useLoader(THREE.TextureLoader, phobosTexture);
+  const deimosMap = useLoader(THREE.TextureLoader, deimosTexture);
   
   // Configure texture properties for proper spherical mapping
   useMemo(() => {
-    [earthDayMap, earthNightMap, earthCloudsMap, moonMap, mercuryMap, venusMap, marsMap, jupiterMap].forEach(tex => {
+    [earthDayMap, earthNightMap, earthCloudsMap, moonMap, mercuryMap, venusMap, marsMap, jupiterMap, phobosMap, deimosMap].forEach(tex => {
       tex.wrapS = THREE.RepeatWrapping;
       tex.wrapT = THREE.ClampToEdgeWrapping;
       tex.colorSpace = THREE.SRGBColorSpace;
     });
-  }, [earthDayMap, earthNightMap, earthCloudsMap, moonMap, mercuryMap, venusMap, marsMap, jupiterMap]);
+  }, [earthDayMap, earthNightMap, earthCloudsMap, moonMap, mercuryMap, venusMap, marsMap, jupiterMap, phobosMap, deimosMap]);
   
   const visuals = PLANET_VISUALS[object.id] || {
     baseColor: object.color,
@@ -668,10 +672,12 @@ export const TexturedPlanet = ({
                   visuals.surfaceDetail === 'triton' ? 18.0 :
                   visuals.surfaceDetail === 'pluto' ? 19.0 :
                   visuals.surfaceDetail === 'ceres' ? 20.0 :
+                  visuals.surfaceDetail === 'phobos' ? 21.0 :
+                  visuals.surfaceDetail === 'deimos' ? 22.0 :
                   visuals.surfaceDetail === 'gaseous' ? 50.0 : 
                   visuals.surfaceDetail === 'icy' ? 51.0 : 
                   visuals.surfaceDetail === 'volcanic' ? 52.0 : 
-                  visuals.surfaceDetail === 'rocky' ? 53.0 : 0.0 
+                  visuals.surfaceDetail === 'rocky' ? 53.0 : 0.0
                 },
                 planetSeed: { value: object.id.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) * 0.1 },
                 objectCenter: { value: new THREE.Vector3(0, 0, 0) },
@@ -692,6 +698,8 @@ export const TexturedPlanet = ({
                 venusMap: { value: venusMap },
                 marsMap: { value: marsMap },
                 jupiterMap: { value: jupiterMap },
+                phobosMap: { value: phobosMap },
+                deimosMap: { value: deimosMap },
               }}
               vertexShader={`
                 varying vec3 vNormal;
@@ -741,6 +749,8 @@ export const TexturedPlanet = ({
                 uniform sampler2D venusMap;
                 uniform sampler2D marsMap;
                 uniform sampler2D jupiterMap;
+                uniform sampler2D phobosMap;
+                uniform sampler2D deimosMap;
                 varying vec3 vNormal;
                 varying vec3 vPosition;
                 varying vec2 vUv;
@@ -1299,40 +1309,101 @@ export const TexturedPlanet = ({
                     float darkSpot = 1.0 - smoothstep(0.06, 0.1, length(vUv - darkSpotCenter));
                     surfaceColor = mix(surfaceColor, secondaryColor * 0.7, darkSpot * 0.6);
                   }
-                  // === IO (11) - Yellow sulfur with orange/red volcanic spots ===
+                  // === IO (11) - Enhanced volcanic moon with lava flows ===
                   else if (surfaceType > 10.5 && surfaceType < 11.5) {
-                    float sulfur = surfaceNoise;
-                    float volcanic = smoothstep(0.55, 0.75, fineNoise);
-                    float hotSpots = smoothstep(0.7, 0.85, fineNoise);
-                    surfaceColor = baseColor; // Yellow
-                    surfaceColor = mix(surfaceColor, secondaryColor, volcanic * 0.6); // Orange
-                    surfaceColor = mix(surfaceColor, tertiaryColor, hotSpots * 0.4); // Red
-                    surfaceColor += vec3(0.25, 0.08, 0.0) * hotSpots; // Glow
+                    // Multi-scale sulfur deposits
+                    float sulfurBase = surfaceNoise * 0.5 + fineNoise * 0.3 + microNoise * 0.2;
+                    
+                    // Volcanic calderas (dark spots)
+                    float calderas = smoothstep(0.65, 0.75, surfaceNoise);
+                    
+                    // Active lava flows (bright orange/red)
+                    float lavaFlows = smoothstep(0.72, 0.82, fineNoise);
+                    float hotSpots = smoothstep(0.78, 0.88, microNoise);
+                    
+                    // Plume deposits (white/light yellow rings)
+                    float plumeRing = smoothstep(0.6, 0.65, surfaceNoise) * smoothstep(0.75, 0.7, surfaceNoise);
+                    
+                    // Base yellow sulfur with variations
+                    surfaceColor = vec3(0.95, 0.9, 0.3); // Bright sulfur yellow
+                    surfaceColor = mix(surfaceColor, vec3(0.85, 0.75, 0.2), sulfurBase); // Yellow-green variations
+                    surfaceColor = mix(surfaceColor, vec3(0.3, 0.2, 0.1), calderas * 0.7); // Dark calderas
+                    surfaceColor = mix(surfaceColor, vec3(1.0, 0.5, 0.1), lavaFlows * 0.8); // Orange lava
+                    surfaceColor = mix(surfaceColor, vec3(1.0, 0.2, 0.0), hotSpots * 0.6); // Red hot spots
+                    surfaceColor = mix(surfaceColor, vec3(1.0, 1.0, 0.9), plumeRing * 0.4); // Plume deposits
+                    
+                    // Volcanic glow on night side
+                    float nightSide = 1.0 - smoothstep(-0.1, 0.1, dot(worldNormal, sunDir));
+                    surfaceColor += vec3(0.4, 0.15, 0.0) * hotSpots * nightSide;
                   }
-                  // === EUROPA (12) - White ice with brown linear cracks ===
+                  // === EUROPA (12) - Enhanced ice shell with chaos terrain ===
                   else if (surfaceType > 11.5 && surfaceType < 12.5) {
-                    float crack1 = smoothstep(0.47, 0.53, sin(vUv.x * 60.0 + vUv.y * 20.0 + surfaceNoise * 3.0));
-                    float crack2 = smoothstep(0.47, 0.53, sin(vUv.y * 50.0 - vUv.x * 15.0 + fineNoise * 2.0));
-                    float crack3 = smoothstep(0.48, 0.52, sin(vUv.x * 35.0 - vUv.y * 40.0));
-                    float cracks = max(max(crack1, crack2), crack3 * 0.5) * 0.55;
-                    surfaceColor = baseColor; // White ice
-                    surfaceColor = mix(surfaceColor, secondaryColor, cracks); // Brown cracks
-                    surfaceColor = mix(surfaceColor, tertiaryColor, microNoise * 0.1);
+                    // Base ice with slight blue tint
+                    vec3 iceColor = vec3(0.95, 0.97, 1.0);
+                    
+                    // Complex crack network (lineae)
+                    float crack1 = smoothstep(0.48, 0.52, sin(vUv.x * 80.0 + vUv.y * 25.0 + surfaceNoise * 4.0));
+                    float crack2 = smoothstep(0.48, 0.52, sin(vUv.y * 70.0 - vUv.x * 20.0 + fineNoise * 3.0));
+                    float crack3 = smoothstep(0.49, 0.51, sin(vUv.x * 45.0 - vUv.y * 55.0 + microNoise * 2.0));
+                    float cracks = max(max(crack1, crack2), crack3) * 0.7;
+                    
+                    // Chaos terrain (jumbled ice blocks)
+                    float chaos = smoothstep(0.55, 0.7, surfaceNoise) * smoothstep(0.8, 0.65, surfaceNoise);
+                    
+                    // Reddish-brown material in cracks (salt/sulfur)
+                    vec3 crackColor = vec3(0.55, 0.35, 0.25);
+                    
+                    surfaceColor = iceColor;
+                    surfaceColor = mix(surfaceColor, crackColor, cracks);
+                    surfaceColor = mix(surfaceColor, vec3(0.7, 0.6, 0.5), chaos * 0.3);
+                    surfaceColor = mix(surfaceColor, vec3(0.9, 0.92, 0.95), microNoise * 0.15);
                   }
-                  // === GANYMEDE (13) - Mixed gray/brown with grooved terrain ===
+                  // === GANYMEDE (13) - Enhanced with dark/light terrain contrast ===
                   else if (surfaceType > 12.5 && surfaceType < 13.5) {
-                    float darkTerrain = smoothstep(0.4, 0.6, surfaceNoise);
-                    float grooves = sin(vUv.x * 80.0 + vUv.y * 30.0) * 0.5 + 0.5;
-                    surfaceColor = mix(secondaryColor, baseColor, darkTerrain);
-                    surfaceColor = mix(surfaceColor, tertiaryColor, grooves * darkTerrain * 0.3);
-                    surfaceColor *= 1.0 - smoothstep(0.6, 0.7, fineNoise) * 0.2;
+                    // Ancient dark terrain
+                    float darkTerrain = smoothstep(0.35, 0.55, surfaceNoise);
+                    
+                    // Bright grooved terrain (younger)
+                    float grooves = sin(vUv.x * 100.0 + vUv.y * 40.0 + fineNoise * 2.0) * 0.5 + 0.5;
+                    float grooveLines = smoothstep(0.4, 0.6, grooves);
+                    
+                    // Impact craters
+                    float craters = smoothstep(0.7, 0.85, microNoise);
+                    
+                    // Dark ancient terrain
+                    vec3 darkColor = vec3(0.25, 0.22, 0.2);
+                    // Bright icy terrain
+                    vec3 brightColor = vec3(0.7, 0.68, 0.65);
+                    
+                    surfaceColor = mix(darkColor, brightColor, darkTerrain);
+                    surfaceColor = mix(surfaceColor, vec3(0.75, 0.73, 0.7), grooveLines * darkTerrain * 0.4);
+                    surfaceColor = mix(surfaceColor, vec3(0.85, 0.83, 0.8), craters * 0.5);
                   }
-                  // === CALLISTO (14) - Very dark with bright crater impacts ===
+                  // === CALLISTO (14) - Enhanced ancient cratered surface ===
                   else if (surfaceType > 13.5 && surfaceType < 14.5) {
-                    float craters = smoothstep(0.65, 0.8, fineNoise);
-                    surfaceColor = mix(secondaryColor, baseColor, surfaceNoise * 0.3);
-                    // Bright impact craters
-                    surfaceColor = mix(surfaceColor, tertiaryColor, craters * 0.7);
+                    // Very dark base (low albedo)
+                    vec3 darkBase = vec3(0.15, 0.12, 0.1);
+                    
+                    // Multi-ring impact basins
+                    float largeImpacts = smoothstep(0.6, 0.8, surfaceNoise);
+                    float smallCraters = smoothstep(0.65, 0.8, fineNoise);
+                    float tinyCraters = smoothstep(0.7, 0.85, microNoise);
+                    
+                    // Bright icy crater floors and rims
+                    vec3 brightIce = vec3(0.9, 0.88, 0.85);
+                    
+                    // Valhalla impact basin effect (concentric rings)
+                    vec2 valhallaCenter = vec2(0.3, 0.4);
+                    float valhallaDist = length(vUv - valhallaCenter);
+                    float valhallaRings = sin(valhallaDist * 80.0) * 0.5 + 0.5;
+                    float valhallaEffect = smoothstep(0.25, 0.0, valhallaDist) * valhallaRings * 0.3;
+                    
+                    surfaceColor = darkBase;
+                    surfaceColor = mix(surfaceColor, vec3(0.3, 0.28, 0.25), surfaceNoise * 0.3);
+                    surfaceColor = mix(surfaceColor, brightIce, largeImpacts * 0.6);
+                    surfaceColor = mix(surfaceColor, brightIce * 0.9, smallCraters * 0.4);
+                    surfaceColor = mix(surfaceColor, brightIce * 0.8, tinyCraters * 0.3);
+                    surfaceColor += vec3(0.15, 0.14, 0.13) * valhallaEffect;
                   }
                   // === TITAN (15) - Orange haze, no surface visible ===
                   else if (surfaceType > 14.5 && surfaceType < 15.5) {
@@ -1384,6 +1455,66 @@ export const TexturedPlanet = ({
                     // Bright spots (Occator crater)
                     float brightSpot = smoothstep(0.85, 0.95, fineNoise);
                     surfaceColor = mix(surfaceColor, tertiaryColor, brightSpot * 0.8);
+                  }
+                  // === PHOBOS (21) - Texture-based dark rocky moon ===
+                  else if (surfaceType > 20.5 && surfaceType < 21.5) {
+                    vec3 phobosColor = texture2D(phobosMap, vUv).rgb;
+                    
+                    // Add bump mapping for craters
+                    float texelSize = 0.005;
+                    float heightC = dot(phobosColor, vec3(0.299, 0.587, 0.114));
+                    float heightL = dot(texture2D(phobosMap, vUv + vec2(-texelSize, 0.0)).rgb, vec3(0.299, 0.587, 0.114));
+                    float heightR = dot(texture2D(phobosMap, vUv + vec2(texelSize, 0.0)).rgb, vec3(0.299, 0.587, 0.114));
+                    float heightU = dot(texture2D(phobosMap, vUv + vec2(0.0, texelSize)).rgb, vec3(0.299, 0.587, 0.114));
+                    float heightD = dot(texture2D(phobosMap, vUv + vec2(0.0, -texelSize)).rgb, vec3(0.299, 0.587, 0.114));
+                    
+                    float bumpStrength = 3.0;
+                    vec3 bumpNormal = normalize(vec3(
+                      (heightL - heightR) * bumpStrength,
+                      (heightD - heightU) * bumpStrength,
+                      1.0
+                    ));
+                    
+                    vec3 tangent = normalize(cross(worldNormal, vec3(0.0, 1.0, 0.0)));
+                    vec3 bitangent = normalize(cross(worldNormal, tangent));
+                    vec3 perturbedNormal = normalize(tangent * bumpNormal.x + bitangent * bumpNormal.y + worldNormal * bumpNormal.z);
+                    float bumpedNdotL = max(dot(perturbedNormal, sunDir), 0.0);
+                    
+                    // Darken to match Phobos's very low albedo
+                    phobosColor *= 0.6;
+                    
+                    surfaceColor = phobosColor;
+                    NdotL = mix(NdotL, bumpedNdotL, 0.7);
+                  }
+                  // === DEIMOS (22) - Texture-based smoother dark moon ===
+                  else if (surfaceType > 21.5 && surfaceType < 22.5) {
+                    vec3 deimosColor = texture2D(deimosMap, vUv).rgb;
+                    
+                    // Lighter bump for smoother surface
+                    float texelSize = 0.005;
+                    float heightC = dot(deimosColor, vec3(0.299, 0.587, 0.114));
+                    float heightL = dot(texture2D(deimosMap, vUv + vec2(-texelSize, 0.0)).rgb, vec3(0.299, 0.587, 0.114));
+                    float heightR = dot(texture2D(deimosMap, vUv + vec2(texelSize, 0.0)).rgb, vec3(0.299, 0.587, 0.114));
+                    float heightU = dot(texture2D(deimosMap, vUv + vec2(0.0, texelSize)).rgb, vec3(0.299, 0.587, 0.114));
+                    float heightD = dot(texture2D(deimosMap, vUv + vec2(0.0, -texelSize)).rgb, vec3(0.299, 0.587, 0.114));
+                    
+                    float bumpStrength = 2.0;
+                    vec3 bumpNormal = normalize(vec3(
+                      (heightL - heightR) * bumpStrength,
+                      (heightD - heightU) * bumpStrength,
+                      1.0
+                    ));
+                    
+                    vec3 tangent = normalize(cross(worldNormal, vec3(0.0, 1.0, 0.0)));
+                    vec3 bitangent = normalize(cross(worldNormal, tangent));
+                    vec3 perturbedNormal = normalize(tangent * bumpNormal.x + bitangent * bumpNormal.y + worldNormal * bumpNormal.z);
+                    float bumpedNdotL = max(dot(perturbedNormal, sunDir), 0.0);
+                    
+                    // Slightly lighter than Phobos
+                    deimosColor *= 0.7;
+                    
+                    surfaceColor = deimosColor;
+                    NdotL = mix(NdotL, bumpedNdotL, 0.6);
                   }
                   // === Generic gaseous (50) ===
                   else if (surfaceType > 49.5 && surfaceType < 50.5) {
