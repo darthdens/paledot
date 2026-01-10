@@ -23,7 +23,7 @@ const WHIRLPOOL = {
   diskRadius: 38000, // Half of 76,000 ly diameter
   bulgeRadius: 5000, // Prominent central bulge
   branches: 2, // Two beautifully defined spiral arms
-  spinTurns: 1.8, // Tight, well-defined spiral
+  spinTurns: 0.9, // Single turn - arms don't wrap around twice
   inclination: (20 * Math.PI) / 180, // ~20° inclination (nearly face-on)
   distanceFromMilkyWay: 23e6, // 23 million light-years
 };
@@ -377,6 +377,68 @@ export const WhirlpoolGalaxy = ({ visualScale }: WhirlpoolGalaxyProps) => {
     return geo;
   }, [gs]);
 
+  // Dust lanes - dark regions between spiral arms
+  const dustLanesGeo = useMemo(() => {
+    const { branches, spinTurns } = WHIRLPOOL;
+    const maxRadius = WHIRLPOOL.diskRadius * gs;
+    const dustCount = 120000;
+
+    const positions = new Float32Array(dustCount * 3);
+    const colors = new Float32Array(dustCount * 3);
+    const color = new THREE.Color();
+
+    for (let i = 0; i < dustCount; i++) {
+      const i3 = i * 3;
+
+      // Distribute along the inner edge of spiral arms (dust lanes)
+      const t = 0.12 + Math.pow(Math.random(), 0.8) * 0.75;
+      const radius = t * maxRadius;
+      const rt = radius / maxRadius;
+
+      const branchIndex = Math.floor(Math.random() * branches);
+      // Offset slightly from the arm center to create the dark lane effect
+      const branchAngle = (branchIndex / branches) * Math.PI * 2 + 0.15; // Offset from arm
+      const spinAngle = rt * spinTurns * Math.PI * 2;
+
+      // Tight to the arm edge
+      const armWidth = 0.04 + rt * 0.06;
+      const armJitter = (Math.random() + Math.random() - 1) * armWidth;
+
+      const angle = branchAngle + spinAngle + armJitter;
+
+      positions[i3] = Math.cos(angle) * radius;
+      
+      const thickness = 0.008;
+      const yJitter = (Math.random() - 0.5) * maxRadius * thickness;
+      positions[i3 + 1] = yJitter;
+      
+      positions[i3 + 2] = Math.sin(angle) * radius;
+
+      // Very dark reddish-brown dust color
+      const dustVariation = Math.random();
+      if (dustVariation < 0.6) {
+        // Dark brown dust
+        color.setHSL(0.05 + Math.random() * 0.03, 0.4 + Math.random() * 0.2, 0.08 + Math.random() * 0.06);
+      } else if (dustVariation < 0.85) {
+        // Darker reddish
+        color.setHSL(0.02 + Math.random() * 0.03, 0.5 + Math.random() * 0.2, 0.06 + Math.random() * 0.04);
+      } else {
+        // Near black
+        color.setHSL(0.0, 0.3 + Math.random() * 0.2, 0.03 + Math.random() * 0.03);
+      }
+
+      colors[i3] = color.r;
+      colors[i3 + 1] = color.g;
+      colors[i3 + 2] = color.b;
+    }
+
+    const geo = new THREE.BufferGeometry();
+    geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    geo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+    geo.boundingSphere = new THREE.Sphere(new THREE.Vector3(0, 0, 0), Infinity);
+    return geo;
+  }, [gs]);
+
   // Companion galaxy NGC 5195 - smaller irregular galaxy
   const companionGeo = useMemo(() => {
     const count = 50000;
@@ -520,6 +582,21 @@ export const WhirlpoolGalaxy = ({ visualScale }: WhirlpoolGalaxyProps) => {
           differentialStrength={0.06}
           renderOrder={2}
         />
+
+        {/* Dust lanes between arms */}
+        <points frustumCulled={false} renderOrder={1}>
+          <bufferGeometry attach="geometry" {...dustLanesGeo} />
+          <pointsMaterial
+            size={gs * 65}
+            map={dotTexture}
+            vertexColors
+            transparent
+            opacity={0.7}
+            blending={THREE.NormalBlending}
+            depthWrite={false}
+            sizeAttenuation
+          />
+        </points>
 
         {/* Core bulge */}
         <DifferentialRotationPoints
