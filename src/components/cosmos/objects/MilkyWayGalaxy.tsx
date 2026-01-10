@@ -80,6 +80,7 @@ const createGalaxyGlowTexture = () => {
 
 export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayGalaxyProps) => {
   const rotatingGroupRef = useRef<THREE.Group>(null);
+  const starsRotatingRef = useRef<THREE.Group>(null); // Inner group for star rotation
   const pulseRef = useRef<THREE.Mesh>(null);
   const pulseRef2 = useRef<THREE.Mesh>(null);
   const markerGroupRef = useRef<THREE.Group>(null);
@@ -94,6 +95,8 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
   const setObjectWorldPosition = useCosmosStore((s) => s.setObjectWorldPosition);
   const setSelectedObject = useCosmosStore((s) => s.setSelectedObject);
   const currentScale = useCosmosStore((s) => s.currentScale);
+  const timeSpeed = useCosmosStore((s) => s.timeSpeed);
+  const isInStarSystem = useCosmosStore((s) => s.isInStarSystem);
   
   // Only show label at galaxy-scale views (not at local group or universe scale - too far away)
   const showLabel = currentScale === 'stellar' || currentScale === 'milkyWay';
@@ -431,10 +434,15 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
     return geo;
   }, [gs]);
   
-  useFrame(({ clock, camera }) => {
+  useFrame(({ clock, camera }, delta) => {
     const t = clock.getElapsedTime();
 
-    // Galaxy rotation is handled by GalaxyRotator in CosmosExplorer
+    // Internal star rotation - stars revolve around the galactic center
+    // Only rotate when NOT inside a star system (same logic as planets around the Sun)
+    if (starsRotatingRef.current && !isInStarSystem) {
+      // 0.00625 rad/s base = same speed as GalaxyRotator for consistency
+      starsRotatingRef.current.rotation.y += delta * 0.00625 * timeSpeed;
+    }
 
     // Keep the galaxy center world position live (needed for camera tracking while rotating)
     if (rotatingGroupRef.current) {
@@ -506,66 +514,69 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
     <>
       {/* Rotating galaxy group - offset so the solar system stays at origin */}
       <group ref={rotatingGroupRef} position={galaxyOffset}>
-        <points geometry={coreGeo} frustumCulled={false}>
-          <pointsMaterial
-            size={gs * 100}
-            map={dotTexture}
-            vertexColors
-            sizeAttenuation
-            transparent
-            opacity={0.95}
-            blending={THREE.AdditiveBlending}
-            depthWrite={false}
-            depthTest={false}
-          />
-        </points>
+        {/* Inner rotating group for stars - rotates around galactic center */}
+        <group ref={starsRotatingRef}>
+          <points geometry={coreGeo} frustumCulled={false}>
+            <pointsMaterial
+              size={gs * 100}
+              map={dotTexture}
+              vertexColors
+              sizeAttenuation
+              transparent
+              opacity={0.95}
+              blending={THREE.AdditiveBlending}
+              depthWrite={false}
+              depthTest={false}
+            />
+          </points>
 
-        {/* Main stars - spiral structure */}
-        <points geometry={starsGeo} frustumCulled={false}>
-          <pointsMaterial
-            size={gs * 60}
-            map={dotTexture}
-            vertexColors
-            sizeAttenuation
-            transparent
-            opacity={0.9}
-            blending={THREE.AdditiveBlending}
-            depthWrite={false}
-            depthTest={false}
-          />
-        </points>
+          {/* Main stars - spiral structure */}
+          <points geometry={starsGeo} frustumCulled={false}>
+            <pointsMaterial
+              size={gs * 60}
+              map={dotTexture}
+              vertexColors
+              sizeAttenuation
+              transparent
+              opacity={0.9}
+              blending={THREE.AdditiveBlending}
+              depthWrite={false}
+              depthTest={false}
+            />
+          </points>
 
-        {/* Volume stars - add height so it feels "full" */}
-        <points geometry={volumeGeo} frustumCulled={false}>
-          <pointsMaterial
-            size={gs * 55}
-            map={dotTexture}
-            vertexColors
-            sizeAttenuation
-            transparent
-            opacity={0.45}
-            blending={THREE.AdditiveBlending}
-            depthWrite={false}
-            depthTest={false}
-          />
-        </points>
+          {/* Volume stars - add height so it feels "full" */}
+          <points geometry={volumeGeo} frustumCulled={false}>
+            <pointsMaterial
+              size={gs * 55}
+              map={dotTexture}
+              vertexColors
+              sizeAttenuation
+              transparent
+              opacity={0.45}
+              blending={THREE.AdditiveBlending}
+              depthWrite={false}
+              depthTest={false}
+            />
+          </points>
 
-        {/* Halo stars - scattered above/below the disk */}
-        <points geometry={haloGeo} frustumCulled={false}>
-          <pointsMaterial
-            size={gs * 45}
-            map={dotTexture}
-            vertexColors
-            sizeAttenuation
-            transparent
-            opacity={0.35}
-            blending={THREE.AdditiveBlending}
-            depthWrite={false}
-            depthTest={false}
-          />
-        </points>
+          {/* Halo stars - scattered above/below the disk */}
+          <points geometry={haloGeo} frustumCulled={false}>
+            <pointsMaterial
+              size={gs * 45}
+              map={dotTexture}
+              vertexColors
+              sizeAttenuation
+              transparent
+              opacity={0.35}
+              blending={THREE.AdditiveBlending}
+              depthWrite={false}
+              depthTest={false}
+            />
+          </points>
+        </group>
 
-        {/* Center glow (billboard) */}
+        {/* Center glow (billboard) - does not rotate with stars */}
         <sprite renderOrder={10} frustumCulled={false} scale={[diskR * 2.2, diskR * 2.2, 1]}>
           <spriteMaterial
             map={glowTexture}
