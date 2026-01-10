@@ -337,6 +337,7 @@ export const TriangulumGalaxy = ({ visualScale }: TriangulumGalaxyProps) => {
         
         {/* Halo stars */}
         <DifferentialRotationPoints
+          key="triangulum-halo"
           geometry={haloGeo}
           size={gs * 35}
           map={dotTexture}
@@ -348,6 +349,7 @@ export const TriangulumGalaxy = ({ visualScale }: TriangulumGalaxyProps) => {
 
         {/* Main spiral arms */}
         <DifferentialRotationPoints
+          key="triangulum-arms"
           geometry={starsGeo}
           size={gs * 50}
           map={dotTexture}
@@ -359,6 +361,7 @@ export const TriangulumGalaxy = ({ visualScale }: TriangulumGalaxyProps) => {
 
         {/* Core bulge */}
         <DifferentialRotationPoints
+          key="triangulum-core"
           geometry={coreGeo}
           size={gs * 75}
           map={dotTexture}
