@@ -111,32 +111,37 @@ export const SombreroGalaxy = ({ visualScale }: SombreroGalaxyProps) => {
   const dotTexture = useMemo(() => createDotTexture(), []);
   const glowTexture = useMemo(() => createSombreroGlowTexture(), []);
 
-  // Central bulge - LENS-SHAPED dense region of stars creating the sombrero hat effect
-  // Wide and flat at center, curving up/down like an eye/lens shape
+  // Central bulge - DOME/ROUNDED shape like a sombrero hat
+  // Flat at the top/bottom, rounded sides - NOT a cone
   const bulgeGeo = useMemo(() => {
-    const count = 200000; // Dense stars
+    const count = 250000; // Dense stars
     const positions = new Float32Array(count * 3);
     const colors = new Float32Array(count * 3);
     const color = new THREE.Color();
-    const maxR = SOMBRERO.bulgeRadius * gs * 1.2; // Wider reach
-    const maxHeight = SOMBRERO.bulgeRadius * gs * 0.5; // Height of the "hat"
+    const maxR = SOMBRERO.bulgeRadius * gs * 1.3; // Wider reach
+    const maxHeight = SOMBRERO.bulgeRadius * gs * 0.45; // Height of the "hat"
 
     for (let i = 0; i < count; i++) {
       const i3 = i * 3;
       
       // Radial distribution - concentrated toward center
-      const r = Math.pow(Math.random(), 1.4) * maxR;
+      const r = Math.pow(Math.random(), 1.3) * maxR;
       const theta = Math.random() * Math.PI * 2;
       const rt = r / maxR;
 
       positions[i3] = r * Math.cos(theta);
       positions[i3 + 2] = r * Math.sin(theta);
       
-      // LENS SHAPE: height decreases with radius (forms the sombrero hat curve)
-      // At center (r=0): maximum height spread
-      // At edges (r=maxR): minimal height (flattens to disk)
-      const heightAtRadius = maxHeight * Math.pow(1 - rt, 1.5);
-      positions[i3 + 1] = (Math.random() * 2 - 1) * heightAtRadius;
+      // DOME SHAPE: use a rounded curve, not linear
+      // Flat at center (top of dome), curves down smoothly toward edges
+      // Using a curve that's flat in the middle and rounds off at edges
+      // sqrt(1 - x^2) gives a nice dome/semicircle shape
+      const domeFactor = Math.sqrt(Math.max(0, 1 - rt * rt)); // Semicircle profile
+      const heightAtRadius = maxHeight * domeFactor;
+      
+      // Add some randomness but keep the dome shape
+      const yPos = (Math.random() * 2 - 1) * heightAtRadius;
+      positions[i3 + 1] = yPos;
 
       // Colors: bright white center → cream/golden
       if (rt < 0.15) {
@@ -261,49 +266,47 @@ export const SombreroGalaxy = ({ visualScale }: SombreroGalaxyProps) => {
     return geo;
   }, [gs]);
 
-  // Dark gas rim - colorful: dark reds, dark blues, browns, more visible
+  // Dark gas cloud - HUGE dense cloud around the galaxy edges
   const darkGasGeo = useMemo(() => {
-    const count = 250000;
+    const count = 400000; // Much denser cloud
     const positions = new Float32Array(count * 3);
     const colors = new Float32Array(count * 3);
     const color = new THREE.Color();
     const maxRadius = SOMBRERO.diskRadius * gs;
-    const rimThickness = maxRadius * 0.02;
+    const cloudThickness = maxRadius * 0.04; // Thicker cloud
 
     for (let i = 0; i < count; i++) {
       const i3 = i * 3;
 
-      // Concentrate at outer edges
-      const t = Math.pow(Math.random(), 0.3);
-      const innerRadius = maxRadius * 0.6;
-      const radius = innerRadius + t * (maxRadius * 1.02 - innerRadius);
+      // Concentrate heavily at outer edges - like a huge surrounding cloud
+      const t = Math.pow(Math.random(), 0.35);
+      const innerRadius = maxRadius * 0.5; // Start earlier
+      const radius = innerRadius + t * (maxRadius * 1.1 - innerRadius);
       const rt = (radius - innerRadius) / (maxRadius - innerRadius);
       const angle = Math.random() * Math.PI * 2;
 
       positions[i3] = Math.cos(angle) * radius;
       
-      const heightSpread = rimThickness * (0.25 + rt * 0.75);
+      // Thicker spread at edges - like a cloud enveloping the disk
+      const heightSpread = cloudThickness * (0.3 + rt * 1.0);
       positions[i3 + 1] = (Math.random() * 2 - 1) * heightSpread;
       
       positions[i3 + 2] = Math.sin(angle) * radius;
 
-      // More colorful: dark reds, dark blues, rust browns - slightly brighter to be visible
+      // Dark colors with hints of red, blue, brown
       const rand = Math.random();
-      if (rand < 0.3) {
-        // Dark red - slightly more saturated and visible
-        color.setHSL(0.0 + Math.random() * 0.02, 0.7 + Math.random() * 0.2, 0.06 + Math.random() * 0.04);
-      } else if (rand < 0.5) {
-        // Dark blue - more visible
-        color.setHSL(0.6 + Math.random() * 0.1, 0.6 + Math.random() * 0.25, 0.05 + Math.random() * 0.04);
-      } else if (rand < 0.7) {
+      if (rand < 0.35) {
+        // Dark red
+        color.setHSL(0.0 + Math.random() * 0.02, 0.65 + Math.random() * 0.2, 0.05 + Math.random() * 0.03);
+      } else if (rand < 0.55) {
+        // Dark blue
+        color.setHSL(0.6 + Math.random() * 0.1, 0.55 + Math.random() * 0.25, 0.04 + Math.random() * 0.03);
+      } else if (rand < 0.75) {
         // Dark rust/brown
-        color.setHSL(0.04 + Math.random() * 0.02, 0.6 + Math.random() * 0.15, 0.07 + Math.random() * 0.04);
-      } else if (rand < 0.85) {
-        // Dark purple hints
-        color.setHSL(0.8 + Math.random() * 0.1, 0.5 + Math.random() * 0.2, 0.04 + Math.random() * 0.03);
+        color.setHSL(0.04 + Math.random() * 0.02, 0.55 + Math.random() * 0.15, 0.06 + Math.random() * 0.03);
       } else {
         // Near black
-        color.setHSL(0.05 + Math.random() * 0.05, 0.3, 0.02 + Math.random() * 0.02);
+        color.setHSL(0.05 + Math.random() * 0.05, 0.25, 0.02 + Math.random() * 0.015);
       }
 
       colors[i3] = color.r;
