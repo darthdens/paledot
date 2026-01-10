@@ -1,10 +1,16 @@
 // TexturedPlanet - Renders planets with realistic lighting and shadows
 import { useRef, useMemo, useEffect } from 'react';
-import { useFrame } from '@react-three/fiber';
+import { useFrame, useLoader } from '@react-three/fiber';
 import * as THREE from 'three';
 import { CelestialObject } from '../types';
 import { useCosmosStore } from '../store/useCosmosStore';
 import { celestialObjects } from '../data/celestialObjects';
+
+// Import NASA texture maps
+import earthDayTexture from '@/assets/textures/earth-day.jpg';
+import earthNightTexture from '@/assets/textures/earth-night.jpg';
+import earthCloudsTexture from '@/assets/textures/earth-clouds.jpg';
+import moonTexture from '@/assets/textures/moon.jpg';
 
 interface TexturedPlanetProps {
   object: CelestialObject;
@@ -369,6 +375,20 @@ export const TexturedPlanet = ({
     return (planetSizes[object.parentId] || 0) * visualScale;
   }, [isMoon, object.parentId, visualScale]);
 
+  // Load NASA textures for Earth and Moon
+  const earthDayMap = useLoader(THREE.TextureLoader, earthDayTexture);
+  const earthNightMap = useLoader(THREE.TextureLoader, earthNightTexture);
+  const earthCloudsMap = useLoader(THREE.TextureLoader, earthCloudsTexture);
+  const moonMap = useLoader(THREE.TextureLoader, moonTexture);
+  
+  // Configure texture properties for proper spherical mapping
+  useMemo(() => {
+    [earthDayMap, earthNightMap, earthCloudsMap, moonMap].forEach(tex => {
+      tex.wrapS = THREE.RepeatWrapping;
+      tex.wrapT = THREE.ClampToEdgeWrapping;
+      tex.colorSpace = THREE.SRGBColorSpace;
+    });
+  }, [earthDayMap, earthNightMap, earthCloudsMap, moonMap]);
   
   const visuals = PLANET_VISUALS[object.id] || {
     baseColor: object.color,
@@ -656,6 +676,10 @@ export const TexturedPlanet = ({
                 planetTilt: { value: tiltRadians },
                 ringOpacity: { value: visuals.ringOpacity ?? 0.8 },
                 ringStyle: { value: ringStyle },
+                // NASA texture maps
+                earthDayMap: { value: earthDayMap },
+                earthNightMap: { value: earthNightMap },
+                moonMap: { value: moonMap },
               }}
               vertexShader={`
                 varying vec3 vNormal;
@@ -697,6 +721,10 @@ export const TexturedPlanet = ({
                 uniform float planetTilt;
                 uniform float ringOpacity;
                 uniform float ringStyle;
+                // NASA texture maps
+                uniform sampler2D earthDayMap;
+                uniform sampler2D earthNightMap;
+                uniform sampler2D moonMap;
                 varying vec3 vNormal;
                 varying vec3 vPosition;
                 varying vec2 vUv;
@@ -888,296 +916,32 @@ export const TexturedPlanet = ({
                     surfaceColor = mix(baseColor, secondaryColor, swirl * 0.4);
                     surfaceColor = mix(surfaceColor, tertiaryColor, bands * 0.2);
                   }
-                  // === EARTH (4) - Earth with recognizable continent shapes ===
+                  // === EARTH (4) - NASA texture map ===
                   else if (surfaceType > 3.5 && surfaceType < 4.5) {
-                    float microDetail = noise(noiseCoord * 12.0);
-                    float absLat = abs(vUv.y - 0.5) * 2.0;
+                    // Sample NASA Earth day texture
+                    vec3 dayColor = texture2D(earthDayMap, vUv).rgb;
+                    // Sample NASA Earth night texture (city lights)
+                    vec3 nightColor = texture2D(earthNightMap, vUv).rgb;
                     
-                    // === CONTINENT DEFINITIONS (approximate real positions) ===
-                    float coastNoise = fbm(noiseCoord * 4.0) * 0.04;
-                    float detailNoise = fbm(noiseCoord * 8.0) * 0.02;
+                    // Calculate sun-facing based on world normal
+                    vec3 worldNormal = normalize(vWorldNormal);
+                    vec3 sunDir = normalize(-vWorldPosition);
+                    float sunFacing = dot(worldNormal, sunDir);
                     
-                    // AFRICA - centered around lon 0.58, lat 0.45
-                    vec2 africaCenter = vec2(0.58, 0.48);
-                    vec2 africaScale = vec2(0.08, 0.18);
-                    float africa = 1.0 - smoothstep(0.0, 1.0, length((vUv - africaCenter) / africaScale));
-                    vec2 hornCenter = vec2(0.64, 0.52);
-                    float horn = 1.0 - smoothstep(0.0, 1.0, length((vUv - hornCenter) / vec2(0.03, 0.04)));
-                    africa = max(africa, horn * 0.8);
+                    // Blend between day and night based on sun position
+                    // Night side shows city lights, day side shows the surface
+                    float dayNightBlend = smoothstep(-0.1, 0.2, sunFacing);
                     
-                    // EUROPE
-                    vec2 europeCenter = vec2(0.52, 0.68);
-                    float europe = 1.0 - smoothstep(0.0, 1.0, length((vUv - europeCenter) / vec2(0.08, 0.06)));
-                    vec2 scandCenter = vec2(0.54, 0.76);
-                    float scand = 1.0 - smoothstep(0.0, 1.0, length((vUv - scandCenter) / vec2(0.025, 0.05)));
-                    europe = max(europe, scand * 0.7);
-                    vec2 iberiaCenter = vec2(0.47, 0.62);
-                    float iberia = 1.0 - smoothstep(0.0, 1.0, length((vUv - iberiaCenter) / vec2(0.025, 0.03)));
-                    europe = max(europe, iberia * 0.8);
+                    // City lights are boosted on the night side
+                    vec3 cityLights = nightColor * 2.5;
                     
-                    // ASIA
-                    vec2 asiaCenter = vec2(0.72, 0.65);
-                    float asia = 1.0 - smoothstep(0.0, 1.0, length((vUv - asiaCenter) / vec2(0.18, 0.15)));
-                    vec2 indiaCenter = vec2(0.70, 0.48);
-                    float india = 1.0 - smoothstep(0.0, 1.0, length((vUv - indiaCenter) / vec2(0.04, 0.07)));
-                    asia = max(asia, india * 0.85);
-                    vec2 seAsiaCenter = vec2(0.78, 0.48);
-                    float seAsia = 1.0 - smoothstep(0.0, 1.0, length((vUv - seAsiaCenter) / vec2(0.05, 0.06)));
-                    asia = max(asia, seAsia * 0.7);
-                    vec2 meCenter = vec2(0.62, 0.58);
-                    float midEast = 1.0 - smoothstep(0.0, 1.0, length((vUv - meCenter) / vec2(0.06, 0.04)));
-                    asia = max(asia, midEast * 0.75);
-                    
-                    // NORTH AMERICA
-                    vec2 naCenter = vec2(0.22, 0.65);
-                    float northAmerica = 1.0 - smoothstep(0.0, 1.0, length((vUv - naCenter) / vec2(0.12, 0.12)));
-                    vec2 alaskaCenter = vec2(0.12, 0.75);
-                    float alaska = 1.0 - smoothstep(0.0, 1.0, length((vUv - alaskaCenter) / vec2(0.04, 0.04)));
-                    northAmerica = max(northAmerica, alaska * 0.8);
-                    vec2 floridaCenter = vec2(0.26, 0.55);
-                    float florida = 1.0 - smoothstep(0.0, 1.0, length((vUv - floridaCenter) / vec2(0.015, 0.035)));
-                    northAmerica = max(northAmerica, florida * 0.7);
-                    vec2 mexicoCenter = vec2(0.20, 0.52);
-                    float mexico = 1.0 - smoothstep(0.0, 1.0, length((vUv - mexicoCenter) / vec2(0.05, 0.04)));
-                    northAmerica = max(northAmerica, mexico * 0.75);
-                    
-                    // SOUTH AMERICA
-                    vec2 saCenter = vec2(0.32, 0.35);
-                    float southAmerica = 1.0 - smoothstep(0.0, 1.0, length((vUv - saCenter) / vec2(0.06, 0.15)));
-                    vec2 brazilCenter = vec2(0.36, 0.42);
-                    float brazil = 1.0 - smoothstep(0.0, 1.0, length((vUv - brazilCenter) / vec2(0.04, 0.05)));
-                    southAmerica = max(southAmerica, brazil * 0.8);
-                    
-                    // AUSTRALIA
-                    vec2 ausCenter = vec2(0.85, 0.32);
-                    float australia = 1.0 - smoothstep(0.0, 1.0, length((vUv - ausCenter) / vec2(0.06, 0.05)));
-                    
-                    // ANTARCTICA
-                    float antarctica = smoothstep(0.88, 0.95, 1.0 - vUv.y);
-                    
-                    // GREENLAND
-                    vec2 greenlandCenter = vec2(0.38, 0.78);
-                    float greenland = 1.0 - smoothstep(0.0, 1.0, length((vUv - greenlandCenter) / vec2(0.03, 0.05)));
-                    
-                    // Combine continents
-                    float continent = max(max(max(max(africa, europe), asia), 
-                                       max(northAmerica, southAmerica)), 
-                                       max(max(australia, antarctica), greenland));
-                    continent = smoothstep(0.3 - coastNoise - detailNoise, 0.5 + coastNoise, continent);
-                    
-                    float coastalShelf = smoothstep(0.15, 0.35, continent) * (1.0 - smoothstep(0.35, 0.5, continent));
-                    
-                    // === OCEAN COLORS ===
-                    vec3 deepOcean = vec3(0.008, 0.035, 0.12);
-                    vec3 midOcean = vec3(0.02, 0.08, 0.22);
-                    vec3 shallowOcean = vec3(0.06, 0.22, 0.38);
-                    vec3 coastalWater = vec3(0.10, 0.32, 0.45);
-                    
-                    float oceanVar = fbm(noiseCoord * 2.0) * 0.3;
-                    vec3 oceanColor = mix(deepOcean, midOcean, oceanVar);
-                    oceanColor = mix(oceanColor, shallowOcean, coastalShelf * 0.6);
-                    oceanColor = mix(oceanColor, coastalWater, coastalShelf * 0.4);
-                    
-                    // === LAND BIOMES ===
-                    float elevation = fbm(noiseCoord * 3.0);
-                    float tropicalZone = smoothstep(0.22, 0.0, absLat);
-                    float temperateZone = smoothstep(0.0, 0.18, absLat) * smoothstep(0.50, 0.32, absLat);
-                    float borealZone = smoothstep(0.32, 0.48, absLat) * smoothstep(0.68, 0.52, absLat);
-                    float tundraZone = smoothstep(0.52, 0.68, absLat);
-                    
-                    // Deserts
-                    float saharaDesert = smoothstep(0.0, 1.0, 1.0 - length((vUv - vec2(0.55, 0.55)) / vec2(0.12, 0.06)));
-                    float arabianDesert = smoothstep(0.0, 1.0, 1.0 - length((vUv - vec2(0.64, 0.54)) / vec2(0.04, 0.04)));
-                    float ausDesert = smoothstep(0.0, 1.0, 1.0 - length((vUv - vec2(0.84, 0.34)) / vec2(0.04, 0.03)));
-                    float gobi = smoothstep(0.0, 1.0, 1.0 - length((vUv - vec2(0.78, 0.62)) / vec2(0.05, 0.03)));
-                    float desert = max(max(saharaDesert, arabianDesert), max(ausDesert, gobi)) * continent;
-                    desert *= smoothstep(0.3, 0.5, continent);
-                    
-                    vec3 tropicalForest = vec3(0.03, 0.16, 0.03);
-                    vec3 temperateForest = vec3(0.06, 0.20, 0.05);
-                    vec3 grassland = vec3(0.18, 0.28, 0.10);
-                    vec3 borealForest = vec3(0.04, 0.12, 0.06);
-                    vec3 tundraBrown = vec3(0.32, 0.30, 0.25);
-                    vec3 desertSand = vec3(0.85, 0.75, 0.52);
-                    vec3 mountainGray = vec3(0.40, 0.36, 0.30);
-                    vec3 snowWhite = vec3(0.94, 0.96, 0.98);
-                    
-                    vec3 landColor = tropicalForest * tropicalZone;
-                    landColor += mix(temperateForest, grassland, elevation) * temperateZone;
-                    landColor += borealForest * borealZone;
-                    landColor += tundraBrown * tundraZone;
-                    landColor = mix(landColor, desertSand, desert * 0.9);
-                    
-                    float mountains = smoothstep(0.6, 0.75, elevation) * continent;
-                    landColor = mix(landColor, mountainGray, mountains * 0.7);
-                    
-                    float snowLine = smoothstep(0.72, 0.82, elevation) * smoothstep(0.2, 0.4, absLat);
-                    float polarSnow = smoothstep(0.65, 0.8, absLat) * continent;
-                    landColor = mix(landColor, snowWhite, max(snowLine, polarSnow) * continent);
-                    landColor = mix(landColor, snowWhite, greenland * 0.9);
-                    landColor = mix(landColor, snowWhite, antarctica * 0.95);
-                    landColor *= 0.88 + microDetail * 0.24;
-                    
-                    surfaceColor = mix(oceanColor, landColor, smoothstep(0.4, 0.6, continent));
-                    
-                    // Polar ice on ocean
-                    float arcticIce = smoothstep(0.82, 0.92, vUv.y) * (1.0 - continent);
-                    float antarcticIce = smoothstep(0.08, 0.02, vUv.y);
-                    surfaceColor = mix(surfaceColor, snowWhite, max(arcticIce, antarcticIce) * 0.9);
+                    // Final blend
+                    surfaceColor = mix(cityLights, dayColor, dayNightBlend);
                   }
-                  // === MOON (5) - Moon with recognizable features ===
+                  // === MOON (5) - NASA texture map ===
                   else if (surfaceType > 4.5 && surfaceType < 5.5) {
-                    float microDetail = noise(noiseCoord * 15.0);
-                    
-                    // === MAJOR MARIA ===
-                    vec2 procCenter = vec2(0.22, 0.52);
-                    float procellarum = 1.0 - smoothstep(0.0, 0.26, length((vUv - procCenter) / vec2(0.8, 1.2)));
-                    procellarum *= smoothstep(0.25, 0.45, vUv.y) * smoothstep(0.78, 0.58, vUv.y);
-                    
-                    vec2 imbriumCenter = vec2(0.35, 0.66);
-                    float imbrium = 1.0 - smoothstep(0.0, 0.14, length(vUv - imbriumCenter));
-                    
-                    vec2 sereCenter = vec2(0.50, 0.62);
-                    float serenitatis = 1.0 - smoothstep(0.0, 0.10, length(vUv - sereCenter));
-                    
-                    vec2 tranqCenter = vec2(0.54, 0.48);
-                    float tranquillitatis = 1.0 - smoothstep(0.0, 0.11, length((vUv - tranqCenter) / vec2(1.0, 1.3)));
-                    
-                    vec2 crisCenter = vec2(0.70, 0.56);
-                    float crisium = 1.0 - smoothstep(0.0, 0.065, length((vUv - crisCenter) / vec2(1.3, 1.0)));
-                    
-                    vec2 fecCenter = vec2(0.62, 0.38);
-                    float fecunditatis = 1.0 - smoothstep(0.0, 0.09, length(vUv - fecCenter));
-                    
-                    vec2 nectCenter = vec2(0.55, 0.32);
-                    float nectaris = 1.0 - smoothstep(0.0, 0.055, length(vUv - nectCenter));
-                    
-                    vec2 nubCenter = vec2(0.38, 0.34);
-                    float nubium = 1.0 - smoothstep(0.0, 0.09, length(vUv - nubCenter));
-                    
-                    vec2 humCenter = vec2(0.26, 0.38);
-                    float humorum = 1.0 - smoothstep(0.0, 0.055, length(vUv - humCenter));
-                    
-                    float frigoris = smoothstep(0.72, 0.78, vUv.y) * smoothstep(0.85, 0.78, vUv.y);
-                    frigoris *= smoothstep(0.2, 0.35, vUv.x) * smoothstep(0.7, 0.55, vUv.x);
-                    
-                    float mariaNoise = fbm(noiseCoord * 1.2) * 0.08;
-                    float maria = max(max(max(procellarum, imbrium), max(serenitatis, tranquillitatis)),
-                                  max(max(crisium, fecunditatis), max(max(nectaris, nubium), max(humorum, frigoris))));
-                    maria = smoothstep(0.0, 0.3, maria + mariaNoise);
-                    
-                    // === NAMED CRATERS ===
-                    // Tycho
-                    vec2 tychoPos = vec2(0.42, 0.18);
-                    float tychoDist = length(vUv - tychoPos);
-                    float tycho = smoothstep(0.028, 0.018, tychoDist);
-                    float tychoRim = smoothstep(0.018, 0.022, tychoDist) * smoothstep(0.032, 0.025, tychoDist);
-                    float tychoRays = 0.0;
-                    for (float i = 0.0; i < 14.0; i++) {
-                      float ang = i * 0.449 + sin(i * 1.7) * 0.12;
-                      vec2 dir = vec2(cos(ang), sin(ang));
-                      float perpDist = abs(dot(vUv - tychoPos, vec2(-dir.y, dir.x)));
-                      float alongDist = dot(vUv - tychoPos, dir);
-                      float rayWidth = 0.006 + alongDist * 0.01;
-                      float ray = smoothstep(rayWidth, 0.0, perpDist) * 
-                                  smoothstep(0.0, 0.04, alongDist) * smoothstep(0.45, 0.08, alongDist);
-                      tychoRays = max(tychoRays, ray * 0.6);
-                    }
-                    
-                    // Copernicus
-                    vec2 copPos = vec2(0.30, 0.54);
-                    float copDist = length(vUv - copPos);
-                    float copernicus = smoothstep(0.022, 0.014, copDist);
-                    float copRim = smoothstep(0.014, 0.018, copDist) * smoothstep(0.026, 0.020, copDist);
-                    float copRays = 0.0;
-                    for (float i = 0.0; i < 10.0; i++) {
-                      float ang = i * 0.628 + sin(i * 2.1) * 0.1;
-                      vec2 dir = vec2(cos(ang), sin(ang));
-                      float perpDist = abs(dot(vUv - copPos, vec2(-dir.y, dir.x)));
-                      float alongDist = dot(vUv - copPos, dir);
-                      float ray = smoothstep(0.005, 0.0, perpDist) * 
-                                  smoothstep(0.0, 0.025, alongDist) * smoothstep(0.22, 0.04, alongDist);
-                      copRays = max(copRays, ray * 0.5);
-                    }
-                    
-                    // Kepler
-                    vec2 kepPos = vec2(0.22, 0.52);
-                    float kepDist = length(vUv - kepPos);
-                    float kepler = smoothstep(0.015, 0.010, kepDist);
-                    float kepRim = smoothstep(0.010, 0.013, kepDist) * smoothstep(0.018, 0.014, kepDist);
-                    
-                    // Aristarchus
-                    vec2 ariPos = vec2(0.18, 0.58);
-                    float ariDist = length(vUv - ariPos);
-                    float aristarchus = smoothstep(0.014, 0.008, ariDist);
-                    float ariRim = smoothstep(0.008, 0.011, ariDist) * smoothstep(0.016, 0.012, ariDist);
-                    
-                    // Plato
-                    vec2 platoPos = vec2(0.42, 0.76);
-                    float platoDist = length((vUv - platoPos) / vec2(1.0, 0.7));
-                    float plato = smoothstep(0.025, 0.018, platoDist);
-                    
-                    // Clavius
-                    vec2 clavPos = vec2(0.38, 0.12);
-                    float clavDist = length((vUv - clavPos) / vec2(1.0, 0.8));
-                    float clavius = smoothstep(0.04, 0.028, clavDist);
-                    float clavRim = smoothstep(0.028, 0.035, clavDist) * smoothstep(0.048, 0.038, clavDist);
-                    
-                    // Highland craters
-                    float highlandCraters = 0.0;
-                    float craterRims = 0.0;
-                    for (float i = 0.0; i < 20.0; i++) {
-                      vec2 pos = vec2(fract(sin(i * 127.1 + planetSeed) * 43758.5),
-                                      fract(sin(i * 311.7 + planetSeed) * 43758.5));
-                      float size = 0.015 + fract(sin(i * 78.2) * 43758.5) * 0.025;
-                      float dist = length(vUv - pos);
-                      float crater = smoothstep(size, size * 0.4, dist);
-                      float rim = smoothstep(size * 0.8, size, dist) * smoothstep(size * 1.3, size, dist);
-                      highlandCraters = max(highlandCraters, crater * 0.25);
-                      craterRims = max(craterRims, rim * 0.15);
-                    }
-                    
-                    float fineCraters = 1.0 - smoothstep(0.52, 0.62, surfaceNoise) * 0.3;
-                    float microCraters = 1.0 - smoothstep(0.55, 0.65, fineNoise) * 0.2;
-                    
-                    // === COLORS ===
-                    vec3 highlandLight = vec3(0.80, 0.78, 0.74);
-                    vec3 highlandDark = vec3(0.60, 0.58, 0.54);
-                    vec3 mariaBasalt = vec3(0.20, 0.19, 0.18);
-                    vec3 freshEjecta = vec3(0.90, 0.88, 0.84);
-                    vec3 darkFloor = vec3(0.15, 0.14, 0.13);
-                    
-                    float highlandVar = fbm(noiseCoord * 1.5);
-                    vec3 highlandColor = mix(highlandDark, highlandLight, highlandVar * 0.6 + 0.3);
-                    
-                    float mariaVar = fbm(noiseCoord * 1.8 + 50.0);
-                    vec3 mariaColor = mix(mariaBasalt, mariaBasalt * 1.3, mariaVar * 0.3);
-                    
-                    surfaceColor = mix(highlandColor, mariaColor, maria);
-                    surfaceColor *= fineCraters * microCraters;
-                    surfaceColor = mix(surfaceColor, surfaceColor * 0.7, highlandCraters);
-                    surfaceColor += vec3(craterRims * 0.3);
-                    
-                    surfaceColor = mix(surfaceColor, freshEjecta, tycho * 0.8);
-                    surfaceColor += vec3(tychoRim * 0.25);
-                    surfaceColor = mix(surfaceColor, freshEjecta, tychoRays);
-                    
-                    surfaceColor = mix(surfaceColor, freshEjecta, copernicus * 0.7);
-                    surfaceColor += vec3(copRim * 0.2);
-                    surfaceColor = mix(surfaceColor, freshEjecta * 0.9, copRays);
-                    
-                    surfaceColor = mix(surfaceColor, freshEjecta, kepler * 0.6);
-                    surfaceColor += vec3(kepRim * 0.15);
-                    
-                    surfaceColor = mix(surfaceColor, freshEjecta, aristarchus * 0.9);
-                    surfaceColor += vec3(ariRim * 0.2);
-                    
-                    surfaceColor = mix(surfaceColor, darkFloor, plato * 0.7);
-                    
-                    surfaceColor = mix(surfaceColor, highlandColor * 0.9, clavius * 0.4);
-                    surfaceColor += vec3(clavRim * 0.12);
-                    
-                    surfaceColor *= 0.88 + microDetail * 0.24;
+                    // Sample NASA Moon texture (LROC)
+                    surfaceColor = texture2D(moonMap, vUv).rgb;
                   }
                   // === MARS (6) - Red with dark regions and white polar caps ===
                   else if (surfaceType > 5.5 && surfaceType < 6.5) {
@@ -1376,6 +1140,8 @@ export const TexturedPlanet = ({
                   parentCenter: { value: new THREE.Vector3(0, 0, 0) },
                   parentRadius: { value: parentPlanetSize },
                   isMoon: { value: isMoon ? 1.0 : 0.0 },
+                  cloudMap: { value: earthCloudsMap },
+                  isEarth: { value: object.id === 'earth' ? 1.0 : 0.0 },
                 }}
                 vertexShader={`
                   varying vec3 vWorldNormal;
@@ -1397,36 +1163,12 @@ export const TexturedPlanet = ({
                   uniform vec3 parentCenter;
                   uniform float parentRadius;
                   uniform float isMoon;
+                  uniform sampler2D cloudMap;
+                  uniform float isEarth;
                   
                   varying vec3 vWorldNormal;
                   varying vec3 vWorldPosition;
                   varying vec2 vUv;
-                  
-                  float hash(vec2 p) {
-                    return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453);
-                  }
-                  
-                  float noise(vec2 p) {
-                    vec2 i = floor(p);
-                    vec2 f = fract(p);
-                    f = f * f * (3.0 - 2.0 * f);
-                    float a = hash(i);
-                    float b = hash(i + vec2(1.0, 0.0));
-                    float c = hash(i + vec2(0.0, 1.0));
-                    float d = hash(i + vec2(1.0, 1.0));
-                    return mix(mix(a, b, f.x), mix(c, d, f.x), f.y);
-                  }
-                  
-                  float fbm(vec2 p) {
-                    float value = 0.0;
-                    float amplitude = 0.5;
-                    for (int i = 0; i < 4; i++) {
-                      value += amplitude * noise(p);
-                      p *= 2.0;
-                      amplitude *= 0.5;
-                    }
-                    return value;
-                  }
                   
                   float calculateShadow(vec3 fragWorldPos, vec3 sunDir) {
                     if (isMoon < 0.5) return 1.0;
@@ -1448,14 +1190,21 @@ export const TexturedPlanet = ({
                     float NdotL = max(dot(worldNormal, sunDir), 0.0);
                     float shadow = calculateShadow(vWorldPosition, sunDir);
                     
-                    vec2 cloudCoord = vUv * 15.0 + time * 0.01;
-                    float clouds = fbm(cloudCoord);
-                    float cloudCoverage = smoothstep(0.35, 0.65, clouds);
+                    float cloudCoverage;
+                    if (isEarth > 0.5) {
+                      // Use NASA cloud texture for Earth
+                      vec3 cloudSample = texture2D(cloudMap, vUv).rgb;
+                      cloudCoverage = cloudSample.r;
+                    } else {
+                      // Procedural clouds for other planets
+                      float hash = fract(sin(dot(vUv * 15.0 + time * 0.01, vec2(127.1, 311.7))) * 43758.5453);
+                      cloudCoverage = smoothstep(0.35, 0.65, hash);
+                    }
                     
                     float lighting = 0.02 + NdotL * 0.98 * shadow;
                     vec3 litCloud = cloudColor * lighting;
                     
-                    gl_FragColor = vec4(litCloud, cloudCoverage * 0.5 * NdotL * shadow);
+                    gl_FragColor = vec4(litCloud, cloudCoverage * 0.6 * NdotL * shadow);
                   }
                 `}
               />
