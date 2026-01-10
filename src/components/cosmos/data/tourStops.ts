@@ -16,8 +16,8 @@ export const tourStops: TourStop[] = [
       fr: 'Bienvenue dans l\'Explorateur du Cosmos. Nous commençons notre voyage sur Terre, notre planète dans l\'immense univers. Embarquons pour un voyage incroyable d\'ici jusqu\'aux confins de l\'univers observable.',
     },
     duration: 8,
-    // Earth radius is 6371 km - similar to Venus
-    cameraPosition: [0, 16000, 48000],
+    // Earth radius is 6371 km - increased distance for mobile visibility
+    cameraPosition: [0, 25000, 75000],
     lookAt: [0, 0, 0],
     scaleLevel: 'earth',
   },
@@ -33,8 +33,8 @@ export const tourStops: TourStop[] = [
       fr: 'En s\'élevant au-dessus de l\'atmosphère terrestre, nous voyons notre Lune - le seul corps céleste que les humains ont visité. Elle est à 384 400 km, une distance que la lumière traverse en seulement 1,3 seconde.',
     },
     duration: 7,
-    // Moon radius is 1737 km - similar to Europa
-    cameraPosition: [0, 5000, 15000],
+    // Moon radius is 1737 km - increased for mobile
+    cameraPosition: [0, 8000, 24000],
     lookAt: [0, 0, 0],
     scaleLevel: 'earth',
   },
@@ -50,8 +50,8 @@ export const tourStops: TourStop[] = [
       fr: 'Vénus, notre plus proche voisine planétaire, est souvent appelée la jumelle de la Terre en raison de sa taille similaire. Mais sous ses épais nuages se cache un monde infernal - avec des températures de surface de 465°C et une pression atmosphérique écrasante 90 fois supérieure à celle de la Terre.',
     },
     duration: 7,
-    // Venus radius is 6052 km - use larger offset for proper view
-    cameraPosition: [0, 15000, 45000],
+    // Venus radius is 6052 km - increased distance for mobile
+    cameraPosition: [0, 24000, 72000],
     lookAt: [0, 0, 0],
     scaleLevel: 'solarSystem',
   },
@@ -67,8 +67,8 @@ export const tourStops: TourStop[] = [
       fr: 'Mercure, la plus petite planète, fait le tour du Soleil en seulement 88 jours. Sa surface est marquée par d\'innombrables cratères et connaît des variations de température extrêmes - de 430°C au soleil à -180°C dans l\'ombre.',
     },
     duration: 7,
-    // Mercury radius is 2440 km - use larger offset for proper view
-    cameraPosition: [0, 8000, 25000],
+    // Mercury radius is 2440 km - increased for mobile
+    cameraPosition: [0, 12000, 36000],
     lookAt: [0, 0, 0],
     scaleLevel: 'solarSystem',
   },
@@ -84,8 +84,8 @@ export const tourStops: TourStop[] = [
       fr: 'Mars, la Planète Rouge, fascine l\'humanité depuis des siècles. Sa couleur rouille provient de l\'oxyde de fer à sa surface. Abritant Olympus Mons, le plus grand volcan du système solaire, Mars reste notre meilleur candidat pour une future colonisation humaine.',
     },
     duration: 8,
-    // Mars radius is 3390 km
-    cameraPosition: [0, 10000, 30000],
+    // Mars radius is 3390 km - increased for mobile
+    cameraPosition: [0, 16000, 48000],
     lookAt: [0, 0, 0],
     scaleLevel: 'solarSystem',
   },
@@ -101,8 +101,8 @@ export const tourStops: TourStop[] = [
       fr: 'Entre Mars et Jupiter se trouve la ceinture d\'astéroïdes, abritant des millions de vestiges rocheux de la formation du système solaire. Cérès, le plus gros objet ici, est une planète naine contenant environ un tiers de la masse totale de la ceinture.',
     },
     duration: 7,
-    // Much wider view to show multiple asteroids in the belt
-    cameraPosition: [0, 0.3 * UNITS.KM_PER_AU, 0.5 * UNITS.KM_PER_AU],
+    // Ceres radius is 473 km - increased significantly for mobile visibility
+    cameraPosition: [0, 4000, 12000],
     lookAt: [0, 0, 0],
     scaleLevel: 'solarSystem',
   },
@@ -151,8 +151,8 @@ export const tourStops: TourStop[] = [
       fr: 'Sous la croûte glacée d\'Europe se trouve un océan global contenant plus d\'eau que tous les océans de la Terre réunis. Cela en fait l\'un des endroits les plus prometteurs pour rechercher la vie extraterrestre dans notre système solaire.',
     },
     duration: 7,
-    // Europa radius is 1561 km - use larger offset similar to Moon (7-8x radius)
-    cameraPosition: [0, 4000, 12000],
+    // Europa radius is 1561 km - increased for mobile visibility
+    cameraPosition: [0, 7000, 21000],
     lookAt: [0, 0, 0],
     scaleLevel: 'solarSystem',
   },
@@ -185,8 +185,8 @@ export const tourStops: TourStop[] = [
       fr: 'Titan est la seule lune de notre système solaire avec une atmosphère dense - encore plus épaisse que celle de la Terre. Sous sa brume orange se trouvent des lacs et des mers de méthane liquide, en faisant l\'un des mondes les plus semblables à la Terre que nous ayons découverts.',
     },
     duration: 7,
-    // Titan radius is 2575 km - use 7-8x radius for good view
-    cameraPosition: [0, 6000, 18000],
+    // Titan radius is 2575 km - increased for mobile visibility
+    cameraPosition: [0, 10000, 30000],
     lookAt: [0, 0, 0],
     scaleLevel: 'solarSystem',
   },
@@ -236,8 +236,8 @@ export const tourStops: TourStop[] = [
       fr: 'Aux confins de notre système solaire se trouve Pluton, reclassifiée planète naine en 2006. Malgré sa petite taille, elle possède cinq lunes et un glacier d\'azote en forme de cœur plus grand que le Texas. Elle marque la porte d\'entrée de la ceinture de Kuiper.',
     },
     duration: 7,
-    // Pluto radius is 1188 km - use 7-8x radius for good view
-    cameraPosition: [0, 3000, 9000],
+    // Pluto radius is 1188 km - increased significantly for mobile
+    cameraPosition: [0, 6000, 18000],
     lookAt: [0, 0, 0],
     scaleLevel: 'solarSystem',
   },
@@ -406,8 +406,8 @@ export const tourStops: TourStop[] = [
       fr: 'Notre voyage à travers le cosmos touche à sa fin, de retour sur notre point bleu pâle. Dans l\'immensité de l\'espace, la Terre reste notre seule maison - une précieuse oasis de vie dans le désert cosmique.',
     },
     duration: 10,
-    // Same view as intro - Earth radius is 6371 km
-    cameraPosition: [0, 16000, 48000],
+    // Same view as intro - increased distance for mobile
+    cameraPosition: [0, 25000, 75000],
     lookAt: [0, 0, 0],
     scaleLevel: 'earth',
   },
