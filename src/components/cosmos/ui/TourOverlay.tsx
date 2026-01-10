@@ -37,9 +37,6 @@ export const TourOverlay = () => {
   const { language } = useLanguage();
   const t = translations[language];
   const [isCollapsed, setIsCollapsed] = useState(false);
-  const [timerProgress, setTimerProgress] = useState(0); // 0 to 100
-  const timerStartRef = useRef<number>(0);
-  const animationFrameRef = useRef<number | null>(null);
   
   // Swipe gesture handling
   const touchStartX = useRef<number | null>(null);
@@ -279,55 +276,22 @@ export const TourOverlay = () => {
     }
   }, [isTouring, goToStop]);
   
-  // Auto-advance when not paused + animate progress bar
+  // Auto-advance when not paused
   useEffect(() => {
-    if (!isTouring || !currentStop) {
-      setTimerProgress(0);
-      return;
-    }
+    if (!isTouring || isPaused || !currentStop) return;
     
     const duration = currentStop.duration * 1000; // Convert to ms
-    
-    // Reset timer start when stop changes or tour resumes
-    if (!isPaused) {
-      timerStartRef.current = performance.now();
-      
-      // Animate the progress bar
-      const animate = () => {
-        const elapsed = performance.now() - timerStartRef.current;
-        const progress = Math.min((elapsed / duration) * 100, 100);
-        setTimerProgress(progress);
-        
-        if (progress < 100 && !useCosmosStore.getState().isPaused) {
-          animationFrameRef.current = requestAnimationFrame(animate);
-        }
-      };
-      
-      animationFrameRef.current = requestAnimationFrame(animate);
-    }
-    
-    // Auto-advance timer
-    const timer = !isPaused ? setTimeout(() => {
+    const timer = setTimeout(() => {
       if (tourIndex < tourStops.length - 1) {
         goToStop(tourIndex + 1);
       } else {
         // Tour complete - stop
         stopTour();
       }
-    }, duration) : undefined;
+    }, duration);
     
-    return () => {
-      if (timer) clearTimeout(timer);
-      if (animationFrameRef.current) {
-        cancelAnimationFrame(animationFrameRef.current);
-      }
-    };
+    return () => clearTimeout(timer);
   }, [isTouring, isPaused, tourIndex, currentStop, goToStop, stopTour]);
-  
-  // Reset progress when changing stops
-  useEffect(() => {
-    setTimerProgress(0);
-  }, [tourIndex]);
 
   // Keyboard shortcuts
   useEffect(() => {
@@ -528,16 +492,6 @@ export const TourOverlay = () => {
         />
       </div>
       
-      {/* Timer progress bar - shows time left on current stop */}
-      <div className="h-0.5 bg-white/5">
-        <div 
-          className="h-full bg-emerald-500/80"
-          style={{ 
-            width: `${100 - timerProgress}%`,
-            transition: isPaused ? 'none' : 'width 100ms linear'
-          }}
-        />
-      </div>
       
       {/* Header - clickable to collapse */}
       <div 
