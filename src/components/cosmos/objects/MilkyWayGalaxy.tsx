@@ -509,6 +509,7 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
       <group ref={rotatingGroupRef} position={galaxyOffset}>
         {/* Stars with differential rotation - inner stars rotate faster */}
         <DifferentialRotationPoints
+          key="milkyway-core"
           geometry={coreGeo}
           size={gs * 100}
           map={dotTexture}
@@ -519,6 +520,7 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
 
         {/* Main stars - spiral structure */}
         <DifferentialRotationPoints
+          key="milkyway-arms"
           geometry={starsGeo}
           size={gs * 60}
           map={dotTexture}
@@ -529,6 +531,7 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
 
         {/* Volume stars - add height so it feels "full" */}
         <DifferentialRotationPoints
+          key="milkyway-volume"
           geometry={volumeGeo}
           size={gs * 55}
           map={dotTexture}
@@ -539,6 +542,7 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
 
         {/* Halo stars - scattered above/below the disk */}
         <DifferentialRotationPoints
+          key="milkyway-halo"
           geometry={haloGeo}
           size={gs * 45}
           map={dotTexture}
