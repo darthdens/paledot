@@ -117,14 +117,12 @@ export const Sun = ({ position = [0, 0, 0], visualScale = 80 }: SunProps) => {
   const sunRef = useRef<THREE.Mesh>(null);
   const coronaRef = useRef<THREE.Mesh>(null);
   const glowRef = useRef<THREE.Mesh>(null);
-  const coronaRaysRef = useRef<THREE.Sprite>(null);
   const outerGlowRef = useRef<THREE.Sprite>(null);
   const groupRef = useRef<THREE.Group>(null);
   const worldPos = useRef(new THREE.Vector3());
   
   const glowTexture = useMemo(() => createSunGlowTexture(), []);
   const outerGlowTexture = useMemo(() => createOuterGlowTexture(), []);
-  const coronaRaysTexture = useMemo(() => createCoronaRaysTexture(), []);
   
   const setSelectedObject = useCosmosStore(state => state.setSelectedObject);
   const setHoveredObject = useCosmosStore(state => state.setHoveredObject);
@@ -140,11 +138,6 @@ export const Sun = ({ position = [0, 0, 0], visualScale = 80 }: SunProps) => {
     }
     if (glowRef.current) {
       glowRef.current.scale.setScalar(1 + Math.sin(time * 0.5) * 0.05);
-    }
-    // Animate corona rays - slow rotation and pulsing
-    if (coronaRaysRef.current) {
-      coronaRaysRef.current.material.rotation += 0.0003;
-      coronaRaysRef.current.material.opacity = 0.35 + Math.sin(time * 0.8) * 0.1;
     }
     // Animate outer glow - gentle pulse
     if (outerGlowRef.current) {
@@ -356,17 +349,6 @@ export const Sun = ({ position = [0, 0, 0], visualScale = 80 }: SunProps) => {
         />
       </sprite>
 
-      {/* Corona rays - animated pulsing */}
-      <sprite ref={coronaRaysRef} renderOrder={-7} scale={[sunSize * 14, sunSize * 14, 1]}>
-        <spriteMaterial
-          map={coronaRaysTexture}
-          transparent
-          opacity={0.2}
-          blending={THREE.AdditiveBlending}
-          depthWrite={false}
-          depthTest={false}
-        />
-      </sprite>
 
       {/* Large outer glow sprite - far reaching halo */}
       <sprite renderOrder={-8} scale={[sunSize * 20, sunSize * 20, 1]}>
