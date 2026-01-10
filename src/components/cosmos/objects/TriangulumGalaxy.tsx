@@ -18,7 +18,7 @@ interface TriangulumGalaxyProps {
 const TRIANGULUM = {
   diskRadius: 30000, // Half of 60,000 ly diameter
   bulgeRadius: 4000, // Smaller, less prominent bulge than Andromeda
-  branches: 2, // Two main spiral arms (loose structure)
+  branches: 4, // Four spiral arms for Triangulum
   spinTurns: 1.2, // Looser spiral than Milky Way
   inclination: (55 * Math.PI) / 180, // ~55° inclination (more face-on than Andromeda)
   distanceFromMilkyWay: 2.73e6, // 2.73 million light-years
