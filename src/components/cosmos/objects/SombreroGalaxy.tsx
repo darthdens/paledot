@@ -22,7 +22,8 @@ const SOMBRERO = {
   distanceFromMilkyWay: 29.3e6, // 29.3 million light-years
 };
 
-// Sombrero glow texture - warm cream/golden gradient like the real galaxy
+// Sombrero glow texture - LENS shaped like the top of a sombrero hat
+// Flat and wide at center, curving up/down like an eye/lens shape
 const createSombreroGlowTexture = () => {
   const size = 1024;
   const canvas = document.createElement('canvas');
@@ -36,23 +37,56 @@ const createSombreroGlowTexture = () => {
   // Clear with transparent
   ctx.clearRect(0, 0, size, size);
   
-  // Create radial gradient - bright cream center fading outward
-  const gradient = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, size / 2);
+  // Draw lens/eye shape by using ellipse - wide horizontally, narrow vertically
+  // This creates the sombrero hat top shape
+  const radiusX = size * 0.48; // Wide
+  const radiusY = size * 0.22; // Narrow - lens shape
   
-  // Warm cream/golden colors matching the Sombrero's iconic look
-  gradient.addColorStop(0, 'rgba(255, 255, 250, 1)');        // Bright white center
-  gradient.addColorStop(0.08, 'rgba(255, 252, 240, 0.95)');  // Cream
-  gradient.addColorStop(0.18, 'rgba(255, 245, 220, 0.85)');  // Light cream
-  gradient.addColorStop(0.3, 'rgba(255, 235, 200, 0.65)');   // Golden cream
-  gradient.addColorStop(0.45, 'rgba(255, 220, 175, 0.45)');  // Warm golden
-  gradient.addColorStop(0.6, 'rgba(245, 200, 150, 0.28)');   // Fading golden
-  gradient.addColorStop(0.75, 'rgba(230, 180, 130, 0.12)');  // Faint
-  gradient.addColorStop(0.9, 'rgba(210, 160, 120, 0.04)');   // Very faint
-  gradient.addColorStop(1, 'rgba(200, 150, 110, 0)');        // Transparent
-
-  ctx.fillStyle = gradient;
+  // Multiple gradient layers for the lens glow
+  // Layer 1: Bright inner core
+  const innerGrad = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, radiusY * 0.5);
+  innerGrad.addColorStop(0, 'rgba(255, 255, 250, 1)');
+  innerGrad.addColorStop(0.5, 'rgba(255, 250, 235, 0.95)');
+  innerGrad.addColorStop(1, 'rgba(255, 240, 210, 0.85)');
+  
+  ctx.save();
+  ctx.scale(radiusX / radiusY, 1); // Scale to create ellipse
   ctx.beginPath();
-  ctx.arc(centerX, centerY, size / 2, 0, Math.PI * 2);
+  ctx.arc(centerX * radiusY / radiusX, centerY, radiusY, 0, Math.PI * 2);
+  ctx.restore();
+  ctx.fillStyle = innerGrad;
+  ctx.fill();
+  
+  // Layer 2: Mid glow - the main hat bulge
+  const midGrad = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, radiusY * 0.8);
+  midGrad.addColorStop(0, 'rgba(255, 248, 230, 0.9)');
+  midGrad.addColorStop(0.3, 'rgba(255, 238, 205, 0.7)');
+  midGrad.addColorStop(0.6, 'rgba(255, 225, 180, 0.45)');
+  midGrad.addColorStop(1, 'rgba(245, 205, 155, 0.2)');
+  
+  ctx.save();
+  ctx.globalCompositeOperation = 'screen';
+  ctx.scale(radiusX / radiusY, 1);
+  ctx.beginPath();
+  ctx.arc(centerX * radiusY / radiusX, centerY, radiusY, 0, Math.PI * 2);
+  ctx.restore();
+  ctx.fillStyle = midGrad;
+  ctx.fill();
+  
+  // Layer 3: Outer glow - fading edges
+  const outerGrad = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, radiusY);
+  outerGrad.addColorStop(0, 'rgba(255, 235, 200, 0.5)');
+  outerGrad.addColorStop(0.4, 'rgba(250, 218, 170, 0.3)');
+  outerGrad.addColorStop(0.7, 'rgba(240, 200, 150, 0.15)');
+  outerGrad.addColorStop(0.9, 'rgba(225, 180, 130, 0.05)');
+  outerGrad.addColorStop(1, 'rgba(210, 165, 115, 0)');
+  
+  ctx.save();
+  ctx.scale(radiusX / radiusY, 1);
+  ctx.beginPath();
+  ctx.arc(centerX * radiusY / radiusX, centerY, radiusY, 0, Math.PI * 2);
+  ctx.restore();
+  ctx.fillStyle = outerGrad;
   ctx.fill();
 
   const tex = new THREE.CanvasTexture(canvas);
@@ -156,22 +190,36 @@ export const SombreroGalaxy = ({ visualScale }: SombreroGalaxyProps) => {
     return geo;
   }, [gs]);
 
-  // Disk stars - high density all the way to the edges
+  // Disk stars - HIGH density at center, LOWER in middle, HIGH again at edges
   const diskGeo = useMemo(() => {
-    const count = 300000; // High density
+    const count = 350000;
     const positions = new Float32Array(count * 3);
     const colors = new Float32Array(count * 3);
     const color = new THREE.Color();
     const maxRadius = SOMBRERO.diskRadius * gs;
-    const diskThickness = maxRadius * 0.006; // Very thin
+    const diskThickness = maxRadius * 0.005;
 
     for (let i = 0; i < count; i++) {
       const i3 = i * 3;
 
-      // More uniform distribution to ensure density at edges
-      const t = Math.pow(Math.random(), 0.7); // Less center-concentrated
-      const innerRadius = maxRadius * 0.08;
-      const radius = innerRadius + t * (maxRadius - innerRadius);
+      // Bimodal distribution: high at center, low in middle, high at edges
+      const rand = Math.random();
+      let radius: number;
+      
+      if (rand < 0.35) {
+        // Inner region - high density (center)
+        const t = Math.pow(Math.random(), 1.5);
+        radius = t * maxRadius * 0.35;
+      } else if (rand < 0.55) {
+        // Middle region - lower density
+        const t = Math.random();
+        radius = maxRadius * 0.35 + t * maxRadius * 0.35;
+      } else {
+        // Outer region - high density (edges)
+        const t = Math.pow(Math.random(), 0.6);
+        radius = maxRadius * 0.7 + t * maxRadius * 0.3;
+      }
+      
       const rt = radius / maxRadius;
       const angle = Math.random() * Math.PI * 2;
 
@@ -179,13 +227,13 @@ export const SombreroGalaxy = ({ visualScale }: SombreroGalaxyProps) => {
       positions[i3 + 1] = (Math.random() * 2 - 1) * diskThickness;
       positions[i3 + 2] = Math.sin(angle) * radius;
 
-      // Disk colors: cream/golden
+      // Disk colors: brighter at center, golden in middle, slightly dimmer at edges
       if (rt < 0.25) {
-        color.setHSL(0.1 + Math.random() * 0.03, 0.18, 0.78 + Math.random() * 0.12);
+        color.setHSL(0.1 + Math.random() * 0.02, 0.15, 0.82 + Math.random() * 0.1);
       } else if (rt < 0.6) {
-        color.setHSL(0.09 + Math.random() * 0.03, 0.25, 0.72 + Math.random() * 0.1);
+        color.setHSL(0.09 + Math.random() * 0.03, 0.22, 0.72 + Math.random() * 0.1);
       } else {
-        color.setHSL(0.08 + Math.random() * 0.03, 0.32, 0.65 + Math.random() * 0.12);
+        color.setHSL(0.08 + Math.random() * 0.03, 0.28, 0.68 + Math.random() * 0.1);
       }
 
       colors[i3] = color.r;
@@ -242,57 +290,49 @@ export const SombreroGalaxy = ({ visualScale }: SombreroGalaxyProps) => {
     return geo;
   }, [gs]);
 
-  // Dark gas rim - more density, better color gradient matching Hubble images
+  // Dark gas rim - colorful: dark reds, dark blues, browns, more visible
   const darkGasGeo = useMemo(() => {
-    const count = 200000; // Increased density
+    const count = 250000;
     const positions = new Float32Array(count * 3);
     const colors = new Float32Array(count * 3);
     const color = new THREE.Color();
     const maxRadius = SOMBRERO.diskRadius * gs;
-    const rimThickness = maxRadius * 0.025;
+    const rimThickness = maxRadius * 0.02;
 
     for (let i = 0; i < count; i++) {
       const i3 = i * 3;
 
-      // Concentrate heavily at outer edges - more gradual falloff
-      const t = Math.pow(Math.random(), 0.25);
-      const innerRadius = maxRadius * 0.55; // Start earlier for gradual buildup
-      const radius = innerRadius + t * (maxRadius * 1.05 - innerRadius);
+      // Concentrate at outer edges
+      const t = Math.pow(Math.random(), 0.3);
+      const innerRadius = maxRadius * 0.6;
+      const radius = innerRadius + t * (maxRadius * 1.02 - innerRadius);
       const rt = (radius - innerRadius) / (maxRadius - innerRadius);
       const angle = Math.random() * Math.PI * 2;
 
       positions[i3] = Math.cos(angle) * radius;
       
-      // Thinner spread near center, thicker at edges
-      const heightSpread = rimThickness * (0.2 + rt * 0.8);
+      const heightSpread = rimThickness * (0.25 + rt * 0.75);
       positions[i3 + 1] = (Math.random() * 2 - 1) * heightSpread;
       
       positions[i3 + 2] = Math.sin(angle) * radius;
 
-      // Color gradient: inner = dark brown/rust, outer = very dark red/blue/black
+      // More colorful: dark reds, dark blues, rust browns - slightly brighter to be visible
       const rand = Math.random();
-      if (rt < 0.3) {
-        // Inner region: dark brown/rust (warmer)
-        color.setHSL(0.04 + Math.random() * 0.02, 0.5 + Math.random() * 0.15, 0.06 + Math.random() * 0.04);
-      } else if (rt < 0.6) {
-        // Mid region: transition - darker browns and reds
-        if (rand < 0.5) {
-          color.setHSL(0.02 + Math.random() * 0.02, 0.55 + Math.random() * 0.2, 0.04 + Math.random() * 0.03);
-        } else {
-          color.setHSL(0.0 + Math.random() * 0.02, 0.6 + Math.random() * 0.2, 0.05 + Math.random() * 0.03);
-        }
+      if (rand < 0.3) {
+        // Dark red - slightly more saturated and visible
+        color.setHSL(0.0 + Math.random() * 0.02, 0.7 + Math.random() * 0.2, 0.06 + Math.random() * 0.04);
+      } else if (rand < 0.5) {
+        // Dark blue - more visible
+        color.setHSL(0.6 + Math.random() * 0.1, 0.6 + Math.random() * 0.25, 0.05 + Math.random() * 0.04);
+      } else if (rand < 0.7) {
+        // Dark rust/brown
+        color.setHSL(0.04 + Math.random() * 0.02, 0.6 + Math.random() * 0.15, 0.07 + Math.random() * 0.04);
+      } else if (rand < 0.85) {
+        // Dark purple hints
+        color.setHSL(0.8 + Math.random() * 0.1, 0.5 + Math.random() * 0.2, 0.04 + Math.random() * 0.03);
       } else {
-        // Outer rim: very dark - mostly black with hints of dark red/blue
-        if (rand < 0.4) {
-          // Very dark red
-          color.setHSL(0.0 + Math.random() * 0.015, 0.65 + Math.random() * 0.2, 0.025 + Math.random() * 0.02);
-        } else if (rand < 0.6) {
-          // Very dark blue
-          color.setHSL(0.6 + Math.random() * 0.1, 0.5 + Math.random() * 0.25, 0.02 + Math.random() * 0.02);
-        } else {
-          // Near black
-          color.setHSL(0.05 + Math.random() * 0.05, 0.25, 0.015 + Math.random() * 0.015);
-        }
+        // Near black
+        color.setHSL(0.05 + Math.random() * 0.05, 0.3, 0.02 + Math.random() * 0.02);
       }
 
       colors[i3] = color.r;
@@ -371,10 +411,10 @@ export const SombreroGalaxy = ({ visualScale }: SombreroGalaxyProps) => {
           renderOrder={5}
         />
 
-        {/* Central glow on a MESH plane - rotates with the galaxy (not a billboard sprite) */}
-        {/* This creates the "sombrero hat" bulge effect */}
+        {/* Central glow - LENS shaped like sombrero hat top */}
+        {/* Wide horizontally, narrow vertically - creates the iconic shape */}
         <mesh renderOrder={1} rotation={[0, 0, 0]}>
-          <planeGeometry args={[bulgeR * 3.5, bulgeR * 3.5]} />
+          <planeGeometry args={[diskR * 1.6, bulgeR * 1.4]} />
           <meshBasicMaterial
             map={glowTexture}
             transparent
