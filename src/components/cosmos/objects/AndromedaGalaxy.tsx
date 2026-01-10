@@ -4,6 +4,7 @@ import * as THREE from 'three';
 import { UNITS } from '../types';
 import { useCosmosStore } from '../store/useCosmosStore';
 import { getObjectById } from '../data/celestialObjects';
+import { DifferentialRotationPoints } from './DifferentialRotationMaterial';
 
 interface AndromedaGalaxyProps {
   visualScale: number;
@@ -84,12 +85,10 @@ const createDotTexture = () => {
 
 export const AndromedaGalaxy = ({ visualScale }: AndromedaGalaxyProps) => {
   const groupRef = useRef<THREE.Group>(null);
-  const rotatingGroupRef = useRef<THREE.Group>(null);
   const centerWorldPos = useRef(new THREE.Vector3());
 
   const setObjectWorldPosition = useCosmosStore((s) => s.setObjectWorldPosition);
   const setSelectedObject = useCosmosStore((s) => s.setSelectedObject);
-  const timeSpeed = useCosmosStore((s) => s.timeSpeed);
 
   const gs = UNITS.KM_PER_LY * visualScale;
   
@@ -329,7 +328,7 @@ export const AndromedaGalaxy = ({ visualScale }: AndromedaGalaxyProps) => {
     return geo;
   }, [gs]);
 
-  useFrame((_, delta) => {
+  useFrame(() => {
     if (groupRef.current) {
       groupRef.current.getWorldPosition(centerWorldPos.current);
       const pos: [number, number, number] = [
@@ -340,10 +339,7 @@ export const AndromedaGalaxy = ({ visualScale }: AndromedaGalaxyProps) => {
       setObjectWorldPosition('andromeda', pos);
     }
     
-    // Rotate Andromeda's stars around its own center (same speed as Milky Way)
-    if (rotatingGroupRef.current) {
-      rotatingGroupRef.current.rotation.y += delta * 0.00625 * timeSpeed;
-    }
+    // Differential star rotation is now handled by DifferentialRotationPoints shader
   });
 
   const diskR = ANDROMEDA.diskRadius * gs;
@@ -352,52 +348,40 @@ export const AndromedaGalaxy = ({ visualScale }: AndromedaGalaxyProps) => {
     <group ref={groupRef} position={andromedaPosition}>
       {/* Apply 77° inclination - tilt around X axis */}
       <group rotation={[ANDROMEDA.inclination, 0.3, 0]}>
-        {/* Rotating group for star rotation around galaxy center */}
-        <group ref={rotatingGroupRef}>
+        {/* Stars with differential rotation - inner stars rotate faster */}
+        
         {/* Halo stars - render first (back) */}
-        <points geometry={haloGeo} frustumCulled={false} renderOrder={1}>
-          <pointsMaterial
-            size={gs * 40}
-            map={dotTexture}
-            vertexColors
-            sizeAttenuation
-            transparent
-            opacity={0.3}
-            blending={THREE.AdditiveBlending}
-            depthWrite={false}
-            depthTest={false}
-          />
-        </points>
+        <DifferentialRotationPoints
+          geometry={haloGeo}
+          size={gs * 40}
+          map={dotTexture}
+          opacity={0.3}
+          maxRadius={diskR * 1.2}
+          rotationMultiplier={0.8}
+          renderOrder={1}
+        />
 
         {/* Main spiral arms */}
-        <points geometry={starsGeo} frustumCulled={false} renderOrder={2}>
-          <pointsMaterial
-            size={gs * 55}
-            map={dotTexture}
-            vertexColors
-            sizeAttenuation
-            transparent
-            opacity={0.85}
-            blending={THREE.AdditiveBlending}
-            depthWrite={false}
-            depthTest={false}
-          />
-        </points>
+        <DifferentialRotationPoints
+          geometry={starsGeo}
+          size={gs * 55}
+          map={dotTexture}
+          opacity={0.85}
+          maxRadius={diskR}
+          rotationMultiplier={1}
+          renderOrder={2}
+        />
 
         {/* Core bulge - render on top */}
-        <points geometry={coreGeo} frustumCulled={false} renderOrder={3}>
-          <pointsMaterial
-            size={gs * 90}
-            map={dotTexture}
-            vertexColors
-            sizeAttenuation
-            transparent
-            opacity={0.95}
-            blending={THREE.AdditiveBlending}
-            depthWrite={false}
-            depthTest={false}
-          />
-        </points>
+        <DifferentialRotationPoints
+          geometry={coreGeo}
+          size={gs * 90}
+          map={dotTexture}
+          opacity={0.95}
+          maxRadius={ANDROMEDA.bulgeRadius * gs}
+          rotationMultiplier={1.5}
+          renderOrder={3}
+        />
 
         {/* Center glow (billboard) - topmost */}
         <sprite renderOrder={4} frustumCulled={false} scale={[diskR * 2.4, diskR * 2.4, 1]}>
@@ -412,7 +396,6 @@ export const AndromedaGalaxy = ({ visualScale }: AndromedaGalaxyProps) => {
             toneMapped={false}
           />
         </sprite>
-        </group>
       </group>
 
       {/* Click target (no label - just for selection) */}
