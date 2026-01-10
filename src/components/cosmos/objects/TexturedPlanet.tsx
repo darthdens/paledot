@@ -13,6 +13,7 @@ import earthCloudsTexture from '@/assets/textures/earth-clouds.jpg';
 import moonTexture from '@/assets/textures/moon.jpg';
 import mercuryTexture from '@/assets/textures/mercury.jpg';
 import venusTexture from '@/assets/textures/venus.jpg';
+import marsTexture from '@/assets/textures/mars.jpg';
 
 interface TexturedPlanetProps {
   object: CelestialObject;
@@ -384,15 +385,16 @@ export const TexturedPlanet = ({
   const moonMap = useLoader(THREE.TextureLoader, moonTexture);
   const mercuryMap = useLoader(THREE.TextureLoader, mercuryTexture);
   const venusMap = useLoader(THREE.TextureLoader, venusTexture);
+  const marsMap = useLoader(THREE.TextureLoader, marsTexture);
   
   // Configure texture properties for proper spherical mapping
   useMemo(() => {
-    [earthDayMap, earthNightMap, earthCloudsMap, moonMap, mercuryMap, venusMap].forEach(tex => {
+    [earthDayMap, earthNightMap, earthCloudsMap, moonMap, mercuryMap, venusMap, marsMap].forEach(tex => {
       tex.wrapS = THREE.RepeatWrapping;
       tex.wrapT = THREE.ClampToEdgeWrapping;
       tex.colorSpace = THREE.SRGBColorSpace;
     });
-  }, [earthDayMap, earthNightMap, earthCloudsMap, moonMap, mercuryMap, venusMap]);
+  }, [earthDayMap, earthNightMap, earthCloudsMap, moonMap, mercuryMap, venusMap, marsMap]);
   
   const visuals = PLANET_VISUALS[object.id] || {
     baseColor: object.color,
@@ -686,6 +688,7 @@ export const TexturedPlanet = ({
                 moonMap: { value: moonMap },
                 mercuryMap: { value: mercuryMap },
                 venusMap: { value: venusMap },
+                marsMap: { value: marsMap },
               }}
               vertexShader={`
                 varying vec3 vNormal;
@@ -733,6 +736,7 @@ export const TexturedPlanet = ({
                 uniform sampler2D moonMap;
                 uniform sampler2D mercuryMap;
                 uniform sampler2D venusMap;
+                uniform sampler2D marsMap;
                 varying vec3 vNormal;
                 varying vec3 vPosition;
                 varying vec2 vUv;
@@ -1191,14 +1195,48 @@ export const TexturedPlanet = ({
                     // Enhanced crater shadows and highlights
                     surfaceColor = moonColor * (0.7 + bumpLighting * 0.5);
                   }
-                  // === MARS (6) - Red with dark regions and white polar caps ===
+                  // === MARS (6) - NASA texture with polar ice caps and dust effects ===
                   else if (surfaceType > 5.5 && surfaceType < 6.5) {
-                    float terrain = surfaceNoise * 0.6 + fineNoise * 0.4;
-                    float darkRegions = smoothstep(0.5, 0.65, terrain);
-                    surfaceColor = mix(baseColor, secondaryColor, darkRegions * 0.6);
-                    float polarLat = abs(vUv.y - 0.5) * 2.0;
-                    float iceCap = smoothstep(0.88, 0.98, polarLat);
-                    surfaceColor = mix(surfaceColor, tertiaryColor, iceCap);
+                    // Sample NASA Mars texture
+                    vec3 marsColor = texture2D(marsMap, vUv).rgb;
+                    
+                    // Procedural bump mapping for terrain depth
+                    float texelSize = 0.002;
+                    float heightC = dot(marsColor, vec3(0.299, 0.587, 0.114));
+                    float heightL = dot(texture2D(marsMap, vUv + vec2(-texelSize, 0.0)).rgb, vec3(0.299, 0.587, 0.114));
+                    float heightR = dot(texture2D(marsMap, vUv + vec2(texelSize, 0.0)).rgb, vec3(0.299, 0.587, 0.114));
+                    float heightU = dot(texture2D(marsMap, vUv + vec2(0.0, texelSize)).rgb, vec3(0.299, 0.587, 0.114));
+                    float heightD = dot(texture2D(marsMap, vUv + vec2(0.0, -texelSize)).rgb, vec3(0.299, 0.587, 0.114));
+                    
+                    float bumpStrength = 2.5;
+                    vec3 bumpNormal = normalize(vec3(
+                      (heightL - heightR) * bumpStrength,
+                      (heightD - heightU) * bumpStrength,
+                      1.0
+                    ));
+                    
+                    // Apply bump to lighting
+                    vec3 tangent = normalize(cross(worldNormal, vec3(0.0, 1.0, 0.0)));
+                    vec3 bitangent = normalize(cross(worldNormal, tangent));
+                    vec3 perturbedNormal = normalize(
+                      tangent * bumpNormal.x + 
+                      bitangent * bumpNormal.y + 
+                      worldNormal * bumpNormal.z
+                    );
+                    
+                    float bumpedNdotL = max(dot(perturbedNormal, sunDir), 0.0);
+                    
+                    // Enhance the rusty red Martian color
+                    vec3 marsRed = vec3(1.0, 0.85, 0.75);
+                    marsColor = marsColor * marsRed;
+                    
+                    // Subtle dust haze in atmosphere at terminator
+                    float terminatorZone = smoothstep(-0.1, 0.1, dot(worldNormal, sunDir)) * smoothstep(0.3, 0.1, dot(worldNormal, sunDir));
+                    vec3 dustHaze = vec3(1.0, 0.7, 0.5);
+                    marsColor += dustHaze * terminatorZone * 0.1;
+                    
+                    surfaceColor = marsColor;
+                    NdotL = mix(NdotL, bumpedNdotL, 0.7);
                   }
                   // === JUPITER (7) - Tan/brown bands with Great Red Spot ===
                   else if (surfaceType > 6.5 && surfaceType < 7.5) {
