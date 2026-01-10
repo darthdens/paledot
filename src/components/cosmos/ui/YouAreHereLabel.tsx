@@ -43,6 +43,11 @@ const translations = {
       subtitle: 'The cosmic web',
       details: ['~2 trillion galaxies', '~93 billion light-years diameter', '~13.8 billion years old'],
     },
+    distantGalaxy: {
+      title: 'Viewing Distant Galaxy',
+      subtitle: 'Beyond the Local Group',
+      details: ['Part of the Virgo Supercluster', 'Millions of light-years away', 'Outside our galactic neighborhood'],
+    },
   },
   fr: {
     currentLocation: 'Position Actuelle',
@@ -81,6 +86,11 @@ const translations = {
       subtitle: 'La toile cosmique',
       details: ['~2 000 milliards de galaxies', '~93 milliards d\'années-lumière', '~13,8 milliards d\'années'],
     },
+    distantGalaxy: {
+      title: 'Observation d\'une Galaxie Lointaine',
+      subtitle: 'Au-delà du Groupe Local',
+      details: ['Fait partie du Superamas de la Vierge', 'À des millions d\'années-lumière', 'Hors de notre voisinage galactique'],
+    },
   },
 };
 
@@ -98,13 +108,13 @@ export const YouAreHereLabel = () => {
   const isDistantGalaxy = selectedObject?.type === 'galaxy' && 
     !localGroupGalaxies.includes(selectedObject.id);
   
-  // Hide the label entirely when viewing non-Local Group galaxies
-  if (isDistantGalaxy) {
-    return null;
-  }
-  
-  // Get location info based on current scale
+  // Get location info based on current scale (or distant galaxy)
   const getLocationInfo = () => {
+    // If viewing a distant galaxy, show special info
+    if (isDistantGalaxy) {
+      return t.distantGalaxy;
+    }
+    
     switch (currentScale) {
       case 'earth':
         return t.earth;
