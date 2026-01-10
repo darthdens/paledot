@@ -29,7 +29,7 @@ const SOMBRERO = {
   distanceFromMilkyWay: 29.3e6, // 29.3 million light-years
 };
 
-// Sombrero glow texture: bright white center → cream/golden halo → fade
+// Sombrero glow texture: bright white center to cream/golden halo to fade
 const createSombreroGlowTexture = () => {
   const size = 1024;
   const canvas = document.createElement('canvas');
