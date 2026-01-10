@@ -789,7 +789,7 @@ export const celestialObjects: CelestialObject[] = [
   },
   {
     id: 'triangulum',
-    name: { en: 'Triangulum Galaxy (M33)', fr: 'Galaxie du Triangle (M33)' },
+    name: { en: 'Triangulum', fr: 'Triangle' },
     type: 'galaxy',
     // Position matches TriangulumGalaxy.tsx component
     position: [-2.73e6 * UNITS.KM_PER_LY * 0.5, 2.73e6 * UNITS.KM_PER_LY * 0.1, 2.73e6 * UNITS.KM_PER_LY * 0.85],
