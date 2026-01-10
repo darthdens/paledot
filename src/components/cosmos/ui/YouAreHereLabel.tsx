@@ -44,9 +44,9 @@ const translations = {
       details: ['~2 trillion galaxies', '~93 billion light-years diameter', '~13.8 billion years old'],
     },
     distantGalaxy: {
-      title: 'Viewing Distant Galaxy',
+      title: 'Virgo Supercluster',
       subtitle: 'Beyond the Local Group',
-      details: ['Part of the Virgo Supercluster', 'Millions of light-years away', 'Outside our galactic neighborhood'],
+      details: ['Contains thousands of galaxies', '~110 million light-years across', 'Part of Laniakea Supercluster'],
     },
   },
   fr: {
@@ -87,9 +87,9 @@ const translations = {
       details: ['~2 000 milliards de galaxies', '~93 milliards d\'années-lumière', '~13,8 milliards d\'années'],
     },
     distantGalaxy: {
-      title: 'Observation d\'une Galaxie Lointaine',
+      title: 'Superamas de la Vierge',
       subtitle: 'Au-delà du Groupe Local',
-      details: ['Fait partie du Superamas de la Vierge', 'À des millions d\'années-lumière', 'Hors de notre voisinage galactique'],
+      details: ['Contient des milliers de galaxies', '~110 millions d\'années-lumière', 'Fait partie du Superamas Laniakea'],
     },
   },
 };
