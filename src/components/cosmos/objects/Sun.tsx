@@ -190,6 +190,7 @@ export const Sun = ({ position = [0, 0, 0], visualScale = 80 }: SunProps) => {
       {/* Sun core - bright emissive */}
       <mesh 
         ref={sunRef}
+        renderOrder={0}
         onClick={handleClick}
         onPointerOver={handlePointerOver}
         onPointerOut={handlePointerOut}
@@ -248,7 +249,7 @@ export const Sun = ({ position = [0, 0, 0], visualScale = 80 }: SunProps) => {
       </mesh>
 
       {/* Inner corona - bright warm yellow */}
-      <mesh ref={coronaRef}>
+      <mesh ref={coronaRef} renderOrder={1}>
         <sphereGeometry args={[sunSize * 1.1, 64, 64]} />
         <meshBasicMaterial
           color="#FFFFF0"
@@ -259,7 +260,7 @@ export const Sun = ({ position = [0, 0, 0], visualScale = 80 }: SunProps) => {
       </mesh>
 
       {/* Middle glow layer */}
-      <mesh>
+      <mesh renderOrder={2}>
         <sphereGeometry args={[sunSize * 1.2, 48, 48]} />
         <meshBasicMaterial
           color="#FFF080"
@@ -270,7 +271,7 @@ export const Sun = ({ position = [0, 0, 0], visualScale = 80 }: SunProps) => {
       </mesh>
 
       {/* Outer glow - large and soft */}
-      <mesh ref={glowRef}>
+      <mesh ref={glowRef} renderOrder={3}>
         <sphereGeometry args={[sunSize * 1.5, 32, 32]} />
         <shaderMaterial
           transparent
@@ -298,7 +299,7 @@ export const Sun = ({ position = [0, 0, 0], visualScale = 80 }: SunProps) => {
       </mesh>
 
       {/* Far outer glow - very soft and large */}
-      <mesh>
+      <mesh renderOrder={4}>
         <sphereGeometry args={[sunSize * 2.0, 32, 32]} />
         <shaderMaterial
           transparent
@@ -326,7 +327,7 @@ export const Sun = ({ position = [0, 0, 0], visualScale = 80 }: SunProps) => {
       </mesh>
 
       {/* Core glow sprite - bright center */}
-      <sprite renderOrder={-5} scale={[sunSize * 10, sunSize * 10, 1]}>
+      <sprite renderOrder={12} scale={[sunSize * 10, sunSize * 10, 1]}>
         <spriteMaterial
           map={glowTexture}
           transparent
@@ -338,7 +339,7 @@ export const Sun = ({ position = [0, 0, 0], visualScale = 80 }: SunProps) => {
       </sprite>
 
       {/* Medium glow sprite - extended corona */}
-      <sprite ref={outerGlowRef} renderOrder={-6} scale={[sunSize * 20, sunSize * 20, 1]}>
+      <sprite ref={outerGlowRef} renderOrder={11} scale={[sunSize * 20, sunSize * 20, 1]}>
         <spriteMaterial
           map={outerGlowTexture}
           transparent
@@ -350,7 +351,7 @@ export const Sun = ({ position = [0, 0, 0], visualScale = 80 }: SunProps) => {
       </sprite>
 
       {/* Large outer glow sprite - far reaching halo */}
-      <sprite renderOrder={-8} scale={[sunSize * 40, sunSize * 40, 1]}>
+      <sprite renderOrder={10} scale={[sunSize * 40, sunSize * 40, 1]}>
         <spriteMaterial
           map={outerGlowTexture}
           transparent
