@@ -378,7 +378,7 @@ export const SombreroGalaxy = ({ visualScale }: SombreroGalaxyProps) => {
           geometry={dustLaneGeo}
           size={gs * 35}
           map={dotTexture}
-          opacity={0.4}
+          opacity={0.92}
           maxRadius={diskR}
           rotationMultiplier={1}
           renderOrder={4}
@@ -389,7 +389,7 @@ export const SombreroGalaxy = ({ visualScale }: SombreroGalaxyProps) => {
           geometry={darkGasGeo}
           size={gs * 45}
           map={dotTexture}
-          opacity={0.4}
+          opacity={0.88}
           maxRadius={diskR * 1.1}
           rotationMultiplier={0.85}
           renderOrder={5}
@@ -402,11 +402,11 @@ export const SombreroGalaxy = ({ visualScale }: SombreroGalaxyProps) => {
         <spriteMaterial
           map={glowTexture}
           transparent
-          opacity={0.35}
+          opacity={0.9}
           blending={THREE.AdditiveBlending}
           depthWrite={false}
           depthTest={false}
-          toneMapped
+          toneMapped={false}
         />
       </sprite>
 
@@ -415,11 +415,11 @@ export const SombreroGalaxy = ({ visualScale }: SombreroGalaxyProps) => {
         <spriteMaterial
           map={glowTexture}
           transparent
-          opacity={0.15}
+          opacity={0.4}
           blending={THREE.AdditiveBlending}
           depthWrite={false}
           depthTest={false}
-          toneMapped
+          toneMapped={false}
         />
       </sprite>
 
@@ -428,11 +428,11 @@ export const SombreroGalaxy = ({ visualScale }: SombreroGalaxyProps) => {
         <spriteMaterial
           map={glowTexture}
           transparent
-          opacity={0.06}
+          opacity={0.18}
           blending={THREE.AdditiveBlending}
           depthWrite={false}
           depthTest={false}
-          toneMapped
+          toneMapped={false}
         />
       </sprite>
 

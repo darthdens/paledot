@@ -39,10 +39,8 @@ export const useDifferentialRotationMaterial = ({
     return new THREE.ShaderMaterial({
       transparent: true,
       depthWrite: false,
-      depthTest: true,
-      // Normal blending prevents galaxies from "blowing out" from additive stacking
-      blending: THREE.NormalBlending,
-      toneMapped: true,
+      depthTest: false,
+      blending: THREE.AdditiveBlending,
       uniforms: {
         uTime: { value: 0 },
         uSize: { value: size },
