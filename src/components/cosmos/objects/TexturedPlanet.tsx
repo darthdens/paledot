@@ -599,7 +599,7 @@ export const TexturedPlanet = ({
   const orbitPoints = useMemo(() => {
     if (!showOrbit || orbitRadius === 0 || isMoon) return null;
     const points = [];
-    const segments = 512;
+    const segments = 1024;
     for (let i = 0; i <= segments; i++) {
       const angle = (i / segments) * Math.PI * 2;
       points.push(
