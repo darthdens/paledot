@@ -121,7 +121,7 @@ export const GalacticOrbitRing = ({ visualScale, visible = true }: GalacticOrbit
         <sphereGeometry args={[markerRadius, 16, 16]} />
         <meshBasicMaterial
           ref={markerMaterialRef}
-          color="#00ff88"
+          color="#ffffff"
           transparent
           opacity={0}
           blending={THREE.AdditiveBlending}
@@ -145,7 +145,7 @@ export const GalacticOrbitRing = ({ visualScale, visible = true }: GalacticOrbit
             itemSize={3}
           />
         </bufferGeometry>
-        <lineBasicMaterial ref={lineMaterialRef} color="#00ff88" transparent opacity={0} />
+        <lineBasicMaterial ref={lineMaterialRef} color="#ffffff" transparent opacity={0} />
       </line>
 
       {/* Tooltip label - always visible when ring is visible */}
