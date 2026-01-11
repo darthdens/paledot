@@ -353,7 +353,7 @@ export const TriangulumGalaxy = ({ visualScale }: TriangulumGalaxyProps) => {
           geometry={starsGeo}
           size={gs * 50}
           map={dotTexture}
-          opacity={0.35}
+          opacity={0.65}
           maxRadius={diskR}
           rotationMultiplier={1}
           renderOrder={2}
@@ -365,7 +365,7 @@ export const TriangulumGalaxy = ({ visualScale }: TriangulumGalaxyProps) => {
           geometry={coreGeo}
           size={gs * 75}
           map={dotTexture}
-          opacity={0.5}
+          opacity={0.8}
           maxRadius={TRIANGULUM.bulgeRadius * gs}
           rotationMultiplier={1.5}
           renderOrder={3}
