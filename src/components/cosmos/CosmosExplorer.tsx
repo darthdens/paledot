@@ -198,12 +198,12 @@ export const CosmosExplorer = () => {
             </>
           )}
           
-          {/* Bloom post-processing for sun glow - high threshold to only bloom stars, not particles */}
+          {/* Bloom post-processing - very high threshold to only bloom actual stars */}
           <EffectComposer>
             <Bloom 
-              intensity={1.0}
-              luminanceThreshold={1.5}
-              luminanceSmoothing={0.3}
+              intensity={0.8}
+              luminanceThreshold={2.5}
+              luminanceSmoothing={0.2}
               mipmapBlur
             />
           </EffectComposer>
