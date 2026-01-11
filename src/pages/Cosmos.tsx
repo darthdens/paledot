@@ -33,6 +33,11 @@ const Cosmos = () => {
                   ? 'Un voyage interactif de la Terre aux confins de l\'univers observable'
                   : 'An interactive journey from Earth to the edge of the observable universe'}
               </p>
+              <p className="text-sm text-muted-foreground/70 italic">
+                {language === 'fr' 
+                  ? '— Toujours et à jamais un travail en cours —'
+                  : '— Always and forever a work in progress —'}
+              </p>
             </div>
           </div>
         </section>
