@@ -223,40 +223,48 @@ export const QuickJumpMenu = () => {
                   )}
                 </button>
 
-                {/* Category items - only for expandable categories */}
-                {expandable && expandedCategory === category.id && (
-                  <div className="ml-2 sm:ml-3 mt-0.5 space-y-0.5 border-l border-white/10 pl-2">
-                    {category.locations.map(locationId => {
-                      const obj = getObjectById(locationId);
-                      if (!obj) return null;
-                      const implemented = isItemImplemented(category.id, locationId);
-                      
-                      return (
-                        <button
-                          key={locationId}
-                          onClick={() => implemented && handleJump(locationId)}
-                          disabled={!implemented}
-                          className={`w-full flex items-center gap-2 p-1.5 rounded transition-colors text-left ${
-                            implemented 
-                              ? 'hover:bg-white/10 cursor-pointer' 
-                              : 'opacity-50 cursor-not-allowed'
-                          }`}
-                        >
-                          <span
-                            className="w-2 h-2 rounded-full shrink-0"
-                            style={{ backgroundColor: obj.color }}
-                          />
-                          <span className={`text-xs truncate ${implemented ? 'text-white/70 hover:text-white' : 'text-white/40'}`}>
-                            {obj.name[language]}
-                          </span>
-                          {!implemented && (
-                            <span className="flex items-center gap-0.5 px-1 py-0.5 bg-amber-500/20 border border-amber-500/30 rounded text-[8px] text-amber-400 ml-auto shrink-0">
-                              <Clock className="w-2 h-2" />
-                            </span>
-                          )}
-                        </button>
-                      );
-                    })}
+                {/* Category items - smooth expand/collapse animation */}
+                {expandable && (
+                  <div 
+                    className={`grid transition-all duration-300 ease-out ${
+                      expandedCategory === category.id ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'
+                    }`}
+                  >
+                    <div className="overflow-hidden">
+                      <div className="ml-2 sm:ml-3 mt-0.5 space-y-0.5 border-l border-white/10 pl-2">
+                        {category.locations.map(locationId => {
+                          const obj = getObjectById(locationId);
+                          if (!obj) return null;
+                          const implemented = isItemImplemented(category.id, locationId);
+                          
+                          return (
+                            <button
+                              key={locationId}
+                              onClick={() => implemented && handleJump(locationId)}
+                              disabled={!implemented}
+                              className={`w-full flex items-center gap-2 p-1.5 rounded transition-colors text-left ${
+                                implemented 
+                                  ? 'hover:bg-white/10 cursor-pointer' 
+                                  : 'opacity-50 cursor-not-allowed'
+                              }`}
+                            >
+                              <span
+                                className="w-2 h-2 rounded-full shrink-0"
+                                style={{ backgroundColor: obj.color }}
+                              />
+                              <span className={`text-xs truncate ${implemented ? 'text-white/70 hover:text-white' : 'text-white/40'}`}>
+                                {obj.name[language]}
+                              </span>
+                              {!implemented && (
+                                <span className="flex items-center gap-0.5 px-1 py-0.5 bg-amber-500/20 border border-amber-500/30 rounded text-[8px] text-amber-400 ml-auto shrink-0">
+                                  <Clock className="w-2 h-2" />
+                                </span>
+                              )}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
                   </div>
                 )}
               </div>
