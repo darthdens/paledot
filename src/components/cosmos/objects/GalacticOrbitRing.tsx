@@ -166,8 +166,8 @@ export const GalacticOrbitRing = ({ visualScale, visible = true }: GalacticOrbit
             transition: 'opacity 0.1s ease-out'
           }}
         >
-          <div className="bg-black/80 backdrop-blur-sm px-3 py-1.5 rounded-lg border border-emerald-500/50 whitespace-nowrap">
-            <span className="text-emerald-400 text-sm font-semibold">
+          <div className="bg-background/90 backdrop-blur-md px-3 py-1.5 rounded-lg whitespace-nowrap">
+            <span className="text-foreground text-sm font-semibold">
               {language === 'fr' ? 'Nous sommes ici' : 'We are here'}
             </span>
           </div>
