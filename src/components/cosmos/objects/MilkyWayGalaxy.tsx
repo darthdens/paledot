@@ -513,7 +513,7 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
           geometry={coreGeo}
           size={gs * 100}
           map={dotTexture}
-          opacity={0.95}
+          opacity={0.35}
           maxRadius={MILKY_WAY.bulgeRadius * gs}
           rotationMultiplier={1.5}
           differentialStrength={0.12}
@@ -525,7 +525,7 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
           geometry={starsGeo}
           size={gs * 60}
           map={dotTexture}
-          opacity={0.9}
+          opacity={0.28}
           maxRadius={diskR}
           rotationMultiplier={1}
           differentialStrength={0.08}
@@ -537,7 +537,7 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
           geometry={volumeGeo}
           size={gs * 55}
           map={dotTexture}
-          opacity={0.45}
+          opacity={0.14}
           maxRadius={diskR}
           rotationMultiplier={1}
           differentialStrength={0.08}
@@ -549,18 +549,18 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
           geometry={haloGeo}
           size={gs * 45}
           map={dotTexture}
-          opacity={0.35}
+          opacity={0.10}
           maxRadius={diskR * 1.2}
           rotationMultiplier={0.8}
           differentialStrength={0.06}
         />
 
-        {/* Center glow (billboard) - does not rotate with stars */}
+        {/* Center glow (billboard) - toned down */}
         <sprite renderOrder={10} frustumCulled={false} scale={[diskR * 2.2, diskR * 2.2, 1]}>
           <spriteMaterial
             map={glowTexture}
             transparent
-            opacity={1}
+            opacity={0.25}
             blending={THREE.AdditiveBlending}
             depthWrite={false}
             depthTest={false}
@@ -569,12 +569,12 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
           />
         </sprite>
 
-        {/* Inner core glow - bright center boost */}
+        {/* Inner core glow - toned down */}
         <sprite renderOrder={11} frustumCulled={false} scale={[diskR * 0.6, diskR * 0.6, 1]}>
           <spriteMaterial
             map={glowTexture}
             transparent
-            opacity={0.9}
+            opacity={0.18}
             blending={THREE.AdditiveBlending}
             depthWrite={false}
             depthTest={false}
@@ -582,12 +582,12 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
           />
         </sprite>
 
-        {/* Hot center core - intense glow */}
+        {/* Hot center core - toned down */}
         <sprite renderOrder={12} frustumCulled={false} scale={[diskR * 0.25, diskR * 0.25, 1]}>
           <spriteMaterial
             map={glowTexture}
             transparent
-            opacity={1}
+            opacity={0.12}
             blending={THREE.AdditiveBlending}
             depthWrite={false}
             depthTest={false}

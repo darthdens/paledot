@@ -383,12 +383,12 @@ export const AndromedaGalaxy = ({ visualScale }: AndromedaGalaxyProps) => {
           renderOrder={3}
         />
 
-        {/* Center glow (billboard) - topmost */}
+        {/* Center glow (billboard) - toned down */}
         <sprite renderOrder={4} frustumCulled={false} scale={[diskR * 2.4, diskR * 2.4, 1]}>
           <spriteMaterial
             map={glowTexture}
             transparent
-            opacity={0.9}
+            opacity={0.22}
             blending={THREE.AdditiveBlending}
             depthWrite={false}
             depthTest={false}

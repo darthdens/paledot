@@ -397,12 +397,12 @@ export const SombreroGalaxy = ({ visualScale }: SombreroGalaxyProps) => {
 
       </group>
 
-      {/* Global smooth glow - SPRITE (billboard) so it looks good from all angles */}
+      {/* Global smooth glow - toned down */}
       <sprite renderOrder={1} frustumCulled={false} scale={[diskR * 2.5, diskR * 2.5, 1]}>
         <spriteMaterial
           map={glowTexture}
           transparent
-          opacity={0.9}
+          opacity={0.22}
           blending={THREE.AdditiveBlending}
           depthWrite={false}
           depthTest={false}
@@ -410,12 +410,12 @@ export const SombreroGalaxy = ({ visualScale }: SombreroGalaxyProps) => {
         />
       </sprite>
 
-      {/* Mid edge glow - softer outline */}
+      {/* Mid edge glow - toned down */}
       <sprite renderOrder={0} frustumCulled={false} scale={[diskR * 2.9, diskR * 2.9, 1]}>
         <spriteMaterial
           map={glowTexture}
           transparent
-          opacity={0.4}
+          opacity={0.10}
           blending={THREE.AdditiveBlending}
           depthWrite={false}
           depthTest={false}
@@ -423,12 +423,12 @@ export const SombreroGalaxy = ({ visualScale }: SombreroGalaxyProps) => {
         />
       </sprite>
 
-      {/* Outer edge glow - faint halo */}
+      {/* Outer edge glow - toned down */}
       <sprite renderOrder={-1} frustumCulled={false} scale={[diskR * 3.4, diskR * 3.4, 1]}>
         <spriteMaterial
           map={glowTexture}
           transparent
-          opacity={0.18}
+          opacity={0.05}
           blending={THREE.AdditiveBlending}
           depthWrite={false}
           depthTest={false}

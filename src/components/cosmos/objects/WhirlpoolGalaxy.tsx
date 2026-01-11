@@ -708,12 +708,12 @@ export const WhirlpoolGalaxy = ({ visualScale }: WhirlpoolGalaxyProps) => {
         />
 
 
-        {/* Center glow */}
+        {/* Center glow (toned down) */}
         <sprite renderOrder={4} frustumCulled={false} scale={[diskR * 2.0, diskR * 2.0, 1]}>
           <spriteMaterial
             map={glowTexture}
             transparent
-            opacity={0.82}
+            opacity={0.18}
             blending={THREE.AdditiveBlending}
             depthWrite={false}
             depthTest={false}
