@@ -389,9 +389,9 @@ export const TourOverlay = () => {
           bottom-2 left-2 right-2 
           sm:bottom-4 sm:top-auto sm:left-auto sm:right-4 sm:w-auto`}
         style={isFullscreen ? {
-          bottom: 'calc(0.5rem + env(safe-area-inset-bottom))',
-          left: 'calc(0.5rem + env(safe-area-inset-left))',
-          right: 'calc(0.5rem + env(safe-area-inset-right))',
+          bottom: 'calc(1rem + env(safe-area-inset-bottom))',
+          right: 'calc(1rem + env(safe-area-inset-right))',
+          left: 'auto',
         } : undefined}
         onClick={toggleCollapse}
         onTouchStart={handleTouchStart}
@@ -477,9 +477,9 @@ export const TourOverlay = () => {
         sm:bottom-4 sm:top-auto sm:left-auto sm:right-4 sm:w-80 sm:max-h-none
         md:w-96`}
       style={isFullscreen ? { 
-        bottom: 'calc(0.5rem + env(safe-area-inset-bottom))',
-        left: 'calc(0.5rem + env(safe-area-inset-left))',
-        right: 'calc(0.5rem + env(safe-area-inset-right))',
+        bottom: 'calc(1rem + env(safe-area-inset-bottom))',
+        right: 'calc(1rem + env(safe-area-inset-right))',
+        left: 'auto',
       } : undefined}
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
