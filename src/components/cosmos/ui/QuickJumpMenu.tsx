@@ -102,9 +102,10 @@ export const QuickJumpMenu = () => {
 
   // Non-fullscreen: quick jump should stop exactly at the container's bottom margin
   // topOffsetPx is the top position (top-12 = 48px on mobile, top-[68px] on sm+)
-  // We need: maxHeight = containerHeight - topOffset - bottomMargin (bottom-2 = 8px)
-  const bottomMarginNonFullscreenPx = 8; // bottom-2 = 0.5rem = 8px
-  const maxHeightNonFullscreenPxFinal = Math.max(160, containerHeight - topOffsetPx - bottomMarginNonFullscreenPx - 8);
+  // We need: maxHeight = containerHeight - topOffset - bottomMargin
+  // Adding extra buffer since content was extending past the bottom margin
+  const bottomMarginNonFullscreenPx = 16; // increased to ensure it stops before the bottom edge
+  const maxHeightNonFullscreenPxFinal = Math.max(160, containerHeight - topOffsetPx - bottomMarginNonFullscreenPx);
 
   const menu = (
     <div 
