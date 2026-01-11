@@ -70,7 +70,7 @@ export const QuickJumpMenu = () => {
 
   const menu = (
     <div 
-      className={`fixed z-[10001] w-[calc(100vw-2rem)] max-w-56 sm:max-w-64 h-[320px] max-h-[calc(100vh-100px)] bg-white/10 backdrop-blur-sm rounded-lg border border-white/20 overflow-hidden flex flex-col top-12 right-2 sm:top-[68px] sm:right-4`}
+      className={`${isFullscreen ? 'fixed' : 'absolute'} top-12 right-2 sm:top-[68px] sm:right-4 z-[10001] w-[calc(100vw-2rem)] max-w-56 sm:max-w-64 h-[320px] max-h-[calc(100vh-100px)] bg-white/10 backdrop-blur-sm rounded-lg border border-white/20 overflow-hidden flex flex-col`}
       style={
         isFullscreen
           ? {
