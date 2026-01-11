@@ -128,8 +128,8 @@ export const CosmosExplorer = () => {
 
           {/* Everything that should rotate together at galaxy scale */}
           <GalaxyRotator visualScale={UNIFIED_SCALE}>
-            {/* Star background - rotates with the rest so the view never "sticks" to it */}
-            <Stars radius={1e8} depth={1e7} count={15000} factor={1e5} saturation={0} fade speed={0.3} />
+            {/* Star background - reduced size/brightness so it doesn't overpower Sun/Proxima */}
+            <Stars radius={1e8} depth={1e7} count={15000} factor={2000} saturation={0} fade speed={0.3} />
 
             {/* Galaxy content with smooth fade transition */}
             <GalaxyFadeWrapper>
