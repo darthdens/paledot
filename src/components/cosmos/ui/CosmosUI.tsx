@@ -472,7 +472,7 @@ export const CosmosUI = () => {
     <>
       {/* Welcome overlay for first visit */}
       {showControlHints && (
-        <div className="absolute inset-0 flex items-center justify-center bg-black z-[20000] p-3">
+        <div className="absolute inset-0 flex items-center justify-center bg-black z-[20000] p-3 animate-fade-in">
           <div className="text-center space-y-3 sm:space-y-5 max-w-sm sm:max-w-lg px-4">
             <h1 className="text-xl sm:text-3xl md:text-4xl font-bold text-white leading-tight">{t.welcome}</h1>
             <p className="text-sm sm:text-base text-white/70">{t.subtitle}</p>
@@ -606,7 +606,7 @@ export const CosmosUI = () => {
       {/* Time speed slider */}
       {showTimeSlider && !showControlHints && (
         <div
-          className={`${isFullscreen ? 'fixed' : 'absolute'} top-12 right-2 sm:top-[68px] sm:right-4 z-[10000] bg-white/10 backdrop-blur-sm rounded-lg p-3 sm:p-4 min-w-[180px] sm:min-w-[220px]`}
+          className={`${isFullscreen ? 'fixed' : 'absolute'} top-12 right-2 sm:top-[68px] sm:right-4 z-[10000] bg-white/10 backdrop-blur-sm rounded-lg p-3 sm:p-4 min-w-[180px] sm:min-w-[220px] animate-fade-in`}
           style={
             isFullscreen
               ? {
