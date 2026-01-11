@@ -84,7 +84,13 @@ export const ProximaCentauri = ({ visualScale = 0.001 }: ProximaCentauriProps) =
     <Select enabled>
       <group>
       {/* Star core - red dwarf surface with subtle texture */}
-      <mesh ref={starRef} onClick={handleClick} onPointerOver={handlePointerOver} onPointerOut={handlePointerOut}>
+      <mesh 
+        ref={starRef} 
+        renderOrder={0}
+        onClick={handleClick} 
+        onPointerOver={handlePointerOver} 
+        onPointerOut={handlePointerOut}
+      >
         <sphereGeometry args={[starSize, 48, 48]} />
         <shaderMaterial
           uniforms={{
@@ -142,9 +148,6 @@ export const ProximaCentauri = ({ visualScale = 0.001 }: ProximaCentauriProps) =
           transparent 
           opacity={0.5} 
           depthWrite={false} 
-          polygonOffset 
-          polygonOffsetFactor={-1} 
-          polygonOffsetUnits={-1} 
         />
       </mesh>
 
@@ -156,9 +159,6 @@ export const ProximaCentauri = ({ visualScale = 0.001 }: ProximaCentauriProps) =
           transparent 
           opacity={0.3} 
           depthWrite={false} 
-          polygonOffset 
-          polygonOffsetFactor={-2} 
-          polygonOffsetUnits={-2} 
         />
       </mesh>
 
@@ -169,9 +169,6 @@ export const ProximaCentauri = ({ visualScale = 0.001 }: ProximaCentauriProps) =
           transparent
           depthWrite={false}
           side={THREE.BackSide}
-          polygonOffset
-          polygonOffsetFactor={-3}
-          polygonOffsetUnits={-3}
           uniforms={{
             glowColor: { value: new THREE.Color('#E05040') },
           }}
@@ -186,7 +183,7 @@ export const ProximaCentauri = ({ visualScale = 0.001 }: ProximaCentauriProps) =
             varying vec3 vNormal;
             uniform vec3 glowColor;
             void main() {
-              float intensity = pow(0.6 - dot(vNormal, vec3(0.0, 0.0, 1.0)), 1.5);
+              float intensity = pow(max(0.0, 0.6 - dot(vNormal, vec3(0.0, 0.0, 1.0))), 1.5);
               gl_FragColor = vec4(glowColor, intensity * 0.6);
             }
           `}
@@ -200,9 +197,6 @@ export const ProximaCentauri = ({ visualScale = 0.001 }: ProximaCentauriProps) =
           transparent
           depthWrite={false}
           side={THREE.BackSide}
-          polygonOffset
-          polygonOffsetFactor={-4}
-          polygonOffsetUnits={-4}
           uniforms={{
             glowColor: { value: new THREE.Color('#B03020') },
           }}
@@ -217,22 +211,22 @@ export const ProximaCentauri = ({ visualScale = 0.001 }: ProximaCentauriProps) =
             varying vec3 vNormal;
             uniform vec3 glowColor;
             void main() {
-              float intensity = pow(0.45 - dot(vNormal, vec3(0.0, 0.0, 1.0)), 2.0);
+              float intensity = pow(max(0.0, 0.5 - dot(vNormal, vec3(0.0, 0.0, 1.0))), 2.0);
               gl_FragColor = vec4(glowColor, intensity * 0.35);
             }
           `}
         />
       </mesh>
 
-      {/* Sprite-based gradient glow (reduced) */}
-      <sprite renderOrder={-5} scale={[starSize * 4, starSize * 4, 1]}>
+      {/* Sprite-based gradient glow */}
+      <sprite renderOrder={10} scale={[starSize * 4, starSize * 4, 1]}>
         <spriteMaterial
           map={glowTexture}
           transparent
           opacity={0.35}
           blending={THREE.AdditiveBlending}
           depthWrite={false}
-          depthTest={false}
+          depthTest={true}
         />
       </sprite>
 
