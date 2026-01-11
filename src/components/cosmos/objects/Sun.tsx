@@ -1,5 +1,6 @@
 import { useRef, useMemo } from 'react';
 import { useFrame } from '@react-three/fiber';
+import { Select } from '@react-three/postprocessing';
 import * as THREE from 'three';
 import { useCosmosStore } from '../store/useCosmosStore';
 
@@ -186,7 +187,8 @@ export const Sun = ({ position = [0, 0, 0], visualScale = 80 }: SunProps) => {
   };
 
   return (
-    <group ref={groupRef} position={position}>
+    <Select enabled>
+      <group ref={groupRef} position={position}>
       {/* Sun core - bright emissive */}
       <mesh 
         ref={sunRef}
@@ -371,6 +373,7 @@ export const Sun = ({ position = [0, 0, 0], visualScale = 80 }: SunProps) => {
         decay={1}
         color="#FFFAF0"
       />
-    </group>
+      </group>
+    </Select>
   );
 };

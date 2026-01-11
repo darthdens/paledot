@@ -1,5 +1,6 @@
 import { useRef, useMemo } from 'react';
 import { useFrame } from '@react-three/fiber';
+import { Select } from '@react-three/postprocessing';
 import * as THREE from 'three';
 import { useCosmosStore } from '../store/useCosmosStore';
 import { getObjectById } from '../data/celestialObjects';
@@ -80,7 +81,8 @@ export const ProximaCentauri = ({ visualScale = 0.001 }: ProximaCentauriProps) =
   };
 
   return (
-    <group>
+    <Select enabled>
+      <group>
       {/* Star core - red dwarf surface with subtle texture */}
       <mesh ref={starRef} onClick={handleClick} onPointerOver={handlePointerOver} onPointerOut={handlePointerOut}>
         <sphereGeometry args={[starSize, 48, 48]} />
@@ -214,6 +216,7 @@ export const ProximaCentauri = ({ visualScale = 0.001 }: ProximaCentauriProps) =
 
       {/* Dimmer point light */}
       <pointLight intensity={2} distance={0} decay={1} color="#FFD0C8" />
-    </group>
+      </group>
+    </Select>
   );
 };
