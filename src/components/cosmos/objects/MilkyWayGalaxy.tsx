@@ -525,7 +525,7 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
           geometry={starsGeo}
           size={gs * 60}
           map={dotTexture}
-          opacity={0.35}
+          opacity={0.7}
           maxRadius={diskR}
           rotationMultiplier={1}
           differentialStrength={0.08}
@@ -537,7 +537,7 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
           geometry={volumeGeo}
           size={gs * 55}
           map={dotTexture}
-          opacity={0.22}
+          opacity={0.4}
           maxRadius={diskR}
           rotationMultiplier={1}
           differentialStrength={0.08}
@@ -549,7 +549,7 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
           geometry={haloGeo}
           size={gs * 45}
           map={dotTexture}
-          opacity={0.18}
+          opacity={0.3}
           maxRadius={diskR * 1.2}
           rotationMultiplier={0.8}
           differentialStrength={0.06}

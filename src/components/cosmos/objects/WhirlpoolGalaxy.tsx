@@ -674,7 +674,7 @@ export const WhirlpoolGalaxy = ({ visualScale }: WhirlpoolGalaxyProps) => {
           geometry={starsGeo}
           size={gs * 52}
           map={dotTexture}
-          opacity={0.35}
+          opacity={0.65}
           maxRadius={diskR}
           rotationMultiplier={1}
           differentialStrength={0.06}
@@ -700,7 +700,7 @@ export const WhirlpoolGalaxy = ({ visualScale }: WhirlpoolGalaxyProps) => {
           geometry={coreGeo}
           size={gs * 80}
           map={dotTexture}
-          opacity={0.5}
+          opacity={0.8}
           maxRadius={WHIRLPOOL.bulgeRadius * gs}
           rotationMultiplier={1.4}
           differentialStrength={0.1}
