@@ -40,6 +40,12 @@ export const QuickJumpMenu = () => {
     if (typeof window === 'undefined') return false;
     return window.matchMedia?.('(min-width: 640px)')?.matches ?? false;
   });
+
+  const [containerHeight, setContainerHeight] = useState<number>(() => {
+    if (typeof window === 'undefined') return 0;
+    const container = document.querySelector('[data-cosmos-container]') as HTMLElement | null;
+    return container?.getBoundingClientRect().height ?? window.innerHeight;
+  });
   
   const showQuickJump = useCosmosStore(state => state.showQuickJump);
   const toggleQuickJump = useCosmosStore(state => state.toggleQuickJump);
@@ -48,14 +54,22 @@ export const QuickJumpMenu = () => {
   const isFullscreen = useFullscreenStore(state => state.isFullscreen);
 
   useEffect(() => {
+    const container = document.querySelector('[data-cosmos-container]') as HTMLElement | null;
+
     const update = () => {
       setIsSmUp(window.matchMedia?.('(min-width: 640px)')?.matches ?? false);
+      if (container) setContainerHeight(container.getBoundingClientRect().height);
     };
 
     update();
     window.addEventListener('resize', update);
+
+    const ro = container && typeof ResizeObserver !== 'undefined' ? new ResizeObserver(update) : null;
+    if (container && ro) ro.observe(container);
+
     return () => {
       window.removeEventListener('resize', update);
+      ro?.disconnect();
     };
   }, []);
 
@@ -86,7 +100,7 @@ export const QuickJumpMenu = () => {
 
   const topOffsetPx = isSmUp ? 68 : 48;
   const bottomMarginPx = 16;
-  const maxHeightNonFullscreen = `calc(100% - ${topOffsetPx}px - ${bottomMarginPx}px)`;
+  const maxHeightNonFullscreenPx = Math.max(160, containerHeight - topOffsetPx - bottomMarginPx);
 
   const menu = (
     <div 
@@ -100,7 +114,7 @@ export const QuickJumpMenu = () => {
                 'calc(100dvh - 48px - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 16px)',
             }
           : {
-              maxHeight: maxHeightNonFullscreen,
+              maxHeight: `${maxHeightNonFullscreenPx}px`,
             }
       }
     >
