@@ -98,7 +98,8 @@ export const CosmosUI = () => {
   const { language } = useLanguage();
   const t = translations[language];
   const isMobile = useIsMobile();
-  const fullscreenDropdownOffsetPx = isMobile ? 48 : 52;
+  // In fullscreen, dropdowns appear directly below the button row (h-8 = 32px + gap)
+  const fullscreenDropdownOffsetPx = isMobile ? 40 : 44;
   const quickJumpButtonRef = useRef<HTMLButtonElement | null>(null);
   const {
     startTour,

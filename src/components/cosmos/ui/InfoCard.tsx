@@ -198,7 +198,9 @@ export const InfoCard = () => {
       style={isFullscreen ? { 
         bottom: 'calc(0.5rem + env(safe-area-inset-bottom))',
         left: 'calc(0.5rem + env(safe-area-inset-left))',
-        right: 'calc(0.5rem + env(safe-area-inset-right))',
+        right: 'auto',
+        width: 'calc(100% - 1rem - env(safe-area-inset-left) - env(safe-area-inset-right))',
+        maxWidth: '320px',
       } : undefined}
     >
       {/* Header - entire bar is clickable to toggle minimize */}
