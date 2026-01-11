@@ -201,9 +201,9 @@ export const CosmosExplorer = () => {
           {/* Bloom post-processing for sun glow */}
           <EffectComposer>
             <Bloom 
-              intensity={1.0}
-              luminanceThreshold={0.95}
-              luminanceSmoothing={0.3}
+              intensity={0.45}
+              luminanceThreshold={0.99}
+              luminanceSmoothing={0.2}
               mipmapBlur
             />
           </EffectComposer>
