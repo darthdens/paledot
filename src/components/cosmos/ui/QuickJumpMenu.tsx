@@ -97,10 +97,12 @@ export const QuickJumpMenu = () => {
   };
 
   const topOffsetPx = isSmUp ? 68 : 48;
-  const bottomMarginPx = 8; // Reduced margin for more content space
-  const maxHeightNonFullscreenPx = Math.max(160, containerHeight - topOffsetPx - bottomMarginPx);
   // In fullscreen, dropdowns appear directly below the button row (h-8 = 32px + gap)
   const fullscreenDropdownOffsetPx = isSmUp ? 44 : 40;
+
+  // Non-fullscreen: quick jump should not extend past the container's bottom margin (bottom-2 = 0.5rem)
+  const bottomMarginNonFullscreenPx = 8; // 0.5rem in px
+  const maxHeightNonFullscreenPxFinal = Math.max(160, containerHeight - topOffsetPx - bottomMarginNonFullscreenPx);
 
   const menu = (
     <div 
@@ -124,10 +126,11 @@ export const QuickJumpMenu = () => {
           style={
             isFullscreen
               ? {
-                  maxHeight: 'calc(100dvh - 48px - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 1rem)',
+                  // In fullscreen, bottom should align with right margin (0.5rem + safe-area)
+                  maxHeight: `calc(100dvh - ${fullscreenDropdownOffsetPx}px - 0.5rem - env(safe-area-inset-top) - 0.5rem - env(safe-area-inset-bottom))`,
                 }
               : {
-                  maxHeight: `${maxHeightNonFullscreenPx}px`,
+                  maxHeight: `${maxHeightNonFullscreenPxFinal}px`,
                 }
           }
         >
