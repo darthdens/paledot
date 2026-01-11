@@ -68,18 +68,22 @@ export const QuickJumpMenu = () => {
     return implemented.includes(locationId);
   };
 
+  // Calculate the top offset for max-height calculation
+  const topOffset = 68; // sm:top-[68px]
+  const mobileTopOffset = 48; // top-12 = 3rem = 48px
+  const bottomMargin = 16;
+
   const menu = (
     <div 
-      className={`${isFullscreen ? 'fixed' : 'absolute'} top-12 bottom-4 right-2 sm:top-[68px] sm:bottom-4 sm:right-4 z-[10001] w-[calc(100vw-2rem)] max-w-56 sm:max-w-64 bg-white/10 backdrop-blur-sm rounded-lg overflow-y-auto flex flex-col`}
-      style={
-        isFullscreen
-          ? {
-              top: 'calc(48px + env(safe-area-inset-top))',
-              right: 'calc(0.5rem + env(safe-area-inset-right))',
-              bottom: 'calc(0.5rem + env(safe-area-inset-bottom))',
-            }
-          : undefined
-      }
+      className={`${isFullscreen ? 'fixed' : 'absolute'} top-12 right-2 sm:top-[68px] sm:right-4 z-[10001] w-[calc(100vw-2rem)] max-w-56 sm:max-w-64 bg-white/10 backdrop-blur-sm rounded-lg overflow-y-auto`}
+      style={{
+        maxHeight: `calc(100vh - ${topOffset}px - ${bottomMargin}px)`,
+        ...(isFullscreen ? {
+          top: 'calc(48px + env(safe-area-inset-top))',
+          right: 'calc(0.5rem + env(safe-area-inset-right))',
+          maxHeight: `calc(100vh - 48px - env(safe-area-inset-top) - ${bottomMargin}px)`,
+        } : {})
+      }}
     >
       {/* Header */}
       <div className="flex items-center justify-between p-2 sm:p-3 border-b border-white/10 shrink-0">
