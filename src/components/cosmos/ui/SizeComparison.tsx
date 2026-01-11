@@ -87,10 +87,10 @@ export const SizeComparison = () => {
     <div 
       className={`${isFullscreen ? 'fixed' : 'absolute'} inset-0 bg-black/95 z-[10002] flex flex-col`}
       style={isFullscreen ? {
-        top: 'env(safe-area-inset-top)',
-        bottom: 'env(safe-area-inset-bottom)',
-        left: 'env(safe-area-inset-left)',
-        right: 'env(safe-area-inset-right)',
+        top: 'calc(0.5rem + env(safe-area-inset-top))',
+        bottom: 'calc(0.5rem + env(safe-area-inset-bottom))',
+        left: 'calc(0.5rem + env(safe-area-inset-left))',
+        right: 'calc(0.5rem + env(safe-area-inset-right))',
       } : undefined}
     >
       {/* Header */}

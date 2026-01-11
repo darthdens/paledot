@@ -109,8 +109,8 @@ export const QuickJumpMenu = () => {
       style={
         isFullscreen
           ? {
-              top: `calc(1rem + env(safe-area-inset-top) + ${fullscreenDropdownOffsetPx}px)`,
-              right: 'calc(1rem + env(safe-area-inset-right))',
+              top: `calc(0.5rem + env(safe-area-inset-top) + ${fullscreenDropdownOffsetPx}px)`,
+              right: 'calc(0.5rem + env(safe-area-inset-right))',
             }
           : undefined
       }
@@ -119,11 +119,11 @@ export const QuickJumpMenu = () => {
         className={`grid transition-all duration-300 ease-out ${showQuickJump ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'}`}
       >
         <div 
-          className="overflow-y-auto w-[calc(100vw-2rem)] max-w-56 sm:max-w-64"
+          className="overflow-y-auto w-[calc(100vw-1rem)] max-w-56 sm:w-[calc(100vw-2rem)] sm:max-w-64"
           style={
             isFullscreen
               ? {
-                  maxHeight: 'calc(100dvh - 48px - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 16px)',
+                  maxHeight: 'calc(100dvh - 48px - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 1rem)',
                 }
               : {
                   maxHeight: `${maxHeightNonFullscreenPx}px`,
