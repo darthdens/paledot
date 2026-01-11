@@ -612,8 +612,8 @@ export const CosmosUI = () => {
           style={
             isFullscreen
               ? {
-                  top: 'calc(48px + env(safe-area-inset-top))',
-                  right: 'calc(0.5rem + env(safe-area-inset-right))',
+                  top: 'calc(1rem + env(safe-area-inset-top) + 44px)',
+                  right: 'calc(1rem + env(safe-area-inset-right))',
                 }
               : undefined
           }
