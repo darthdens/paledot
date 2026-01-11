@@ -27,16 +27,18 @@ export const GalaxyRotator = ({ children }: GalaxyRotatorProps) => {
   useFrame((_, delta) => {
     if (!groupRef.current) return;
 
-    // Don't rotate when inside a star system
+    // Don't rotate when inside a star system (solar system or Proxima)
     if (isInStarSystem) return;
     
-    // Don't rotate when viewing the galaxy from outside (would make it look like it's orbiting something)
-    // Only rotate when at stellar scale (traveling between stars within the galaxy)
-    if (currentScale === 'milkyWay' || currentScale === 'localGroup' || currentScale === 'universe') return;
+    // Don't rotate when viewing from beyond the galaxy (localGroup, universe)
+    // At those scales the galaxy should appear stationary
+    if (currentScale === 'localGroup' || currentScale === 'universe') return;
 
     // Base rotation speed * timeSpeed multiplier
-    // 0.00625 rad/s base = one full rotation every ~16 minutes at 1x speed (slower for better viewing)
-    currentRotation.current += delta * 0.00625 * timeSpeed;
+    // At milkyWay scale, use a slower speed so the orbits are visible but not distracting
+    // 0.00625 rad/s base = one full rotation every ~16 minutes at 1x speed
+    const baseSpeed = currentScale === 'milkyWay' ? 0.003 : 0.00625;
+    currentRotation.current += delta * baseSpeed * timeSpeed;
     groupRef.current.rotation.y = currentRotation.current;
   });
 
