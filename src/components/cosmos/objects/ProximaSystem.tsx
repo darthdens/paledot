@@ -1,10 +1,10 @@
 import { useMemo } from 'react';
-import { Stars } from '@react-three/drei';
 import { UNITS } from '../types';
 import { getObjectById } from '../data/celestialObjects';
 import { WorldPositionTracker } from './WorldPositionTracker';
 import { OortCloud } from './OortCloud';
 import { ProximaCentauri } from './ProximaCentauri';
+import { DimStars } from './DimStars';
 import { useCosmosStore } from '../store/useCosmosStore';
 
 interface ProximaSystemProps {
@@ -50,15 +50,17 @@ export const ProximaSystem = ({
       {/* Only show Proxima's local details when NOT in Sun's system */}
       {showFullDetails && (
         <>
-          {/* Local star background - heavily reduced */}
-          <Stars 
+          {/* Local star particles - custom (dimmer than drei Stars) */}
+          <DimStars 
             radius={1e8} 
             depth={1e7} 
             count={5000} 
-            factor={250} 
+            factor={2} 
             saturation={0} 
             fade 
             speed={0.1} 
+            opacity={0.06}
+            blending="normal"
           />
           
           <ProximaCentauri visualScale={visualScale} />

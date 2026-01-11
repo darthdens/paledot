@@ -1,7 +1,8 @@
 // Cosmos Explorer - Solar System visualization with fly-to navigation
 import { Canvas } from '@react-three/fiber';
-import { OrbitControls, Stars, PerspectiveCamera } from '@react-three/drei';
+import { OrbitControls, PerspectiveCamera } from '@react-three/drei';
 import { EffectComposer, SelectiveBloom, Selection } from '@react-three/postprocessing';
+import { DimStars } from './objects/DimStars';
 import { Suspense, useEffect, useRef } from 'react';
 import { ProximaSystem } from './objects/ProximaSystem';
 import { MilkyWayGalaxy } from './objects/MilkyWayGalaxy';
@@ -128,8 +129,8 @@ export const CosmosExplorer = () => {
 
           {/* Everything that should rotate together at galaxy scale */}
           <GalaxyRotator visualScale={UNIFIED_SCALE}>
-            {/* Star background - heavily reduced so it never overpowers key stars */}
-            <Stars radius={1e8} depth={1e7} count={9000} factor={250} saturation={0} fade speed={0.3} />
+            {/* Star particles - custom (dimmer than drei Stars) */}
+            <DimStars radius={1e8} depth={1e7} count={9000} factor={2} saturation={0} fade speed={0.3} opacity={0.08} blending="normal" />
 
             {/* Galaxy content with smooth fade transition */}
             <GalaxyFadeWrapper>
@@ -157,14 +158,14 @@ export const CosmosExplorer = () => {
               selectedObject={selectedObject}
             />
             
-            {/* Distant stars - tiny point-like spheres */}
+            {/* Distant stars - tiny point-like spheres (very dim) */}
             {stars.map((star) => {
               const starPos = star.position.map((p) => p * UNIFIED_SCALE) as [number, number, number];
               return (
                 <WorldPositionTracker key={star.id} objectId={star.id} position={starPos} updateInterval={0.15}>
                   <mesh position={[0, 0, 0]}>
-                    <sphereGeometry args={[120, 6, 6]} />
-                    <meshBasicMaterial color={star.color} transparent opacity={0.18} />
+                    <sphereGeometry args={[80, 6, 6]} />
+                    <meshBasicMaterial color={star.color} transparent opacity={0.08} />
                   </mesh>
                 </WorldPositionTracker>
               );
