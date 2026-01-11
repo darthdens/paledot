@@ -97,6 +97,7 @@ export const CosmosUI = () => {
   const { language } = useLanguage();
   const t = translations[language];
   const isMobile = useIsMobile();
+  const fullscreenDropdownOffsetPx = isMobile ? 48 : 52;
   const quickJumpButtonRef = useRef<HTMLButtonElement | null>(null);
   const {
     startTour,
@@ -612,7 +613,7 @@ export const CosmosUI = () => {
           style={
             isFullscreen
               ? {
-                  top: 'calc(1rem + env(safe-area-inset-top) + 44px)',
+                  top: `calc(1rem + env(safe-area-inset-top) + ${fullscreenDropdownOffsetPx}px)`,
                   right: 'calc(1rem + env(safe-area-inset-right))',
                 }
               : undefined
