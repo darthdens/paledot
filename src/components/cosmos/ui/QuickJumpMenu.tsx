@@ -4,7 +4,6 @@ import { X, ChevronRight, Clock } from 'lucide-react';
 import { useCosmosStore } from '../store/useCosmosStore';
 import { useFullscreenStore } from '../store/useFullscreenStore';
 import { quickJumpCategories, getObjectById } from '../data/celestialObjects';
-import { useIsMobile } from '@/hooks/use-mobile';
 import { useEffect, useState } from 'react';
 
 const translations = {
@@ -35,12 +34,16 @@ const IMPLEMENTED_OBJECTS: Record<string, string[]> = {
 export const QuickJumpMenu = () => {
   const { language } = useLanguage();
   const t = translations[language];
-  const isMobile = useIsMobile();
   const [expandedCategory, setExpandedCategory] = useState<string | null>('solarSystem');
 
   const [viewportHeight, setViewportHeight] = useState<number>(() => {
     if (typeof window === 'undefined') return 0;
     return window.visualViewport?.height ?? window.innerHeight;
+  });
+
+  const [isSmUp, setIsSmUp] = useState<boolean>(() => {
+    if (typeof window === 'undefined') return false;
+    return window.matchMedia?.('(min-width: 640px)')?.matches ?? false;
   });
   
   const showQuickJump = useCosmosStore(state => state.showQuickJump);
@@ -52,6 +55,7 @@ export const QuickJumpMenu = () => {
   useEffect(() => {
     const update = () => {
       setViewportHeight(window.visualViewport?.height ?? window.innerHeight);
+      setIsSmUp(window.matchMedia?.('(min-width: 640px)')?.matches ?? false);
     };
 
     update();
@@ -93,19 +97,20 @@ export const QuickJumpMenu = () => {
     return implemented.includes(locationId);
   };
 
-  const topOffsetPx = isMobile ? 48 : 68;
+  const topOffsetPx = isSmUp ? 68 : 48;
   const bottomMarginPx = 16;
   const maxHeightPx = Math.max(160, viewportHeight - topOffsetPx - bottomMarginPx);
 
   const menu = (
     <div 
-      className={`fixed top-12 right-2 sm:top-[68px] sm:right-4 z-[10001] w-[calc(100vw-2rem)] max-w-56 sm:max-w-64 bg-white/10 backdrop-blur-sm rounded-lg overflow-hidden flex flex-col`}
+      className={`${isFullscreen ? 'fixed' : 'absolute'} top-12 right-2 sm:top-[68px] sm:right-4 z-[10001] w-[calc(100vw-2rem)] max-w-56 sm:max-w-64 bg-white/10 backdrop-blur-sm rounded-lg overflow-y-auto`}
       style={
         isFullscreen
           ? {
               top: 'calc(48px + env(safe-area-inset-top))',
               right: 'calc(0.5rem + env(safe-area-inset-right))',
-              maxHeight: 'calc(100dvh - 48px - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 16px)',
+              maxHeight:
+                'calc(100dvh - 48px - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 16px)',
             }
           : {
               maxHeight: `${maxHeightPx}px`,
@@ -125,8 +130,8 @@ export const QuickJumpMenu = () => {
         </Button>
       </div>
 
-      {/* Scrollable content */}
-      <div className="overflow-y-auto flex-1 min-h-0">
+      {/* Content */}
+      <div>
         {/* Recent jumps */}
         {recentJumps.length > 0 && (
           <div className="p-2 border-b border-white/10">
