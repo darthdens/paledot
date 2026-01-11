@@ -1,7 +1,7 @@
 // Cosmos Explorer - Solar System visualization with fly-to navigation
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls, Stars, PerspectiveCamera } from '@react-three/drei';
-import { EffectComposer, Bloom } from '@react-three/postprocessing';
+import { EffectComposer, SelectiveBloom, Selection } from '@react-three/postprocessing';
 import { Suspense, useEffect, useRef } from 'react';
 import { ProximaSystem } from './objects/ProximaSystem';
 import { MilkyWayGalaxy } from './objects/MilkyWayGalaxy';
@@ -90,7 +90,8 @@ export const CosmosExplorer = () => {
     <div ref={containerRef} className="relative w-full h-full">
       <Canvas gl={{ alpha: false }}>
         <Suspense fallback={null}>
-          <PerspectiveCamera 
+          <Selection>
+            <PerspectiveCamera 
             makeDefault 
             position={initialCameraPosition} 
             fov={60} 
@@ -198,18 +199,19 @@ export const CosmosExplorer = () => {
             </>
           )}
           
-          {/* Bloom post-processing - ultra high threshold for Sun/Proxima only */}
+          {/* Bloom post-processing - only on selected objects (Sun/Proxima), not star particles */}
           <EffectComposer>
-            <Bloom 
-              intensity={0.4}
-              luminanceThreshold={6.0}
-              luminanceSmoothing={0.05}
+            <SelectiveBloom
+              intensity={1.0}
+              luminanceThreshold={0.8}
+              luminanceSmoothing={0.2}
               mipmapBlur
             />
           </EffectComposer>
           
           {/* Performance stats */}
           <PerformanceHUD />
+          </Selection>
         </Suspense>
       </Canvas>
       
