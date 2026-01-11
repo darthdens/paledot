@@ -40,9 +40,8 @@ export const useDifferentialRotationMaterial = ({
       transparent: true,
       depthWrite: false,
       depthTest: true,
-      // Additive blending restores the perceived "dense" core look.
-      // We counteract distance "blowout" in-shader (see vAtten) so zooming out doesn't wash everything.
-      blending: THREE.AdditiveBlending,
+      // Normal blending prevents galaxies from "blowing out" from additive stacking
+      blending: THREE.NormalBlending,
       toneMapped: true,
       uniforms: {
         uTime: { value: 0 },
@@ -62,7 +61,6 @@ export const useDifferentialRotationMaterial = ({
         
         attribute vec3 color;
         varying vec3 vColor;
-        varying float vAtten;
         
         void main() {
           vColor = color;
@@ -96,14 +94,8 @@ export const useDifferentialRotationMaterial = ({
           gl_Position = projectionMatrix * mvPosition;
           
           // Size attenuation
-          float rawSize = uSize * (300.0 / -mvPosition.z);
-          gl_PointSize = clamp(rawSize, 0.5, 100.0);
-
-          // Distance-based attenuation to prevent far-view overdraw from "blowing out" the galaxy.
-          // When zoomed in, rawSize is larger -> vAtten ~ 1.
-          // When zoomed out, rawSize shrinks -> vAtten approaches a low floor (still visible, but not washed out).
-          float t = smoothstep(0.5, 6.0, rawSize);
-          vAtten = mix(0.12, 1.0, t);
+          gl_PointSize = uSize * (300.0 / -mvPosition.z);
+          gl_PointSize = clamp(gl_PointSize, 1.0, 100.0);
         }
       `,
       fragmentShader: `
@@ -111,17 +103,10 @@ export const useDifferentialRotationMaterial = ({
         uniform float uOpacity;
         
         varying vec3 vColor;
-        varying float vAtten;
         
         void main() {
           vec4 texColor = texture2D(uMap, gl_PointCoord);
-
-          float alpha = texColor.a * uOpacity * vAtten;
-          if (alpha < 0.01) discard;
-
-          // Multiply RGB by alpha to keep additive stacking controlled.
-          vec3 rgb = vColor * texColor.rgb * alpha;
-          gl_FragColor = vec4(rgb, alpha);
+          gl_FragColor = vec4(vColor * texColor.rgb, texColor.a * uOpacity);
         }
       `,
     });
