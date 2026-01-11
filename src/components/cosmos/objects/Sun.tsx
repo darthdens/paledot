@@ -242,7 +242,7 @@ export const Sun = ({ position = [0, 0, 0], visualScale = 80 }: SunProps) => {
               vec3 surfaceColor = mix(hotColor, coreColor, n);
               
               // Make it extremely bright (HDR-like)
-              surfaceColor *= 8.0;
+              surfaceColor *= 4.0;
               
               gl_FragColor = vec4(surfaceColor, 1.0);
             }
@@ -330,32 +330,20 @@ export const Sun = ({ position = [0, 0, 0], visualScale = 80 }: SunProps) => {
         />
       </mesh>
 
-      {/* Core glow sprite - bright center */}
-      <sprite renderOrder={12} scale={[sunSize * 10, sunSize * 10, 1]}>
+      {/* Core glow sprite - bright center (reduced) */}
+      <sprite renderOrder={12} scale={[sunSize * 6, sunSize * 6, 1]}>
         <spriteMaterial
           map={glowTexture}
           transparent
-          opacity={1.0}
+          opacity={0.5}
           blending={THREE.AdditiveBlending}
           depthWrite={false}
           depthTest={true}
         />
       </sprite>
 
-      {/* Medium glow sprite - extended corona */}
-      <sprite ref={outerGlowRef} renderOrder={11} scale={[sunSize * 20, sunSize * 20, 1]}>
-        <spriteMaterial
-          map={outerGlowTexture}
-          transparent
-          opacity={0.6}
-          blending={THREE.AdditiveBlending}
-          depthWrite={false}
-          depthTest={true}
-        />
-      </sprite>
-
-      {/* Large outer glow sprite - far reaching halo */}
-      <sprite renderOrder={10} scale={[sunSize * 40, sunSize * 40, 1]}>
+      {/* Medium glow sprite - extended corona (reduced) */}
+      <sprite ref={outerGlowRef} renderOrder={11} scale={[sunSize * 12, sunSize * 12, 1]}>
         <spriteMaterial
           map={outerGlowTexture}
           transparent
@@ -366,9 +354,21 @@ export const Sun = ({ position = [0, 0, 0], visualScale = 80 }: SunProps) => {
         />
       </sprite>
 
-      {/* Point light from sun - strong intensity */}
+      {/* Large outer glow sprite - far reaching halo (reduced) */}
+      <sprite renderOrder={10} scale={[sunSize * 24, sunSize * 24, 1]}>
+        <spriteMaterial
+          map={outerGlowTexture}
+          transparent
+          opacity={0.12}
+          blending={THREE.AdditiveBlending}
+          depthWrite={false}
+          depthTest={true}
+        />
+      </sprite>
+
+      {/* Point light from sun - reduced intensity */}
       <pointLight
-        intensity={25}
+        intensity={12}
         distance={0}
         decay={1}
         color="#FFFAF0"
