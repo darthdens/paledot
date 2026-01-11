@@ -127,7 +127,7 @@ export const ProximaCentauri = ({ visualScale = 0.001 }: ProximaCentauriProps) =
               vec3 coolColor = vec3(0.95, 0.55, 0.5);
               vec3 surfaceColor = mix(coolColor, coreColor, n);
 
-              surfaceColor *= 1.8;
+              surfaceColor *= 1.3;
               gl_FragColor = vec4(surfaceColor, 1.0);
             }
           `}
@@ -202,12 +202,12 @@ export const ProximaCentauri = ({ visualScale = 0.001 }: ProximaCentauriProps) =
         />
       </mesh>
 
-      {/* Sprite-based gradient glow */}
-      <sprite renderOrder={-5} scale={[starSize * 6, starSize * 6, 1]}>
+      {/* Sprite-based gradient glow (reduced) */}
+      <sprite renderOrder={-5} scale={[starSize * 4, starSize * 4, 1]}>
         <spriteMaterial
           map={glowTexture}
           transparent
-          opacity={0.9}
+          opacity={0.35}
           blending={THREE.AdditiveBlending}
           depthWrite={false}
           depthTest={false}
@@ -215,7 +215,7 @@ export const ProximaCentauri = ({ visualScale = 0.001 }: ProximaCentauriProps) =
       </sprite>
 
       {/* Dimmer point light */}
-      <pointLight intensity={2} distance={0} decay={1} color="#FFD0C8" />
+      <pointLight intensity={1} distance={0} decay={1} color="#FFD0C8" />
       </group>
     </Select>
   );

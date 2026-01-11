@@ -202,8 +202,8 @@ export const CosmosExplorer = () => {
           {/* Bloom post-processing - selective, only affects Sun/Proxima wrapped in <Select> */}
           <EffectComposer>
             <SelectiveBloom
-              intensity={0.15}
-              luminanceThreshold={6.0}
+              intensity={0.03}
+              luminanceThreshold={10.0}
               luminanceSmoothing={0.05}
               mipmapBlur
             />
