@@ -566,13 +566,13 @@ export const CosmosUI = () => {
       >
         <div className="flex items-center gap-1 sm:gap-1.5">
           {/* Navigation group */}
-            <Button size="icon" variant="ghost" onClick={toggleFullscreen} className="h-8 w-8 sm:h-9 sm:w-9 bg-white/10 hover:bg-white/20 text-white" title={isFullscreen ? t.exitFullscreen : t.fullscreen}>
+            <Button size="icon" variant="ghost" onClick={toggleFullscreen} className="h-8 w-8 sm:h-9 sm:w-9 bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white" title={isFullscreen ? t.exitFullscreen : t.fullscreen}>
               {isFullscreen ? <Minimize className="w-4 h-4 sm:w-5 sm:h-5" /> : <Maximize className="w-4 h-4 sm:w-5 sm:h-5" />}
             </Button>
-            <Button ref={quickJumpButtonRef} size="icon" variant="ghost" onClick={handleQuickJumpClick} className={`h-8 w-8 sm:h-9 sm:w-9 text-white ${showQuickJump ? 'bg-white/25' : 'bg-white/10 hover:bg-white/20'}`} title={t.quickJump}>
+            <Button ref={quickJumpButtonRef} size="icon" variant="ghost" onClick={handleQuickJumpClick} className={`h-8 w-8 sm:h-9 sm:w-9 backdrop-blur-sm text-white ${showQuickJump ? 'bg-white/25' : 'bg-white/10 hover:bg-white/20'}`} title={t.quickJump}>
               <Compass className="w-4 h-4 sm:w-5 sm:h-5" />
             </Button>
-            <Button size="icon" variant="ghost" onClick={goHome} className="h-8 w-8 sm:h-9 sm:w-9 bg-white/10 hover:bg-white/20 text-white" title={t.home}>
+            <Button size="icon" variant="ghost" onClick={goHome} className="h-8 w-8 sm:h-9 sm:w-9 bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white" title={t.home}>
               <Home className="w-4 h-4 sm:w-5 sm:h-5" />
             </Button>
             
@@ -580,16 +580,16 @@ export const CosmosUI = () => {
             <div className="w-px h-6 bg-white/20 mx-0.5" />
             
             {/* Display options group */}
-            <Button size="icon" variant="ghost" onClick={toggleOrbits} className={`h-8 w-8 sm:h-9 sm:w-9 text-white ${showOrbits ? 'bg-white/25' : 'bg-white/10 hover:bg-white/20'}`} title={showOrbits ? t.hideOrbits : t.showOrbits}>
+            <Button size="icon" variant="ghost" onClick={toggleOrbits} className={`h-8 w-8 sm:h-9 sm:w-9 backdrop-blur-sm text-white ${showOrbits ? 'bg-white/25' : 'bg-white/10 hover:bg-white/20'}`} title={showOrbits ? t.hideOrbits : t.showOrbits}>
               {showOrbits ? <CircleDot className="w-4 h-4 sm:w-5 sm:h-5" /> : <CircleOff className="w-4 h-4 sm:w-5 sm:h-5" />}
             </Button>
-            <Button size="icon" variant="ghost" onClick={toggleTrails} className={`h-8 w-8 sm:h-9 sm:w-9 text-white ${showTrails ? 'bg-white/25' : 'bg-white/10 hover:bg-white/20'}`} title={showTrails ? t.hideTrails : t.showTrails}>
+            <Button size="icon" variant="ghost" onClick={toggleTrails} className={`h-8 w-8 sm:h-9 sm:w-9 backdrop-blur-sm text-white ${showTrails ? 'bg-white/25' : 'bg-white/10 hover:bg-white/20'}`} title={showTrails ? t.hideTrails : t.showTrails}>
               <Sparkles className="w-4 h-4 sm:w-5 sm:h-5" />
             </Button>
-            <Button size="icon" variant="ghost" onClick={() => setShowTimeSlider(!showTimeSlider)} className={`h-8 w-8 sm:h-9 sm:w-9 text-white ${showTimeSlider ? 'bg-white/25' : 'bg-white/10 hover:bg-white/20'}`} title={t.timeSpeed}>
+            <Button size="icon" variant="ghost" onClick={() => setShowTimeSlider(!showTimeSlider)} className={`h-8 w-8 sm:h-9 sm:w-9 backdrop-blur-sm text-white ${showTimeSlider ? 'bg-white/25' : 'bg-white/10 hover:bg-white/20'}`} title={t.timeSpeed}>
               <Clock className="w-4 h-4 sm:w-5 sm:h-5" />
             </Button>
-            <Button size="icon" variant="ghost" onClick={toggleSizeComparison} className="h-8 w-8 sm:h-9 sm:w-9 bg-white/10 hover:bg-white/20 text-white" title={t.sizeComparison}>
+            <Button size="icon" variant="ghost" onClick={toggleSizeComparison} className="h-8 w-8 sm:h-9 sm:w-9 bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white" title={t.sizeComparison}>
               <BarChart3 className="w-4 h-4 sm:w-5 sm:h-5" />
             </Button>
             
@@ -597,7 +597,7 @@ export const CosmosUI = () => {
             <div className="w-px h-6 bg-white/20 mx-0.5" />
             
             {/* Help */}
-            <Button size="icon" variant="ghost" onClick={() => setShowControlHints(true)} className="h-8 w-8 sm:h-9 sm:w-9 bg-blue-500/30 hover:bg-blue-500/50 text-white" title={t.help}>
+            <Button size="icon" variant="ghost" onClick={() => setShowControlHints(true)} className="h-8 w-8 sm:h-9 sm:w-9 bg-blue-500/30 hover:bg-blue-500/50 backdrop-blur-sm text-white" title={t.help}>
               <HelpCircle className="w-4 h-4 sm:w-5 sm:h-5" />
             </Button>
           </div>
