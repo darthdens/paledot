@@ -388,7 +388,7 @@ export const AndromedaGalaxy = ({ visualScale }: AndromedaGalaxyProps) => {
           <spriteMaterial
             map={glowTexture}
             transparent
-            opacity={0.7}
+            opacity={0.35}
             blending={THREE.AdditiveBlending}
             depthWrite={false}
             depthTest={false}
