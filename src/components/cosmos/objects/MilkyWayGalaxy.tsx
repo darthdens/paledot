@@ -560,7 +560,7 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
           <spriteMaterial
             map={glowTexture}
             transparent
-            opacity={0.4}
+            opacity={1}
             blending={THREE.AdditiveBlending}
             depthWrite={false}
             depthTest={false}
@@ -574,7 +574,7 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
           <spriteMaterial
             map={glowTexture}
             transparent
-            opacity={0.35}
+            opacity={0.9}
             blending={THREE.AdditiveBlending}
             depthWrite={false}
             depthTest={false}
@@ -587,7 +587,7 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
           <spriteMaterial
             map={glowTexture}
             transparent
-            opacity={0.5}
+            opacity={1}
             blending={THREE.AdditiveBlending}
             depthWrite={false}
             depthTest={false}
