@@ -97,7 +97,7 @@ export const QuickJumpMenu = () => {
   };
 
   const topOffsetPx = isSmUp ? 68 : 48;
-  const bottomMarginPx = 16;
+  const bottomMarginPx = 8; // Reduced margin for more content space
   const maxHeightNonFullscreenPx = Math.max(160, containerHeight - topOffsetPx - bottomMarginPx);
   const fullscreenDropdownOffsetPx = isSmUp ? 52 : 48;
 
