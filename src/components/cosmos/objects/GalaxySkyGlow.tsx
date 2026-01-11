@@ -45,8 +45,8 @@ export const GalaxySkyGlow = () => {
         uCenterDirView: { value: new THREE.Vector3(0, 0, -1) },
         uInvProjection: { value: new THREE.Matrix4() },
         // Tuned to be clearly visible but not overpowering.
-        uBase: { value: 0.18 },
-        uPeak: { value: 0.55 },
+        uBase: { value: 0.06 },
+        uPeak: { value: 0.18 },
         uOpacity: { value: 0 },
       },
       vertexShader: `

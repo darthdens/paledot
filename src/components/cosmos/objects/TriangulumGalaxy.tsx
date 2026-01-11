@@ -371,12 +371,12 @@ export const TriangulumGalaxy = ({ visualScale }: TriangulumGalaxyProps) => {
           renderOrder={3}
         />
 
-        {/* Center glow */}
+        {/* Center glow (toned down) */}
         <sprite renderOrder={4} frustumCulled={false} scale={[diskR * 2.2, diskR * 2.2, 1]}>
           <spriteMaterial
             map={glowTexture}
             transparent
-            opacity={0.85}
+            opacity={0.20}
             blending={THREE.AdditiveBlending}
             depthWrite={false}
             depthTest={false}
