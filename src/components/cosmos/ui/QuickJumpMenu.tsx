@@ -100,9 +100,11 @@ export const QuickJumpMenu = () => {
   // In fullscreen, dropdowns appear directly below the button row (h-8 = 32px + gap)
   const fullscreenDropdownOffsetPx = isSmUp ? 44 : 40;
 
-  // Non-fullscreen: quick jump should not extend past the container's bottom margin (bottom-2 = 0.5rem)
-  const bottomMarginNonFullscreenPx = 8; // 0.5rem in px
-  const maxHeightNonFullscreenPxFinal = Math.max(160, containerHeight - topOffsetPx - bottomMarginNonFullscreenPx);
+  // Non-fullscreen: quick jump should stop exactly at the container's bottom margin
+  // topOffsetPx is the top position (top-12 = 48px on mobile, top-[68px] on sm+)
+  // We need: maxHeight = containerHeight - topOffset - bottomMargin (bottom-2 = 8px)
+  const bottomMarginNonFullscreenPx = 8; // bottom-2 = 0.5rem = 8px
+  const maxHeightNonFullscreenPxFinal = Math.max(160, containerHeight - topOffsetPx - bottomMarginNonFullscreenPx - 8);
 
   const menu = (
     <div 
