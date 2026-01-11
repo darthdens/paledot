@@ -36,11 +36,6 @@ export const QuickJumpMenu = () => {
   const t = translations[language];
   const [expandedCategory, setExpandedCategory] = useState<string | null>('solarSystem');
 
-  const [viewportHeight, setViewportHeight] = useState<number>(() => {
-    if (typeof window === 'undefined') return 0;
-    return window.visualViewport?.height ?? window.innerHeight;
-  });
-
   const [isSmUp, setIsSmUp] = useState<boolean>(() => {
     if (typeof window === 'undefined') return false;
     return window.matchMedia?.('(min-width: 640px)')?.matches ?? false;
@@ -54,21 +49,13 @@ export const QuickJumpMenu = () => {
 
   useEffect(() => {
     const update = () => {
-      setViewportHeight(window.visualViewport?.height ?? window.innerHeight);
       setIsSmUp(window.matchMedia?.('(min-width: 640px)')?.matches ?? false);
     };
 
     update();
     window.addEventListener('resize', update);
-
-    const vv = window.visualViewport;
-    vv?.addEventListener('resize', update);
-    vv?.addEventListener('scroll', update);
-
     return () => {
       window.removeEventListener('resize', update);
-      vv?.removeEventListener('resize', update);
-      vv?.removeEventListener('scroll', update);
     };
   }, []);
 
@@ -99,7 +86,7 @@ export const QuickJumpMenu = () => {
 
   const topOffsetPx = isSmUp ? 68 : 48;
   const bottomMarginPx = 16;
-  const maxHeightPx = Math.max(160, viewportHeight - topOffsetPx - bottomMarginPx);
+  const maxHeightNonFullscreen = `calc(100% - ${topOffsetPx}px - ${bottomMarginPx}px)`;
 
   const menu = (
     <div 
@@ -113,7 +100,7 @@ export const QuickJumpMenu = () => {
                 'calc(100dvh - 48px - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 16px)',
             }
           : {
-              maxHeight: `${maxHeightPx}px`,
+              maxHeight: maxHeightNonFullscreen,
             }
       }
     >
