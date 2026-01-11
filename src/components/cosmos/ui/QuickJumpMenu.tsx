@@ -4,7 +4,7 @@ import { X, ChevronRight, Clock } from 'lucide-react';
 import { useCosmosStore } from '../store/useCosmosStore';
 import { useFullscreenStore } from '../store/useFullscreenStore';
 import { quickJumpCategories, getObjectById } from '../data/celestialObjects';
-import { useEffect, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 
 const translations = {
   en: {
@@ -41,11 +41,9 @@ export const QuickJumpMenu = () => {
     return window.matchMedia?.('(min-width: 640px)')?.matches ?? false;
   });
 
-  const [containerHeight, setContainerHeight] = useState<number>(() => {
-    if (typeof window === 'undefined') return 0;
-    const container = document.querySelector('[data-cosmos-container]') as HTMLElement | null;
-    return container?.getBoundingClientRect().height ?? window.innerHeight;
-  });
+  const menuRef = useRef<HTMLDivElement | null>(null);
+  const scrollAreaRef = useRef<HTMLDivElement | null>(null);
+  const [maxHeightNonFullscreenPx, setMaxHeightNonFullscreenPx] = useState<number>(240);
   
   const showQuickJump = useCosmosStore(state => state.showQuickJump);
   const toggleQuickJump = useCosmosStore(state => state.toggleQuickJump);
@@ -54,24 +52,42 @@ export const QuickJumpMenu = () => {
   const isFullscreen = useFullscreenStore(state => state.isFullscreen);
 
   useEffect(() => {
-    const container = document.querySelector('[data-cosmos-container]') as HTMLElement | null;
-
     const update = () => {
       setIsSmUp(window.matchMedia?.('(min-width: 640px)')?.matches ?? false);
-      if (container) setContainerHeight(container.getBoundingClientRect().height);
     };
 
     update();
     window.addEventListener('resize', update);
+    return () => window.removeEventListener('resize', update);
+  }, []);
 
-    const ro = container && typeof ResizeObserver !== 'undefined' ? new ResizeObserver(update) : null;
-    if (container && ro) ro.observe(container);
+  useLayoutEffect(() => {
+    if (!showQuickJump || isFullscreen) return;
+
+    const container = document.querySelector('[data-cosmos-container]') as HTMLElement | null;
+    const scrollEl = scrollAreaRef.current;
+    if (!container || !scrollEl) return;
+
+    const bottomMarginPx = 8; // bottom-2
+
+    const measure = () => {
+      const containerRect = container.getBoundingClientRect();
+      const scrollRect = scrollEl.getBoundingClientRect();
+      const next = Math.max(160, Math.floor(containerRect.bottom - scrollRect.top - bottomMarginPx));
+      setMaxHeightNonFullscreenPx(next);
+    };
+
+    measure();
+
+    window.addEventListener('resize', measure);
+    const ro = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(measure) : null;
+    ro?.observe(container);
 
     return () => {
-      window.removeEventListener('resize', update);
+      window.removeEventListener('resize', measure);
       ro?.disconnect();
     };
-  }, []);
+  }, [showQuickJump, isFullscreen]);
 
   const handleJump = (objectId: string) => {
     const object = getObjectById(objectId);
@@ -96,19 +112,12 @@ export const QuickJumpMenu = () => {
     return implemented.includes(locationId);
   };
 
-  const topOffsetPx = isSmUp ? 68 : 48;
   // In fullscreen, dropdowns appear directly below the button row (h-8 = 32px + gap)
   const fullscreenDropdownOffsetPx = isSmUp ? 44 : 40;
 
-  // Non-fullscreen: quick jump should stop exactly at the container's bottom margin
-  // topOffsetPx is the top position (top-12 = 48px on mobile, top-[68px] on sm+)
-  // We need: maxHeight = containerHeight - topOffset - bottomMargin
-  // Adding extra buffer since content was extending past the bottom margin
-  const bottomMarginNonFullscreenPx = 16; // increased to ensure it stops before the bottom edge
-  const maxHeightNonFullscreenPxFinal = Math.max(160, containerHeight - topOffsetPx - bottomMarginNonFullscreenPx);
-
   const menu = (
-    <div 
+    <div
+      ref={menuRef}
       className={`${isFullscreen ? 'fixed' : 'absolute'} top-12 right-2 sm:top-[68px] sm:right-4 z-[10001] bg-white/10 backdrop-blur-sm rounded-lg overflow-hidden transition-all duration-300 ease-out ${
         showQuickJump ? 'opacity-100 scale-100' : 'opacity-0 scale-95 pointer-events-none'
       }`}
@@ -124,7 +133,8 @@ export const QuickJumpMenu = () => {
       <div 
         className={`grid transition-all duration-300 ease-out ${showQuickJump ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'}`}
       >
-        <div 
+        <div
+          ref={scrollAreaRef}
           className="overflow-y-auto w-[calc(100vw-1rem)] max-w-56 sm:w-[calc(100vw-2rem)] sm:max-w-64"
           style={
             isFullscreen
@@ -133,7 +143,7 @@ export const QuickJumpMenu = () => {
                   maxHeight: `calc(100dvh - ${fullscreenDropdownOffsetPx}px - 0.5rem - env(safe-area-inset-top) - 0.5rem - env(safe-area-inset-bottom))`,
                 }
               : {
-                  maxHeight: `${maxHeightNonFullscreenPxFinal}px`,
+                  maxHeight: `${maxHeightNonFullscreenPx}px`,
                 }
           }
         >
