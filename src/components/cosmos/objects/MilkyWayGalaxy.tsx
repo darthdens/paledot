@@ -81,8 +81,6 @@ const createGalaxyGlowTexture = () => {
 
 export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayGalaxyProps) => {
   const rotatingGroupRef = useRef<THREE.Group>(null);
-  const pulseRef = useRef<THREE.Mesh>(null);
-  const pulseRef2 = useRef<THREE.Mesh>(null);
   const markerGroupRef = useRef<THREE.Group>(null);
   const proximaMarkerRef = useRef<THREE.Group>(null);
   const proximaPulseRef = useRef<THREE.Mesh>(null);
@@ -453,18 +451,7 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
       setObjectWorldPosition('milkyWay_center', pos);
     }
 
-    // Sun marker pulses
-    if (pulseRef.current) {
-      const phase = (t * 2) % 1;
-      pulseRef.current.scale.setScalar(1 + phase * 4);
-      (pulseRef.current.material as THREE.MeshBasicMaterial).opacity = (1 - phase) * 0.8;
-    }
-
-    if (pulseRef2.current) {
-      const phase = ((t * 2) + 0.5) % 1;
-      pulseRef2.current.scale.setScalar(1 + phase * 4);
-      (pulseRef2.current.material as THREE.MeshBasicMaterial).opacity = (1 - phase) * 0.8;
-    }
+    // "We are here" marker pulse rings removed (keep marker spheres only)
 
     // Proxima marker pulses
     if (proximaPulseRef.current) {
@@ -662,10 +649,10 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
               style={{ pointerEvents: 'auto' }}
             >
               <div
-                className="bg-white/10 backdrop-blur-sm px-3 py-1.5 rounded-lg whitespace-nowrap shadow-lg cursor-pointer"
+                className="bg-white/10 backdrop-blur-sm px-3 py-1.5 rounded-lg whitespace-nowrap cursor-pointer"
                 onClick={handleYouAreHereLabelClick}
               >
-                <span className="text-white text-sm font-semibold drop-shadow-md">
+                <span className="text-white text-sm font-semibold">
                   {language === 'fr' ? 'Nous sommes ici' : 'We are here'}
                 </span>
               </div>
@@ -697,27 +684,6 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
             />
           </mesh>
           
-          <mesh ref={pulseRef} rotation={[Math.PI / 2, 0, 0]} onClick={handleYouAreHereClick} onPointerDown={handleYouAreHereClick}>
-            <ringGeometry args={[baseMarkerSize * 1.5, baseMarkerSize * 2.5, 32]} />
-            <meshBasicMaterial
-              color="#00ff88"
-              transparent
-              opacity={0.8}
-              side={THREE.DoubleSide}
-              blending={THREE.AdditiveBlending}
-            />
-          </mesh>
-          
-          <mesh ref={pulseRef2} rotation={[Math.PI / 2, 0, 0]} onClick={handleYouAreHereClick} onPointerDown={handleYouAreHereClick}>
-            <ringGeometry args={[baseMarkerSize * 1.5, baseMarkerSize * 2.5, 32]} />
-            <meshBasicMaterial
-              color="#00ff88"
-              transparent
-              opacity={0.8}
-              side={THREE.DoubleSide}
-              blending={THREE.AdditiveBlending}
-            />
-          </mesh>
         </group>
       )}
 

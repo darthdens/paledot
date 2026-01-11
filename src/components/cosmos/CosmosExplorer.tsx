@@ -16,7 +16,7 @@ import { GalaxyFadeWrapper } from './GalaxyFadeWrapper';
 import { WorldPositionTracker } from './objects/WorldPositionTracker';
 import { SolarSystemTracker } from './objects/SolarSystemTracker';
 import { SolarSystemContent } from './objects/SolarSystemContent';
-
+import { GalacticOrbitRing } from './objects/GalacticOrbitRing';
 import { Nebula } from './objects/Nebula';
 import { CosmosUI } from './ui/CosmosUI';
 import { InfoCard } from './ui/InfoCard';
@@ -184,6 +184,8 @@ export const CosmosExplorer = () => {
                 />
               ))}
               
+              {/* Galactic orbit ring - hidden when in any star system */}
+              {showOrbits && <GalacticOrbitRing visualScale={UNIFIED_SCALE} />}
             </GalaxyFadeWrapper>
           </GalaxyRotator>
           
