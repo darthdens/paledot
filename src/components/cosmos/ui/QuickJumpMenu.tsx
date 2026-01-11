@@ -4,6 +4,7 @@ import { X, ChevronRight, Clock } from 'lucide-react';
 import { useCosmosStore } from '../store/useCosmosStore';
 import { useFullscreenStore } from '../store/useFullscreenStore';
 import { quickJumpCategories, getObjectById } from '../data/celestialObjects';
+import { useIsMobile } from '@/hooks/use-mobile';
 import { useState } from 'react';
 
 const translations = {
@@ -34,6 +35,7 @@ const IMPLEMENTED_OBJECTS: Record<string, string[]> = {
 export const QuickJumpMenu = () => {
   const { language } = useLanguage();
   const t = translations[language];
+  const isMobile = useIsMobile();
   const [expandedCategory, setExpandedCategory] = useState<string | null>('solarSystem');
   
   const showQuickJump = useCosmosStore(state => state.showQuickJump);
@@ -68,17 +70,22 @@ export const QuickJumpMenu = () => {
     return implemented.includes(locationId);
   };
 
+  const nonFullscreenTopPx = isMobile ? 48 : 68;
+
   const menu = (
     <div 
-      className={`${isFullscreen ? 'fixed' : 'absolute'} top-12 right-2 sm:top-[68px] sm:right-4 z-[10001] w-[calc(100vw-2rem)] max-w-56 sm:max-w-64 bg-white/10 backdrop-blur-sm rounded-lg overflow-hidden flex flex-col max-h-[calc(100dvh-64px-env(safe-area-inset-bottom))] sm:max-h-[calc(100dvh-84px-env(safe-area-inset-bottom))]`}
+      className={`${isFullscreen ? 'fixed' : 'absolute'} top-12 right-2 sm:top-[68px] sm:right-4 z-[10001] w-[calc(100vw-2rem)] max-w-56 sm:max-w-64 bg-white/10 backdrop-blur-sm rounded-lg overflow-hidden flex flex-col`}
       style={
         isFullscreen
           ? {
               top: 'calc(48px + env(safe-area-inset-top))',
               right: 'calc(0.5rem + env(safe-area-inset-right))',
-              maxHeight: 'calc(100dvh - 48px - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 16px)',
+              maxHeight:
+                'calc(100dvh - 48px - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 16px)',
             }
-          : undefined
+          : {
+              maxHeight: `calc(100dvh - ${nonFullscreenTopPx}px - env(safe-area-inset-bottom) - 16px)`,
+            }
       }
     >
       {/* Header */}
