@@ -388,9 +388,9 @@ export const TourOverlay = () => {
         sm:bottom-4 sm:top-auto sm:left-auto sm:right-4 sm:w-80
         md:w-96`}
       style={isFullscreen ? { 
-        bottom: 'calc(1rem + env(safe-area-inset-bottom))',
-        right: 'calc(1rem + env(safe-area-inset-right))',
-        left: 'auto',
+        bottom: 'calc(0.5rem + env(safe-area-inset-bottom))',
+        left: 'calc(0.5rem + env(safe-area-inset-left))',
+        right: 'calc(0.5rem + env(safe-area-inset-right))',
       } : undefined}
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}

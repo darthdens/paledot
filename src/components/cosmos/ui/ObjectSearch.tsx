@@ -127,6 +127,7 @@ export const ObjectSearch = ({ isFullscreen }: ObjectSearchProps) => {
           ? {
               top: 'calc(0.5rem + env(safe-area-inset-top))',
               left: 'calc(0.5rem + env(safe-area-inset-left))',
+              right: 'calc(0.5rem + env(safe-area-inset-right))',
             }
           : undefined
       }
