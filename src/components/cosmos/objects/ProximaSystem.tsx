@@ -50,12 +50,12 @@ export const ProximaSystem = ({
       {/* Only show Proxima's local details when NOT in Sun's system */}
       {showFullDetails && (
         <>
-          {/* Local star background - same as solar system */}
+          {/* Local star background - reduced size/brightness */}
           <Stars 
             radius={1e8} 
             depth={1e7} 
             count={8000} 
-            factor={1e5} 
+            factor={2000} 
             saturation={0} 
             fade 
             speed={0.1} 
