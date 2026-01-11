@@ -5,7 +5,7 @@ import { useCosmosStore } from '../store/useCosmosStore';
 import { useFullscreenStore } from '../store/useFullscreenStore';
 import { quickJumpCategories, getObjectById } from '../data/celestialObjects';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 const translations = {
   en: {
@@ -37,13 +37,36 @@ export const QuickJumpMenu = () => {
   const t = translations[language];
   const isMobile = useIsMobile();
   const [expandedCategory, setExpandedCategory] = useState<string | null>('solarSystem');
+
+  const [viewportHeight, setViewportHeight] = useState<number>(() => {
+    if (typeof window === 'undefined') return 0;
+    return window.visualViewport?.height ?? window.innerHeight;
+  });
   
   const showQuickJump = useCosmosStore(state => state.showQuickJump);
-  const quickJumpAnchorRect = useCosmosStore(state => state.quickJumpAnchorRect);
   const toggleQuickJump = useCosmosStore(state => state.toggleQuickJump);
   const jumpToObject = useCosmosStore(state => state.jumpToObject);
   const recentJumps = useCosmosStore(state => state.recentJumps);
   const isFullscreen = useFullscreenStore(state => state.isFullscreen);
+
+  useEffect(() => {
+    const update = () => {
+      setViewportHeight(window.visualViewport?.height ?? window.innerHeight);
+    };
+
+    update();
+    window.addEventListener('resize', update);
+
+    const vv = window.visualViewport;
+    vv?.addEventListener('resize', update);
+    vv?.addEventListener('scroll', update);
+
+    return () => {
+      window.removeEventListener('resize', update);
+      vv?.removeEventListener('resize', update);
+      vv?.removeEventListener('scroll', update);
+    };
+  }, []);
 
   if (!showQuickJump) return null;
 
@@ -70,21 +93,22 @@ export const QuickJumpMenu = () => {
     return implemented.includes(locationId);
   };
 
-  const nonFullscreenTopPx = isMobile ? 48 : 68;
+  const topOffsetPx = isMobile ? 48 : 68;
+  const bottomMarginPx = 16;
+  const maxHeightPx = Math.max(160, viewportHeight - topOffsetPx - bottomMarginPx);
 
   const menu = (
     <div 
-      className={`${isFullscreen ? 'fixed' : 'absolute'} top-12 right-2 sm:top-[68px] sm:right-4 z-[10001] w-[calc(100vw-2rem)] max-w-56 sm:max-w-64 bg-white/10 backdrop-blur-sm rounded-lg overflow-hidden flex flex-col`}
+      className={`fixed top-12 right-2 sm:top-[68px] sm:right-4 z-[10001] w-[calc(100vw-2rem)] max-w-56 sm:max-w-64 bg-white/10 backdrop-blur-sm rounded-lg overflow-hidden flex flex-col`}
       style={
         isFullscreen
           ? {
               top: 'calc(48px + env(safe-area-inset-top))',
               right: 'calc(0.5rem + env(safe-area-inset-right))',
-              maxHeight:
-                'calc(100dvh - 48px - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 16px)',
+              maxHeight: 'calc(100dvh - 48px - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 16px)',
             }
           : {
-              maxHeight: `calc(100dvh - ${nonFullscreenTopPx}px - env(safe-area-inset-bottom) - 16px)`,
+              maxHeight: `${maxHeightPx}px`,
             }
       }
     >
