@@ -99,6 +99,7 @@ export const QuickJumpMenu = () => {
   const topOffsetPx = isSmUp ? 68 : 48;
   const bottomMarginPx = 16;
   const maxHeightNonFullscreenPx = Math.max(160, containerHeight - topOffsetPx - bottomMarginPx);
+  const fullscreenDropdownOffsetPx = isSmUp ? 52 : 48;
 
   const menu = (
     <div 
@@ -108,7 +109,7 @@ export const QuickJumpMenu = () => {
       style={
         isFullscreen
           ? {
-              top: 'calc(1rem + env(safe-area-inset-top) + 44px)',
+              top: `calc(1rem + env(safe-area-inset-top) + ${fullscreenDropdownOffsetPx}px)`,
               right: 'calc(1rem + env(safe-area-inset-right))',
             }
           : undefined
