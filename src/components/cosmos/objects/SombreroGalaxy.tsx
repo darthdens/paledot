@@ -402,7 +402,7 @@ export const SombreroGalaxy = ({ visualScale }: SombreroGalaxyProps) => {
         <spriteMaterial
           map={glowTexture}
           transparent
-          opacity={0.9}
+          opacity={0.5}
           blending={THREE.AdditiveBlending}
           depthWrite={false}
           depthTest={false}
@@ -415,7 +415,7 @@ export const SombreroGalaxy = ({ visualScale }: SombreroGalaxyProps) => {
         <spriteMaterial
           map={glowTexture}
           transparent
-          opacity={0.4}
+          opacity={0.2}
           blending={THREE.AdditiveBlending}
           depthWrite={false}
           depthTest={false}
@@ -428,7 +428,7 @@ export const SombreroGalaxy = ({ visualScale }: SombreroGalaxyProps) => {
         <spriteMaterial
           map={glowTexture}
           transparent
-          opacity={0.18}
+          opacity={0.08}
           blending={THREE.AdditiveBlending}
           depthWrite={false}
           depthTest={false}
