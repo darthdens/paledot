@@ -46,7 +46,12 @@ export const StarSystemTracker = () => {
     }
 
     // Determine which star system we're in (if any)
-    if (distanceToSun < STAR_ZOOM_THRESHOLD && distanceToSun <= distanceToProxima) {
+    // At stellar or milkyWay scale, we're zoomed out enough that we shouldn't be "in" a star system
+    // (this allows galactic rotation to work at those scales)
+    if (currentScale === 'stellar' || currentScale === 'milkyWay') {
+      isInSystem = false;
+      starSystemId = null;
+    } else if (distanceToSun < STAR_ZOOM_THRESHOLD && distanceToSun <= distanceToProxima) {
       isInSystem = true;
       starSystemId = 'sun';
     } else if (distanceToProxima < STAR_ZOOM_THRESHOLD && distanceToProxima < distanceToSun) {
