@@ -674,7 +674,7 @@ export const WhirlpoolGalaxy = ({ visualScale }: WhirlpoolGalaxyProps) => {
           geometry={starsGeo}
           size={gs * 52}
           map={dotTexture}
-          opacity={0.88}
+          opacity={0.35}
           maxRadius={diskR}
           rotationMultiplier={1}
           differentialStrength={0.06}
@@ -687,7 +687,7 @@ export const WhirlpoolGalaxy = ({ visualScale }: WhirlpoolGalaxyProps) => {
           geometry={dustLanesGeo}
           size={gs * 140}
           map={dotTexture}
-          opacity={0.55}
+          opacity={0.28}
           maxRadius={diskR}
           rotationMultiplier={1}
           differentialStrength={0.06}
@@ -700,7 +700,7 @@ export const WhirlpoolGalaxy = ({ visualScale }: WhirlpoolGalaxyProps) => {
           geometry={coreGeo}
           size={gs * 80}
           map={dotTexture}
-          opacity={0.95}
+          opacity={0.5}
           maxRadius={WHIRLPOOL.bulgeRadius * gs}
           rotationMultiplier={1.4}
           differentialStrength={0.1}
@@ -731,8 +731,8 @@ export const WhirlpoolGalaxy = ({ visualScale }: WhirlpoolGalaxyProps) => {
               map={dotTexture}
               vertexColors
               transparent
-              opacity={0.85}
-              blending={THREE.AdditiveBlending}
+              opacity={0.55}
+              blending={THREE.NormalBlending}
               depthWrite={false}
               sizeAttenuation
             />

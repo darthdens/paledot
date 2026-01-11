@@ -366,7 +366,7 @@ export const AndromedaGalaxy = ({ visualScale }: AndromedaGalaxyProps) => {
           geometry={starsGeo}
           size={gs * 55}
           map={dotTexture}
-          opacity={0.85}
+          opacity={0.35}
           maxRadius={diskR}
           rotationMultiplier={1}
           renderOrder={2}
@@ -377,7 +377,7 @@ export const AndromedaGalaxy = ({ visualScale }: AndromedaGalaxyProps) => {
           geometry={coreGeo}
           size={gs * 90}
           map={dotTexture}
-          opacity={0.95}
+          opacity={0.5}
           maxRadius={ANDROMEDA.bulgeRadius * gs}
           rotationMultiplier={1.5}
           renderOrder={3}

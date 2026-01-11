@@ -356,7 +356,7 @@ export const SombreroGalaxy = ({ visualScale }: SombreroGalaxyProps) => {
           geometry={diskGeo}
           size={gs * 40}
           map={dotTexture}
-          opacity={0.85}
+          opacity={0.35}
           maxRadius={diskR}
           rotationMultiplier={1}
           renderOrder={2}
@@ -367,7 +367,7 @@ export const SombreroGalaxy = ({ visualScale }: SombreroGalaxyProps) => {
           geometry={bulgeGeo}
           size={gs * 50}
           map={dotTexture}
-          opacity={0.9}
+          opacity={0.45}
           maxRadius={bulgeR}
           rotationMultiplier={1.1}
           renderOrder={3}
@@ -378,7 +378,7 @@ export const SombreroGalaxy = ({ visualScale }: SombreroGalaxyProps) => {
           geometry={dustLaneGeo}
           size={gs * 35}
           map={dotTexture}
-          opacity={0.92}
+          opacity={0.4}
           maxRadius={diskR}
           rotationMultiplier={1}
           renderOrder={4}
@@ -389,7 +389,7 @@ export const SombreroGalaxy = ({ visualScale }: SombreroGalaxyProps) => {
           geometry={darkGasGeo}
           size={gs * 45}
           map={dotTexture}
-          opacity={0.88}
+          opacity={0.4}
           maxRadius={diskR * 1.1}
           rotationMultiplier={0.85}
           renderOrder={5}
