@@ -99,7 +99,8 @@ export const QuickJumpMenu = () => {
   const topOffsetPx = isSmUp ? 68 : 48;
   const bottomMarginPx = 8; // Reduced margin for more content space
   const maxHeightNonFullscreenPx = Math.max(160, containerHeight - topOffsetPx - bottomMarginPx);
-  const fullscreenDropdownOffsetPx = isSmUp ? 52 : 48;
+  // In fullscreen, dropdowns appear directly below the button row (h-8 = 32px + gap)
+  const fullscreenDropdownOffsetPx = isSmUp ? 44 : 40;
 
   const menu = (
     <div 
