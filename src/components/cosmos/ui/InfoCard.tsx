@@ -225,7 +225,7 @@ export const InfoCard = () => {
 
       {/* Content - collapsible */}
       {!isMinimized && (
-        <div className="p-3 space-y-3 max-h-[40vh] sm:max-h-[45vh] overflow-y-auto">
+        <div className="p-3 space-y-3 max-h-[40vh] sm:max-h-[45vh] overflow-y-auto border-t border-white/10">
         {/* Type badge */}
         <div className="flex items-center gap-2">
           <span 

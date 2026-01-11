@@ -161,7 +161,7 @@ export const YouAreHereLabel = () => {
           onClick={() => setIsMinimized(!isMinimized)}
           className="w-full flex items-center justify-between gap-2 px-3 py-2 hover:bg-white/5 transition-colors"
         >
-          <div className="flex items-center gap-2 text-emerald-400">
+          <div className="flex items-center gap-2 text-white">
             {getScaleIcon(currentScale)}
             <span className="text-sm font-semibold">{locationInfo.title}</span>
           </div>
@@ -174,7 +174,7 @@ export const YouAreHereLabel = () => {
         
         {!isMinimized && (
           <div className="px-3 pb-3 space-y-1 border-t border-white/10 pt-2">
-            <p className="text-emerald-300/80 text-xs">{locationInfo.subtitle}</p>
+            <p className="text-white/70 text-xs">{locationInfo.subtitle}</p>
             <div className="mt-2 space-y-0.5">
               {locationInfo.details.map((detail, index) => (
                 <p key={index} className="text-white/60 text-xs">• {detail}</p>
