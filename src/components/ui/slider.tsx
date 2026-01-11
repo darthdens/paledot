@@ -3,14 +3,19 @@ import * as SliderPrimitive from "@radix-ui/react-slider";
 
 import { cn } from "@/lib/utils";
 
+export interface SliderProps extends React.ComponentPropsWithoutRef<typeof SliderPrimitive.Root> {
+  variant?: "default" | "light";
+}
+
 const Slider = React.forwardRef<
   React.ElementRef<typeof SliderPrimitive.Root>,
-  React.ComponentPropsWithoutRef<typeof SliderPrimitive.Root>
+  SliderProps
 >(
   (
     {
       className,
       orientation = "horizontal",
+      variant = "default",
       onPointerDown,
       onPointerMove,
       onPointerUp,
@@ -39,18 +44,25 @@ const Slider = React.forwardRef<
     >
       <SliderPrimitive.Track
         className={cn(
-          "relative grow overflow-hidden rounded-full bg-border pointer-events-auto",
-          orientation === "horizontal" ? "h-2 w-full" : "w-4 sm:w-2 h-full"
+          "relative grow overflow-hidden rounded-full pointer-events-auto",
+          orientation === "horizontal" ? "h-2 w-full" : "w-4 sm:w-2 h-full",
+          variant === "light" ? "bg-white/20" : "bg-border"
         )}
       >
         <SliderPrimitive.Range
           className={cn(
-            "absolute bg-secondary",
-            orientation === "horizontal" ? "h-full" : "w-full"
+            "absolute",
+            orientation === "horizontal" ? "h-full" : "w-full",
+            variant === "light" ? "bg-white/60" : "bg-secondary"
           )}
         />
       </SliderPrimitive.Track>
-      <SliderPrimitive.Thumb className="block h-5 w-5 rounded-full border-2 border-secondary bg-background ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 cursor-grab active:cursor-grabbing relative z-50 pointer-events-auto" />
+      <SliderPrimitive.Thumb 
+        className={cn(
+          "block h-5 w-5 rounded-full border-2 ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 cursor-grab active:cursor-grabbing relative z-50 pointer-events-auto",
+          variant === "light" ? "border-white bg-white" : "border-secondary bg-background"
+        )}
+      />
     </SliderPrimitive.Root>
   )
 );

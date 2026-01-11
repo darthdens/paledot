@@ -606,7 +606,7 @@ export const CosmosUI = () => {
       {/* Time speed slider */}
       {showTimeSlider && !showControlHints && (
         <div
-          className={`${isFullscreen ? 'fixed' : 'absolute'} top-12 right-2 sm:top-[68px] sm:right-4 z-[10000] bg-white/10 backdrop-blur-sm rounded-lg p-3 sm:p-4 min-w-[180px] sm:min-w-[220px] animate-scale-in origin-top-right`}
+          className={`${isFullscreen ? 'fixed' : 'absolute'} top-12 right-2 sm:top-[68px] sm:right-4 z-[10000] bg-white/10 backdrop-blur-sm rounded-lg p-3 sm:p-4 min-w-[180px] sm:min-w-[220px] animate-slide-in-right`}
           style={
             isFullscreen
               ? {
@@ -629,6 +629,7 @@ export const CosmosUI = () => {
               min={0}
               max={10}
               step={0.5}
+              variant="light"
               className="w-full"
             />
             <div className="flex justify-between text-[10px] sm:text-xs text-white/50">

@@ -202,7 +202,7 @@ export const InfoCard = () => {
     >
       {/* Header - entire bar is clickable to toggle minimize */}
       <div 
-        className="flex items-center justify-between p-3 cursor-pointer hover:bg-white/5 transition-colors"
+        className="flex items-center justify-between p-3 cursor-pointer hover:bg-white/5 transition-colors rounded-t-lg"
         onClick={() => setIsMinimized(!isMinimized)}
       >
         <h3 className="text-white font-semibold text-sm sm:text-base truncate flex-1 mr-2">
