@@ -198,12 +198,12 @@ export const CosmosExplorer = () => {
             </>
           )}
           
-          {/* Bloom post-processing - extreme threshold to only bloom Sun/Proxima cores */}
+          {/* Bloom post-processing - ultra high threshold for Sun/Proxima only */}
           <EffectComposer>
             <Bloom 
-              intensity={0.6}
-              luminanceThreshold={4.0}
-              luminanceSmoothing={0.1}
+              intensity={0.4}
+              luminanceThreshold={6.0}
+              luminanceSmoothing={0.05}
               mipmapBlur
             />
           </EffectComposer>
