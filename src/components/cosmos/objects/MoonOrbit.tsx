@@ -25,7 +25,7 @@ export const MoonOrbit = ({ parentId, moonOrbitRadius, color = '#ffffff' }: Moon
   // Create orbit circle points
   const orbitPoints = useMemo(() => {
     const points = [];
-    const segments = 64;
+    const segments = 256;
     for (let i = 0; i <= segments; i++) {
       const angle = (i / segments) * Math.PI * 2;
       points.push(
