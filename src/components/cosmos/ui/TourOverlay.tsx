@@ -385,7 +385,7 @@ export const TourOverlay = () => {
   if (isCollapsed) {
     return (
       <div 
-        className={`${isFullscreen ? 'fixed' : 'absolute'} z-[10001] bg-white/10 backdrop-blur-sm rounded-lg overflow-hidden cursor-pointer animate-fade-in
+        className={`${isFullscreen ? 'fixed' : 'absolute'} z-[10001] bg-white/10 backdrop-blur-sm rounded-lg overflow-hidden cursor-pointer animate-scale-in origin-bottom-right
           bottom-2 left-2 right-2 
           sm:bottom-4 sm:top-auto sm:left-auto sm:right-4 sm:w-auto`}
         style={isFullscreen ? {
@@ -472,7 +472,7 @@ export const TourOverlay = () => {
   // Expanded view
   return (
     <div 
-      className={`${isFullscreen ? 'fixed' : 'absolute'} z-[10001] bg-white/10 backdrop-blur-sm rounded-lg overflow-hidden animate-fade-in
+      className={`${isFullscreen ? 'fixed' : 'absolute'} z-[10001] bg-white/10 backdrop-blur-sm rounded-lg overflow-hidden animate-scale-in origin-bottom-right
         bottom-2 left-2 right-2 max-h-[45vh]
         sm:bottom-4 sm:top-auto sm:left-auto sm:right-4 sm:w-80 sm:max-h-none
         md:w-96`}

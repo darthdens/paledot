@@ -194,7 +194,7 @@ export const InfoCard = () => {
 
   const card = (
     <div 
-      className={`${isFullscreen ? 'fixed' : 'absolute'} bottom-2 left-2 right-2 sm:bottom-4 sm:left-4 sm:right-auto z-[10001] w-auto sm:w-72 md:w-80 bg-white/10 backdrop-blur-sm rounded-lg animate-fade-in`}
+      className={`${isFullscreen ? 'fixed' : 'absolute'} bottom-2 left-2 right-2 sm:bottom-4 sm:left-4 sm:right-auto z-[10001] w-auto sm:w-72 md:w-80 bg-white/10 backdrop-blur-sm rounded-lg animate-scale-in origin-bottom-left`}
       style={isFullscreen ? { 
         bottom: 'calc(1rem + env(safe-area-inset-bottom))',
         left: 'calc(1rem + env(safe-area-inset-left))',
@@ -223,97 +223,101 @@ export const InfoCard = () => {
         </div>
       </div>
 
-      {/* Content - collapsible */}
-      {!isMinimized && (
-        <div className="p-3 space-y-3 max-h-[40vh] sm:max-h-[45vh] overflow-y-auto border-t border-white/10">
-        {/* Type badge */}
-        <div className="flex items-center gap-2">
-          <span 
-            className="px-2 py-0.5 rounded-full text-xs font-medium"
-            style={{ 
-              backgroundColor: selectedObject.color + '33',
-              color: selectedObject.color,
-              border: `1px solid ${selectedObject.color}66`
-            }}
-          >
-            {objectType}
-          </span>
-        </div>
-
-        {/* Stats */}
-        <div className="grid grid-cols-2 gap-2 text-xs sm:text-sm">
-          <div className="bg-white/5 rounded p-2">
-            <div className="text-white/50 text-xs">{t.distance}</div>
-            <div className="text-white font-medium">
-              {formatDistance(selectedObject.distanceFromEarth, selectedObject.distanceUnit, language)}
+      {/* Content - collapsible with smooth animation */}
+      <div 
+        className={`grid transition-all duration-300 ease-out ${isMinimized ? 'grid-rows-[0fr]' : 'grid-rows-[1fr]'}`}
+      >
+        <div className="overflow-hidden">
+          <div className="p-3 space-y-3 max-h-[40vh] sm:max-h-[45vh] overflow-y-auto border-t border-white/10">
+            {/* Type badge */}
+            <div className="flex items-center gap-2">
+              <span 
+                className="px-2 py-0.5 rounded-full text-xs font-medium"
+                style={{ 
+                  backgroundColor: selectedObject.color + '33',
+                  color: selectedObject.color,
+                  border: `1px solid ${selectedObject.color}66`
+                }}
+              >
+                {objectType}
+              </span>
             </div>
-          </div>
-          <div className="bg-white/5 rounded p-2">
-            <div className="text-white/50 text-xs">{t.size}</div>
-            <div className="text-white font-medium">
-              {formatSize(selectedObject.size, language)}
-            </div>
-          </div>
-        </div>
 
-        {/* Real Periods - only when toggle is on */}
-        {showRealPeriods && (orbitalPeriodDays || rotationPeriodHours) && (
-          <div className="grid grid-cols-2 gap-2 text-xs sm:text-sm">
-            {orbitalPeriodDays && (
+            {/* Stats */}
+            <div className="grid grid-cols-2 gap-2 text-xs sm:text-sm">
               <div className="bg-white/5 rounded p-2">
-                <div className="text-white/50 text-xs">{t.orbitalPeriod}</div>
+                <div className="text-white/50 text-xs">{t.distance}</div>
                 <div className="text-white font-medium">
-                  {formatOrbitalPeriod(orbitalPeriodDays, language, t)}
+                  {formatDistance(selectedObject.distanceFromEarth, selectedObject.distanceUnit, language)}
                 </div>
               </div>
-            )}
-            {rotationPeriodHours && (
               <div className="bg-white/5 rounded p-2">
-                <div className="text-white/50 text-xs">{t.rotationPeriod}</div>
+                <div className="text-white/50 text-xs">{t.size}</div>
                 <div className="text-white font-medium">
-                  {formatRotationPeriod(rotationPeriodHours, language, t)}
+                  {formatSize(selectedObject.size, language)}
                 </div>
               </div>
+            </div>
+
+            {/* Real Periods - only when toggle is on */}
+            {showRealPeriods && (orbitalPeriodDays || rotationPeriodHours) && (
+              <div className="grid grid-cols-2 gap-2 text-xs sm:text-sm">
+                {orbitalPeriodDays && (
+                  <div className="bg-white/5 rounded p-2">
+                    <div className="text-white/50 text-xs">{t.orbitalPeriod}</div>
+                    <div className="text-white font-medium">
+                      {formatOrbitalPeriod(orbitalPeriodDays, language, t)}
+                    </div>
+                  </div>
+                )}
+                {rotationPeriodHours && (
+                  <div className="bg-white/5 rounded p-2">
+                    <div className="text-white/50 text-xs">{t.rotationPeriod}</div>
+                    <div className="text-white font-medium">
+                      {formatRotationPeriod(rotationPeriodHours, language, t)}
+                    </div>
+                  </div>
+                )}
+              </div>
             )}
-          </div>
-        )}
 
-        {/* Facts */}
-        {facts.length > 0 && (
-          <div className="space-y-1">
-            <div className="text-white/50 text-xs">{t.facts}</div>
-            <ul className="space-y-1">
-              {facts.map((fact, index) => (
-                <li key={index} className="text-white/80 text-xs flex items-start gap-1.5">
-                  <span className="text-white/40 mt-0.5">•</span>
-                  <span>{fact}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
+            {/* Facts */}
+            {facts.length > 0 && (
+              <div className="space-y-1">
+                <div className="text-white/50 text-xs">{t.facts}</div>
+                <ul className="space-y-1">
+                  {facts.map((fact, index) => (
+                    <li key={index} className="text-white/80 text-xs flex items-start gap-1.5">
+                      <span className="text-white/40 mt-0.5">•</span>
+                      <span>{fact}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
 
-        {/* Actions */}
-        <div className="flex gap-2 pt-1">
-          <Button
-            size="sm"
-            onClick={handleFlyTo}
-            className="flex-1 text-xs bg-white/10 hover:bg-white/20 text-white border-0"
-          >
-            <Navigation className="w-3 h-3 mr-1.5" />
-            {t.flyTo}
-          </Button>
-          <Button
-            size="sm"
-            onClick={toggleFollowing}
-            className={`flex-1 text-xs border-0 ${isFollowing ? 'bg-primary/80 hover:bg-primary text-primary-foreground' : 'bg-white/10 hover:bg-white/20 text-white'}`}
-          >
-            {isFollowing ? <EyeOff className="w-3 h-3 mr-1.5" /> : <Eye className="w-3 h-3 mr-1.5" />}
-            {isFollowing ? t.unfollow : t.follow}
-          </Button>
+            {/* Actions */}
+            <div className="flex gap-2 pt-1">
+              <Button
+                size="sm"
+                onClick={handleFlyTo}
+                className="flex-1 text-xs bg-white/10 hover:bg-white/20 text-white border-0"
+              >
+                <Navigation className="w-3 h-3 mr-1.5" />
+                {t.flyTo}
+              </Button>
+              <Button
+                size="sm"
+                onClick={toggleFollowing}
+                className={`flex-1 text-xs border-0 ${isFollowing ? 'bg-primary/80 hover:bg-primary text-primary-foreground' : 'bg-white/10 hover:bg-white/20 text-white'}`}
+              >
+                {isFollowing ? <EyeOff className="w-3 h-3 mr-1.5" /> : <Eye className="w-3 h-3 mr-1.5" />}
+                {isFollowing ? t.unfollow : t.follow}
+              </Button>
+            </div>
+          </div>
         </div>
       </div>
-      )}
     </div>
   );
 
