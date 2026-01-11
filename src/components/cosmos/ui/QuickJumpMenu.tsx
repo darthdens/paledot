@@ -68,26 +68,17 @@ export const QuickJumpMenu = () => {
     return implemented.includes(locationId);
   };
 
-  const gap = 8;
-
-  const menuTop = quickJumpAnchorRect
-    ? `${Math.round(quickJumpAnchorRect.top + quickJumpAnchorRect.height + gap)}px`
-    : isFullscreen
-      ? 'calc(68px + env(safe-area-inset-top))'
-      : '68px';
-
-  const menuLeft = quickJumpAnchorRect
-    ? `${Math.round(quickJumpAnchorRect.left)}px`
-    : undefined;
-
   const menu = (
     <div 
-      className={`fixed z-[10001] w-[calc(100vw-2rem)] max-w-56 sm:max-w-64 h-[320px] max-h-[calc(100vh-100px)] bg-white/10 backdrop-blur-sm rounded-lg border border-white/20 overflow-hidden flex flex-col`}
-      style={{
-        top: menuTop,
-        left: menuLeft,
-        right: menuLeft ? 'auto' : isFullscreen ? 'calc(1rem + env(safe-area-inset-right))' : '1rem',
-      }}
+      className={`fixed z-[10001] w-[calc(100vw-2rem)] max-w-56 sm:max-w-64 h-[320px] max-h-[calc(100vh-100px)] bg-white/10 backdrop-blur-sm rounded-lg border border-white/20 overflow-hidden flex flex-col top-12 right-2 sm:top-[68px] sm:right-4`}
+      style={
+        isFullscreen
+          ? {
+              top: 'calc(48px + env(safe-area-inset-top))',
+              right: 'calc(0.5rem + env(safe-area-inset-right))',
+            }
+          : undefined
+      }
     >
       {/* Header */}
       <div className="flex items-center justify-between p-2 sm:p-3 border-b border-white/10 shrink-0">
