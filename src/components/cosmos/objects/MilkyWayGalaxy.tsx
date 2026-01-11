@@ -674,13 +674,13 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
           
           <mesh onClick={handleYouAreHereClick} onPointerDown={handleYouAreHereClick}>
             <sphereGeometry args={[baseMarkerSize, 16, 16]} />
-            <meshBasicMaterial color="#00ff88" />
+            <meshBasicMaterial color="#ffffff" />
           </mesh>
           
           <mesh onClick={handleYouAreHereClick} onPointerDown={handleYouAreHereClick}>
             <sphereGeometry args={[baseMarkerSize * 1.5, 16, 16]} />
             <meshBasicMaterial
-              color="#00ff88"
+              color="#ffffff"
               transparent
               opacity={0.7}
               blending={THREE.AdditiveBlending}
@@ -690,7 +690,7 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
           <mesh onClick={handleYouAreHereClick} onPointerDown={handleYouAreHereClick}>
             <sphereGeometry args={[baseMarkerSize * 3, 16, 16]} />
             <meshBasicMaterial
-              color="#00ff88"
+              color="#ffffff"
               transparent
               opacity={0.4}
               blending={THREE.AdditiveBlending}
