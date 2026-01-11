@@ -395,8 +395,8 @@ export const TourOverlay = () => {
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
     >
-      {/* Overall tour progress bar */}
-      <div className="h-1 bg-white/10">
+      {/* Overall tour progress bar - inside the card, no top outline needed */}
+      <div className="h-1 bg-white/10 -mt-px">
         <div 
           className="h-full bg-blue-500 transition-all duration-300"
           style={{ width: `${((tourIndex + 1) / totalStops) * 100}%` }}
@@ -405,7 +405,7 @@ export const TourOverlay = () => {
       
       {/* Header - clickable to toggle collapse */}
       <div 
-        className="flex items-center justify-between px-3 py-2 sm:p-3 border-b border-white/10 cursor-pointer hover:bg-white/5 transition-colors rounded-t-lg gap-2"
+        className="flex items-center justify-between px-3 py-2 sm:p-3 border-b border-white/10 cursor-pointer hover:bg-white/5 transition-colors gap-2"
         onClick={toggleCollapse}
       >
         <div className="flex items-center gap-2 min-w-0 flex-1">

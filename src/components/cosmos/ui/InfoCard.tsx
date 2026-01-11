@@ -194,18 +194,18 @@ export const InfoCard = () => {
 
   const card = (
     <div 
-      className={`${isFullscreen ? 'fixed' : 'absolute'} bottom-2 left-2 right-2 sm:bottom-4 sm:left-4 sm:right-auto z-[10001] w-auto sm:w-72 md:w-80 bg-white/10 backdrop-blur-sm rounded-lg animate-scale-in origin-bottom-left`}
+      className={`${isFullscreen ? 'fixed' : 'absolute'} bottom-2 left-2 right-2 sm:bottom-4 sm:left-4 sm:right-auto z-[10001] w-auto sm:w-72 md:w-80 bg-white/10 backdrop-blur-sm rounded-lg animate-scale-in origin-bottom-left overflow-hidden`}
       style={isFullscreen ? { 
         bottom: 'calc(0.5rem + env(safe-area-inset-bottom))',
         left: 'calc(0.5rem + env(safe-area-inset-left))',
-        right: 'auto',
-        width: 'calc(100% - 1rem - env(safe-area-inset-left) - env(safe-area-inset-right))',
+        right: 'calc(0.5rem + env(safe-area-inset-right))',
+        width: 'auto',
         maxWidth: '320px',
       } : undefined}
     >
       {/* Header - entire bar is clickable to toggle minimize */}
       <div 
-        className="flex items-center justify-between p-3 cursor-pointer hover:bg-white/5 transition-colors rounded-t-lg"
+        className="flex items-center justify-between p-3 cursor-pointer hover:bg-white/5 transition-colors"
         onClick={() => setIsMinimized(!isMinimized)}
       >
         <h3 className="text-white font-semibold text-sm sm:text-base truncate flex-1 mr-2">
