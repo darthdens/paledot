@@ -95,6 +95,7 @@ export const OrbitalTrail = ({
   const countRef = useRef(0);
   const lastPosRef = useRef<[number, number, number] | null>(null);
   const frameCountRef = useRef(0);
+  const wasEnabledRef = useRef(enabled);
 
   useEffect(() => {
     geometryRef.current = geometry;
@@ -111,9 +112,27 @@ export const OrbitalTrail = ({
   }, [geometry, material, glowLine]);
 
   useFrame(() => {
-    // Always record positions (so trail doesn't reset on visibility toggle)
-    // Only skip if time is paused
-    if (timeSpeed === 0) return;
+    // Clear trail when re-enabled after being disabled (prevents old trail from showing at wrong position)
+    if (enabled && !wasEnabledRef.current) {
+      // Reset trail data
+      countRef.current = 0;
+      lastPosRef.current = null;
+      frameCountRef.current = 0;
+      positions.fill(0);
+      if (geometryRef.current) {
+        geometryRef.current.setDrawRange(0, 0);
+        positionAttr.needsUpdate = true;
+      }
+      if (glowLine && glowGeometryRef.current) {
+        glowLine.positions.fill(0);
+        glowGeometryRef.current.setDrawRange(0, 0);
+        glowLine.positionAttr.needsUpdate = true;
+      }
+    }
+    wasEnabledRef.current = enabled;
+
+    // Only record when enabled and time is moving
+    if (!enabled || timeSpeed === 0) return;
 
     const worldPos = useCosmosStore.getState().objectWorldPositions[objectId];
     if (!worldPos || !geometryRef.current) return;
