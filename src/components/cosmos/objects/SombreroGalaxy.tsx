@@ -356,7 +356,7 @@ export const SombreroGalaxy = ({ visualScale }: SombreroGalaxyProps) => {
           geometry={diskGeo}
           size={gs * 40}
           map={dotTexture}
-          opacity={0.65}
+          opacity={0.85}
           maxRadius={diskR}
           rotationMultiplier={1}
           renderOrder={2}
@@ -367,7 +367,7 @@ export const SombreroGalaxy = ({ visualScale }: SombreroGalaxyProps) => {
           geometry={bulgeGeo}
           size={gs * 50}
           map={dotTexture}
-          opacity={0.75}
+          opacity={0.9}
           maxRadius={bulgeR}
           rotationMultiplier={1.1}
           renderOrder={3}
