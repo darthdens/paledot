@@ -29,10 +29,9 @@ export const GalaxyRotator = ({ children }: GalaxyRotatorProps) => {
 
     // Don't rotate when inside a star system
     if (isInStarSystem) return;
-    
-    // Don't rotate when viewing the galaxy from outside (would make it look like it's orbiting something)
-    // Only rotate when at stellar scale (traveling between stars within the galaxy)
-    if (currentScale === 'milkyWay' || currentScale === 'localGroup' || currentScale === 'universe') return;
+    // Don't rotate when viewing the galaxy from far outside (would make it look like it's orbiting something)
+    // Rotate at stellar + milkyWay scales (traveling between stars / viewing the galaxy as a whole)
+    if (currentScale === 'localGroup' || currentScale === 'universe') return;
 
     // Base rotation speed * timeSpeed multiplier
     // 0.00625 rad/s base = one full rotation every ~16 minutes at 1x speed (slower for better viewing)
