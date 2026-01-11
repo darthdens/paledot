@@ -395,8 +395,8 @@ export const TourOverlay = () => {
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
     >
-      {/* Overall tour progress bar - inside the card, no top outline needed */}
-      <div className="h-1 bg-white/10 -mt-px">
+      {/* Overall tour progress bar - inside the card */}
+      <div className="h-1 bg-white/10">
         <div 
           className="h-full bg-blue-500 transition-all duration-300"
           style={{ width: `${((tourIndex + 1) / totalStops) * 100}%` }}
