@@ -148,17 +148,6 @@ export const SolarSystemContent = ({
             />
           ))}
 
-          {/* Orbital trails for moons */}
-          {moons.map((moon) => (
-            <OrbitalTrail
-              key={`trail-${moon.id}`}
-              objectId={moon.id}
-              color={moon.color}
-              enabled={showTrails}
-              maxPoints={80}
-              opacity={0.25}
-            />
-          ))}
         </>
       )}
     </>
