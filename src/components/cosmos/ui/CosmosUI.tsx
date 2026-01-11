@@ -1,6 +1,7 @@
 import { useLanguage } from '@/i18n/LanguageContext';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { HelpCircle, Compass, Maximize, Minimize, CircleDot, CircleOff, Clock, Timer, TimerOff, Orbit, Activity, Home, Scaling, BarChart3 } from 'lucide-react';
 import { useCosmosStore } from '../store/useCosmosStore';
 import { useFullscreenStore } from '../store/useFullscreenStore';
@@ -565,43 +566,106 @@ export const CosmosUI = () => {
             : undefined
         }
       >
-        <div className="flex items-center gap-1 sm:gap-1.5">
-          {/* Navigation group */}
-            <Button size="icon" variant="ghost" onClick={toggleFullscreen} className="h-8 w-8 sm:h-9 sm:w-9 bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white" title={isFullscreen ? t.exitFullscreen : t.fullscreen}>
-              {isFullscreen ? <Minimize className="w-4 h-4 sm:w-5 sm:h-5" /> : <Maximize className="w-4 h-4 sm:w-5 sm:h-5" />}
-            </Button>
-            <Button ref={quickJumpButtonRef} size="icon" variant="ghost" onClick={handleQuickJumpClick} className={`h-8 w-8 sm:h-9 sm:w-9 backdrop-blur-sm text-white ${showQuickJump ? 'bg-white/25' : 'bg-white/10 hover:bg-white/20'}`} title={t.quickJump}>
-              <Compass className="w-4 h-4 sm:w-5 sm:h-5" />
-            </Button>
-            <Button size="icon" variant="ghost" onClick={goHome} className="h-8 w-8 sm:h-9 sm:w-9 bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white" title={t.home}>
-              <Home className="w-4 h-4 sm:w-5 sm:h-5" />
-            </Button>
-            
+        <TooltipProvider delayDuration={300}>
+          <div className="flex items-center gap-1 sm:gap-1.5">
+            {/* Navigation group */}
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button size="icon" variant="ghost" onClick={toggleFullscreen} className="h-8 w-8 sm:h-9 sm:w-9 bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white">
+                  {isFullscreen ? <Minimize className="w-4 h-4 sm:w-5 sm:h-5" /> : <Maximize className="w-4 h-4 sm:w-5 sm:h-5" />}
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent variant="dark" side="bottom">
+                {isFullscreen ? t.exitFullscreen : t.fullscreen}
+              </TooltipContent>
+            </Tooltip>
+
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button ref={quickJumpButtonRef} size="icon" variant="ghost" onClick={handleQuickJumpClick} className={`h-8 w-8 sm:h-9 sm:w-9 backdrop-blur-sm text-white ${showQuickJump ? 'bg-white/25' : 'bg-white/10 hover:bg-white/20'}`}>
+                  <Compass className="w-4 h-4 sm:w-5 sm:h-5" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent variant="dark" side="bottom">
+                {t.quickJump}
+              </TooltipContent>
+            </Tooltip>
+
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button size="icon" variant="ghost" onClick={goHome} className="h-8 w-8 sm:h-9 sm:w-9 bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white">
+                  <Home className="w-4 h-4 sm:w-5 sm:h-5" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent variant="dark" side="bottom">
+                {t.home}
+              </TooltipContent>
+            </Tooltip>
+              
             {/* Divider */}
             <div className="w-px h-6 bg-white/20 mx-0.5" />
-            
+              
             {/* Display options group */}
-            <Button size="icon" variant="ghost" onClick={toggleOrbits} className={`h-8 w-8 sm:h-9 sm:w-9 backdrop-blur-sm text-white ${showOrbits ? 'bg-white/25' : 'bg-white/10 hover:bg-white/20'}`} title={showOrbits ? t.hideOrbits : t.showOrbits}>
-              {showOrbits ? <CircleDot className="w-4 h-4 sm:w-5 sm:h-5" /> : <CircleOff className="w-4 h-4 sm:w-5 sm:h-5" />}
-            </Button>
-            <Button size="icon" variant="ghost" onClick={toggleTrails} className={`h-8 w-8 sm:h-9 sm:w-9 backdrop-blur-sm text-white ${showTrails ? 'bg-white/25' : 'bg-white/10 hover:bg-white/20'}`} title={showTrails ? t.hideTrails : t.showTrails}>
-              <Orbit className="w-4 h-4 sm:w-5 sm:h-5" />
-            </Button>
-            <Button size="icon" variant="ghost" onClick={() => setShowTimeSlider(!showTimeSlider)} className={`h-8 w-8 sm:h-9 sm:w-9 backdrop-blur-sm text-white ${showTimeSlider ? 'bg-white/25' : 'bg-white/10 hover:bg-white/20'}`} title={t.timeSpeed}>
-              <Clock className="w-4 h-4 sm:w-5 sm:h-5" />
-            </Button>
-            <Button size="icon" variant="ghost" onClick={toggleSizeComparison} className="h-8 w-8 sm:h-9 sm:w-9 bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white" title={t.sizeComparison}>
-              <BarChart3 className="w-4 h-4 sm:w-5 sm:h-5" />
-            </Button>
-            
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button size="icon" variant="ghost" onClick={toggleOrbits} className={`h-8 w-8 sm:h-9 sm:w-9 backdrop-blur-sm text-white ${showOrbits ? 'bg-white/25' : 'bg-white/10 hover:bg-white/20'}`}>
+                  {showOrbits ? <CircleDot className="w-4 h-4 sm:w-5 sm:h-5" /> : <CircleOff className="w-4 h-4 sm:w-5 sm:h-5" />}
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent variant="dark" side="bottom">
+                {showOrbits ? t.hideOrbits : t.showOrbits}
+              </TooltipContent>
+            </Tooltip>
+
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button size="icon" variant="ghost" onClick={toggleTrails} className={`h-8 w-8 sm:h-9 sm:w-9 backdrop-blur-sm text-white ${showTrails ? 'bg-white/25' : 'bg-white/10 hover:bg-white/20'}`}>
+                  <Orbit className="w-4 h-4 sm:w-5 sm:h-5" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent variant="dark" side="bottom">
+                {showTrails ? t.hideTrails : t.showTrails}
+              </TooltipContent>
+            </Tooltip>
+
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button size="icon" variant="ghost" onClick={() => setShowTimeSlider(!showTimeSlider)} className={`h-8 w-8 sm:h-9 sm:w-9 backdrop-blur-sm text-white ${showTimeSlider ? 'bg-white/25' : 'bg-white/10 hover:bg-white/20'}`}>
+                  <Clock className="w-4 h-4 sm:w-5 sm:h-5" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent variant="dark" side="bottom">
+                {t.timeSpeed}
+              </TooltipContent>
+            </Tooltip>
+
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button size="icon" variant="ghost" onClick={toggleSizeComparison} className="h-8 w-8 sm:h-9 sm:w-9 bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white">
+                  <BarChart3 className="w-4 h-4 sm:w-5 sm:h-5" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent variant="dark" side="bottom">
+                {t.sizeComparison}
+              </TooltipContent>
+            </Tooltip>
+              
             {/* Divider */}
             <div className="w-px h-6 bg-white/20 mx-0.5" />
-            
+              
             {/* Help */}
-            <Button size="icon" variant="ghost" onClick={() => setShowControlHints(true)} className="h-8 w-8 sm:h-9 sm:w-9 bg-blue-500/30 hover:bg-blue-500/50 backdrop-blur-sm text-white" title={t.help}>
-              <HelpCircle className="w-4 h-4 sm:w-5 sm:h-5" />
-            </Button>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button size="icon" variant="ghost" onClick={() => setShowControlHints(true)} className="h-8 w-8 sm:h-9 sm:w-9 bg-blue-500/30 hover:bg-blue-500/50 backdrop-blur-sm text-white">
+                  <HelpCircle className="w-4 h-4 sm:w-5 sm:h-5" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent variant="dark" side="bottom">
+                {t.help}
+              </TooltipContent>
+            </Tooltip>
           </div>
+        </TooltipProvider>
       </div>
 
       {/* Time speed slider */}
