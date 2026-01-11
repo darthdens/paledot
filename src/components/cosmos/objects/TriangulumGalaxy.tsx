@@ -376,7 +376,7 @@ export const TriangulumGalaxy = ({ visualScale }: TriangulumGalaxyProps) => {
           <spriteMaterial
             map={glowTexture}
             transparent
-            opacity={0.45}
+            opacity={0.65}
             blending={THREE.AdditiveBlending}
             depthWrite={false}
             depthTest={false}
