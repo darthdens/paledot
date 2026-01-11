@@ -135,24 +135,43 @@ export const ProximaCentauri = ({ visualScale = 0.001 }: ProximaCentauriProps) =
       </mesh>
 
       {/* Inner corona - soft pink */}
-      <mesh ref={coronaRef}>
+      <mesh ref={coronaRef} renderOrder={1}>
         <sphereGeometry args={[starSize * 1.06, 48, 48]} />
-        <meshBasicMaterial color="#FFB0A8" transparent opacity={0.5} depthWrite={false} />
+        <meshBasicMaterial 
+          color="#FFB0A8" 
+          transparent 
+          opacity={0.5} 
+          depthWrite={false} 
+          polygonOffset 
+          polygonOffsetFactor={-1} 
+          polygonOffsetUnits={-1} 
+        />
       </mesh>
 
       {/* Middle glow layer - coral */}
-      <mesh>
+      <mesh renderOrder={2}>
         <sphereGeometry args={[starSize * 1.15, 32, 32]} />
-        <meshBasicMaterial color="#FF8878" transparent opacity={0.3} depthWrite={false} />
+        <meshBasicMaterial 
+          color="#FF8878" 
+          transparent 
+          opacity={0.3} 
+          depthWrite={false} 
+          polygonOffset 
+          polygonOffsetFactor={-2} 
+          polygonOffsetUnits={-2} 
+        />
       </mesh>
 
       {/* Outer glow - reddish */}
-      <mesh ref={glowRef}>
+      <mesh ref={glowRef} renderOrder={3}>
         <sphereGeometry args={[starSize * 1.4, 32, 32]} />
         <shaderMaterial
           transparent
           depthWrite={false}
           side={THREE.BackSide}
+          polygonOffset
+          polygonOffsetFactor={-3}
+          polygonOffsetUnits={-3}
           uniforms={{
             glowColor: { value: new THREE.Color('#E05040') },
           }}
@@ -175,12 +194,15 @@ export const ProximaCentauri = ({ visualScale = 0.001 }: ProximaCentauriProps) =
       </mesh>
 
       {/* Far outer glow - deep red, very soft */}
-      <mesh>
+      <mesh renderOrder={4}>
         <sphereGeometry args={[starSize * 1.8, 24, 24]} />
         <shaderMaterial
           transparent
           depthWrite={false}
           side={THREE.BackSide}
+          polygonOffset
+          polygonOffsetFactor={-4}
+          polygonOffsetUnits={-4}
           uniforms={{
             glowColor: { value: new THREE.Color('#B03020') },
           }}
