@@ -662,10 +662,10 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
               style={{ pointerEvents: 'auto' }}
             >
               <div
-                className="bg-background/90 backdrop-blur-md px-3 py-1.5 rounded-lg whitespace-nowrap shadow-lg cursor-pointer"
+                className="bg-white/10 backdrop-blur-sm px-3 py-1.5 rounded-lg whitespace-nowrap shadow-lg cursor-pointer"
                 onClick={handleYouAreHereLabelClick}
               >
-                <span className="text-foreground text-sm font-semibold drop-shadow-md">
+                <span className="text-white text-sm font-semibold drop-shadow-md">
                   {language === 'fr' ? 'Nous sommes ici' : 'We are here'}
                 </span>
               </div>
