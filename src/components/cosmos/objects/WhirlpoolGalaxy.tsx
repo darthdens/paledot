@@ -713,12 +713,12 @@ export const WhirlpoolGalaxy = ({ visualScale }: WhirlpoolGalaxyProps) => {
           <spriteMaterial
             map={glowTexture}
             transparent
-            opacity={0.82}
+            opacity={0.45}
             blending={THREE.AdditiveBlending}
             depthWrite={false}
             depthTest={false}
             side={THREE.DoubleSide}
-            toneMapped={false}
+            toneMapped
           />
         </sprite>
 
@@ -743,12 +743,12 @@ export const WhirlpoolGalaxy = ({ visualScale }: WhirlpoolGalaxyProps) => {
             <spriteMaterial
               map={companionGlowTexture}
               transparent
-              opacity={0.75}
+              opacity={0.4}
               blending={THREE.AdditiveBlending}
               depthWrite={false}
               depthTest={false}
               side={THREE.DoubleSide}
-              toneMapped={false}
+              toneMapped
             />
           </sprite>
         </group>
