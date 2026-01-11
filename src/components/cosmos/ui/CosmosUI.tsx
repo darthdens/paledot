@@ -604,9 +604,11 @@ export const CosmosUI = () => {
       </div>
 
       {/* Time speed slider */}
-      {showTimeSlider && !showControlHints && (
+      {!showControlHints && (
         <div
-          className={`${isFullscreen ? 'fixed' : 'absolute'} top-12 right-2 sm:top-[68px] sm:right-4 z-[10000] bg-white/10 backdrop-blur-sm rounded-lg p-3 sm:p-4 min-w-[180px] sm:min-w-[220px] animate-slide-in-right`}
+          className={`${isFullscreen ? 'fixed' : 'absolute'} top-12 right-2 sm:top-[68px] sm:right-4 z-[10000] bg-white/10 backdrop-blur-sm rounded-lg overflow-hidden transition-all duration-300 ease-out ${
+            showTimeSlider ? 'opacity-100 scale-100' : 'opacity-0 scale-95 pointer-events-none'
+          }`}
           style={
             isFullscreen
               ? {
@@ -616,25 +618,31 @@ export const CosmosUI = () => {
               : undefined
           }
         >
-          <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <span className="text-white text-xs sm:text-sm font-medium">{t.timeSpeed}</span>
-              <span className="text-white/70 text-xs">
-                {timeSpeed === 0 ? t.paused : timeSpeed === 1 ? '1×' : `${timeSpeed}×`}
-              </span>
-            </div>
-            <Slider
-              value={[timeSpeed]}
-              onValueChange={([value]) => setTimeSpeed(value)}
-              min={0}
-              max={10}
-              step={0.5}
-              variant="light"
-              className="w-full"
-            />
-            <div className="flex justify-between text-[10px] sm:text-xs text-white/50">
-              <span>{t.paused}</span>
-              <span>10×</span>
+          <div 
+            className={`grid transition-all duration-300 ease-out ${showTimeSlider ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'}`}
+          >
+            <div className="overflow-hidden">
+              <div className="p-3 sm:p-4 min-w-[180px] sm:min-w-[220px] space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-white text-xs sm:text-sm font-medium">{t.timeSpeed}</span>
+                  <span className="text-white/70 text-xs">
+                    {timeSpeed === 0 ? t.paused : timeSpeed === 1 ? '1×' : `${timeSpeed}×`}
+                  </span>
+                </div>
+                <Slider
+                  value={[timeSpeed]}
+                  onValueChange={([value]) => setTimeSpeed(value)}
+                  min={0}
+                  max={10}
+                  step={0.5}
+                  variant="light"
+                  className="w-full"
+                />
+                <div className="flex justify-between text-[10px] sm:text-xs text-white/50">
+                  <span>{t.paused}</span>
+                  <span>10×</span>
+                </div>
+              </div>
             </div>
           </div>
         </div>

@@ -381,25 +381,36 @@ export const TourOverlay = () => {
   
   if (!isTouring || !currentStop) return null;
 
-  // Collapsed/minimized view
-  if (isCollapsed) {
-    return (
+  return (
+    <div 
+      className={`${isFullscreen ? 'fixed' : 'absolute'} z-[10001] bg-white/10 backdrop-blur-sm rounded-lg overflow-hidden animate-slide-in-right
+        bottom-2 left-2 right-2
+        sm:bottom-4 sm:top-auto sm:left-auto sm:right-4 sm:w-80
+        md:w-96`}
+      style={isFullscreen ? { 
+        bottom: 'calc(1rem + env(safe-area-inset-bottom))',
+        right: 'calc(1rem + env(safe-area-inset-right))',
+        left: 'auto',
+      } : undefined}
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
+    >
+      {/* Overall tour progress bar */}
+      <div className="h-1 bg-white/10">
+        <div 
+          className="h-full bg-blue-500 transition-all duration-300"
+          style={{ width: `${((tourIndex + 1) / totalStops) * 100}%` }}
+        />
+      </div>
+      
+      {/* Header - clickable to toggle collapse */}
       <div 
-        className={`${isFullscreen ? 'fixed' : 'absolute'} z-[10001] bg-white/10 backdrop-blur-sm rounded-lg overflow-hidden cursor-pointer animate-slide-in-right
-          bottom-2 left-2 right-2 
-          sm:bottom-4 sm:top-auto sm:left-auto sm:right-4 sm:w-auto`}
-        style={isFullscreen ? {
-          bottom: 'calc(1rem + env(safe-area-inset-bottom))',
-          right: 'calc(1rem + env(safe-area-inset-right))',
-          left: 'auto',
-        } : undefined}
+        className="flex items-center justify-between px-3 py-2 sm:p-3 border-b border-white/10 cursor-pointer hover:bg-white/5 transition-colors rounded-t-lg"
         onClick={toggleCollapse}
-        onTouchStart={handleTouchStart}
-        onTouchEnd={handleTouchEnd}
       >
-        <div className="flex items-center gap-2 px-3 py-2 sm:px-4 sm:py-2.5">
-          {/* Progress indicator */}
-          <div className="relative w-8 h-8 sm:w-10 sm:h-10 flex-shrink-0">
+        <div className="flex items-center gap-2">
+          {/* Progress indicator (visible when collapsed) */}
+          <div className={`relative flex-shrink-0 transition-all duration-300 ${isCollapsed ? 'w-8 h-8 sm:w-10 sm:h-10 opacity-100' : 'w-0 h-0 opacity-0 overflow-hidden'}`}>
             <svg className="w-full h-full -rotate-90" viewBox="0 0 36 36">
               <circle
                 cx="18"
@@ -425,15 +436,16 @@ export const TourOverlay = () => {
             </span>
           </div>
           
-          {/* Title */}
-          <div className="flex-1 min-w-0">
-            <p className="text-white text-xs sm:text-sm font-medium truncate">
-              {currentStop.title[language]}
-            </p>
-          </div>
-          
-          {/* Controls */}
-          <div className="flex items-center gap-1 flex-shrink-0">
+          <span className={`text-white/50 text-[10px] sm:text-xs transition-opacity duration-300 ${isCollapsed ? 'hidden' : 'block'}`}>
+            {tourIndex + 1}/{totalStops}
+          </span>
+          <h2 className="text-white font-semibold text-sm truncate max-w-[180px]">
+            {currentStop.title[language]}
+          </h2>
+        </div>
+        <div className="flex items-center gap-1">
+          {/* Collapsed controls */}
+          <div className={`flex items-center gap-1 transition-all duration-300 ${isCollapsed ? 'opacity-100' : 'opacity-0 w-0 overflow-hidden'}`}>
             <Button
               size="icon"
               variant="ghost"
@@ -461,53 +473,11 @@ export const TourOverlay = () => {
             >
               <SkipForward className="w-3 h-3 sm:w-4 sm:h-4" />
             </Button>
-            
-            <ChevronUp className="w-4 h-4 text-white/50 ml-1" />
           </div>
-        </div>
-      </div>
-    );
-  }
-  
-  // Expanded view
-  return (
-    <div 
-      className={`${isFullscreen ? 'fixed' : 'absolute'} z-[10001] bg-white/10 backdrop-blur-sm rounded-lg overflow-hidden animate-slide-in-right
-        bottom-2 left-2 right-2 max-h-[45vh]
-        sm:bottom-4 sm:top-auto sm:left-auto sm:right-4 sm:w-80 sm:max-h-none
-        md:w-96`}
-      style={isFullscreen ? { 
-        bottom: 'calc(1rem + env(safe-area-inset-bottom))',
-        right: 'calc(1rem + env(safe-area-inset-right))',
-        left: 'auto',
-      } : undefined}
-      onTouchStart={handleTouchStart}
-      onTouchEnd={handleTouchEnd}
-    >
-      {/* Overall tour progress bar */}
-      <div className="h-1 bg-white/10">
-        <div 
-          className="h-full bg-blue-500 transition-all duration-300"
-          style={{ width: `${((tourIndex + 1) / totalStops) * 100}%` }}
-        />
-      </div>
-      
-      
-      {/* Header - clickable to collapse */}
-      <div 
-        className="flex items-center justify-between px-3 py-2 sm:p-3 border-b border-white/10 cursor-pointer hover:bg-white/5 transition-colors"
-        onClick={toggleCollapse}
-      >
-        <div className="flex items-center gap-2">
-          <span className="text-white/50 text-[10px] sm:text-xs">
-            {tourIndex + 1}/{totalStops}
-          </span>
-          <h2 className="text-white font-semibold text-sm sm:hidden truncate max-w-[180px]">
-            {currentStop.title[language]}
-          </h2>
-        </div>
-        <div className="flex items-center gap-1">
-          <ChevronDown className="w-4 h-4 text-white/70" />
+          
+          <div className="h-6 w-6 flex items-center justify-center text-white/70">
+            {isCollapsed ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+          </div>
           <Button
             size="icon"
             variant="ghost"
@@ -522,51 +492,55 @@ export const TourOverlay = () => {
         </div>
       </div>
       
-      {/* Content - scrollable and compact on mobile */}
-      <div className="p-3 sm:p-4 space-y-2 sm:space-y-3 overflow-y-auto max-h-[25vh] sm:max-h-none">
-        <h2 className="hidden sm:block text-white font-bold text-lg">
-          {currentStop.title[language]}
-        </h2>
-        <p className="text-white/80 text-xs sm:text-sm leading-relaxed line-clamp-4 sm:line-clamp-none">
-          {currentStop.narration[language]}
-        </p>
-      </div>
-      
-      {/* Controls - more compact on mobile */}
-      <div className="flex items-center justify-between px-2 py-2 sm:p-3 border-t border-white/10 bg-white/5">
-        <Button
-          size="sm"
-          variant="ghost"
-          onClick={handlePrevious}
-          disabled={tourIndex === 0}
-          className="text-[10px] sm:text-xs text-white/70 hover:text-white hover:bg-white/10 disabled:opacity-30 px-2 sm:px-3 h-7 sm:h-8"
-        >
-          <SkipBack className="w-3 h-3 sm:w-4 sm:h-4 mr-0.5 sm:mr-1" />
-          <span className="hidden xs:inline">{t.previous}</span>
-        </Button>
-        
-        <Button
-          size="icon"
-          variant="ghost"
-          onClick={togglePause}
-          className="h-8 w-8 sm:h-10 sm:w-10 rounded-full bg-white/10 hover:bg-white/20 text-white"
-        >
-          {isPaused ? (
-            <Play className="w-4 h-4 sm:w-5 sm:h-5" />
-          ) : (
-            <Pause className="w-4 h-4 sm:w-5 sm:h-5" />
-          )}
-        </Button>
-        
-        <Button
-          size="sm"
-          variant="ghost"
-          onClick={handleNext}
-          className="text-[10px] sm:text-xs text-white/70 hover:text-white hover:bg-white/10 px-2 sm:px-3 h-7 sm:h-8"
-        >
-          <span className="hidden xs:inline">{t.next}</span>
-          <SkipForward className="w-3 h-3 sm:w-4 sm:h-4 ml-0.5 sm:ml-1" />
-        </Button>
+      {/* Content - collapsible with smooth animation */}
+      <div 
+        className={`grid transition-all duration-300 ease-out ${isCollapsed ? 'grid-rows-[0fr]' : 'grid-rows-[1fr]'}`}
+      >
+        <div className="overflow-hidden">
+          {/* Content area */}
+          <div className="p-3 sm:p-4 space-y-2 sm:space-y-3 max-h-[25vh] sm:max-h-none overflow-y-auto">
+            <p className="text-white/80 text-xs sm:text-sm leading-relaxed line-clamp-4 sm:line-clamp-none">
+              {currentStop.narration[language]}
+            </p>
+          </div>
+          
+          {/* Controls */}
+          <div className="flex items-center justify-between px-2 py-2 sm:p-3 border-t border-white/10 bg-white/5">
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={handlePrevious}
+              disabled={tourIndex === 0}
+              className="text-[10px] sm:text-xs text-white/70 hover:text-white hover:bg-white/10 disabled:opacity-30 px-2 sm:px-3 h-7 sm:h-8"
+            >
+              <SkipBack className="w-3 h-3 sm:w-4 sm:h-4 mr-0.5 sm:mr-1" />
+              <span className="hidden xs:inline">{t.previous}</span>
+            </Button>
+            
+            <Button
+              size="icon"
+              variant="ghost"
+              onClick={togglePause}
+              className="h-8 w-8 sm:h-10 sm:w-10 rounded-full bg-white/10 hover:bg-white/20 text-white"
+            >
+              {isPaused ? (
+                <Play className="w-4 h-4 sm:w-5 sm:h-5" />
+              ) : (
+                <Pause className="w-4 h-4 sm:w-5 sm:h-5" />
+              )}
+            </Button>
+            
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={handleNext}
+              className="text-[10px] sm:text-xs text-white/70 hover:text-white hover:bg-white/10 px-2 sm:px-3 h-7 sm:h-8"
+            >
+              <span className="hidden xs:inline">{t.next}</span>
+              <SkipForward className="w-3 h-3 sm:w-4 sm:h-4 ml-0.5 sm:ml-1" />
+            </Button>
+          </div>
+        </div>
       </div>
     </div>
   );

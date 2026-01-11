@@ -73,8 +73,6 @@ export const QuickJumpMenu = () => {
     };
   }, []);
 
-  if (!showQuickJump) return null;
-
   const handleJump = (objectId: string) => {
     const object = getObjectById(objectId);
     if (object) {
@@ -104,20 +102,33 @@ export const QuickJumpMenu = () => {
 
   const menu = (
     <div 
-      className={`${isFullscreen ? 'fixed' : 'absolute'} top-12 right-2 sm:top-[68px] sm:right-4 z-[10001] w-[calc(100vw-2rem)] max-w-56 sm:max-w-64 bg-white/10 backdrop-blur-sm rounded-lg overflow-y-auto animate-slide-in-right`}
+      className={`${isFullscreen ? 'fixed' : 'absolute'} top-12 right-2 sm:top-[68px] sm:right-4 z-[10001] bg-white/10 backdrop-blur-sm rounded-lg overflow-hidden transition-all duration-300 ease-out ${
+        showQuickJump ? 'opacity-100 scale-100' : 'opacity-0 scale-95 pointer-events-none'
+      }`}
       style={
         isFullscreen
           ? {
               top: 'calc(48px + env(safe-area-inset-top))',
               right: 'calc(0.5rem + env(safe-area-inset-right))',
-              maxHeight:
-                'calc(100dvh - 48px - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 16px)',
             }
-          : {
-              maxHeight: `${maxHeightNonFullscreenPx}px`,
-            }
+          : undefined
       }
     >
+      <div 
+        className={`grid transition-all duration-300 ease-out ${showQuickJump ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'}`}
+      >
+        <div 
+          className="overflow-y-auto w-[calc(100vw-2rem)] max-w-56 sm:max-w-64"
+          style={
+            isFullscreen
+              ? {
+                  maxHeight: 'calc(100dvh - 48px - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 16px)',
+                }
+              : {
+                  maxHeight: `${maxHeightNonFullscreenPx}px`,
+                }
+          }
+        >
       {/* Header */}
       <div className="flex items-center justify-between p-2 sm:p-3 border-b border-white/10 shrink-0">
         <h3 className="text-white font-semibold text-sm">{t.title}</h3>
@@ -234,6 +245,8 @@ export const QuickJumpMenu = () => {
             );
           })}
         </div>
+        </div>
+      </div>
       </div>
     </div>
   );
