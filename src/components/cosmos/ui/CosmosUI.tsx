@@ -1,7 +1,7 @@
 import { useLanguage } from '@/i18n/LanguageContext';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
-import { HelpCircle, Compass, Maximize, Minimize, CircleDot, CircleOff, Clock, Timer, TimerOff, Sparkles, Activity, Home, Scaling, BarChart3 } from 'lucide-react';
+import { HelpCircle, Compass, Maximize, Minimize, CircleDot, CircleOff, Clock, Timer, TimerOff, Orbit, Activity, Home, Scaling, BarChart3 } from 'lucide-react';
 import { useCosmosStore } from '../store/useCosmosStore';
 import { useFullscreenStore } from '../store/useFullscreenStore';
 import { useCallback, useEffect, useRef, useState } from 'react';
@@ -585,7 +585,7 @@ export const CosmosUI = () => {
               {showOrbits ? <CircleDot className="w-4 h-4 sm:w-5 sm:h-5" /> : <CircleOff className="w-4 h-4 sm:w-5 sm:h-5" />}
             </Button>
             <Button size="icon" variant="ghost" onClick={toggleTrails} className={`h-8 w-8 sm:h-9 sm:w-9 backdrop-blur-sm text-white ${showTrails ? 'bg-white/25' : 'bg-white/10 hover:bg-white/20'}`} title={showTrails ? t.hideTrails : t.showTrails}>
-              <Sparkles className="w-4 h-4 sm:w-5 sm:h-5" />
+              <Orbit className="w-4 h-4 sm:w-5 sm:h-5" />
             </Button>
             <Button size="icon" variant="ghost" onClick={() => setShowTimeSlider(!showTimeSlider)} className={`h-8 w-8 sm:h-9 sm:w-9 backdrop-blur-sm text-white ${showTimeSlider ? 'bg-white/25' : 'bg-white/10 hover:bg-white/20'}`} title={t.timeSpeed}>
               <Clock className="w-4 h-4 sm:w-5 sm:h-5" />
