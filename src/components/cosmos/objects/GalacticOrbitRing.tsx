@@ -110,18 +110,7 @@ export const GalacticOrbitRing = ({ visualScale, visible = true }: GalacticOrbit
 
   return (
     <group position={galaxyCenter}>
-      {/* Main orbit ring */}
-      <line>
-        <bufferGeometry attach="geometry" {...ringGeometry} />
-        <lineBasicMaterial
-          ref={ringMaterialRef}
-          color={0x00ff88}
-          transparent
-          opacity={0}
-          blending={THREE.AdditiveBlending}
-          depthWrite={false}
-        />
-      </line>
+      {/* Main orbit ring removed - keeping only marker, line and label */}
 
       {/* Current position marker on the ring */}
       <mesh
