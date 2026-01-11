@@ -128,8 +128,8 @@ export const CosmosExplorer = () => {
 
           {/* Everything that should rotate together at galaxy scale */}
           <GalaxyRotator visualScale={UNIFIED_SCALE}>
-            {/* Star background - reduced size/brightness so it doesn't overpower Sun/Proxima */}
-            <Stars radius={1e8} depth={1e7} count={15000} factor={2000} saturation={0} fade speed={0.3} />
+            {/* Star background - heavily reduced so it never overpowers key stars */}
+            <Stars radius={1e8} depth={1e7} count={9000} factor={250} saturation={0} fade speed={0.3} />
 
             {/* Galaxy content with smooth fade transition */}
             <GalaxyFadeWrapper>
@@ -163,8 +163,8 @@ export const CosmosExplorer = () => {
               return (
                 <WorldPositionTracker key={star.id} objectId={star.id} position={starPos} updateInterval={0.15}>
                   <mesh position={[0, 0, 0]}>
-                    <sphereGeometry args={[200, 6, 6]} />
-                    <meshBasicMaterial color={star.color} transparent opacity={0.5} />
+                    <sphereGeometry args={[120, 6, 6]} />
+                    <meshBasicMaterial color={star.color} transparent opacity={0.18} />
                   </mesh>
                 </WorldPositionTracker>
               );
