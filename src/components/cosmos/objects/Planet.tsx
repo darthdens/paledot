@@ -40,7 +40,10 @@ export const Planet = ({ object, showOrbit = true, scale = 1 }: PlanetProps) => 
   const orbitPoints = useMemo(() => {
     if (!showOrbit || orbitRadius === 0) return null;
     const points = [];
-    const segments = 4096;
+    // Scale segments based on orbit radius - larger orbits need more segments for smoothness
+    const baseSegments = 4096;
+    const radiusScale = Math.max(1, orbitRadius / 100);
+    const segments = Math.min(16384, Math.round(baseSegments * Math.sqrt(radiusScale)));
     for (let i = 0; i <= segments; i++) {
       const angle = (i / segments) * Math.PI * 2;
       points.push(

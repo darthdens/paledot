@@ -599,7 +599,11 @@ export const TexturedPlanet = ({
   const orbitPoints = useMemo(() => {
     if (!showOrbit || orbitRadius === 0 || isMoon) return null;
     const points = [];
-    const segments = 4096;
+    // Scale segments based on orbit radius - larger orbits need more segments for smoothness
+    // Base of 4096 for small orbits, scaling up for larger ones
+    const baseSegments = 4096;
+    const radiusScale = Math.max(1, orbitRadius / 100); // Normalize by ~Mercury orbit
+    const segments = Math.min(16384, Math.round(baseSegments * Math.sqrt(radiusScale)));
     for (let i = 0; i <= segments; i++) {
       const angle = (i / segments) * Math.PI * 2;
       points.push(
