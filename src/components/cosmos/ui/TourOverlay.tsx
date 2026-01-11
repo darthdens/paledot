@@ -405,10 +405,10 @@ export const TourOverlay = () => {
       
       {/* Header - clickable to toggle collapse */}
       <div 
-        className="flex items-center justify-between px-3 py-2 sm:p-3 border-b border-white/10 cursor-pointer hover:bg-white/5 transition-colors rounded-t-lg"
+        className="flex items-center justify-between px-3 py-2 sm:p-3 border-b border-white/10 cursor-pointer hover:bg-white/5 transition-colors rounded-t-lg gap-2"
         onClick={toggleCollapse}
       >
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 min-w-0 flex-1">
           {/* Progress indicator (visible when collapsed) */}
           <div className={`relative flex-shrink-0 transition-all duration-300 ${isCollapsed ? 'w-8 h-8 sm:w-10 sm:h-10 opacity-100' : 'w-0 h-0 opacity-0 overflow-hidden'}`}>
             <svg className="w-full h-full -rotate-90" viewBox="0 0 36 36">
@@ -436,14 +436,14 @@ export const TourOverlay = () => {
             </span>
           </div>
           
-          <span className={`text-white/50 text-[10px] sm:text-xs transition-opacity duration-300 ${isCollapsed ? 'hidden' : 'block'}`}>
+          <span className={`text-white/50 text-[10px] sm:text-xs transition-opacity duration-300 flex-shrink-0 ${isCollapsed ? 'hidden' : 'block'}`}>
             {tourIndex + 1}/{totalStops}
           </span>
-          <h2 className="text-white font-semibold text-sm truncate max-w-[180px]">
+          <h2 className="text-white font-semibold text-sm truncate min-w-0">
             {currentStop.title[language]}
           </h2>
         </div>
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-1 flex-shrink-0">
           {/* Collapsed controls */}
           <div className={`flex items-center gap-1 transition-all duration-300 ${isCollapsed ? 'opacity-100' : 'opacity-0 w-0 overflow-hidden'}`}>
             <Button
