@@ -202,8 +202,8 @@ export const CosmosExplorer = () => {
           <EffectComposer>
             <Bloom 
               intensity={0.8}
-              luminanceThreshold={0.8}
-              luminanceSmoothing={0.5}
+              luminanceThreshold={0.92}
+              luminanceSmoothing={0.4}
               mipmapBlur
             />
           </EffectComposer>
