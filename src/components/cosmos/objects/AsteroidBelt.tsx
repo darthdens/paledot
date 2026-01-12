@@ -71,11 +71,14 @@ const generateAsteroids = (count: number, innerRadius: number, outerRadius: numb
       sizes[i] = 10 + Math.random() * 40; // Small asteroids (most common)
     }
     
-    // Orbital speed varies with distance (Kepler's laws - farther = slower)
-    // Average asteroid belt orbital period is ~4-5 years
-    // Speed scaled to be visible: ~0.02 rad/s at 1x speed for inner belt
-    const normalizedRadius = (radius - innerRadius) / beltWidth;
-    speeds[i] = 0.02 / Math.sqrt(1 + normalizedRadius * 2);
+    // Orbital speed using same formula as planets for consistency
+    // orbital period in days based on Kepler's third law: T ∝ a^1.5
+    // Ceres at 2.77 AU has period of 1680 days
+    // For asteroid at radius r (scaled), estimate period proportionally
+    // Angular velocity = (2π * 365.25) / (periodDays * 240)
+    const auRadius = radius / 2.77 * 2.77; // Approximate AU based on scale
+    const periodDays = 1680 * Math.pow(radius / 2.77, 1.5); // Kepler's law relative to Ceres
+    speeds[i] = (2 * Math.PI * 365.25) / (periodDays * 240);
     
     // Random starting phase
     phases[i] = angle;
