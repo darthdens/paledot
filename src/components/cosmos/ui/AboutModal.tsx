@@ -14,7 +14,7 @@ const SOCIAL_LINKS = {
   linkedin: 'https://www.linkedin.com/in/denisakoka/',
   telegram: 'https://t.me/densakoka',
   instagram: 'https://www.instagram.com/densakoka/',
-  facebook: 'https://www.facebook.com/densakoka',
+  facebook: 'https://www.facebook.com/densgpt/',
 };
 
 // Changelog data
@@ -46,7 +46,7 @@ const translations = {
     about: 'About',
     version: 'Version',
     createdBy: 'Created by',
-    bio: 'Multidisciplinary creative with 7+ years of experience at the intersection of design, technology, and marketing. Co-Founder at Echo AI. I create brands, websites, apps, and lead teams of marketers and engineers.',
+    bio: "Multidisciplinary creative with 7+ years of experience at the intersection of design, technology, and marketing. Co-Founder at Echo AI. I'm also a huge space fan and nerd — I love everything about it, its terrifying scale, and how it grounds and humbles us.",
     location: 'Dundee, Scotland',
     description: 'An interactive 3D exploration of our solar system and beyond. Navigate through planets, moons, and distant galaxies with scientifically accurate data.',
     visitWebsite: 'Website',
@@ -67,7 +67,7 @@ const translations = {
     about: 'À propos',
     version: 'Version',
     createdBy: 'Créé par',
-    bio: "Créatif pluridisciplinaire avec plus de 7 ans d'expérience à l'intersection du design, de la technologie et du marketing. Co-fondateur d'Echo AI. Je crée des marques, sites web, applications et dirige des équipes de marketeurs et ingénieurs.",
+    bio: "Créatif pluridisciplinaire avec plus de 7 ans d'expérience à l'intersection du design, de la technologie et du marketing. Co-fondateur d'Echo AI. Je suis aussi un grand fan de l'espace — j'aime tout ce qui le concerne, son échelle terrifiante, et comment il nous ancre et nous rend humbles.",
     location: 'Dundee, Écosse',
     description: "Une exploration 3D interactive de notre système solaire et au-delà. Naviguez à travers les planètes, lunes et galaxies avec des données scientifiquement précises.",
     visitWebsite: 'Site web',
