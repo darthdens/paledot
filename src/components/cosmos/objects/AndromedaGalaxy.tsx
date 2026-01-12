@@ -1,4 +1,4 @@
-import { useRef, useMemo, useCallback } from 'react';
+import { useRef, useMemo, useCallback, useState } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import { UNITS } from '../types';
@@ -6,6 +6,12 @@ import { useCosmosStore } from '../store/useCosmosStore';
 import { getObjectById } from '../data/celestialObjects';
 import { DifferentialRotationPoints } from './DifferentialRotationMaterial';
 import { getDotTexture, getAndromedaGlowTexture } from '../utils/sharedTextures';
+import {
+  LODController,
+  createLODGeometry,
+  getParticleSizeMultiplier,
+  type LODLevel,
+} from '../utils/lodManager';
 
 interface AndromedaGalaxyProps {
   visualScale: number;
@@ -20,9 +26,20 @@ const ANDROMEDA = {
   distanceFromMilkyWay: 2.537e6,
 };
 
+// Keep visuals stable: only ever switch between HIGH (full) and MEDIUM (50% + larger points).
+const ANDROMEDA_LOD_CONFIG = {
+  highThresholdMultiplier: 20,
+  // Push medium threshold very far so we never drop to low/sprite for this galaxy.
+  mediumThresholdMultiplier: 1000000,
+  lowThresholdMultiplier: 1000000,
+} as const;
+
 export const AndromedaGalaxy = ({ visualScale }: AndromedaGalaxyProps) => {
   const groupRef = useRef<THREE.Group>(null);
   const centerWorldPos = useRef(new THREE.Vector3());
+  const frameCountRef = useRef(0);
+  const lodControllerRef = useRef(new LODController('high'));
+  const [lodLevel, setLodLevel] = useState<LODLevel>('high');
 
   const { camera } = useThree();
   const setObjectWorldPosition = useCosmosStore((s) => s.setObjectWorldPosition);
@@ -30,33 +47,40 @@ export const AndromedaGalaxy = ({ visualScale }: AndromedaGalaxyProps) => {
 
   const gs = UNITS.KM_PER_LY * visualScale;
   const diskR = ANDROMEDA.diskRadius * gs;
-  
-  const andromedaPosition = useMemo<[number, number, number]>(() => [
-    ANDROMEDA.distanceFromMilkyWay * gs * 0.7,
-    ANDROMEDA.distanceFromMilkyWay * gs * 0.15,
-    ANDROMEDA.distanceFromMilkyWay * gs * 0.7,
-  ], [gs]);
+
+  const andromedaPosition = useMemo<[number, number, number]>(
+    () => [
+      ANDROMEDA.distanceFromMilkyWay * gs * 0.7,
+      ANDROMEDA.distanceFromMilkyWay * gs * 0.15,
+      ANDROMEDA.distanceFromMilkyWay * gs * 0.7,
+    ],
+    [gs]
+  );
 
   const andromedaObject = useMemo(() => getObjectById('andromeda'), []);
 
-  const handleClick = useCallback((e: { stopPropagation: () => void }) => {
-    e.stopPropagation();
-    if (andromedaObject) setSelectedObject(andromedaObject);
-  }, [andromedaObject, setSelectedObject]);
+  const handleClick = useCallback(
+    (e: { stopPropagation: () => void }) => {
+      e.stopPropagation();
+      if (andromedaObject) setSelectedObject(andromedaObject);
+    },
+    [andromedaObject, setSelectedObject]
+  );
 
   // Use shared textures
   const dotTexture = useMemo(() => getDotTexture(), []);
   const glowTexture = useMemo(() => getAndromedaGlowTexture(), []);
 
-  // Fixed full particle counts - no LOD reduction
-  const starCount = 700000;
-  const coreCount = 180000;
-  const haloCount = 35000;
+  // Full particle counts (visual reference)
+  const starsCountFull = 700000;
+  const coreCountFull = 180000;
+  const haloCountFull = 35000;
 
-  // Stars geometry - EXACTLY the same logic as before
-  const starsGeo = useMemo(() => {
+  // Full-res geometries
+  const starsGeoFull = useMemo(() => {
     const { branches, spinTurns } = ANDROMEDA;
     const maxRadius = ANDROMEDA.diskRadius * gs;
+    const starCount = starsCountFull;
 
     const positions = new Float32Array(starCount * 3);
     const colors = new Float32Array(starCount * 3);
@@ -85,7 +109,7 @@ export const AndromedaGalaxy = ({ visualScale }: AndromedaGalaxyProps) => {
       const branchAngle = (branchIndex / branches) * Math.PI * 2;
       const spinAngle = rt * spinTurns * Math.PI * 2;
 
-      const armWidth = 0.12 + rt * 0.20;
+      const armWidth = 0.12 + rt * 0.2;
       const armJitter = (seededRandom() + seededRandom() + seededRandom() - 1.5) * armWidth;
       const isInterArm = seededRandom() < 0.45;
       const interArmJitter = isInterArm ? (seededRandom() - 0.5) * (1.0 + rt * 0.7) : 0;
@@ -97,7 +121,8 @@ export const AndromedaGalaxy = ({ visualScale }: AndromedaGalaxyProps) => {
 
       positions[i3] = Math.cos(angle) * finalRadius;
       const thickness = 0.015 + rt * 0.025;
-      const yJitter = (seededRandom() + seededRandom() + seededRandom() - 1.5) * maxRadius * thickness;
+      const yJitter =
+        (seededRandom() + seededRandom() + seededRandom() - 1.5) * maxRadius * thickness;
       positions[i3 + 1] = yJitter;
       positions[i3 + 2] = Math.sin(angle) * finalRadius;
 
@@ -148,10 +173,10 @@ export const AndromedaGalaxy = ({ visualScale }: AndromedaGalaxyProps) => {
     geo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
     geo.boundingSphere = new THREE.Sphere(new THREE.Vector3(0, 0, 0), Infinity);
     return geo;
-  }, [gs, starCount]);
+  }, [gs]);
 
-  // Core geometry - EXACTLY the same logic as before
-  const coreGeo = useMemo(() => {
+  const coreGeoFull = useMemo(() => {
+    const coreCount = coreCountFull;
     const positions = new Float32Array(coreCount * 3);
     const colors = new Float32Array(coreCount * 3);
     const color = new THREE.Color();
@@ -196,10 +221,10 @@ export const AndromedaGalaxy = ({ visualScale }: AndromedaGalaxyProps) => {
     geo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
     geo.boundingSphere = new THREE.Sphere(new THREE.Vector3(0, 0, 0), Infinity);
     return geo;
-  }, [gs, coreCount]);
+  }, [gs]);
 
-  // Halo geometry - EXACTLY the same logic as before
-  const haloGeo = useMemo(() => {
+  const haloGeoFull = useMemo(() => {
+    const haloCount = haloCountFull;
     const maxRadius = ANDROMEDA.diskRadius * gs * 0.5;
     const maxHeight = ANDROMEDA.diskRadius * gs * 0.15;
     const positions = new Float32Array(haloCount * 3);
@@ -247,12 +272,38 @@ export const AndromedaGalaxy = ({ visualScale }: AndromedaGalaxyProps) => {
     geo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
     geo.boundingSphere = new THREE.Sphere(new THREE.Vector3(0, 0, 0), Infinity);
     return geo;
-  }, [gs, haloCount]);
+  }, [gs]);
+
+  // LOD geometries (medium = 50% sampled)
+  const starsGeoMedium = useMemo(() => createLODGeometry(starsGeoFull, 'medium'), [starsGeoFull]);
+  const coreGeoMedium = useMemo(() => createLODGeometry(coreGeoFull, 'medium'), [coreGeoFull]);
+  const haloGeoMedium = useMemo(() => createLODGeometry(haloGeoFull, 'medium'), [haloGeoFull]);
+
+  const starsGeo = lodLevel === 'high' ? starsGeoFull : starsGeoMedium;
+  const coreGeo = lodLevel === 'high' ? coreGeoFull : coreGeoMedium;
+  const haloGeo = lodLevel === 'high' ? haloGeoFull : haloGeoMedium;
+
+  const sizeMultiplier = getParticleSizeMultiplier(lodLevel === 'sprite' ? 'low' : lodLevel);
 
   useFrame(() => {
-    if (groupRef.current) {
-      groupRef.current.getWorldPosition(centerWorldPos.current);
+    frameCountRef.current++;
 
+    if (!groupRef.current) return;
+
+    groupRef.current.getWorldPosition(centerWorldPos.current);
+
+    // State-based LOD (re-render only on actual LOD changes)
+    const { level, changed } = lodControllerRef.current.update(camera.position, centerWorldPos.current, {
+      galaxyDiameter: diskR * 2,
+      ...ANDROMEDA_LOD_CONFIG,
+    });
+
+    // Force a minimum threshold (never go below medium to preserve visuals)
+    const nextLevel: LODLevel = level === 'high' ? 'high' : 'medium';
+    if (changed && nextLevel !== lodLevel) setLodLevel(nextLevel);
+
+    // Throttle position updates
+    if (lodControllerRef.current.shouldUpdateThisFrame()) {
       const pos: [number, number, number] = [
         centerWorldPos.current.x,
         centerWorldPos.current.y,
@@ -267,7 +318,7 @@ export const AndromedaGalaxy = ({ visualScale }: AndromedaGalaxyProps) => {
       <group rotation={[ANDROMEDA.inclination, 0.3, 0]}>
         <DifferentialRotationPoints
           geometry={haloGeo}
-          size={gs * 40}
+          size={gs * 40 * sizeMultiplier}
           map={dotTexture}
           opacity={0.3}
           maxRadius={diskR * 1.2}
@@ -277,7 +328,7 @@ export const AndromedaGalaxy = ({ visualScale }: AndromedaGalaxyProps) => {
 
         <DifferentialRotationPoints
           geometry={starsGeo}
-          size={gs * 55}
+          size={gs * 55 * sizeMultiplier}
           map={dotTexture}
           opacity={0.85}
           maxRadius={diskR}
@@ -287,7 +338,7 @@ export const AndromedaGalaxy = ({ visualScale }: AndromedaGalaxyProps) => {
 
         <DifferentialRotationPoints
           geometry={coreGeo}
-          size={gs * 90}
+          size={gs * 90 * sizeMultiplier}
           map={dotTexture}
           opacity={0.95}
           maxRadius={ANDROMEDA.bulgeRadius * gs}
@@ -310,11 +361,16 @@ export const AndromedaGalaxy = ({ visualScale }: AndromedaGalaxyProps) => {
       </group>
 
       {/* Click target - reduced complexity */}
-      <mesh 
+      <mesh
         onClick={handleClick}
         onPointerDown={handleClick}
-        onPointerOver={(e) => { e.stopPropagation(); document.body.style.cursor = 'pointer'; }}
-        onPointerOut={() => { document.body.style.cursor = 'auto'; }}
+        onPointerOver={(e) => {
+          e.stopPropagation();
+          document.body.style.cursor = 'pointer';
+        }}
+        onPointerOut={() => {
+          document.body.style.cursor = 'auto';
+        }}
       >
         <sphereGeometry args={[diskR * 1.2, 8, 8]} />
         <meshBasicMaterial transparent opacity={0} depthWrite={false} />
