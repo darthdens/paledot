@@ -28,6 +28,9 @@ export const GalaxyRotator = ({ children, visualScale }: GalaxyRotatorProps) => 
   const timeSpeed = useCosmosStore((state) => state.timeSpeed);
   const isInStarSystem = useCosmosStore((state) => state.isInStarSystem);
   const currentScale = useCosmosStore((state) => state.currentScale);
+  const isFollowing = useCosmosStore((state) => state.isFollowing);
+  const selectedObject = useCosmosStore((state) => state.selectedObject);
+  const isTouring = useCosmosStore((state) => state.isTouring);
 
   // Galactic center (in scene units). The Sun/solar system starts at world origin.
   // We rotate around this point by using a pivot group at the galactic center.
@@ -50,6 +53,12 @@ export const GalaxyRotator = ({ children, visualScale }: GalaxyRotatorProps) => 
 
     // Don't rotate when inside a star system
     if (isInStarSystem) return;
+
+    // Don't rotate when following/flying to an object (camera needs stable target)
+    if (isFollowing && selectedObject) return;
+
+    // Don't rotate during guided tour
+    if (isTouring) return;
 
     // Don't rotate when viewing the galaxy from far outside
     if (currentScale === 'localGroup' || currentScale === 'universe') return;
