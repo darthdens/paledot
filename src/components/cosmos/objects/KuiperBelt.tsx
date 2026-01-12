@@ -3,6 +3,7 @@ import { useRef, useMemo } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { useCosmosStore } from '../store/useCosmosStore';
+import { UNITS } from '../types';
 
 interface KuiperBeltProps {
   innerRadius: number;  // Neptune orbit ~4.5B km (30 AU)
@@ -11,9 +12,11 @@ interface KuiperBeltProps {
   scale?: number;
 }
 
-const generateKuiperObjects = (count: number, innerRadius: number, outerRadius: number) => {
+const generateKuiperObjects = (count: number, innerRadius: number, outerRadius: number, distanceScale: number) => {
   const positions = new Float32Array(count * 3);
   const sizes = new Float32Array(count);
+  const radii = new Float32Array(count);     // Store orbital radii
+  const heights = new Float32Array(count);   // Store Y positions
   const speeds = new Float32Array(count);
   const phases = new Float32Array(count);
   const colors = new Float32Array(count * 3);
@@ -49,6 +52,10 @@ const generateKuiperObjects = (count: number, innerRadius: number, outerRadius: 
     positions[i * 3 + 1] = y;
     positions[i * 3 + 2] = Math.sin(angle) * radius;
     
+    // Store for animation
+    radii[i] = radius;
+    heights[i] = y;
+    
     // Size distribution - most are small icy bodies
     const sizeRand = Math.random();
     if (sizeRand > 0.998) {
@@ -61,9 +68,14 @@ const generateKuiperObjects = (count: number, innerRadius: number, outerRadius: 
       sizes[i] = 20 + Math.random() * 80; // Small icy bodies
     }
     
-    // Very slow orbital speeds (Pluto takes 248 years!)
-    const normalizedRadius = (radius - innerRadius) / beltWidth;
-    speeds[i] = 0.00005 / Math.sqrt(1 + normalizedRadius * 2);
+    // Orbital speed using Kepler's law - same formula as planets/asteroids
+    // Convert scene units back to km, then to AU
+    const radiusKm = distanceScale > 0 ? radius / distanceScale : radius;
+    const semiMajorAxisAu = Math.max(radiusKm / UNITS.KM_PER_AU, 1e-6);
+    // Kepler's third law: periodYears = a^(3/2)
+    const periodDays = 365.25 * Math.pow(semiMajorAxisAu, 1.5);
+    // Scale: 1 Earth year (365.25 days) = 240 seconds at 1x speed
+    speeds[i] = (2 * Math.PI * 365.25) / (periodDays * 240);
     
     phases[i] = angle;
     
@@ -93,7 +105,7 @@ const generateKuiperObjects = (count: number, innerRadius: number, outerRadius: 
     }
   }
   
-  return { positions, sizes, speeds, phases, colors };
+  return { positions, sizes, radii, heights, speeds, phases, colors };
 };
 
 export const KuiperBelt = ({ 
@@ -107,8 +119,8 @@ export const KuiperBelt = ({
   const simTime = useRef(0);
   
   const kuiperData = useMemo(() => 
-    generateKuiperObjects(count, innerRadius, outerRadius),
-    [count, innerRadius, outerRadius]
+    generateKuiperObjects(count, innerRadius, outerRadius, scale),
+    [count, innerRadius, outerRadius, scale]
   );
   
   const geometry = useMemo(() => {
@@ -166,15 +178,15 @@ export const KuiperBelt = ({
     simTime.current += delta * timeSpeed;
     
     const positions = pointsRef.current.geometry.attributes.position.array as Float32Array;
-    const { speeds, phases } = kuiperData;
+    const { radii, heights, speeds, phases } = kuiperData;
     
+    // Update positions using stored radii (same approach as AsteroidBelt)
     for (let i = 0; i < count; i++) {
-      const x = positions[i * 3];
-      const z = positions[i * 3 + 2];
-      const radius = Math.sqrt(x * x + z * z);
+      const radius = radii[i];
       const currentAngle = phases[i] + simTime.current * speeds[i];
       
       positions[i * 3] = Math.cos(currentAngle) * radius;
+      positions[i * 3 + 1] = heights[i]; // Keep original height
       positions[i * 3 + 2] = Math.sin(currentAngle) * radius;
     }
     
