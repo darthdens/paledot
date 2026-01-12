@@ -60,8 +60,15 @@ const translations = {
     ],
     close: 'Close',
     connect: 'Connect',
-    madeWith: 'Made with',
-    and: 'and',
+    madeWithLove: 'Made with',
+    by: 'by',
+    techStack: 'Tech Stack',
+    credits: 'Credits & Data',
+    creditsList: [
+      'Planet textures from NASA',
+      'Astronomical data from NASA/JPL',
+      'Built with React Three Fiber',
+    ],
   },
   fr: {
     about: 'À propos',
@@ -81,8 +88,15 @@ const translations = {
     ],
     close: 'Fermer',
     connect: 'Contact',
-    madeWith: 'Fait avec',
-    and: 'et',
+    madeWithLove: 'Fait avec',
+    by: 'par',
+    techStack: 'Technologies',
+    credits: 'Crédits & Données',
+    creditsList: [
+      'Textures des planètes de la NASA',
+      'Données astronomiques de NASA/JPL',
+      'Construit avec React Three Fiber',
+    ],
   },
 };
 
@@ -249,18 +263,45 @@ export const AboutModal = ({ open, onOpenChange }: AboutModalProps) => {
             ))}
           </div>
           </div>
+          
+          {/* Tech Stack & Credits grid */}
+          <div className="grid gap-3 text-left grid-cols-1 sm:grid-cols-2">
+            {/* Tech Stack */}
+            <div className="bg-white/10 rounded-lg p-3 sm:p-4 space-y-2">
+              <p className="text-white/90 font-medium text-sm">{t.techStack}</p>
+              <div className="flex flex-wrap gap-1.5">
+                <span className="px-2 py-0.5 bg-blue-500/20 text-blue-300 text-[10px] font-medium rounded">React</span>
+                <span className="px-2 py-0.5 bg-blue-500/20 text-blue-300 text-[10px] font-medium rounded">TypeScript</span>
+                <span className="px-2 py-0.5 bg-blue-500/20 text-blue-300 text-[10px] font-medium rounded">Three.js</span>
+                <span className="px-2 py-0.5 bg-blue-500/20 text-blue-300 text-[10px] font-medium rounded">Tailwind CSS</span>
+                <span className="px-2 py-0.5 bg-white/10 text-white/60 text-[10px] font-medium rounded">Vite</span>
+                <span className="px-2 py-0.5 bg-white/10 text-white/60 text-[10px] font-medium rounded">Zustand</span>
+              </div>
+            </div>
+
+            {/* Credits */}
+            <div className="bg-white/10 rounded-lg p-3 sm:p-4 space-y-1.5">
+              <p className="text-white/90 font-medium text-sm">{t.credits}</p>
+              {t.creditsList.map((credit, index) => (
+                <p key={index} className="text-white/60 text-xs">• {credit}</p>
+              ))}
+            </div>
+          </div>
         </div>
-        {/* Made with badge */}
-        <div className="flex items-center justify-center gap-1.5 text-xs text-white/50 flex-wrap">
-          <span>{t.madeWith}</span>
+
+        {/* Made with love badge */}
+        <div className="flex items-center justify-center gap-1.5 text-xs text-white/50">
+          <span>{t.madeWithLove}</span>
           <Heart className="w-3.5 h-3.5 text-red-400 fill-red-400" />
-          <span className="text-white/70">React</span>
-          <span>•</span>
-          <span className="text-white/70">TypeScript</span>
-          <span>•</span>
-          <span className="text-white/70">Three.js</span>
-          <span>•</span>
-          <span className="text-white/70">Tailwind</span>
+          <span>{t.by}</span>
+          <a
+            href={SOCIAL_LINKS.website}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-white/80 hover:text-white underline underline-offset-2 transition-colors"
+          >
+            Dens Akoka
+          </a>
         </div>
 
         {/* Close button */}
