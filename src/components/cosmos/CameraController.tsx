@@ -176,8 +176,12 @@ export const CameraController = () => {
     const getLivePos = () => useCosmosStore.getState().objectWorldPositions[selectedObject.id];
     const currentLivePos = getLivePos();
 
-    // For solar system bodies and stars, wait until we have a runtime world position to avoid repeated re-fly.
-    const needsLivePos = selectedObject.category === 'solarSystem' || selectedObject.category === 'stars';
+    // For objects whose world position can change due to scene motion (orbits/galactic rotation),
+    // wait until we have a runtime world position to avoid flying to stale static coordinates.
+    const needsLivePos =
+      selectedObject.category === 'solarSystem' ||
+      selectedObject.category === 'stars' ||
+      selectedObject.category === 'nebulae';
     if (needsLivePos && !currentLivePos) {
       let done = false;
       const unsubscribe = useCosmosStore.subscribe((state) => {
@@ -228,7 +232,9 @@ export const CameraController = () => {
           }
         } else if (
           !isTourAnimation.current &&
-          (selectedObject.category === 'solarSystem' || selectedObject.category === 'stars')
+          (selectedObject.category === 'solarSystem' ||
+            selectedObject.category === 'stars' ||
+            selectedObject.category === 'nebulae')
         ) {
           const livePos = useCosmosStore.getState().objectWorldPositions[selectedObject.id];
           if (livePos) {
@@ -262,12 +268,14 @@ export const CameraController = () => {
     }
 
     // After fly-to: continuously follow the selected object (keep it centered)
-    // Only follow objects that actually move (solar system bodies + stars)
+    // Follow objects that can move due to orbits/galactic rotation
     if (
       selectedObject &&
       isFollowing &&
       !isTouring &&
-      (selectedObject.category === 'solarSystem' || selectedObject.category === 'stars')
+      (selectedObject.category === 'solarSystem' ||
+        selectedObject.category === 'stars' ||
+        selectedObject.category === 'nebulae')
     ) {
       const livePos = useCosmosStore.getState().objectWorldPositions[selectedObject.id];
       if (livePos) {

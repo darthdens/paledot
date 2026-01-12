@@ -259,6 +259,7 @@ export const useCosmosStore = create<CosmosStore>()(
         set({
           targetPosition: position,
           selectedObject: object,
+          isFollowing: true,
           showQuickJump: false,
         });
       },
