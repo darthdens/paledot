@@ -41,6 +41,7 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
   const { camera } = useThree();
 
   const setObjectWorldPosition = useCosmosStore((s) => s.setObjectWorldPosition);
+  const getObjectWorldPosition = useCosmosStore((s) => s.getObjectWorldPosition);
   const setSelectedObject = useCosmosStore((s) => s.setSelectedObject);
   const currentScale = useCosmosStore((s) => s.currentScale);
   
@@ -370,14 +371,24 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
       (proximaPulseRef2.current.material as THREE.MeshBasicMaterial).opacity = (1 - phase) * 0.8;
     }
 
+    // Update "We are here" marker position to track the solar system's live world position
     if (markerGroupRef.current) {
+      const solarSystemPos = getObjectWorldPosition('solar-system-marker');
+      if (solarSystemPos) {
+        markerGroupRef.current.position.set(solarSystemPos[0], solarSystemPos[1], solarSystemPos[2]);
+      }
       markerGroupRef.current.getWorldPosition(markerWorldPos.current);
       const distance = camera.position.distanceTo(markerWorldPos.current);
       const scale = Math.max(1, distance * 0.025);
       markerGroupRef.current.scale.setScalar(scale);
     }
 
+    // Update Proxima marker position to track Proxima's live world position
     if (proximaMarkerRef.current) {
+      const proximaPos = getObjectWorldPosition('proxima-centauri');
+      if (proximaPos) {
+        proximaMarkerRef.current.position.set(proximaPos[0], proximaPos[1], proximaPos[2]);
+      }
       const worldPos = new THREE.Vector3();
       proximaMarkerRef.current.getWorldPosition(worldPos);
       const distance = camera.position.distanceTo(worldPos);
@@ -487,7 +498,7 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
       </group>
 
       {showYouAreHereMarker && (
-        <group ref={markerGroupRef} position={[0, 0, 0]}>
+        <group ref={markerGroupRef}>
           <points>
             <bufferGeometry>
               <bufferAttribute
@@ -575,7 +586,7 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
       )}
 
       {showLabel && (
-        <group ref={proximaMarkerRef} position={proximaPosition}>
+        <group ref={proximaMarkerRef}>
           <points>
             <bufferGeometry>
               <bufferAttribute
