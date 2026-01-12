@@ -1,4 +1,4 @@
-import { useRef, useMemo, useCallback, useState } from 'react';
+import { useRef, useMemo, useCallback } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import { UNITS } from '../types';
@@ -20,17 +20,9 @@ const TRIANGULUM = {
   distanceFromMilkyWay: 2.73e6,
 };
 
-// LOD thresholds - only reduce particles when VERY far away
-// Close = full detail, Far = reduced for performance
-type LODLevel = 'full' | 'reduced';
-
 export const TriangulumGalaxy = ({ visualScale }: TriangulumGalaxyProps) => {
   const groupRef = useRef<THREE.Group>(null);
   const centerWorldPos = useRef(new THREE.Vector3());
-  const stableFramesRef = useRef(0);
-  
-  // React state for LOD - triggers re-render when changed
-  const [lodLevel, setLodLevel] = useState<LODLevel>('full');
 
   const { camera } = useThree();
   const setObjectWorldPosition = useCosmosStore((s) => s.setObjectWorldPosition);
@@ -38,9 +30,6 @@ export const TriangulumGalaxy = ({ visualScale }: TriangulumGalaxyProps) => {
 
   const gs = UNITS.KM_PER_LY * visualScale;
   const diskR = TRIANGULUM.diskRadius * gs;
-  
-  // LOD threshold: only reduce when camera is 20x the galaxy diameter away
-  const lodThreshold = diskR * 2 * 20;
   
   const triangulumPosition = useMemo<[number, number, number]>(() => [
     -TRIANGULUM.distanceFromMilkyWay * gs * 0.5,
@@ -59,13 +48,10 @@ export const TriangulumGalaxy = ({ visualScale }: TriangulumGalaxyProps) => {
   const dotTexture = useMemo(() => getDotTexture(), []);
   const glowTexture = useMemo(() => getTriangulumGlowTexture(), []);
 
-  // Particle counts based on LOD - full is exactly the same as before
-  const starCount = lodLevel === 'full' ? 500000 : 180000;
-  const coreCount = lodLevel === 'full' ? 120000 : 40000;
-  const haloCount = lodLevel === 'full' ? 60000 : 20000;
-  
-  // Size multiplier - larger particles when reduced to maintain visual density
-  const sizeMultiplier = lodLevel === 'full' ? 1 : 1.8;
+  // Fixed full particle counts - no LOD reduction
+  const starCount = 500000;
+  const coreCount = 120000;
+  const haloCount = 60000;
 
   // Stars geometry - EXACTLY the same logic as before
   const starsGeo = useMemo(() => {
@@ -260,22 +246,7 @@ export const TriangulumGalaxy = ({ visualScale }: TriangulumGalaxyProps) => {
   useFrame(() => {
     if (groupRef.current) {
       groupRef.current.getWorldPosition(centerWorldPos.current);
-      
-      const distance = camera.position.distanceTo(centerWorldPos.current);
-      const newLevel: LODLevel = distance > lodThreshold ? 'reduced' : 'full';
-      
-      // Hysteresis: require 60 stable frames before switching LOD
-      if (newLevel !== lodLevel) {
-        stableFramesRef.current++;
-        if (stableFramesRef.current >= 60) {
-          setLodLevel(newLevel);
-          stableFramesRef.current = 0;
-        }
-      } else {
-        stableFramesRef.current = 0;
-      }
 
-      // Update world position for other systems
       const pos: [number, number, number] = [
         centerWorldPos.current.x,
         centerWorldPos.current.y,
@@ -291,7 +262,7 @@ export const TriangulumGalaxy = ({ visualScale }: TriangulumGalaxyProps) => {
         <DifferentialRotationPoints
           key="triangulum-halo"
           geometry={haloGeo}
-          size={gs * 35 * sizeMultiplier}
+          size={gs * 35}
           map={dotTexture}
           opacity={0.25}
           maxRadius={diskR * 1.3}
@@ -302,7 +273,7 @@ export const TriangulumGalaxy = ({ visualScale }: TriangulumGalaxyProps) => {
         <DifferentialRotationPoints
           key="triangulum-arms"
           geometry={starsGeo}
-          size={gs * 50 * sizeMultiplier}
+          size={gs * 50}
           map={dotTexture}
           opacity={0.85}
           maxRadius={diskR}
@@ -313,7 +284,7 @@ export const TriangulumGalaxy = ({ visualScale }: TriangulumGalaxyProps) => {
         <DifferentialRotationPoints
           key="triangulum-core"
           geometry={coreGeo}
-          size={gs * 75 * sizeMultiplier}
+          size={gs * 75}
           map={dotTexture}
           opacity={0.95}
           maxRadius={TRIANGULUM.bulgeRadius * gs}
