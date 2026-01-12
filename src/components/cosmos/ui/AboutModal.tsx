@@ -251,11 +251,16 @@ export const AboutModal = ({ open, onOpenChange }: AboutModalProps) => {
           </div>
         </div>
         {/* Made with badge */}
-        <div className="flex items-center justify-center gap-1.5 text-xs text-white/50">
+        <div className="flex items-center justify-center gap-1.5 text-xs text-white/50 flex-wrap">
           <span>{t.madeWith}</span>
           <Heart className="w-3.5 h-3.5 text-red-400 fill-red-400" />
-          <span>{t.and}</span>
-          <span className="text-white/70 font-medium">Three.js</span>
+          <span className="text-white/70">React</span>
+          <span>•</span>
+          <span className="text-white/70">TypeScript</span>
+          <span>•</span>
+          <span className="text-white/70">Three.js</span>
+          <span>•</span>
+          <span className="text-white/70">Tailwind</span>
         </div>
 
         {/* Close button */}
