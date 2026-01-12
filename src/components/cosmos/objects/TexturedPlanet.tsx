@@ -88,6 +88,7 @@ const PLANET_VISUALS: Record<string, {
     tertiaryColor: '#888888',    // Lighter highlands
     roughness: 0.98,
     metalness: 0.1,
+    tilt: 0.034,                 // Nearly no tilt
     surfaceDetail: 'mercury',
   },
   venus: {
@@ -101,6 +102,7 @@ const PLANET_VISUALS: Record<string, {
     atmosphereIntensity: 1.0,
     hasClouds: true,
     cloudColor: '#F5EED8',
+    tilt: 177.4,                 // Nearly upside down (retrograde)
     surfaceDetail: 'venus',
   },
   earth: {
@@ -123,6 +125,7 @@ const PLANET_VISUALS: Record<string, {
     tertiaryColor: '#8A8A8A',    // Mid-tone transitional areas
     roughness: 0.95,
     metalness: 0,
+    tilt: 6.68,                  // Moon's axial tilt to its orbital plane
     surfaceDetail: 'moon',
   },
   mars: {
@@ -134,6 +137,7 @@ const PLANET_VISUALS: Record<string, {
     hasAtmosphere: true,
     atmosphereColor: '#FFB090',
     atmosphereIntensity: 0.15,
+    tilt: 25.19,                 // Very similar to Earth
     surfaceDetail: 'mars',
   },
   jupiter: {
@@ -145,6 +149,7 @@ const PLANET_VISUALS: Record<string, {
     hasAtmosphere: true,
     atmosphereColor: '#F5E6D3',
     atmosphereIntensity: 0.3,
+    tilt: 3.13,                  // Nearly upright
     surfaceDetail: 'jupiter',
     uniqueFeature: 'greatRedSpot',
   },
@@ -154,6 +159,7 @@ const PLANET_VISUALS: Record<string, {
     tertiaryColor: '#CC0000',    // Red volcanic vents
     roughness: 0.7,
     metalness: 0.05,
+    tilt: 0.05,                  // Nearly no tilt (tidally locked)
     surfaceDetail: 'io',
   },
   europa: {
@@ -162,6 +168,7 @@ const PLANET_VISUALS: Record<string, {
     tertiaryColor: '#D4C4B0',    // Tan patches
     roughness: 0.2,
     metalness: 0.3,
+    tilt: 0.1,                   // Nearly no tilt (tidally locked)
     surfaceDetail: 'europa',
   },
   ganymede: {
@@ -170,6 +177,7 @@ const PLANET_VISUALS: Record<string, {
     tertiaryColor: '#B8B0A8',    // Lighter grooved terrain
     roughness: 0.85,
     metalness: 0.1,
+    tilt: 0.33,                  // Slight tilt
     surfaceDetail: 'ganymede',
   },
   callisto: {
@@ -178,6 +186,7 @@ const PLANET_VISUALS: Record<string, {
     tertiaryColor: '#E8E8E8',    // Bright white crater impacts
     roughness: 0.95,
     metalness: 0.05,
+    tilt: 0.0,                   // No tilt (tidally locked)
     surfaceDetail: 'callisto',
   },
   saturn: {
@@ -207,6 +216,7 @@ const PLANET_VISUALS: Record<string, {
     hasAtmosphere: true,
     atmosphereColor: '#FFA500',
     atmosphereIntensity: 1.2,    // Very thick - hides surface
+    tilt: 0.3,                   // Slight tilt (tidally locked to Saturn)
     surfaceDetail: 'titan',
   },
   uranus: {
@@ -236,6 +246,7 @@ const PLANET_VISUALS: Record<string, {
     hasAtmosphere: true,
     atmosphereColor: '#6688FF',
     atmosphereIntensity: 0.45,
+    tilt: 28.32,                 // Similar to Earth and Saturn
     surfaceDetail: 'neptune',
   },
   pluto: {
@@ -244,6 +255,7 @@ const PLANET_VISUALS: Record<string, {
     tertiaryColor: '#FFFFFF',    // White heart (Sputnik Planitia)
     roughness: 0.9,
     metalness: 0,
+    tilt: 122.53,                // Highly tilted (rotates on its side like Uranus)
     surfaceDetail: 'pluto',
   },
   ceres: {
@@ -252,6 +264,7 @@ const PLANET_VISUALS: Record<string, {
     tertiaryColor: '#FFFFFF',    // Bright spots (Occator crater)
     roughness: 0.88,
     metalness: 0.1,
+    tilt: 4.0,                   // Small tilt
     surfaceDetail: 'ceres',
   },
   enceladus: {
@@ -260,6 +273,7 @@ const PLANET_VISUALS: Record<string, {
     tertiaryColor: '#80B0C0',    // Tiger stripe fractures (bluish)
     roughness: 0.15,
     metalness: 0.25,
+    tilt: 0.0,                   // Tidally locked to Saturn
     surfaceDetail: 'enceladus',
   },
   iapetus: {
@@ -268,6 +282,7 @@ const PLANET_VISUALS: Record<string, {
     tertiaryColor: '#808080',    // Transition zone
     roughness: 0.85,
     metalness: 0.05,
+    tilt: 15.47,                 // Significant tilt
     surfaceDetail: 'iapetus',
   },
   triton: {
@@ -279,6 +294,7 @@ const PLANET_VISUALS: Record<string, {
     hasAtmosphere: true,
     atmosphereColor: '#FFE8E0',
     atmosphereIntensity: 0.1,
+    tilt: 156.885,               // Retrograde orbit, highly tilted
     surfaceDetail: 'triton',
   },
 };
