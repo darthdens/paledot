@@ -1,5 +1,5 @@
 import { useRef, useMemo, useCallback, type MouseEvent as ReactMouseEvent } from 'react';
-import { useFrame } from '@react-three/fiber';
+import { useFrame, useThree } from '@react-three/fiber';
 import { Html } from '@react-three/drei';
 import * as THREE from 'three';
 import { UNITS } from '../types';
@@ -7,6 +7,8 @@ import { useCosmosStore } from '../store/useCosmosStore';
 import { useLanguage } from '@/i18n/LanguageContext';
 import { getObjectById } from '../data/celestialObjects';
 import { DifferentialRotationPoints } from './DifferentialRotationMaterial';
+import { getDotTexture, getMilkyWayGlowTexture } from '../utils/sharedTextures';
+import { LODController, getParticleSizeMultiplier, createLODGeometry, type LODLevel } from '../utils/lodManager';
 
 interface MilkyWayGalaxyProps {
   visualScale: number;
@@ -20,64 +22,8 @@ const MILKY_WAY = {
   sunDistance: 26000,
   sunAngle: Math.PI * 0.72,
   branches: 4,
-  spinTurns: 1.8, // how many turns the arms make from center to edge
+  spinTurns: 1.8,
 };
-
-// Simple crisp dot texture
-const createDotTexture = () => {
-  const size = 32;
-  const canvas = document.createElement('canvas');
-  canvas.width = size;
-  canvas.height = size;
-  const ctx = canvas.getContext('2d')!;
-
-  const gradient = ctx.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2);
-  gradient.addColorStop(0, 'rgba(255, 255, 255, 1)');
-  gradient.addColorStop(0.25, 'rgba(255, 255, 255, 0.75)');
-  gradient.addColorStop(0.55, 'rgba(255, 255, 255, 0.18)');
-  gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
-
-  ctx.fillStyle = gradient;
-  ctx.fillRect(0, 0, size, size);
-
-  const tex = new THREE.CanvasTexture(canvas);
-  tex.minFilter = THREE.LinearFilter;
-  tex.magFilter = THREE.LinearFilter;
-  tex.colorSpace = THREE.SRGBColorSpace;
-  return tex;
-};
-
-// Galaxy glow texture with color gradient: yellow (center) → orange → purple → blue → fade
-const createGalaxyGlowTexture = () => {
-  const size = 1024;
-  const canvas = document.createElement('canvas');
-  canvas.width = size;
-  canvas.height = size;
-  const ctx = canvas.getContext('2d')!;
-
-  // Create radial gradient with color progression
-  const gradient = ctx.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2);
-
-  // Yellow center → Orange → Purple → Blue → Fade to transparent
-  gradient.addColorStop(0, 'rgba(255, 220, 80, 0.9)');      // Bright yellow center
-  gradient.addColorStop(0.12, 'rgba(255, 180, 40, 0.7)');   // Yellow-orange
-  gradient.addColorStop(0.25, 'rgba(255, 120, 30, 0.5)');   // Orange
-  gradient.addColorStop(0.4, 'rgba(200, 80, 140, 0.35)');   // Orange-purple
-  gradient.addColorStop(0.55, 'rgba(140, 70, 200, 0.25)');  // Purple
-  gradient.addColorStop(0.7, 'rgba(80, 100, 220, 0.15)');   // Purple-blue
-  gradient.addColorStop(0.85, 'rgba(50, 80, 180, 0.08)');   // Blue
-  gradient.addColorStop(1, 'rgba(30, 50, 150, 0)');         // Fade to transparent
-
-  ctx.fillStyle = gradient;
-  ctx.fillRect(0, 0, size, size);
-
-  const tex = new THREE.CanvasTexture(canvas);
-  tex.minFilter = THREE.LinearFilter;
-  tex.magFilter = THREE.LinearFilter;
-  tex.colorSpace = THREE.SRGBColorSpace;
-  return tex;
-};
-
 
 export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayGalaxyProps) => {
   const rotatingGroupRef = useRef<THREE.Group>(null);
@@ -87,27 +33,26 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
   const proximaPulseRef2 = useRef<THREE.Mesh>(null);
   const centerWorldPos = useRef(new THREE.Vector3());
   const markerWorldPos = useRef(new THREE.Vector3());
+  const frameCountRef = useRef(0);
+  const lodControllerRef = useRef(new LODController('high'));
+  const currentLODRef = useRef<LODLevel>('high');
   
   const { language } = useLanguage();
+  const { camera } = useThree();
 
   const setObjectWorldPosition = useCosmosStore((s) => s.setObjectWorldPosition);
   const setSelectedObject = useCosmosStore((s) => s.setSelectedObject);
   const currentScale = useCosmosStore((s) => s.currentScale);
   
-  // Only show label at galaxy-scale views (not at local group or universe scale - too far away)
   const showLabel = currentScale === 'stellar' || currentScale === 'milkyWay';
-  
-  // Hide "We are here" marker when zoomed out to local group or universe scale
   const showYouAreHereMarker = showYouAreHere && (currentScale === 'stellar' || currentScale === 'milkyWay');
 
   const gs = UNITS.KM_PER_LY * visualScale;
 
-  // Get celestial objects for click handlers
   const earthObject = useMemo(() => getObjectById('earth'), []);
   const proximaObject = useMemo(() => getObjectById('proxima-centauri'), []);
   const milkyWayObject = useMemo(() => getObjectById('milky-way-center'), []);
 
-  // Click handlers - "You are here" marker goes to Earth (our home!)
   const handleYouAreHereClick = useCallback((e: { stopPropagation: () => void }) => {
     e.stopPropagation();
     if (earthObject) setSelectedObject(earthObject);
@@ -118,13 +63,11 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
     if (proximaObject) setSelectedObject(proximaObject);
   }, [proximaObject, setSelectedObject]);
 
-  // Click on the galaxy itself (when zoomed out to local group view)
   const handleMilkyWayClick = useCallback((e: { stopPropagation: () => void }) => {
     e.stopPropagation();
     if (milkyWayObject) setSelectedObject(milkyWayObject);
   }, [milkyWayObject, setSelectedObject]);
 
-  // Click handlers for HTML labels (DOM events)
   const handleYouAreHereLabelClick = useCallback((e: ReactMouseEvent<HTMLDivElement>) => {
     e.stopPropagation();
     if (earthObject) setSelectedObject(earthObject);
@@ -135,8 +78,6 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
     if (proximaObject) setSelectedObject(proximaObject);
   }, [proximaObject, setSelectedObject]);
 
-  // Offset to position the galaxy so the solar system (Sun) stays at scene origin (0,0,0)
-  // The galaxy center is displaced by the Sun's distance from galactic center
   const galaxyOffset = useMemo<[number, number, number]>(
     () => [
       -Math.cos(MILKY_WAY.sunAngle) * MILKY_WAY.sunDistance * gs,
@@ -146,12 +87,12 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
     [gs]
   );
   
-  const dotTexture = useMemo(() => createDotTexture(), []);
-  const glowTexture = useMemo(() => createGalaxyGlowTexture(), []);
+  // Use shared textures instead of creating new ones
+  const dotTexture = useMemo(() => getDotTexture(), []);
+  const glowTexture = useMemo(() => getMilkyWayGlowTexture(), []);
   
-  // Generate ONLY stars - crisp dots with colors matching glow regions
-  // Density decreases exponentially with distance from center
-  const starsGeo = useMemo(() => {
+  // Generate full-resolution geometries
+  const starsGeoFull = useMemo(() => {
     const { branches, spinTurns } = MILKY_WAY;
     const maxRadius = MILKY_WAY.diskRadius * gs;
     const starCount = 400000;
@@ -160,99 +101,65 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
     const colors = new Float32Array(starCount * 3);
     const color = new THREE.Color();
 
-    // Exponential radial falloff (higher = denser center, sparser edge)
-    // t in [0..1], with PDF ~ exp(-k*t)
     const k = 5.0;
     const denom = 1 - Math.exp(-k);
 
     for (let i = 0; i < starCount; i++) {
       const i3 = i * 3;
-
-      // Exponential distribution for radius fraction
       const u = Math.random();
       const t = -Math.log(1 - u * denom) / k;
-
-      // Avoid stacking many points at x=z≈0 (creates a visible vertical "needle")
       const innerRadius = maxRadius * 0.02;
       const radius = innerRadius + t * (maxRadius - innerRadius);
       const rt = radius / maxRadius;
 
-      // Pick an arm
       const branchIndex = Math.floor(Math.random() * branches);
       const branchAngle = (branchIndex / branches) * Math.PI * 2;
-
-      // Turn the arms as radius increases
       const spinAngle = rt * spinTurns * Math.PI * 2;
 
-      // Arm thickness in radians
       const armWidth = 0.06 + rt * 0.12;
       const armJitter = (Math.random() + Math.random() + Math.random() - 1.5) * armWidth;
-
-      // Inter-arm fill
       const isInterArm = Math.random() < 0.35;
       const interArmJitter = isInterArm ? (Math.random() - 0.5) * (0.8 + rt * 0.6) : 0;
-
       const angle = branchAngle + spinAngle + armJitter + interArmJitter;
 
-      // Radial spread to make arms thicker horizontally (not just angular)
       const radialSpread = (0.03 + rt * 0.06) * maxRadius;
       const radialJitter = (Math.random() + Math.random() - 1) * radialSpread;
       const finalRadius = radius + radialJitter;
 
       positions[i3] = Math.cos(angle) * finalRadius;
-
-      // Vertical thickness
       const thickness = 0.012 + rt * 0.03;
       const yJitter = (Math.random() + Math.random() + Math.random() - 1.5) * maxRadius * thickness;
       positions[i3 + 1] = yJitter;
-
       positions[i3 + 2] = Math.sin(angle) * finalRadius;
 
-      // Star colors with diversity: yellow center → yellow+orange → yellow+orange+purple → purple+blue → blue
-      // More saturated colors (less white), with mixing in transition zones
       const rand = Math.random();
-
       if (rt < 0.15) {
-        // Center: mostly yellow, some orange - VIBRANT
         if (rand < 0.85) {
-          // Yellow
           color.setHSL(0.12 + Math.random() * 0.04, 0.95 + Math.random() * 0.05, 0.55 + Math.random() * 0.1);
         } else {
-          // Orange
           color.setHSL(0.06 + Math.random() * 0.04, 1.0, 0.5 + Math.random() * 0.12);
         }
       } else if (rt < 0.3) {
-        // Yellow and orange mix - VIBRANT
         if (rand < 0.5) {
-          // Yellow
           color.setHSL(0.11 + Math.random() * 0.04, 0.95, 0.52 + Math.random() * 0.1);
         } else {
-          // Orange
           color.setHSL(0.05 + Math.random() * 0.04, 1.0, 0.48 + Math.random() * 0.1);
         }
       } else if (rt < 0.5) {
-        // Yellow, orange, and purple mix - VIBRANT
         if (rand < 0.33) {
-          // Yellow
           color.setHSL(0.12 + Math.random() * 0.03, 0.92, 0.52 + Math.random() * 0.1);
         } else if (rand < 0.66) {
-          // Orange
           color.setHSL(0.04 + Math.random() * 0.04, 1.0, 0.45 + Math.random() * 0.1);
         } else {
-          // Purple
           color.setHSL(0.78 + Math.random() * 0.08, 0.9, 0.45 + Math.random() * 0.12);
         }
       } else if (rt < 0.7) {
-        // Purple and blue mix - VIBRANT
         if (rand < 0.5) {
-          // Purple
           color.setHSL(0.76 + Math.random() * 0.08, 0.88, 0.45 + Math.random() * 0.1);
         } else {
-          // Blue
           color.setHSL(0.6 + Math.random() * 0.08, 0.92, 0.45 + Math.random() * 0.1);
         }
       } else {
-        // Outer: mostly blue - VIBRANT
         color.setHSL(0.58 + Math.random() * 0.08, 0.95, 0.4 + Math.random() * 0.12);
       }
 
@@ -264,13 +171,11 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
     const geo = new THREE.BufferGeometry();
     geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
     geo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
-    // Prevent frustum culling by setting infinite bounding sphere
     geo.boundingSphere = new THREE.Sphere(new THREE.Vector3(0, 0, 0), Infinity);
     return geo;
   }, [gs]);
   
-  // Core bulge stars - denser center with golden color
-  const coreGeo = useMemo(() => {
+  const coreGeoFull = useMemo(() => {
     const coreCount = 130000;
     const positions = new Float32Array(coreCount * 3);
     const colors = new Float32Array(coreCount * 3);
@@ -279,26 +184,21 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
 
     for (let i = 0; i < coreCount; i++) {
       const i3 = i * 3;
-
       const r = Math.pow(Math.random(), 1.25) * coreRadius;
       const theta = Math.random() * Math.PI * 2;
       const phi = Math.acos(2 * Math.random() - 1);
-      const t = r / coreRadius; // 0 at center, 1 at edge
+      const t = r / coreRadius;
 
       positions[i3] = r * Math.sin(phi) * Math.cos(theta);
       positions[i3 + 1] = r * Math.cos(phi) * 0.55;
       positions[i3 + 2] = r * Math.sin(phi) * Math.sin(theta);
 
-      // Core: mostly yellow with some orange - VIBRANT
       const rand = Math.random();
       if (t < 0.4) {
-        // Inner core: bright yellow
         color.setHSL(0.12 + Math.random() * 0.03, 1.0, 0.55 + Math.random() * 0.08);
       } else if (rand < 0.7) {
-        // Yellow
         color.setHSL(0.11 + Math.random() * 0.04, 0.95, 0.52 + Math.random() * 0.1);
       } else {
-        // Orange
         color.setHSL(0.06 + Math.random() * 0.04, 1.0, 0.48 + Math.random() * 0.1);
       }
 
@@ -314,8 +214,7 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
     return geo;
   }, [gs]);
 
-  // Extra "volume" stars above/below disk - colored by region
-  const volumeGeo = useMemo(() => {
+  const volumeGeoFull = useMemo(() => {
     const count = 100000;
     const maxRadius = MILKY_WAY.diskRadius * gs;
     const positions = new Float32Array(count * 3);
@@ -330,23 +229,19 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
 
       positions[i3] = Math.cos(angle) * radius;
       positions[i3 + 2] = Math.sin(angle) * radius;
-
       const ySpread = (0.12 + (1 - t) * 0.22) * maxRadius;
       positions[i3 + 1] = (Math.random() + Math.random() + Math.random() - 1.5) * ySpread * 0.08;
 
-      // Volume stars: same color logic as main stars
       const regionT = 0.15 + t * 0.85;
       const rand = Math.random();
       
       if (regionT < 0.25) {
-        // Yellow/orange mix - VIBRANT
         if (rand < 0.6) {
           color.setHSL(0.11 + Math.random() * 0.04, 0.95, 0.52 + Math.random() * 0.1);
         } else {
           color.setHSL(0.05 + Math.random() * 0.04, 1.0, 0.48 + Math.random() * 0.1);
         }
       } else if (regionT < 0.5) {
-        // Yellow, orange, purple mix - VIBRANT
         if (rand < 0.33) {
           color.setHSL(0.11 + Math.random() * 0.03, 0.92, 0.52 + Math.random() * 0.1);
         } else if (rand < 0.66) {
@@ -355,14 +250,12 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
           color.setHSL(0.78 + Math.random() * 0.08, 0.9, 0.45 + Math.random() * 0.1);
         }
       } else if (regionT < 0.75) {
-        // Purple/blue mix - VIBRANT
         if (rand < 0.5) {
           color.setHSL(0.76 + Math.random() * 0.08, 0.88, 0.45 + Math.random() * 0.1);
         } else {
           color.setHSL(0.6 + Math.random() * 0.08, 0.92, 0.45 + Math.random() * 0.1);
         }
       } else {
-        // Outer: blue - VIBRANT
         color.setHSL(0.58 + Math.random() * 0.08, 0.95, 0.4 + Math.random() * 0.1);
       }
 
@@ -378,8 +271,7 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
     return geo;
   }, [gs]);
 
-  // Halo stars - scattered above/below the disk, denser near center
-  const haloGeo = useMemo(() => {
+  const haloGeoFull = useMemo(() => {
     const count = 25000;
     const maxRadius = MILKY_WAY.diskRadius * gs * 0.65;
     const maxHeight = MILKY_WAY.diskRadius * gs * 0.2;
@@ -389,8 +281,6 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
 
     for (let i = 0; i < count; i++) {
       const i3 = i * 3;
-      
-      // Concentrated toward center (power of 2 for falloff)
       const t = Math.pow(Math.random(), 2);
       const innerRadius = maxRadius * 0.02;
       const radius = innerRadius + t * (maxRadius - innerRadius);
@@ -399,22 +289,17 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
       positions[i3] = Math.cos(angle) * radius;
       positions[i3 + 2] = Math.sin(angle) * radius;
 
-      // Vertical position: keep some thickness, but never stack points at x=z≈0
       const rt = radius / maxRadius;
       const heightScale = 0.25 + rt * 0.75;
       const y = (Math.random() * 2 - 1) * maxHeight * heightScale;
       positions[i3 + 1] = y;
 
-      // Halo stars: older, more yellow/orange, some ancient blue stragglers
       const rand = Math.random();
       if (rand < 0.6) {
-        // Yellow-orange (old stars)
         color.setHSL(0.08 + Math.random() * 0.06, 0.85 + Math.random() * 0.1, 0.5 + Math.random() * 0.1);
       } else if (rand < 0.85) {
-        // Orange-red
         color.setHSL(0.03 + Math.random() * 0.04, 0.9, 0.45 + Math.random() * 0.1);
       } else {
-        // Rare blue stragglers
         color.setHSL(0.6 + Math.random() * 0.08, 0.8, 0.5 + Math.random() * 0.1);
       }
 
@@ -429,29 +314,48 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
     geo.boundingSphere = new THREE.Sphere(new THREE.Vector3(0, 0, 0), Infinity);
     return geo;
   }, [gs]);
+
+  // Create LOD geometries
+  const starsGeoLow = useMemo(() => createLODGeometry(starsGeoFull, 'low'), [starsGeoFull]);
+  const coreGeoLow = useMemo(() => createLODGeometry(coreGeoFull, 'low'), [coreGeoFull]);
+  const volumeGeoLow = useMemo(() => createLODGeometry(volumeGeoFull, 'low'), [volumeGeoFull]);
+  const haloGeoLow = useMemo(() => createLODGeometry(haloGeoFull, 'low'), [haloGeoFull]);
+
+  // Select geometry based on current LOD
+  const starsGeo = currentLODRef.current === 'high' || currentLODRef.current === 'medium' ? starsGeoFull : starsGeoLow;
+  const coreGeo = currentLODRef.current === 'high' || currentLODRef.current === 'medium' ? coreGeoFull : coreGeoLow;
+  const volumeGeo = currentLODRef.current === 'high' || currentLODRef.current === 'medium' ? volumeGeoFull : volumeGeoLow;
+  const haloGeo = currentLODRef.current === 'high' || currentLODRef.current === 'medium' ? haloGeoFull : haloGeoLow;
+
+  const sizeMultiplier = getParticleSizeMultiplier(currentLODRef.current);
   
-  useFrame(({ clock, camera }) => {
+  useFrame(({ clock }) => {
+    frameCountRef.current++;
     const t = clock.getElapsedTime();
 
-    // Differential star rotation is now handled by DifferentialRotationPoints shader
-
-    // Keep the galaxy center world position live (needed for camera tracking while rotating)
+    // Update LOD based on camera distance
     if (rotatingGroupRef.current) {
       rotatingGroupRef.current.getWorldPosition(centerWorldPos.current);
+      
+      const diskR = MILKY_WAY.diskRadius * gs;
+      const { level } = lodControllerRef.current.update(
+        camera.position,
+        centerWorldPos.current,
+        { galaxyDiameter: diskR * 2 }
+      );
+      currentLODRef.current = level;
 
-      // NOTE: selectable object id uses dashes (see celestialObjects.ts)
-      const pos: [number, number, number] = [
-        centerWorldPos.current.x,
-        centerWorldPos.current.y,
-        centerWorldPos.current.z,
-      ];
-      setObjectWorldPosition('milky-way-center', pos);
-
-      // Back-compat with any older references
-      setObjectWorldPosition('milkyWay_center', pos);
+      // Throttle position updates for distant galaxies
+      if (lodControllerRef.current.shouldUpdateThisFrame()) {
+        const pos: [number, number, number] = [
+          centerWorldPos.current.x,
+          centerWorldPos.current.y,
+          centerWorldPos.current.z,
+        ];
+        setObjectWorldPosition('milky-way-center', pos);
+        setObjectWorldPosition('milkyWay_center', pos);
+      }
     }
-
-    // "We are here" marker pulse rings removed (keep marker spheres only)
 
     // Proxima marker pulses
     if (proximaPulseRef.current) {
@@ -468,13 +372,11 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
 
     if (markerGroupRef.current) {
       markerGroupRef.current.getWorldPosition(markerWorldPos.current);
-
       const distance = camera.position.distanceTo(markerWorldPos.current);
       const scale = Math.max(1, distance * 0.025);
       markerGroupRef.current.scale.setScalar(scale);
     }
 
-    // Scale Proxima marker similarly
     if (proximaMarkerRef.current) {
       const worldPos = new THREE.Vector3();
       proximaMarkerRef.current.getWorldPosition(worldPos);
@@ -486,19 +388,15 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
   
   const baseMarkerSize = gs * 300;
   const diskR = MILKY_WAY.diskRadius * gs;
-  
-  // Proxima Centauri position in scene units (2x actual distance for visual separation)
-  // Position in light-years: [5.80, -0.28, -6.16]
   const proximaPosition: [number, number, number] = [5.80 * gs, -0.28 * gs, -6.16 * gs];
+
   return (
     <>
-      {/* Rotating galaxy group - offset so the solar system stays at origin */}
       <group ref={rotatingGroupRef} position={galaxyOffset}>
-        {/* Stars with differential rotation - inner stars rotate faster */}
         <DifferentialRotationPoints
           key="milkyway-core"
           geometry={coreGeo}
-          size={gs * 100}
+          size={gs * 100 * sizeMultiplier}
           map={dotTexture}
           opacity={0.35}
           maxRadius={MILKY_WAY.bulgeRadius * gs}
@@ -506,11 +404,10 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
           differentialStrength={0.12}
         />
 
-        {/* Main stars - spiral structure */}
         <DifferentialRotationPoints
           key="milkyway-arms"
           geometry={starsGeo}
-          size={gs * 60}
+          size={gs * 60 * sizeMultiplier}
           map={dotTexture}
           opacity={0.28}
           maxRadius={diskR}
@@ -518,11 +415,10 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
           differentialStrength={0.08}
         />
 
-        {/* Volume stars - add height so it feels "full" */}
         <DifferentialRotationPoints
           key="milkyway-volume"
           geometry={volumeGeo}
-          size={gs * 55}
+          size={gs * 55 * sizeMultiplier}
           map={dotTexture}
           opacity={0.14}
           maxRadius={diskR}
@@ -530,11 +426,10 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
           differentialStrength={0.08}
         />
 
-        {/* Halo stars - scattered above/below the disk */}
         <DifferentialRotationPoints
           key="milkyway-halo"
           geometry={haloGeo}
-          size={gs * 45}
+          size={gs * 45 * sizeMultiplier}
           map={dotTexture}
           opacity={0.10}
           maxRadius={diskR * 1.2}
@@ -542,7 +437,6 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
           differentialStrength={0.06}
         />
 
-        {/* Center glow (billboard) - toned down */}
         <sprite renderOrder={10} frustumCulled={false} scale={[diskR * 2.2, diskR * 2.2, 1]}>
           <spriteMaterial
             map={glowTexture}
@@ -556,7 +450,6 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
           />
         </sprite>
 
-        {/* Inner core glow - toned down */}
         <sprite renderOrder={11} frustumCulled={false} scale={[diskR * 0.6, diskR * 0.6, 1]}>
           <spriteMaterial
             map={glowTexture}
@@ -569,7 +462,6 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
           />
         </sprite>
 
-        {/* Hot center core - toned down */}
         <sprite renderOrder={12} frustumCulled={false} scale={[diskR * 0.25, diskR * 0.25, 1]}>
           <spriteMaterial
             map={glowTexture}
@@ -582,22 +474,20 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
           />
         </sprite>
 
-        {/* Invisible click target for the galaxy (visible at local group scale) */}
+        {/* Click target - reduced complexity from 32x32 to 8x8 */}
         <mesh 
           onClick={handleMilkyWayClick}
           onPointerDown={handleMilkyWayClick}
           onPointerOver={(e) => { e.stopPropagation(); document.body.style.cursor = 'pointer'; }}
           onPointerOut={() => { document.body.style.cursor = 'auto'; }}
         >
-          <sphereGeometry args={[diskR * 1.2, 32, 32]} />
+          <sphereGeometry args={[diskR * 1.2, 8, 8]} />
           <meshBasicMaterial transparent opacity={0} depthWrite={false} />
         </mesh>
       </group>
 
-      {/* Solar system marker ("You are here") - stays at origin since that's where the solar system is */}
       {showYouAreHereMarker && (
         <group ref={markerGroupRef} position={[0, 0, 0]}>
-          {/* White star point that matches the galaxy stars style */}
           <points>
             <bufferGeometry>
               <bufferAttribute
@@ -626,25 +516,23 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
             />
           </points>
           
-          {/* Invisible click target for star point - large size for easy clicking at galaxy scale */}
+          {/* Reduced click target complexity */}
           <mesh 
             onClick={handleYouAreHereClick} 
             onPointerDown={handleYouAreHereClick}
             onPointerOver={(e) => { e.stopPropagation(); document.body.style.cursor = 'pointer'; }}
             onPointerOut={() => { document.body.style.cursor = 'auto'; }}
           >
-            <sphereGeometry args={[baseMarkerSize * 40, 32, 32]} />
+            <sphereGeometry args={[baseMarkerSize * 40, 8, 8]} />
             <meshBasicMaterial transparent opacity={0} depthWrite={false} />
           </mesh>
           
-          {/* "We are here" label */}
           {showLabel && (
             <Html
               position={[0, baseMarkerSize * 15, 0]}
               center
               distanceFactor={baseMarkerSize * 50}
               occlude={false}
-              // Keep this label beneath app modals/overlays (e.g., Help & Controls)
               zIndexRange={[0, 0]}
               style={{ pointerEvents: 'auto' }}
             >
@@ -660,12 +548,12 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
           )}
           
           <mesh onClick={handleYouAreHereClick} onPointerDown={handleYouAreHereClick}>
-            <sphereGeometry args={[baseMarkerSize, 16, 16]} />
+            <sphereGeometry args={[baseMarkerSize, 8, 8]} />
             <meshBasicMaterial color="#ffffff" />
           </mesh>
           
           <mesh onClick={handleYouAreHereClick} onPointerDown={handleYouAreHereClick}>
-            <sphereGeometry args={[baseMarkerSize * 1.5, 16, 16]} />
+            <sphereGeometry args={[baseMarkerSize * 1.5, 8, 8]} />
             <meshBasicMaterial
               color="#ffffff"
               transparent
@@ -675,7 +563,7 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
           </mesh>
           
           <mesh onClick={handleYouAreHereClick} onPointerDown={handleYouAreHereClick}>
-            <sphereGeometry args={[baseMarkerSize * 3, 16, 16]} />
+            <sphereGeometry args={[baseMarkerSize * 3, 8, 8]} />
             <meshBasicMaterial
               color="#ffffff"
               transparent
@@ -683,14 +571,11 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
               blending={THREE.AdditiveBlending}
             />
           </mesh>
-          
         </group>
       )}
 
-      {/* Proxima Centauri marker - visible at galaxy scales */}
       {showLabel && (
         <group ref={proximaMarkerRef} position={proximaPosition}>
-          {/* Red-orange star point matching Proxima's color */}
           <points>
             <bufferGeometry>
               <bufferAttribute
@@ -719,18 +604,17 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
             />
           </points>
           
-          {/* Invisible click target for star point - large size for easy clicking at galaxy scale */}
+          {/* Reduced click target complexity */}
           <mesh 
             onClick={handleProximaClick} 
             onPointerDown={handleProximaClick}
             onPointerOver={(e) => { e.stopPropagation(); document.body.style.cursor = 'pointer'; }}
             onPointerOut={() => { document.body.style.cursor = 'auto'; }}
           >
-            <sphereGeometry args={[baseMarkerSize * 40, 32, 32]} />
+            <sphereGeometry args={[baseMarkerSize * 40, 8, 8]} />
             <meshBasicMaterial transparent opacity={0} depthWrite={false} />
           </mesh>
           
-          {/* "Proxima Centauri" label */}
           <Html
             position={[0, baseMarkerSize * 15, 0]}
             center
@@ -749,15 +633,13 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
             </div>
           </Html>
           
-          {/* Core sphere - red/orange for red dwarf */}
           <mesh onClick={handleProximaClick} onPointerDown={handleProximaClick}>
-            <sphereGeometry args={[baseMarkerSize * 0.7, 16, 16]} />
+            <sphereGeometry args={[baseMarkerSize * 0.7, 8, 8]} />
             <meshBasicMaterial color="#ff6b4a" />
           </mesh>
           
-          {/* Inner glow */}
           <mesh onClick={handleProximaClick} onPointerDown={handleProximaClick}>
-            <sphereGeometry args={[baseMarkerSize * 1.2, 16, 16]} />
+            <sphereGeometry args={[baseMarkerSize * 1.2, 8, 8]} />
             <meshBasicMaterial
               color="#ff6b4a"
               transparent
@@ -766,9 +648,8 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
             />
           </mesh>
           
-          {/* Outer glow */}
           <mesh onClick={handleProximaClick} onPointerDown={handleProximaClick}>
-            <sphereGeometry args={[baseMarkerSize * 2.5, 16, 16]} />
+            <sphereGeometry args={[baseMarkerSize * 2.5, 8, 8]} />
             <meshBasicMaterial
               color="#ff6b4a"
               transparent
@@ -777,9 +658,8 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
             />
           </mesh>
           
-          {/* Pulse rings */}
           <mesh ref={proximaPulseRef} rotation={[Math.PI / 2, 0, 0]} onClick={handleProximaClick} onPointerDown={handleProximaClick}>
-            <ringGeometry args={[baseMarkerSize * 1.2, baseMarkerSize * 2, 32]} />
+            <ringGeometry args={[baseMarkerSize * 1.2, baseMarkerSize * 2, 16]} />
             <meshBasicMaterial
               color="#ff6b4a"
               transparent
@@ -790,7 +670,7 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
           </mesh>
           
           <mesh ref={proximaPulseRef2} rotation={[Math.PI / 2, 0, 0]} onClick={handleProximaClick} onPointerDown={handleProximaClick}>
-            <ringGeometry args={[baseMarkerSize * 1.2, baseMarkerSize * 2, 32]} />
+            <ringGeometry args={[baseMarkerSize * 1.2, baseMarkerSize * 2, 16]} />
             <meshBasicMaterial
               color="#ff6b4a"
               transparent
