@@ -6,7 +6,7 @@ import { useCosmosStore } from '../store/useCosmosStore';
 import { getObjectById } from '../data/celestialObjects';
 import { DifferentialRotationPoints } from './DifferentialRotationMaterial';
 import { getDotTexture, getTriangulumGlowTexture } from '../utils/sharedTextures';
-import { LODController, getParticleSizeMultiplier, createLODGeometry, type LODLevel } from '../utils/lodManager';
+import { LODController } from '../utils/lodManager';
 
 interface TriangulumGalaxyProps {
   visualScale: number;
@@ -24,9 +24,7 @@ const TRIANGULUM = {
 export const TriangulumGalaxy = ({ visualScale }: TriangulumGalaxyProps) => {
   const groupRef = useRef<THREE.Group>(null);
   const centerWorldPos = useRef(new THREE.Vector3());
-  const frameCountRef = useRef(0);
   const lodControllerRef = useRef(new LODController('high'));
-  const currentLODRef = useRef<LODLevel>('high');
 
   const { camera } = useThree();
   const setObjectWorldPosition = useCosmosStore((s) => s.setObjectWorldPosition);
@@ -242,30 +240,22 @@ export const TriangulumGalaxy = ({ visualScale }: TriangulumGalaxyProps) => {
     return geo;
   }, [gs]);
 
-  // Create LOD geometries
-  const starsGeoLow = useMemo(() => createLODGeometry(starsGeoFull, 'low'), [starsGeoFull]);
-  const coreGeoLow = useMemo(() => createLODGeometry(coreGeoFull, 'low'), [coreGeoFull]);
-  const haloGeoLow = useMemo(() => createLODGeometry(haloGeoFull, 'low'), [haloGeoFull]);
-
-  // Select geometry based on LOD
-  const starsGeo = currentLODRef.current === 'high' || currentLODRef.current === 'medium' ? starsGeoFull : starsGeoLow;
-  const coreGeo = currentLODRef.current === 'high' || currentLODRef.current === 'medium' ? coreGeoFull : coreGeoLow;
-  const haloGeo = currentLODRef.current === 'high' || currentLODRef.current === 'medium' ? haloGeoFull : haloGeoLow;
-  const sizeMultiplier = getParticleSizeMultiplier(currentLODRef.current);
+  // Always use full resolution geometries - LOD was causing particle count issues
+  const starsGeo = starsGeoFull;
+  const coreGeo = coreGeoFull;
+  const haloGeo = haloGeoFull;
+  const sizeMultiplier = 1;
 
   useFrame(() => {
-    frameCountRef.current++;
-    
     if (groupRef.current) {
       groupRef.current.getWorldPosition(centerWorldPos.current);
       
       const diskR = TRIANGULUM.diskRadius * gs;
-      const { level } = lodControllerRef.current.update(
+      lodControllerRef.current.update(
         camera.position,
         centerWorldPos.current,
         { galaxyDiameter: diskR * 2 }
       );
-      currentLODRef.current = level;
 
       // Throttle position updates
       if (lodControllerRef.current.shouldUpdateThisFrame()) {
