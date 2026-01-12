@@ -14,7 +14,9 @@ const generateTrojans = (count: number, orbitRadius: number, lagrangeAngle: numb
   const positions = new Float32Array(count * 3);
   const sizes = new Float32Array(count);
   const colors = new Float32Array(count * 3);
-  const offsets = new Float32Array(count); // Offset from Lagrange point
+  const radii = new Float32Array(count);       // Store orbital radii for animation
+  const heights = new Float32Array(count);     // Store Y positions
+  const angleOffsets = new Float32Array(count); // Offset from Jupiter's angle
   
   for (let i = 0; i < count; i++) {
     // Trojans cluster around L4 (leading) or L5 (trailing) - 60° ahead/behind Jupiter
@@ -33,7 +35,10 @@ const generateTrojans = (count: number, orbitRadius: number, lagrangeAngle: numb
     positions[i * 3 + 1] = y;
     positions[i * 3 + 2] = Math.sin(angle) * radius;
     
-    offsets[i] = angleOffset;
+    // Store for animation
+    radii[i] = radius;
+    heights[i] = y;
+    angleOffsets[i] = lagrangeAngle + angleOffset; // Full angle offset from Jupiter
     
     // Size distribution
     const sizeRand = Math.random();
@@ -67,7 +72,7 @@ const generateTrojans = (count: number, orbitRadius: number, lagrangeAngle: numb
     }
   }
   
-  return { positions, sizes, colors, offsets };
+  return { positions, sizes, colors, radii, heights, angleOffsets };
 };
 
 export const TrojanAsteroids = ({ 
@@ -146,20 +151,37 @@ export const TrojanAsteroids = ({
   }), [scale]);
   
   // Jupiter's orbital period is about 11.86 years
-  // Angular velocity = 2π / (11.86 * 365.25 * 240) at 1x speed (slower for better viewing)
+  // Angular velocity = 2π * 365.25 / (periodDays * 240) at 1x speed
   const jupiterAngularVelocity = (2 * Math.PI * 365.25) / (4332.59 * 240);
+  
+  // Helper to update positions for a Trojan group
+  const updateTrojanPositions = (
+    ref: React.RefObject<THREE.Points>,
+    data: ReturnType<typeof generateTrojans>,
+    jupiterAngle: number
+  ) => {
+    if (!ref.current) return;
+    const positions = ref.current.geometry.attributes.position.array as Float32Array;
+    const { radii, heights, angleOffsets } = data;
+    
+    for (let i = 0; i < count; i++) {
+      // Each Trojan orbits at Jupiter's speed, maintaining its offset from Jupiter
+      const currentAngle = jupiterAngle + angleOffsets[i];
+      positions[i * 3] = Math.cos(currentAngle) * radii[i];
+      positions[i * 3 + 1] = heights[i];
+      positions[i * 3 + 2] = Math.sin(currentAngle) * radii[i];
+    }
+    
+    ref.current.geometry.attributes.position.needsUpdate = true;
+  };
   
   useFrame((_, delta) => {
     simTime.current += delta * timeSpeed;
     const jupiterAngle = simTime.current * jupiterAngularVelocity;
     
-    // Trojans orbit with Jupiter, maintaining their relative position
-    if (l4Ref.current) {
-      l4Ref.current.rotation.y = jupiterAngle;
-    }
-    if (l5Ref.current) {
-      l5Ref.current.rotation.y = jupiterAngle;
-    }
+    // Update both L4 and L5 Trojan positions
+    updateTrojanPositions(l4Ref, l4Data, jupiterAngle);
+    updateTrojanPositions(l5Ref, l5Data, jupiterAngle);
   });
   
   return (
