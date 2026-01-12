@@ -465,6 +465,7 @@ export const TexturedPlanet = ({
       earth: 23.934,      // 23h 56m 4s
       moon: 655.7,        // 27.32 days (tidally locked)
       mars: 24.623,       // 24h 37m 22s
+      ceres: 9.07,        // 9h 4m (fastest dwarf planet)
       jupiter: 9.925,     // 9h 55m 30s (fastest planet)
       io: 42.46,          // 1.77 days (tidally locked)
       europa: 85.23,      // 3.55 days (tidally locked)
