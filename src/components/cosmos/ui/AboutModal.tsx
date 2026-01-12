@@ -1,15 +1,19 @@
 import { useLanguage } from '@/i18n/LanguageContext';
 import { Button } from '@/components/ui/button';
-import { ExternalLink, Globe, X } from 'lucide-react';
+import { Globe, X, MapPin, MessageCircle } from 'lucide-react';
 
 const APP_VERSION = '1.0.0';
+
+// Profile picture
+const PROFILE_PIC = 'https://images.spr.so/cdn-cgi/imagedelivery/j42No7y-dcokJuNgXeA0ig/6364ed24-d073-426f-9f7a-5f679c6b957f/dens-new-pfp/w=512,quality=90,fit=scale-down';
 
 // Social links
 const SOCIAL_LINKS = {
   website: 'https://dens.so',
-  github: 'https://github.com/densmusic',
-  twitter: 'https://x.com/AkokaDens',
-  linkedin: 'https://linkedin.com/in/densmusic',
+  twitter: 'https://x.com/densweb3',
+  linkedin: 'https://www.linkedin.com/in/denisakoka/',
+  telegram: 'https://t.me/densakoka',
+  instagram: 'https://www.instagram.com/densakoka/',
 };
 
 // Changelog data
@@ -38,9 +42,11 @@ const CHANGELOG = [
 
 const translations = {
   en: {
-    about: 'About Cosmos Explorer',
+    about: 'About',
     version: 'Version',
     createdBy: 'Created by',
+    bio: 'Multidisciplinary creative with 7+ years of experience at the intersection of design, technology, and marketing. Co-Founder at Echo AI. I create brands, websites, apps, and lead teams of marketers and engineers.',
+    location: 'Dundee, Scotland',
     description: 'An interactive 3D exploration of our solar system and beyond. Navigate through planets, moons, and distant galaxies with scientifically accurate data.',
     visitWebsite: 'Website',
     changelog: 'Changelog',
@@ -52,24 +58,26 @@ const translations = {
       'Educational info for each celestial body',
     ],
     close: 'Close',
-    followMe: 'Follow me',
+    connect: 'Connect',
   },
   fr: {
-    about: 'À propos de Cosmos Explorer',
+    about: 'À propos',
     version: 'Version',
     createdBy: 'Créé par',
+    bio: "Créatif pluridisciplinaire avec plus de 7 ans d'expérience à l'intersection du design, de la technologie et du marketing. Co-fondateur d'Echo AI. Je crée des marques, sites web, applications et dirige des équipes de marketeurs et ingénieurs.",
+    location: 'Dundee, Écosse',
     description: "Une exploration 3D interactive de notre système solaire et au-delà. Naviguez à travers les planètes, lunes et galaxies avec des données scientifiquement précises.",
     visitWebsite: 'Site web',
-    changelog: 'Historique des versions',
-    features: 'Fonctionnalités clés',
+    changelog: 'Historique',
+    features: 'Fonctionnalités',
     featuresList: [
-      'Rotations planétaires et inclinaisons axiales réalistes',
+      'Rotations planétaires et inclinaisons réalistes',
       'Périodes orbitales et distances précises',
       'Contrôles de caméra interactifs',
       'Infos éducatives pour chaque corps céleste',
     ],
     close: 'Fermer',
-    followMe: 'Me suivre',
+    connect: 'Contact',
   },
 };
 
@@ -95,119 +103,126 @@ export const AboutModal = ({ open, onOpenChange }: AboutModalProps) => {
         <X className="w-6 h-6" />
       </button>
 
-      <div className="text-center space-y-4 sm:space-y-6 max-w-sm sm:max-w-2xl px-4 py-8">
-        {/* Header */}
-        <div className="space-y-2">
-          <div className="flex items-center justify-center gap-3">
-            <span className="text-3xl sm:text-4xl">🌌</span>
-            <h1 className="text-xl sm:text-3xl md:text-4xl font-bold text-white leading-tight">
-              {t.about}
-            </h1>
+      <div className="text-center space-y-4 sm:space-y-5 max-w-sm sm:max-w-2xl px-4 py-6 my-auto">
+        {/* Header - simplified */}
+        <div className="space-y-3">
+          <h1 className="text-2xl sm:text-3xl font-bold text-white flex items-center justify-center gap-2">
+            <span>🌌</span> Cosmos Explorer
+          </h1>
+          <p className="text-sm text-white/60 max-w-md mx-auto">
+            {t.description}
+          </p>
+          <span className="inline-block px-2.5 py-1 bg-blue-500/20 text-blue-300 text-xs font-medium rounded-full">
+            {t.version} {APP_VERSION}
+          </span>
+        </div>
+
+        {/* Creator section - prominent */}
+        <div className="bg-white/10 rounded-xl p-4 sm:p-5 space-y-4">
+          <div className="flex items-center gap-4">
+            <img
+              src={PROFILE_PIC}
+              alt="Dens Akoka"
+              className="w-16 h-16 sm:w-20 sm:h-20 rounded-full object-cover border-2 border-white/20"
+            />
+            <div className="text-left flex-1">
+              <p className="text-xs text-white/50">{t.createdBy}</p>
+              <p className="font-bold text-white text-lg sm:text-xl">Dens Akoka</p>
+              <div className="flex items-center gap-1.5 text-white/50 text-xs mt-1">
+                <MapPin className="w-3 h-3" />
+                <span>{t.location}</span>
+              </div>
+            </div>
           </div>
-          <div className="flex items-center justify-center gap-2">
-            <span className="px-2.5 py-1 bg-blue-500/20 text-blue-300 text-xs font-medium rounded-full">
-              {t.version} {APP_VERSION}
-            </span>
+          
+          <p className="text-sm text-white/70 text-left leading-relaxed">
+            {t.bio}
+          </p>
+          
+          {/* Social links */}
+          <div className="flex flex-wrap gap-2 pt-1">
+            <a
+              href={SOCIAL_LINKS.website}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-500/20 hover:bg-blue-500/30 rounded-full text-xs text-blue-300 hover:text-blue-200 transition-colors font-medium"
+            >
+              <Globe className="w-3.5 h-3.5" />
+              {t.visitWebsite}
+            </a>
+            <a
+              href={SOCIAL_LINKS.twitter}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-white/10 hover:bg-white/20 rounded-full text-xs text-white/80 hover:text-white transition-colors"
+            >
+              <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+              </svg>
+              X
+            </a>
+            <a
+              href={SOCIAL_LINKS.linkedin}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-white/10 hover:bg-white/20 rounded-full text-xs text-white/80 hover:text-white transition-colors"
+            >
+              <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+              </svg>
+              LinkedIn
+            </a>
+            <a
+              href={SOCIAL_LINKS.telegram}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-white/10 hover:bg-white/20 rounded-full text-xs text-white/80 hover:text-white transition-colors"
+            >
+              <MessageCircle className="w-3.5 h-3.5" />
+              Telegram
+            </a>
+            <a
+              href={SOCIAL_LINKS.instagram}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-white/10 hover:bg-white/20 rounded-full text-xs text-white/80 hover:text-white transition-colors"
+            >
+              <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/>
+              </svg>
+              Instagram
+            </a>
           </div>
         </div>
 
-        {/* Description */}
-        <p className="text-sm sm:text-base text-white/70 max-w-lg mx-auto">
-          {t.description}
-        </p>
-
-        {/* Main content grid */}
+        {/* Features & Changelog grid */}
         <div className="grid gap-3 text-left grid-cols-1 sm:grid-cols-2">
-          {/* Creator section */}
-          <div className="bg-white/10 rounded-lg p-3 sm:p-4 space-y-3">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-base sm:text-lg font-bold text-white">
-                DA
-              </div>
-              <div>
-                <p className="text-xs text-white/50">{t.createdBy}</p>
-                <p className="font-semibold text-white text-sm sm:text-base">Dens Akoka</p>
-              </div>
-            </div>
-            
-            {/* Social links */}
-            <div className="space-y-2">
-              <p className="text-xs text-white/50">{t.followMe}</p>
-              <div className="flex flex-wrap gap-2">
-                <a
-                  href={SOCIAL_LINKS.website}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-1.5 px-2.5 py-1.5 bg-white/10 hover:bg-white/20 rounded-md text-xs text-white/80 hover:text-white transition-colors"
-                >
-                  <Globe className="w-3.5 h-3.5" />
-                  {t.visitWebsite}
-                </a>
-                <a
-                  href={SOCIAL_LINKS.github}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-1.5 px-2.5 py-1.5 bg-white/10 hover:bg-white/20 rounded-md text-xs text-white/80 hover:text-white transition-colors"
-                >
-                  <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
-                  </svg>
-                  GitHub
-                </a>
-                <a
-                  href={SOCIAL_LINKS.twitter}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-1.5 px-2.5 py-1.5 bg-white/10 hover:bg-white/20 rounded-md text-xs text-white/80 hover:text-white transition-colors"
-                >
-                  <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
-                  </svg>
-                  X
-                </a>
-                <a
-                  href={SOCIAL_LINKS.linkedin}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-1.5 px-2.5 py-1.5 bg-white/10 hover:bg-white/20 rounded-md text-xs text-white/80 hover:text-white transition-colors"
-                >
-                  <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
-                  </svg>
-                  LinkedIn
-                </a>
-              </div>
-            </div>
-          </div>
-
           {/* Features */}
           <div className="bg-white/10 rounded-lg p-3 sm:p-4 space-y-1.5">
-            <p className="text-white/90 font-medium text-sm sm:text-base">{t.features}:</p>
+            <p className="text-white/90 font-medium text-sm">{t.features}</p>
             {t.featuresList.map((feature, index) => (
-              <p key={index} className="text-white/70 text-xs sm:text-sm">• {feature}</p>
+              <p key={index} className="text-white/60 text-xs">• {feature}</p>
             ))}
           </div>
-        </div>
 
-        {/* Changelog section */}
-        <div className="bg-white/10 rounded-lg p-3 sm:p-4 text-left">
-          <p className="text-white/90 font-medium text-sm sm:text-base mb-3">{t.changelog}</p>
-          <div className="space-y-4 max-h-40 overflow-y-auto pr-2">
+          {/* Changelog */}
+          <div className="bg-white/10 rounded-lg p-3 sm:p-4 space-y-2">
+            <p className="text-white/90 font-medium text-sm">{t.changelog}</p>
             {CHANGELOG.map((entry) => (
-              <div key={entry.version} className="space-y-1.5">
+              <div key={entry.version} className="space-y-1">
                 <div className="flex items-center gap-2">
-                  <span className="px-2 py-0.5 bg-blue-500/20 text-blue-300 text-xs font-medium rounded">
+                  <span className="px-1.5 py-0.5 bg-blue-500/20 text-blue-300 text-[10px] font-medium rounded">
                     v{entry.version}
                   </span>
-                  <span className="text-white/50 text-xs">{entry.date}</span>
+                  <span className="text-white/40 text-[10px]">{entry.date}</span>
                 </div>
-                <ul className="space-y-0.5 pl-1">
-                  {(language === 'fr' ? entry.changes_fr : entry.changes_en).map((change, idx) => (
-                    <li key={idx} className="text-white/60 text-xs flex items-start gap-2">
-                      <span className="text-blue-400 mt-0.5">•</span>
-                      {change}
-                    </li>
+                <ul className="space-y-0.5">
+                  {(language === 'fr' ? entry.changes_fr : entry.changes_en).slice(0, 3).map((change, idx) => (
+                    <li key={idx} className="text-white/50 text-[11px]">• {change}</li>
                   ))}
+                  {(language === 'fr' ? entry.changes_fr : entry.changes_en).length > 3 && (
+                    <li className="text-white/40 text-[11px]">+ {(language === 'fr' ? entry.changes_fr : entry.changes_en).length - 3} more...</li>
+                  )}
                 </ul>
               </div>
             ))}
@@ -215,20 +230,18 @@ export const AboutModal = ({ open, onOpenChange }: AboutModalProps) => {
         </div>
 
         {/* Close button */}
-        <div className="pt-2">
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={() => onOpenChange(false)}
-            className="text-xs sm:text-sm bg-transparent border-white/30 text-white hover:bg-white/10 hover:text-white"
-          >
-            {t.close}
-          </Button>
-        </div>
+        <Button
+          size="sm"
+          variant="outline"
+          onClick={() => onOpenChange(false)}
+          className="text-xs sm:text-sm bg-transparent border-white/30 text-white hover:bg-white/10 hover:text-white"
+        >
+          {t.close}
+        </Button>
 
         {/* Copyright */}
-        <p className="text-xs text-white/40">
-          © 2025 Dens Akoka. All rights reserved.
+        <p className="text-[11px] text-white/30">
+          © 2025 Dens Akoka
         </p>
       </div>
     </div>
