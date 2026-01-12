@@ -51,82 +51,89 @@ export const AndromedaGalaxy = ({ visualScale }: AndromedaGalaxyProps) => {
   const dotTexture = useMemo(() => getDotTexture(), []);
   const glowTexture = useMemo(() => getAndromedaGlowTexture(), []);
 
-  // Full resolution geometries
+  // Full resolution geometries - use seeded random for consistent generation
   const starsGeoFull = useMemo(() => {
     const { branches, spinTurns } = ANDROMEDA;
     const maxRadius = ANDROMEDA.diskRadius * gs;
-    const starCount = 700000; // Increased from 450000
+    const starCount = 700000;
 
     const positions = new Float32Array(starCount * 3);
     const colors = new Float32Array(starCount * 3);
     const color = new THREE.Color();
+
+    // Seeded random for consistent geometry
+    let seed = 12345;
+    const seededRandom = () => {
+      seed = (seed * 1103515245 + 12345) & 0x7fffffff;
+      return seed / 0x7fffffff;
+    };
 
     const k = 4.5;
     const denom = 1 - Math.exp(-k);
 
     for (let i = 0; i < starCount; i++) {
       const i3 = i * 3;
-      const u = Math.random();
+      const u = seededRandom();
       const t = -Math.log(1 - u * denom) / k;
 
       const innerRadius = maxRadius * 0.02;
       const radius = innerRadius + t * (maxRadius - innerRadius);
       const rt = radius / maxRadius;
 
-      const branchIndex = Math.floor(Math.random() * branches);
+      const branchIndex = Math.floor(seededRandom() * branches);
       const branchAngle = (branchIndex / branches) * Math.PI * 2;
       const spinAngle = rt * spinTurns * Math.PI * 2;
 
       const armWidth = 0.12 + rt * 0.20;
-      const armJitter = (Math.random() + Math.random() + Math.random() - 1.5) * armWidth;
-      const isInterArm = Math.random() < 0.45;
-      const interArmJitter = isInterArm ? (Math.random() - 0.5) * (1.0 + rt * 0.7) : 0;
+      const armJitter = (seededRandom() + seededRandom() + seededRandom() - 1.5) * armWidth;
+      const isInterArm = seededRandom() < 0.45;
+      const interArmJitter = isInterArm ? (seededRandom() - 0.5) * (1.0 + rt * 0.7) : 0;
       const angle = branchAngle + spinAngle + armJitter + interArmJitter;
 
       const radialSpread = (0.06 + rt * 0.12) * maxRadius;
-      const radialJitter = (Math.random() + Math.random() - 1) * radialSpread;
+      const radialJitter = (seededRandom() + seededRandom() - 1) * radialSpread;
       const finalRadius = radius + radialJitter;
 
       positions[i3] = Math.cos(angle) * finalRadius;
       const thickness = 0.015 + rt * 0.025;
-      const yJitter = (Math.random() + Math.random() + Math.random() - 1.5) * maxRadius * thickness;
+      const yJitter = (seededRandom() + seededRandom() + seededRandom() - 1.5) * maxRadius * thickness;
       positions[i3 + 1] = yJitter;
       positions[i3 + 2] = Math.sin(angle) * finalRadius;
 
-      const rand = Math.random();
+      const rand = seededRandom();
       if (rt < 0.12) {
         if (rand < 0.6) {
-          color.setHSL(0.6 + Math.random() * 0.05, 0.15 + Math.random() * 0.1, 0.85 + Math.random() * 0.1);
+          color.setHSL(0.6 + seededRandom() * 0.05, 0.15 + seededRandom() * 0.1, 0.85 + seededRandom() * 0.1);
         } else {
-          color.setHSL(0.58 + Math.random() * 0.06, 0.6 + Math.random() * 0.2, 0.75 + Math.random() * 0.12);
+          color.setHSL(0.58 + seededRandom() * 0.06, 0.6 + seededRandom() * 0.2, 0.75 + seededRandom() * 0.12);
         }
       } else if (rt < 0.25) {
         if (rand < 0.7) {
-          color.setHSL(0.58 + Math.random() * 0.08, 0.75 + Math.random() * 0.2, 0.58 + Math.random() * 0.12);
+          color.setHSL(0.58 + seededRandom() * 0.08, 0.75 + seededRandom() * 0.2, 0.58 + seededRandom() * 0.12);
         } else {
-          color.setHSL(0.6 + Math.random() * 0.04, 0.4 + Math.random() * 0.15, 0.75 + Math.random() * 0.1);
+          color.setHSL(0.6 + seededRandom() * 0.04, 0.4 + seededRandom() * 0.15, 0.75 + seededRandom() * 0.1);
         }
       } else if (rt < 0.45) {
         if (rand < 0.45) {
-          color.setHSL(0.08 + Math.random() * 0.06, 0.9 + Math.random() * 0.1, 0.52 + Math.random() * 0.12);
+          color.setHSL(0.08 + seededRandom() * 0.06, 0.9 + seededRandom() * 0.1, 0.52 + seededRandom() * 0.12);
         } else if (rand < 0.85) {
-          color.setHSL(0.56 + Math.random() * 0.1, 0.85 + Math.random() * 0.15, 0.55 + Math.random() * 0.12);
+          color.setHSL(0.56 + seededRandom() * 0.1, 0.85 + seededRandom() * 0.15, 0.55 + seededRandom() * 0.12);
         } else {
-          color.setHSL(0.52 + Math.random() * 0.06, 0.9 + Math.random() * 0.1, 0.6 + Math.random() * 0.1);
+          color.setHSL(0.52 + seededRandom() * 0.06, 0.9 + seededRandom() * 0.1, 0.6 + seededRandom() * 0.1);
         }
       } else if (rt < 0.7) {
         if (rand < 0.8) {
-          color.setHSL(0.55 + Math.random() * 0.12, 0.9 + Math.random() * 0.1, 0.55 + Math.random() * 0.15);
+          color.setHSL(0.55 + seededRandom() * 0.12, 0.9 + seededRandom() * 0.1, 0.55 + seededRandom() * 0.15);
         } else if (rand < 0.92) {
-          color.setHSL(0.5 + Math.random() * 0.08, 0.95, 0.6 + Math.random() * 0.1);
+          color.setHSL(0.5 + seededRandom() * 0.08, 0.95, 0.6 + seededRandom() * 0.1);
         } else {
-          color.setHSL(0.06 + Math.random() * 0.05, 0.85 + Math.random() * 0.1, 0.5 + Math.random() * 0.1);
+          color.setHSL(0.06 + seededRandom() * 0.05, 0.85 + seededRandom() * 0.1, 0.5 + seededRandom() * 0.1);
         }
       } else {
         if (rand < 0.85) {
-          color.setHSL(0.55 + Math.random() * 0.1, 0.92 + Math.random() * 0.08, 0.5 + Math.random() * 0.15);
+          color.setHSL(0.55 + seededRandom() * 0.1, 0.92 + seededRandom() * 0.08, 0.5 + seededRandom() * 0.15);
         } else {
-          color.setHSL(0.5 + Math.random() * 0.06, 0.95, 0.58 + Math.random() * 0.12);
+          color.setHSL(0.5 + seededRandom() * 0.06, 0.95, 0.58 + seededRandom() * 0.12);
         }
       }
 
@@ -143,32 +150,39 @@ export const AndromedaGalaxy = ({ visualScale }: AndromedaGalaxyProps) => {
   }, [gs]);
 
   const coreGeoFull = useMemo(() => {
-    const coreCount = 180000; // Increased from 100000
+    const coreCount = 180000;
     const positions = new Float32Array(coreCount * 3);
     const colors = new Float32Array(coreCount * 3);
     const color = new THREE.Color();
     const coreRadius = ANDROMEDA.bulgeRadius * gs * 0.9;
 
+    // Seeded random for consistent geometry
+    let seed = 23456;
+    const seededRandom = () => {
+      seed = (seed * 1103515245 + 12345) & 0x7fffffff;
+      return seed / 0x7fffffff;
+    };
+
     for (let i = 0; i < coreCount; i++) {
       const i3 = i * 3;
-      const r = Math.pow(Math.random(), 1.2) * coreRadius;
-      const theta = Math.random() * Math.PI * 2;
-      const phi = Math.acos(2 * Math.random() - 1);
+      const r = Math.pow(seededRandom(), 1.2) * coreRadius;
+      const theta = seededRandom() * Math.PI * 2;
+      const phi = Math.acos(2 * seededRandom() - 1);
       const t = r / coreRadius;
 
       positions[i3] = r * Math.sin(phi) * Math.cos(theta);
       positions[i3 + 1] = r * Math.cos(phi) * 0.5;
       positions[i3 + 2] = r * Math.sin(phi) * Math.sin(theta);
 
-      const rand = Math.random();
+      const rand = seededRandom();
       if (t < 0.3) {
-        color.setHSL(0.6 + Math.random() * 0.05, 0.1 + Math.random() * 0.1, 0.9 + Math.random() * 0.08);
+        color.setHSL(0.6 + seededRandom() * 0.05, 0.1 + seededRandom() * 0.1, 0.9 + seededRandom() * 0.08);
       } else if (rand < 0.5) {
-        color.setHSL(0.58 + Math.random() * 0.06, 0.25 + Math.random() * 0.15, 0.78 + Math.random() * 0.12);
+        color.setHSL(0.58 + seededRandom() * 0.06, 0.25 + seededRandom() * 0.15, 0.78 + seededRandom() * 0.12);
       } else if (rand < 0.8) {
-        color.setHSL(0.58 + Math.random() * 0.08, 0.45 + Math.random() * 0.2, 0.65 + Math.random() * 0.15);
+        color.setHSL(0.58 + seededRandom() * 0.08, 0.45 + seededRandom() * 0.2, 0.65 + seededRandom() * 0.15);
       } else {
-        color.setHSL(0.08 + Math.random() * 0.04, 0.4 + Math.random() * 0.2, 0.6 + Math.random() * 0.15);
+        color.setHSL(0.08 + seededRandom() * 0.04, 0.4 + seededRandom() * 0.2, 0.6 + seededRandom() * 0.15);
       }
 
       colors[i3] = color.r;
@@ -184,35 +198,42 @@ export const AndromedaGalaxy = ({ visualScale }: AndromedaGalaxyProps) => {
   }, [gs]);
 
   const haloGeoFull = useMemo(() => {
-    const count = 35000; // Increased from 15000
+    const count = 35000;
     const maxRadius = ANDROMEDA.diskRadius * gs * 0.5;
     const maxHeight = ANDROMEDA.diskRadius * gs * 0.15;
     const positions = new Float32Array(count * 3);
     const colors = new Float32Array(count * 3);
     const color = new THREE.Color();
 
+    // Seeded random for consistent geometry
+    let seed = 34567;
+    const seededRandom = () => {
+      seed = (seed * 1103515245 + 12345) & 0x7fffffff;
+      return seed / 0x7fffffff;
+    };
+
     for (let i = 0; i < count; i++) {
       const i3 = i * 3;
-      const t = Math.pow(Math.random(), 2);
+      const t = Math.pow(seededRandom(), 2);
       const innerRadius = maxRadius * 0.05;
       const radius = innerRadius + t * (maxRadius - innerRadius);
-      const angle = Math.random() * Math.PI * 2;
+      const angle = seededRandom() * Math.PI * 2;
 
       positions[i3] = Math.cos(angle) * radius;
       positions[i3 + 2] = Math.sin(angle) * radius;
 
       const rt = radius / maxRadius;
       const heightScale = 0.3 + rt * 0.7;
-      const y = (Math.random() * 2 - 1) * maxHeight * heightScale;
+      const y = (seededRandom() * 2 - 1) * maxHeight * heightScale;
       positions[i3 + 1] = y;
 
-      const rand = Math.random();
+      const rand = seededRandom();
       if (rand < 0.5) {
-        color.setHSL(0.12 + Math.random() * 0.06, 0.3 + Math.random() * 0.2, 0.65 + Math.random() * 0.15);
+        color.setHSL(0.12 + seededRandom() * 0.06, 0.3 + seededRandom() * 0.2, 0.65 + seededRandom() * 0.15);
       } else if (rand < 0.8) {
-        color.setHSL(0.08 + Math.random() * 0.05, 0.5 + Math.random() * 0.2, 0.55 + Math.random() * 0.15);
+        color.setHSL(0.08 + seededRandom() * 0.05, 0.5 + seededRandom() * 0.2, 0.55 + seededRandom() * 0.15);
       } else {
-        color.setHSL(0.58 + Math.random() * 0.08, 0.6 + Math.random() * 0.2, 0.55 + Math.random() * 0.15);
+        color.setHSL(0.58 + seededRandom() * 0.08, 0.6 + seededRandom() * 0.2, 0.55 + seededRandom() * 0.15);
       }
 
       colors[i3] = color.r;

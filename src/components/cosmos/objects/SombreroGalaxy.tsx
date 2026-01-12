@@ -52,7 +52,7 @@ export const SombreroGalaxy = ({ visualScale }: SombreroGalaxyProps) => {
 
   // Full resolution geometries - reduced particle counts for better performance
   const bulgeGeoFull = useMemo(() => {
-    const count = 500000; // Restored to full count
+    const count = 800000; // Significantly increased for much denser core
     const positions = new Float32Array(count * 3);
     const colors = new Float32Array(count * 3);
     const color = new THREE.Color();
