@@ -47,9 +47,9 @@ export const getParticleMultiplier = (level: LODLevel): number => {
     case 'high':
       return 1.0;
     case 'medium':
-      return 0.3;
+      return 0.5;  // 50% of particles
     case 'low':
-      return 0.08;
+      return 0.25; // 25% of particles (was 8%, too aggressive)
     case 'sprite':
       return 0; // No particles, use sprite only
   }
