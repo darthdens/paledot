@@ -96,7 +96,7 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
   const starsGeoFull = useMemo(() => {
     const { branches, spinTurns } = MILKY_WAY;
     const maxRadius = MILKY_WAY.diskRadius * gs;
-    const starCount = 400000;
+    const starCount = 650000; // Increased from 400000
 
     const positions = new Float32Array(starCount * 3);
     const colors = new Float32Array(starCount * 3);
@@ -177,7 +177,7 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
   }, [gs]);
   
   const coreGeoFull = useMemo(() => {
-    const coreCount = 130000;
+    const coreCount = 200000; // Increased from 130000
     const positions = new Float32Array(coreCount * 3);
     const colors = new Float32Array(coreCount * 3);
     const color = new THREE.Color();
@@ -216,7 +216,7 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
   }, [gs]);
 
   const volumeGeoFull = useMemo(() => {
-    const count = 100000;
+    const count = 160000; // Increased from 100000
     const maxRadius = MILKY_WAY.diskRadius * gs;
     const positions = new Float32Array(count * 3);
     const colors = new Float32Array(count * 3);
@@ -273,7 +273,7 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
   }, [gs]);
 
   const haloGeoFull = useMemo(() => {
-    const count = 25000;
+    const count = 50000; // Increased from 25000
     const maxRadius = MILKY_WAY.diskRadius * gs * 0.65;
     const maxHeight = MILKY_WAY.diskRadius * gs * 0.2;
     const positions = new Float32Array(count * 3);

@@ -55,7 +55,7 @@ export const TriangulumGalaxy = ({ visualScale }: TriangulumGalaxyProps) => {
   const starsGeoFull = useMemo(() => {
     const { branches, spinTurns } = TRIANGULUM;
     const maxRadius = TRIANGULUM.diskRadius * gs;
-    const starCount = 300000;
+    const starCount = 500000; // Increased from 300000
 
     const positions = new Float32Array(starCount * 3);
     const colors = new Float32Array(starCount * 3);
@@ -147,7 +147,7 @@ export const TriangulumGalaxy = ({ visualScale }: TriangulumGalaxyProps) => {
   }, [gs]);
 
   const coreGeoFull = useMemo(() => {
-    const coreCount = 60000;
+    const coreCount = 120000; // Increased from 60000
     const positions = new Float32Array(coreCount * 3);
     const colors = new Float32Array(coreCount * 3);
     const color = new THREE.Color();
@@ -186,7 +186,7 @@ export const TriangulumGalaxy = ({ visualScale }: TriangulumGalaxyProps) => {
   }, [gs]);
 
   const haloGeoFull = useMemo(() => {
-    const haloCount = 30000;
+    const haloCount = 60000; // Increased from 30000
     const positions = new Float32Array(haloCount * 3);
     const colors = new Float32Array(haloCount * 3);
     const color = new THREE.Color();
