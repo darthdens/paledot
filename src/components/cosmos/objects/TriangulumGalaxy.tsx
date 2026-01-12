@@ -1,4 +1,4 @@
-import { useRef, useMemo, useCallback, useState } from 'react';
+import { useRef, useMemo, useCallback } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import { UNITS } from '../types';
@@ -26,20 +26,12 @@ const TRIANGULUM = {
   distanceFromMilkyWay: 2.73e6,
 };
 
-// LOD thresholds tuned to preserve visuals up close, while allowing a *visible* low LOD far away.
-// (We also clamp away "sprite" so stars never disappear entirely.)
-const TRIANGULUM_LOD_CONFIG = {
-  highThresholdMultiplier: 10,
-  mediumThresholdMultiplier: 40,
-  lowThresholdMultiplier: 120,
-} as const;
-
 export const TriangulumGalaxy = ({ visualScale }: TriangulumGalaxyProps) => {
   const groupRef = useRef<THREE.Group>(null);
   const centerWorldPos = useRef(new THREE.Vector3());
   const frameCountRef = useRef(0);
   const lodControllerRef = useRef(new LODController('high'));
-  const [lodLevel, setLodLevel] = useState<LODLevel>('high');
+  const currentLODRef = useRef<LODLevel>('high');
 
   const { camera } = useThree();
   const setObjectWorldPosition = useCosmosStore((s) => s.setObjectWorldPosition);
@@ -71,15 +63,10 @@ export const TriangulumGalaxy = ({ visualScale }: TriangulumGalaxyProps) => {
   const dotTexture = useMemo(() => getDotTexture(), []);
   const glowTexture = useMemo(() => getTriangulumGlowTexture(), []);
 
-  // Full particle counts (visual reference)
-  const starsCountFull = 500000;
-  const coreCountFull = 120000;
-  const haloCountFull = 60000;
-
   const starsGeoFull = useMemo(() => {
     const { branches, spinTurns } = TRIANGULUM;
     const maxRadius = TRIANGULUM.diskRadius * gs;
-    const starCount = starsCountFull;
+    const starCount = 500000;
 
     const positions = new Float32Array(starCount * 3);
     const colors = new Float32Array(starCount * 3);
@@ -179,7 +166,7 @@ export const TriangulumGalaxy = ({ visualScale }: TriangulumGalaxyProps) => {
   }, [gs]);
 
   const coreGeoFull = useMemo(() => {
-    const coreCount = coreCountFull;
+    const coreCount = 120000;
     const positions = new Float32Array(coreCount * 3);
     const colors = new Float32Array(coreCount * 3);
     const color = new THREE.Color();
@@ -225,7 +212,7 @@ export const TriangulumGalaxy = ({ visualScale }: TriangulumGalaxyProps) => {
   }, [gs]);
 
   const haloGeoFull = useMemo(() => {
-    const haloCount = haloCountFull;
+    const haloCount = 60000;
     const positions = new Float32Array(haloCount * 3);
     const colors = new Float32Array(haloCount * 3);
     const color = new THREE.Color();
@@ -267,20 +254,16 @@ export const TriangulumGalaxy = ({ visualScale }: TriangulumGalaxyProps) => {
     return geo;
   }, [gs]);
 
-  // LOD geometries
-  const starsGeoMedium = useMemo(() => createLODGeometry(starsGeoFull, 'medium'), [starsGeoFull]);
-  const coreGeoMedium = useMemo(() => createLODGeometry(coreGeoFull, 'medium'), [coreGeoFull]);
-  const haloGeoMedium = useMemo(() => createLODGeometry(haloGeoFull, 'medium'), [haloGeoFull]);
-
+  // Create LOD geometries
   const starsGeoLow = useMemo(() => createLODGeometry(starsGeoFull, 'low'), [starsGeoFull]);
   const coreGeoLow = useMemo(() => createLODGeometry(coreGeoFull, 'low'), [coreGeoFull]);
   const haloGeoLow = useMemo(() => createLODGeometry(haloGeoFull, 'low'), [haloGeoFull]);
 
-  const starsGeo = lodLevel === 'high' ? starsGeoFull : lodLevel === 'medium' ? starsGeoMedium : starsGeoLow;
-  const coreGeo = lodLevel === 'high' ? coreGeoFull : lodLevel === 'medium' ? coreGeoMedium : coreGeoLow;
-  const haloGeo = lodLevel === 'high' ? haloGeoFull : lodLevel === 'medium' ? haloGeoMedium : haloGeoLow;
-
-  const sizeMultiplier = getParticleSizeMultiplier(lodLevel);
+  // Select geometry based on LOD (same pattern as WhirlpoolGalaxy)
+  const starsGeo = currentLODRef.current === 'high' || currentLODRef.current === 'medium' ? starsGeoFull : starsGeoLow;
+  const coreGeo = currentLODRef.current === 'high' || currentLODRef.current === 'medium' ? coreGeoFull : coreGeoLow;
+  const haloGeo = currentLODRef.current === 'high' || currentLODRef.current === 'medium' ? haloGeoFull : haloGeoLow;
+  const sizeMultiplier = getParticleSizeMultiplier(currentLODRef.current);
 
   useFrame(() => {
     frameCountRef.current++;
@@ -289,15 +272,11 @@ export const TriangulumGalaxy = ({ visualScale }: TriangulumGalaxyProps) => {
 
     groupRef.current.getWorldPosition(centerWorldPos.current);
 
-    // State-based LOD (re-render only on actual LOD changes)
-    const { level, changed } = lodControllerRef.current.update(camera.position, centerWorldPos.current, {
+    // Update LOD based on camera distance (ref-based, no re-render)
+    const { level } = lodControllerRef.current.update(camera.position, centerWorldPos.current, {
       galaxyDiameter: diskR * 2,
-      ...TRIANGULUM_LOD_CONFIG,
     });
-
-    // Never let this galaxy drop to "sprite" (zero particles) — keep at least LOW.
-    const nextLevel: LODLevel = level === 'sprite' ? 'low' : level;
-    if (changed && nextLevel !== lodLevel) setLodLevel(nextLevel);
+    currentLODRef.current = level;
 
     // Throttle position updates
     if (lodControllerRef.current.shouldUpdateThisFrame()) {
