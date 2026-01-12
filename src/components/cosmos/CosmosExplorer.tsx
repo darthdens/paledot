@@ -127,37 +127,37 @@ export const CosmosExplorer = () => {
           {/* Galactic ambient glow (screen-space background; always present) */}
           <GalaxySkyGlow />
 
-          {/* Everything that should rotate together at galaxy scale */}
+          {/* Milky Way Galaxy + orbital ring are anchored to the galactic center (they should NOT orbit around the Sun) */}
+          <GalaxyFadeWrapper>
+            <MilkyWayGalaxy visualScale={UNIFIED_SCALE} showYouAreHere={true} />
+            {showOrbits && <GalacticOrbitRing visualScale={UNIFIED_SCALE} />}
+          </GalaxyFadeWrapper>
+
+          {/* Everything that should orbit around the Milky Way center */}
           <GalaxyRotator visualScale={UNIFIED_SCALE}>
             {/* Star particles - custom (dimmer than drei Stars) */}
             <DimStars radius={1e8} depth={1e7} count={9000} factor={2} saturation={0} fade speed={0.3} opacity={0.08} blending="normal" />
 
-            {/* Galaxy content with smooth fade transition */}
-            <GalaxyFadeWrapper>
-              {/* Milky Way Galaxy */}
-              <MilkyWayGalaxy visualScale={UNIFIED_SCALE} showYouAreHere={true} />
-            </GalaxyFadeWrapper>
-            
             {/* Sun's light - moves with the solar system */}
-            <pointLight 
-              position={[0, 0, 0]} 
-              intensity={5} 
-              distance={0} 
-              decay={1} 
-              color="#FFF8E7" 
+            <pointLight
+              position={[0, 0, 0]}
+              intensity={5}
+              distance={0}
+              decay={1}
+              color="#FFF8E7"
             />
-            
+
             {/* Track solar system position for camera following at all scales */}
             <SolarSystemTracker />
-            
+
             {/* Solar System Content - hidden when in Proxima's system */}
-            <SolarSystemContent 
+            <SolarSystemContent
               visualScale={UNIFIED_SCALE}
               showOrbits={showOrbits}
               showTrails={showTrails}
               selectedObject={selectedObject}
             />
-            
+
             {/* Distant stars - tiny point-like spheres (very dim) */}
             {stars.map((star) => {
               const starPos = star.position.map((p) => p * UNIFIED_SCALE) as [number, number, number];
@@ -170,25 +170,18 @@ export const CosmosExplorer = () => {
                 </WorldPositionTracker>
               );
             })}
-            
+
             {/* Proxima Centauri system - hidden when in Sun's system */}
             <ProximaSystem visualScale={UNIFIED_SCALE} />
 
-            {/* Nebulae and galactic orbit ring - fade with galaxy */}
+            {/* Nebulae - fade with galaxy */}
             <GalaxyFadeWrapper>
               {nebulae.map((nebula) => (
-                <Nebula
-                  key={nebula.id}
-                  nebula={nebula}
-                  visualScale={UNIFIED_SCALE}
-                />
+                <Nebula key={nebula.id} nebula={nebula} visualScale={UNIFIED_SCALE} />
               ))}
-              
-              {/* Galactic orbit ring - hidden when in any star system */}
-              {showOrbits && <GalacticOrbitRing visualScale={UNIFIED_SCALE} />}
             </GalaxyFadeWrapper>
           </GalaxyRotator>
-          
+
           {/* Distant Galaxies - OUTSIDE the GalaxyRotator so they don't rotate with Milky Way */}
           {/* Hidden when within solar system or Proxima Centauri system for performance */}
           {showDistantGalaxies && (
