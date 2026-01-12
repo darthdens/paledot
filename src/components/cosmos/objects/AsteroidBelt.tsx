@@ -15,13 +15,14 @@ interface AsteroidBeltProps {
 const generateAsteroids = (count: number, innerRadius: number, outerRadius: number) => {
   const positions = new Float32Array(count * 3);
   const sizes = new Float32Array(count);
+  const radii = new Float32Array(count);     // Store orbital radii
+  const heights = new Float32Array(count);   // Store Y positions (inclination)
   const speeds = new Float32Array(count);
   const phases = new Float32Array(count);
   const colors = new Float32Array(count * 3);
   
   // Asteroid belt is concentrated between 2.2 and 3.2 AU
   // with gaps (Kirkwood gaps) at certain resonances
-  const beltCenter = (innerRadius + outerRadius) / 2;
   const beltWidth = outerRadius - innerRadius;
   
   for (let i = 0; i < count; i++) {
@@ -54,6 +55,10 @@ const generateAsteroids = (count: number, innerRadius: number, outerRadius: numb
     positions[i * 3 + 1] = y;
     positions[i * 3 + 2] = Math.sin(angle) * radius;
     
+    // Store radius and height for animation
+    radii[i] = radius;
+    heights[i] = y;
+    
     // Most asteroids are small, few are larger (power law distribution)
     const sizeRand = Math.random();
     if (sizeRand > 0.995) {
@@ -67,8 +72,10 @@ const generateAsteroids = (count: number, innerRadius: number, outerRadius: numb
     }
     
     // Orbital speed varies with distance (Kepler's laws - farther = slower)
+    // Average asteroid belt orbital period is ~4-5 years
+    // Speed scaled to be visible: ~0.02 rad/s at 1x speed for inner belt
     const normalizedRadius = (radius - innerRadius) / beltWidth;
-    speeds[i] = 0.0003 / Math.sqrt(1 + normalizedRadius);
+    speeds[i] = 0.02 / Math.sqrt(1 + normalizedRadius * 2);
     
     // Random starting phase
     phases[i] = angle;
@@ -95,7 +102,7 @@ const generateAsteroids = (count: number, innerRadius: number, outerRadius: numb
     }
   }
   
-  return { positions, sizes, speeds, phases, colors };
+  return { positions, sizes, radii, heights, speeds, phases, colors };
 };
 
 export const AsteroidBelt = ({ 
@@ -175,18 +182,15 @@ export const AsteroidBelt = ({
     simTime.current += delta * timeSpeed;
     
     const positions = pointsRef.current.geometry.attributes.position.array as Float32Array;
-    const { speeds, phases } = asteroidData;
+    const { radii, heights, speeds, phases } = asteroidData;
     
-    // Update positions based on orbital motion
+    // Update positions based on orbital motion using stored radii
     for (let i = 0; i < count; i++) {
-      const x = positions[i * 3];
-      const z = positions[i * 3 + 2];
-      const radius = Math.sqrt(x * x + z * z);
-      
-      // Current angle + rotation based on speed and time
+      const radius = radii[i];
       const currentAngle = phases[i] + simTime.current * speeds[i];
       
       positions[i * 3] = Math.cos(currentAngle) * radius;
+      positions[i * 3 + 1] = heights[i]; // Keep original height
       positions[i * 3 + 2] = Math.sin(currentAngle) * radius;
     }
     
