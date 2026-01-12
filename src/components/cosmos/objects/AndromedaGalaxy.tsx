@@ -1,4 +1,4 @@
-import { useRef, useMemo, useCallback } from 'react';
+import { useRef, useMemo, useCallback, useState } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import { UNITS } from '../types';
@@ -6,7 +6,6 @@ import { useCosmosStore } from '../store/useCosmosStore';
 import { getObjectById } from '../data/celestialObjects';
 import { DifferentialRotationPoints } from './DifferentialRotationMaterial';
 import { getDotTexture, getAndromedaGlowTexture } from '../utils/sharedTextures';
-import { LODController } from '../utils/lodManager';
 
 interface AndromedaGalaxyProps {
   visualScale: number;
@@ -21,16 +20,27 @@ const ANDROMEDA = {
   distanceFromMilkyWay: 2.537e6,
 };
 
+// LOD thresholds - only reduce particles when VERY far away
+// Close = full detail, Far = reduced for performance
+type LODLevel = 'full' | 'reduced';
+
 export const AndromedaGalaxy = ({ visualScale }: AndromedaGalaxyProps) => {
   const groupRef = useRef<THREE.Group>(null);
   const centerWorldPos = useRef(new THREE.Vector3());
-  const lodControllerRef = useRef(new LODController('high'));
+  const stableFramesRef = useRef(0);
+  
+  // React state for LOD - triggers re-render when changed
+  const [lodLevel, setLodLevel] = useState<LODLevel>('full');
 
   const { camera } = useThree();
   const setObjectWorldPosition = useCosmosStore((s) => s.setObjectWorldPosition);
   const setSelectedObject = useCosmosStore((s) => s.setSelectedObject);
 
   const gs = UNITS.KM_PER_LY * visualScale;
+  const diskR = ANDROMEDA.diskRadius * gs;
+  
+  // LOD threshold: only reduce when camera is 20x the galaxy diameter away
+  const lodThreshold = diskR * 2 * 20;
   
   const andromedaPosition = useMemo<[number, number, number]>(() => [
     ANDROMEDA.distanceFromMilkyWay * gs * 0.7,
@@ -49,11 +59,18 @@ export const AndromedaGalaxy = ({ visualScale }: AndromedaGalaxyProps) => {
   const dotTexture = useMemo(() => getDotTexture(), []);
   const glowTexture = useMemo(() => getAndromedaGlowTexture(), []);
 
-  // Full resolution geometries - use seeded random for consistent generation
-  const starsGeoFull = useMemo(() => {
+  // Particle counts based on LOD - full is exactly the same as before
+  const starCount = lodLevel === 'full' ? 700000 : 250000;
+  const coreCount = lodLevel === 'full' ? 180000 : 60000;
+  const haloCount = lodLevel === 'full' ? 35000 : 12000;
+  
+  // Size multiplier - larger particles when reduced to maintain visual density
+  const sizeMultiplier = lodLevel === 'full' ? 1 : 1.8;
+
+  // Stars geometry - EXACTLY the same logic as before
+  const starsGeo = useMemo(() => {
     const { branches, spinTurns } = ANDROMEDA;
     const maxRadius = ANDROMEDA.diskRadius * gs;
-    const starCount = 700000;
 
     const positions = new Float32Array(starCount * 3);
     const colors = new Float32Array(starCount * 3);
@@ -145,10 +162,10 @@ export const AndromedaGalaxy = ({ visualScale }: AndromedaGalaxyProps) => {
     geo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
     geo.boundingSphere = new THREE.Sphere(new THREE.Vector3(0, 0, 0), Infinity);
     return geo;
-  }, [gs]);
+  }, [gs, starCount]);
 
-  const coreGeoFull = useMemo(() => {
-    const coreCount = 180000;
+  // Core geometry - EXACTLY the same logic as before
+  const coreGeo = useMemo(() => {
     const positions = new Float32Array(coreCount * 3);
     const colors = new Float32Array(coreCount * 3);
     const color = new THREE.Color();
@@ -193,14 +210,14 @@ export const AndromedaGalaxy = ({ visualScale }: AndromedaGalaxyProps) => {
     geo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
     geo.boundingSphere = new THREE.Sphere(new THREE.Vector3(0, 0, 0), Infinity);
     return geo;
-  }, [gs]);
+  }, [gs, coreCount]);
 
-  const haloGeoFull = useMemo(() => {
-    const count = 35000;
+  // Halo geometry - EXACTLY the same logic as before
+  const haloGeo = useMemo(() => {
     const maxRadius = ANDROMEDA.diskRadius * gs * 0.5;
     const maxHeight = ANDROMEDA.diskRadius * gs * 0.15;
-    const positions = new Float32Array(count * 3);
-    const colors = new Float32Array(count * 3);
+    const positions = new Float32Array(haloCount * 3);
+    const colors = new Float32Array(haloCount * 3);
     const color = new THREE.Color();
 
     // Seeded random for consistent geometry
@@ -210,7 +227,7 @@ export const AndromedaGalaxy = ({ visualScale }: AndromedaGalaxyProps) => {
       return seed / 0x7fffffff;
     };
 
-    for (let i = 0; i < count; i++) {
+    for (let i = 0; i < haloCount; i++) {
       const i3 = i * 3;
       const t = Math.pow(seededRandom(), 2);
       const innerRadius = maxRadius * 0.05;
@@ -244,38 +261,35 @@ export const AndromedaGalaxy = ({ visualScale }: AndromedaGalaxyProps) => {
     geo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
     geo.boundingSphere = new THREE.Sphere(new THREE.Vector3(0, 0, 0), Infinity);
     return geo;
-  }, [gs]);
-
-  // Always use full resolution geometries - LOD was causing particle count issues
-  const starsGeo = starsGeoFull;
-  const coreGeo = coreGeoFull;
-  const haloGeo = haloGeoFull;
-  const sizeMultiplier = 1;
+  }, [gs, haloCount]);
 
   useFrame(() => {
     if (groupRef.current) {
       groupRef.current.getWorldPosition(centerWorldPos.current);
       
-      const diskR = ANDROMEDA.diskRadius * gs;
-      lodControllerRef.current.update(
-        camera.position,
-        centerWorldPos.current,
-        { galaxyDiameter: diskR * 2 }
-      );
-
-      // Throttle position updates
-      if (lodControllerRef.current.shouldUpdateThisFrame()) {
-        const pos: [number, number, number] = [
-          centerWorldPos.current.x,
-          centerWorldPos.current.y,
-          centerWorldPos.current.z,
-        ];
-        setObjectWorldPosition('andromeda', pos);
+      const distance = camera.position.distanceTo(centerWorldPos.current);
+      const newLevel: LODLevel = distance > lodThreshold ? 'reduced' : 'full';
+      
+      // Hysteresis: require 60 stable frames before switching LOD
+      if (newLevel !== lodLevel) {
+        stableFramesRef.current++;
+        if (stableFramesRef.current >= 60) {
+          setLodLevel(newLevel);
+          stableFramesRef.current = 0;
+        }
+      } else {
+        stableFramesRef.current = 0;
       }
+
+      // Update world position for other systems
+      const pos: [number, number, number] = [
+        centerWorldPos.current.x,
+        centerWorldPos.current.y,
+        centerWorldPos.current.z,
+      ];
+      setObjectWorldPosition('andromeda', pos);
     }
   });
-
-  const diskR = ANDROMEDA.diskRadius * gs;
 
   return (
     <group ref={groupRef} position={andromedaPosition}>
