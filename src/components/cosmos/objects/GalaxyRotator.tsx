@@ -55,7 +55,10 @@ export const GalaxyRotator = ({ children, visualScale }: GalaxyRotatorProps) => 
     if (currentScale === 'localGroup' || currentScale === 'universe') return;
 
     // Base rotation speed * timeSpeed multiplier
-    currentRotation.current += delta * 0.00625 * timeSpeed;
+    // NEGATIVE rotation to match the Milky Way's internal star rotation direction
+    // (DifferentialRotationMaterial rotates stars with positive angle, which is counter-clockwise;
+    // we need the solar system to move in the same direction relative to the galaxy center)
+    currentRotation.current -= delta * 0.00625 * timeSpeed;
     pivotRef.current.rotation.y = currentRotation.current;
   });
 
