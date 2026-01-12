@@ -2,7 +2,7 @@
 import { useRef, useMemo } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
-import { useCosmosStore } from '../store/useCosmosStore';
+import { useCosmosStore } from '../store/useCosmosStore'; import { UNITS } from '../types';
 
 interface AsteroidBeltProps {
   innerRadius: number;  // Mars orbit ~228M km
@@ -12,7 +12,7 @@ interface AsteroidBeltProps {
 }
 
 // Pre-generate asteroid data for performance
-const generateAsteroids = (count: number, innerRadius: number, outerRadius: number) => {
+const generateAsteroids = (count: number, innerRadius: number, outerRadius: number, distanceScale: number) => {
   const positions = new Float32Array(count * 3);
   const sizes = new Float32Array(count);
   const radii = new Float32Array(count);     // Store orbital radii
@@ -71,15 +71,15 @@ const generateAsteroids = (count: number, innerRadius: number, outerRadius: numb
       sizes[i] = 10 + Math.random() * 40; // Small asteroids (most common)
     }
     
-    // Orbital speed using same formula as planets for consistency
-    // orbital period in days based on Kepler's third law: T ∝ a^1.5
-    // Ceres at 2.77 AU has period of 1680 days
-    // For asteroid at radius r (scaled), estimate period proportionally
-    // Angular velocity = (2π * 365.25) / (periodDays * 240)
-    const auRadius = radius / 2.77 * 2.77; // Approximate AU based on scale
-    const periodDays = 1680 * Math.pow(radius / 2.77, 1.5); // Kepler's law relative to Ceres
+    // Orbital speed consistent with TexturedPlanet (real periods + same time scale)
+    // Convert scene units back to AU using the same distance scale (visualScale)
+    const radiusKm = distanceScale > 0 ? radius / distanceScale : radius;
+    const semiMajorAxisAu = Math.max(radiusKm / UNITS.KM_PER_AU, 1e-6);
+    // Kepler's third law (assuming 1 solar mass): periodYears = a^(3/2)
+    const periodDays = 365.25 * Math.pow(semiMajorAxisAu, 1.5);
+    // Scale: 1 Earth year (365.25 days) = 240 seconds at 1x speed
     speeds[i] = (2 * Math.PI * 365.25) / (periodDays * 240);
-    
+
     // Random starting phase
     phases[i] = angle;
     
@@ -119,8 +119,8 @@ export const AsteroidBelt = ({
   const simTime = useRef(0);
   
   const asteroidData = useMemo(() => 
-    generateAsteroids(count, innerRadius, outerRadius),
-    [count, innerRadius, outerRadius]
+    generateAsteroids(count, innerRadius, outerRadius, scale),
+    [count, innerRadius, outerRadius, scale]
   );
   
   // Create geometry with positions and colors
