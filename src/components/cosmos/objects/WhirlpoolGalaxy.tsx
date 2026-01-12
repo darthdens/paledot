@@ -76,7 +76,7 @@ export const WhirlpoolGalaxy = ({ visualScale }: WhirlpoolGalaxyProps) => {
   const starsGeoFull = useMemo(() => {
     const { branches, spinTurns } = WHIRLPOOL;
     const maxRadius = WHIRLPOOL.diskRadius * gs;
-    const starCount = 400000; // Reduced from 600000
+    const starCount = 600000; // Restored to full count
 
     const positions = new Float32Array(starCount * 3);
     const colors = new Float32Array(starCount * 3);
@@ -181,7 +181,7 @@ export const WhirlpoolGalaxy = ({ visualScale }: WhirlpoolGalaxyProps) => {
   }, [gs]);
 
   const coreGeoFull = useMemo(() => {
-    const coreCount = 50000; // Reduced from 75000
+    const coreCount = 100000; // Increased for density
     const positions = new Float32Array(coreCount * 3);
     const colors = new Float32Array(coreCount * 3);
     const color = new THREE.Color();
@@ -222,7 +222,7 @@ export const WhirlpoolGalaxy = ({ visualScale }: WhirlpoolGalaxyProps) => {
   }, [gs]);
 
   const haloGeoFull = useMemo(() => {
-    const haloCount = 15000; // Reduced from 25000
+    const haloCount = 40000; // Increased for density
     const positions = new Float32Array(haloCount * 3);
     const colors = new Float32Array(haloCount * 3);
     const color = new THREE.Color();
@@ -262,7 +262,7 @@ export const WhirlpoolGalaxy = ({ visualScale }: WhirlpoolGalaxyProps) => {
   const dustLanesGeoFull = useMemo(() => {
     const { branches, spinTurns } = WHIRLPOOL;
     const maxRadius = WHIRLPOOL.diskRadius * gs;
-    const dustCount = 80000; // Reduced from 120000
+    const dustCount = 150000; // Increased for detail
 
     const positions = new Float32Array(dustCount * 3);
     const colors = new Float32Array(dustCount * 3);
@@ -312,7 +312,7 @@ export const WhirlpoolGalaxy = ({ visualScale }: WhirlpoolGalaxyProps) => {
   }, [gs]);
 
   const companionGeo = useMemo(() => {
-    const count = 30000; // Reduced from 50000
+    const count = 60000; // Increased for density
     const positions = new Float32Array(count * 3);
     const colors = new Float32Array(count * 3);
     const color = new THREE.Color();
