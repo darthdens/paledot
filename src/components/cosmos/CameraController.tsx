@@ -9,6 +9,7 @@ const UNIFIED_SCALE = 0.001;
 export const CameraController = () => {
   const { camera, controls } = useThree();
   const selectedObject = useCosmosStore((state) => state.selectedObject);
+  const currentScale = useCosmosStore((state) => state.currentScale);
   const isFollowing = useCosmosStore((state) => state.isFollowing);
   const tourCameraTarget = useCosmosStore((state) => state.tourCameraTarget);
   const isTouring = useCosmosStore((state) => state.isTouring);
