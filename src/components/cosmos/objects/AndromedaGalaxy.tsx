@@ -1,4 +1,4 @@
-import { useRef, useMemo, useCallback, useState } from 'react';
+import { useRef, useMemo, useCallback } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import { UNITS } from '../types';
@@ -20,17 +20,9 @@ const ANDROMEDA = {
   distanceFromMilkyWay: 2.537e6,
 };
 
-// LOD thresholds - only reduce particles when VERY far away
-// Close = full detail, Far = reduced for performance
-type LODLevel = 'full' | 'reduced';
-
 export const AndromedaGalaxy = ({ visualScale }: AndromedaGalaxyProps) => {
   const groupRef = useRef<THREE.Group>(null);
   const centerWorldPos = useRef(new THREE.Vector3());
-  const stableFramesRef = useRef(0);
-  
-  // React state for LOD - triggers re-render when changed
-  const [lodLevel, setLodLevel] = useState<LODLevel>('full');
 
   const { camera } = useThree();
   const setObjectWorldPosition = useCosmosStore((s) => s.setObjectWorldPosition);
@@ -38,9 +30,6 @@ export const AndromedaGalaxy = ({ visualScale }: AndromedaGalaxyProps) => {
 
   const gs = UNITS.KM_PER_LY * visualScale;
   const diskR = ANDROMEDA.diskRadius * gs;
-  
-  // LOD threshold: only reduce when camera is 20x the galaxy diameter away
-  const lodThreshold = diskR * 2 * 20;
   
   const andromedaPosition = useMemo<[number, number, number]>(() => [
     ANDROMEDA.distanceFromMilkyWay * gs * 0.7,
@@ -59,13 +48,10 @@ export const AndromedaGalaxy = ({ visualScale }: AndromedaGalaxyProps) => {
   const dotTexture = useMemo(() => getDotTexture(), []);
   const glowTexture = useMemo(() => getAndromedaGlowTexture(), []);
 
-  // Particle counts based on LOD - full is exactly the same as before
-  const starCount = lodLevel === 'full' ? 700000 : 250000;
-  const coreCount = lodLevel === 'full' ? 180000 : 60000;
-  const haloCount = lodLevel === 'full' ? 35000 : 12000;
-  
-  // Size multiplier - larger particles when reduced to maintain visual density
-  const sizeMultiplier = lodLevel === 'full' ? 1 : 1.8;
+  // Fixed full particle counts - no LOD reduction
+  const starCount = 700000;
+  const coreCount = 180000;
+  const haloCount = 35000;
 
   // Stars geometry - EXACTLY the same logic as before
   const starsGeo = useMemo(() => {
@@ -266,22 +252,7 @@ export const AndromedaGalaxy = ({ visualScale }: AndromedaGalaxyProps) => {
   useFrame(() => {
     if (groupRef.current) {
       groupRef.current.getWorldPosition(centerWorldPos.current);
-      
-      const distance = camera.position.distanceTo(centerWorldPos.current);
-      const newLevel: LODLevel = distance > lodThreshold ? 'reduced' : 'full';
-      
-      // Hysteresis: require 60 stable frames before switching LOD
-      if (newLevel !== lodLevel) {
-        stableFramesRef.current++;
-        if (stableFramesRef.current >= 60) {
-          setLodLevel(newLevel);
-          stableFramesRef.current = 0;
-        }
-      } else {
-        stableFramesRef.current = 0;
-      }
 
-      // Update world position for other systems
       const pos: [number, number, number] = [
         centerWorldPos.current.x,
         centerWorldPos.current.y,
@@ -296,7 +267,7 @@ export const AndromedaGalaxy = ({ visualScale }: AndromedaGalaxyProps) => {
       <group rotation={[ANDROMEDA.inclination, 0.3, 0]}>
         <DifferentialRotationPoints
           geometry={haloGeo}
-          size={gs * 40 * sizeMultiplier}
+          size={gs * 40}
           map={dotTexture}
           opacity={0.3}
           maxRadius={diskR * 1.2}
@@ -306,7 +277,7 @@ export const AndromedaGalaxy = ({ visualScale }: AndromedaGalaxyProps) => {
 
         <DifferentialRotationPoints
           geometry={starsGeo}
-          size={gs * 55 * sizeMultiplier}
+          size={gs * 55}
           map={dotTexture}
           opacity={0.85}
           maxRadius={diskR}
@@ -316,7 +287,7 @@ export const AndromedaGalaxy = ({ visualScale }: AndromedaGalaxyProps) => {
 
         <DifferentialRotationPoints
           geometry={coreGeo}
-          size={gs * 90 * sizeMultiplier}
+          size={gs * 90}
           map={dotTexture}
           opacity={0.95}
           maxRadius={ANDROMEDA.bulgeRadius * gs}
