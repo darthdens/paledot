@@ -6,12 +6,7 @@ import { useCosmosStore } from '../store/useCosmosStore';
 import { getObjectById } from '../data/celestialObjects';
 import { DifferentialRotationPoints } from './DifferentialRotationMaterial';
 import { getDotTexture, getAndromedaGlowTexture } from '../utils/sharedTextures';
-import {
-  LODController,
-  createLODGeometry,
-  getParticleSizeMultiplier,
-  type LODLevel,
-} from '../utils/lodManager';
+import { LODController } from '../utils/lodManager';
 
 interface AndromedaGalaxyProps {
   visualScale: number;
@@ -31,7 +26,6 @@ export const AndromedaGalaxy = ({ visualScale }: AndromedaGalaxyProps) => {
   const centerWorldPos = useRef(new THREE.Vector3());
   const frameCountRef = useRef(0);
   const lodControllerRef = useRef(new LODController('high'));
-  const currentLODRef = useRef<LODLevel>('high');
 
   const { camera } = useThree();
   const setObjectWorldPosition = useCosmosStore((s) => s.setObjectWorldPosition);
@@ -261,16 +255,11 @@ export const AndromedaGalaxy = ({ visualScale }: AndromedaGalaxyProps) => {
     return geo;
   }, [gs]);
 
-  // Create LOD geometries
-  const starsGeoLow = useMemo(() => createLODGeometry(starsGeoFull, 'low'), [starsGeoFull]);
-  const coreGeoLow = useMemo(() => createLODGeometry(coreGeoFull, 'low'), [coreGeoFull]);
-  const haloGeoLow = useMemo(() => createLODGeometry(haloGeoFull, 'low'), [haloGeoFull]);
-
-  // Select geometry based on LOD (same pattern as WhirlpoolGalaxy)
-  const starsGeo = currentLODRef.current === 'high' || currentLODRef.current === 'medium' ? starsGeoFull : starsGeoLow;
-  const coreGeo = currentLODRef.current === 'high' || currentLODRef.current === 'medium' ? coreGeoFull : coreGeoLow;
-  const haloGeo = currentLODRef.current === 'high' || currentLODRef.current === 'medium' ? haloGeoFull : haloGeoLow;
-  const sizeMultiplier = getParticleSizeMultiplier(currentLODRef.current);
+  // Keep full star counts always (like Whirlpool's perceived behavior in the UI)
+  const starsGeo = starsGeoFull;
+  const coreGeo = coreGeoFull;
+  const haloGeo = haloGeoFull;
+  const sizeMultiplier = 1.0;
 
   useFrame(() => {
     frameCountRef.current++;
@@ -279,11 +268,10 @@ export const AndromedaGalaxy = ({ visualScale }: AndromedaGalaxyProps) => {
 
     groupRef.current.getWorldPosition(centerWorldPos.current);
 
-    // Update LOD based on camera distance (ref-based, no re-render)
-    const { level } = lodControllerRef.current.update(camera.position, centerWorldPos.current, {
+    // Update LOD based on camera distance (used only for throttling; no visual reduction)
+    lodControllerRef.current.update(camera.position, centerWorldPos.current, {
       galaxyDiameter: diskR * 2,
     });
-    currentLODRef.current = level;
 
     // Throttle position updates
     if (lodControllerRef.current.shouldUpdateThisFrame()) {
