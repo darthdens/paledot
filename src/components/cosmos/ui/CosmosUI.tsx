@@ -2,13 +2,13 @@ import { useLanguage } from '@/i18n/LanguageContext';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { HelpCircle, Compass, Maximize, Minimize, CircleDot, CircleOff, Clock, Timer, TimerOff, Orbit, Activity, Home, Scaling, BarChart3 } from 'lucide-react';
+import { HelpCircle, Compass, Maximize, Minimize, CircleDot, CircleOff, Clock, Timer, TimerOff, Orbit, Activity, Home, Scaling, BarChart3, Info } from 'lucide-react';
 import { useCosmosStore } from '../store/useCosmosStore';
 import { useFullscreenStore } from '../store/useFullscreenStore';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { ObjectSearch } from './ObjectSearch';
 import { useIsMobile } from '@/hooks/use-mobile';
-
+import { AboutModal } from './AboutModal';
 const translations = {
   en: {
     startTour: 'Start Guided Tour',
@@ -50,6 +50,7 @@ const translations = {
     fullscreen: 'Fullscreen',
     exitFullscreen: 'Exit fullscreen',
     help: 'Help & Controls',
+    about: 'About',
   },
   fr: {
     startTour: 'Commencer la Visite',
@@ -91,6 +92,7 @@ const translations = {
     fullscreen: 'Plein écran',
     exitFullscreen: 'Quitter plein écran',
     help: 'Aide & Contrôles',
+    about: 'À propos',
   },
 };
 
@@ -126,6 +128,7 @@ export const CosmosUI = () => {
   } = useCosmosStore();
   const { isFullscreen, setIsFullscreen } = useFullscreenStore();
   const [showTimeSlider, setShowTimeSlider] = useState(false);
+  const [showAbout, setShowAbout] = useState(false);
 
   const handleQuickJumpClick = () => {
     const el = quickJumpButtonRef.current;
@@ -654,7 +657,7 @@ export const CosmosUI = () => {
             {/* Divider */}
             <div className="w-px h-6 bg-white/20 mx-0.5" />
               
-            {/* Help */}
+            {/* Help & About */}
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button size="icon" variant="ghost" onClick={() => setShowControlHints(true)} className="h-8 w-8 sm:h-9 sm:w-9 bg-blue-500/30 hover:bg-blue-500/50 backdrop-blur-sm text-white">
@@ -663,6 +666,17 @@ export const CosmosUI = () => {
               </TooltipTrigger>
               <TooltipContent variant="dark" side="bottom">
                 {t.help}
+              </TooltipContent>
+            </Tooltip>
+
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button size="icon" variant="ghost" onClick={() => setShowAbout(true)} className="h-8 w-8 sm:h-9 sm:w-9 bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white">
+                  <Info className="w-4 h-4 sm:w-5 sm:h-5" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent variant="dark" side="bottom">
+                {t.about}
               </TooltipContent>
             </Tooltip>
           </div>
@@ -714,7 +728,8 @@ export const CosmosUI = () => {
         </div>
       )}
 
-      {/* Bottom tour button removed - users can access tour from the help (?) button */}
+      {/* About modal */}
+      <AboutModal open={showAbout} onOpenChange={setShowAbout} />
     </>
   );
 };
