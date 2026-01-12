@@ -26,12 +26,12 @@ const TRIANGULUM = {
   distanceFromMilkyWay: 2.73e6,
 };
 
-// Keep visuals stable: only ever switch between HIGH (full) and MEDIUM (50% + larger points).
+// LOD thresholds tuned to preserve visuals up close, while allowing a *visible* low LOD far away.
+// (We also clamp away "sprite" so stars never disappear entirely.)
 const TRIANGULUM_LOD_CONFIG = {
-  highThresholdMultiplier: 25,
-  // Push medium threshold very far so we never drop to low/sprite for this galaxy.
-  mediumThresholdMultiplier: 1000000,
-  lowThresholdMultiplier: 1000000,
+  highThresholdMultiplier: 10,
+  mediumThresholdMultiplier: 40,
+  lowThresholdMultiplier: 120,
 } as const;
 
 export const TriangulumGalaxy = ({ visualScale }: TriangulumGalaxyProps) => {
@@ -267,16 +267,20 @@ export const TriangulumGalaxy = ({ visualScale }: TriangulumGalaxyProps) => {
     return geo;
   }, [gs]);
 
-  // LOD geometries (medium = 50% sampled)
+  // LOD geometries
   const starsGeoMedium = useMemo(() => createLODGeometry(starsGeoFull, 'medium'), [starsGeoFull]);
   const coreGeoMedium = useMemo(() => createLODGeometry(coreGeoFull, 'medium'), [coreGeoFull]);
   const haloGeoMedium = useMemo(() => createLODGeometry(haloGeoFull, 'medium'), [haloGeoFull]);
 
-  const starsGeo = lodLevel === 'high' ? starsGeoFull : starsGeoMedium;
-  const coreGeo = lodLevel === 'high' ? coreGeoFull : coreGeoMedium;
-  const haloGeo = lodLevel === 'high' ? haloGeoFull : haloGeoMedium;
+  const starsGeoLow = useMemo(() => createLODGeometry(starsGeoFull, 'low'), [starsGeoFull]);
+  const coreGeoLow = useMemo(() => createLODGeometry(coreGeoFull, 'low'), [coreGeoFull]);
+  const haloGeoLow = useMemo(() => createLODGeometry(haloGeoFull, 'low'), [haloGeoFull]);
 
-  const sizeMultiplier = getParticleSizeMultiplier(lodLevel === 'sprite' ? 'low' : lodLevel);
+  const starsGeo = lodLevel === 'high' ? starsGeoFull : lodLevel === 'medium' ? starsGeoMedium : starsGeoLow;
+  const coreGeo = lodLevel === 'high' ? coreGeoFull : lodLevel === 'medium' ? coreGeoMedium : coreGeoLow;
+  const haloGeo = lodLevel === 'high' ? haloGeoFull : lodLevel === 'medium' ? haloGeoMedium : haloGeoLow;
+
+  const sizeMultiplier = getParticleSizeMultiplier(lodLevel);
 
   useFrame(() => {
     frameCountRef.current++;
@@ -291,8 +295,8 @@ export const TriangulumGalaxy = ({ visualScale }: TriangulumGalaxyProps) => {
       ...TRIANGULUM_LOD_CONFIG,
     });
 
-    // Force a minimum threshold (never go below medium to preserve visuals)
-    const nextLevel: LODLevel = level === 'high' ? 'high' : 'medium';
+    // Never let this galaxy drop to "sprite" (zero particles) — keep at least LOW.
+    const nextLevel: LODLevel = level === 'sprite' ? 'low' : level;
     if (changed && nextLevel !== lodLevel) setLodLevel(nextLevel);
 
     // Throttle position updates
