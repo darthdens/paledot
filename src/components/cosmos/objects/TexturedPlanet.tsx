@@ -80,6 +80,7 @@ const PLANET_VISUALS: Record<string, {
     emissiveIntensity: 2.5,
     roughness: 1,
     metalness: 0,
+    tilt: 7.25,                  // Sun's axial tilt relative to ecliptic
     surfaceDetail: 'sun',
   },
   mercury: {
