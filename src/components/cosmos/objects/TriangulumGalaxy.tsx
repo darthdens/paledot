@@ -1,4 +1,4 @@
-import { useRef, useMemo, useCallback } from 'react';
+import { useRef, useMemo, useCallback, useState } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import { UNITS } from '../types';
@@ -6,6 +6,12 @@ import { useCosmosStore } from '../store/useCosmosStore';
 import { getObjectById } from '../data/celestialObjects';
 import { DifferentialRotationPoints } from './DifferentialRotationMaterial';
 import { getDotTexture, getTriangulumGlowTexture } from '../utils/sharedTextures';
+import {
+  LODController,
+  createLODGeometry,
+  getParticleSizeMultiplier,
+  type LODLevel,
+} from '../utils/lodManager';
 
 interface TriangulumGalaxyProps {
   visualScale: number;
@@ -20,9 +26,20 @@ const TRIANGULUM = {
   distanceFromMilkyWay: 2.73e6,
 };
 
+// Keep visuals stable: only ever switch between HIGH (full) and MEDIUM (50% + larger points).
+const TRIANGULUM_LOD_CONFIG = {
+  highThresholdMultiplier: 25,
+  // Push medium threshold very far so we never drop to low/sprite for this galaxy.
+  mediumThresholdMultiplier: 1000000,
+  lowThresholdMultiplier: 1000000,
+} as const;
+
 export const TriangulumGalaxy = ({ visualScale }: TriangulumGalaxyProps) => {
   const groupRef = useRef<THREE.Group>(null);
   const centerWorldPos = useRef(new THREE.Vector3());
+  const frameCountRef = useRef(0);
+  const lodControllerRef = useRef(new LODController('high'));
+  const [lodLevel, setLodLevel] = useState<LODLevel>('high');
 
   const { camera } = useThree();
   const setObjectWorldPosition = useCosmosStore((s) => s.setObjectWorldPosition);
@@ -30,33 +47,39 @@ export const TriangulumGalaxy = ({ visualScale }: TriangulumGalaxyProps) => {
 
   const gs = UNITS.KM_PER_LY * visualScale;
   const diskR = TRIANGULUM.diskRadius * gs;
-  
-  const triangulumPosition = useMemo<[number, number, number]>(() => [
-    -TRIANGULUM.distanceFromMilkyWay * gs * 0.5,
-    TRIANGULUM.distanceFromMilkyWay * gs * 0.1,
-    TRIANGULUM.distanceFromMilkyWay * gs * 0.85,
-  ], [gs]);
+
+  const triangulumPosition = useMemo<[number, number, number]>(
+    () => [
+      -TRIANGULUM.distanceFromMilkyWay * gs * 0.5,
+      TRIANGULUM.distanceFromMilkyWay * gs * 0.1,
+      TRIANGULUM.distanceFromMilkyWay * gs * 0.85,
+    ],
+    [gs]
+  );
 
   const triangulumObject = useMemo(() => getObjectById('triangulum'), []);
 
-  const handleClick = useCallback((e: { stopPropagation: () => void }) => {
-    e.stopPropagation();
-    if (triangulumObject) setSelectedObject(triangulumObject);
-  }, [triangulumObject, setSelectedObject]);
+  const handleClick = useCallback(
+    (e: { stopPropagation: () => void }) => {
+      e.stopPropagation();
+      if (triangulumObject) setSelectedObject(triangulumObject);
+    },
+    [triangulumObject, setSelectedObject]
+  );
 
   // Use shared textures
   const dotTexture = useMemo(() => getDotTexture(), []);
   const glowTexture = useMemo(() => getTriangulumGlowTexture(), []);
 
-  // Fixed full particle counts - no LOD reduction
-  const starCount = 500000;
-  const coreCount = 120000;
-  const haloCount = 60000;
+  // Full particle counts (visual reference)
+  const starsCountFull = 500000;
+  const coreCountFull = 120000;
+  const haloCountFull = 60000;
 
-  // Stars geometry - EXACTLY the same logic as before
-  const starsGeo = useMemo(() => {
+  const starsGeoFull = useMemo(() => {
     const { branches, spinTurns } = TRIANGULUM;
     const maxRadius = TRIANGULUM.diskRadius * gs;
+    const starCount = starsCountFull;
 
     const positions = new Float32Array(starCount * 3);
     const colors = new Float32Array(starCount * 3);
@@ -76,7 +99,7 @@ export const TriangulumGalaxy = ({ visualScale }: TriangulumGalaxyProps) => {
       const i3 = i * 3;
       const u = seededRandom();
       const t = -Math.log(1 - u * denom) / k;
-      
+
       const innerRadius = maxRadius * 0.02;
       const radius = innerRadius + t * (maxRadius - innerRadius);
       const rt = radius / maxRadius;
@@ -97,7 +120,8 @@ export const TriangulumGalaxy = ({ visualScale }: TriangulumGalaxyProps) => {
 
       positions[i3] = Math.cos(angle) * finalRadius;
       const thickness = 0.015 + rt * 0.04;
-      const yJitter = (seededRandom() + seededRandom() + seededRandom() - 1.5) * maxRadius * thickness;
+      const yJitter =
+        (seededRandom() + seededRandom() + seededRandom() - 1.5) * maxRadius * thickness;
       positions[i3 + 1] = yJitter;
       positions[i3 + 2] = Math.sin(angle) * finalRadius;
 
@@ -152,10 +176,10 @@ export const TriangulumGalaxy = ({ visualScale }: TriangulumGalaxyProps) => {
     geo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
     geo.boundingSphere = new THREE.Sphere(new THREE.Vector3(0, 0, 0), Infinity);
     return geo;
-  }, [gs, starCount]);
+  }, [gs]);
 
-  // Core geometry - EXACTLY the same logic as before
-  const coreGeo = useMemo(() => {
+  const coreGeoFull = useMemo(() => {
+    const coreCount = coreCountFull;
     const positions = new Float32Array(coreCount * 3);
     const colors = new Float32Array(coreCount * 3);
     const color = new THREE.Color();
@@ -198,10 +222,10 @@ export const TriangulumGalaxy = ({ visualScale }: TriangulumGalaxyProps) => {
     geo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
     geo.boundingSphere = new THREE.Sphere(new THREE.Vector3(0, 0, 0), Infinity);
     return geo;
-  }, [gs, coreCount]);
+  }, [gs]);
 
-  // Halo geometry - EXACTLY the same logic as before
-  const haloGeo = useMemo(() => {
+  const haloGeoFull = useMemo(() => {
+    const haloCount = haloCountFull;
     const positions = new Float32Array(haloCount * 3);
     const colors = new Float32Array(haloCount * 3);
     const color = new THREE.Color();
@@ -241,12 +265,38 @@ export const TriangulumGalaxy = ({ visualScale }: TriangulumGalaxyProps) => {
     geo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
     geo.boundingSphere = new THREE.Sphere(new THREE.Vector3(0, 0, 0), Infinity);
     return geo;
-  }, [gs, haloCount]);
+  }, [gs]);
+
+  // LOD geometries (medium = 50% sampled)
+  const starsGeoMedium = useMemo(() => createLODGeometry(starsGeoFull, 'medium'), [starsGeoFull]);
+  const coreGeoMedium = useMemo(() => createLODGeometry(coreGeoFull, 'medium'), [coreGeoFull]);
+  const haloGeoMedium = useMemo(() => createLODGeometry(haloGeoFull, 'medium'), [haloGeoFull]);
+
+  const starsGeo = lodLevel === 'high' ? starsGeoFull : starsGeoMedium;
+  const coreGeo = lodLevel === 'high' ? coreGeoFull : coreGeoMedium;
+  const haloGeo = lodLevel === 'high' ? haloGeoFull : haloGeoMedium;
+
+  const sizeMultiplier = getParticleSizeMultiplier(lodLevel === 'sprite' ? 'low' : lodLevel);
 
   useFrame(() => {
-    if (groupRef.current) {
-      groupRef.current.getWorldPosition(centerWorldPos.current);
+    frameCountRef.current++;
 
+    if (!groupRef.current) return;
+
+    groupRef.current.getWorldPosition(centerWorldPos.current);
+
+    // State-based LOD (re-render only on actual LOD changes)
+    const { level, changed } = lodControllerRef.current.update(camera.position, centerWorldPos.current, {
+      galaxyDiameter: diskR * 2,
+      ...TRIANGULUM_LOD_CONFIG,
+    });
+
+    // Force a minimum threshold (never go below medium to preserve visuals)
+    const nextLevel: LODLevel = level === 'high' ? 'high' : 'medium';
+    if (changed && nextLevel !== lodLevel) setLodLevel(nextLevel);
+
+    // Throttle position updates
+    if (lodControllerRef.current.shouldUpdateThisFrame()) {
       const pos: [number, number, number] = [
         centerWorldPos.current.x,
         centerWorldPos.current.y,
@@ -262,7 +312,7 @@ export const TriangulumGalaxy = ({ visualScale }: TriangulumGalaxyProps) => {
         <DifferentialRotationPoints
           key="triangulum-halo"
           geometry={haloGeo}
-          size={gs * 35}
+          size={gs * 35 * sizeMultiplier}
           map={dotTexture}
           opacity={0.25}
           maxRadius={diskR * 1.3}
@@ -273,7 +323,7 @@ export const TriangulumGalaxy = ({ visualScale }: TriangulumGalaxyProps) => {
         <DifferentialRotationPoints
           key="triangulum-arms"
           geometry={starsGeo}
-          size={gs * 50}
+          size={gs * 50 * sizeMultiplier}
           map={dotTexture}
           opacity={0.85}
           maxRadius={diskR}
@@ -284,7 +334,7 @@ export const TriangulumGalaxy = ({ visualScale }: TriangulumGalaxyProps) => {
         <DifferentialRotationPoints
           key="triangulum-core"
           geometry={coreGeo}
-          size={gs * 75}
+          size={gs * 75 * sizeMultiplier}
           map={dotTexture}
           opacity={0.95}
           maxRadius={TRIANGULUM.bulgeRadius * gs}
@@ -296,7 +346,7 @@ export const TriangulumGalaxy = ({ visualScale }: TriangulumGalaxyProps) => {
           <spriteMaterial
             map={glowTexture}
             transparent
-            opacity={0.20}
+            opacity={0.2}
             blending={THREE.AdditiveBlending}
             depthWrite={false}
             depthTest={false}
@@ -307,11 +357,16 @@ export const TriangulumGalaxy = ({ visualScale }: TriangulumGalaxyProps) => {
       </group>
 
       {/* Click target - reduced complexity */}
-      <mesh 
+      <mesh
         onClick={handleClick}
         onPointerDown={handleClick}
-        onPointerOver={(e) => { e.stopPropagation(); document.body.style.cursor = 'pointer'; }}
-        onPointerOut={() => { document.body.style.cursor = 'auto'; }}
+        onPointerOver={(e) => {
+          e.stopPropagation();
+          document.body.style.cursor = 'pointer';
+        }}
+        onPointerOut={() => {
+          document.body.style.cursor = 'auto';
+        }}
       >
         <sphereGeometry args={[diskR * 1.2, 8, 8]} />
         <meshBasicMaterial transparent opacity={0} depthWrite={false} />
