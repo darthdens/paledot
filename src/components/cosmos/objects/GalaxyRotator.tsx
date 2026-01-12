@@ -1,7 +1,4 @@
-import * as THREE from 'three';
-import { useMemo, useRef } from 'react';
-import { useFrame } from '@react-three/fiber';
-import { useCosmosStore } from '../store/useCosmosStore';
+import { useMemo, type ReactNode } from 'react';
 import { UNITS } from '../types';
 
 // Milky Way parameters - must match MilkyWayGalaxy.tsx / GalacticOrbitRing.tsx
@@ -11,26 +8,18 @@ const MILKY_WAY = {
 };
 
 interface GalaxyRotatorProps {
-  children: React.ReactNode;
+  children: ReactNode;
   visualScale: number;
 }
 
 /**
- * Rotates children (solar system, nearby stars, nebulae, etc.) around the Milky Way's galactic center.
- *
- * IMPORTANT: Do NOT place the MilkyWayGalaxy itself inside this rotator.
- * Otherwise the entire Milky Way will appear to orbit around the Sun.
+ * Wrapper that positions children relative to the Milky Way's galactic center.
+ * 
+ * Galactic rotation is disabled to simplify navigation and camera tracking.
+ * The Milky Way's internal star rotation (via DifferentialRotationMaterial)
+ * still provides visual motion at galaxy scale.
  */
 export const GalaxyRotator = ({ children, visualScale }: GalaxyRotatorProps) => {
-  const pivotRef = useRef<THREE.Group>(null);
-  const currentRotation = useRef(0);
-
-  const timeSpeed = useCosmosStore((state) => state.timeSpeed);
-  const isInStarSystem = useCosmosStore((state) => state.isInStarSystem);
-  const currentScale = useCosmosStore((state) => state.currentScale);
-  const isFollowing = useCosmosStore((state) => state.isFollowing);
-  const selectedObject = useCosmosStore((state) => state.selectedObject);
-  const isTouring = useCosmosStore((state) => state.isTouring);
 
   // Galactic center (in scene units). The Sun/solar system starts at world origin.
   // We rotate around this point by using a pivot group at the galactic center.
@@ -48,31 +37,13 @@ export const GalaxyRotator = ({ children, visualScale }: GalaxyRotatorProps) => 
     [galacticCenter]
   );
 
-  useFrame((_, delta) => {
-    if (!pivotRef.current) return;
-
-    // Don't rotate when inside a star system
-    if (isInStarSystem) return;
-
-    // Don't rotate when following/flying to an object (camera needs stable target)
-    if (isFollowing && selectedObject) return;
-
-    // Don't rotate during guided tour
-    if (isTouring) return;
-
-    // Don't rotate when viewing the galaxy from far outside
-    if (currentScale === 'localGroup' || currentScale === 'universe') return;
-
-    // Base rotation speed * timeSpeed multiplier
-    // NEGATIVE rotation to match the Milky Way's internal star rotation direction
-    // (DifferentialRotationMaterial rotates stars with positive angle, which is counter-clockwise;
-    // we need the solar system to move in the same direction relative to the galaxy center)
-    currentRotation.current -= delta * 0.00625 * timeSpeed;
-    pivotRef.current.rotation.y = currentRotation.current;
-  });
+  // Galactic rotation is disabled - objects stay fixed relative to the Milky Way
+  // This simplifies navigation and camera tracking
+  // The Milky Way's internal star rotation (via DifferentialRotationMaterial) 
+  // still provides visual motion at galaxy scale
 
   return (
-    <group ref={pivotRef} position={galacticCenter}>
+    <group position={galacticCenter}>
       <group position={inverseCenter}>{children}</group>
     </group>
   );
