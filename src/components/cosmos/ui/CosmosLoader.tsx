@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo, useCallback } from 'react';
 import * as THREE from 'three';
 import { useLanguage } from '@/i18n/LanguageContext';
 import { useCosmosStore, EXPECTED_GEOMETRIES } from '../store/useCosmosStore';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 // Import all textures that need to be preloaded
 import earthDayTexture from '@/assets/textures/earth-day.jpg';
@@ -73,6 +74,7 @@ export const CosmosLoader = ({
   onDismissed,
 }: CosmosLoaderProps) => {
   const { language } = useLanguage();
+  const isMobile = useIsMobile();
   const [fadeOut, setFadeOut] = useState(false);
   const [stage, setStage] = useState<LoadingStage>('textures');
   const [simulatedProgress, setSimulatedProgress] = useState(0);
@@ -390,11 +392,16 @@ export const CosmosLoader = ({
           </div>
         </div>
 
-        {/* Tip */}
+        {/* Tip - different for desktop vs mobile/tablet */}
         <p className="text-xs text-white/30 text-center max-w-xs mt-2">
-          {language === 'fr' 
-            ? 'Astuce: Utilisez la molette pour zoomer à travers les échelles de l\'univers'
-            : 'Tip: Use scroll wheel to zoom through the scales of the universe'}
+          {isMobile
+            ? (language === 'fr' 
+                ? 'Astuce: Pincez pour zoomer à travers les échelles de l\'univers'
+                : 'Tip: Pinch to zoom through the scales of the universe')
+            : (language === 'fr' 
+                ? 'Astuce: Utilisez la molette pour zoomer à travers les échelles de l\'univers'
+                : 'Tip: Use scroll wheel to zoom through the scales of the universe')
+          }
         </p>
       </div>
     </div>
