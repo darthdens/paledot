@@ -117,10 +117,16 @@ export const CameraController = () => {
       // For nebulae (category 'nebulae'), size is in light-years, need larger distance
       // For stars, size is in km but they're very far - need appropriate viewing distance
       // For galaxies, size is in light-years - view from closer for better visibility
+      // For deepSpace, positions and sizes are in light-years
       // For other objects, size is in km
       let visualSize = selectedObject.size * UNIFIED_SCALE;
       
-      if (selectedObject.category === 'nebulae') {
+      if (selectedObject.category === 'deepSpace') {
+        // Deep space objects: positions and sizes are in light-years
+        visualSize = selectedObject.size * UNITS.KM_PER_LY * UNIFIED_SCALE;
+        // View from appropriate distance based on structure size
+        flyToDistance.current = Math.max(visualSize * 0.3, 1e10);
+      } else if (selectedObject.category === 'nebulae') {
         // Nebula size is in light-years - use a much larger viewing distance
         visualSize = selectedObject.size * UNITS.KM_PER_LY * UNIFIED_SCALE;
         flyToDistance.current = Math.max(visualSize * 3, 1e9);
@@ -138,7 +144,7 @@ export const CameraController = () => {
       }
 
       // Use live world position when available (for moving solar-system bodies and stars)
-      // Positions in celestialObjects: solarSystem in km, stars/nebulae in light-years, galaxies in km
+      // Positions in celestialObjects: solarSystem in km, stars/nebulae in light-years, galaxies in km, deepSpace in light-years
       const fallbackPos: [number, number, number] =
         selectedObject.category === 'solarSystem' || selectedObject.category === 'galaxies'
           ? [
@@ -146,9 +152,9 @@ export const CameraController = () => {
               selectedObject.position[1] * UNIFIED_SCALE,
               selectedObject.position[2] * UNIFIED_SCALE,
             ]
-          : selectedObject.category === 'nebulae' || selectedObject.category === 'stars'
+          : selectedObject.category === 'nebulae' || selectedObject.category === 'stars' || selectedObject.category === 'deepSpace'
             ? [
-                // Stars and nebulae positions are in light-years
+                // Stars, nebulae, and deepSpace positions are in light-years
                 selectedObject.position[0] * UNITS.KM_PER_LY * UNIFIED_SCALE,
                 selectedObject.position[1] * UNITS.KM_PER_LY * UNIFIED_SCALE,
                 selectedObject.position[2] * UNITS.KM_PER_LY * UNIFIED_SCALE,

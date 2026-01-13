@@ -616,15 +616,16 @@ export const celestialObjects: CelestialObject[] = [
 
   // ==================== DEEP SPACE ====================
   // These are scale-based viewpoints, positioned to show our existing visual elements
+  // Positions are in scene units (already scaled) for direct camera positioning
   
-  // LOCAL GROUP - view centered to see Milky Way, Andromeda, Triangulum together
+  // LOCAL GROUP (~10 Mly) - view centered to see Milky Way, Andromeda, Triangulum together
   {
     id: 'local-group',
     name: { en: 'Local Group', fr: 'Groupe Local' },
     type: 'cluster',
-    // Position to view our existing galaxies (MW at origin, Andromeda, Triangulum)
-    position: [1.5e6 * UNITS.KM_PER_LY, 0.5e6 * UNITS.KM_PER_LY, 1e6 * UNITS.KM_PER_LY],
-    size: 10e6 * UNITS.KM_PER_LY, // ~10 Mly diameter
+    // Position in light-years (same as stars/nebulae) - camera will fly here to see our galaxies
+    position: [1.5e6, 0.5e6, 1.5e6], // 1.5 Mly offset to view MW, Andromeda, Triangulum
+    size: 10e6, // ~10 Mly diameter in light-years
     color: '#87ceeb',
     distanceFromEarth: 0, // We're in it
     distanceUnit: 'Mly',
@@ -635,14 +636,32 @@ export const celestialObjects: CelestialObject[] = [
     },
   },
   
-  // LANIAKEA SUPERCLUSTER - our home supercluster view (shows cosmic web structure)
+  // VIRGO SUPERCLUSTER (~110 Mly) - contains Local Group and many clusters
+  {
+    id: 'virgo-supercluster',
+    name: { en: 'Virgo Supercluster', fr: 'Superamas de la Vierge' },
+    type: 'supercluster',
+    // Position in light-years to view the larger structure
+    position: [30e6, 10e6, 20e6], // 30 Mly offset
+    size: 110e6, // ~110 Mly diameter
+    color: '#ffb347',
+    distanceFromEarth: 0, // We're in it
+    distanceUnit: 'Mly',
+    category: 'deepSpace',
+    facts: {
+      en: ['Contains ~100 galaxy groups/clusters', '~110 million light-years across', 'Part of Laniakea'],
+      fr: ['Contient ~100 groupes/amas', '~110 millions d\'années-lumière', 'Fait partie de Laniakea'],
+    },
+  },
+  
+  // LANIAKEA SUPERCLUSTER (~520 Mly) - our home supercluster view (shows cosmic web structure)
   {
     id: 'laniakea',
     name: { en: 'Laniakea Supercluster', fr: 'Superamas Laniakea' },
     type: 'supercluster',
-    // Position to view the cosmic web filaments we created
-    position: [250e6 * UNITS.KM_PER_LY, 50e6 * UNITS.KM_PER_LY, 100e6 * UNITS.KM_PER_LY],
-    size: 520e6 * UNITS.KM_PER_LY, // ~520 Mly diameter
+    // Position in light-years to view the cosmic web filaments
+    position: [150e6, 50e6, 100e6], // 150 Mly offset
+    size: 520e6, // ~520 Mly diameter
     color: '#9370db',
     distanceFromEarth: 0, // We're in it
     distanceUnit: 'Mly',
@@ -653,14 +672,14 @@ export const celestialObjects: CelestialObject[] = [
     },
   },
   
-  // OBSERVABLE UNIVERSE - maximum zoom out to see cosmic web
+  // OBSERVABLE UNIVERSE (~93 Bly diameter) - maximum zoom out to see cosmic web
   {
     id: 'observable-universe',
     name: { en: 'Observable Universe', fr: 'Univers Observable' },
     type: 'other',
-    // Far enough to see the full cosmic web structure
-    position: [20e9 * UNITS.KM_PER_LY, 10e9 * UNITS.KM_PER_LY, 15e9 * UNITS.KM_PER_LY],
-    size: 93e9 * UNITS.KM_PER_LY,
+    // Position in light-years - far enough to see the full cosmic web structure
+    position: [5e9, 3e9, 4e9], // 5 Bly offset
+    size: 93e9, // 93 Bly diameter
     color: '#dc143c',
     distanceFromEarth: 46.5,
     distanceUnit: 'Bly',
@@ -707,6 +726,7 @@ export const quickJumpCategories = [
     name: { en: 'Deep Space', fr: 'Espace Profond' },
     locations: [
       'local-group',
+      'virgo-supercluster',
       'laniakea',
       'observable-universe'
     ],
