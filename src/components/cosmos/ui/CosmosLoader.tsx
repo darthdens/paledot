@@ -350,6 +350,11 @@ export const CosmosLoader = ({
         <h2 className="text-xl font-serif text-white/90 tracking-wide">
           {language === 'fr' ? 'Chargement du Cosmos' : 'Loading the Cosmos'}
         </h2>
+        <p className="text-xs text-white/40 -mt-6 italic">
+          {language === 'fr' 
+            ? 'Je sais, c\'est long... mais ça vaut le coup, promis !'
+            : 'I know it\'s long... but trust me, it\'s worth the wait!'}
+        </p>
 
         {/* Stage indicator */}
         <div className="flex items-center gap-3 text-xs text-white/50">
