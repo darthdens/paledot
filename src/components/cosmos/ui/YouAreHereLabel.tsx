@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useLanguage } from '@/i18n/LanguageContext';
 import { useCosmosStore } from '../store/useCosmosStore';
-import { Globe, Sun, Star, Sparkles, Circle, Infinity, ChevronDown, ChevronUp, Orbit, Network, Waypoints } from 'lucide-react';
+import { Globe, Sun, Star, Sparkles, Circle, Infinity, ChevronDown, ChevronUp, Hexagon, Waypoints } from 'lucide-react';
 import type { ScaleLevel } from '../types';
 
 // Which cosmic structure each galaxy belongs to
@@ -202,9 +202,9 @@ export const YouAreHereLabel = () => {
       case 'localGroup':
         return <Circle className="w-4 h-4" />;
       case 'virgoSupercluster':
-        return <Orbit className="w-4 h-4" />;
+        return <Hexagon className="w-4 h-4" />;
       case 'laniakea':
-        return <Network className="w-4 h-4" />;
+        return <Waypoints className="w-4 h-4" />;
       case 'universe':
         return <Infinity className="w-4 h-4" />;
       default:
