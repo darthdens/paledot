@@ -7,6 +7,7 @@ import { getObjectById } from '../data/celestialObjects';
 import { DifferentialRotationPoints } from './DifferentialRotationMaterial';
 import { getDotTexture, getTriangulumGlowTexture } from '../utils/sharedTextures';
 import { LODController, getParticleSizeMultiplier, createLODGeometry, type LODLevel } from '../utils/lodManager';
+import { useGeometryReady } from '../hooks/useGeometryReady';
 
 interface TriangulumGalaxyProps {
   visualScale: number;
@@ -228,6 +229,9 @@ export const TriangulumGalaxy = ({ visualScale }: TriangulumGalaxyProps) => {
   const starsGeoLow = useMemo(() => createLODGeometry(starsGeoFull, 'low'), [starsGeoFull]);
   const coreGeoLow = useMemo(() => createLODGeometry(coreGeoFull, 'low'), [coreGeoFull]);
   const haloGeoLow = useMemo(() => createLODGeometry(haloGeoFull, 'low'), [haloGeoFull]);
+
+  // Signal geometry ready for loading screen
+  useGeometryReady('triangulum', !!starsGeoFull);
 
   // Select geometry based on LOD
   const starsGeo = lodLevel === 'high' || lodLevel === 'medium' ? starsGeoFull : starsGeoLow;

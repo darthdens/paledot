@@ -20,7 +20,30 @@ interface TourCameraTarget {
   offset?: [number, number, number];
 }
 
+// Loading progress tracking - which major components have signaled readiness
+export interface LoadingProgress {
+  texturesLoaded: number;
+  texturesTotal: number;
+  geometriesReady: Set<string>;
+  currentItem: string;
+}
+
+// Expected geometries that need to signal ready
+export const EXPECTED_GEOMETRIES = [
+  'milky-way',
+  'andromeda',
+  'triangulum',
+  'whirlpool',
+  'sombrero',
+  'cosmic-web',
+  'virgo-supercluster',
+  'laniakea',
+] as const;
+
 interface CosmosStore {
+  // Loading state
+  loadingProgress: LoadingProgress;
+
   // Camera state
   cameraDistance: number;
   currentScale: ScaleLevel;
@@ -70,6 +93,10 @@ interface CosmosStore {
   timeSpeed: number; // Multiplier for orbit/rotation speed (1 = normal)
 
   // Actions
+  setTextureProgress: (loaded: number, total: number, currentItem: string) => void;
+  markGeometryReady: (geometryId: string) => void;
+  resetLoadingProgress: () => void;
+  
   setCameraDistance: (distance: number) => void;
   setCurrentScale: (scale: ScaleLevel) => void;
   setTargetPosition: (position: [number, number, number]) => void;
@@ -117,9 +144,19 @@ const getScaleFromDistance = (distance: number): ScaleLevel => {
   return 'universe';
 };
 
+const createInitialLoadingProgress = (): LoadingProgress => ({
+  texturesLoaded: 0,
+  texturesTotal: 18, // Number of textures we preload
+  geometriesReady: new Set<string>(),
+  currentItem: '',
+});
+
 export const useCosmosStore = create<CosmosStore>()(
   persist(
     (set, get) => ({
+      // Loading state
+      loadingProgress: createInitialLoadingProgress(),
+
       // Initial state
       cameraDistance: 50000,
       currentScale: 'earth',
@@ -161,6 +198,31 @@ export const useCosmosStore = create<CosmosStore>()(
       timeSpeed: 1,
       
       // Actions
+      setTextureProgress: (loaded, total, currentItem) =>
+        set((state) => ({
+          loadingProgress: {
+            ...state.loadingProgress,
+            texturesLoaded: loaded,
+            texturesTotal: total,
+            currentItem,
+          },
+        })),
+
+      markGeometryReady: (geometryId) =>
+        set((state) => {
+          const newSet = new Set(state.loadingProgress.geometriesReady);
+          newSet.add(geometryId);
+          return {
+            loadingProgress: {
+              ...state.loadingProgress,
+              geometriesReady: newSet,
+              currentItem: geometryId,
+            },
+          };
+        }),
+
+      resetLoadingProgress: () =>
+        set({ loadingProgress: createInitialLoadingProgress() }),
       setCameraDistance: (distance) => {
         const scale = getScaleFromDistance(distance);
         set({ cameraDistance: distance, currentScale: scale });

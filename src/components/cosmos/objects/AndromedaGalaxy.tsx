@@ -7,6 +7,7 @@ import { getObjectById } from '../data/celestialObjects';
 import { DifferentialRotationPoints } from './DifferentialRotationMaterial';
 import { getDotTexture, getAndromedaGlowTexture } from '../utils/sharedTextures';
 import { LODController, getParticleSizeMultiplier, createLODGeometry, type LODLevel } from '../utils/lodManager';
+import { useGeometryReady } from '../hooks/useGeometryReady';
 
 interface AndromedaGalaxyProps {
   visualScale: number;
@@ -234,6 +235,9 @@ export const AndromedaGalaxy = ({ visualScale }: AndromedaGalaxyProps) => {
   const starsGeoLow = useMemo(() => createLODGeometry(starsGeoFull, 'low'), [starsGeoFull]);
   const coreGeoLow = useMemo(() => createLODGeometry(coreGeoFull, 'low'), [coreGeoFull]);
   const haloGeoLow = useMemo(() => createLODGeometry(haloGeoFull, 'low'), [haloGeoFull]);
+
+  // Signal geometry ready for loading screen
+  useGeometryReady('andromeda', !!starsGeoFull && !!coreGeoFull);
 
   // Select geometry based on LOD
   const starsGeo = lodLevel === 'high' || lodLevel === 'medium' ? starsGeoFull : starsGeoLow;

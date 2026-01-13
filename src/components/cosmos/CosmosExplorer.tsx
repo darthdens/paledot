@@ -125,10 +125,9 @@ export const CosmosExplorer = () => {
       {/* Loading screen */}
       {showLoader && (
         <CosmosLoader
-          onLoadComplete={handleTexturesReady}
+          onTexturesComplete={handleTexturesReady}
           dismiss={bootDone}
           onDismissed={() => setShowLoader(false)}
-          isFinalizing={texturesReady && !sceneReady}
         />
       )}
 

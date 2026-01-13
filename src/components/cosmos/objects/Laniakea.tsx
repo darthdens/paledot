@@ -3,6 +3,7 @@ import { useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import { UNITS } from '../types';
 import { useCosmosStore } from '../store/useCosmosStore';
+import { useGeometryReady } from '../hooks/useGeometryReady';
 
 interface LaniakeaProps {
   visualScale: number;
@@ -282,6 +283,9 @@ export const Laniakea = ({ visualScale }: LaniakeaProps) => {
       filamentMaterial: createMaterial(140000.0),
     };
   }, [mlyScale]);
+
+  // Signal geometry ready for loading screen
+  useGeometryReady('laniakea', !!superclusterGeometry);
   
   useFrame(() => {
     if (!isVisible) return;

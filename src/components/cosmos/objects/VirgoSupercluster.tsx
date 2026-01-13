@@ -3,6 +3,7 @@ import { useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import { UNITS } from '../types';
 import { useCosmosStore } from '../store/useCosmosStore';
+import { useGeometryReady } from '../hooks/useGeometryReady';
 
 interface VirgoSuperclusterProps {
   visualScale: number;
@@ -287,6 +288,9 @@ export const VirgoSupercluster = ({ visualScale }: VirgoSuperclusterProps) => {
       filamentMaterial: createMaterial(45000.0),
     };
   }, [mlyScale]);
+
+  // Signal geometry ready for loading screen
+  useGeometryReady('virgo-supercluster', !!clusterGeometry);
   
   useFrame(() => {
     if (!isVisible) return;

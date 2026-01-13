@@ -3,6 +3,7 @@ import { useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import { UNITS } from '../types';
 import { useCosmosStore } from '../store/useCosmosStore';
+import { useGeometryReady } from '../hooks/useGeometryReady';
 
 interface CosmicWebProps {
   visualScale: number;
@@ -280,6 +281,9 @@ export const CosmicWeb = ({ visualScale }: CosmicWebProps) => {
       nodeMaterial: createMaterial(1600000.0),
     };
   }, [mlyScale, universeRadiusMly]);
+
+  // Signal geometry ready for loading screen
+  useGeometryReady('cosmic-web', !!filamentGeometry && !!nodeGeometry);
   
   useFrame(() => {
     if (!isVisible) return;

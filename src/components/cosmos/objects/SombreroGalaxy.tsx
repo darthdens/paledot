@@ -7,6 +7,7 @@ import { getObjectById } from '../data/celestialObjects';
 import { DifferentialRotationPoints } from './DifferentialRotationMaterial';
 import { getDotTexture, getSombreroGlowTexture } from '../utils/sharedTextures';
 import { LODController, getParticleSizeMultiplier, createLODGeometry, type LODLevel } from '../utils/lodManager';
+import { useGeometryReady } from '../hooks/useGeometryReady';
 
 interface SombreroGalaxyProps {
   visualScale: number;
@@ -253,6 +254,9 @@ export const SombreroGalaxy = ({ visualScale }: SombreroGalaxyProps) => {
   const diskGeoLow = useMemo(() => createLODGeometry(diskGeoFull, 'low'), [diskGeoFull]);
   const dustLaneGeoLow = useMemo(() => createLODGeometry(dustLaneGeoFull, 'low'), [dustLaneGeoFull]);
   const darkGasGeoLow = useMemo(() => createLODGeometry(darkGasGeoFull, 'low'), [darkGasGeoFull]);
+
+  // Signal geometry ready for loading screen
+  useGeometryReady('sombrero', !!bulgeGeoFull);
 
   // Select geometry based on LOD
   const bulgeGeo = lodLevel === 'high' || lodLevel === 'medium' ? bulgeGeoFull : bulgeGeoLow;
