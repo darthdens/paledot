@@ -369,6 +369,9 @@ export const WhirlpoolGalaxy = ({ visualScale }: WhirlpoolGalaxyProps) => {
   const dustLanesGeo = lodLevel === 'high' || lodLevel === 'medium' ? dustLanesGeoFull : dustLanesGeoLow;
   const sizeMultiplier = getParticleSizeMultiplier(lodLevel);
 
+  // Signal geometry ready for loader
+  useGeometryReady('whirlpool', !!starsGeoFull && !!coreGeoFull && !!companionGeo);
+
   useFrame((_, delta) => {
     frameCountRef.current++;
 
