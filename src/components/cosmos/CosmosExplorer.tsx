@@ -11,6 +11,9 @@ import { TriangulumGalaxy } from './objects/TriangulumGalaxy';
 import { WhirlpoolGalaxy } from './objects/WhirlpoolGalaxy';
 import { SombreroGalaxy } from './objects/SombreroGalaxy';
 import { LocalGroupDwarfGalaxies } from './objects/LocalGroupDwarfGalaxies';
+import { VirgoSupercluster } from './objects/VirgoSupercluster';
+import { Laniakea } from './objects/Laniakea';
+import { CosmicWeb } from './objects/CosmicWeb';
 import { GalaxySkyGlow } from './objects/GalaxySkyGlow';
 import { GalaxyRotator } from './objects/GalaxyRotator';
 import { GalaxyFadeWrapper } from './GalaxyFadeWrapper';
@@ -205,6 +208,15 @@ export const CosmosExplorer = () => {
               <LocalGroupDwarfGalaxies visualScale={UNIFIED_SCALE} />
             </>
           )}
+          
+          {/* Virgo Supercluster - visible at supercluster scale (~110 Mly diameter) */}
+          <VirgoSupercluster visualScale={UNIFIED_SCALE} />
+          
+          {/* Laniakea - visible at Laniakea scale (~520 Mly diameter) */}
+          <Laniakea visualScale={UNIFIED_SCALE} />
+          
+          {/* Cosmic Web - large-scale structure with filaments */}
+          <CosmicWeb visualScale={UNIFIED_SCALE} />
           
           {/* Bloom post-processing - disabled (was making galaxies look overexposed) */}
           <EffectComposer>
