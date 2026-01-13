@@ -1,4 +1,4 @@
-import { useRef, useMemo } from 'react';
+import { useRef, useMemo, useEffect } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import { UNITS } from '../types';
@@ -179,8 +179,8 @@ export const LocalGroupDwarfGalaxies = ({ visualScale }: LocalGroupDwarfGalaxies
     return tex;
   }, []);
   
-  // Set up instance matrices
-  useMemo(() => {
+  // Set up instance matrices on mount
+  useEffect(() => {
     if (!meshRef.current) return;
     
     const mesh = meshRef.current;
@@ -202,7 +202,10 @@ export const LocalGroupDwarfGalaxies = ({ visualScale }: LocalGroupDwarfGalaxies
     });
     
     mesh.instanceMatrix.needsUpdate = true;
-  }, [galaxies]);
+    
+    // Also set instance colors here
+    mesh.instanceColor = new THREE.InstancedBufferAttribute(colors, 3);
+  }, [galaxies, colors]);
   
   // Billboard - make sprites face camera (throttled for performance)
   const frameCount = useRef(0);
@@ -241,11 +244,6 @@ export const LocalGroupDwarfGalaxies = ({ visualScale }: LocalGroupDwarfGalaxies
     mesh.instanceMatrix.needsUpdate = true;
   });
   
-  // Apply instance colors
-  useMemo(() => {
-    if (!meshRef.current) return;
-    meshRef.current.instanceColor = new THREE.InstancedBufferAttribute(colors, 3);
-  }, [colors]);
   
   return (
     <instancedMesh
