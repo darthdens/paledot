@@ -677,8 +677,8 @@ export const celestialObjects: CelestialObject[] = [
     id: 'observable-universe',
     name: { en: 'Observable Universe', fr: 'Univers Observable' },
     type: 'other',
-    // Camera viewpoint position - way out to see the full cosmic web
-    position: [30e9, 20e9, 25e9], // 30 Bly away - much farther for proper view
+    // Camera viewpoint position - very far out to see the entire cosmic web structure
+    position: [80e9, 50e9, 60e9], // 80 Bly away - maximum zoom out
     size: 93e9, // 93 Bly diameter
     color: '#dc143c',
     distanceFromEarth: 46.5,
