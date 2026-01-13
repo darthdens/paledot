@@ -615,14 +615,15 @@ export const celestialObjects: CelestialObject[] = [
   },
 
   // ==================== DEEP SPACE ====================
-  // Ordered by distance from Earth for logical scale progression
+  // These are scale-based viewpoints, positioned to show our existing visual elements
   
-  // LOCAL GROUP (~10 Mly diameter - our galaxy neighborhood)
+  // LOCAL GROUP - view centered to see Milky Way, Andromeda, Triangulum together
   {
     id: 'local-group',
     name: { en: 'Local Group', fr: 'Groupe Local' },
     type: 'cluster',
-    position: [2e6 * UNITS.KM_PER_LY, 0, 1e6 * UNITS.KM_PER_LY], // Centered roughly between MW, Andromeda, Triangulum
+    // Position to view our existing galaxies (MW at origin, Andromeda, Triangulum)
+    position: [1.5e6 * UNITS.KM_PER_LY, 0.5e6 * UNITS.KM_PER_LY, 1e6 * UNITS.KM_PER_LY],
     size: 10e6 * UNITS.KM_PER_LY, // ~10 Mly diameter
     color: '#87ceeb',
     distanceFromEarth: 0, // We're in it
@@ -634,80 +635,13 @@ export const celestialObjects: CelestialObject[] = [
     },
   },
   
-  // VIRGO CLUSTER (~54 Mly - nearest large cluster)
-  {
-    id: 'virgo-cluster',
-    name: { en: 'Virgo Cluster', fr: 'Amas de la Vierge' },
-    type: 'cluster',
-    position: [54e6 * UNITS.KM_PER_LY, 0, 20e6 * UNITS.KM_PER_LY],
-    size: 15e6 * UNITS.KM_PER_LY,
-    color: '#ffd700',
-    distanceFromEarth: 54,
-    distanceUnit: 'Mly',
-    category: 'deepSpace',
-    facts: {
-      en: ['Nearest large galaxy cluster', 'Contains 1,300-2,000 galaxies', 'Heart of our supercluster'],
-      fr: ['Amas de galaxies le plus proche', '1 300 à 2 000 galaxies', 'Cœur de notre superamas'],
-    },
-  },
-  
-  // VIRGO SUPERCLUSTER (~110 Mly diameter)
-  {
-    id: 'virgo-supercluster',
-    name: { en: 'Virgo Supercluster', fr: 'Superamas de la Vierge' },
-    type: 'supercluster',
-    position: [54e6 * UNITS.KM_PER_LY, 5e6 * UNITS.KM_PER_LY, 20e6 * UNITS.KM_PER_LY],
-    size: 110e6 * UNITS.KM_PER_LY, // ~110 Mly diameter
-    color: '#ffb347',
-    distanceFromEarth: 54,
-    distanceUnit: 'Mly',
-    category: 'deepSpace',
-    facts: {
-      en: ['Contains ~100 galaxy groups/clusters', '~110 million light-years across', 'Part of Laniakea'],
-      fr: ['Contient ~100 groupes/amas', '~110 millions d\'années-lumière', 'Fait partie de Laniakea'],
-    },
-  },
-  
-  // GREAT ATTRACTOR (~250 Mly - gravitational anomaly)
-  {
-    id: 'great-attractor',
-    name: { en: 'Great Attractor', fr: 'Grand Attracteur' },
-    type: 'other',
-    position: [250e6 * UNITS.KM_PER_LY, -30e6 * UNITS.KM_PER_LY, 100e6 * UNITS.KM_PER_LY],
-    size: 300e6 * UNITS.KM_PER_LY, // Gravitational influence region
-    color: '#ff4500',
-    distanceFromEarth: 250,
-    distanceUnit: 'Mly',
-    category: 'deepSpace',
-    facts: {
-      en: ['Gravitational anomaly in Zone of Avoidance', 'Pulls our galaxy at 600 km/s', 'Hidden behind Milky Way dust'],
-      fr: ['Anomalie gravitationnelle', 'Attire notre galaxie à 600 km/s', 'Caché derrière la poussière'],
-    },
-  },
-  
-  // COMA CLUSTER (~321 Mly)
-  {
-    id: 'coma-cluster',
-    name: { en: 'Coma Cluster', fr: 'Amas de la Chevelure' },
-    type: 'cluster',
-    position: [321e6 * UNITS.KM_PER_LY, 50e6 * UNITS.KM_PER_LY, 100e6 * UNITS.KM_PER_LY],
-    size: 20e6 * UNITS.KM_PER_LY,
-    color: '#ff8c00',
-    distanceFromEarth: 321,
-    distanceUnit: 'Mly',
-    category: 'deepSpace',
-    facts: {
-      en: ['One of densest clusters known', 'Over 1,000 galaxies', 'Mostly elliptical galaxies'],
-      fr: ['Un des amas les plus denses', 'Plus de 1 000 galaxies', 'Galaxies elliptiques'],
-    },
-  },
-  
-  // LANIAKEA SUPERCLUSTER (~520 Mly diameter - our home supercluster)
+  // LANIAKEA SUPERCLUSTER - our home supercluster view (shows cosmic web structure)
   {
     id: 'laniakea',
     name: { en: 'Laniakea Supercluster', fr: 'Superamas Laniakea' },
     type: 'supercluster',
-    position: [250e6 * UNITS.KM_PER_LY, 0, 100e6 * UNITS.KM_PER_LY], // Centered near Great Attractor
+    // Position to view the cosmic web filaments we created
+    position: [250e6 * UNITS.KM_PER_LY, 50e6 * UNITS.KM_PER_LY, 100e6 * UNITS.KM_PER_LY],
     size: 520e6 * UNITS.KM_PER_LY, // ~520 Mly diameter
     color: '#9370db',
     distanceFromEarth: 0, // We're in it
@@ -719,114 +653,13 @@ export const celestialObjects: CelestialObject[] = [
     },
   },
   
-  // SHAPLEY SUPERCLUSTER (~650 Mly - most massive nearby)
+  // OBSERVABLE UNIVERSE - maximum zoom out to see cosmic web
   {
-    id: 'shapley-supercluster',
-    name: { en: 'Shapley Supercluster', fr: 'Superamas Shapley' },
-    type: 'supercluster',
-    position: [650e6 * UNITS.KM_PER_LY, -50e6 * UNITS.KM_PER_LY, 200e6 * UNITS.KM_PER_LY],
-    size: 400e6 * UNITS.KM_PER_LY, // ~400 Mly across
-    color: '#ff6347',
-    distanceFromEarth: 650,
-    distanceUnit: 'Mly',
-    category: 'deepSpace',
-    facts: {
-      en: ['Most massive nearby supercluster', '~8,000 galaxies', 'Behind the Great Attractor'],
-      fr: ['Superamas le plus massif proche', '~8 000 galaxies', 'Derrière le Grand Attracteur'],
-    },
-  },
-  
-  // BOÖTES VOID (~700 Mly away, ~330 Mly diameter)
-  {
-    id: 'bootes-void',
-    name: { en: 'Boötes Void', fr: 'Vide du Bouvier' },
-    type: 'void',
-    position: [-500e6 * UNITS.KM_PER_LY, 300e6 * UNITS.KM_PER_LY, 400e6 * UNITS.KM_PER_LY],
-    size: 330e6 * UNITS.KM_PER_LY, // ~330 Mly diameter
-    color: '#1a1a2e',
-    distanceFromEarth: 700,
-    distanceUnit: 'Mly',
-    category: 'deepSpace',
-    facts: {
-      en: ['One of largest known voids', '~330 Mly diameter, nearly empty', 'Contains only ~60 galaxies'],
-      fr: ['Un des plus grands vides', '~330 Mal de diamètre, presque vide', 'Seulement ~60 galaxies'],
-    },
-  },
-  
-  // PERSEUS-PISCES SUPERCLUSTER (~250 Mly)
-  {
-    id: 'perseus-pisces',
-    name: { en: 'Perseus-Pisces Supercluster', fr: 'Superamas Persée-Poissons' },
-    type: 'supercluster',
-    position: [250e6 * UNITS.KM_PER_LY, 100e6 * UNITS.KM_PER_LY, -150e6 * UNITS.KM_PER_LY],
-    size: 300e6 * UNITS.KM_PER_LY,
-    color: '#4682b4',
-    distanceFromEarth: 250,
-    distanceUnit: 'Mly',
-    category: 'deepSpace',
-    facts: {
-      en: ['One of largest structures visible', 'Forms a cosmic "wall"', '~1 billion light-years long'],
-      fr: ['Une des plus grandes structures', 'Forme un "mur" cosmique', '~1 milliard d\'années-lumière'],
-    },
-  },
-  
-  // SLOAN GREAT WALL (~1.4 Bly away)
-  {
-    id: 'sloan-great-wall',
-    name: { en: 'Sloan Great Wall', fr: 'Grande Muraille Sloan' },
-    type: 'other',
-    position: [1e9 * UNITS.KM_PER_LY, 200e6 * UNITS.KM_PER_LY, 500e6 * UNITS.KM_PER_LY],
-    size: 1.37e9 * UNITS.KM_PER_LY, // ~1.37 Bly long
-    color: '#daa520',
-    distanceFromEarth: 1,
-    distanceUnit: 'Bly',
-    category: 'deepSpace',
-    facts: {
-      en: ['~1.37 billion light-years long', 'One of largest known structures', 'Contains thousands of galaxies'],
-      fr: ['~1,37 milliard d\'années-lumière', 'Une des plus grandes structures', 'Milliers de galaxies'],
-    },
-  },
-  
-  // HERCULES-CORONA BOREALIS GREAT WALL (~10 Bly)
-  {
-    id: 'hercules-corona-wall',
-    name: { en: 'Hercules-Corona Wall', fr: 'Grande Muraille Hercule' },
-    type: 'other',
-    position: [10e9 * UNITS.KM_PER_LY, 2e9 * UNITS.KM_PER_LY, 3e9 * UNITS.KM_PER_LY],
-    size: 10e9 * UNITS.KM_PER_LY, // ~10 Bly across
-    color: '#8b0000',
-    distanceFromEarth: 10,
-    distanceUnit: 'Bly',
-    category: 'deepSpace',
-    facts: {
-      en: ['Largest known structure (~10 Bly)', 'Discovered via gamma-ray bursts', 'Challenges cosmological models'],
-      fr: ['Plus grande structure connue (~10 Gal)', 'Découverte par sursauts gamma', 'Défie les modèles cosmologiques'],
-    },
-  },
-  
-  // HUBBLE DEEP FIELD (~13 Bly)
-  {
-    id: 'hubble-deep-field',
-    name: { en: 'Hubble Deep Field', fr: 'Champ Profond de Hubble' },
-    type: 'other',
-    position: [13e9 * UNITS.KM_PER_LY, 5e9 * UNITS.KM_PER_LY, 0],
-    size: 1e9 * UNITS.KM_PER_LY,
-    color: '#4169e1',
-    distanceFromEarth: 13,
-    distanceUnit: 'Bly',
-    category: 'deepSpace',
-    facts: {
-      en: ['Shows oldest galaxies', 'Tiny patch, thousands of galaxies', 'Light from 13 billion years ago'],
-      fr: ['Plus anciennes galaxies', 'Petit patch, milliers de galaxies', 'Lumière de 13 milliards d\'années'],
-    },
-  },
-  
-  // OBSERVABLE UNIVERSE EDGE (~46.5 Bly)
-  {
-    id: 'observable-universe-edge',
+    id: 'observable-universe',
     name: { en: 'Observable Universe', fr: 'Univers Observable' },
     type: 'other',
-    position: [46.5e9 * UNITS.KM_PER_LY, 0, 0],
+    // Far enough to see the full cosmic web structure
+    position: [20e9 * UNITS.KM_PER_LY, 10e9 * UNITS.KM_PER_LY, 15e9 * UNITS.KM_PER_LY],
     size: 93e9 * UNITS.KM_PER_LY,
     color: '#dc143c',
     distanceFromEarth: 46.5,
@@ -874,18 +707,8 @@ export const quickJumpCategories = [
     name: { en: 'Deep Space', fr: 'Espace Profond' },
     locations: [
       'local-group',
-      'virgo-cluster', 
-      'virgo-supercluster',
-      'great-attractor',
-      'coma-cluster',
       'laniakea',
-      'shapley-supercluster',
-      'bootes-void',
-      'perseus-pisces',
-      'sloan-great-wall',
-      'hercules-corona-wall',
-      'hubble-deep-field',
-      'observable-universe-edge'
+      'observable-universe'
     ],
   },
 ];
