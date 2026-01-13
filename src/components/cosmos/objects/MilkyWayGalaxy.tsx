@@ -177,7 +177,7 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
   }, [gs]);
   
   const coreGeoFull = useMemo(() => {
-    const coreCount = 130000;
+    const coreCount = 200000; // Increased for denser core
     const positions = new Float32Array(coreCount * 3);
     const colors = new Float32Array(coreCount * 3);
     const color = new THREE.Color();
@@ -185,7 +185,8 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
 
     for (let i = 0; i < coreCount; i++) {
       const i3 = i * 3;
-      const r = Math.pow(Math.random(), 1.25) * coreRadius;
+      // Higher exponent = more concentrated toward center
+      const r = Math.pow(Math.random(), 2.0) * coreRadius;
       const theta = Math.random() * Math.PI * 2;
       const phi = Math.acos(2 * Math.random() - 1);
       const t = r / coreRadius;
@@ -195,12 +196,13 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
       positions[i3 + 2] = r * Math.sin(phi) * Math.sin(theta);
 
       const rand = Math.random();
+      // Brighter colors for core stars
       if (t < 0.4) {
-        color.setHSL(0.12 + Math.random() * 0.03, 1.0, 0.55 + Math.random() * 0.08);
+        color.setHSL(0.12 + Math.random() * 0.03, 0.95, 0.65 + Math.random() * 0.1);
       } else if (rand < 0.7) {
-        color.setHSL(0.11 + Math.random() * 0.04, 0.95, 0.52 + Math.random() * 0.1);
+        color.setHSL(0.11 + Math.random() * 0.04, 0.9, 0.6 + Math.random() * 0.12);
       } else {
-        color.setHSL(0.06 + Math.random() * 0.04, 1.0, 0.48 + Math.random() * 0.1);
+        color.setHSL(0.06 + Math.random() * 0.04, 0.95, 0.55 + Math.random() * 0.12);
       }
 
       colors[i3] = color.r;
@@ -407,9 +409,9 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
         <DifferentialRotationPoints
           key="milkyway-core"
           geometry={coreGeo}
-          size={gs * 100 * sizeMultiplier}
+          size={gs * 110 * sizeMultiplier}
           map={dotTexture}
-          opacity={0.35}
+          opacity={0.85}
           maxRadius={MILKY_WAY.bulgeRadius * gs}
           rotationMultiplier={1.5}
           differentialStrength={0.12}

@@ -32,6 +32,13 @@ import { StarSystemTracker } from './StarSystemTracker';
 import { celestialObjects } from './data/celestialObjects';
 import { UNITS } from './types';
 import { useCosmosStore } from './store/useCosmosStore';
+import { useGalaxyTimeManager } from './objects/DifferentialRotationMaterial';
+
+// Component to manage galaxy rotation time globally (called once)
+const GalaxyTimeManager = () => {
+  useGalaxyTimeManager();
+  return null;
+};
 
 export const CosmosExplorer = () => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -126,6 +133,9 @@ export const CosmosExplorer = () => {
           
           {/* Galactic ambient glow (screen-space background; always present) */}
           <GalaxySkyGlow />
+
+          {/* Global galaxy time manager - called once to update rotation time */}
+          <GalaxyTimeManager />
 
           {/* Milky Way Galaxy + orbital ring are anchored to the galactic center (they should NOT orbit around the Sun) */}
           <GalaxyFadeWrapper>
