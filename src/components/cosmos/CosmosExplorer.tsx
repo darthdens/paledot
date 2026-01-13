@@ -14,7 +14,6 @@ import { LocalGroupDwarfGalaxies } from './objects/LocalGroupDwarfGalaxies';
 import { VirgoSupercluster } from './objects/VirgoSupercluster';
 import { Laniakea } from './objects/Laniakea';
 import { CosmicWeb } from './objects/CosmicWeb';
-import { CosmicYouAreHere } from './objects/CosmicYouAreHere';
 import { GalaxySkyGlow } from './objects/GalaxySkyGlow';
 import { GalaxyRotator } from './objects/GalaxyRotator';
 import { GalaxyFadeWrapper } from './GalaxyFadeWrapper';
@@ -218,9 +217,6 @@ export const CosmosExplorer = () => {
           
           {/* Cosmic Web - large-scale structure with filaments */}
           <CosmicWeb visualScale={UNIFIED_SCALE} />
-          
-          {/* You Are Here marker for cosmic scales */}
-          <CosmicYouAreHere visualScale={UNIFIED_SCALE} />
           
           {/* Bloom post-processing - disabled (was making galaxies look overexposed) */}
           <EffectComposer>

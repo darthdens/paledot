@@ -8,55 +8,88 @@ interface LaniakeaProps {
   visualScale: number;
 }
 
-// Laniakea: ~520 Mly diameter, ~100,000+ galaxies
-// Great Attractor is the gravitational center
+// Laniakea Supercluster - our cosmic home
+// Diameter: ~520 Mly, contains ~100,000+ galaxies
+// Great Attractor region is the gravitational center
 
 interface Supercluster {
   name: string;
-  position: [number, number, number];
-  diameter: number;
+  position: [number, number, number]; // in Mly from Milky Way
+  diameter: number; // in Mly
   galaxyDensity: number;
   color: string;
 }
 
-// Major structures in and around Laniakea
+// Major superclusters and structures in and around Laniakea
+// Based on Tully et al. 2014 cosmic flow analysis
 const LANIAKEA_STRUCTURES: Supercluster[] = [
-  // LANIAKEA CORE
-  { name: 'Virgo Supercluster', position: [0, 0, 0], diameter: 110, galaxyDensity: 0.85, color: '#FFE4B5' },
-  { name: 'Centaurus Supercluster', position: [145, 35, 85], diameter: 160, galaxyDensity: 0.95, color: '#FFA07A' },
-  { name: 'Great Attractor', position: [200, 20, 100], diameter: 90, galaxyDensity: 1.0, color: '#FFD700' },
-  { name: 'Norma Wall', position: [210, -15, 95], diameter: 110, galaxyDensity: 0.9, color: '#F0E68C' },
-  { name: 'Hydra Supercluster', position: [120, -55, 95], diameter: 130, galaxyDensity: 0.8, color: '#E6E6FA' },
-  { name: 'Pavo-Indus Supercluster', position: [-85, 90, 165], diameter: 140, galaxyDensity: 0.75, color: '#87CEEB' },
-  { name: 'Southern Supercluster', position: [-60, -130, 55], diameter: 110, galaxyDensity: 0.7, color: '#DDA0DD' },
-  { name: 'Antlia Wall', position: [90, -40, 55], diameter: 80, galaxyDensity: 0.65, color: '#B0E0E6' },
-  { name: 'Puppis Filament', position: [55, -70, 80], diameter: 70, galaxyDensity: 0.6, color: '#ADD8E6' },
-  { name: 'Telescopium Wall', position: [-50, 60, 120], diameter: 75, galaxyDensity: 0.55, color: '#98D8C8' },
+  // === LANIAKEA CORE (inside Laniakea) ===
+  // Virgo Supercluster (our home)
+  { name: 'Virgo Supercluster', position: [0, 0, 0], diameter: 110, galaxyDensity: 0.8, color: '#FFE4B5' },
   
-  // NEIGHBORING SUPERCLUSTERS
-  { name: 'Perseus-Pisces', position: [-250, 30, -180], diameter: 220, galaxyDensity: 0.85, color: '#FF6B6B' },
-  { name: 'Coma Supercluster', position: [280, 90, -50], diameter: 200, galaxyDensity: 0.9, color: '#4ECDC4' },
-  { name: 'Shapley Supercluster', position: [450, -35, 180], diameter: 280, galaxyDensity: 1.0, color: '#FF9F43' },
-  { name: 'Hercules Supercluster', position: [380, 65, -120], diameter: 180, galaxyDensity: 0.75, color: '#A8E6CF' },
-  { name: 'Leo Supercluster', position: [320, 45, 25], diameter: 160, galaxyDensity: 0.7, color: '#FFD93D' },
-  { name: 'Horologium-Reticulum', position: [-180, -200, 300], diameter: 200, galaxyDensity: 0.8, color: '#6C5CE7' },
-  { name: 'Sculptor Supercluster', position: [-200, -150, 180], diameter: 140, galaxyDensity: 0.65, color: '#A29BFE' },
-  { name: 'Corona Borealis', position: [750, 50, -100], diameter: 160, galaxyDensity: 0.7, color: '#FD79A8' },
-  { name: 'Boötes Supercluster', position: [650, 80, 50], diameter: 150, galaxyDensity: 0.65, color: '#74B9FF' },
-  { name: 'Ursa Major Supercluster', position: [480, 120, -80], diameter: 130, galaxyDensity: 0.6, color: '#55A8B5' },
-  { name: 'Pisces-Cetus', position: [-300, -80, -120], diameter: 180, galaxyDensity: 0.7, color: '#F8B500' },
-  { name: 'Aquarius Supercluster', position: [-180, -120, -200], diameter: 140, galaxyDensity: 0.6, color: '#00CED1' },
+  // Centaurus Supercluster - toward Great Attractor
+  { name: 'Centaurus Supercluster', position: [145, 35, 85], diameter: 150, galaxyDensity: 0.95, color: '#FFA07A' },
+  
+  // Great Attractor region - gravitational center
+  { name: 'Great Attractor', position: [200, 20, 100], diameter: 80, galaxyDensity: 1.0, color: '#FFD700' },
+  
+  // Norma Cluster region
+  { name: 'Norma Wall', position: [210, -15, 95], diameter: 100, galaxyDensity: 0.9, color: '#F0E68C' },
+  
+  // Hydra Supercluster
+  { name: 'Hydra Supercluster', position: [120, -55, 95], diameter: 120, galaxyDensity: 0.8, color: '#E6E6FA' },
+  
+  // Pavo-Indus Supercluster
+  { name: 'Pavo-Indus Supercluster', position: [-85, 90, 165], diameter: 130, galaxyDensity: 0.75, color: '#87CEEB' },
+  
+  // Southern Supercluster
+  { name: 'Southern Supercluster', position: [-60, -130, 55], diameter: 100, galaxyDensity: 0.7, color: '#DDA0DD' },
+  
+  // Antlia Wall
+  { name: 'Antlia Wall', position: [90, -40, 55], diameter: 70, galaxyDensity: 0.65, color: '#B0E0E6' },
+  
+  // Puppis Filament
+  { name: 'Puppis Filament', position: [55, -70, 80], diameter: 60, galaxyDensity: 0.55, color: '#ADD8E6' },
+  
+  // === NEIGHBORING SUPERCLUSTERS (outside Laniakea but visible) ===
+  // Perseus-Pisces Supercluster - behind us from Great Attractor
+  { name: 'Perseus-Pisces', position: [-250, 30, -180], diameter: 200, galaxyDensity: 0.85, color: '#FF6B6B' },
+  
+  // Coma Supercluster
+  { name: 'Coma Supercluster', position: [280, 90, -50], diameter: 180, galaxyDensity: 0.9, color: '#4ECDC4' },
+  
+  // Shapley Supercluster - most massive nearby structure
+  { name: 'Shapley Supercluster', position: [450, -35, 180], diameter: 250, galaxyDensity: 1.0, color: '#FF9F43' },
+  
+  // Hercules Supercluster
+  { name: 'Hercules Supercluster', position: [380, 65, -120], diameter: 160, galaxyDensity: 0.75, color: '#A8E6CF' },
+  
+  // Leo Supercluster
+  { name: 'Leo Supercluster', position: [320, 45, 25], diameter: 140, galaxyDensity: 0.7, color: '#FFD93D' },
+  
+  // Horologium-Reticulum Supercluster
+  { name: 'Horologium-Reticulum', position: [-180, -200, 300], diameter: 180, galaxyDensity: 0.8, color: '#6C5CE7' },
+  
+  // Sculptor Supercluster
+  { name: 'Sculptor Supercluster', position: [-200, -150, 180], diameter: 120, galaxyDensity: 0.65, color: '#A29BFE' },
+  
+  // Corona Borealis Supercluster
+  { name: 'Corona Borealis', position: [750, 50, -100], diameter: 140, galaxyDensity: 0.7, color: '#FD79A8' },
+  
+  // Boötes Supercluster
+  { name: 'Boötes Supercluster', position: [650, 80, 50], diameter: 130, galaxyDensity: 0.65, color: '#74B9FF' },
 ];
 
+// Cosmic voids - large empty regions
 const COSMIC_VOIDS = [
-  { name: 'Local Void', position: [-30, 50, -30], radius: 80 },
-  { name: 'Eridanus Void', position: [-40, -100, 40], radius: 70 },
-  { name: 'Taurus Void', position: [-90, -150, -20], radius: 80 },
-  { name: 'Sculptor Void', position: [-120, -80, 100], radius: 90 },
-  { name: 'Boötes Void', position: [450, 120, -80], radius: 180 },
-  { name: 'Capricornus Void', position: [100, -180, -50], radius: 80 },
-  { name: 'Coma Void', position: [200, 150, -30], radius: 70 },
-  { name: 'Microscopium Void', position: [80, -120, 150], radius: 75 },
+  { name: 'Local Void', position: [-30, 50, -30], radius: 70 },
+  { name: 'Eridanus Void', position: [-40, -100, 40], radius: 60 },
+  { name: 'Taurus Void', position: [-90, -150, -20], radius: 70 },
+  { name: 'Sculptor Void', position: [-120, -80, 100], radius: 80 },
+  { name: 'Microscopium Void', position: [80, -120, 150], radius: 65 },
+  { name: 'Boötes Void', position: [450, 120, -80], radius: 150 }, // One of the largest voids
+  { name: 'Capricornus Void', position: [100, -180, -50], radius: 70 },
+  { name: 'Coma Void', position: [200, 150, -30], radius: 60 },
 ];
 
 const seededRandom = (seed: number) => {
@@ -69,7 +102,7 @@ const isInVoid = (x: number, y: number, z: number): boolean => {
     const dx = x - v.position[0];
     const dy = y - v.position[1];
     const dz = z - v.position[2];
-    if (dx * dx + dy * dy + dz * dz < v.radius * v.radius * 0.5) {
+    if (dx * dx + dy * dy + dz * dz < v.radius * v.radius * 0.6) {
       return true;
     }
   }
@@ -90,20 +123,20 @@ export const Laniakea = ({ visualScale }: LaniakeaProps) => {
     const allColors: number[] = [];
     const allSizes: number[] = [];
     
-    // Supercluster galaxies
+    // Generate galaxies for each supercluster
     LANIAKEA_STRUCTURES.forEach((sc, scIdx) => {
-      const count = Math.floor(sc.diameter * sc.galaxyDensity * 35);
+      const count = Math.floor(sc.diameter * sc.galaxyDensity * 25);
       const radius = sc.diameter * 0.5;
       
       for (let i = 0; i < count; i++) {
         const seed = scIdx * 10000 + i;
         
-        const r = Math.pow(seededRandom(seed), 0.5) * radius;
+        const r = Math.pow(seededRandom(seed), 0.55) * radius;
         const theta = seededRandom(seed + 1) * Math.PI * 2;
         const phi = Math.acos(2 * seededRandom(seed + 2) - 1);
         
         const x = sc.position[0] + r * Math.sin(phi) * Math.cos(theta);
-        const y = sc.position[1] + r * Math.cos(phi) * 0.55;
+        const y = sc.position[1] + r * Math.cos(phi) * 0.6;
         const z = sc.position[2] + r * Math.sin(phi) * Math.sin(theta);
         
         if (isInVoid(x, y, z)) continue;
@@ -112,34 +145,35 @@ export const Laniakea = ({ visualScale }: LaniakeaProps) => {
         
         const baseColor = new THREE.Color(sc.color);
         const variation = 0.1 + seededRandom(seed + 3) * 0.15;
-        baseColor.offsetHSL(seededRandom(seed + 4) * 0.06 - 0.03, 0, variation - 0.1);
+        baseColor.offsetHSL(seededRandom(seed + 4) * 0.05 - 0.025, 0, variation - 0.12);
         
         allColors.push(baseColor.r, baseColor.g, baseColor.b);
-        allSizes.push((0.7 + seededRandom(seed + 5) * 0.7) * sc.galaxyDensity);
+        allSizes.push((0.8 + seededRandom(seed + 5) * 0.6) * sc.galaxyDensity);
       }
     });
     
-    // Dense field galaxies across the visible region
-    const fieldCount = 60000;
+    // Field galaxies distributed across Laniakea and beyond
+    const fieldCount = 20000;
     for (let i = 0; i < fieldCount; i++) {
       const seed = i + 100000;
       
-      const radius = 500 * Math.pow(seededRandom(seed), 0.45);
+      // Extend to visible neighboring structures (~800 Mly)
+      const radius = 400 * Math.pow(seededRandom(seed), 0.5);
       const theta = seededRandom(seed + 1) * Math.PI * 2;
       const phi = Math.acos(2 * seededRandom(seed + 2) - 1);
       
       const x = radius * Math.sin(phi) * Math.cos(theta);
-      const y = radius * Math.cos(phi) * 0.4;
+      const y = radius * Math.cos(phi) * 0.45;
       const z = radius * Math.sin(phi) * Math.sin(theta);
       
       if (isInVoid(x, y, z)) continue;
       
       allPositions.push(x * mlyScale, y * mlyScale, z * mlyScale);
       
-      const hue = 0.52 + seededRandom(seed + 3) * 0.15;
-      const color = new THREE.Color().setHSL(hue, 0.28, 0.32 + seededRandom(seed + 4) * 0.12);
+      const hue = 0.55 + seededRandom(seed + 3) * 0.12;
+      const color = new THREE.Color().setHSL(hue, 0.25, 0.35);
       allColors.push(color.r, color.g, color.b);
-      allSizes.push(0.18 + seededRandom(seed + 5) * 0.25);
+      allSizes.push(0.2 + seededRandom(seed + 4) * 0.25);
     }
     
     const geo = new THREE.BufferGeometry();
@@ -180,8 +214,8 @@ export const Laniakea = ({ visualScale }: LaniakeaProps) => {
           gl_Position = projectionMatrix * mvPosition;
           
           float dist = -mvPosition.z;
-          float pointSize = size * 180000.0 / dist;
-          gl_PointSize = clamp(pointSize, 0.8, 28.0);
+          float pointSize = size * 150000.0 / dist;
+          gl_PointSize = clamp(pointSize, 1.0, 25.0);
         }
       `,
       fragmentShader: `
@@ -207,10 +241,10 @@ export const Laniakea = ({ visualScale }: LaniakeaProps) => {
     if (!pointsRef.current || !isVisible) return;
     
     const distance = camera.position.length();
-    const fadeIn = THREE.MathUtils.smoothstep(distance, mlyScale * 60, mlyScale * 180);
-    const fadeOut = 1 - THREE.MathUtils.smoothstep(distance, mlyScale * 2500, mlyScale * 5000);
+    const fadeIn = THREE.MathUtils.smoothstep(distance, mlyScale * 80, mlyScale * 200);
+    const fadeOut = 1 - THREE.MathUtils.smoothstep(distance, mlyScale * 2000, mlyScale * 4000);
     
-    (material as THREE.ShaderMaterial).uniforms.uOpacity.value = Math.min(fadeIn, fadeOut) * 0.85;
+    (material as THREE.ShaderMaterial).uniforms.uOpacity.value = Math.min(fadeIn, fadeOut) * 0.8;
   });
   
   if (!isVisible) return null;
