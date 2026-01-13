@@ -75,6 +75,7 @@ export const CosmosLoader = ({
   const { language } = useLanguage();
   const [fadeOut, setFadeOut] = useState(false);
   const [stage, setStage] = useState<LoadingStage>('textures');
+  const [simulatedProgress, setSimulatedProgress] = useState(0);
   
   const loadingProgress = useCosmosStore((s) => s.loadingProgress);
   const setTextureProgress = useCosmosStore((s) => s.setTextureProgress);
@@ -161,21 +162,44 @@ export const CosmosLoader = ({
     }
   }, [stage, geometriesCount, geometriesTotal]);
 
-  // Calculate overall progress
+  // Simulate gradual progress during geometry loading to avoid jumps
+  useEffect(() => {
+    if (stage !== 'geometries') {
+      setSimulatedProgress(0);
+      return;
+    }
+
+    // Target based on real geometry progress
+    const targetProgress = (geometriesCount / geometriesTotal) * 100;
+    
+    const interval = setInterval(() => {
+      setSimulatedProgress(prev => {
+        // Slowly increment toward target, but never exceed it
+        const nextTarget = Math.min(targetProgress, 100);
+        if (prev >= nextTarget - 1) return nextTarget;
+        // Increment by small random amount for natural feel
+        const increment = Math.random() * 3 + 0.5;
+        return Math.min(prev + increment, nextTarget);
+      });
+    }, 150);
+
+    return () => clearInterval(interval);
+  }, [stage, geometriesCount, geometriesTotal]);
+
+  // Calculate overall progress - more granular with simulated increments
   const texturesProgress = loadingProgress.texturesTotal > 0
     ? loadingProgress.texturesLoaded / loadingProgress.texturesTotal
     : 0;
-  
-  const geometryProgress = geometriesTotal > 0 ? geometriesCount / geometriesTotal : 0;
 
-  // Weighted progress: textures = 40%, geometries = 50%, finalizing = 10%
+  // Weighted progress: textures = 35%, geometries = 55%, finalizing = 10%
   let overallProgress = 0;
   if (stage === 'textures') {
-    overallProgress = texturesProgress * 40;
+    overallProgress = texturesProgress * 35;
   } else if (stage === 'geometries') {
-    overallProgress = 40 + geometryProgress * 50;
+    // Use simulated progress for smoother animation
+    overallProgress = 35 + (simulatedProgress / 100) * 55;
   } else {
-    overallProgress = 90 + (dismiss ? 10 : 5); // 95% while finalizing, 100% when dismiss
+    overallProgress = 90 + (dismiss ? 10 : 8); // 98% while finalizing, 100% when dismiss
   }
 
   // Current item display
@@ -249,66 +273,69 @@ export const CosmosLoader = ({
       {/* Central loader content */}
       <div className="relative z-10 flex flex-col items-center gap-8 px-4">
         
-        {/* Sleek pulsing ring animation */}
-        <div className="relative w-28 h-28 flex items-center justify-center">
-          {/* Outer ring - slow pulse */}
+        {/* Earth orbiting Sun animation - polished */}
+        <div className="relative w-32 h-32 flex items-center justify-center">
+          {/* Orbit ring */}
           <div 
-            className="absolute w-full h-full rounded-full border border-white/20"
+            className="absolute w-28 h-28 rounded-full border border-white/15"
             style={{
-              animation: 'pulse 3s ease-in-out infinite',
+              boxShadow: '0 0 20px 2px rgba(255,200,100,0.05)',
             }}
           />
           
-          {/* Middle ring - rotating gradient */}
-          <div 
-            className="absolute w-20 h-20 rounded-full"
-            style={{
-              background: 'conic-gradient(from 0deg, transparent, rgba(100,150,255,0.4), transparent)',
-              animation: 'spin 2s linear infinite',
-            }}
-          />
-          
-          {/* Inner glow core */}
+          {/* Sun at center */}
           <div 
             className="absolute w-8 h-8 rounded-full"
             style={{
-              background: 'radial-gradient(circle, rgba(150,180,255,0.9) 0%, rgba(80,120,220,0.5) 50%, transparent 80%)',
-              boxShadow: '0 0 30px 8px rgba(100,150,255,0.3)',
-              animation: 'pulse 2s ease-in-out infinite',
+              background: 'radial-gradient(circle, #fff9e6 0%, #ffcc33 30%, #ff9500 70%, #cc6600 100%)',
+              boxShadow: '0 0 30px 12px rgba(255,180,50,0.4), 0 0 60px 20px rgba(255,150,50,0.2)',
+              animation: 'pulse 4s ease-in-out infinite',
             }}
           />
           
-          {/* Orbiting particle 1 */}
+          {/* Orbiting Earth container */}
           <div 
-            className="absolute w-full h-full"
-            style={{ animation: 'spin 4s linear infinite' }}
+            className="absolute w-28 h-28"
+            style={{ animation: 'spin 8s linear infinite' }}
           >
+            {/* Earth */}
             <div 
-              className="absolute w-2 h-2 rounded-full bg-white/80"
+              className="absolute w-4 h-4 rounded-full"
               style={{
                 top: '0',
                 left: '50%',
                 transform: 'translateX(-50%)',
-                boxShadow: '0 0 8px 2px rgba(255,255,255,0.6)',
+                background: 'radial-gradient(circle at 35% 35%, #87ceeb 0%, #4a90d9 40%, #1e5799 70%, #0d3a6e 100%)',
+                boxShadow: '0 0 10px 3px rgba(100,180,255,0.4)',
               }}
-            />
+            >
+              {/* Moon orbiting Earth */}
+              <div 
+                className="absolute w-6 h-6 -top-1 -left-1"
+                style={{ animation: 'spin 2s linear infinite' }}
+              >
+                <div 
+                  className="absolute w-1.5 h-1.5 rounded-full"
+                  style={{
+                    top: '-2px',
+                    left: '50%',
+                    transform: 'translateX(-50%)',
+                    background: 'radial-gradient(circle at 40% 40%, #f5f5f5 0%, #c0c0c0 50%, #808080 100%)',
+                    boxShadow: '0 0 4px 1px rgba(200,200,200,0.3)',
+                  }}
+                />
+              </div>
+            </div>
           </div>
           
-          {/* Orbiting particle 2 - opposite direction */}
+          {/* Subtle outer glow ring */}
           <div 
-            className="absolute w-16 h-16"
-            style={{ animation: 'spin 3s linear infinite reverse' }}
-          >
-            <div 
-              className="absolute w-1.5 h-1.5 rounded-full bg-blue-300/80"
-              style={{
-                bottom: '0',
-                left: '50%',
-                transform: 'translateX(-50%)',
-                boxShadow: '0 0 6px 2px rgba(150,180,255,0.5)',
-              }}
-            />
-          </div>
+            className="absolute w-32 h-32 rounded-full"
+            style={{
+              background: 'radial-gradient(circle, transparent 40%, rgba(255,180,80,0.03) 60%, transparent 80%)',
+              animation: 'pulse 5s ease-in-out infinite',
+            }}
+          />
         </div>
 
         {/* Title */}
