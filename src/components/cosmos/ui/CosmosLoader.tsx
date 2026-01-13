@@ -46,37 +46,54 @@ const ALL_TEXTURES = [
 
 interface CosmosLoaderProps {
   onLoadComplete: () => void;
+  /** When true, the loader fades out (controlled by parent). */
+  dismiss?: boolean;
+  /** Called after the fade-out completes so parent can unmount safely. */
+  onDismissed?: () => void;
+  /** Show a “finalizing” message once textures are loaded but the scene is still warming up. */
+  isFinalizing?: boolean;
 }
 
-export const CosmosLoader = ({ onLoadComplete }: CosmosLoaderProps) => {
+export const CosmosLoader = ({
+  onLoadComplete,
+  dismiss = false,
+  onDismissed,
+  isFinalizing = false,
+}: CosmosLoaderProps) => {
   const { language } = useLanguage();
   const [progress, setProgress] = useState(0);
   const [currentItem, setCurrentItem] = useState('');
   const [fadeOut, setFadeOut] = useState(false);
 
   // Planet names for display
-  const textureNames: Record<string, { en: string; fr: string }> = useMemo(() => ({
-    [earthDayTexture]: { en: 'Earth', fr: 'Terre' },
-    [earthNightTexture]: { en: 'Earth (Night)', fr: 'Terre (Nuit)' },
-    [earthCloudsTexture]: { en: 'Earth (Clouds)', fr: 'Terre (Nuages)' },
-    [moonTexture]: { en: 'Moon', fr: 'Lune' },
-    [mercuryTexture]: { en: 'Mercury', fr: 'Mercure' },
-    [venusTexture]: { en: 'Venus', fr: 'Vénus' },
-    [marsTexture]: { en: 'Mars', fr: 'Mars' },
-    [jupiterTexture]: { en: 'Jupiter', fr: 'Jupiter' },
-    [saturnTexture]: { en: 'Saturn', fr: 'Saturne' },
-    [uranusTexture]: { en: 'Uranus', fr: 'Uranus' },
-    [neptuneTexture]: { en: 'Neptune', fr: 'Neptune' },
-    [plutoTexture]: { en: 'Pluto', fr: 'Pluton' },
-    [titanTexture]: { en: 'Titan', fr: 'Titan' },
-    [europaTexture]: { en: 'Europa', fr: 'Europe' },
-    [ceresTexture]: { en: 'Ceres', fr: 'Cérès' },
-    [enceladusTexture]: { en: 'Enceladus', fr: 'Encelade' },
-    [tritonTexture]: { en: 'Triton', fr: 'Triton' },
-    [iapetusTexture]: { en: 'Iapetus', fr: 'Japet' },
-  }), []);
+  const textureNames: Record<string, { en: string; fr: string }> = useMemo(
+    () => ({
+      [earthDayTexture]: { en: 'Earth', fr: 'Terre' },
+      [earthNightTexture]: { en: 'Earth (Night)', fr: 'Terre (Nuit)' },
+      [earthCloudsTexture]: { en: 'Earth (Clouds)', fr: 'Terre (Nuages)' },
+      [moonTexture]: { en: 'Moon', fr: 'Lune' },
+      [mercuryTexture]: { en: 'Mercury', fr: 'Mercure' },
+      [venusTexture]: { en: 'Venus', fr: 'Vénus' },
+      [marsTexture]: { en: 'Mars', fr: 'Mars' },
+      [jupiterTexture]: { en: 'Jupiter', fr: 'Jupiter' },
+      [saturnTexture]: { en: 'Saturn', fr: 'Saturne' },
+      [uranusTexture]: { en: 'Uranus', fr: 'Uranus' },
+      [neptuneTexture]: { en: 'Neptune', fr: 'Neptune' },
+      [plutoTexture]: { en: 'Pluto', fr: 'Pluton' },
+      [titanTexture]: { en: 'Titan', fr: 'Titan' },
+      [europaTexture]: { en: 'Europa', fr: 'Europe' },
+      [ceresTexture]: { en: 'Ceres', fr: 'Cérès' },
+      [enceladusTexture]: { en: 'Enceladus', fr: 'Encelade' },
+      [tritonTexture]: { en: 'Triton', fr: 'Triton' },
+      [iapetusTexture]: { en: 'Iapetus', fr: 'Japet' },
+    }),
+    []
+  );
 
   useEffect(() => {
+    // Ensure subsequent R3F texture loads can reuse these requests.
+    THREE.Cache.enabled = true;
+
     const textureLoader = new THREE.TextureLoader();
     let loaded = 0;
     const total = ALL_TEXTURES.length;
@@ -85,7 +102,7 @@ export const CosmosLoader = ({ onLoadComplete }: CosmosLoaderProps) => {
       return new Promise((resolve) => {
         const name = textureNames[url]?.[language] || 'Unknown';
         setCurrentItem(name);
-        
+
         textureLoader.load(
           url,
           (texture) => {
@@ -93,7 +110,7 @@ export const CosmosLoader = ({ onLoadComplete }: CosmosLoaderProps) => {
             texture.wrapS = THREE.RepeatWrapping;
             texture.wrapT = THREE.ClampToEdgeWrapping;
             texture.colorSpace = THREE.SRGBColorSpace;
-            
+
             loaded++;
             setProgress(Math.round((loaded / total) * 100));
             resolve();
@@ -114,18 +131,23 @@ export const CosmosLoader = ({ onLoadComplete }: CosmosLoaderProps) => {
       for (const texture of ALL_TEXTURES) {
         await loadTexture(texture);
       }
-      
-      // Small delay then fade out
-      setTimeout(() => {
-        setFadeOut(true);
-        setTimeout(() => {
-          onLoadComplete();
-        }, 500);
-      }, 300);
+
+      onLoadComplete();
     };
 
     loadAll();
   }, [language, textureNames, onLoadComplete]);
+
+  useEffect(() => {
+    if (!dismiss) return;
+
+    setFadeOut(true);
+    const t = window.setTimeout(() => {
+      onDismissed?.();
+    }, 500);
+
+    return () => window.clearTimeout(t);
+  }, [dismiss, onDismissed]);
 
   return (
     <div 
@@ -219,10 +241,15 @@ export const CosmosLoader = ({ onLoadComplete }: CosmosLoaderProps) => {
           {/* Progress text */}
           <div className="flex justify-between items-center mt-2 text-xs text-white/60">
             <span className="truncate max-w-[180px]">
-              {currentItem && (
-                language === 'fr' 
-                  ? `Chargement: ${currentItem}` 
-                  : `Loading: ${currentItem}`
+              {progress >= 100 ? (
+                isFinalizing ? (
+                  language === 'fr' ? 'Finalisation de l\'univers…' : 'Finalizing universe…'
+                ) : (
+                  language === 'fr' ? 'Terminé' : 'Done'
+                )
+              ) : (
+                currentItem &&
+                (language === 'fr' ? `Chargement: ${currentItem}` : `Loading: ${currentItem}`)
               )}
             </span>
             <span className="font-mono ml-2">{progress}%</span>

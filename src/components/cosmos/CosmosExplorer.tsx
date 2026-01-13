@@ -3,7 +3,8 @@ import { Canvas } from '@react-three/fiber';
 import { OrbitControls, PerspectiveCamera } from '@react-three/drei';
 import { EffectComposer, SelectiveBloom, Selection } from '@react-three/postprocessing';
 import { DimStars } from './objects/DimStars';
-import { Suspense, useEffect, useRef, useState, useCallback } from 'react';
+import { Suspense, useEffect, useRef, useState, useCallback, useMemo } from 'react';
+import * as THREE from 'three';
 import { ProximaSystem } from './objects/ProximaSystem';
 import { MilkyWayGalaxy } from './objects/MilkyWayGalaxy';
 import { AndromedaGalaxy } from './objects/AndromedaGalaxy';
@@ -38,6 +39,10 @@ import { celestialObjects } from './data/celestialObjects';
 import { UNITS } from './types';
 import { useCosmosStore } from './store/useCosmosStore';
 import { useGalaxyTimeManager } from './objects/DifferentialRotationMaterial';
+import { CosmosBootGate } from './ui/CosmosBootGate';
+
+// Allow loaders (R3F + our preload) to reuse texture requests.
+THREE.Cache.enabled = true;
 
 // Component to manage galaxy rotation time globally (called once)
 const GalaxyTimeManager = () => {
@@ -47,47 +52,59 @@ const GalaxyTimeManager = () => {
 
 export const CosmosExplorer = () => {
   const containerRef = useRef<HTMLDivElement>(null);
-  const [isLoaded, setIsLoaded] = useState(false);
-  const selectedObject = useCosmosStore(state => state.selectedObject);
-  const showOrbits = useCosmosStore(state => state.showOrbits);
-  const showTrails = useCosmosStore(state => state.showTrails);
-  const currentScale = useCosmosStore(state => state.currentScale);
-  
-  // Memoize the callback to prevent re-renders
-  const handleLoadComplete = useCallback(() => setIsLoaded(true), []);
-  
+
+  // We separate "textures are loaded" vs "scene is warmed up" so the loader can actually
+  // hide all the heavy work (geometry generation + shader compilation).
+  const [texturesReady, setTexturesReady] = useState(false);
+  const [sceneReady, setSceneReady] = useState(false);
+  const [showLoader, setShowLoader] = useState(true);
+
+  const selectedObject = useCosmosStore((state) => state.selectedObject);
+  const showOrbits = useCosmosStore((state) => state.showOrbits);
+  const showTrails = useCosmosStore((state) => state.showTrails);
+  const currentScale = useCosmosStore((state) => state.currentScale);
+
+  const handleTexturesReady = useCallback(() => setTexturesReady(true), []);
+  const handleSceneReady = useCallback(() => setSceneReady(true), []);
+
+  const bootDone = texturesReady && sceneReady;
+
   // Hide distant galaxies when within solar system or Proxima Centauri system
-  const showDistantGalaxies = currentScale !== 'earth' && currentScale !== 'solarSystem' && currentScale !== 'stellar';
-  
+  const showDistantGalaxies =
+    currentScale !== 'earth' && currentScale !== 'solarSystem' && currentScale !== 'stellar';
+
   // Force cursor none on canvas - OrbitControls tries to set cursor styles
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
-    
+
     const observer = new MutationObserver(() => {
       const canvas = container.querySelector('canvas');
       if (canvas && canvas.style.cursor !== 'none') {
         canvas.style.setProperty('cursor', 'none', 'important');
       }
     });
-    
-    observer.observe(container, { 
-      attributes: true, 
-      subtree: true, 
-      attributeFilter: ['style'] 
+
+    observer.observe(container, {
+      attributes: true,
+      subtree: true,
+      attributeFilter: ['style'],
     });
-    
+
     // Also set immediately
     const canvas = container.querySelector('canvas');
     if (canvas) {
       canvas.style.setProperty('cursor', 'none', 'important');
     }
-    
+
     return () => observer.disconnect();
   }, []);
-  
-  const stars = celestialObjects.filter(obj => obj.type === 'star' && obj.id !== 'sun' && obj.id !== 'proxima-centauri');
-  const nebulae = celestialObjects.filter(obj => obj.type === 'nebula');
+
+  const stars = useMemo(
+    () => celestialObjects.filter((obj) => obj.type === 'star' && obj.id !== 'sun' && obj.id !== 'proxima-centauri'),
+    []
+  );
+  const nebulae = useMemo(() => celestialObjects.filter((obj) => obj.type === 'nebula'), []);
 
   // Unified scale factor - same for objects AND distances to maintain true proportions
   // Sun diameter: 1,392,700 km, Mercury orbit: 57.9M km (0.39 AU)
@@ -96,156 +113,155 @@ export const CosmosExplorer = () => {
 
   // Start camera looking at Earth - the natural starting point for exploration
   const earthOrbitRadius = UNITS.KM_PER_AU * UNIFIED_SCALE; // Earth's distance from Sun in scene units
-  const earthVisualRadius = 12742 * UNIFIED_SCALE / 2; // Earth's radius in scene units
+  const earthVisualRadius = (12742 * UNIFIED_SCALE) / 2; // Earth's radius in scene units
   const initialCameraPosition: [number, number, number] = [
-    earthOrbitRadius + earthVisualRadius * 8,  // Slightly offset from Earth on X
-    earthVisualRadius * 4,                      // A bit above Earth
-    earthVisualRadius * 10                      // Far enough to see Earth nicely
+    earthOrbitRadius + earthVisualRadius * 8, // Slightly offset from Earth on X
+    earthVisualRadius * 4, // A bit above Earth
+    earthVisualRadius * 10, // Far enough to see Earth nicely
   ];
 
   return (
     <div ref={containerRef} className="relative w-full h-full">
-      {/* Loading screen - preloads all textures */}
-      {!isLoaded && <CosmosLoader onLoadComplete={handleLoadComplete} />}
-      
-      {/* Only render canvas after textures are preloaded */}
-      {isLoaded && (
+      {/* Loading screen */}
+      {showLoader && (
+        <CosmosLoader
+          onLoadComplete={handleTexturesReady}
+          dismiss={bootDone}
+          onDismissed={() => setShowLoader(false)}
+          isFinalizing={texturesReady && !sceneReady}
+        />
+      )}
+
+      {/* Keep the scene mounted immediately so heavy work happens behind the loader */}
       <Canvas gl={{ alpha: false }}>
         <Suspense fallback={null}>
           <Selection>
-            <PerspectiveCamera 
-            makeDefault 
-            position={initialCameraPosition} 
-            fov={60} 
-            near={0.1} 
-            far={1e12} 
-          />
-          <OrbitControls
-            makeDefault
-            enablePan={true}
-            enableZoom={true}
-            enableRotate={true}
-            zoomSpeed={2}
-            panSpeed={1}
-            rotateSpeed={0.5}
-            minDistance={1}
-            maxDistance={1e21}
-          />
-          
-          {/* Camera fly-to controller */}
-          <CameraController />
-          
-          {/* Scale tracker - updates store with current scale level */}
-          <ScaleTracker />
-          
-          {/* Star system tracker - detects when zoomed into any star system */}
-          <StarSystemTracker />
-          
-          {/* Lighting - ambient stays outside, Sun light goes inside rotator */}
-          <ambientLight intensity={0.02} />
-          <hemisphereLight args={['#ffffff', '#444466', 0.15]} />
-          
-          {/* Galactic ambient glow (screen-space background; always present) */}
-          <GalaxySkyGlow />
-
-          {/* Global galaxy time manager - called once to update rotation time */}
-          <GalaxyTimeManager />
-
-          {/* Milky Way Galaxy + orbital ring are anchored to the galactic center (they should NOT orbit around the Sun) */}
-          <GalaxyFadeWrapper>
-            <MilkyWayGalaxy visualScale={UNIFIED_SCALE} showYouAreHere={true} />
-            {showOrbits && <GalacticOrbitRing visualScale={UNIFIED_SCALE} />}
-          </GalaxyFadeWrapper>
-
-          {/* Everything that should orbit around the Milky Way center */}
-          <GalaxyRotator visualScale={UNIFIED_SCALE}>
-            {/* Star particles - custom (dimmer than drei Stars) */}
-            <DimStars radius={1e8} depth={1e7} count={9000} factor={2} saturation={0} fade speed={0.3} opacity={0.08} blending="normal" />
-
-            {/* Sun's light - moves with the solar system */}
-            <pointLight
-              position={[0, 0, 0]}
-              intensity={5}
-              distance={0}
-              decay={1}
-              color="#FFF8E7"
+            <PerspectiveCamera makeDefault position={initialCameraPosition} fov={60} near={0.1} far={1e12} />
+            <OrbitControls
+              makeDefault
+              enablePan={true}
+              enableZoom={true}
+              enableRotate={true}
+              zoomSpeed={2}
+              panSpeed={1}
+              rotateSpeed={0.5}
+              minDistance={1}
+              maxDistance={1e21}
             />
 
-            {/* Track solar system position for camera following at all scales */}
-            <SolarSystemTracker />
+            {/* Camera fly-to controller */}
+            <CameraController />
 
-            {/* Solar System Content - hidden when in Proxima's system */}
-            <SolarSystemContent
-              visualScale={UNIFIED_SCALE}
-              showOrbits={showOrbits}
-              showTrails={showTrails}
-              selectedObject={selectedObject}
-            />
+            {/* Scale tracker - updates store with current scale level */}
+            <ScaleTracker />
 
-            {/* Distant stars - tiny point-like spheres (very dim) */}
-            {stars.map((star) => {
-              const starPos = star.position.map((p) => p * UNIFIED_SCALE) as [number, number, number];
-              return (
-                <WorldPositionTracker key={star.id} objectId={star.id} position={starPos} updateInterval={0.15}>
-                  <mesh position={[0, 0, 0]}>
-                    <sphereGeometry args={[80, 6, 6]} />
-                    <meshBasicMaterial color={star.color} transparent opacity={0.08} />
-                  </mesh>
-                </WorldPositionTracker>
-              );
-            })}
+            {/* Star system tracker - detects when zoomed into any star system */}
+            <StarSystemTracker />
 
-            {/* Proxima Centauri system - hidden when in Sun's system */}
-            <ProximaSystem visualScale={UNIFIED_SCALE} />
+            {/* Warmup gate: once textures are loaded, wait a couple frames + compile */}
+            <CosmosBootGate enabled={texturesReady} onReady={handleSceneReady} warmupFrames={2} />
 
-            {/* Nebulae - fade with galaxy */}
+            {/* Lighting - ambient stays outside, Sun light goes inside rotator */}
+            <ambientLight intensity={0.02} />
+            <hemisphereLight args={['#ffffff', '#444466', 0.15]} />
+
+            {/* Galactic ambient glow (screen-space background; always present) */}
+            <GalaxySkyGlow />
+
+            {/* Global galaxy time manager - called once to update rotation time */}
+            <GalaxyTimeManager />
+
+            {/* Milky Way Galaxy + orbital ring are anchored to the galactic center (they should NOT orbit around the Sun) */}
             <GalaxyFadeWrapper>
-              {nebulae.map((nebula) => (
-                <Nebula key={nebula.id} nebula={nebula} visualScale={UNIFIED_SCALE} />
-              ))}
+              <MilkyWayGalaxy visualScale={UNIFIED_SCALE} showYouAreHere={true} />
+              {showOrbits && <GalacticOrbitRing visualScale={UNIFIED_SCALE} />}
             </GalaxyFadeWrapper>
-          </GalaxyRotator>
 
-          {/* Distant Galaxies - OUTSIDE the GalaxyRotator so they don't rotate with Milky Way */}
-          {/* Hidden when within solar system or Proxima Centauri system for performance */}
-          {showDistantGalaxies && (
-            <>
+            {/* Everything that should orbit around the Milky Way center */}
+            <GalaxyRotator visualScale={UNIFIED_SCALE}>
+              {/* Star particles - custom (dimmer than drei Stars) */}
+              <DimStars
+                radius={1e8}
+                depth={1e7}
+                count={9000}
+                factor={2}
+                saturation={0}
+                fade
+                speed={0.3}
+                opacity={0.08}
+                blending="normal"
+              />
+
+              {/* Sun's light - moves with the solar system */}
+              <pointLight position={[0, 0, 0]} intensity={5} distance={0} decay={1} color="#FFF8E7" />
+
+              {/* Track solar system position for camera following at all scales */}
+              <SolarSystemTracker />
+
+              {/* Solar System Content - hidden when in Proxima's system */}
+              <SolarSystemContent
+                visualScale={UNIFIED_SCALE}
+                showOrbits={showOrbits}
+                showTrails={showTrails}
+                selectedObject={selectedObject}
+              />
+
+              {/* Distant stars - tiny point-like spheres (very dim) */}
+              {stars.map((star) => {
+                const starPos = star.position.map((p) => p * UNIFIED_SCALE) as [number, number, number];
+                return (
+                  <WorldPositionTracker key={star.id} objectId={star.id} position={starPos} updateInterval={0.15}>
+                    <mesh position={[0, 0, 0]}>
+                      <sphereGeometry args={[80, 6, 6]} />
+                      <meshBasicMaterial color={star.color} transparent opacity={0.08} />
+                    </mesh>
+                  </WorldPositionTracker>
+                );
+              })}
+
+              {/* Proxima Centauri system - hidden when in Sun's system */}
+              <ProximaSystem visualScale={UNIFIED_SCALE} />
+
+              {/* Nebulae - fade with galaxy */}
+              <GalaxyFadeWrapper>
+                {nebulae.map((nebula) => (
+                  <Nebula key={nebula.id} nebula={nebula} visualScale={UNIFIED_SCALE} />
+                ))}
+              </GalaxyFadeWrapper>
+            </GalaxyRotator>
+
+            {/* Distant Galaxies - keep mounted so geometry is built during loader; only render when needed */}
+            <group visible={showDistantGalaxies}>
               <AndromedaGalaxy visualScale={UNIFIED_SCALE} />
               <TriangulumGalaxy visualScale={UNIFIED_SCALE} />
               <WhirlpoolGalaxy visualScale={UNIFIED_SCALE} />
               <SombreroGalaxy visualScale={UNIFIED_SCALE} />
               {/* Local Group dwarf galaxies - ~80 procedural satellites */}
               <LocalGroupDwarfGalaxies visualScale={UNIFIED_SCALE} />
-            </>
-          )}
-          
-          {/* Virgo Supercluster - visible at supercluster scale (~110 Mly diameter) */}
-          <VirgoSupercluster visualScale={UNIFIED_SCALE} />
-          
-          {/* Laniakea - visible at Laniakea scale (~520 Mly diameter) */}
-          <Laniakea visualScale={UNIFIED_SCALE} />
-          
-          {/* Cosmic Web - large-scale structure with filaments */}
-          <CosmicWeb visualScale={UNIFIED_SCALE} />
-          
-          {/* Bloom post-processing - disabled (was making galaxies look overexposed) */}
-          <EffectComposer>
-            <SelectiveBloom
-              intensity={0}
-              luminanceThreshold={999}
-              luminanceSmoothing={0}
-            />
-          </EffectComposer>
-          
-          {/* Performance stats */}
-          <PerformanceHUD />
+            </group>
+
+            {/* Virgo Supercluster - visible at supercluster scale (~110 Mly diameter) */}
+            <VirgoSupercluster visualScale={UNIFIED_SCALE} />
+
+            {/* Laniakea - visible at Laniakea scale (~520 Mly diameter) */}
+            <Laniakea visualScale={UNIFIED_SCALE} />
+
+            {/* Cosmic Web - large-scale structure with filaments */}
+            <CosmicWeb visualScale={UNIFIED_SCALE} />
+
+            {/* Bloom post-processing - disabled (was making galaxies look overexposed) */}
+            <EffectComposer>
+              <SelectiveBloom intensity={0} luminanceThreshold={999} luminanceSmoothing={0} />
+            </EffectComposer>
+
+            {/* Performance stats */}
+            <PerformanceHUD />
           </Selection>
         </Suspense>
       </Canvas>
-      )}
-      
-      {/* UI Overlays - only show when loaded */}
-      {isLoaded && (
+
+      {/* UI Overlays - only after boot completes */}
+      {bootDone && (
         <>
           <CosmosUI />
           <TourOverlay />
