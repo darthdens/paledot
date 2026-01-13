@@ -108,39 +108,54 @@ export const AndromedaGalaxy = ({ visualScale }: AndromedaGalaxyProps) => {
       positions[i3 + 2] = Math.sin(angle) * finalRadius;
 
       const rand = seededRandom();
+      // Brighter colors to match Whirlpool's visual density
       if (rt < 0.12) {
         if (rand < 0.6) {
-          color.setHSL(0.6 + seededRandom() * 0.05, 0.15 + seededRandom() * 0.1, 0.85 + seededRandom() * 0.1);
+          color.setHSL(0.12 + seededRandom() * 0.04, 0.35 + seededRandom() * 0.15, 0.85 + seededRandom() * 0.1);
         } else {
-          color.setHSL(0.58 + seededRandom() * 0.06, 0.6 + seededRandom() * 0.2, 0.75 + seededRandom() * 0.12);
+          color.setHSL(0.1 + seededRandom() * 0.05, 0.5 + seededRandom() * 0.2, 0.78 + seededRandom() * 0.12);
         }
       } else if (rt < 0.25) {
-        if (rand < 0.7) {
-          color.setHSL(0.58 + seededRandom() * 0.08, 0.75 + seededRandom() * 0.2, 0.58 + seededRandom() * 0.12);
-        } else {
-          color.setHSL(0.6 + seededRandom() * 0.04, 0.4 + seededRandom() * 0.15, 0.75 + seededRandom() * 0.1);
-        }
-      } else if (rt < 0.45) {
-        if (rand < 0.45) {
-          color.setHSL(0.08 + seededRandom() * 0.06, 0.9 + seededRandom() * 0.1, 0.52 + seededRandom() * 0.12);
+        if (rand < 0.4) {
+          color.setHSL(0.11 + seededRandom() * 0.04, 0.45 + seededRandom() * 0.2, 0.72 + seededRandom() * 0.12);
+        } else if (rand < 0.7) {
+          color.setHSL(0.56 + seededRandom() * 0.1, 0.6 + seededRandom() * 0.25, 0.58 + seededRandom() * 0.15);
         } else if (rand < 0.85) {
-          color.setHSL(0.56 + seededRandom() * 0.1, 0.85 + seededRandom() * 0.15, 0.55 + seededRandom() * 0.12);
+          color.setHSL(0.92 + seededRandom() * 0.06, 0.85 + seededRandom() * 0.12, 0.6 + seededRandom() * 0.12);
         } else {
-          color.setHSL(0.52 + seededRandom() * 0.06, 0.9 + seededRandom() * 0.1, 0.6 + seededRandom() * 0.1);
+          color.setHSL(0.6 + seededRandom() * 0.05, 0.2 + seededRandom() * 0.1, 0.82 + seededRandom() * 0.1);
         }
-      } else if (rt < 0.7) {
-        if (rand < 0.8) {
-          color.setHSL(0.55 + seededRandom() * 0.12, 0.9 + seededRandom() * 0.1, 0.55 + seededRandom() * 0.15);
-        } else if (rand < 0.92) {
-          color.setHSL(0.5 + seededRandom() * 0.08, 0.95, 0.6 + seededRandom() * 0.1);
+      } else if (rt < 0.5) {
+        if (rand < 0.35) {
+          color.setHSL(0.93 + seededRandom() * 0.05, 0.88 + seededRandom() * 0.1, 0.58 + seededRandom() * 0.12);
+        } else if (rand < 0.55) {
+          color.setHSL(0.55 + seededRandom() * 0.12, 0.75 + seededRandom() * 0.2, 0.55 + seededRandom() * 0.15);
+        } else if (rand < 0.72) {
+          color.setHSL(0.98 + seededRandom() * 0.04, 0.8 + seededRandom() * 0.15, 0.52 + seededRandom() * 0.12);
+        } else if (rand < 0.88) {
+          color.setHSL(0.52 + seededRandom() * 0.08, 0.7 + seededRandom() * 0.2, 0.54 + seededRandom() * 0.12);
         } else {
-          color.setHSL(0.06 + seededRandom() * 0.05, 0.85 + seededRandom() * 0.1, 0.5 + seededRandom() * 0.1);
+          color.setHSL(0.58 + seededRandom() * 0.06, 0.35 + seededRandom() * 0.15, 0.74 + seededRandom() * 0.12);
+        }
+      } else if (rt < 0.75) {
+        if (rand < 0.28) {
+          color.setHSL(0.94 + seededRandom() * 0.04, 0.82 + seededRandom() * 0.15, 0.55 + seededRandom() * 0.12);
+        } else if (rand < 0.55) {
+          color.setHSL(0.56 + seededRandom() * 0.1, 0.7 + seededRandom() * 0.2, 0.52 + seededRandom() * 0.15);
+        } else if (rand < 0.75) {
+          color.setHSL(0.58 + seededRandom() * 0.08, 0.45 + seededRandom() * 0.2, 0.56 + seededRandom() * 0.12);
+        } else if (rand < 0.9) {
+          color.setHSL(0.5 + seededRandom() * 0.08, 0.65 + seededRandom() * 0.2, 0.54 + seededRandom() * 0.1);
+        } else {
+          color.setHSL(0.0 + seededRandom() * 0.03, 0.7 + seededRandom() * 0.2, 0.48 + seededRandom() * 0.1);
         }
       } else {
-        if (rand < 0.85) {
-          color.setHSL(0.55 + seededRandom() * 0.1, 0.92 + seededRandom() * 0.08, 0.5 + seededRandom() * 0.15);
+        if (rand < 0.6) {
+          color.setHSL(0.57 + seededRandom() * 0.1, 0.5 + seededRandom() * 0.25, 0.5 + seededRandom() * 0.15);
+        } else if (rand < 0.85) {
+          color.setHSL(0.55 + seededRandom() * 0.12, 0.6 + seededRandom() * 0.2, 0.48 + seededRandom() * 0.12);
         } else {
-          color.setHSL(0.5 + seededRandom() * 0.06, 0.95, 0.58 + seededRandom() * 0.12);
+          color.setHSL(0.95 + seededRandom() * 0.04, 0.65 + seededRandom() * 0.2, 0.5 + seededRandom() * 0.1);
         }
       }
 
@@ -182,14 +197,15 @@ export const AndromedaGalaxy = ({ visualScale }: AndromedaGalaxyProps) => {
       positions[i3 + 2] = r * Math.sin(phi) * Math.sin(theta);
 
       const rand = seededRandom();
-      if (t < 0.3) {
-        color.setHSL(0.6 + seededRandom() * 0.05, 0.1 + seededRandom() * 0.1, 0.9 + seededRandom() * 0.08);
-      } else if (rand < 0.5) {
-        color.setHSL(0.58 + seededRandom() * 0.06, 0.25 + seededRandom() * 0.15, 0.78 + seededRandom() * 0.12);
-      } else if (rand < 0.8) {
-        color.setHSL(0.58 + seededRandom() * 0.08, 0.45 + seededRandom() * 0.2, 0.65 + seededRandom() * 0.15);
+      // Brighter core colors
+      if (t < 0.4) {
+        color.setHSL(0.12 + seededRandom() * 0.03, 0.3 + seededRandom() * 0.1, 0.9 + seededRandom() * 0.08);
+      } else if (rand < 0.6) {
+        color.setHSL(0.1 + seededRandom() * 0.04, 0.45 + seededRandom() * 0.15, 0.8 + seededRandom() * 0.1);
+      } else if (rand < 0.85) {
+        color.setHSL(0.08 + seededRandom() * 0.05, 0.55 + seededRandom() * 0.2, 0.7 + seededRandom() * 0.12);
       } else {
-        color.setHSL(0.08 + seededRandom() * 0.04, 0.4 + seededRandom() * 0.2, 0.6 + seededRandom() * 0.15);
+        color.setHSL(0.06 + seededRandom() * 0.04, 0.6 + seededRandom() * 0.15, 0.62 + seededRandom() * 0.12);
       }
 
       colors[i3] = color.r;
@@ -235,12 +251,13 @@ export const AndromedaGalaxy = ({ visualScale }: AndromedaGalaxyProps) => {
       positions[i3 + 1] = y;
 
       const rand = seededRandom();
+      // Brighter halo colors
       if (rand < 0.5) {
-        color.setHSL(0.12 + seededRandom() * 0.06, 0.3 + seededRandom() * 0.2, 0.65 + seededRandom() * 0.15);
+        color.setHSL(0.58 + seededRandom() * 0.1, 0.35 + seededRandom() * 0.2, 0.55 + seededRandom() * 0.15);
       } else if (rand < 0.8) {
-        color.setHSL(0.08 + seededRandom() * 0.05, 0.5 + seededRandom() * 0.2, 0.55 + seededRandom() * 0.15);
+        color.setHSL(0.12 + seededRandom() * 0.06, 0.3 + seededRandom() * 0.15, 0.58 + seededRandom() * 0.15);
       } else {
-        color.setHSL(0.58 + seededRandom() * 0.08, 0.6 + seededRandom() * 0.2, 0.55 + seededRandom() * 0.15);
+        color.setHSL(0.55 + seededRandom() * 0.08, 0.25 + seededRandom() * 0.15, 0.62 + seededRandom() * 0.12);
       }
 
       colors[i3] = color.r;
