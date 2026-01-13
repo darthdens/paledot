@@ -61,7 +61,7 @@ export const AndromedaGalaxy = ({ visualScale }: AndromedaGalaxyProps) => {
   const starsGeoFull = useMemo(() => {
     const { branches, spinTurns } = ANDROMEDA;
     const maxRadius = ANDROMEDA.diskRadius * gs;
-    const starCount = 700000;
+    const starCount = 1200000; // Increased from 700k to match Whirlpool density
 
     const positions = new Float32Array(starCount * 3);
     const colors = new Float32Array(starCount * 3);
@@ -157,7 +157,7 @@ export const AndromedaGalaxy = ({ visualScale }: AndromedaGalaxyProps) => {
   }, [gs]);
 
   const coreGeoFull = useMemo(() => {
-    const coreCount = 180000;
+    const coreCount = 350000; // Increased from 180k for denser core
     const positions = new Float32Array(coreCount * 3);
     const colors = new Float32Array(coreCount * 3);
     const color = new THREE.Color();
@@ -205,7 +205,7 @@ export const AndromedaGalaxy = ({ visualScale }: AndromedaGalaxyProps) => {
   }, [gs]);
 
   const haloGeoFull = useMemo(() => {
-    const haloCount = 35000;
+    const haloCount = 80000; // Increased from 35k
     const maxRadius = ANDROMEDA.diskRadius * gs * 0.5;
     const maxHeight = ANDROMEDA.diskRadius * gs * 0.15;
     const positions = new Float32Array(haloCount * 3);
