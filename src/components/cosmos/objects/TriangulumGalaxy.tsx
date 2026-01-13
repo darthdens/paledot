@@ -147,7 +147,7 @@ export const TriangulumGalaxy = ({ visualScale }: TriangulumGalaxyProps) => {
   }, [gs]);
 
   const coreGeoFull = useMemo(() => {
-    const coreCount = 60000;
+    const coreCount = 120000; // Increased for denser core
     const positions = new Float32Array(coreCount * 3);
     const colors = new Float32Array(coreCount * 3);
     const color = new THREE.Color();
@@ -155,7 +155,8 @@ export const TriangulumGalaxy = ({ visualScale }: TriangulumGalaxyProps) => {
 
     for (let i = 0; i < coreCount; i++) {
       const i3 = i * 3;
-      const r = Math.pow(Math.random(), 1.3) * coreRadius;
+      // Lower exponent = more concentrated toward center
+      const r = Math.pow(Math.random(), 2.0) * coreRadius;
       const theta = Math.random() * Math.PI * 2;
       const phi = Math.acos(2 * Math.random() - 1);
       const t = r / coreRadius;
@@ -165,12 +166,13 @@ export const TriangulumGalaxy = ({ visualScale }: TriangulumGalaxyProps) => {
       positions[i3 + 2] = r * Math.sin(phi) * Math.sin(theta);
 
       const rand = Math.random();
+      // Brighter colors for core stars
       if (t < 0.5) {
-        color.setHSL(0.6 + Math.random() * 0.05, 0.25 + Math.random() * 0.15, 0.88 + Math.random() * 0.08);
+        color.setHSL(0.6 + Math.random() * 0.05, 0.2 + Math.random() * 0.1, 0.92 + Math.random() * 0.08);
       } else if (rand < 0.7) {
-        color.setHSL(0.58 + Math.random() * 0.06, 0.4 + Math.random() * 0.2, 0.75 + Math.random() * 0.12);
+        color.setHSL(0.58 + Math.random() * 0.06, 0.35 + Math.random() * 0.15, 0.85 + Math.random() * 0.1);
       } else {
-        color.setHSL(0.56 + Math.random() * 0.08, 0.6 + Math.random() * 0.2, 0.6 + Math.random() * 0.15);
+        color.setHSL(0.56 + Math.random() * 0.08, 0.5 + Math.random() * 0.15, 0.75 + Math.random() * 0.12);
       }
 
       colors[i3] = color.r;
@@ -288,9 +290,9 @@ export const TriangulumGalaxy = ({ visualScale }: TriangulumGalaxyProps) => {
         <DifferentialRotationPoints
           key="triangulum-core"
           geometry={coreGeo}
-          size={gs * 75 * sizeMultiplier}
+          size={gs * 90 * sizeMultiplier}
           map={dotTexture}
-          opacity={0.95}
+          opacity={1.0}
           maxRadius={TRIANGULUM.bulgeRadius * gs}
           rotationMultiplier={1.5}
           renderOrder={3}
