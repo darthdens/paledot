@@ -122,10 +122,12 @@ export const CameraController = () => {
       let visualSize = selectedObject.size * UNIFIED_SCALE;
       
       if (selectedObject.category === 'deepSpace') {
-        // Deep space objects: positions and sizes are in light-years
+        // Deep space objects: these are VIEWPOINTS, not objects to look at
+        // Camera positions itself at the object's position and looks at the ORIGIN (center of universe)
         visualSize = selectedObject.size * UNITS.KM_PER_LY * UNIFIED_SCALE;
-        // View from appropriate distance based on structure size
-        flyToDistance.current = Math.max(visualSize * 0.3, 1e10);
+        // Distance based on structure size - larger structures need more distance
+        const sizeMultiplier = selectedObject.id === 'observable-universe' ? 1.5 : 0.8;
+        flyToDistance.current = Math.max(visualSize * sizeMultiplier, 1e12);
       } else if (selectedObject.category === 'nebulae') {
         // Nebula size is in light-years - use a much larger viewing distance
         visualSize = selectedObject.size * UNITS.KM_PER_LY * UNIFIED_SCALE;
@@ -163,20 +165,28 @@ export const CameraController = () => {
 
       const targetPos = liveTargetPos ?? fallbackPos;
 
-      // Set target to object center
-      endTarget.current.set(targetPos[0], targetPos[1], targetPos[2]);
+      // For deep space viewpoints: camera goes TO the position and LOOKS AT origin (center of universe)
+      if (selectedObject.category === 'deepSpace') {
+        // Camera position IS the object's defined position (the viewpoint)
+        endPosition.current.set(targetPos[0], targetPos[1], targetPos[2]);
+        // Look at the origin (center of our universe where Milky Way is)
+        endTarget.current.set(0, 0, 0);
+      } else {
+        // For regular objects: look at the object
+        endTarget.current.set(targetPos[0], targetPos[1], targetPos[2]);
 
-      // Initialize follow smoothing from the current target to avoid an initial "snap"
-      smoothedTarget.current.copy(orbitControls.target);
+        // Initialize follow smoothing from the current target to avoid an initial "snap"
+        smoothedTarget.current.copy(orbitControls.target);
 
-      // Calculate camera position - offset from target
-      cameraOffset.current.set(
-        flyToDistance.current * 0.5,
-        flyToDistance.current * 0.3,
-        flyToDistance.current
-      );
+        // Calculate camera position - offset from target
+        cameraOffset.current.set(
+          flyToDistance.current * 0.5,
+          flyToDistance.current * 0.3,
+          flyToDistance.current
+        );
 
-      endPosition.current.copy(endTarget.current).add(cameraOffset.current);
+        endPosition.current.copy(endTarget.current).add(cameraOffset.current);
+      }
     };
 
     const getLivePos = () => useCosmosStore.getState().objectWorldPositions[selectedObject.id];

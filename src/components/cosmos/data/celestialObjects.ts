@@ -615,17 +615,17 @@ export const celestialObjects: CelestialObject[] = [
   },
 
   // ==================== DEEP SPACE ====================
-  // These are scale-based viewpoints, positioned to show our existing visual elements
-  // Positions are in scene units (already scaled) for direct camera positioning
+  // These are VIEWPOINTS - the position is where the CAMERA goes, looking at origin (center of universe)
+  // Positions are in light-years, will be scaled by UNITS.KM_PER_LY * UNIFIED_SCALE
   
   // LOCAL GROUP (~10 Mly) - view centered to see Milky Way, Andromeda, Triangulum together
   {
     id: 'local-group',
     name: { en: 'Local Group', fr: 'Groupe Local' },
     type: 'cluster',
-    // Position in light-years (same as stars/nebulae) - camera will fly here to see our galaxies
-    position: [1.5e6, 0.5e6, 1.5e6], // 1.5 Mly offset to view MW, Andromeda, Triangulum
-    size: 10e6, // ~10 Mly diameter in light-years
+    // Camera viewpoint position - offset from origin to see the Local Group galaxies
+    position: [4e6, 2e6, 4e6], // 4 Mly away, looking back at origin
+    size: 10e6, // ~10 Mly diameter in light-years (used for info display)
     color: '#87ceeb',
     distanceFromEarth: 0, // We're in it
     distanceUnit: 'Mly',
@@ -641,8 +641,8 @@ export const celestialObjects: CelestialObject[] = [
     id: 'virgo-supercluster',
     name: { en: 'Virgo Supercluster', fr: 'Superamas de la Vierge' },
     type: 'supercluster',
-    // Position in light-years to view the larger structure
-    position: [30e6, 10e6, 20e6], // 30 Mly offset
+    // Camera viewpoint position - farther out to see supercluster structure
+    position: [80e6, 40e6, 60e6], // 80 Mly away
     size: 110e6, // ~110 Mly diameter
     color: '#ffb347',
     distanceFromEarth: 0, // We're in it
@@ -659,8 +659,8 @@ export const celestialObjects: CelestialObject[] = [
     id: 'laniakea',
     name: { en: 'Laniakea Supercluster', fr: 'Superamas Laniakea' },
     type: 'supercluster',
-    // Position in light-years to view the cosmic web filaments
-    position: [150e6, 50e6, 100e6], // 150 Mly offset
+    // Camera viewpoint position - far enough to see cosmic web filaments
+    position: [400e6, 200e6, 300e6], // 400 Mly away
     size: 520e6, // ~520 Mly diameter
     color: '#9370db',
     distanceFromEarth: 0, // We're in it
@@ -677,8 +677,8 @@ export const celestialObjects: CelestialObject[] = [
     id: 'observable-universe',
     name: { en: 'Observable Universe', fr: 'Univers Observable' },
     type: 'other',
-    // Position in light-years - far enough to see the full cosmic web structure
-    position: [5e9, 3e9, 4e9], // 5 Bly offset
+    // Camera viewpoint position - way out to see the full cosmic web
+    position: [30e9, 20e9, 25e9], // 30 Bly away - much farther for proper view
     size: 93e9, // 93 Bly diameter
     color: '#dc143c',
     distanceFromEarth: 46.5,
