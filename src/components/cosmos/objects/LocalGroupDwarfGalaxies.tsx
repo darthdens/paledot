@@ -1,5 +1,4 @@
-import { useRef, useMemo, useEffect } from 'react';
-import { useFrame, useThree } from '@react-three/fiber';
+import { useMemo } from 'react';
 import * as THREE from 'three';
 import { UNITS } from '../types';
 
@@ -12,253 +11,190 @@ type DwarfType = 'irregular' | 'elliptical' | 'spheroidal';
 
 interface DwarfGalaxy {
   position: [number, number, number];
-  size: number; // in light-years
   type: DwarfType;
   color: THREE.Color;
   brightness: number;
-  seed: number;
+  sizePx: number; // screen-space size
 }
 
 // Generate ~80 realistic Local Group dwarf galaxies
 // Real Local Group spans roughly 10 million light-years
-// Most dwarfs are 1,000 - 10,000 light-years across
 const generateDwarfGalaxies = (gs: number): DwarfGalaxy[] => {
   const galaxies: DwarfGalaxy[] = [];
-  const count = 82; // Match real Local Group count
-  
+  const targetCount = 82;
+
   // Seeded random for consistency
-  const seededRandom = (seed: number) => {
+  const rnd = (seed: number) => {
     const x = Math.sin(seed * 9999) * 10000;
     return x - Math.floor(x);
   };
-  
-  // Local Group rough bounds in light-years
-  const localGroupRadius = 5e6; // 5 million light-years
-  
-  // Colors for different dwarf types
+
+  // Local Group bounds in light-years (radius ~5 Mly => ~10 Mly across)
+  const localGroupRadiusLy = 5e6;
+
   const irregularColors = [
-    new THREE.Color('#8ecae6'), // Blue (active star formation)
+    new THREE.Color('#8ecae6'),
     new THREE.Color('#a0d2db'),
     new THREE.Color('#bee3db'),
   ];
-  
+
   const ellipticalColors = [
-    new THREE.Color('#ffd6a5'), // Yellow/orange (older stars)
+    new THREE.Color('#ffd6a5'),
     new THREE.Color('#ffb88c'),
     new THREE.Color('#f9c74f'),
   ];
-  
+
   const spheroidalColors = [
-    new THREE.Color('#e6ccb2'), // Pale (very old, little gas)
+    new THREE.Color('#e6ccb2'),
     new THREE.Color('#ddb892'),
     new THREE.Color('#b08968'),
   ];
-  
-  for (let i = 0; i < count; i++) {
-    const seed = i * 12345.6789;
-    
-    // Distribute in a rough sphere with clustering toward center
-    const u = seededRandom(seed);
-    const v = seededRandom(seed + 1);
+
+  // We generate a few extra candidates then take the first N that pass constraints
+  for (let i = 0; i < 2000 && galaxies.length < targetCount; i++) {
+    const seed = (i + 1) * 12345.6789;
+
+    // Spherical distribution
+    const u = rnd(seed);
+    const v = rnd(seed + 1);
     const theta = 2 * Math.PI * u;
     const phi = Math.acos(2 * v - 1);
-    
-    // Use exponential falloff for realistic clustering
-    const radialU = seededRandom(seed + 2);
-    const distance = localGroupRadius * Math.pow(radialU, 0.4) * 0.9; // Most within 4.5Mly
-    
-    // Add some vertical flattening (Local Group is slightly flattened)
+
+    // Exponential falloff (cluster toward center)
+    const radialU = rnd(seed + 2);
+    const distanceLy = localGroupRadiusLy * Math.pow(radialU, 0.42) * 0.95;
+
+    // Slight flattening
     const flattenFactor = 0.7;
-    
-    const x = distance * Math.sin(phi) * Math.cos(theta);
-    const y = distance * Math.cos(phi) * flattenFactor;
-    const z = distance * Math.sin(phi) * Math.sin(theta);
-    
-    // Avoid placing galaxies too close to major galaxies
-    // (Milky Way at origin, Andromeda at ~2.5Mly, Triangulum at ~2.7Mly)
-    const distFromOrigin = Math.sqrt(x * x + y * y + z * z);
-    if (distFromOrigin < 50000) continue; // Skip if too close to Milky Way core
-    
-    // Size: most dwarfs are 1,000-10,000 ly, some up to 30,000 ly
-    const sizeRand = seededRandom(seed + 3);
-    const size = 1000 + Math.pow(sizeRand, 2) * 29000; // Bias toward smaller
-    
+
+    const xLy = distanceLy * Math.sin(phi) * Math.cos(theta);
+    const yLy = distanceLy * Math.cos(phi) * flattenFactor;
+    const zLy = distanceLy * Math.sin(phi) * Math.sin(theta);
+
+    // Keep a "clear" area around Milky Way core (50k ly)
+    const distFromOriginLy = Math.sqrt(xLy * xLy + yLy * yLy + zLy * zLy);
+    if (distFromOriginLy < 50000) continue;
+
     // Type distribution: 40% irregular, 25% elliptical, 35% spheroidal
-    const typeRand = seededRandom(seed + 4);
+    const typeRand = rnd(seed + 4);
     let type: DwarfType;
-    let colors: THREE.Color[];
-    
+    let palette: THREE.Color[];
+
     if (typeRand < 0.4) {
       type = 'irregular';
-      colors = irregularColors;
+      palette = irregularColors;
     } else if (typeRand < 0.65) {
       type = 'elliptical';
-      colors = ellipticalColors;
+      palette = ellipticalColors;
     } else {
       type = 'spheroidal';
-      colors = spheroidalColors;
+      palette = spheroidalColors;
     }
-    
-    const colorIndex = Math.floor(seededRandom(seed + 5) * colors.length);
-    const color = colors[colorIndex].clone();
-    
-    // Slight color variation
-    color.r += (seededRandom(seed + 6) - 0.5) * 0.1;
-    color.g += (seededRandom(seed + 7) - 0.5) * 0.1;
-    color.b += (seededRandom(seed + 8) - 0.5) * 0.1;
-    
-    // Brightness varies with size and type
-    const brightness = 0.3 + seededRandom(seed + 9) * 0.7;
-    
+
+    const colorIndex = Math.floor(rnd(seed + 5) * palette.length);
+    const color = palette[colorIndex].clone();
+
+    // Subtle per-galaxy tint variance
+    color.r = THREE.MathUtils.clamp(color.r + (rnd(seed + 6) - 0.5) * 0.12, 0, 1);
+    color.g = THREE.MathUtils.clamp(color.g + (rnd(seed + 7) - 0.5) * 0.12, 0, 1);
+    color.b = THREE.MathUtils.clamp(color.b + (rnd(seed + 8) - 0.5) * 0.12, 0, 1);
+
+    const brightness = 0.55 + rnd(seed + 9) * 0.65;
+
+    // Screen-space size (keeps them visible at all cosmic scales)
+    let sizePx = 10 + rnd(seed + 10) * 18; // 10..28px
+    if (type === 'spheroidal') sizePx *= 0.85;
+    if (type === 'irregular') sizePx *= 1.1;
+
     galaxies.push({
-      position: [x * gs, y * gs, z * gs],
-      size: size * gs,
+      position: [xLy * gs, yLy * gs, zLy * gs],
       type,
       color,
       brightness,
-      seed,
+      sizePx,
     });
   }
-  
+
   return galaxies;
 };
 
-// Single instanced mesh for all dwarf galaxies (maximum performance)
 export const LocalGroupDwarfGalaxies = ({ visualScale }: LocalGroupDwarfGalaxiesProps) => {
-  const meshRef = useRef<THREE.InstancedMesh>(null);
-  const { camera } = useThree();
-  const matrixRef = useRef(new THREE.Matrix4());
-  const vec3Ref = useRef(new THREE.Vector3());
-  
   const gs = UNITS.KM_PER_LY * visualScale;
-  
-  const galaxies = useMemo(() => generateDwarfGalaxies(gs), [gs]);
-  
-  // Create instanced attributes
-  const { geometry, colors, count } = useMemo(() => {
-    const count = galaxies.length;
-    
-    // Simple sprite geometry - just a plane
-    const geo = new THREE.PlaneGeometry(1, 1);
-    
-    // Instance colors
-    const colorArray = new Float32Array(count * 3);
-    
-    galaxies.forEach((g, i) => {
-      colorArray[i * 3] = g.color.r * g.brightness;
-      colorArray[i * 3 + 1] = g.color.g * g.brightness;
-      colorArray[i * 3 + 2] = g.color.b * g.brightness;
+
+  const { geometry, material } = useMemo(() => {
+    const dwarfs = generateDwarfGalaxies(gs);
+
+    const positions = new Float32Array(dwarfs.length * 3);
+    const colors = new Float32Array(dwarfs.length * 3);
+    const sizes = new Float32Array(dwarfs.length);
+
+    dwarfs.forEach((g, i) => {
+      positions[i * 3] = g.position[0];
+      positions[i * 3 + 1] = g.position[1];
+      positions[i * 3 + 2] = g.position[2];
+
+      colors[i * 3] = g.color.r * g.brightness;
+      colors[i * 3 + 1] = g.color.g * g.brightness;
+      colors[i * 3 + 2] = g.color.b * g.brightness;
+
+      sizes[i] = g.sizePx;
     });
-    
-    return { geometry: geo, colors: colorArray, count };
-  }, [galaxies]);
-  
-  // Create sprite texture for dwarf galaxies
-  const texture = useMemo(() => {
+
+    const geometry = new THREE.BufferGeometry();
+    geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+    geometry.setAttribute('aSize', new THREE.BufferAttribute(sizes, 1));
+
+    // Soft sprite texture (canvas)
     const size = 64;
     const canvas = document.createElement('canvas');
     canvas.width = size;
     canvas.height = size;
     const ctx = canvas.getContext('2d')!;
-    
-    // Radial gradient for soft galaxy appearance
-    const gradient = ctx.createRadialGradient(
-      size / 2, size / 2, 0,
-      size / 2, size / 2, size / 2
-    );
+
+    const gradient = ctx.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2);
     gradient.addColorStop(0, 'rgba(255, 255, 255, 1)');
-    gradient.addColorStop(0.2, 'rgba(255, 255, 255, 0.8)');
-    gradient.addColorStop(0.5, 'rgba(255, 255, 255, 0.3)');
+    gradient.addColorStop(0.25, 'rgba(255, 255, 255, 0.8)');
+    gradient.addColorStop(0.6, 'rgba(255, 255, 255, 0.25)');
     gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
-    
     ctx.fillStyle = gradient;
     ctx.fillRect(0, 0, size, size);
-    
-    const tex = new THREE.CanvasTexture(canvas);
-    tex.needsUpdate = true;
-    return tex;
-  }, []);
-  
-  // Set up instance matrices on mount
-  useEffect(() => {
-    if (!meshRef.current) return;
-    
-    const mesh = meshRef.current;
-    const matrix = new THREE.Matrix4();
-    
-    galaxies.forEach((g, i) => {
-      // Position
-      matrix.makeTranslation(g.position[0], g.position[1], g.position[2]);
-      
-      // Scale based on size and type
-      let scale = g.size * 2;
-      if (g.type === 'irregular') scale *= 1.2;
-      if (g.type === 'spheroidal') scale *= 0.8;
-      
-      const scaleMatrix = new THREE.Matrix4().makeScale(scale, scale, scale);
-      matrix.multiply(scaleMatrix);
-      
-      mesh.setMatrixAt(i, matrix);
+
+    const texture = new THREE.CanvasTexture(canvas);
+    texture.needsUpdate = true;
+
+    const material = new THREE.ShaderMaterial({
+      uniforms: {
+        uMap: { value: texture },
+      },
+      vertexShader: `
+        attribute float aSize;
+        attribute vec3 color;
+        varying vec3 vColor;
+        void main() {
+          vColor = color;
+          vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
+          gl_Position = projectionMatrix * mvPosition;
+          gl_PointSize = aSize;
+        }
+      `,
+      fragmentShader: `
+        uniform sampler2D uMap;
+        varying vec3 vColor;
+        void main() {
+          vec4 tex = texture2D(uMap, gl_PointCoord);
+          gl_FragColor = vec4(vColor, 1.0) * tex;
+        }
+      `,
+      transparent: true,
+      depthWrite: false,
+      blending: THREE.AdditiveBlending,
     });
-    
-    mesh.instanceMatrix.needsUpdate = true;
-    
-    // Also set instance colors here
-    mesh.instanceColor = new THREE.InstancedBufferAttribute(colors, 3);
-  }, [galaxies, colors]);
-  
-  // Billboard - make sprites face camera (throttled for performance)
-  const frameCount = useRef(0);
-  useFrame(() => {
-    if (!meshRef.current) return;
-    
-    // Only update every 3 frames for performance
-    frameCount.current++;
-    if (frameCount.current % 3 !== 0) return;
-    
-    const mesh = meshRef.current;
-    const matrix = matrixRef.current;
-    const position = vec3Ref.current;
-    
-    // Get camera rotation for billboarding
-    const camQuat = camera.quaternion;
-    
-    galaxies.forEach((g, i) => {
-      mesh.getMatrixAt(i, matrix);
-      position.setFromMatrixPosition(matrix);
-      
-      // Reset matrix with billboarding
-      matrix.makeRotationFromQuaternion(camQuat);
-      
-      // Scale
-      let scale = g.size * 2;
-      if (g.type === 'irregular') scale *= 1.2;
-      if (g.type === 'spheroidal') scale *= 0.8;
-      
-      matrix.scale(new THREE.Vector3(scale, scale, scale));
-      matrix.setPosition(position);
-      
-      mesh.setMatrixAt(i, matrix);
-    });
-    
-    mesh.instanceMatrix.needsUpdate = true;
-  });
-  
-  
+
+    return { geometry, material };
+  }, [gs]);
+
   return (
-    <instancedMesh
-      ref={meshRef}
-      args={[geometry, undefined, count]}
-      frustumCulled={false}
-    >
-      <meshBasicMaterial
-        map={texture}
-        transparent
-        opacity={0.85}
-        depthWrite={false}
-        blending={THREE.AdditiveBlending}
-        vertexColors
-      />
-    </instancedMesh>
+    <points geometry={geometry} material={material} frustumCulled={false} />
   );
 };
