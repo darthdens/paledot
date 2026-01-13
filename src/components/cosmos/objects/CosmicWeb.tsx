@@ -11,9 +11,7 @@ interface CosmicWebProps {
 // Cosmic Web - the large-scale structure of the universe
 // Observable universe radius: ~46.5 billion light-years (Bly)
 // Contains ~2 trillion galaxies arranged in filaments, walls, and clusters
-// Structure resembles a sponge or neural network
-// Filaments: 150-500 Mly long, 30-100 Mly wide
-// Voids: 100-400 Mly diameter, occupy ~80% of volume
+// Filaments naturally define the structure - no artificial boundary needed
 
 const seededRandom = (seed: number) => {
   const x = Math.sin(seed * 9999) * 10000;
@@ -27,14 +25,14 @@ const generateWebNodes = (count: number, maxRadius: number): THREE.Vector3[] => 
   for (let i = 0; i < count; i++) {
     const seed = i * 7777;
     
-    // More uniform distribution across full sphere
-    const r = maxRadius * Math.cbrt(seededRandom(seed)); // Cube root for volume-uniform
+    // Volume-uniform distribution across full sphere
+    const r = maxRadius * Math.cbrt(seededRandom(seed));
     const theta = seededRandom(seed + 1) * Math.PI * 2;
     const phi = Math.acos(2 * seededRandom(seed + 2) - 1);
     
     nodes.push(new THREE.Vector3(
       r * Math.sin(phi) * Math.cos(theta),
-      r * Math.cos(phi) * 0.85, // Slight flattening
+      r * Math.cos(phi) * 0.9,
       r * Math.sin(phi) * Math.sin(theta)
     ));
   }
@@ -42,7 +40,7 @@ const generateWebNodes = (count: number, maxRadius: number): THREE.Vector3[] => 
   return nodes;
 };
 
-// Build Delaunay-like connections for cosmic web
+// Build connections for cosmic web
 const generateFilaments = (nodes: THREE.Vector3[], maxConnectionDist: number) => {
   const connections: { from: THREE.Vector3; to: THREE.Vector3; strength: number }[] = [];
   
@@ -52,14 +50,14 @@ const generateFilaments = (nodes: THREE.Vector3[], maxConnectionDist: number) =>
     const nearby: { idx: number; dist: number }[] = [];
     for (let j = i + 1; j < nodes.length; j++) {
       const dist = node.distanceTo(nodes[j]);
-      if (dist < maxConnectionDist && dist > maxConnectionDist * 0.02) {
+      if (dist < maxConnectionDist && dist > maxConnectionDist * 0.015) {
         nearby.push({ idx: j, dist });
       }
     }
     
     nearby.sort((a, b) => a.dist - b.dist);
-    // Connect to 4-8 neighbors for dense web
-    const connectionCount = Math.min(4 + Math.floor(seededRandom(i * 123) * 4), nearby.length);
+    // Connect to 5-10 neighbors for very dense web
+    const connectionCount = Math.min(5 + Math.floor(seededRandom(i * 123) * 5), nearby.length);
     
     for (let c = 0; c < connectionCount; c++) {
       const target = nodes[nearby[c].idx];
@@ -74,7 +72,6 @@ const generateFilaments = (nodes: THREE.Vector3[], maxConnectionDist: number) =>
 export const CosmicWeb = ({ visualScale }: CosmicWebProps) => {
   const filamentPointsRef = useRef<THREE.Points>(null);
   const nodePointsRef = useRef<THREE.Points>(null);
-  const cmbSphereRef = useRef<THREE.Mesh>(null);
   const { camera } = useThree();
   const currentScale = useCosmosStore(state => state.currentScale);
   
@@ -86,14 +83,13 @@ export const CosmicWeb = ({ visualScale }: CosmicWebProps) => {
   
   const { 
     filamentGeometry, filamentMaterial, 
-    nodeGeometry, nodeMaterial, 
-    cmbGeometry, cmbMaterial 
+    nodeGeometry, nodeMaterial
   } = useMemo(() => {
-    // Dense web structure - many nodes across the entire universe
-    const nodeCount = 3000;
-    const maxRadius = universeRadiusMly * 0.98; // Almost to the CMB edge
+    // Very dense web structure - many nodes across the entire universe
+    const nodeCount = 5000;
+    const maxRadius = universeRadiusMly;
     const nodes = generateWebNodes(nodeCount, maxRadius);
-    const filaments = generateFilaments(nodes, maxRadius * 0.08);
+    const filaments = generateFilaments(nodes, maxRadius * 0.06);
     
     // === FILAMENT PARTICLES - THE MAIN VISUAL ===
     const filamentPositions: number[] = [];
@@ -103,14 +99,14 @@ export const CosmicWeb = ({ visualScale }: CosmicWebProps) => {
     filaments.forEach((fil, fIdx) => {
       const filLength = fil.from.distanceTo(fil.to);
       // More segments for longer filaments
-      const segmentCount = Math.floor(15 + filLength / 500);
-      const filamentWidth = 150 + seededRandom(fIdx * 222) * 250; // Wider filaments
+      const segmentCount = Math.floor(20 + filLength / 300);
+      const filamentWidth = 200 + seededRandom(fIdx * 222) * 350;
       
       for (let s = 0; s <= segmentCount; s++) {
         const t = s / segmentCount;
         
         const seed = fIdx * 1000 + s;
-        const curveAmount = filLength * 0.1;
+        const curveAmount = filLength * 0.12;
         const perpX = (seededRandom(seed) - 0.5) * curveAmount;
         const perpZ = (seededRandom(seed + 50) - 0.5) * curveAmount;
         
@@ -121,7 +117,7 @@ export const CosmicWeb = ({ visualScale }: CosmicWebProps) => {
         const baseZ = fil.from.z + (fil.to.z - fil.from.z) * t + perpZ * curveT;
         
         // Dense particles along filament core
-        const particlesPerSegment = 8 + Math.floor(fil.strength * 15);
+        const particlesPerSegment = 10 + Math.floor(fil.strength * 18);
         for (let p = 0; p < particlesPerSegment; p++) {
           const pseed = seed + p * 100;
           
@@ -131,7 +127,7 @@ export const CosmicWeb = ({ visualScale }: CosmicWebProps) => {
           const gaussianR = Math.sqrt(-2 * Math.log(Math.max(r1, 0.001))) * Math.cos(2 * Math.PI * r2);
           
           const scatter = filamentWidth * gaussianR * 0.35;
-          const scatterY = filamentWidth * 0.25 * (seededRandom(pseed + 2) - 0.5) * gaussianR;
+          const scatterY = filamentWidth * 0.2 * gaussianR * (seededRandom(pseed + 2) - 0.5);
           const scatterZ = filamentWidth * gaussianR * 0.35 * (seededRandom(pseed + 7) - 0.5) * 2;
           
           filamentPositions.push(
@@ -140,41 +136,45 @@ export const CosmicWeb = ({ visualScale }: CosmicWebProps) => {
             (baseZ + scatterZ) * mlyScale
           );
           
-          // Purple/blue/magenta gradient like Illustris/Millennium simulations
-          const hue = 0.68 + seededRandom(pseed + 3) * 0.18; // 0.68-0.86 (blue to magenta)
-          const sat = 0.45 + seededRandom(pseed + 4) * 0.35;
-          const light = 0.2 + fil.strength * 0.35 + seededRandom(pseed + 5) * 0.1;
+          // Purple/blue/magenta gradient like simulations
+          const hue = 0.65 + seededRandom(pseed + 3) * 0.2;
+          const sat = 0.4 + seededRandom(pseed + 4) * 0.4;
+          const light = 0.18 + fil.strength * 0.35 + seededRandom(pseed + 5) * 0.12;
           
           const color = new THREE.Color().setHSL(hue, sat, light);
           filamentColors.push(color.r, color.g, color.b);
-          filamentSizes.push((0.3 + fil.strength * 0.7) * (0.6 + seededRandom(pseed + 6) * 0.4));
+          filamentSizes.push((0.25 + fil.strength * 0.65) * (0.6 + seededRandom(pseed + 6) * 0.4));
         }
       }
     });
     
-    // Additional fine filaments to fill gaps - distributed across entire volume
-    const fineFilamentCount = 600000;
+    // Massive fill of fine structure across entire observable universe
+    const fineFilamentCount = 1200000;
     for (let i = 0; i < fineFilamentCount; i++) {
-      const seed = i + 300000;
+      const seed = i + 500000;
       
-      // Volume-uniform distribution
-      const radius = universeRadiusMly * 0.95 * Math.cbrt(seededRandom(seed));
+      // Volume-uniform distribution to edge
+      const radius = universeRadiusMly * Math.cbrt(seededRandom(seed));
       const theta = seededRandom(seed + 1) * Math.PI * 2;
       const phi = Math.acos(2 * seededRandom(seed + 2) - 1);
       
       filamentPositions.push(
         radius * Math.sin(phi) * Math.cos(theta) * mlyScale,
-        radius * Math.cos(phi) * 0.85 * mlyScale,
+        radius * Math.cos(phi) * 0.9 * mlyScale,
         radius * Math.sin(phi) * Math.sin(theta) * mlyScale
       );
       
+      // Distance-based brightness falloff for natural edge
+      const distFactor = radius / universeRadiusMly;
+      const edgeFade = 1 - Math.pow(distFactor, 3); // Gradual fade at edges
+      
       // Consistent purple/blue colors
-      const hue = 0.62 + seededRandom(seed + 3) * 0.22;
-      const sat = 0.35 + seededRandom(seed + 8) * 0.25;
-      const light = 0.18 + seededRandom(seed + 4) * 0.18;
-      const color = new THREE.Color().setHSL(hue, sat, light);
+      const hue = 0.6 + seededRandom(seed + 3) * 0.25;
+      const sat = 0.3 + seededRandom(seed + 8) * 0.3;
+      const light = (0.15 + seededRandom(seed + 4) * 0.18) * edgeFade;
+      const color = new THREE.Color().setHSL(hue, sat, Math.max(light, 0.05));
       filamentColors.push(color.r, color.g, color.b);
-      filamentSizes.push(0.12 + seededRandom(seed + 5) * 0.2);
+      filamentSizes.push((0.1 + seededRandom(seed + 5) * 0.18) * (0.5 + edgeFade * 0.5));
     }
     
     const filamentGeo = new THREE.BufferGeometry();
@@ -183,24 +183,26 @@ export const CosmicWeb = ({ visualScale }: CosmicWebProps) => {
     filamentGeo.setAttribute('size', new THREE.BufferAttribute(new Float32Array(filamentSizes), 1));
     filamentGeo.boundingSphere = new THREE.Sphere(new THREE.Vector3(0, 0, 0), Infinity);
     
-    // === NODE PARTICLES (galaxy clusters/superclusters at intersections) ===
+    // === NODE PARTICLES (galaxy clusters at intersections) ===
     const nodePositions: number[] = [];
     const nodeColors: number[] = [];
     const nodeSizes: number[] = [];
     
     nodes.forEach((node, idx) => {
-      // Count connections for brightness
       const connectionCount = filaments.filter(f => 
         f.from.equals(node) || f.to.equals(node)
       ).length;
-      const brightness = Math.min(0.35 + connectionCount * 0.08, 1.0);
+      const brightness = Math.min(0.3 + connectionCount * 0.06, 1.0);
       
-      // More particles per node for visible clusters
-      const particleCount = 20 + Math.floor(brightness * 40);
+      // Distance fade for natural boundary
+      const nodeDist = node.length();
+      const edgeFade = 1 - Math.pow(nodeDist / universeRadiusMly, 4);
+      
+      const particleCount = Math.floor((15 + brightness * 35) * edgeFade);
       
       for (let p = 0; p < particleCount; p++) {
         const seed = idx * 1000 + p;
-        const scatter = 100 * (seededRandom(seed) - 0.5);
+        const scatter = 120 * (seededRandom(seed) - 0.5);
         
         nodePositions.push(
           (node.x + scatter) * mlyScale,
@@ -210,12 +212,12 @@ export const CosmicWeb = ({ visualScale }: CosmicWebProps) => {
         
         // Warmer orange/yellow for dense cluster nodes
         const hue = 0.05 + seededRandom(seed + 1) * 0.12;
-        const sat = 0.65 + seededRandom(seed + 2) * 0.3;
-        const light = 0.4 + brightness * 0.35;
+        const sat = 0.6 + seededRandom(seed + 2) * 0.3;
+        const light = (0.35 + brightness * 0.35) * edgeFade;
         
-        const color = new THREE.Color().setHSL(hue, sat, light);
+        const color = new THREE.Color().setHSL(hue, sat, Math.max(light, 0.1));
         nodeColors.push(color.r, color.g, color.b);
-        nodeSizes.push((0.5 + brightness * 1.0) * (0.5 + seededRandom(seed + 3) * 0.5));
+        nodeSizes.push((0.45 + brightness * 0.9) * (0.5 + seededRandom(seed + 3) * 0.5) * edgeFade);
       }
     });
     
@@ -224,45 +226,6 @@ export const CosmicWeb = ({ visualScale }: CosmicWebProps) => {
     nodeGeo.setAttribute('color', new THREE.BufferAttribute(new Float32Array(nodeColors), 3));
     nodeGeo.setAttribute('size', new THREE.BufferAttribute(new Float32Array(nodeSizes), 1));
     nodeGeo.boundingSphere = new THREE.Sphere(new THREE.Vector3(0, 0, 0), Infinity);
-    
-    // === CMB BOUNDARY SPHERE ===
-    // The Cosmic Microwave Background - subtle warm glow at edge of observable universe
-    const cmbRadius = universeRadiusMly * mlyScale;
-    const cmbGeo = new THREE.SphereGeometry(cmbRadius, 64, 32);
-    
-    // CMB shader - subtle warm reddish glow
-    const cmbMat = new THREE.ShaderMaterial({
-      uniforms: {
-        uOpacity: { value: 1.0 },
-      },
-      vertexShader: `
-        varying vec3 vNormal;
-        
-        void main() {
-          vNormal = normalize(normalMatrix * normal);
-          gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-        }
-      `,
-      fragmentShader: `
-        uniform float uOpacity;
-        varying vec3 vNormal;
-        
-        void main() {
-          // Subtle warm cream/red CMB color
-          vec3 cmbColor = vec3(0.35, 0.25, 0.2);
-          
-          // Fresnel edge glow
-          float fresnel = pow(1.0 - abs(dot(vNormal, vec3(0.0, 0.0, 1.0))), 2.0);
-          float edgeGlow = 0.3 + fresnel * 0.5;
-          
-          gl_FragColor = vec4(cmbColor * edgeGlow, uOpacity * 0.25);
-        }
-      `,
-      transparent: true,
-      depthWrite: false,
-      side: THREE.BackSide,
-      blending: THREE.AdditiveBlending,
-    });
     
     // Shared point texture - softer glow
     const texSize = 64;
@@ -323,8 +286,6 @@ export const CosmicWeb = ({ visualScale }: CosmicWebProps) => {
       filamentMaterial: createMaterial(1200000.0),
       nodeGeometry: nodeGeo,
       nodeMaterial: createMaterial(1600000.0),
-      cmbGeometry: cmbGeo,
-      cmbMaterial: cmbMat,
     };
   }, [mlyScale, universeRadiusMly]);
   
@@ -336,9 +297,8 @@ export const CosmicWeb = ({ visualScale }: CosmicWebProps) => {
     // Fade in at large scales
     const fadeIn = THREE.MathUtils.smoothstep(distance, mlyScale * 200, mlyScale * 600);
     
-    const filamentOpacity = fadeIn * 0.75;
+    const filamentOpacity = fadeIn * 0.8;
     const nodeOpacity = fadeIn * 0.85;
-    const cmbOpacity = fadeIn;
     
     if (filamentPointsRef.current) {
       (filamentMaterial as THREE.ShaderMaterial).uniforms.uOpacity.value = filamentOpacity;
@@ -346,23 +306,17 @@ export const CosmicWeb = ({ visualScale }: CosmicWebProps) => {
     if (nodePointsRef.current) {
       (nodeMaterial as THREE.ShaderMaterial).uniforms.uOpacity.value = nodeOpacity;
     }
-    if (cmbSphereRef.current) {
-      (cmbMaterial as THREE.ShaderMaterial).uniforms.uOpacity.value = cmbOpacity;
-    }
   });
   
   if (!isVisible) return null;
   
   return (
     <group>
-      {/* Filaments - the main web structure */}
+      {/* Filaments - the main web structure filling the observable universe */}
       <points ref={filamentPointsRef} geometry={filamentGeometry} material={filamentMaterial} frustumCulled={false} />
       
       {/* Nodes - galaxy clusters at intersections */}
       <points ref={nodePointsRef} geometry={nodeGeometry} material={nodeMaterial} frustumCulled={false} />
-      
-      {/* CMB boundary sphere */}
-      <mesh ref={cmbSphereRef} geometry={cmbGeometry} material={cmbMaterial} frustumCulled={false} />
     </group>
   );
 };
