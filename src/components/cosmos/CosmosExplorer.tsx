@@ -10,6 +10,7 @@ import { AndromedaGalaxy } from './objects/AndromedaGalaxy';
 import { TriangulumGalaxy } from './objects/TriangulumGalaxy';
 import { WhirlpoolGalaxy } from './objects/WhirlpoolGalaxy';
 import { SombreroGalaxy } from './objects/SombreroGalaxy';
+import { LocalGroupDwarfGalaxies } from './objects/LocalGroupDwarfGalaxies';
 import { GalaxySkyGlow } from './objects/GalaxySkyGlow';
 import { GalaxyRotator } from './objects/GalaxyRotator';
 import { GalaxyFadeWrapper } from './GalaxyFadeWrapper';
@@ -200,6 +201,8 @@ export const CosmosExplorer = () => {
               <TriangulumGalaxy visualScale={UNIFIED_SCALE} />
               <WhirlpoolGalaxy visualScale={UNIFIED_SCALE} />
               <SombreroGalaxy visualScale={UNIFIED_SCALE} />
+              {/* Local Group dwarf galaxies - ~80 procedural satellites */}
+              <LocalGroupDwarfGalaxies visualScale={UNIFIED_SCALE} />
             </>
           )}
           
