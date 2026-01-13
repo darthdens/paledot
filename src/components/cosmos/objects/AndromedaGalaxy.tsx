@@ -34,6 +34,9 @@ export const AndromedaGalaxy = ({ visualScale }: AndromedaGalaxyProps) => {
   const gs = UNITS.KM_PER_LY * visualScale;
   const diskR = ANDROMEDA.diskRadius * gs;
 
+  // Bump this whenever we tweak star generation so Fast Refresh recomputes geometries
+  const GEOMETRY_VERSION = 2;
+
   const andromedaPosition = useMemo<[number, number, number]>(
     () => [
       ANDROMEDA.distanceFromMilkyWay * gs * 0.7,
@@ -169,7 +172,7 @@ export const AndromedaGalaxy = ({ visualScale }: AndromedaGalaxyProps) => {
     geo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
     geo.boundingSphere = new THREE.Sphere(new THREE.Vector3(0, 0, 0), Infinity);
     return geo;
-  }, [gs]);
+  }, [gs, GEOMETRY_VERSION]);
 
   const coreGeoFull = useMemo(() => {
     const coreCount = 180000;
@@ -218,7 +221,7 @@ export const AndromedaGalaxy = ({ visualScale }: AndromedaGalaxyProps) => {
     geo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
     geo.boundingSphere = new THREE.Sphere(new THREE.Vector3(0, 0, 0), Infinity);
     return geo;
-  }, [gs]);
+  }, [gs, GEOMETRY_VERSION]);
 
   const haloGeoFull = useMemo(() => {
     const haloCount = 35000;
@@ -270,7 +273,7 @@ export const AndromedaGalaxy = ({ visualScale }: AndromedaGalaxyProps) => {
     geo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
     geo.boundingSphere = new THREE.Sphere(new THREE.Vector3(0, 0, 0), Infinity);
     return geo;
-  }, [gs]);
+  }, [gs, GEOMETRY_VERSION]);
 
   // Keep full star counts always (like Whirlpool's perceived behavior in the UI)
   const starsGeo = starsGeoFull;
@@ -306,7 +309,7 @@ export const AndromedaGalaxy = ({ visualScale }: AndromedaGalaxyProps) => {
       <group rotation={[ANDROMEDA.inclination, 0.3, 0]}>
         <DifferentialRotationPoints
           geometry={haloGeo}
-          size={gs * 40 * sizeMultiplier}
+          size={gs * 45 * sizeMultiplier}
           map={dotTexture}
           opacity={0.28}
           maxRadius={diskR * 1.2}
@@ -317,7 +320,7 @@ export const AndromedaGalaxy = ({ visualScale }: AndromedaGalaxyProps) => {
 
         <DifferentialRotationPoints
           geometry={starsGeo}
-          size={gs * 55 * sizeMultiplier}
+          size={gs * 62 * sizeMultiplier}
           map={dotTexture}
           opacity={0.88}
           maxRadius={diskR}
@@ -328,7 +331,7 @@ export const AndromedaGalaxy = ({ visualScale }: AndromedaGalaxyProps) => {
 
         <DifferentialRotationPoints
           geometry={coreGeo}
-          size={gs * 90 * sizeMultiplier}
+          size={gs * 95 * sizeMultiplier}
           map={dotTexture}
           opacity={0.95}
           maxRadius={ANDROMEDA.bulgeRadius * gs}

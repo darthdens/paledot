@@ -34,6 +34,9 @@ export const TriangulumGalaxy = ({ visualScale }: TriangulumGalaxyProps) => {
   const gs = UNITS.KM_PER_LY * visualScale;
   const diskR = TRIANGULUM.diskRadius * gs;
 
+  // Bump this whenever we tweak star generation so Fast Refresh recomputes geometries
+  const GEOMETRY_VERSION = 2;
+
   const triangulumPosition = useMemo<[number, number, number]>(
     () => [
       -TRIANGULUM.distanceFromMilkyWay * gs * 0.5,
@@ -169,7 +172,7 @@ export const TriangulumGalaxy = ({ visualScale }: TriangulumGalaxyProps) => {
     geo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
     geo.boundingSphere = new THREE.Sphere(new THREE.Vector3(0, 0, 0), Infinity);
     return geo;
-  }, [gs]);
+  }, [gs, GEOMETRY_VERSION]);
 
   const coreGeoFull = useMemo(() => {
     const coreCount = 120000;
@@ -218,7 +221,7 @@ export const TriangulumGalaxy = ({ visualScale }: TriangulumGalaxyProps) => {
     geo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
     geo.boundingSphere = new THREE.Sphere(new THREE.Vector3(0, 0, 0), Infinity);
     return geo;
-  }, [gs]);
+  }, [gs, GEOMETRY_VERSION]);
 
   const haloGeoFull = useMemo(() => {
     const haloCount = 60000;
@@ -264,7 +267,7 @@ export const TriangulumGalaxy = ({ visualScale }: TriangulumGalaxyProps) => {
     geo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
     geo.boundingSphere = new THREE.Sphere(new THREE.Vector3(0, 0, 0), Infinity);
     return geo;
-  }, [gs]);
+  }, [gs, GEOMETRY_VERSION]);
 
   // Keep full star counts always (like Whirlpool's perceived behavior in the UI)
   const starsGeo = starsGeoFull;
@@ -301,7 +304,7 @@ export const TriangulumGalaxy = ({ visualScale }: TriangulumGalaxyProps) => {
         <DifferentialRotationPoints
           key="triangulum-halo"
           geometry={haloGeo}
-          size={gs * 35 * sizeMultiplier}
+          size={gs * 42 * sizeMultiplier}
           map={dotTexture}
           opacity={0.28}
           maxRadius={diskR * 1.3}
@@ -313,7 +316,7 @@ export const TriangulumGalaxy = ({ visualScale }: TriangulumGalaxyProps) => {
         <DifferentialRotationPoints
           key="triangulum-arms"
           geometry={starsGeo}
-          size={gs * 50 * sizeMultiplier}
+          size={gs * 60 * sizeMultiplier}
           map={dotTexture}
           opacity={0.88}
           maxRadius={diskR}
@@ -325,7 +328,7 @@ export const TriangulumGalaxy = ({ visualScale }: TriangulumGalaxyProps) => {
         <DifferentialRotationPoints
           key="triangulum-core"
           geometry={coreGeo}
-          size={gs * 75 * sizeMultiplier}
+          size={gs * 85 * sizeMultiplier}
           map={dotTexture}
           opacity={0.95}
           maxRadius={TRIANGULUM.bulgeRadius * gs}
