@@ -3,8 +3,8 @@ import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { useCosmosStore } from '../store/useCosmosStore';
 
-// Global time tracker shared across all galaxy materials to prevent visual glitches when switching
-const globalGalaxyTime = { value: 0 };
+// Global time tracker - updated by a single manager, not per-material
+const globalGalaxyTime = { value: 0, lastUpdateFrame: -1 };
 
 interface DifferentialRotationMaterialProps {
   size: number;
@@ -31,7 +31,7 @@ export const useDifferentialRotationMaterial = ({
   const isInStarSystem = useCosmosStore((s) => s.isInStarSystem);
   const timeSpeed = useCosmosStore((s) => s.timeSpeed);
 
-  // Create material only once, update uniforms separately
+  // Create material only once
   const material = useMemo(() => {
     const mat = new THREE.ShaderMaterial({
       transparent: true,
@@ -120,17 +120,34 @@ export const useDifferentialRotationMaterial = ({
     }
   }, [size, opacity, maxRadius, rotationMultiplier, differentialStrength]);
 
-  // Update time uniform each frame using global time
-  useFrame((_, delta) => {
-    if (!isInStarSystem) {
-      globalGalaxyTime.value += delta * 0.00625 * timeSpeed;
-    }
+  // Only sync time from global - don't update global here
+  useFrame(() => {
     if (materialRef.current) {
       materialRef.current.uniforms.uTime.value = globalGalaxyTime.value;
     }
   });
 
   return material;
+};
+
+/**
+ * Hook to update the global galaxy time - should only be called ONCE in the scene
+ */
+export const useGalaxyTimeManager = () => {
+  const isInStarSystem = useCosmosStore((s) => s.isInStarSystem);
+  const timeSpeed = useCosmosStore((s) => s.timeSpeed);
+
+  useFrame((state, delta) => {
+    // Only update once per frame (check frame number)
+    const frameNumber = Math.floor(state.clock.elapsedTime * 1000);
+    if (globalGalaxyTime.lastUpdateFrame === frameNumber) return;
+    globalGalaxyTime.lastUpdateFrame = frameNumber;
+
+    if (!isInStarSystem) {
+      // Very slow rotation - one full rotation takes ~1000 real seconds at 1x speed
+      globalGalaxyTime.value += delta * 0.00625 * timeSpeed;
+    }
+  });
 };
 
 /**
