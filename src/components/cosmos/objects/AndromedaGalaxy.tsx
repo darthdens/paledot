@@ -143,7 +143,7 @@ export const AndromedaGalaxy = ({ visualScale }: AndromedaGalaxyProps) => {
   }, [gs]);
 
   const coreGeoFull = useMemo(() => {
-    const coreCount = 100000;
+    const coreCount = 180000; // Increased for denser, brighter core
     const positions = new Float32Array(coreCount * 3);
     const colors = new Float32Array(coreCount * 3);
     const color = new THREE.Color();
@@ -151,7 +151,8 @@ export const AndromedaGalaxy = ({ visualScale }: AndromedaGalaxyProps) => {
 
     for (let i = 0; i < coreCount; i++) {
       const i3 = i * 3;
-      const r = Math.pow(Math.random(), 1.2) * coreRadius;
+      // Higher exponent = more concentrated toward center
+      const r = Math.pow(Math.random(), 2.0) * coreRadius;
       const theta = Math.random() * Math.PI * 2;
       const phi = Math.acos(2 * Math.random() - 1);
       const t = r / coreRadius;
@@ -161,14 +162,15 @@ export const AndromedaGalaxy = ({ visualScale }: AndromedaGalaxyProps) => {
       positions[i3 + 2] = r * Math.sin(phi) * Math.sin(theta);
 
       const rand = Math.random();
+      // Brighter colors for core stars
       if (t < 0.3) {
-        color.setHSL(0.6 + Math.random() * 0.05, 0.1 + Math.random() * 0.1, 0.9 + Math.random() * 0.08);
+        color.setHSL(0.6 + Math.random() * 0.05, 0.08 + Math.random() * 0.06, 0.95 + Math.random() * 0.05);
       } else if (rand < 0.5) {
-        color.setHSL(0.58 + Math.random() * 0.06, 0.25 + Math.random() * 0.15, 0.78 + Math.random() * 0.12);
+        color.setHSL(0.58 + Math.random() * 0.06, 0.2 + Math.random() * 0.1, 0.88 + Math.random() * 0.08);
       } else if (rand < 0.8) {
-        color.setHSL(0.58 + Math.random() * 0.08, 0.45 + Math.random() * 0.2, 0.65 + Math.random() * 0.15);
+        color.setHSL(0.58 + Math.random() * 0.08, 0.35 + Math.random() * 0.15, 0.78 + Math.random() * 0.12);
       } else {
-        color.setHSL(0.08 + Math.random() * 0.04, 0.4 + Math.random() * 0.2, 0.6 + Math.random() * 0.15);
+        color.setHSL(0.08 + Math.random() * 0.04, 0.35 + Math.random() * 0.15, 0.72 + Math.random() * 0.12);
       }
 
       colors[i3] = color.r;
@@ -291,9 +293,9 @@ export const AndromedaGalaxy = ({ visualScale }: AndromedaGalaxyProps) => {
 
         <DifferentialRotationPoints
           geometry={coreGeo}
-          size={gs * 90 * sizeMultiplier}
+          size={gs * 105 * sizeMultiplier}
           map={dotTexture}
-          opacity={0.95}
+          opacity={1.0}
           maxRadius={ANDROMEDA.bulgeRadius * gs}
           rotationMultiplier={1.5}
           renderOrder={3}

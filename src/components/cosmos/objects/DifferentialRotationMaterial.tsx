@@ -1,27 +1,23 @@
-import { useMemo, useRef } from 'react';
+import { useMemo, useRef, useEffect } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { useCosmosStore } from '../store/useCosmosStore';
+
+// Global time tracker shared across all galaxy materials to prevent visual glitches when switching
+const globalGalaxyTime = { value: 0 };
 
 interface DifferentialRotationMaterialProps {
   size: number;
   map: THREE.Texture;
   opacity?: number;
-  maxRadius: number; // The maximum radius of the galaxy for normalization
-  rotationMultiplier?: number; // Base rotation speed multiplier
-  /**
-   * 0 = rigid rotation (preserves spiral shape), 1 = fully differential.
-   * Using a small value prevents spiral arms from shearing over time.
-   */
+  maxRadius: number;
+  rotationMultiplier?: number;
   differentialStrength?: number;
 }
 
 /**
  * Custom ShaderMaterial for galaxy stars with differential rotation.
  * Inner stars rotate faster than outer stars, simulating real galactic rotation.
- * 
- * Uses a simplified rotation curve where angular velocity ∝ 1/sqrt(r)
- * (Keplerian-like, but with a flat rotation curve at larger radii like real galaxies)
  */
 export const useDifferentialRotationMaterial = ({
   size,
@@ -31,18 +27,19 @@ export const useDifferentialRotationMaterial = ({
   rotationMultiplier = 1,
   differentialStrength = 1,
 }: DifferentialRotationMaterialProps) => {
-  const timeRef = useRef(0);
+  const materialRef = useRef<THREE.ShaderMaterial | null>(null);
   const isInStarSystem = useCosmosStore((s) => s.isInStarSystem);
   const timeSpeed = useCosmosStore((s) => s.timeSpeed);
 
+  // Create material only once, update uniforms separately
   const material = useMemo(() => {
-    return new THREE.ShaderMaterial({
+    const mat = new THREE.ShaderMaterial({
       transparent: true,
       depthWrite: false,
       depthTest: false,
       blending: THREE.AdditiveBlending,
       uniforms: {
-        uTime: { value: 0 },
+        uTime: { value: globalGalaxyTime.value },
         uSize: { value: size },
         uMap: { value: map },
         uOpacity: { value: opacity },
@@ -108,15 +105,29 @@ export const useDifferentialRotationMaterial = ({
         }
       `,
     });
-  }, [size, map, opacity, maxRadius, rotationMultiplier, differentialStrength]);
+    materialRef.current = mat;
+    return mat;
+  }, [map]); // Only recreate if texture changes
 
-  // Update time uniform each frame
+  // Update uniforms when props change (without recreating material)
+  useEffect(() => {
+    if (materialRef.current) {
+      materialRef.current.uniforms.uSize.value = size;
+      materialRef.current.uniforms.uOpacity.value = opacity;
+      materialRef.current.uniforms.uMaxRadius.value = maxRadius;
+      materialRef.current.uniforms.uRotationMultiplier.value = rotationMultiplier;
+      materialRef.current.uniforms.uDifferentialStrength.value = differentialStrength;
+    }
+  }, [size, opacity, maxRadius, rotationMultiplier, differentialStrength]);
+
+  // Update time uniform each frame using global time
   useFrame((_, delta) => {
     if (!isInStarSystem) {
-      // Base speed: 0.00625 rad/s at 1x speed (same as before)
-      timeRef.current += delta * 0.00625 * timeSpeed;
+      globalGalaxyTime.value += delta * 0.00625 * timeSpeed;
     }
-    material.uniforms.uTime.value = timeRef.current;
+    if (materialRef.current) {
+      materialRef.current.uniforms.uTime.value = globalGalaxyTime.value;
+    }
   });
 
   return material;
