@@ -192,11 +192,39 @@ export class LODController {
   ): { level: LODLevel; changed: boolean } {
     this.frameCount++;
 
+    const distance = cameraPosition.distanceTo(galaxyPosition);
+    const diameter = config.galaxyDiameter;
+    const highThreshold = diameter * (config.highThresholdMultiplier ?? 3);
+    const mediumThreshold = diameter * (config.mediumThresholdMultiplier ?? 15);
+    const lowThreshold = diameter * (config.lowThresholdMultiplier ?? 50);
+
     const newLevel = calculateLODLevel(cameraPosition, galaxyPosition, config);
 
     if (newLevel === this.currentLevel) {
       this.stableFrames = 0;
       return { level: this.currentLevel, changed: false };
+    }
+
+    // If we rapidly moved closer (quick jump), upgrade LOD immediately so the core/arms
+    // don't stay stuck in a low-density LOD until some unrelated re-render happens.
+    const levelRank: Record<LODLevel, number> = {
+      high: 3,
+      medium: 2,
+      low: 1,
+      sprite: 0,
+    };
+    const isUpgrade = levelRank[newLevel] > levelRank[this.currentLevel];
+
+    const isDeepInsideThreshold =
+      (newLevel === 'high' && distance < highThreshold * 0.6) ||
+      (newLevel === 'medium' && distance < mediumThreshold * 0.6) ||
+      (newLevel === 'low' && distance < lowThreshold * 0.6);
+
+    if (isUpgrade && isDeepInsideThreshold) {
+      const oldLevel = this.currentLevel;
+      this.currentLevel = newLevel;
+      this.stableFrames = 0;
+      return { level: this.currentLevel, changed: oldLevel !== newLevel };
     }
 
     this.stableFrames++;

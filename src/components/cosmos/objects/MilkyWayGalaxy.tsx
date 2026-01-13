@@ -1,4 +1,4 @@
-import { useRef, useMemo, useCallback, type MouseEvent as ReactMouseEvent } from 'react';
+import { useRef, useMemo, useCallback, useState, type MouseEvent as ReactMouseEvent } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 import { Html } from '@react-three/drei';
 import * as THREE from 'three';
@@ -35,7 +35,8 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
   const markerWorldPos = useRef(new THREE.Vector3());
   const frameCountRef = useRef(0);
   const lodControllerRef = useRef(new LODController('high'));
-  const currentLODRef = useRef<LODLevel>('high');
+  const [lodLevel, setLodLevel] = useState<LODLevel>('high');
+  const lodLevelRef = useRef<LODLevel>('high');
   
   const { language } = useLanguage();
   const { camera } = useThree();
@@ -325,13 +326,13 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
   const haloGeoLow = useMemo(() => createLODGeometry(haloGeoFull, 'low'), [haloGeoFull]);
 
   // Select geometry based on current LOD
-  const starsGeo = currentLODRef.current === 'high' || currentLODRef.current === 'medium' ? starsGeoFull : starsGeoLow;
-  const coreGeo = currentLODRef.current === 'high' || currentLODRef.current === 'medium' ? coreGeoFull : coreGeoLow;
-  const volumeGeo = currentLODRef.current === 'high' || currentLODRef.current === 'medium' ? volumeGeoFull : volumeGeoLow;
-  const haloGeo = currentLODRef.current === 'high' || currentLODRef.current === 'medium' ? haloGeoFull : haloGeoLow;
+  const starsGeo = lodLevel === 'high' || lodLevel === 'medium' ? starsGeoFull : starsGeoLow;
+  const coreGeo = lodLevel === 'high' || lodLevel === 'medium' ? coreGeoFull : coreGeoLow;
+  const volumeGeo = lodLevel === 'high' || lodLevel === 'medium' ? volumeGeoFull : volumeGeoLow;
+  const haloGeo = lodLevel === 'high' || lodLevel === 'medium' ? haloGeoFull : haloGeoLow;
 
-  const sizeMultiplier = getParticleSizeMultiplier(currentLODRef.current);
-  
+  const sizeMultiplier = getParticleSizeMultiplier(lodLevel);
+
   useFrame(({ clock }) => {
     frameCountRef.current++;
     const t = clock.getElapsedTime();
@@ -339,14 +340,18 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
     // Update LOD based on camera distance
     if (rotatingGroupRef.current) {
       rotatingGroupRef.current.getWorldPosition(centerWorldPos.current);
-      
+
       const diskR = MILKY_WAY.diskRadius * gs;
       const { level } = lodControllerRef.current.update(
         camera.position,
         centerWorldPos.current,
         { galaxyDiameter: diskR * 2 }
       );
-      currentLODRef.current = level;
+
+      if (level !== lodLevelRef.current) {
+        lodLevelRef.current = level;
+        setLodLevel(level);
+      }
 
       // Throttle position updates for distant galaxies
       if (lodControllerRef.current.shouldUpdateThisFrame()) {
