@@ -3,7 +3,7 @@ import { Canvas } from '@react-three/fiber';
 import { OrbitControls, PerspectiveCamera } from '@react-three/drei';
 import { EffectComposer, SelectiveBloom, Selection } from '@react-three/postprocessing';
 import { DimStars } from './objects/DimStars';
-import { Suspense, useEffect, useRef } from 'react';
+import { Suspense, useEffect, useRef, useState, useCallback } from 'react';
 import { ProximaSystem } from './objects/ProximaSystem';
 import { MilkyWayGalaxy } from './objects/MilkyWayGalaxy';
 import { AndromedaGalaxy } from './objects/AndromedaGalaxy';
@@ -30,6 +30,7 @@ import { PerformanceHUD } from './ui/PerformanceHUD';
 import { KeyboardShortcuts } from './ui/KeyboardShortcuts';
 import { SizeComparison } from './ui/SizeComparison';
 import { YouAreHereLabel } from './ui/YouAreHereLabel';
+import { CosmosLoader } from './ui/CosmosLoader';
 import { CameraController } from './CameraController';
 import { ScaleTracker } from './ScaleTracker';
 import { StarSystemTracker } from './StarSystemTracker';
@@ -46,10 +47,14 @@ const GalaxyTimeManager = () => {
 
 export const CosmosExplorer = () => {
   const containerRef = useRef<HTMLDivElement>(null);
+  const [isLoaded, setIsLoaded] = useState(false);
   const selectedObject = useCosmosStore(state => state.selectedObject);
   const showOrbits = useCosmosStore(state => state.showOrbits);
   const showTrails = useCosmosStore(state => state.showTrails);
   const currentScale = useCosmosStore(state => state.currentScale);
+  
+  // Memoize the callback to prevent re-renders
+  const handleLoadComplete = useCallback(() => setIsLoaded(true), []);
   
   // Hide distant galaxies when within solar system or Proxima Centauri system
   const showDistantGalaxies = currentScale !== 'earth' && currentScale !== 'solarSystem' && currentScale !== 'stellar';
@@ -100,6 +105,11 @@ export const CosmosExplorer = () => {
 
   return (
     <div ref={containerRef} className="relative w-full h-full">
+      {/* Loading screen - preloads all textures */}
+      {!isLoaded && <CosmosLoader onLoadComplete={handleLoadComplete} />}
+      
+      {/* Only render canvas after textures are preloaded */}
+      {isLoaded && (
       <Canvas gl={{ alpha: false }}>
         <Suspense fallback={null}>
           <Selection>
@@ -232,15 +242,20 @@ export const CosmosExplorer = () => {
           </Selection>
         </Suspense>
       </Canvas>
+      )}
       
-      {/* UI Overlays */}
-      <CosmosUI />
-      <TourOverlay />
-      <InfoCard />
-      <QuickJumpMenu />
-      <KeyboardShortcuts />
-      <SizeComparison />
-      <YouAreHereLabel />
+      {/* UI Overlays - only show when loaded */}
+      {isLoaded && (
+        <>
+          <CosmosUI />
+          <TourOverlay />
+          <InfoCard />
+          <QuickJumpMenu />
+          <KeyboardShortcuts />
+          <SizeComparison />
+          <YouAreHereLabel />
+        </>
+      )}
     </div>
   );
 };
