@@ -163,25 +163,31 @@ export const CosmosLoader = ({
   }, [stage, geometriesCount, geometriesTotal]);
 
   // Simulate gradual progress during geometry loading to avoid jumps
+  // The geometries load very fast, so we simulate a slower animation
   useEffect(() => {
     if (stage !== 'geometries') {
       setSimulatedProgress(0);
       return;
     }
 
-    // Target based on real geometry progress
-    const targetProgress = (geometriesCount / geometriesTotal) * 100;
+    const allReady = geometriesCount >= geometriesTotal;
     
     const interval = setInterval(() => {
       setSimulatedProgress(prev => {
-        // Slowly increment toward target, but never exceed it
-        const nextTarget = Math.min(targetProgress, 100);
-        if (prev >= nextTarget - 1) return nextTarget;
-        // Increment by small random amount for natural feel
-        const increment = Math.random() * 3 + 0.5;
-        return Math.min(prev + increment, nextTarget);
+        if (allReady) {
+          // If all geometries ready, quickly finish to 100
+          if (prev >= 99) return 100;
+          return prev + 5;
+        }
+        // Otherwise, slowly increment but cap at 85% until all ready
+        // This prevents jumping from low % to 100%
+        const maxWhileLoading = 85;
+        if (prev >= maxWhileLoading) return maxWhileLoading;
+        // Natural slow increment
+        const increment = Math.random() * 2 + 0.3;
+        return Math.min(prev + increment, maxWhileLoading);
       });
-    }, 150);
+    }, 100);
 
     return () => clearInterval(interval);
   }, [stage, geometriesCount, geometriesTotal]);
