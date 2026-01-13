@@ -52,7 +52,7 @@ export const SombreroGalaxy = ({ visualScale }: SombreroGalaxyProps) => {
 
   // Full resolution geometries - reduced particle counts for better performance
   const bulgeGeoFull = useMemo(() => {
-    const count = 800000; // Significantly increased for much denser core
+    const count = 300000; // Reduced from 500000
     const positions = new Float32Array(count * 3);
     const colors = new Float32Array(count * 3);
     const color = new THREE.Color();
@@ -112,7 +112,7 @@ export const SombreroGalaxy = ({ visualScale }: SombreroGalaxyProps) => {
   }, [gs]);
 
   const diskGeoFull = useMemo(() => {
-    const count = 400000; // Restored to full count
+    const count = 250000; // Reduced from 400000
     const positions = new Float32Array(count * 3);
     const colors = new Float32Array(count * 3);
     const color = new THREE.Color();
@@ -163,7 +163,7 @@ export const SombreroGalaxy = ({ visualScale }: SombreroGalaxyProps) => {
   }, [gs]);
 
   const dustLaneGeoFull = useMemo(() => {
-    const count = 100000; // Increased for detail
+    const count = 50000; // Reduced from 80000
     const positions = new Float32Array(count * 3);
     const colors = new Float32Array(count * 3);
     const color = new THREE.Color();
@@ -202,7 +202,7 @@ export const SombreroGalaxy = ({ visualScale }: SombreroGalaxyProps) => {
   }, [gs]);
 
   const darkGasGeoFull = useMemo(() => {
-    const count = 500000; // Restored to full count
+    const count = 300000; // Reduced from 500000
     const positions = new Float32Array(count * 3);
     const colors = new Float32Array(count * 3);
     const color = new THREE.Color();

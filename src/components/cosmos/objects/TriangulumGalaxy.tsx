@@ -6,7 +6,7 @@ import { useCosmosStore } from '../store/useCosmosStore';
 import { getObjectById } from '../data/celestialObjects';
 import { DifferentialRotationPoints } from './DifferentialRotationMaterial';
 import { getDotTexture, getTriangulumGlowTexture } from '../utils/sharedTextures';
-import { LODController } from '../utils/lodManager';
+import { LODController, getParticleSizeMultiplier, createLODGeometry, type LODLevel } from '../utils/lodManager';
 
 interface TriangulumGalaxyProps {
   visualScale: number;
@@ -26,139 +26,111 @@ export const TriangulumGalaxy = ({ visualScale }: TriangulumGalaxyProps) => {
   const centerWorldPos = useRef(new THREE.Vector3());
   const frameCountRef = useRef(0);
   const lodControllerRef = useRef(new LODController('high'));
+  const currentLODRef = useRef<LODLevel>('high');
 
   const { camera } = useThree();
   const setObjectWorldPosition = useCosmosStore((s) => s.setObjectWorldPosition);
   const setSelectedObject = useCosmosStore((s) => s.setSelectedObject);
 
   const gs = UNITS.KM_PER_LY * visualScale;
-  const diskR = TRIANGULUM.diskRadius * gs;
-
-  // Bump this whenever we tweak star generation so Fast Refresh recomputes geometries
-  const GEOMETRY_VERSION = 2;
-
-  const triangulumPosition = useMemo<[number, number, number]>(
-    () => [
-      -TRIANGULUM.distanceFromMilkyWay * gs * 0.5,
-      TRIANGULUM.distanceFromMilkyWay * gs * 0.1,
-      TRIANGULUM.distanceFromMilkyWay * gs * 0.85,
-    ],
-    [gs]
-  );
+  
+  const triangulumPosition = useMemo<[number, number, number]>(() => [
+    -TRIANGULUM.distanceFromMilkyWay * gs * 0.5,
+    TRIANGULUM.distanceFromMilkyWay * gs * 0.1,
+    TRIANGULUM.distanceFromMilkyWay * gs * 0.85,
+  ], [gs]);
 
   const triangulumObject = useMemo(() => getObjectById('triangulum'), []);
 
-  const handleClick = useCallback(
-    (e: { stopPropagation: () => void }) => {
-      e.stopPropagation();
-      if (triangulumObject) setSelectedObject(triangulumObject);
-    },
-    [triangulumObject, setSelectedObject]
-  );
+  const handleClick = useCallback((e: { stopPropagation: () => void }) => {
+    e.stopPropagation();
+    if (triangulumObject) setSelectedObject(triangulumObject);
+  }, [triangulumObject, setSelectedObject]);
 
   // Use shared textures
   const dotTexture = useMemo(() => getDotTexture(), []);
   const glowTexture = useMemo(() => getTriangulumGlowTexture(), []);
 
+  // Full resolution geometries
   const starsGeoFull = useMemo(() => {
     const { branches, spinTurns } = TRIANGULUM;
     const maxRadius = TRIANGULUM.diskRadius * gs;
-    const starCount = 500000;
+    const starCount = 300000;
 
     const positions = new Float32Array(starCount * 3);
     const colors = new Float32Array(starCount * 3);
     const color = new THREE.Color();
-
-    // Seeded random for consistent geometry
-    let seed = 54321;
-    const seededRandom = () => {
-      seed = (seed * 1103515245 + 12345) & 0x7fffffff;
-      return seed / 0x7fffffff;
-    };
 
     const k = 4.0;
     const denom = 1 - Math.exp(-k);
 
     for (let i = 0; i < starCount; i++) {
       const i3 = i * 3;
-      const u = seededRandom();
+      const u = Math.random();
       const t = -Math.log(1 - u * denom) / k;
-
+      
       const innerRadius = maxRadius * 0.02;
       const radius = innerRadius + t * (maxRadius - innerRadius);
       const rt = radius / maxRadius;
 
-      const branchIndex = Math.floor(seededRandom() * branches);
+      const branchIndex = Math.floor(Math.random() * branches);
       const branchAngle = (branchIndex / branches) * Math.PI * 2;
       const spinAngle = rt * spinTurns * Math.PI * 2;
 
       const armWidth = 0.1 + rt * 0.2;
-      const armJitter = (seededRandom() + seededRandom() + seededRandom() - 1.5) * armWidth;
-      const isInterArm = seededRandom() < 0.45;
-      const interArmJitter = isInterArm ? (seededRandom() - 0.5) * (1.0 + rt * 0.8) : 0;
+      const armJitter = (Math.random() + Math.random() + Math.random() - 1.5) * armWidth;
+      const isInterArm = Math.random() < 0.45;
+      const interArmJitter = isInterArm ? (Math.random() - 0.5) * (1.0 + rt * 0.8) : 0;
       const angle = branchAngle + spinAngle + armJitter + interArmJitter;
 
       const radialSpread = (0.04 + rt * 0.08) * maxRadius;
-      const radialJitter = (seededRandom() + seededRandom() - 1) * radialSpread;
+      const radialJitter = (Math.random() + Math.random() - 1) * radialSpread;
       const finalRadius = radius + radialJitter;
 
       positions[i3] = Math.cos(angle) * finalRadius;
       const thickness = 0.015 + rt * 0.04;
-      const yJitter =
-        (seededRandom() + seededRandom() + seededRandom() - 1.5) * maxRadius * thickness;
+      const yJitter = (Math.random() + Math.random() + Math.random() - 1.5) * maxRadius * thickness;
       positions[i3 + 1] = yJitter;
       positions[i3 + 2] = Math.sin(angle) * finalRadius;
 
-      const rand = seededRandom();
-      const nearArmCenter = Math.abs(armJitter) < armWidth * 0.4;
-      // Brighter colors to match Whirlpool's visual density
-      if (rt < 0.12) {
+      const rand = Math.random();
+      if (rt < 0.15) {
         if (rand < 0.7) {
-          color.setHSL(0.12 + seededRandom() * 0.04, 0.35 + seededRandom() * 0.15, 0.85 + seededRandom() * 0.1);
+          color.setHSL(0.6 + Math.random() * 0.05, 0.3 + Math.random() * 0.2, 0.85 + Math.random() * 0.1);
         } else {
-          color.setHSL(0.1 + seededRandom() * 0.05, 0.5 + seededRandom() * 0.2, 0.75 + seededRandom() * 0.12);
+          color.setHSL(0.58 + Math.random() * 0.08, 0.5 + Math.random() * 0.2, 0.7 + Math.random() * 0.15);
         }
-      } else if (rt < 0.25) {
-        if (rand < 0.4) {
-          color.setHSL(0.11 + seededRandom() * 0.04, 0.45 + seededRandom() * 0.2, 0.7 + seededRandom() * 0.12);
-        } else if (rand < 0.7) {
-          color.setHSL(0.56 + seededRandom() * 0.1, 0.6 + seededRandom() * 0.25, 0.55 + seededRandom() * 0.15);
-        } else if (nearArmCenter && rand < 0.85) {
-          color.setHSL(0.92 + seededRandom() * 0.06, 0.85 + seededRandom() * 0.12, 0.58 + seededRandom() * 0.12);
+      } else if (rt < 0.35) {
+        if (rand < 0.6) {
+          color.setHSL(0.58 + Math.random() * 0.08, 0.7 + Math.random() * 0.2, 0.55 + Math.random() * 0.15);
+        } else if (rand < 0.85) {
+          color.setHSL(0.52 + Math.random() * 0.06, 0.8 + Math.random() * 0.15, 0.5 + Math.random() * 0.12);
         } else {
-          color.setHSL(0.6 + seededRandom() * 0.05, 0.2 + seededRandom() * 0.1, 0.8 + seededRandom() * 0.1);
+          color.setHSL(0.92 + Math.random() * 0.06, 0.8 + Math.random() * 0.15, 0.6 + Math.random() * 0.1);
         }
-      } else if (rt < 0.5) {
-        if (nearArmCenter && rand < 0.35) {
-          color.setHSL(0.93 + seededRandom() * 0.05, 0.88 + seededRandom() * 0.1, 0.55 + seededRandom() * 0.12);
-        } else if (rand < 0.55) {
-          color.setHSL(0.55 + seededRandom() * 0.12, 0.75 + seededRandom() * 0.2, 0.52 + seededRandom() * 0.15);
-        } else if (rand < 0.72) {
-          color.setHSL(0.98 + seededRandom() * 0.04, 0.8 + seededRandom() * 0.15, 0.48 + seededRandom() * 0.12);
-        } else if (rand < 0.88) {
-          color.setHSL(0.52 + seededRandom() * 0.08, 0.7 + seededRandom() * 0.2, 0.5 + seededRandom() * 0.12);
+      } else if (rt < 0.6) {
+        if (rand < 0.3) {
+          color.setHSL(0.58 + Math.random() * 0.08, 0.75 + Math.random() * 0.2, 0.5 + Math.random() * 0.15);
+        } else if (rand < 0.5) {
+          color.setHSL(0.9 + Math.random() * 0.08, 0.85 + Math.random() * 0.1, 0.55 + Math.random() * 0.12);
+        } else if (rand < 0.65) {
+          color.setHSL(0.5 + Math.random() * 0.06, 0.8 + Math.random() * 0.15, 0.5 + Math.random() * 0.1);
+        } else if (rand < 0.85) {
+          color.setHSL(0.12 + Math.random() * 0.06, 0.85 + Math.random() * 0.1, 0.55 + Math.random() * 0.12);
         } else {
-          color.setHSL(0.58 + seededRandom() * 0.06, 0.35 + seededRandom() * 0.15, 0.72 + seededRandom() * 0.12);
-        }
-      } else if (rt < 0.75) {
-        if (nearArmCenter && rand < 0.28) {
-          color.setHSL(0.94 + seededRandom() * 0.04, 0.82 + seededRandom() * 0.15, 0.52 + seededRandom() * 0.12);
-        } else if (rand < 0.55) {
-          color.setHSL(0.56 + seededRandom() * 0.1, 0.7 + seededRandom() * 0.2, 0.48 + seededRandom() * 0.15);
-        } else if (rand < 0.75) {
-          color.setHSL(0.58 + seededRandom() * 0.08, 0.45 + seededRandom() * 0.2, 0.52 + seededRandom() * 0.12);
-        } else if (rand < 0.9) {
-          color.setHSL(0.5 + seededRandom() * 0.08, 0.65 + seededRandom() * 0.2, 0.5 + seededRandom() * 0.1);
-        } else {
-          color.setHSL(0.0 + seededRandom() * 0.03, 0.7 + seededRandom() * 0.2, 0.45 + seededRandom() * 0.1);
+          color.setHSL(0.08 + Math.random() * 0.04, 0.9 + Math.random() * 0.1, 0.5 + Math.random() * 0.1);
         }
       } else {
-        if (rand < 0.6) {
-          color.setHSL(0.57 + seededRandom() * 0.1, 0.5 + seededRandom() * 0.25, 0.45 + seededRandom() * 0.15);
-        } else if (rand < 0.85) {
-          color.setHSL(0.55 + seededRandom() * 0.12, 0.6 + seededRandom() * 0.2, 0.42 + seededRandom() * 0.12);
+        if (rand < 0.35) {
+          color.setHSL(0.58 + Math.random() * 0.1, 0.7 + Math.random() * 0.25, 0.45 + Math.random() * 0.15);
+        } else if (rand < 0.55) {
+          color.setHSL(0.92 + Math.random() * 0.06, 0.75 + Math.random() * 0.2, 0.5 + Math.random() * 0.15);
+        } else if (rand < 0.75) {
+          color.setHSL(0.13 + Math.random() * 0.05, 0.8 + Math.random() * 0.15, 0.55 + Math.random() * 0.12);
+        } else if (rand < 0.9) {
+          color.setHSL(0.1 + Math.random() * 0.04, 0.9 + Math.random() * 0.1, 0.5 + Math.random() * 0.1);
         } else {
-          color.setHSL(0.95 + seededRandom() * 0.04, 0.65 + seededRandom() * 0.2, 0.45 + seededRandom() * 0.1);
+          color.setHSL(0.45 + Math.random() * 0.1, 0.6 + Math.random() * 0.2, 0.45 + Math.random() * 0.1);
         }
       }
 
@@ -172,43 +144,33 @@ export const TriangulumGalaxy = ({ visualScale }: TriangulumGalaxyProps) => {
     geo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
     geo.boundingSphere = new THREE.Sphere(new THREE.Vector3(0, 0, 0), Infinity);
     return geo;
-  }, [gs, GEOMETRY_VERSION]);
+  }, [gs]);
 
   const coreGeoFull = useMemo(() => {
-    const coreCount = 120000;
+    const coreCount = 60000;
     const positions = new Float32Array(coreCount * 3);
     const colors = new Float32Array(coreCount * 3);
     const color = new THREE.Color();
     const coreRadius = TRIANGULUM.bulgeRadius * gs;
 
-    // Seeded random for consistent geometry
-    let seed = 65432;
-    const seededRandom = () => {
-      seed = (seed * 1103515245 + 12345) & 0x7fffffff;
-      return seed / 0x7fffffff;
-    };
-
     for (let i = 0; i < coreCount; i++) {
       const i3 = i * 3;
-      const r = Math.pow(seededRandom(), 1.3) * coreRadius;
-      const theta = seededRandom() * Math.PI * 2;
-      const phi = Math.acos(2 * seededRandom() - 1);
+      const r = Math.pow(Math.random(), 1.3) * coreRadius;
+      const theta = Math.random() * Math.PI * 2;
+      const phi = Math.acos(2 * Math.random() - 1);
       const t = r / coreRadius;
 
       positions[i3] = r * Math.sin(phi) * Math.cos(theta);
       positions[i3 + 1] = r * Math.cos(phi) * 0.4;
       positions[i3 + 2] = r * Math.sin(phi) * Math.sin(theta);
 
-      const rand = seededRandom();
-      // Brighter core colors
-      if (t < 0.4) {
-        color.setHSL(0.12 + seededRandom() * 0.03, 0.3 + seededRandom() * 0.1, 0.9 + seededRandom() * 0.08);
-      } else if (rand < 0.6) {
-        color.setHSL(0.1 + seededRandom() * 0.04, 0.45 + seededRandom() * 0.15, 0.78 + seededRandom() * 0.1);
-      } else if (rand < 0.85) {
-        color.setHSL(0.08 + seededRandom() * 0.05, 0.55 + seededRandom() * 0.2, 0.68 + seededRandom() * 0.12);
+      const rand = Math.random();
+      if (t < 0.5) {
+        color.setHSL(0.6 + Math.random() * 0.05, 0.25 + Math.random() * 0.15, 0.88 + Math.random() * 0.08);
+      } else if (rand < 0.7) {
+        color.setHSL(0.58 + Math.random() * 0.06, 0.4 + Math.random() * 0.2, 0.75 + Math.random() * 0.12);
       } else {
-        color.setHSL(0.06 + seededRandom() * 0.04, 0.6 + seededRandom() * 0.15, 0.6 + seededRandom() * 0.12);
+        color.setHSL(0.56 + Math.random() * 0.08, 0.6 + Math.random() * 0.2, 0.6 + Math.random() * 0.15);
       }
 
       colors[i3] = color.r;
@@ -221,40 +183,30 @@ export const TriangulumGalaxy = ({ visualScale }: TriangulumGalaxyProps) => {
     geo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
     geo.boundingSphere = new THREE.Sphere(new THREE.Vector3(0, 0, 0), Infinity);
     return geo;
-  }, [gs, GEOMETRY_VERSION]);
+  }, [gs]);
 
   const haloGeoFull = useMemo(() => {
-    const haloCount = 60000;
+    const haloCount = 30000;
     const positions = new Float32Array(haloCount * 3);
     const colors = new Float32Array(haloCount * 3);
     const color = new THREE.Color();
     const haloRadius = TRIANGULUM.diskRadius * gs * 1.3;
 
-    // Seeded random for consistent geometry
-    let seed = 76543;
-    const seededRandom = () => {
-      seed = (seed * 1103515245 + 12345) & 0x7fffffff;
-      return seed / 0x7fffffff;
-    };
-
     for (let i = 0; i < haloCount; i++) {
       const i3 = i * 3;
-      const r = (0.4 + Math.pow(seededRandom(), 0.6) * 0.6) * haloRadius;
-      const theta = seededRandom() * Math.PI * 2;
-      const phi = Math.acos(2 * seededRandom() - 1);
+      const r = (0.4 + Math.pow(Math.random(), 0.6) * 0.6) * haloRadius;
+      const theta = Math.random() * Math.PI * 2;
+      const phi = Math.acos(2 * Math.random() - 1);
 
       positions[i3] = r * Math.sin(phi) * Math.cos(theta);
       positions[i3 + 1] = r * Math.cos(phi) * 0.6;
       positions[i3 + 2] = r * Math.sin(phi) * Math.sin(theta);
 
-      const rand = seededRandom();
-      // Brighter halo colors
-      if (rand < 0.5) {
-        color.setHSL(0.58 + seededRandom() * 0.1, 0.35 + seededRandom() * 0.2, 0.5 + seededRandom() * 0.2);
-      } else if (rand < 0.8) {
-        color.setHSL(0.12 + seededRandom() * 0.06, 0.3 + seededRandom() * 0.15, 0.55 + seededRandom() * 0.15);
+      const rand = Math.random();
+      if (rand < 0.6) {
+        color.setHSL(0.6 + Math.random() * 0.08, 0.3 + Math.random() * 0.2, 0.5 + Math.random() * 0.2);
       } else {
-        color.setHSL(0.55 + seededRandom() * 0.08, 0.25 + seededRandom() * 0.15, 0.6 + seededRandom() * 0.15);
+        color.setHSL(0.55 + Math.random() * 0.1, 0.2 + Math.random() * 0.15, 0.6 + Math.random() * 0.15);
       }
 
       colors[i3] = color.r;
@@ -267,36 +219,46 @@ export const TriangulumGalaxy = ({ visualScale }: TriangulumGalaxyProps) => {
     geo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
     geo.boundingSphere = new THREE.Sphere(new THREE.Vector3(0, 0, 0), Infinity);
     return geo;
-  }, [gs, GEOMETRY_VERSION]);
+  }, [gs]);
 
-  // Keep full star counts always (like Whirlpool's perceived behavior in the UI)
-  const starsGeo = starsGeoFull;
-  const coreGeo = coreGeoFull;
-  const haloGeo = haloGeoFull;
-  const sizeMultiplier = 1.0;
+  // Create LOD geometries
+  const starsGeoLow = useMemo(() => createLODGeometry(starsGeoFull, 'low'), [starsGeoFull]);
+  const coreGeoLow = useMemo(() => createLODGeometry(coreGeoFull, 'low'), [coreGeoFull]);
+  const haloGeoLow = useMemo(() => createLODGeometry(haloGeoFull, 'low'), [haloGeoFull]);
+
+  // Select geometry based on LOD
+  const starsGeo = currentLODRef.current === 'high' || currentLODRef.current === 'medium' ? starsGeoFull : starsGeoLow;
+  const coreGeo = currentLODRef.current === 'high' || currentLODRef.current === 'medium' ? coreGeoFull : coreGeoLow;
+  const haloGeo = currentLODRef.current === 'high' || currentLODRef.current === 'medium' ? haloGeoFull : haloGeoLow;
+  const sizeMultiplier = getParticleSizeMultiplier(currentLODRef.current);
 
   useFrame(() => {
     frameCountRef.current++;
+    
+    if (groupRef.current) {
+      groupRef.current.getWorldPosition(centerWorldPos.current);
+      
+      const diskR = TRIANGULUM.diskRadius * gs;
+      const { level } = lodControllerRef.current.update(
+        camera.position,
+        centerWorldPos.current,
+        { galaxyDiameter: diskR * 2 }
+      );
+      currentLODRef.current = level;
 
-    if (!groupRef.current) return;
-
-    groupRef.current.getWorldPosition(centerWorldPos.current);
-
-    // Update LOD based on camera distance (used only for throttling; no visual reduction)
-    lodControllerRef.current.update(camera.position, centerWorldPos.current, {
-      galaxyDiameter: diskR * 2,
-    });
-
-    // Throttle position updates
-    if (lodControllerRef.current.shouldUpdateThisFrame()) {
-      const pos: [number, number, number] = [
-        centerWorldPos.current.x,
-        centerWorldPos.current.y,
-        centerWorldPos.current.z,
-      ];
-      setObjectWorldPosition('triangulum', pos);
+      // Throttle position updates
+      if (lodControllerRef.current.shouldUpdateThisFrame()) {
+        const pos: [number, number, number] = [
+          centerWorldPos.current.x,
+          centerWorldPos.current.y,
+          centerWorldPos.current.z,
+        ];
+        setObjectWorldPosition('triangulum', pos);
+      }
     }
   });
+
+  const diskR = TRIANGULUM.diskRadius * gs;
 
   return (
     <group ref={groupRef} position={triangulumPosition}>
@@ -304,36 +266,33 @@ export const TriangulumGalaxy = ({ visualScale }: TriangulumGalaxyProps) => {
         <DifferentialRotationPoints
           key="triangulum-halo"
           geometry={haloGeo}
-          size={gs * 42 * sizeMultiplier}
+          size={gs * 35 * sizeMultiplier}
           map={dotTexture}
-          opacity={0.28}
+          opacity={0.25}
           maxRadius={diskR * 1.3}
           rotationMultiplier={0.7}
-          differentialStrength={0.08}
           renderOrder={1}
         />
 
         <DifferentialRotationPoints
           key="triangulum-arms"
           geometry={starsGeo}
-          size={gs * 60 * sizeMultiplier}
+          size={gs * 50 * sizeMultiplier}
           map={dotTexture}
-          opacity={0.88}
+          opacity={0.85}
           maxRadius={diskR}
           rotationMultiplier={1}
-          differentialStrength={0.06}
           renderOrder={2}
         />
 
         <DifferentialRotationPoints
           key="triangulum-core"
           geometry={coreGeo}
-          size={gs * 85 * sizeMultiplier}
+          size={gs * 75 * sizeMultiplier}
           map={dotTexture}
           opacity={0.95}
           maxRadius={TRIANGULUM.bulgeRadius * gs}
           rotationMultiplier={1.5}
-          differentialStrength={0.1}
           renderOrder={3}
         />
 
@@ -341,7 +300,7 @@ export const TriangulumGalaxy = ({ visualScale }: TriangulumGalaxyProps) => {
           <spriteMaterial
             map={glowTexture}
             transparent
-            opacity={0.2}
+            opacity={0.20}
             blending={THREE.AdditiveBlending}
             depthWrite={false}
             depthTest={false}
@@ -352,16 +311,11 @@ export const TriangulumGalaxy = ({ visualScale }: TriangulumGalaxyProps) => {
       </group>
 
       {/* Click target - reduced complexity */}
-      <mesh
+      <mesh 
         onClick={handleClick}
         onPointerDown={handleClick}
-        onPointerOver={(e) => {
-          e.stopPropagation();
-          document.body.style.cursor = 'pointer';
-        }}
-        onPointerOut={() => {
-          document.body.style.cursor = 'auto';
-        }}
+        onPointerOver={(e) => { e.stopPropagation(); document.body.style.cursor = 'pointer'; }}
+        onPointerOut={() => { document.body.style.cursor = 'auto'; }}
       >
         <sphereGeometry args={[diskR * 1.2, 8, 8]} />
         <meshBasicMaterial transparent opacity={0} depthWrite={false} />
