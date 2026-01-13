@@ -29,9 +29,9 @@ export const GalaxySkyGlow = () => {
   const currentScale = useCosmosStore((s) => s.currentScale);
   const centerPos = useCosmosStore((s) => s.objectWorldPositions["milky-way-center"]);
 
-  // Target opacity: 0 when in star system OR when zoomed out to local group/universe scale
+  // Target opacity: 0 when in star system OR when zoomed out beyond Milky Way scale
   // The glow should only be visible when we're in the Milky Way but outside a star system
-  const isZoomedOutTooFar = currentScale === 'localGroup' || currentScale === 'universe';
+  const isZoomedOutTooFar = currentScale === 'localGroup' || currentScale === 'virgoSupercluster' || currentScale === 'laniakea' || currentScale === 'universe';
   const targetOpacity = (isInStarSystem || isZoomedOutTooFar) ? 0 : 1;
 
   const material = useMemo(() => {
