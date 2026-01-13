@@ -1,4 +1,4 @@
-import { useRef, useMemo, useCallback, useState, type MouseEvent as ReactMouseEvent } from 'react';
+import { useRef, useMemo, useCallback, useState, useEffect, type MouseEvent as ReactMouseEvent } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 import { Html } from '@react-three/drei';
 import * as THREE from 'three';
@@ -9,6 +9,7 @@ import { getObjectById } from '../data/celestialObjects';
 import { DifferentialRotationPoints } from './DifferentialRotationMaterial';
 import { getDotTexture, getMilkyWayGlowTexture } from '../utils/sharedTextures';
 import { LODController, getParticleSizeMultiplier, createLODGeometry, type LODLevel } from '../utils/lodManager';
+import { useGeometryReady } from '../hooks/useGeometryReady';
 
 interface MilkyWayGalaxyProps {
   visualScale: number;
@@ -324,6 +325,9 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
   const coreGeoLow = useMemo(() => createLODGeometry(coreGeoFull, 'low'), [coreGeoFull]);
   const volumeGeoLow = useMemo(() => createLODGeometry(volumeGeoFull, 'low'), [volumeGeoFull]);
   const haloGeoLow = useMemo(() => createLODGeometry(haloGeoFull, 'low'), [haloGeoFull]);
+
+  // Signal geometry ready for loading screen
+  useGeometryReady('milky-way', !!starsGeoFull && !!coreGeoFull);
 
   // Select geometry based on current LOD
   const starsGeo = lodLevel === 'high' || lodLevel === 'medium' ? starsGeoFull : starsGeoLow;

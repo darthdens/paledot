@@ -7,6 +7,7 @@ import { getObjectById } from '../data/celestialObjects';
 import { DifferentialRotationPoints } from './DifferentialRotationMaterial';
 import { getDotTexture, getWhirlpoolGlowTexture, getCompanionGlowTexture } from '../utils/sharedTextures';
 import { LODController, getParticleSizeMultiplier, createLODGeometry, type LODLevel } from '../utils/lodManager';
+import { useGeometryReady } from '../hooks/useGeometryReady';
 
 interface WhirlpoolGalaxyProps {
   visualScale: number;
