@@ -1,4 +1,4 @@
-import { useRef, useMemo, useCallback } from 'react';
+import { useRef, useMemo, useCallback, useState } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import { UNITS } from '../types';
@@ -34,7 +34,8 @@ export const WhirlpoolGalaxy = ({ visualScale }: WhirlpoolGalaxyProps) => {
   const rotationTimeRef = useRef(0);
   const frameCountRef = useRef(0);
   const lodControllerRef = useRef(new LODController('high'));
-  const currentLODRef = useRef<LODLevel>('high');
+  const [lodLevel, setLodLevel] = useState<LODLevel>('high');
+  const lodLevelRef = useRef<LODLevel>('high');
 
   const { camera } = useThree();
   const setObjectWorldPosition = useCosmosStore((s) => s.setObjectWorldPosition);
@@ -361,25 +362,29 @@ export const WhirlpoolGalaxy = ({ visualScale }: WhirlpoolGalaxyProps) => {
   const dustLanesGeoLow = useMemo(() => createLODGeometry(dustLanesGeoFull, 'low'), [dustLanesGeoFull]);
 
   // Select geometry based on LOD
-  const starsGeo = currentLODRef.current === 'high' || currentLODRef.current === 'medium' ? starsGeoFull : starsGeoLow;
-  const coreGeo = currentLODRef.current === 'high' || currentLODRef.current === 'medium' ? coreGeoFull : coreGeoLow;
-  const haloGeo = currentLODRef.current === 'high' || currentLODRef.current === 'medium' ? haloGeoFull : haloGeoLow;
-  const dustLanesGeo = currentLODRef.current === 'high' || currentLODRef.current === 'medium' ? dustLanesGeoFull : dustLanesGeoLow;
-  const sizeMultiplier = getParticleSizeMultiplier(currentLODRef.current);
+  const starsGeo = lodLevel === 'high' || lodLevel === 'medium' ? starsGeoFull : starsGeoLow;
+  const coreGeo = lodLevel === 'high' || lodLevel === 'medium' ? coreGeoFull : coreGeoLow;
+  const haloGeo = lodLevel === 'high' || lodLevel === 'medium' ? haloGeoFull : haloGeoLow;
+  const dustLanesGeo = lodLevel === 'high' || lodLevel === 'medium' ? dustLanesGeoFull : dustLanesGeoLow;
+  const sizeMultiplier = getParticleSizeMultiplier(lodLevel);
 
   useFrame((_, delta) => {
     frameCountRef.current++;
-    
+
     if (groupRef.current) {
       groupRef.current.getWorldPosition(centerWorldPos.current);
-      
+
       const diskR = WHIRLPOOL.diskRadius * gs;
       const { level } = lodControllerRef.current.update(
         camera.position,
         centerWorldPos.current,
         { galaxyDiameter: diskR * 2 }
       );
-      currentLODRef.current = level;
+
+      if (level !== lodLevelRef.current) {
+        lodLevelRef.current = level;
+        setLodLevel(level);
+      }
 
       // Throttle position updates
       if (lodControllerRef.current.shouldUpdateThisFrame()) {
