@@ -1,13 +1,24 @@
 import { useState } from 'react';
 import { useLanguage } from '@/i18n/LanguageContext';
 import { useCosmosStore } from '../store/useCosmosStore';
-import { Globe, Sun, Star, Sparkles, Circle, Infinity, ChevronDown, ChevronUp } from 'lucide-react';
+import { Globe, Sun, Star, Sparkles, Circle, Infinity, ChevronDown, ChevronUp, Orbit, Network, Waypoints } from 'lucide-react';
 import type { ScaleLevel } from '../types';
+
+// Which cosmic structure each galaxy belongs to
+const GALAXY_STRUCTURES: Record<string, 'localGroup' | 'virgoCluster' | 'otherSupercluster'> = {
+  // Local Group galaxies
+  'milky-way-center': 'localGroup',
+  'andromeda': 'localGroup',
+  'triangulum': 'localGroup',
+  // Virgo Cluster / Supercluster galaxies
+  'sombrero': 'virgoCluster',
+  'whirlpool': 'virgoCluster',
+};
 
 const translations = {
   en: {
     currentLocation: 'Current Location',
-    // Scale-specific locations
+    // Scale-specific locations for LOCAL GROUP path (Milky Way, Andromeda, Triangulum)
     earth: {
       title: 'Earth Orbit',
       subtitle: 'Inner Solar System',
@@ -33,20 +44,31 @@ const translations = {
       subtitle: 'Our galaxy cluster',
       details: ['~80+ galaxies', 'Andromeda is our neighbor', '~10 million light-years across'],
     },
-    deepSpace: {
+    virgoSupercluster: {
       title: 'Virgo Supercluster',
-      subtitle: 'Laniakea Supercluster',
-      details: ['Contains ~100 galaxy groups', '~110 million light-years across', 'Our cosmic neighborhood'],
+      subtitle: 'Our supercluster home',
+      details: ['Contains ~100 galaxy groups', 'Virgo Cluster at its heart', '~110 million light-years across'],
+    },
+    laniakea: {
+      title: 'Laniakea Supercluster',
+      subtitle: 'Our cosmic basin',
+      details: ['Contains ~100,000 galaxies', 'Great Attractor at center', '~520 million light-years across'],
     },
     universe: {
       title: 'Observable Universe',
       subtitle: 'The cosmic web',
       details: ['~2 trillion galaxies', '~93 billion light-years diameter', '~13.8 billion years old'],
     },
-    distantGalaxy: {
+    // For galaxies in Virgo Cluster (Sombrero, Whirlpool, etc.)
+    virgoClusterGalaxy: {
+      title: 'Virgo Cluster Galaxy',
+      subtitle: 'Heart of the Virgo Supercluster',
+      details: ['~1,500 galaxies in Virgo Cluster', '~54 million light-years away', 'Largest nearby galaxy cluster'],
+    },
+    virgoSuperclusterFromVirgo: {
       title: 'Virgo Supercluster',
-      subtitle: 'Beyond the Local Group',
-      details: ['Contains thousands of galaxies', '~110 million light-years across', 'Part of Laniakea Supercluster'],
+      subtitle: 'Viewing from Virgo Cluster',
+      details: ['You are near the center', 'Contains Local Group on edge', '~110 million light-years across'],
     },
   },
   fr: {
@@ -76,20 +98,30 @@ const translations = {
       subtitle: 'Notre amas de galaxies',
       details: ['~80+ galaxies', 'Andromède est notre voisine', '~10 millions d\'années-lumière'],
     },
-    deepSpace: {
+    virgoSupercluster: {
       title: 'Superamas de la Vierge',
-      subtitle: 'Superamas Laniakea',
-      details: ['Contient ~100 groupes de galaxies', '~110 millions d\'années-lumière', 'Notre voisinage cosmique'],
+      subtitle: 'Notre superamas',
+      details: ['Contient ~100 groupes de galaxies', 'Amas de la Vierge en son cœur', '~110 millions d\'années-lumière'],
+    },
+    laniakea: {
+      title: 'Superamas Laniakea',
+      subtitle: 'Notre bassin cosmique',
+      details: ['Contient ~100 000 galaxies', 'Grand Attracteur au centre', '~520 millions d\'années-lumière'],
     },
     universe: {
       title: 'Univers Observable',
       subtitle: 'La toile cosmique',
       details: ['~2 000 milliards de galaxies', '~93 milliards d\'années-lumière', '~13,8 milliards d\'années'],
     },
-    distantGalaxy: {
+    virgoClusterGalaxy: {
+      title: 'Galaxie de l\'Amas de la Vierge',
+      subtitle: 'Cœur du Superamas de la Vierge',
+      details: ['~1 500 galaxies dans l\'Amas de la Vierge', '~54 millions d\'années-lumière', 'Plus grand amas proche'],
+    },
+    virgoSuperclusterFromVirgo: {
       title: 'Superamas de la Vierge',
-      subtitle: 'Au-delà du Groupe Local',
-      details: ['Contient des milliers de galaxies', '~110 millions d\'années-lumière', 'Fait partie du Superamas Laniakea'],
+      subtitle: 'Vue depuis l\'Amas de la Vierge',
+      details: ['Vous êtes près du centre', 'Contient le Groupe Local en périphérie', '~110 millions d\'années-lumière'],
     },
   },
 };
@@ -101,20 +133,35 @@ export const YouAreHereLabel = () => {
   const selectedObject = useCosmosStore((state) => state.selectedObject);
   const [isMinimized, setIsMinimized] = useState(false);
 
-  // Local Group galaxies (Milky Way, Andromeda, Triangulum)
-  const localGroupGalaxies = ['milky-way-center', 'andromeda', 'triangulum'];
+  // Determine which cosmic structure we're viewing from
+  const getGalaxyStructure = () => {
+    if (!selectedObject || selectedObject.type !== 'galaxy') return 'localGroup';
+    return GALAXY_STRUCTURES[selectedObject.id] || 'localGroup';
+  };
   
-  // Check if we're viewing a galaxy outside the Local Group (Virgo Supercluster galaxies)
-  const isDistantGalaxy = selectedObject?.type === 'galaxy' && 
-    !localGroupGalaxies.includes(selectedObject.id);
+  const galaxyStructure = getGalaxyStructure();
+  const isInVirgoCluster = galaxyStructure === 'virgoCluster';
   
-  // Get location info based on current scale (or distant galaxy)
+  // Get location info based on current scale and which galaxy we're viewing
   const getLocationInfo = () => {
-    // If viewing a distant galaxy, show special info
-    if (isDistantGalaxy) {
-      return t.distantGalaxy;
+    // If viewing a Virgo Cluster galaxy (Sombrero, Whirlpool), use different context
+    if (isInVirgoCluster) {
+      switch (currentScale) {
+        case 'milkyWay':
+          return t.virgoClusterGalaxy;
+        case 'localGroup':
+        case 'virgoSupercluster':
+          return t.virgoSuperclusterFromVirgo;
+        case 'laniakea':
+          return t.laniakea;
+        case 'universe':
+          return t.universe;
+        default:
+          return t.virgoClusterGalaxy;
+      }
     }
     
+    // Standard Local Group path (Milky Way, Andromeda, Triangulum)
     switch (currentScale) {
       case 'earth':
         return t.earth;
@@ -126,6 +173,10 @@ export const YouAreHereLabel = () => {
         return t.milkyWay;
       case 'localGroup':
         return t.localGroup;
+      case 'virgoSupercluster':
+        return t.virgoSupercluster;
+      case 'laniakea':
+        return t.laniakea;
       case 'universe':
         return t.universe;
       default:
@@ -134,6 +185,11 @@ export const YouAreHereLabel = () => {
   };
   
   const getScaleIcon = (scale: ScaleLevel) => {
+    // Different icons based on whether viewing from Virgo Cluster
+    if (isInVirgoCluster && scale === 'milkyWay') {
+      return <Sparkles className="w-4 h-4" />; // Galaxy icon for Virgo Cluster galaxy
+    }
+    
     switch (scale) {
       case 'earth':
         return <Globe className="w-4 h-4" />;
@@ -145,6 +201,10 @@ export const YouAreHereLabel = () => {
         return <Sparkles className="w-4 h-4" />;
       case 'localGroup':
         return <Circle className="w-4 h-4" />;
+      case 'virgoSupercluster':
+        return <Orbit className="w-4 h-4" />;
+      case 'laniakea':
+        return <Network className="w-4 h-4" />;
       case 'universe':
         return <Infinity className="w-4 h-4" />;
       default:

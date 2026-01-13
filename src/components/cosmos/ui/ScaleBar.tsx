@@ -14,12 +14,16 @@ const translations = {
     au: 'AU',
     ly: 'light-years',
     kly: 'thousand light-years',
+    mly: 'million light-years',
+    bly: 'billion light-years',
   },
   fr: {
     km: 'km',
     au: 'UA',
     ly: 'années-lumière',
     kly: 'milliers d\'années-lumière',
+    mly: 'millions d\'années-lumière',
+    bly: 'milliards d\'années-lumière',
   },
 };
 
@@ -43,6 +47,17 @@ const SCALE_LEVELS = [
   { maxDistance: UNITS.KM_PER_LY * 10000, scaleKm: UNITS.KM_PER_LY * 1000, label: (t: typeof translations.en) => `1 ${t.kly}` },
   { maxDistance: UNITS.KM_PER_LY * 100000, scaleKm: UNITS.KM_PER_LY * 10000, label: (t: typeof translations.en) => `10 ${t.kly}` },
   { maxDistance: UNITS.KM_PER_LY * 1000000, scaleKm: UNITS.KM_PER_LY * 100000, label: (t: typeof translations.en) => `100 ${t.kly}` },
+  // Local Group scale (~10 Mly)
+  { maxDistance: UNITS.KM_PER_MLY * 10, scaleKm: UNITS.KM_PER_MLY, label: (t: typeof translations.en) => `1 ${t.mly}` },
+  // Virgo Supercluster scale (~110 Mly)
+  { maxDistance: UNITS.KM_PER_MLY * 100, scaleKm: UNITS.KM_PER_MLY * 10, label: (t: typeof translations.en) => `10 ${t.mly}` },
+  { maxDistance: UNITS.KM_PER_MLY * 500, scaleKm: UNITS.KM_PER_MLY * 100, label: (t: typeof translations.en) => `100 ${t.mly}` },
+  // Laniakea scale (~520 Mly)
+  { maxDistance: UNITS.KM_PER_BLY * 1, scaleKm: UNITS.KM_PER_MLY * 500, label: (t: typeof translations.en) => `500 ${t.mly}` },
+  // Observable universe scale
+  { maxDistance: UNITS.KM_PER_BLY * 10, scaleKm: UNITS.KM_PER_BLY, label: (t: typeof translations.en) => `1 ${t.bly}` },
+  { maxDistance: UNITS.KM_PER_BLY * 50, scaleKm: UNITS.KM_PER_BLY * 10, label: (t: typeof translations.en) => `10 ${t.bly}` },
+  { maxDistance: UNITS.KM_PER_BLY * 100, scaleKm: UNITS.KM_PER_BLY * 50, label: (t: typeof translations.en) => `50 ${t.bly}` },
 ];
 
 // Component to be rendered inside the Canvas (has access to useThree)

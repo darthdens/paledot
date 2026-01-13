@@ -112,6 +112,8 @@ const getScaleFromDistance = (distance: number): ScaleLevel => {
   if (distance <= SCALE_BOUNDARIES.stellar.max) return 'stellar';
   if (distance <= SCALE_BOUNDARIES.milkyWay.max) return 'milkyWay';
   if (distance <= SCALE_BOUNDARIES.localGroup.max) return 'localGroup';
+  if (distance <= SCALE_BOUNDARIES.virgoSupercluster.max) return 'virgoSupercluster';
+  if (distance <= SCALE_BOUNDARIES.laniakea.max) return 'laniakea';
   return 'universe';
 };
 

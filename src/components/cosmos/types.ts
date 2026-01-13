@@ -1,6 +1,6 @@
 // Cosmos type definitions
 
-export type ScaleLevel = 'earth' | 'solarSystem' | 'stellar' | 'milkyWay' | 'localGroup' | 'universe';
+export type ScaleLevel = 'earth' | 'solarSystem' | 'stellar' | 'milkyWay' | 'localGroup' | 'virgoSupercluster' | 'laniakea' | 'universe';
 
 export interface CelestialObject {
   id: string;
@@ -25,6 +25,8 @@ export interface CelestialObject {
   rotationSpeed?: number;
   parentId?: string; // For moons - the id of the parent planet
   category: 'solarSystem' | 'stars' | 'nebulae' | 'galaxies' | 'deepSpace';
+  // Which cosmic structure this object belongs to
+  cosmicStructure?: 'localGroup' | 'virgoCluster' | 'virgoSupercluster';
 }
 
 export interface TourStop {
@@ -66,13 +68,20 @@ export interface CosmosState {
 }
 
 // Scale boundaries in km
+// Accurate cosmic hierarchy:
+// - Local Group: ~10 Mly diameter
+// - Virgo Supercluster: ~110 Mly diameter  
+// - Laniakea Supercluster: ~520 Mly diameter
+// - Observable Universe: ~93 Bly diameter
 export const SCALE_BOUNDARIES = {
   earth: { min: 0, max: 1000 },
   solarSystem: { min: 1000, max: 14959787070 }, // 100 AU in km
   stellar: { min: 14959787070, max: 9.461e14 }, // 100 ly in km
   milkyWay: { min: 9.461e14, max: 9.461e17 }, // 100,000 ly in km
   localGroup: { min: 9.461e17, max: 9.461e19 }, // 10 million ly in km
-  universe: { min: 9.461e19, max: 4.4e23 }, // 46.5 billion ly in km
+  virgoSupercluster: { min: 9.461e19, max: 1.04e21 }, // 110 million ly in km
+  laniakea: { min: 1.04e21, max: 4.92e21 }, // 520 million ly in km
+  universe: { min: 4.92e21, max: 4.4e23 }, // 46.5 billion ly in km
 } as const;
 
 // Unit conversions
