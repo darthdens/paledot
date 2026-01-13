@@ -50,9 +50,9 @@ export const SombreroGalaxy = ({ visualScale }: SombreroGalaxyProps) => {
   const dotTexture = useMemo(() => getDotTexture(), []);
   const glowTexture = useMemo(() => getSombreroGlowTexture(), []);
 
-  // Full resolution geometries - reduced particle counts for better performance
+  // Full resolution geometries - increased core density for brighter center
   const bulgeGeoFull = useMemo(() => {
-    const count = 300000; // Reduced from 500000
+    const count = 500000; // Increased for denser, brighter core
     const positions = new Float32Array(count * 3);
     const colors = new Float32Array(count * 3);
     const color = new THREE.Color();
@@ -62,7 +62,8 @@ export const SombreroGalaxy = ({ visualScale }: SombreroGalaxyProps) => {
 
     for (let i = 0; i < count; i++) {
       const i3 = i * 3;
-      const r = Math.pow(Math.random(), 2.0) * maxR;
+      // Higher exponent = more concentrated toward center
+      const r = Math.pow(Math.random(), 2.8) * maxR;
       const theta = Math.random() * Math.PI * 2;
       const rt = r / maxR;
 
@@ -89,14 +90,15 @@ export const SombreroGalaxy = ({ visualScale }: SombreroGalaxyProps) => {
       }
       positions[i3 + 1] = yPos;
 
+      // Brighter colors especially near center
       if (rt < 0.08) {
-        color.setHSL(0.12 + Math.random() * 0.02, 0.03, 0.99 + Math.random() * 0.01);
+        color.setHSL(0.12 + Math.random() * 0.02, 0.02, 1.0);
       } else if (rt < 0.2) {
-        color.setHSL(0.11 + Math.random() * 0.02, 0.05, 0.95 + Math.random() * 0.03);
+        color.setHSL(0.11 + Math.random() * 0.02, 0.04, 0.98 + Math.random() * 0.02);
       } else if (rt < 0.45) {
-        color.setHSL(0.1 + Math.random() * 0.02, 0.1, 0.89 + Math.random() * 0.06);
+        color.setHSL(0.1 + Math.random() * 0.02, 0.08, 0.93 + Math.random() * 0.05);
       } else {
-        color.setHSL(0.09 + Math.random() * 0.02, 0.16, 0.8 + Math.random() * 0.1);
+        color.setHSL(0.09 + Math.random() * 0.02, 0.14, 0.85 + Math.random() * 0.08);
       }
 
       colors[i3] = color.r;
@@ -302,9 +304,9 @@ export const SombreroGalaxy = ({ visualScale }: SombreroGalaxyProps) => {
 
         <DifferentialRotationPoints
           geometry={bulgeGeo}
-          size={gs * 50 * sizeMultiplier}
+          size={gs * 65 * sizeMultiplier}
           map={dotTexture}
-          opacity={0.9}
+          opacity={1.0}
           maxRadius={bulgeR}
           rotationMultiplier={1.1}
           renderOrder={3}

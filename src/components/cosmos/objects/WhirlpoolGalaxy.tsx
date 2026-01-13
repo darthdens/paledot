@@ -181,7 +181,7 @@ export const WhirlpoolGalaxy = ({ visualScale }: WhirlpoolGalaxyProps) => {
   }, [gs]);
 
   const coreGeoFull = useMemo(() => {
-    const coreCount = 50000; // Reduced from 75000
+    const coreCount = 100000; // Increased for denser core
     const positions = new Float32Array(coreCount * 3);
     const colors = new Float32Array(coreCount * 3);
     const color = new THREE.Color();
@@ -189,7 +189,8 @@ export const WhirlpoolGalaxy = ({ visualScale }: WhirlpoolGalaxyProps) => {
 
     for (let i = 0; i < coreCount; i++) {
       const i3 = i * 3;
-      const r = Math.pow(Math.random(), 1.4) * coreRadius;
+      // Lower exponent = more concentrated toward center
+      const r = Math.pow(Math.random(), 2.2) * coreRadius;
       const theta = Math.random() * Math.PI * 2;
       const phi = Math.acos(2 * Math.random() - 1);
       const t = r / coreRadius;
@@ -199,14 +200,15 @@ export const WhirlpoolGalaxy = ({ visualScale }: WhirlpoolGalaxyProps) => {
       positions[i3 + 2] = r * Math.sin(phi) * Math.sin(theta);
 
       const rand = Math.random();
+      // Brighter colors for core stars
       if (t < 0.4) {
-        color.setHSL(0.12 + Math.random() * 0.03, 0.3 + Math.random() * 0.1, 0.9 + Math.random() * 0.08);
+        color.setHSL(0.12 + Math.random() * 0.03, 0.25 + Math.random() * 0.08, 0.95 + Math.random() * 0.05);
       } else if (rand < 0.6) {
-        color.setHSL(0.1 + Math.random() * 0.04, 0.45 + Math.random() * 0.15, 0.78 + Math.random() * 0.1);
+        color.setHSL(0.1 + Math.random() * 0.04, 0.38 + Math.random() * 0.12, 0.88 + Math.random() * 0.08);
       } else if (rand < 0.85) {
-        color.setHSL(0.08 + Math.random() * 0.05, 0.55 + Math.random() * 0.2, 0.68 + Math.random() * 0.12);
+        color.setHSL(0.08 + Math.random() * 0.05, 0.48 + Math.random() * 0.15, 0.8 + Math.random() * 0.1);
       } else {
-        color.setHSL(0.06 + Math.random() * 0.04, 0.6 + Math.random() * 0.15, 0.6 + Math.random() * 0.12);
+        color.setHSL(0.06 + Math.random() * 0.04, 0.55 + Math.random() * 0.12, 0.72 + Math.random() * 0.1);
       }
 
       colors[i3] = color.r;
@@ -449,9 +451,9 @@ export const WhirlpoolGalaxy = ({ visualScale }: WhirlpoolGalaxyProps) => {
         <DifferentialRotationPoints
           key="whirlpool-core"
           geometry={coreGeo}
-          size={gs * 80 * sizeMultiplier}
+          size={gs * 95 * sizeMultiplier}
           map={dotTexture}
-          opacity={0.95}
+          opacity={1.0}
           maxRadius={WHIRLPOOL.bulgeRadius * gs}
           rotationMultiplier={1.4}
           differentialStrength={0.1}
