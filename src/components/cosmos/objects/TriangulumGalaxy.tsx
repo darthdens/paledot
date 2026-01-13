@@ -60,7 +60,7 @@ export const TriangulumGalaxy = ({ visualScale }: TriangulumGalaxyProps) => {
   const starsGeoFull = useMemo(() => {
     const { branches, spinTurns } = TRIANGULUM;
     const maxRadius = TRIANGULUM.diskRadius * gs;
-    const starCount = 900000; // Increased from 500k to match density
+    const starCount = 500000;
 
     const positions = new Float32Array(starCount * 3);
     const colors = new Float32Array(starCount * 3);
@@ -160,7 +160,7 @@ export const TriangulumGalaxy = ({ visualScale }: TriangulumGalaxyProps) => {
   }, [gs]);
 
   const coreGeoFull = useMemo(() => {
-    const coreCount = 250000; // Increased from 120k for denser core
+    const coreCount = 120000;
     const positions = new Float32Array(coreCount * 3);
     const colors = new Float32Array(coreCount * 3);
     const color = new THREE.Color();
@@ -206,7 +206,7 @@ export const TriangulumGalaxy = ({ visualScale }: TriangulumGalaxyProps) => {
   }, [gs]);
 
   const haloGeoFull = useMemo(() => {
-    const haloCount = 100000; // Increased from 60k
+    const haloCount = 60000;
     const positions = new Float32Array(haloCount * 3);
     const colors = new Float32Array(haloCount * 3);
     const color = new THREE.Color();
@@ -285,9 +285,10 @@ export const TriangulumGalaxy = ({ visualScale }: TriangulumGalaxyProps) => {
           geometry={haloGeo}
           size={gs * 35 * sizeMultiplier}
           map={dotTexture}
-          opacity={0.25}
+          opacity={0.28}
           maxRadius={diskR * 1.3}
           rotationMultiplier={0.7}
+          differentialStrength={0.08}
           renderOrder={1}
         />
 
@@ -296,9 +297,10 @@ export const TriangulumGalaxy = ({ visualScale }: TriangulumGalaxyProps) => {
           geometry={starsGeo}
           size={gs * 50 * sizeMultiplier}
           map={dotTexture}
-          opacity={0.85}
+          opacity={0.88}
           maxRadius={diskR}
           rotationMultiplier={1}
+          differentialStrength={0.06}
           renderOrder={2}
         />
 
@@ -310,6 +312,7 @@ export const TriangulumGalaxy = ({ visualScale }: TriangulumGalaxyProps) => {
           opacity={0.95}
           maxRadius={TRIANGULUM.bulgeRadius * gs}
           rotationMultiplier={1.5}
+          differentialStrength={0.1}
           renderOrder={3}
         />
 

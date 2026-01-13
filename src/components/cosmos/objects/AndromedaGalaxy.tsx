@@ -61,7 +61,7 @@ export const AndromedaGalaxy = ({ visualScale }: AndromedaGalaxyProps) => {
   const starsGeoFull = useMemo(() => {
     const { branches, spinTurns } = ANDROMEDA;
     const maxRadius = ANDROMEDA.diskRadius * gs;
-    const starCount = 1200000; // Increased from 700k to match Whirlpool density
+    const starCount = 700000;
 
     const positions = new Float32Array(starCount * 3);
     const colors = new Float32Array(starCount * 3);
@@ -157,7 +157,7 @@ export const AndromedaGalaxy = ({ visualScale }: AndromedaGalaxyProps) => {
   }, [gs]);
 
   const coreGeoFull = useMemo(() => {
-    const coreCount = 350000; // Increased from 180k for denser core
+    const coreCount = 180000;
     const positions = new Float32Array(coreCount * 3);
     const colors = new Float32Array(coreCount * 3);
     const color = new THREE.Color();
@@ -205,7 +205,7 @@ export const AndromedaGalaxy = ({ visualScale }: AndromedaGalaxyProps) => {
   }, [gs]);
 
   const haloGeoFull = useMemo(() => {
-    const haloCount = 80000; // Increased from 35k
+    const haloCount = 35000;
     const maxRadius = ANDROMEDA.diskRadius * gs * 0.5;
     const maxHeight = ANDROMEDA.diskRadius * gs * 0.15;
     const positions = new Float32Array(haloCount * 3);
@@ -291,9 +291,10 @@ export const AndromedaGalaxy = ({ visualScale }: AndromedaGalaxyProps) => {
           geometry={haloGeo}
           size={gs * 40 * sizeMultiplier}
           map={dotTexture}
-          opacity={0.3}
+          opacity={0.28}
           maxRadius={diskR * 1.2}
           rotationMultiplier={0.8}
+          differentialStrength={0.08}
           renderOrder={1}
         />
 
@@ -301,9 +302,10 @@ export const AndromedaGalaxy = ({ visualScale }: AndromedaGalaxyProps) => {
           geometry={starsGeo}
           size={gs * 55 * sizeMultiplier}
           map={dotTexture}
-          opacity={0.85}
+          opacity={0.88}
           maxRadius={diskR}
           rotationMultiplier={1}
+          differentialStrength={0.06}
           renderOrder={2}
         />
 
@@ -314,6 +316,7 @@ export const AndromedaGalaxy = ({ visualScale }: AndromedaGalaxyProps) => {
           opacity={0.95}
           maxRadius={ANDROMEDA.bulgeRadius * gs}
           rotationMultiplier={1.5}
+          differentialStrength={0.1}
           renderOrder={3}
         />
 
