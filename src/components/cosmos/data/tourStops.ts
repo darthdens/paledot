@@ -388,6 +388,74 @@ export const tourStops: TourStop[] = [
     scaleLevel: 'localGroup',
   },
   {
+    id: 'local-group',
+    locationId: 'local-group',
+    title: {
+      en: 'The Local Group',
+      fr: 'Le Groupe Local',
+    },
+    narration: {
+      en: 'Zooming out further, we now see the Local Group - our galactic neighborhood containing over 80 galaxies within a region spanning about 10 million light-years. The Milky Way and Andromeda are the two largest members, gravitationally bound and destined to merge.',
+      fr: 'En s\'éloignant davantage, nous voyons maintenant le Groupe Local - notre voisinage galactique contenant plus de 80 galaxies dans une région d\'environ 10 millions d\'années-lumière. La Voie Lactée et Andromède sont les deux plus grands membres, liés gravitationnellement et destinés à fusionner.',
+    },
+    duration: 10,
+    // Position to see Local Group structure - 4 Mly viewpoint
+    cameraPosition: [4e6 * UNITS.KM_PER_LY, 2e6 * UNITS.KM_PER_LY, 4e6 * UNITS.KM_PER_LY],
+    lookAt: [0, 0, 0],
+    scaleLevel: 'localGroup',
+  },
+  {
+    id: 'virgo-supercluster',
+    locationId: 'virgo-supercluster',
+    title: {
+      en: 'The Virgo Supercluster',
+      fr: 'Le Superamas de la Vierge',
+    },
+    narration: {
+      en: 'The Virgo Supercluster is a massive collection of about 100 galaxy groups and clusters, spanning 110 million light-years. Our Local Group is just a small part of this cosmic structure, orbiting around the Virgo Cluster at its heart.',
+      fr: 'Le Superamas de la Vierge est une collection massive d\'environ 100 groupes et amas de galaxies, s\'étendant sur 110 millions d\'années-lumière. Notre Groupe Local n\'est qu\'une petite partie de cette structure cosmique, orbitant autour de l\'Amas de la Vierge en son cœur.',
+    },
+    duration: 10,
+    // Position to see Virgo Supercluster structure - 80 Mly viewpoint
+    cameraPosition: [80e6 * UNITS.KM_PER_LY, 40e6 * UNITS.KM_PER_LY, 60e6 * UNITS.KM_PER_LY],
+    lookAt: [0, 0, 0],
+    scaleLevel: 'virgoSupercluster',
+  },
+  {
+    id: 'laniakea',
+    locationId: 'laniakea',
+    title: {
+      en: 'Laniakea Supercluster',
+      fr: 'Le Superamas Laniakea',
+    },
+    narration: {
+      en: 'Discovered in 2014, Laniakea means "immense heaven" in Hawaiian. This colossal supercluster spans 520 million light-years and contains about 100,000 galaxies, including our own. All these galaxies are flowing toward a gravitational anomaly called the Great Attractor.',
+      fr: 'Découvert en 2014, Laniakea signifie "ciel immense" en hawaïen. Ce colossal superamas s\'étend sur 520 millions d\'années-lumière et contient environ 100 000 galaxies, dont la nôtre. Toutes ces galaxies convergent vers une anomalie gravitationnelle appelée le Grand Attracteur.',
+    },
+    duration: 10,
+    // Position to see Laniakea structure - 400 Mly viewpoint
+    cameraPosition: [400e6 * UNITS.KM_PER_LY, 200e6 * UNITS.KM_PER_LY, 300e6 * UNITS.KM_PER_LY],
+    lookAt: [0, 0, 0],
+    scaleLevel: 'laniakea',
+  },
+  {
+    id: 'observable-universe',
+    locationId: 'observable-universe',
+    title: {
+      en: 'The Observable Universe',
+      fr: 'L\'Univers Observable',
+    },
+    narration: {
+      en: 'At the ultimate scale, we behold the observable universe - a sphere 93 billion light-years across, containing over 2 trillion galaxies. The cosmic web of filaments and voids stretches in all directions. Beyond this horizon, light hasn\'t had time to reach us since the Big Bang 13.8 billion years ago.',
+      fr: 'À l\'échelle ultime, nous contemplons l\'univers observable - une sphère de 93 milliards d\'années-lumière de diamètre, contenant plus de 2 billions de galaxies. La toile cosmique de filaments et de vides s\'étend dans toutes les directions. Au-delà de cet horizon, la lumière n\'a pas eu le temps de nous parvenir depuis le Big Bang il y a 13,8 milliards d\'années.',
+    },
+    duration: 12,
+    // Position to see the entire cosmic web - 80 Bly viewpoint
+    cameraPosition: [80e9 * UNITS.KM_PER_LY, 50e9 * UNITS.KM_PER_LY, 60e9 * UNITS.KM_PER_LY],
+    lookAt: [0, 0, 0],
+    scaleLevel: 'universe',
+  },
+  {
     id: 'conclusion',
     locationId: 'earth',
     title: {
@@ -395,8 +463,8 @@ export const tourStops: TourStop[] = [
       fr: 'De Retour à la Maison',
     },
     narration: {
-      en: 'Our journey through the cosmos comes to an end, returning to our pale blue dot. In the vastness of space, Earth remains our only home - a precious oasis of life in the cosmic desert.',
-      fr: 'Notre voyage à travers le cosmos touche à sa fin, de retour sur notre point bleu pâle. Dans l\'immensité de l\'espace, la Terre reste notre seule maison - une précieuse oasis de vie dans le désert cosmique.',
+      en: 'Our journey through the cosmos comes to an end, returning to our pale blue dot. From the edge of the observable universe to our tiny planet, we\'ve traveled across 93 billion light-years. In this vast cosmic ocean, Earth remains our only home - a precious oasis of life.',
+      fr: 'Notre voyage à travers le cosmos touche à sa fin, de retour sur notre point bleu pâle. Du bord de l\'univers observable à notre minuscule planète, nous avons parcouru 93 milliards d\'années-lumière. Dans cet immense océan cosmique, la Terre reste notre seule maison - une précieuse oasis de vie.',
     },
     duration: 10,
     // Same view as intro - centered on Earth
