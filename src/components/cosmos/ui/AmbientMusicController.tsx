@@ -9,8 +9,10 @@ import { useLanguage } from '@/i18n/LanguageContext';
 
 export const AmbientMusicController = () => {
   const { language } = useLanguage();
-  const volume = useCosmosStore((s) => s.volume);
-  const setVolume = useCosmosStore((s) => s.setVolume);
+
+  const store = useCosmosStore();
+  const volume = store.volume;
+  const setVolume = store.setVolume;
 
   const { startMusic, stopMusic, isPlaying } = useAmbientMusic();
   const [showVolumeSlider, setShowVolumeSlider] = useState(false);
@@ -24,9 +26,12 @@ export const AmbientMusicController = () => {
     }
   }, [isPlaying, startMusic, stopMusic]);
 
-  const handleVolumeChange = useCallback((value: number[]) => {
-    setVolume(value[0]);
-  }, [setVolume]);
+  const handleVolumeChange = useCallback(
+    (value: number[]) => {
+      setVolume(value[0]);
+    },
+    [setVolume]
+  );
 
   const handleMouseEnter = useCallback(() => {
     if (sliderTimeoutRef.current) {
@@ -59,18 +64,18 @@ export const AmbientMusicController = () => {
     }
   }, [isPlaying]);
 
-  const tooltipLabel = isPlaying 
-    ? (language === 'fr' ? 'Désactiver le son' : 'Disable sound') 
-    : (language === 'fr' ? 'Activer le son' : 'Enable sound');
+  const tooltipLabel = isPlaying
+    ? language === 'fr'
+      ? 'Désactiver le son'
+      : 'Disable sound'
+    : language === 'fr'
+      ? 'Activer le son'
+      : 'Enable sound';
 
   return (
-    <div 
-      className="flex items-center"
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
-    >
+    <div className="flex items-center" onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
       {/* Volume slider (shows on hover when playing) - animates width */}
-      <div 
+      <div
         className={`flex items-center transition-all duration-300 ease-out overflow-hidden ${
           showVolumeSlider ? 'w-20 opacity-100 mr-1' : 'w-0 opacity-0'
         }`}
@@ -81,7 +86,7 @@ export const AmbientMusicController = () => {
           max={1}
           step={0.05}
           variant="light"
-          className="w-full [&_[data-radix-slider-range]]:bg-white/60"
+          className="w-full [&_[data-radix-slider-range]]:bg-foreground/25"
           aria-label={language === 'fr' ? 'Volume' : 'Volume'}
         />
       </div>
@@ -93,8 +98,8 @@ export const AmbientMusicController = () => {
             variant="ghost"
             size="icon"
             onClick={toggleSound}
-            className={`h-8 w-8 sm:h-9 sm:w-9 backdrop-blur-sm text-white ${
-              isPlaying ? 'bg-white/25' : 'bg-white/10 hover:bg-white/20'
+            className={`h-8 w-8 sm:h-9 sm:w-9 backdrop-blur-sm text-foreground ${
+              isPlaying ? 'bg-foreground/25' : 'bg-foreground/10 hover:bg-foreground/20'
             }`}
           >
             {isPlaying ? (

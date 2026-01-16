@@ -1,12 +1,20 @@
-import { useEffect, useRef, useCallback } from 'react';
+import { useEffect, useCallback } from 'react';
 import { useCosmosStore } from '../store/useCosmosStore';
 
 // Single space ambient track for all scales
 const SPACE_AMBIENT_TRACK = '/audio/space-ambient.mp3';
 
-// Global audio instance to persist across component re-renders
+// Global audio instance to persist across component re-renders (and hot reload)
 let globalAudio: HTMLAudioElement | null = null;
 let fadeIntervalGlobal: NodeJS.Timeout | null = null;
+let isFadingGlobal = false;
+
+const clearFadeInterval = () => {
+  if (fadeIntervalGlobal) {
+    clearInterval(fadeIntervalGlobal);
+    fadeIntervalGlobal = null;
+  }
+};
 
 export const useAmbientMusic = () => {
   const store = useCosmosStore();
@@ -14,10 +22,49 @@ export const useAmbientMusic = () => {
   const isPlaying = store.isMusicPlaying;
   const setMusicPlaying = store.setMusicPlaying;
 
+  // If hot-reload left an audio instance running, re-sync the UI state.
+  useEffect(() => {
+    if (!globalAudio) return;
+    setMusicPlaying(!globalAudio.paused);
+  }, [setMusicPlaying]);
+
   const startMusic = useCallback(() => {
-    if (isPlaying || globalAudio) return;
-    
-    setMusicPlaying(true);
+    // If an audio instance already exists (common during hot reload), reuse it.
+    if (globalAudio) {
+      clearFadeInterval();
+      isFadingGlobal = true;
+
+      globalAudio.loop = true;
+      globalAudio
+        .play()
+        .then(() => {
+          setMusicPlaying(true);
+
+          const targetVolume = volume * 0.3;
+          const steps = 20;
+          let step = 0;
+
+          fadeIntervalGlobal = setInterval(() => {
+            step++;
+            if (globalAudio) {
+              globalAudio.volume = Math.min(targetVolume, (step / steps) * targetVolume);
+            }
+            if (step >= steps) {
+              clearFadeInterval();
+              isFadingGlobal = false;
+            }
+          }, 100);
+        })
+        .catch(() => {
+          isFadingGlobal = false;
+          setMusicPlaying(false);
+        });
+
+      return;
+    }
+
+    clearFadeInterval();
+    isFadingGlobal = true;
 
     const audio = new Audio(SPACE_AMBIENT_TRACK);
     audio.loop = true;
@@ -25,35 +72,43 @@ export const useAmbientMusic = () => {
     audio.volume = 0;
     globalAudio = audio;
 
-    audio.play().then(() => {
-      const targetVolume = volume * 0.3;
-      const steps = 20;
-      let step = 0;
+    audio
+      .play()
+      .then(() => {
+        setMusicPlaying(true);
 
-      if (fadeIntervalGlobal) clearInterval(fadeIntervalGlobal);
-      fadeIntervalGlobal = setInterval(() => {
-        step++;
-        if (globalAudio) {
-          globalAudio.volume = Math.min(targetVolume, (step / steps) * targetVolume);
-        }
-        if (step >= steps && fadeIntervalGlobal) {
-          clearInterval(fadeIntervalGlobal);
-          fadeIntervalGlobal = null;
-        }
-      }, 100);
-    }).catch(() => {
-      setMusicPlaying(false);
-      globalAudio = null;
-    });
-  }, [isPlaying, volume, setMusicPlaying]);
+        const targetVolume = volume * 0.3;
+        const steps = 20;
+        let step = 0;
+
+        fadeIntervalGlobal = setInterval(() => {
+          step++;
+          if (globalAudio) {
+            globalAudio.volume = Math.min(targetVolume, (step / steps) * targetVolume);
+          }
+          if (step >= steps) {
+            clearFadeInterval();
+            isFadingGlobal = false;
+          }
+        }, 100);
+      })
+      .catch(() => {
+        isFadingGlobal = false;
+        setMusicPlaying(false);
+        globalAudio = null;
+      });
+  }, [volume, setMusicPlaying]);
 
   const stopMusic = useCallback(() => {
-    if (!isPlaying || !globalAudio) return;
-    
-    if (fadeIntervalGlobal) {
-      clearInterval(fadeIntervalGlobal);
-      fadeIntervalGlobal = null;
+    // If state got desynced (e.g. hot reload), still stop the actual audio.
+    if (!globalAudio) {
+      setMusicPlaying(false);
+      return;
     }
+
+    clearFadeInterval();
+    isFadingGlobal = true;
+    setMusicPlaying(false);
 
     const audio = globalAudio;
     const startVolume = audio.volume;
@@ -61,25 +116,21 @@ export const useAmbientMusic = () => {
 
     fadeIntervalGlobal = setInterval(() => {
       step++;
-      if (audio) {
-        audio.volume = Math.max(0, startVolume * (1 - step / 10));
-      }
+      audio.volume = Math.max(0, startVolume * (1 - step / 10));
+
       if (step >= 10) {
-        if (fadeIntervalGlobal) {
-          clearInterval(fadeIntervalGlobal);
-          fadeIntervalGlobal = null;
-        }
+        clearFadeInterval();
         audio.pause();
         audio.src = '';
         globalAudio = null;
-        setMusicPlaying(false);
+        isFadingGlobal = false;
       }
     }, 100);
-  }, [isPlaying, setMusicPlaying]);
+  }, [setMusicPlaying]);
 
   // Handle volume changes (sync audio volume with store volume)
   useEffect(() => {
-    if (globalAudio && isPlaying) {
+    if (globalAudio && isPlaying && !isFadingGlobal) {
       globalAudio.volume = volume * 0.3;
     }
   }, [volume, isPlaying]);
