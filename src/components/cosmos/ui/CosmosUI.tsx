@@ -131,6 +131,46 @@ export const CosmosUI = () => {
   const [showTimeSlider, setShowTimeSlider] = useState(false);
   const [showMoreMenu, setShowMoreMenu] = useState(false);
   const [showAbout, setShowAbout] = useState(false);
+  
+  const timeSliderRef = useRef<HTMLDivElement | null>(null);
+  const moreMenuRef = useRef<HTMLDivElement | null>(null);
+  const moreMenuButtonRef = useRef<HTMLButtonElement | null>(null);
+  const timeSpeedButtonRef = useRef<HTMLButtonElement | null>(null);
+
+  // Click-outside and Escape key handlers for dropdowns
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      const target = e.target as Node;
+      
+      // Close time slider if clicking outside
+      if (showTimeSlider && timeSliderRef.current && !timeSliderRef.current.contains(target) && 
+          timeSpeedButtonRef.current && !timeSpeedButtonRef.current.contains(target)) {
+        setShowTimeSlider(false);
+      }
+      
+      // Close more menu if clicking outside
+      if (showMoreMenu && moreMenuRef.current && !moreMenuRef.current.contains(target) &&
+          moreMenuButtonRef.current && !moreMenuButtonRef.current.contains(target)) {
+        setShowMoreMenu(false);
+      }
+    };
+
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        if (showTimeSlider) setShowTimeSlider(false);
+        if (showMoreMenu) setShowMoreMenu(false);
+        if (showQuickJump) toggleQuickJump();
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener('keydown', handleEscape);
+    
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('keydown', handleEscape);
+    };
+  }, [showTimeSlider, showMoreMenu, showQuickJump, toggleQuickJump]);
 
   const handleQuickJumpClick = () => {
     const el = quickJumpButtonRef.current;
@@ -645,7 +685,7 @@ export const CosmosUI = () => {
 
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Button size="icon" variant="ghost" onClick={() => setShowTimeSlider(!showTimeSlider)} className={`h-9 w-9 backdrop-blur-sm text-white ${showTimeSlider ? 'bg-white/25' : 'bg-white/10 hover:bg-white/20'}`}>
+                  <Button ref={timeSpeedButtonRef} size="icon" variant="ghost" onClick={() => setShowTimeSlider(!showTimeSlider)} className={`h-9 w-9 backdrop-blur-sm text-white ${showTimeSlider ? 'bg-white/25' : 'bg-white/10 hover:bg-white/20'}`}>
                     <Clock className="w-5 h-5" />
                   </Button>
                 </TooltipTrigger>
@@ -694,6 +734,7 @@ export const CosmosUI = () => {
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button 
+                  ref={moreMenuButtonRef}
                   size="icon" 
                   variant="ghost" 
                   onClick={() => setShowMoreMenu(!showMoreMenu)} 
@@ -712,6 +753,7 @@ export const CosmosUI = () => {
 
       {/* Mobile & Tablet more menu - same style as QuickJump */}
       <div
+        ref={moreMenuRef}
         className={`lg:hidden ${isFullscreen ? 'fixed' : 'absolute'} z-[10001] bg-white/10 backdrop-blur-sm rounded-lg overflow-hidden transition-all duration-300 ease-out ${
           showMoreMenu ? 'opacity-100 scale-100' : 'opacity-0 scale-95 pointer-events-none'
         }`}
@@ -801,6 +843,7 @@ export const CosmosUI = () => {
       {/* Time speed slider */}
       {!showControlHints && (
         <div
+          ref={timeSliderRef}
           className={`${isFullscreen ? 'fixed' : 'absolute'} top-12 right-2 sm:top-[68px] sm:right-4 z-[10000] bg-white/10 backdrop-blur-sm rounded-lg overflow-hidden transition-all duration-300 ease-out ${
             showTimeSlider ? 'opacity-100 scale-100' : 'opacity-0 scale-95 pointer-events-none'
           }`}

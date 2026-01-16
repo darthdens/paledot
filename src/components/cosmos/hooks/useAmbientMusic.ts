@@ -5,7 +5,6 @@ import { useCosmosStore } from '../store/useCosmosStore';
 const SPACE_AMBIENT_TRACK = '/audio/space-ambient.mp3';
 
 export const useAmbientMusic = () => {
-  const isMuted = useCosmosStore((s) => s.isMuted);
   const volume = useCosmosStore((s) => s.volume);
 
   const [isPlaying, setIsPlaying] = useState(false);
@@ -57,13 +56,12 @@ export const useAmbientMusic = () => {
     }
   }, [isPlaying]);
 
-  // Handle volume/mute changes
+  // Handle volume changes (sync audio volume with store volume)
   useEffect(() => {
-    const targetVolume = isMuted ? 0 : volume * 0.3;
-    if (audioRef.current) {
-      audioRef.current.volume = targetVolume;
+    if (audioRef.current && isPlaying) {
+      audioRef.current.volume = volume * 0.3;
     }
-  }, [isMuted, volume]);
+  }, [volume, isPlaying]);
 
   // Cleanup on unmount
   useEffect(() => {

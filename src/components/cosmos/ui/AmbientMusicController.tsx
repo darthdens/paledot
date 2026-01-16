@@ -80,6 +80,7 @@ export const AmbientMusicController = () => {
           onValueChange={handleVolumeChange}
           max={1}
           step={0.05}
+          variant="light"
           className="w-full"
           aria-label={language === 'fr' ? 'Volume' : 'Volume'}
         />
@@ -92,11 +93,7 @@ export const AmbientMusicController = () => {
             variant="ghost"
             size="icon"
             onClick={toggleSound}
-            className={`h-8 w-8 sm:h-9 sm:w-9 backdrop-blur-sm text-white transition-colors ${
-              isPlaying 
-                ? 'bg-green-500/30 hover:bg-green-500/40' 
-                : 'bg-white/10 hover:bg-white/20'
-            }`}
+            className="h-8 w-8 sm:h-9 sm:w-9 backdrop-blur-sm text-white bg-white/10 hover:bg-white/20"
           >
             {isPlaying ? (
               <Volume2 className="h-4 w-4 sm:h-5 sm:w-5" />
