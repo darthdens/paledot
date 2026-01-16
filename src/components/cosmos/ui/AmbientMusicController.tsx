@@ -101,7 +101,7 @@ export const AmbientMusicController = () => {
         variant="ghost"
         size="icon"
         onClick={handleMuteToggle}
-        className={`h-8 w-8 backdrop-blur-sm text-white ${
+        className={`h-8 w-8 sm:h-9 sm:w-9 backdrop-blur-sm text-white ${
           isMuted 
             ? 'bg-white/10 hover:bg-white/20' 
             : 'bg-white/25'
@@ -112,9 +112,9 @@ export const AmbientMusicController = () => {
         }
       >
         {isMuted ? (
-          <VolumeX className="h-4 w-4" />
+          <VolumeX className="h-4 w-4 sm:h-5 sm:w-5" />
         ) : (
-          <Volume2 className="h-4 w-4" />
+          <Volume2 className="h-4 w-4 sm:h-5 sm:w-5" />
         )}
       </Button>
 
@@ -123,7 +123,7 @@ export const AmbientMusicController = () => {
         variant="ghost"
         size="icon"
         onClick={toggleMusic}
-        className={`h-8 w-8 backdrop-blur-sm text-white ${
+        className={`h-8 w-8 sm:h-9 sm:w-9 backdrop-blur-sm text-white ${
           isActive 
             ? 'bg-white/25' 
             : 'bg-white/10 hover:bg-white/20'
@@ -133,7 +133,7 @@ export const AmbientMusicController = () => {
           : (language === 'fr' ? 'Activer la musique ambiante' : 'Enable ambient music')
         }
       >
-        <Music className="h-4 w-4" />
+        <Music className="h-4 w-4 sm:h-5 sm:w-5" />
       </Button>
     </div>
   );
