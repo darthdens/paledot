@@ -561,18 +561,19 @@ export const CosmosUI = () => {
 
       {/* Top controls - icon buttons with tooltips */}
       <div
-        className={`${isFullscreen ? 'fixed' : 'absolute'} top-2 right-2 sm:top-4 sm:right-4 z-[10000]`}
+        className={`${isFullscreen ? 'fixed' : 'absolute'} top-2 left-2 right-2 sm:top-4 sm:left-auto sm:right-4 z-[10000]`}
         style={
           isFullscreen
             ? {
                 top: 'calc(0.5rem + env(safe-area-inset-top))',
+                left: 'calc(0.5rem + env(safe-area-inset-left))',
                 right: 'calc(0.5rem + env(safe-area-inset-right))',
               }
             : undefined
         }
       >
         <TooltipProvider delayDuration={300}>
-          <div className="flex items-center gap-1 sm:gap-1.5">
+          <div className="flex flex-wrap items-center justify-end gap-1 sm:gap-1.5">
             {/* Navigation group */}
             <Tooltip>
               <TooltipTrigger asChild>
@@ -607,8 +608,8 @@ export const CosmosUI = () => {
               </TooltipContent>
             </Tooltip>
               
-            {/* Divider */}
-            <div className="w-px h-6 bg-white/20 mx-0.5" />
+            {/* Divider - hidden on mobile */}
+            <div className="hidden sm:block w-px h-6 bg-white/20 mx-0.5" />
               
             {/* Display options group */}
             <Tooltip>
@@ -655,14 +656,14 @@ export const CosmosUI = () => {
               </TooltipContent>
             </Tooltip>
               
-            {/* Divider */}
-            <div className="w-px h-6 bg-white/20 mx-0.5" />
+            {/* Divider - hidden on mobile */}
+            <div className="hidden sm:block w-px h-6 bg-white/20 mx-0.5" />
 
             {/* Ambient Music Controller */}
             <AmbientMusicController />
               
-            {/* Divider */}
-            <div className="w-px h-6 bg-white/20 mx-0.5" />
+            {/* Divider - hidden on mobile */}
+            <div className="hidden sm:block w-px h-6 bg-white/20 mx-0.5" />
               
             {/* Help & About */}
             <Tooltip>
