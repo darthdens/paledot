@@ -86,6 +86,7 @@ interface CosmosStore {
 
   // Audio
   isMuted: boolean;
+  isMusicPlaying: boolean;
   volume: number;
 
   // Time travel
@@ -128,6 +129,7 @@ interface CosmosStore {
   jumpToObject: (object: CelestialObject) => void;
   goHome: () => void;
   setMuted: (muted: boolean) => void;
+  setMusicPlaying: (playing: boolean) => void;
   setVolume: (volume: number) => void;
   setTimeOffset: (offset: number) => void;
   setTimeSpeed: (speed: number) => void;
@@ -192,6 +194,7 @@ export const useCosmosStore = create<CosmosStore>()(
       recentJumps: [],
 
       isMuted: false,
+      isMusicPlaying: false,
       volume: 0.5,
       
       timeOffset: 0,
@@ -352,6 +355,8 @@ export const useCosmosStore = create<CosmosStore>()(
       },
       
       setMuted: (muted) => set({ isMuted: muted }),
+      
+      setMusicPlaying: (playing) => set({ isMusicPlaying: playing }),
       
       setVolume: (volume) => set({ volume }),
       
