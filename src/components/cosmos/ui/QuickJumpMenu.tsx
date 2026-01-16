@@ -64,6 +64,27 @@ export const QuickJumpMenu = () => {
     return () => window.removeEventListener('resize', update);
   }, []);
 
+  // Click-outside handler
+  useEffect(() => {
+    if (!showQuickJump) return;
+
+    const handleClickOutside = (e: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        toggleQuickJump();
+      }
+    };
+
+    // Delay to prevent immediate close from the same click that opened it
+    const timeoutId = setTimeout(() => {
+      document.addEventListener('mousedown', handleClickOutside);
+    }, 0);
+
+    return () => {
+      clearTimeout(timeoutId);
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showQuickJump, toggleQuickJump]);
+
   useLayoutEffect(() => {
     if (!showQuickJump || isFullscreen) return;
 
@@ -106,7 +127,8 @@ export const QuickJumpMenu = () => {
     const scrollEl = scrollAreaRef.current;
     if (!container || !scrollEl) return;
 
-    const bottomMarginPx = isSmUp ? 16 : 12;
+    // Use consistent margins matching the right edge
+    const bottomMarginPx = isSmUp ? 16 : 8;
 
     const measure = () => {
       const containerRect = container.getBoundingClientRect();
