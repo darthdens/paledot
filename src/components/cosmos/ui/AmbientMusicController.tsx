@@ -71,8 +71,8 @@ export const AmbientMusicController = () => {
     >
       {/* Volume slider (shows on hover when playing) */}
       <div 
-        className={`flex items-center transition-all duration-300 overflow-hidden ${
-          showVolumeSlider ? 'w-20 opacity-100 mr-1' : 'w-0 opacity-0'
+        className={`flex items-center w-20 mr-1 transition-opacity duration-300 overflow-hidden ${
+          showVolumeSlider ? 'opacity-100' : 'opacity-0 pointer-events-none'
         }`}
       >
         <Slider

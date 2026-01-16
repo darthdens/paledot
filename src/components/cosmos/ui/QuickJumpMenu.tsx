@@ -44,9 +44,12 @@ export const QuickJumpMenu = () => {
   const menuRef = useRef<HTMLDivElement | null>(null);
   const scrollAreaRef = useRef<HTMLDivElement | null>(null);
   const [maxHeightNonFullscreenPx, setMaxHeightNonFullscreenPx] = useState<number>(240);
+  const [anchorStyle, setAnchorStyle] = useState<{ top: number; right: number } | null>(null);
   
   const showQuickJump = useCosmosStore(state => state.showQuickJump);
   const toggleQuickJump = useCosmosStore(state => state.toggleQuickJump);
+  const setQuickJumpAnchorRect = useCosmosStore(state => state.setQuickJumpAnchorRect);
+  const quickJumpAnchorRect = useCosmosStore(state => state.quickJumpAnchorRect);
   const jumpToObject = useCosmosStore(state => state.jumpToObject);
   const recentJumps = useCosmosStore(state => state.recentJumps);
   const isFullscreen = useFullscreenStore(state => state.isFullscreen);
@@ -65,16 +68,23 @@ export const QuickJumpMenu = () => {
     if (!showQuickJump || isFullscreen) return;
 
     const container = document.querySelector('[data-cosmos-container]') as HTMLElement | null;
-    const scrollEl = scrollAreaRef.current;
-    if (!container || !scrollEl) return;
+    if (!container) return;
 
-    const bottomMarginPx = 8; // bottom-2
+    const gapPx = isSmUp ? 12 : 8;
+    const fallbackTop = isSmUp ? 68 : 48;
+    const fallbackRight = isSmUp ? 16 : 8;
 
     const measure = () => {
       const containerRect = container.getBoundingClientRect();
-      const scrollRect = scrollEl.getBoundingClientRect();
-      const next = Math.max(160, Math.floor(containerRect.bottom - scrollRect.top - bottomMarginPx));
-      setMaxHeightNonFullscreenPx(next);
+      const anchor = quickJumpAnchorRect;
+
+      if (anchor) {
+        const top = Math.round(anchor.top - containerRect.top + anchor.height + gapPx);
+        const right = Math.round(containerRect.right - (anchor.left + anchor.width));
+        setAnchorStyle({ top, right });
+      } else {
+        setAnchorStyle({ top: fallbackTop, right: fallbackRight });
+      }
     };
 
     measure();
@@ -87,7 +97,37 @@ export const QuickJumpMenu = () => {
       window.removeEventListener('resize', measure);
       ro?.disconnect();
     };
-  }, [showQuickJump, isFullscreen]);
+  }, [showQuickJump, isFullscreen, isSmUp, quickJumpAnchorRect]);
+
+  useLayoutEffect(() => {
+    if (!showQuickJump || isFullscreen) return;
+
+    const container = document.querySelector('[data-cosmos-container]') as HTMLElement | null;
+    const scrollEl = scrollAreaRef.current;
+    if (!container || !scrollEl) return;
+
+    const bottomMarginPx = isSmUp ? 16 : 12;
+
+    const measure = () => {
+      const containerRect = container.getBoundingClientRect();
+      const scrollRect = scrollEl.getBoundingClientRect();
+      const next = Math.max(160, Math.floor(containerRect.bottom - scrollRect.top - bottomMarginPx));
+      setMaxHeightNonFullscreenPx(next);
+    };
+
+    // Let the anchorStyle apply before measuring
+    const raf = window.requestAnimationFrame(measure);
+
+    window.addEventListener('resize', measure);
+    const ro = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(measure) : null;
+    ro?.observe(container);
+
+    return () => {
+      window.cancelAnimationFrame(raf);
+      window.removeEventListener('resize', measure);
+      ro?.disconnect();
+    };
+  }, [showQuickJump, isFullscreen, isSmUp, anchorStyle]);
 
   const handleJump = (objectId: string) => {
     const object = getObjectById(objectId);
@@ -118,7 +158,7 @@ export const QuickJumpMenu = () => {
   const menu = (
     <div
       ref={menuRef}
-      className={`${isFullscreen ? 'fixed' : 'absolute'} top-12 right-2 sm:top-[68px] sm:right-4 z-[10001] bg-white/10 backdrop-blur-sm rounded-lg overflow-hidden transition-all duration-300 ease-out ${
+      className={`${isFullscreen ? 'fixed' : 'absolute'} z-[10001] bg-white/10 backdrop-blur-sm rounded-lg overflow-hidden transition-all duration-300 ease-out ${
         showQuickJump ? 'opacity-100 scale-100' : 'opacity-0 scale-95 pointer-events-none'
       }`}
       style={
@@ -127,7 +167,10 @@ export const QuickJumpMenu = () => {
               top: `calc(0.5rem + env(safe-area-inset-top) + ${fullscreenDropdownOffsetPx}px)`,
               right: 'calc(0.5rem + env(safe-area-inset-right))',
             }
-          : undefined
+          : {
+              top: `${anchorStyle?.top ?? (isSmUp ? 68 : 48)}px`,
+              right: `${anchorStyle?.right ?? (isSmUp ? 16 : 8)}px`,
+            }
       }
     >
       <div 
