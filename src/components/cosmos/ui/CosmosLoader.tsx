@@ -121,6 +121,8 @@ interface CosmosLoaderProps {
   dismiss?: boolean;
   /** Called after the fade-out completes so parent can unmount safely. */
   onDismissed?: () => void;
+  /** Called when user clicks skip - enters cosmos early with progressive loading */
+  onSkip?: () => void;
 }
 
 type LoadingStage = 'textures' | 'geometries' | 'finalizing';
@@ -129,6 +131,7 @@ export const CosmosLoader = ({
   onTexturesComplete,
   dismiss = false,
   onDismissed,
+  onSkip,
 }: CosmosLoaderProps) => {
   const { language } = useLanguage();
   const isMobile = useIsMobile();
@@ -453,6 +456,16 @@ export const CosmosLoader = ({
             </span>
           </div>
         </div>
+
+        {/* Skip Loading Button */}
+        {!dismiss && stage !== 'finalizing' && (
+          <button
+            onClick={onSkip}
+            className="mt-4 px-4 py-2 text-xs text-white/50 hover:text-white/90 hover:bg-white/10 rounded-md transition-all duration-200 border border-white/10 hover:border-white/30"
+          >
+            {language === 'fr' ? 'Passer le chargement' : 'Skip loading'}
+          </button>
+        )}
 
         {/* Rotating tips */}
         <RotatingTip isMobile={isMobile} language={language} />
