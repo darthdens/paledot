@@ -101,7 +101,11 @@ export const AmbientMusicController = () => {
         variant="ghost"
         size="icon"
         onClick={handleMuteToggle}
-        className="h-8 w-8 text-white/70 hover:text-white hover:bg-white/10"
+        className={`h-8 w-8 backdrop-blur-sm text-white ${
+          isMuted 
+            ? 'bg-white/10 hover:bg-white/20' 
+            : 'bg-white/25'
+        }`}
         title={isMuted 
           ? (language === 'fr' ? 'Activer le son' : 'Unmute') 
           : (language === 'fr' ? 'Couper le son' : 'Mute')
