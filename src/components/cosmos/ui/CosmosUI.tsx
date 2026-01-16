@@ -2,7 +2,6 @@ import { useLanguage } from '@/i18n/LanguageContext';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { HelpCircle, Compass, Maximize, Minimize, CircleDot, CircleOff, Clock, Timer, TimerOff, Orbit, Activity, Home, Scaling, BarChart3, Info, MoreVertical } from 'lucide-react';
 import { useCosmosStore } from '../store/useCosmosStore';
 import { useFullscreenStore } from '../store/useFullscreenStore';
@@ -130,6 +129,7 @@ export const CosmosUI = () => {
   } = useCosmosStore();
   const { isFullscreen, setIsFullscreen } = useFullscreenStore();
   const [showTimeSlider, setShowTimeSlider] = useState(false);
+  const [showMoreMenu, setShowMoreMenu] = useState(false);
   const [showAbout, setShowAbout] = useState(false);
 
   const handleQuickJumpClick = () => {
@@ -609,6 +609,9 @@ export const CosmosUI = () => {
               </TooltipContent>
             </Tooltip>
 
+            {/* Divider before sound */}
+            <div className="hidden md:block w-px h-6 bg-white/20 mx-0.5" />
+
             {/* Ambient Music Controller - always visible */}
             <AmbientMusicController />
 
@@ -685,53 +688,106 @@ export const CosmosUI = () => {
               </Tooltip>
             </div>
 
-            {/* Mobile & Tablet dropdown menu */}
-            <div className="md:hidden">
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button size="icon" variant="ghost" className="h-8 w-8 bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white">
-                    <MoreVertical className="w-4 h-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="bg-black/90 backdrop-blur-md border-white/20 min-w-[200px]">
-                  <DropdownMenuItem onClick={toggleOrbits} className="text-white hover:bg-white/10 focus:bg-white/10 cursor-pointer flex items-center justify-between">
-                    <div className="flex items-center">
-                      {showOrbits ? <CircleDot className="w-4 h-4 mr-2" /> : <CircleOff className="w-4 h-4 mr-2" />}
-                      {showOrbits ? t.hideOrbits : t.showOrbits}
-                    </div>
-                    {showOrbits && <div className="w-2 h-2 rounded-full bg-green-400" />}
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={toggleTrails} className="text-white hover:bg-white/10 focus:bg-white/10 cursor-pointer flex items-center justify-between">
-                    <div className="flex items-center">
-                      <Orbit className="w-4 h-4 mr-2" />
-                      {showTrails ? t.hideTrails : t.showTrails}
-                    </div>
-                    {showTrails && <div className="w-2 h-2 rounded-full bg-green-400" />}
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => setShowTimeSlider(!showTimeSlider)} className="text-white hover:bg-white/10 focus:bg-white/10 cursor-pointer flex items-center justify-between">
-                    <div className="flex items-center">
-                      <Clock className="w-4 h-4 mr-2" />
-                      {t.timeSpeed}
-                    </div>
-                    {showTimeSlider && <div className="w-2 h-2 rounded-full bg-green-400" />}
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={toggleSizeComparison} className="text-white hover:bg-white/10 focus:bg-white/10 cursor-pointer">
-                    <BarChart3 className="w-4 h-4 mr-2" />
-                    {t.sizeComparison}
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => setShowControlHints(true)} className="text-white hover:bg-white/10 focus:bg-white/10 cursor-pointer">
-                    <HelpCircle className="w-4 h-4 mr-2" />
-                    {t.help}
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => setShowAbout(true)} className="text-white hover:bg-white/10 focus:bg-white/10 cursor-pointer">
-                    <Info className="w-4 h-4 mr-2" />
-                    {t.about}
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
+            {/* Mobile & Tablet more button */}
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button 
+                  size="icon" 
+                  variant="ghost" 
+                  onClick={() => setShowMoreMenu(!showMoreMenu)} 
+                  className={`md:hidden h-8 w-8 backdrop-blur-sm text-white ${showMoreMenu ? 'bg-white/25' : 'bg-white/10 hover:bg-white/20'}`}
+                >
+                  <MoreVertical className="w-4 h-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent variant="dark" side="bottom">
+                {language === 'fr' ? 'Plus d\'options' : 'More options'}
+              </TooltipContent>
+            </Tooltip>
           </div>
         </TooltipProvider>
+      </div>
+
+      {/* Mobile & Tablet more menu - same style as QuickJump */}
+      <div
+        className={`md:hidden ${isFullscreen ? 'fixed' : 'absolute'} top-12 right-2 z-[10001] bg-white/10 backdrop-blur-sm rounded-lg overflow-hidden transition-all duration-300 ease-out ${
+          showMoreMenu ? 'opacity-100 scale-100' : 'opacity-0 scale-95 pointer-events-none'
+        }`}
+        style={
+          isFullscreen
+            ? {
+                top: `calc(0.5rem + env(safe-area-inset-top) + ${fullscreenDropdownOffsetPx}px)`,
+                right: 'calc(0.5rem + env(safe-area-inset-right))',
+              }
+            : undefined
+        }
+      >
+        <div className={`grid transition-all duration-300 ease-out ${showMoreMenu ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'}`}>
+          <div className="overflow-hidden">
+            <div className="p-2 min-w-[180px] space-y-0.5">
+              {/* Toggle options */}
+              <button
+                onClick={() => { toggleOrbits(); }}
+                className="w-full flex items-center justify-between p-2 rounded hover:bg-white/10 transition-colors"
+              >
+                <div className="flex items-center gap-2">
+                  {showOrbits ? <CircleDot className="w-4 h-4 text-white/70" /> : <CircleOff className="w-4 h-4 text-white/70" />}
+                  <span className="text-sm text-white/90">{showOrbits ? t.hideOrbits : t.showOrbits}</span>
+                </div>
+                {showOrbits && <div className="w-2 h-2 rounded-full bg-green-400" />}
+              </button>
+
+              <button
+                onClick={() => { toggleTrails(); }}
+                className="w-full flex items-center justify-between p-2 rounded hover:bg-white/10 transition-colors"
+              >
+                <div className="flex items-center gap-2">
+                  <Orbit className="w-4 h-4 text-white/70" />
+                  <span className="text-sm text-white/90">{showTrails ? t.hideTrails : t.showTrails}</span>
+                </div>
+                {showTrails && <div className="w-2 h-2 rounded-full bg-green-400" />}
+              </button>
+
+              <button
+                onClick={() => { setShowTimeSlider(!showTimeSlider); setShowMoreMenu(false); }}
+                className="w-full flex items-center justify-between p-2 rounded hover:bg-white/10 transition-colors"
+              >
+                <div className="flex items-center gap-2">
+                  <Clock className="w-4 h-4 text-white/70" />
+                  <span className="text-sm text-white/90">{t.timeSpeed}</span>
+                </div>
+                {showTimeSlider && <div className="w-2 h-2 rounded-full bg-green-400" />}
+              </button>
+
+              <button
+                onClick={() => { toggleSizeComparison(); setShowMoreMenu(false); }}
+                className="w-full flex items-center gap-2 p-2 rounded hover:bg-white/10 transition-colors"
+              >
+                <BarChart3 className="w-4 h-4 text-white/70" />
+                <span className="text-sm text-white/90">{t.sizeComparison}</span>
+              </button>
+
+              {/* Divider */}
+              <div className="border-t border-white/10 my-1" />
+
+              <button
+                onClick={() => { setShowControlHints(true); setShowMoreMenu(false); }}
+                className="w-full flex items-center gap-2 p-2 rounded hover:bg-white/10 transition-colors"
+              >
+                <HelpCircle className="w-4 h-4 text-blue-400" />
+                <span className="text-sm text-white/90">{t.help}</span>
+              </button>
+
+              <button
+                onClick={() => { setShowAbout(true); setShowMoreMenu(false); }}
+                className="w-full flex items-center gap-2 p-2 rounded hover:bg-white/10 transition-colors"
+              >
+                <Info className="w-4 h-4 text-white/70" />
+                <span className="text-sm text-white/90">{t.about}</span>
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Time speed slider */}
