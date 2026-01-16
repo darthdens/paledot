@@ -58,6 +58,7 @@ export const CosmosExplorer = () => {
   const [texturesReady, setTexturesReady] = useState(false);
   const [sceneReady, setSceneReady] = useState(false);
   const [showLoader, setShowLoader] = useState(true);
+  const [skippedLoading, setSkippedLoading] = useState(false);
 
   const selectedObject = useCosmosStore((state) => state.selectedObject);
   const showOrbits = useCosmosStore((state) => state.showOrbits);
@@ -67,7 +68,13 @@ export const CosmosExplorer = () => {
   const handleTexturesReady = useCallback(() => setTexturesReady(true), []);
   const handleSceneReady = useCallback(() => setSceneReady(true), []);
 
-  const bootDone = texturesReady && sceneReady;
+  // Handle skip loading - enter cosmos immediately, continue loading in background
+  const handleSkipLoading = useCallback(() => {
+    setSkippedLoading(true);
+    setShowLoader(false);
+  }, []);
+
+  const bootDone = (texturesReady && sceneReady) || skippedLoading;
 
   // Hide distant galaxies when within solar system or Proxima Centauri system
   const showDistantGalaxies =
@@ -126,8 +133,9 @@ export const CosmosExplorer = () => {
       {showLoader && (
         <CosmosLoader
           onTexturesComplete={handleTexturesReady}
-          dismiss={bootDone}
+          dismiss={(texturesReady && sceneReady)}
           onDismissed={() => setShowLoader(false)}
+          onSkip={handleSkipLoading}
         />
       )}
 

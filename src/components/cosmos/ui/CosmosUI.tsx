@@ -9,6 +9,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { ObjectSearch } from './ObjectSearch';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { AboutModal } from './AboutModal';
+import { AmbientMusicController } from './AmbientMusicController';
 const translations = {
   en: {
     startTour: 'Start Guided Tour',
@@ -653,6 +654,12 @@ export const CosmosUI = () => {
                 {t.sizeComparison}
               </TooltipContent>
             </Tooltip>
+              
+            {/* Divider */}
+            <div className="w-px h-6 bg-white/20 mx-0.5" />
+
+            {/* Ambient Music Controller */}
+            <AmbientMusicController />
               
             {/* Divider */}
             <div className="w-px h-6 bg-white/20 mx-0.5" />
