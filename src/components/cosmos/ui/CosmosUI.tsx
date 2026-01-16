@@ -712,7 +712,7 @@ export const CosmosUI = () => {
 
       {/* Mobile & Tablet more menu - same style as QuickJump */}
       <div
-        className={`lg:hidden ${isFullscreen ? 'fixed' : 'absolute'} top-12 right-2 z-[10001] bg-white/10 backdrop-blur-sm rounded-lg overflow-hidden transition-all duration-300 ease-out ${
+        className={`lg:hidden ${isFullscreen ? 'fixed' : 'absolute'} z-[10001] bg-white/10 backdrop-blur-sm rounded-lg overflow-hidden transition-all duration-300 ease-out ${
           showMoreMenu ? 'opacity-100 scale-100' : 'opacity-0 scale-95 pointer-events-none'
         }`}
         style={
@@ -721,7 +721,10 @@ export const CosmosUI = () => {
                 top: `calc(0.5rem + env(safe-area-inset-top) + ${fullscreenDropdownOffsetPx}px)`,
                 right: 'calc(0.5rem + env(safe-area-inset-right))',
               }
-            : undefined
+            : {
+                top: isMobile ? '48px' : '68px',
+                right: isMobile ? '8px' : '16px',
+              }
         }
       >
         <div className={`grid transition-all duration-300 ease-out ${showMoreMenu ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'}`}>
@@ -758,7 +761,7 @@ export const CosmosUI = () => {
                   <Clock className="w-4 h-4 text-white/70" />
                   <span className="text-sm text-white/90">{t.timeSpeed}</span>
                 </div>
-                {showTimeSlider && <div className="w-2 h-2 rounded-full bg-green-400" />}
+                {timeSpeed > 1 && <div className="w-2 h-2 rounded-full bg-green-400" />}
               </button>
 
               <button

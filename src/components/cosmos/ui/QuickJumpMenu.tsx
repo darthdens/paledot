@@ -169,7 +169,7 @@ export const QuickJumpMenu = () => {
             }
           : {
               top: `${anchorStyle?.top ?? (isSmUp ? 68 : 48)}px`,
-              right: `${anchorStyle?.right ?? (isSmUp ? 16 : 8)}px`,
+              right: `${isSmUp ? 16 : 8}px`,
             }
       }
     >
