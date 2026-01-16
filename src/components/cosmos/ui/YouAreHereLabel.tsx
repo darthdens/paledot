@@ -131,7 +131,7 @@ export const YouAreHereLabel = () => {
   const t = translations[language];
   const currentScale: ScaleLevel = useCosmosStore((state) => state.currentScale as ScaleLevel);
   const selectedObject = useCosmosStore((state) => state.selectedObject);
-  const [isMinimized, setIsMinimized] = useState(false);
+  const [isMinimized, setIsMinimized] = useState(true);
 
   // Determine which cosmic structure we're viewing from
   const getGalaxyStructure = () => {
