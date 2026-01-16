@@ -65,14 +65,14 @@ export const AmbientMusicController = () => {
 
   return (
     <div 
-      className="flex items-center gap-1"
+      className="flex items-center"
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
-      {/* Volume slider (shows on hover when playing) */}
+      {/* Volume slider (shows on hover when playing) - animates width */}
       <div 
-        className={`flex items-center w-20 mr-1 transition-opacity duration-300 overflow-hidden ${
-          showVolumeSlider ? 'opacity-100' : 'opacity-0 pointer-events-none'
+        className={`flex items-center transition-all duration-300 ease-out overflow-hidden ${
+          showVolumeSlider ? 'w-20 opacity-100 mr-1' : 'w-0 opacity-0'
         }`}
       >
         <Slider
@@ -92,9 +92,9 @@ export const AmbientMusicController = () => {
             variant="ghost"
             size="icon"
             onClick={toggleSound}
-            className={`h-8 w-8 sm:h-9 sm:w-9 backdrop-blur-sm text-white ${
+            className={`h-8 w-8 sm:h-9 sm:w-9 backdrop-blur-sm text-white transition-colors ${
               isPlaying 
-                ? 'bg-white/25' 
+                ? 'bg-green-500/30 hover:bg-green-500/40' 
                 : 'bg-white/10 hover:bg-white/20'
             }`}
           >
