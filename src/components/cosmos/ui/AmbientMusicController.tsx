@@ -33,6 +33,26 @@ export const AmbientMusicController = () => {
     [setVolume]
   );
 
+  // Toggle slider visibility on click/tap (for mobile support)
+  const handleButtonClick = useCallback(() => {
+    if (!isPlaying) {
+      // If not playing, start music and show slider
+      startMusic();
+      setShowVolumeSlider(true);
+    } else {
+      // If playing, toggle slider visibility (tap to show/hide volume)
+      setShowVolumeSlider(prev => !prev);
+    }
+  }, [isPlaying, startMusic]);
+
+  // Mute/unmute function (separate from showing slider)
+  const handleMuteToggle = useCallback(() => {
+    if (isPlaying) {
+      stopMusic();
+      setShowVolumeSlider(false);
+    }
+  }, [isPlaying, stopMusic]);
+
   const handleMouseEnter = useCallback(() => {
     if (sliderTimeoutRef.current) {
       clearTimeout(sliderTimeoutRef.current);
@@ -45,7 +65,7 @@ export const AmbientMusicController = () => {
   const handleMouseLeave = useCallback(() => {
     sliderTimeoutRef.current = setTimeout(() => {
       setShowVolumeSlider(false);
-    }, 500);
+    }, 2000); // Longer delay for touch users
   }, []);
 
   // Cleanup on unmount
@@ -74,30 +94,40 @@ export const AmbientMusicController = () => {
 
   return (
     <div className="flex items-center" onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
-      {/* Volume slider (shows on hover when playing) - animates width */}
+      {/* Volume slider with mute button (shows when playing and toggled) */}
       <div
-        className={`flex items-center transition-all duration-300 ease-out overflow-hidden ${
-          showVolumeSlider ? 'w-20 opacity-100 mr-1' : 'w-0 opacity-0'
+        className={`flex items-center gap-1 transition-all duration-300 ease-out overflow-hidden ${
+          showVolumeSlider ? 'w-28 opacity-100 mr-1' : 'w-0 opacity-0'
         }`}
       >
+        {/* Mute button inside slider area */}
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={handleMuteToggle}
+          className="h-6 w-6 flex-shrink-0 backdrop-blur-sm text-foreground bg-foreground/10 hover:bg-foreground/20"
+          aria-label={language === 'fr' ? 'Couper le son' : 'Mute'}
+        >
+          <VolumeX className="h-3 w-3" />
+        </Button>
         <Slider
           value={[volume]}
           onValueChange={handleVolumeChange}
           max={1}
           step={0.05}
           variant="light"
-          className="w-full [&_[data-radix-slider-range]]:bg-foreground/25"
+          className="flex-1 [&_[data-radix-slider-range]]:bg-foreground/25"
           aria-label={language === 'fr' ? 'Volume' : 'Volume'}
         />
       </div>
 
-      {/* Sound toggle button with tooltip */}
+      {/* Sound toggle button with tooltip - tap to show volume slider */}
       <Tooltip>
         <TooltipTrigger asChild>
           <Button
             variant="ghost"
             size="icon"
-            onClick={toggleSound}
+            onClick={handleButtonClick}
             className={`h-8 w-8 sm:h-9 sm:w-9 backdrop-blur-sm text-foreground ${
               isPlaying ? 'bg-foreground/25' : 'bg-foreground/10 hover:bg-foreground/20'
             }`}
