@@ -615,9 +615,11 @@ export const CosmosUI = () => {
             {/* Ambient Music Controller - always visible */}
             <AmbientMusicController />
 
+            {/* Divider after sound */}
+            <div className="hidden md:block w-px h-6 bg-white/20 mx-0.5" />
+
             {/* Desktop-only controls (hidden on mobile and tablet) */}
             <div className="hidden md:flex items-center gap-1.5">
-              <div className="w-px h-6 bg-white/20 mx-0.5" />
               
               <Tooltip>
                 <TooltipTrigger asChild>
