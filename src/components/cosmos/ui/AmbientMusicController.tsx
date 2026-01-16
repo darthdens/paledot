@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
-import { Volume2, VolumeX, Music } from 'lucide-react';
+import { Volume2, VolumeX } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
 import { useCosmosStore } from '../store/useCosmosStore';
@@ -8,56 +8,33 @@ import { useLanguage } from '@/i18n/LanguageContext';
 
 export const AmbientMusicController = () => {
   const { language } = useLanguage();
-  const isMuted = useCosmosStore((s) => s.isMuted);
   const volume = useCosmosStore((s) => s.volume);
-  const setMuted = useCosmosStore((s) => s.setMuted);
   const setVolume = useCosmosStore((s) => s.setVolume);
 
-  const { startMusic, stopMusic } = useAmbientMusic();
-  const [isActive, setIsActive] = useState(false);
+  const { startMusic, stopMusic, isPlaying } = useAmbientMusic();
   const [showVolumeSlider, setShowVolumeSlider] = useState(false);
   const sliderTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  const toggleMusic = useCallback(() => {
-    if (isActive) {
+  const toggleSound = useCallback(() => {
+    if (isPlaying) {
       stopMusic();
-      setIsActive(false);
     } else {
       startMusic();
-      setIsActive(true);
-      if (isMuted) {
-        setMuted(false);
-      }
     }
-  }, [isActive, startMusic, stopMusic, isMuted, setMuted]);
+  }, [isPlaying, startMusic, stopMusic]);
 
   const handleVolumeChange = useCallback((value: number[]) => {
     setVolume(value[0]);
-    if (value[0] === 0) {
-      setMuted(true);
-    } else if (isMuted) {
-      setMuted(false);
-    }
-  }, [setVolume, isMuted, setMuted]);
-
-  const handleMuteToggle = useCallback(() => {
-    if (isMuted) {
-      setMuted(false);
-      if (!isActive) {
-        startMusic();
-        setIsActive(true);
-      }
-    } else {
-      setMuted(true);
-    }
-  }, [isMuted, setMuted, isActive, startMusic]);
+  }, [setVolume]);
 
   const handleMouseEnter = useCallback(() => {
     if (sliderTimeoutRef.current) {
       clearTimeout(sliderTimeoutRef.current);
     }
-    setShowVolumeSlider(true);
-  }, []);
+    if (isPlaying) {
+      setShowVolumeSlider(true);
+    }
+  }, [isPlaying]);
 
   const handleMouseLeave = useCallback(() => {
     sliderTimeoutRef.current = setTimeout(() => {
@@ -74,20 +51,27 @@ export const AmbientMusicController = () => {
     };
   }, []);
 
+  // Hide slider when music stops
+  useEffect(() => {
+    if (!isPlaying) {
+      setShowVolumeSlider(false);
+    }
+  }, [isPlaying]);
+
   return (
     <div 
       className="flex items-center gap-1"
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
-      {/* Volume slider (shows on hover) */}
+      {/* Volume slider (shows on hover when playing) */}
       <div 
         className={`flex items-center transition-all duration-300 overflow-hidden ${
           showVolumeSlider ? 'w-20 opacity-100 mr-1' : 'w-0 opacity-0'
         }`}
       >
         <Slider
-          value={[isMuted ? 0 : volume]}
+          value={[volume]}
           onValueChange={handleVolumeChange}
           max={1}
           step={0.05}
@@ -96,44 +80,26 @@ export const AmbientMusicController = () => {
         />
       </div>
 
-      {/* Mute/Unmute button */}
+      {/* Sound toggle button */}
       <Button
         variant="ghost"
         size="icon"
-        onClick={handleMuteToggle}
+        onClick={toggleSound}
         className={`h-8 w-8 sm:h-9 sm:w-9 backdrop-blur-sm text-white ${
-          isMuted 
-            ? 'bg-white/10 hover:bg-white/20' 
-            : 'bg-white/25'
-        }`}
-        title={isMuted 
-          ? (language === 'fr' ? 'Activer le son' : 'Unmute') 
-          : (language === 'fr' ? 'Couper le son' : 'Mute')
-        }
-      >
-        {isMuted ? (
-          <VolumeX className="h-4 w-4 sm:h-5 sm:w-5" />
-        ) : (
-          <Volume2 className="h-4 w-4 sm:h-5 sm:w-5" />
-        )}
-      </Button>
-
-      {/* Music toggle button */}
-      <Button
-        variant="ghost"
-        size="icon"
-        onClick={toggleMusic}
-        className={`h-8 w-8 sm:h-9 sm:w-9 backdrop-blur-sm text-white ${
-          isActive 
+          isPlaying 
             ? 'bg-white/25' 
             : 'bg-white/10 hover:bg-white/20'
         }`}
-        title={isActive 
-          ? (language === 'fr' ? 'Désactiver la musique ambiante' : 'Disable ambient music') 
-          : (language === 'fr' ? 'Activer la musique ambiante' : 'Enable ambient music')
+        title={isPlaying 
+          ? (language === 'fr' ? 'Désactiver le son' : 'Disable sound') 
+          : (language === 'fr' ? 'Activer le son' : 'Enable sound')
         }
       >
-        <Music className="h-4 w-4 sm:h-5 sm:w-5" />
+        {isPlaying ? (
+          <Volume2 className="h-4 w-4 sm:h-5 sm:w-5" />
+        ) : (
+          <VolumeX className="h-4 w-4 sm:h-5 sm:w-5" />
+        )}
       </Button>
     </div>
   );
