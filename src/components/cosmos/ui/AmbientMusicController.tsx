@@ -119,10 +119,10 @@ export const AmbientMusicController = () => {
         variant="ghost"
         size="icon"
         onClick={toggleMusic}
-        className={`h-8 w-8 transition-colors ${
+        className={`h-8 w-8 backdrop-blur-sm text-white ${
           isActive 
-            ? 'text-primary bg-primary/20 hover:bg-primary/30' 
-            : 'text-white/70 hover:text-white hover:bg-white/10'
+            ? 'bg-white/25' 
+            : 'bg-white/10 hover:bg-white/20'
         }`}
         title={isActive 
           ? (language === 'fr' ? 'Désactiver la musique ambiante' : 'Disable ambient music') 
