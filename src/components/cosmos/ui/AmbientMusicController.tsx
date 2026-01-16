@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
-import { Volume2, VolumeX } from 'lucide-react';
+import { Volume1, Volume2, VolumeX } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
@@ -84,13 +84,19 @@ export const AmbientMusicController = () => {
     }
   }, [isPlaying]);
 
-  const tooltipLabel = isPlaying
+  // Determine if effectively muted (volume at 0 or not playing)
+  const isMuted = !isPlaying || volume === 0;
+
+  const tooltipLabel = isMuted
     ? language === 'fr'
-      ? 'Désactiver le son'
-      : 'Disable sound'
-    : language === 'fr'
       ? 'Activer le son'
-      : 'Enable sound';
+      : 'Enable sound'
+    : language === 'fr'
+      ? 'Désactiver le son'
+      : 'Disable sound';
+
+  // Get appropriate volume icon based on volume level
+  const VolumeIcon = isMuted ? VolumeX : volume < 0.5 ? Volume1 : Volume2;
 
   return (
     <div className="flex items-center" onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
@@ -129,14 +135,10 @@ export const AmbientMusicController = () => {
             size="icon"
             onClick={handleButtonClick}
             className={`h-8 w-8 sm:h-9 sm:w-9 backdrop-blur-sm text-foreground ${
-              isPlaying ? 'bg-foreground/25' : 'bg-foreground/10 hover:bg-foreground/20'
+              !isMuted ? 'bg-foreground/25' : 'bg-foreground/10 hover:bg-foreground/20'
             }`}
           >
-            {isPlaying ? (
-              <Volume2 className="h-4 w-4 sm:h-5 sm:w-5" />
-            ) : (
-              <VolumeX className="h-4 w-4 sm:h-5 sm:w-5" />
-            )}
+            <VolumeIcon className="h-4 w-4 sm:h-5 sm:w-5" />
           </Button>
         </TooltipTrigger>
         <TooltipContent variant="dark" side="bottom">
