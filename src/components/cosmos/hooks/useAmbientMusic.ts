@@ -1,74 +1,93 @@
-import { useEffect, useRef, useCallback, useState } from 'react';
+import { useEffect, useRef, useCallback } from 'react';
 import { useCosmosStore } from '../store/useCosmosStore';
 
 // Single space ambient track for all scales
 const SPACE_AMBIENT_TRACK = '/audio/space-ambient.mp3';
 
+// Global audio instance to persist across component re-renders
+let globalAudio: HTMLAudioElement | null = null;
+
 export const useAmbientMusic = () => {
   const volume = useCosmosStore((s) => s.volume);
+  const isPlaying = useCosmosStore((s) => s.isMusicPlaying);
+  const setMusicPlaying = useCosmosStore((s) => s.setMusicPlaying);
 
-  const [isPlaying, setIsPlaying] = useState(false);
-  
-  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const fadeIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
   const startMusic = useCallback(() => {
-    if (isPlaying) return;
-    setIsPlaying(true);
+    if (isPlaying || globalAudio) return;
+    
+    setMusicPlaying(true);
 
     const audio = new Audio(SPACE_AMBIENT_TRACK);
     audio.loop = true;
     audio.preload = 'auto';
     audio.volume = 0;
-    audioRef.current = audio;
+    globalAudio = audio;
 
     audio.play().then(() => {
       const targetVolume = volume * 0.3;
       const steps = 20;
       let step = 0;
 
-      const fadeIn = setInterval(() => {
+      fadeIntervalRef.current = setInterval(() => {
         step++;
-        audio.volume = Math.min(targetVolume, (step / steps) * targetVolume);
-        if (step >= steps) clearInterval(fadeIn);
-      }, 100);
-    }).catch(() => {});
-  }, [isPlaying, volume]);
-
-  const stopMusic = useCallback(() => {
-    if (!isPlaying) return;
-    setIsPlaying(false);
-
-    const audio = audioRef.current;
-    if (audio) {
-      const startVolume = audio.volume;
-      let step = 0;
-
-      const fadeOut = setInterval(() => {
-        step++;
-        audio.volume = Math.max(0, startVolume * (1 - step / 10));
-        if (step >= 10) {
-          clearInterval(fadeOut);
-          audio.pause();
-          audio.src = '';
-          audioRef.current = null;
+        if (globalAudio) {
+          globalAudio.volume = Math.min(targetVolume, (step / steps) * targetVolume);
+        }
+        if (step >= steps && fadeIntervalRef.current) {
+          clearInterval(fadeIntervalRef.current);
+          fadeIntervalRef.current = null;
         }
       }, 100);
+    }).catch(() => {
+      setMusicPlaying(false);
+      globalAudio = null;
+    });
+  }, [isPlaying, volume, setMusicPlaying]);
+
+  const stopMusic = useCallback(() => {
+    if (!isPlaying || !globalAudio) return;
+    
+    if (fadeIntervalRef.current) {
+      clearInterval(fadeIntervalRef.current);
+      fadeIntervalRef.current = null;
     }
-  }, [isPlaying]);
+
+    const audio = globalAudio;
+    const startVolume = audio.volume;
+    let step = 0;
+
+    fadeIntervalRef.current = setInterval(() => {
+      step++;
+      if (audio) {
+        audio.volume = Math.max(0, startVolume * (1 - step / 10));
+      }
+      if (step >= 10) {
+        if (fadeIntervalRef.current) {
+          clearInterval(fadeIntervalRef.current);
+          fadeIntervalRef.current = null;
+        }
+        audio.pause();
+        audio.src = '';
+        globalAudio = null;
+        setMusicPlaying(false);
+      }
+    }, 100);
+  }, [isPlaying, setMusicPlaying]);
 
   // Handle volume changes (sync audio volume with store volume)
   useEffect(() => {
-    if (audioRef.current && isPlaying) {
-      audioRef.current.volume = volume * 0.3;
+    if (globalAudio && isPlaying) {
+      globalAudio.volume = volume * 0.3;
     }
   }, [volume, isPlaying]);
 
   // Cleanup on unmount
   useEffect(() => {
     return () => {
-      if (audioRef.current) {
-        audioRef.current.pause();
-        audioRef.current.src = '';
+      if (fadeIntervalRef.current) {
+        clearInterval(fadeIntervalRef.current);
       }
     };
   }, []);
