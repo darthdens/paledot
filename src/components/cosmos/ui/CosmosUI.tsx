@@ -610,16 +610,16 @@ export const CosmosUI = () => {
             </Tooltip>
 
             {/* Divider before sound */}
-            <div className="hidden md:block w-px h-6 bg-white/20 mx-0.5" />
+            <div className="hidden lg:block w-px h-6 bg-white/20 mx-0.5" />
 
             {/* Ambient Music Controller - always visible */}
             <AmbientMusicController />
 
             {/* Divider after sound */}
-            <div className="hidden md:block w-px h-6 bg-white/20 mx-0.5" />
+            <div className="hidden lg:block w-px h-6 bg-white/20 mx-0.5" />
 
             {/* Desktop-only controls (hidden on mobile and tablet) */}
-            <div className="hidden md:flex items-center gap-1.5">
+            <div className="hidden lg:flex items-center gap-1.5">
               
               <Tooltip>
                 <TooltipTrigger asChild>
@@ -697,9 +697,9 @@ export const CosmosUI = () => {
                   size="icon" 
                   variant="ghost" 
                   onClick={() => setShowMoreMenu(!showMoreMenu)} 
-                  className={`md:hidden h-8 w-8 backdrop-blur-sm text-white ${showMoreMenu ? 'bg-white/25' : 'bg-white/10 hover:bg-white/20'}`}
+                  className={`lg:hidden h-8 w-8 sm:h-9 sm:w-9 backdrop-blur-sm text-white ${showMoreMenu ? 'bg-white/25' : 'bg-white/10 hover:bg-white/20'}`}
                 >
-                  <MoreVertical className="w-4 h-4" />
+                  <MoreVertical className="w-4 h-4 sm:w-5 sm:h-5" />
                 </Button>
               </TooltipTrigger>
               <TooltipContent variant="dark" side="bottom">
@@ -712,7 +712,7 @@ export const CosmosUI = () => {
 
       {/* Mobile & Tablet more menu - same style as QuickJump */}
       <div
-        className={`md:hidden ${isFullscreen ? 'fixed' : 'absolute'} top-12 right-2 z-[10001] bg-white/10 backdrop-blur-sm rounded-lg overflow-hidden transition-all duration-300 ease-out ${
+        className={`lg:hidden ${isFullscreen ? 'fixed' : 'absolute'} top-12 right-2 z-[10001] bg-white/10 backdrop-blur-sm rounded-lg overflow-hidden transition-all duration-300 ease-out ${
           showMoreMenu ? 'opacity-100 scale-100' : 'opacity-0 scale-95 pointer-events-none'
         }`}
         style={
@@ -774,10 +774,13 @@ export const CosmosUI = () => {
 
               <button
                 onClick={() => { setShowControlHints(true); setShowMoreMenu(false); }}
-                className="w-full flex items-center gap-2 p-2 rounded hover:bg-white/10 transition-colors"
+                className="w-full flex items-center justify-between p-2 rounded hover:bg-white/10 transition-colors"
               >
-                <HelpCircle className="w-4 h-4 text-blue-400" />
-                <span className="text-sm text-white/90">{t.help}</span>
+                <div className="flex items-center gap-2">
+                  <HelpCircle className="w-4 h-4 text-white/70" />
+                  <span className="text-sm text-white/90">{t.help}</span>
+                </div>
+                <div className="w-2 h-2 rounded-full bg-blue-400" />
               </button>
 
               <button
