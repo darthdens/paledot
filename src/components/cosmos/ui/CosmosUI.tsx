@@ -612,8 +612,8 @@ export const CosmosUI = () => {
             {/* Ambient Music Controller - always visible */}
             <AmbientMusicController />
 
-            {/* Desktop-only controls */}
-            <div className="hidden sm:flex items-center gap-1.5">
+            {/* Desktop-only controls (hidden on mobile and tablet) */}
+            <div className="hidden md:flex items-center gap-1.5">
               <div className="w-px h-6 bg-white/20 mx-0.5" />
               
               <Tooltip>
@@ -685,26 +685,35 @@ export const CosmosUI = () => {
               </Tooltip>
             </div>
 
-            {/* Mobile-only dropdown menu */}
-            <div className="sm:hidden">
+            {/* Mobile & Tablet dropdown menu */}
+            <div className="md:hidden">
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button size="icon" variant="ghost" className="h-8 w-8 bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white">
                     <MoreVertical className="w-4 h-4" />
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="bg-black/90 backdrop-blur-md border-white/20 min-w-[180px]">
-                  <DropdownMenuItem onClick={toggleOrbits} className="text-white hover:bg-white/10 focus:bg-white/10 cursor-pointer">
-                    {showOrbits ? <CircleDot className="w-4 h-4 mr-2" /> : <CircleOff className="w-4 h-4 mr-2" />}
-                    {showOrbits ? t.hideOrbits : t.showOrbits}
+                <DropdownMenuContent align="end" className="bg-black/90 backdrop-blur-md border-white/20 min-w-[200px]">
+                  <DropdownMenuItem onClick={toggleOrbits} className="text-white hover:bg-white/10 focus:bg-white/10 cursor-pointer flex items-center justify-between">
+                    <div className="flex items-center">
+                      {showOrbits ? <CircleDot className="w-4 h-4 mr-2" /> : <CircleOff className="w-4 h-4 mr-2" />}
+                      {showOrbits ? t.hideOrbits : t.showOrbits}
+                    </div>
+                    {showOrbits && <div className="w-2 h-2 rounded-full bg-green-400" />}
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={toggleTrails} className="text-white hover:bg-white/10 focus:bg-white/10 cursor-pointer">
-                    <Orbit className="w-4 h-4 mr-2" />
-                    {showTrails ? t.hideTrails : t.showTrails}
+                  <DropdownMenuItem onClick={toggleTrails} className="text-white hover:bg-white/10 focus:bg-white/10 cursor-pointer flex items-center justify-between">
+                    <div className="flex items-center">
+                      <Orbit className="w-4 h-4 mr-2" />
+                      {showTrails ? t.hideTrails : t.showTrails}
+                    </div>
+                    {showTrails && <div className="w-2 h-2 rounded-full bg-green-400" />}
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => setShowTimeSlider(!showTimeSlider)} className="text-white hover:bg-white/10 focus:bg-white/10 cursor-pointer">
-                    <Clock className="w-4 h-4 mr-2" />
-                    {t.timeSpeed}
+                  <DropdownMenuItem onClick={() => setShowTimeSlider(!showTimeSlider)} className="text-white hover:bg-white/10 focus:bg-white/10 cursor-pointer flex items-center justify-between">
+                    <div className="flex items-center">
+                      <Clock className="w-4 h-4 mr-2" />
+                      {t.timeSpeed}
+                    </div>
+                    {showTimeSlider && <div className="w-2 h-2 rounded-full bg-green-400" />}
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={toggleSizeComparison} className="text-white hover:bg-white/10 focus:bg-white/10 cursor-pointer">
                     <BarChart3 className="w-4 h-4 mr-2" />
