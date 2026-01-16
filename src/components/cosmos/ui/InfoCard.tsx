@@ -174,7 +174,7 @@ export const InfoCard = () => {
   const showRealPeriods = useCosmosStore(state => state.showRealPeriods);
   const isTouring = useCosmosStore(state => state.isTouring);
   const isFullscreen = useFullscreenStore(state => state.isFullscreen);
-  const [isMinimized, setIsMinimized] = useState(false);
+  const [isMinimized, setIsMinimized] = useState(true);
 
   // Hide InfoCard when touring (TourOverlay shows the info instead)
   if (!selectedObject || isTouring) return null;
