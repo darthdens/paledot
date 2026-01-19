@@ -45,7 +45,7 @@ const Cosmos = () => {
         {/* 3D Cosmos Section - Force dark theme regardless of system preference */}
         <section className="container mx-auto px-4 sm:px-6 max-w-7xl pb-8">
           <div 
-            className="dark w-full h-[50vh] sm:h-[55vh] md:h-[65vh] lg:h-[70vh] rounded-lg overflow-hidden border border-neutral-800"
+            className="dark w-full h-[65vh] sm:h-[60vh] md:h-[65vh] lg:h-[70vh] rounded-lg overflow-hidden border border-neutral-800"
             style={{ 
               backgroundColor: '#0a0a0f', 
               colorScheme: 'dark',
