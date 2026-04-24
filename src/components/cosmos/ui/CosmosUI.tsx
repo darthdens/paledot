@@ -10,6 +10,7 @@ import { ObjectSearch } from './ObjectSearch';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { AboutModal } from './AboutModal';
 import { AmbientMusicController } from './AmbientMusicController';
+import { isNativeApp } from '@/lib/platform';
 const translations = {
   en: {
     startTour: 'Start Guided Tour',
@@ -101,6 +102,9 @@ export const CosmosUI = () => {
   const { language } = useLanguage();
   const t = translations[language];
   const isMobile = useIsMobile();
+  // In the native iOS / iPadOS / macOS / visionOS app the experience is
+  // already full-bleed, so the fullscreen toggle is unnecessary.
+  const native = isNativeApp();
   // In fullscreen, dropdowns appear directly below the button row (h-8 = 32px + gap)
   const fullscreenDropdownOffsetPx = isMobile ? 40 : 44;
   const quickJumpButtonRef = useRef<HTMLButtonElement | null>(null);
@@ -616,16 +620,18 @@ export const CosmosUI = () => {
         <TooltipProvider delayDuration={300}>
           <div className="flex items-center justify-end gap-1 sm:gap-1.5">
             {/* Essential controls - always visible */}
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button size="icon" variant="ghost" onClick={toggleFullscreen} className="h-8 w-8 sm:h-9 sm:w-9 bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white">
-                  {isFullscreen ? <Minimize className="w-4 h-4 sm:w-5 sm:h-5" /> : <Maximize className="w-4 h-4 sm:w-5 sm:h-5" />}
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent variant="dark" side="bottom">
-                {isFullscreen ? t.exitFullscreen : t.fullscreen}
-              </TooltipContent>
-            </Tooltip>
+            {!native && (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button size="icon" variant="ghost" onClick={toggleFullscreen} className="h-8 w-8 sm:h-9 sm:w-9 bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white">
+                    {isFullscreen ? <Minimize className="w-4 h-4 sm:w-5 sm:h-5" /> : <Maximize className="w-4 h-4 sm:w-5 sm:h-5" />}
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent variant="dark" side="bottom">
+                  {isFullscreen ? t.exitFullscreen : t.fullscreen}
+                </TooltipContent>
+              </Tooltip>
+            )}
 
             <Tooltip>
               <TooltipTrigger asChild>

@@ -4,9 +4,11 @@ import { Starfield } from '@/components/Starfield';
 import { CosmosExplorer } from '@/components/cosmos/CosmosExplorer';
 import { useLanguage } from '@/i18n/LanguageContext';
 import { useEffect } from 'react';
+import { isNativeApp } from '@/lib/platform';
 
 const Cosmos = () => {
   const { language } = useLanguage();
+  const native = isNativeApp();
 
   useEffect(() => {
     document.title =
@@ -14,6 +16,29 @@ const Cosmos = () => {
         ? 'Explorateur du Cosmos | Par Dens'
         : 'Cosmos Explorer | By Dens';
   }, [language]);
+
+  // Native iOS / iPadOS / macOS / visionOS app: render the explorer
+  // edge-to-edge with no marketing chrome (no nav, no hero, no footer).
+  if (native) {
+    return (
+      <div
+        className="dark fixed inset-0 w-screen overflow-hidden"
+        style={{
+          height: '100dvh',
+          backgroundColor: '#0a0a0f',
+          colorScheme: 'dark',
+          paddingTop: 'env(safe-area-inset-top)',
+          paddingBottom: 'env(safe-area-inset-bottom)',
+          paddingLeft: 'env(safe-area-inset-left)',
+          paddingRight: 'env(safe-area-inset-right)',
+        }}
+        data-cosmos-container
+        data-cosmos-native="true"
+      >
+        <CosmosExplorer />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background text-foreground relative flex flex-col">
