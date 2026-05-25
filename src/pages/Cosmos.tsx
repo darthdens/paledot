@@ -2,6 +2,7 @@ import { Navigation } from '@/components/Navigation';
 import { Footer } from '@/components/Footer';
 import { Starfield } from '@/components/Starfield';
 import { CosmosExplorer } from '@/components/cosmos/CosmosExplorer';
+import { WebGLBoundary } from '@/components/cosmos/WebGLBoundary';
 import { useLanguage } from '@/i18n/LanguageContext';
 import { useEffect } from 'react';
 import { isNativeApp } from '@/lib/platform';
@@ -35,7 +36,9 @@ const Cosmos = () => {
         data-cosmos-container
         data-cosmos-native="true"
       >
-        <CosmosExplorer />
+        <WebGLBoundary>
+          <CosmosExplorer />
+        </WebGLBoundary>
       </div>
     );
   }
@@ -77,7 +80,9 @@ const Cosmos = () => {
             }}
             data-cosmos-container
           >
-            <CosmosExplorer />
+            <WebGLBoundary>
+              <CosmosExplorer />
+            </WebGLBoundary>
           </div>
         </section>
       </main>

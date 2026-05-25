@@ -265,3 +265,11 @@ All colors MUST be HSL.
 .custom-cursor.is-cosmos.is-pointer .custom-cursor__icon {
   color: hsl(43 19% 93%);
 }
+/* Honor reduced-motion for non-explorer UI (Three.js scene unaffected). */
+@media (prefers-reduced-motion: reduce) {
+  *:not([data-cosmos-container] *) {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}

@@ -6,7 +6,7 @@ const SPACE_AMBIENT_TRACK = '/audio/space-ambient.mp3';
 
 // Global audio instance to persist across component re-renders (and hot reload)
 let globalAudio: HTMLAudioElement | null = null;
-let fadeIntervalGlobal: NodeJS.Timeout | null = null;
+let fadeIntervalGlobal: ReturnType<typeof setInterval> | null = null;
 let isFadingGlobal = false;
 
 const clearFadeInterval = () => {
