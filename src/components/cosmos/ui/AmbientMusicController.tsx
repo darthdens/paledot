@@ -16,7 +16,7 @@ export const AmbientMusicController = () => {
 
   const { startMusic, stopMusic, isPlaying } = useAmbientMusic();
   const [showVolumeSlider, setShowVolumeSlider] = useState(false);
-  const sliderTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const sliderTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const toggleSound = useCallback(() => {
     if (isPlaying) {
