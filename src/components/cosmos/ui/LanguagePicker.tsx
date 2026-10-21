@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
-import { Check, Globe } from 'lucide-react';
+import { Check } from 'lucide-react';
+import { FlagIcon } from './FlagIcon';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { useLanguage } from '@/i18n/LanguageContext';
@@ -20,8 +21,11 @@ const LanguageList = ({ onPick }: { onPick?: () => void }) => {
             locale === l.code ? 'bg-white/25 text-white' : 'text-white/80 hover:bg-white/10'
           }`}
         >
-          <span>{l.label}</span>
-          {locale === l.code && <Check className="w-3.5 h-3.5" />}
+          <span className="flex items-center gap-2 min-w-0">
+            <FlagIcon locale={l.code} className="w-4 h-4 shrink-0" />
+            <span className="whitespace-nowrap">{l.label}</span>
+          </span>
+          {locale === l.code && <Check className="w-3.5 h-3.5 shrink-0" />}
         </button>
       ))}
     </div>
@@ -43,7 +47,7 @@ export const LanguageMenuList = ({ onPick }: { onPick?: () => void }) => {
           className="w-full flex items-center justify-between gap-3 p-2 rounded-[4px] hover:bg-white/10 transition-colors"
         >
           <div className="flex items-center gap-2 min-w-0">
-            <Globe className="w-4 h-4 shrink-0 text-white/70" />
+            <FlagIcon locale={l.code} className="w-4 h-4 shrink-0" />
             <span className="text-sm text-white/90 whitespace-nowrap">{l.label}</span>
           </div>
           {locale === l.code && <div className="w-2 h-2 shrink-0 rounded-full bg-green-400" />}
@@ -55,7 +59,7 @@ export const LanguageMenuList = ({ onPick }: { onPick?: () => void }) => {
 
 /** Globe button for the desktop toolbar. */
 export const LanguageButton = () => {
-  const { tx } = useLanguage();
+  const { tx, locale } = useLanguage();
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
@@ -85,7 +89,7 @@ export const LanguageButton = () => {
             onClick={() => setOpen((o) => !o)}
             className={`h-9 w-9 backdrop-blur-xs text-white ${open ? 'bg-white/25' : 'bg-white/10 hover:bg-white/20'}`}
           >
-            <Globe className="w-5 h-5" />
+            <FlagIcon locale={locale} className="w-5 h-5" />
           </Button>
         </TooltipTrigger>
         <TooltipContent variant="dark" side="bottom">
