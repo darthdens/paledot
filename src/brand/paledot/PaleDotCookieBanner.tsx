@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { notifyConsentChange } from "@/components/GoogleAnalytics";
 
 import { useLanguage } from "@/i18n/LanguageContext";
 import { PALEDOT_COPY } from "./copy";

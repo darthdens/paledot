@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { notifyConsentChange } from "@/components/GoogleAnalytics";
 import { Link } from "@/lib/router-compat";
 import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/i18n/LanguageContext";
