@@ -4,10 +4,10 @@ import { useLanguage } from '@/i18n/LanguageContext';
 interface State { hasError: boolean }
 
 class ErrorBoundary extends Component<{ fallback: ReactNode; children: ReactNode }, State> {
-  state: State = { hasError: false };
+  override state: State = { hasError: false };
   static getDerivedStateFromError() { return { hasError: true }; }
-  componentDidCatch(err: unknown) { console.error('[Cosmos] render error', err); }
-  render() { return this.state.hasError ? this.props.fallback : this.props.children; }
+  override componentDidCatch(err: unknown) { console.error('[Cosmos] render error', err); }
+  override render() { return this.state.hasError ? this.props.fallback : this.props.children; }
 }
 
 function Fallback() {
