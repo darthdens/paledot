@@ -473,7 +473,8 @@ export const CosmosLoader = ({
 };
 
 // Separate component for rotating tips to manage its own state
-const RotatingTip = ({ isMobile, language }: { isMobile: boolean; language: 'en' | 'fr' }) => {
+const RotatingTip = ({ isMobile }: { isMobile: boolean }) => {
+  const { tr, tx } = useLanguage();
   const [currentTipIndex, setCurrentTipIndex] = useState(0);
   const [isVisible, setIsVisible] = useState(true);
 
