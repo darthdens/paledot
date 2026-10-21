@@ -12,7 +12,8 @@ const copy = {
       "In 1990, Voyager 1 turned around six billion kilometres from home and photographed Earth: a pale blue dot, smaller than a pixel, hanging in a sunbeam.",
     body2:
       "Pale Dot starts you on that dot and lets you travel in 3D past the planets, the stars and the galaxies, all the way to the edge of the observable universe.",
-    credit: "Created by Dens",
+    credit: "Created by",
+    name: "Dens Akoka",
     cta: "Continue",
   },
   fr: {
@@ -22,7 +23,8 @@ const copy = {
       "En 1990, Voyager 1 s'est retournée à six milliards de kilomètres de chez nous et a photographié la Terre : un point bleu pâle, plus petit qu'un pixel, suspendu dans un rayon de soleil.",
     body2:
       "Pale Dot vous place sur ce point et vous emmène en 3D au-delà des planètes, des étoiles et des galaxies, jusqu'aux confins de l'univers observable.",
-    credit: "Créé par Dens",
+    credit: "Créé par",
+    name: "Dens Akoka",
     cta: "Continuer",
   },
 } as const;
@@ -65,7 +67,17 @@ const PaleDot = () => {
           >
             {t.cta}
           </button>
-          <p className="text-xs text-muted-foreground/70">{t.credit}</p>
+          <p className="text-xs text-muted-foreground/70">
+            {t.credit}{" "}
+            <a
+              href="https://dens.so"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-foreground/90 underline decoration-white/50 underline-offset-2 transition-colors hover:text-foreground hover:decoration-white/80"
+            >
+              {t.name}
+            </a>
+          </p>
         </div>
       </div>
     );
