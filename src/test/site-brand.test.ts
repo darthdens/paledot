@@ -19,3 +19,10 @@ describe("brandFromHost", () => {
     expect(brandFromHost("cosmos.dens.so", "?site=paledot")).toBe("paledot");
   });
 });
+
+import { buildHead } from "@/lib/site-meta";
+describe("buildHead", () => {
+  it("gives Pale Dot its own share image", () => {
+    expect(buildHead("paledot").meta).toContainEqual({ property: "og:image", content: "https://paledot.org/paledot/og.png" });
+  });
+});

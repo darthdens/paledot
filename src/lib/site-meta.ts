@@ -1,4 +1,5 @@
 import type { SiteBrand } from "./site-brand";
+import { PALEDOT_META, PALEDOT_JSON_LD } from "@/brand/paledot/siteMeta.paledot";
 
 const DENS_BANNER =
   "https://storage.googleapis.com/gpt-engineer-file-uploads/ec13kXpRjVTkAQHkK5GwP0G1VtU2/social-images/social-1767715217204-dens-banner-1.png";
@@ -9,6 +10,9 @@ type SiteMeta = {
   description: string;
   url: string;
   image?: string;
+  imageAlt?: string;
+  themeColor?: string;
+  author?: string;
 };
 
 export const SITE_META: Record<SiteBrand, SiteMeta> = {
@@ -19,14 +23,7 @@ export const SITE_META: Record<SiteBrand, SiteMeta> = {
     url: "https://cosmos.dens.so/",
     image: DENS_BANNER,
   },
-  paledot: {
-    name: "Pale Dot",
-    title: "Pale Dot: explore the observable universe",
-    description:
-      "Start from Earth, our pale blue dot, and travel in 3D through planets, stars and galaxies to the edge of the observable universe.",
-    url: "https://paledot.org/",
-    // Pale Dot share image arrives with the brand assets.
-  },
+  paledot: PALEDOT_META,
 };
 
 export function buildHead(brand: SiteBrand) {
@@ -36,8 +33,8 @@ export function buildHead(brand: SiteBrand) {
     { name: "viewport", content: "width=device-width, initial-scale=1.0, viewport-fit=cover" },
     { title: m.title },
     { name: "description", content: m.description },
-    { name: "author", content: "Dens" },
-    { name: "theme-color", content: "#0a0a0f" },
+    { name: "author", content: m.author ?? "Dens" },
+    { name: "theme-color", content: m.themeColor ?? "#0a0a0f" },
     { property: "og:type", content: "website" },
     { property: "og:site_name", content: m.name },
     { property: "og:title", content: m.title },
@@ -51,7 +48,15 @@ export function buildHead(brand: SiteBrand) {
   if (m.image) {
     meta.push({ property: "og:image", content: m.image }, { name: "twitter:image", content: m.image });
   }
-  const jsonLd = {
+  if (m.imageAlt) {
+    meta.push(
+      { property: "og:image:width", content: "1200" },
+      { property: "og:image:height", content: "630" },
+      { property: "og:image:alt", content: m.imageAlt },
+      { name: "twitter:image:alt", content: m.imageAlt },
+    );
+  }
+  const jsonLd = brand === "paledot" ? PALEDOT_JSON_LD : {
     "@context": "https://schema.org",
     "@type": "WebApplication",
     name: m.name,

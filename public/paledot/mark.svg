@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" role="img" aria-label="Pale Dot">
+<defs><radialGradient id="pd-glow"><stop offset="0" stop-color="#9AD0F4" stop-opacity="0.34"/><stop offset="0.45" stop-color="#9AD0F4" stop-opacity="0.08"/><stop offset="1" stop-color="#9AD0F4" stop-opacity="0"/></radialGradient></defs>
+<rect width="512" height="512" rx="114.53" fill="#0A0B10"/>
+<circle cx="256.0" cy="256.0" r="239.62" fill="url(#pd-glow)"/>
+<circle cx="256.0" cy="256.0" r="92.16" fill="#C9E5F8"/>
+</svg>

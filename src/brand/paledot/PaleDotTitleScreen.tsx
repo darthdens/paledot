@@ -1,0 +1,50 @@
+import { useEffect, useRef } from "react";
+
+import { useLanguage } from "@/i18n/LanguageContext";
+import { PaleDotWordmark } from "./PaleDotWordmark";
+import { setupPaleDotMotion } from "./paledotMotion";
+import { PALEDOT_COPY } from "./copy";
+import { PaleDotStars } from "./PaleDotStars";
+
+/**
+ * The paledot.org title screen. Replaces the intro in src/pages/PaleDot.tsx.
+ * The wordmark reveals from a single dot at the centre of the screen; the descriptor and the
+ * "Begin at Earth" pill follow. Click anywhere to skip. Credit links to dens.so in a new tab.
+ */
+export function PaleDotTitleScreen({ onBegin }: { onBegin: () => void }) {
+  const { language } = useLanguage();
+  const t = PALEDOT_COPY[language as "en" | "fr"] ?? PALEDOT_COPY.en;
+  const stageRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const stage = stageRef.current;
+    if (!stage) return;
+    const motion = setupPaleDotMotion(stage);
+    const id = window.setTimeout(motion.reveal, 300);
+    return () => { window.clearTimeout(id); motion.destroy(); };
+  }, []);
+
+  return (
+    <div
+      ref={stageRef}
+      className="paledot dark pd-stage fixed inset-0"
+      style={{ height: "100dvh", colorScheme: "dark" }}
+      data-cosmos-container
+    >
+      <PaleDotStars />
+      <PaleDotWordmark lit />
+      <p className="pd-desc">{t.descriptor}</p>
+      <div className="pd-actions">
+        <button type="button" data-action className="pd-pill" onClick={onBegin}>
+          {t.begin}
+        </button>
+      </div>
+      <p className="pd-credit">
+        {t.credit}{" "}
+        <a href="https://dens.so" target="_blank" rel="noopener noreferrer">
+          {t.author}
+        </a>
+      </p>
+    </div>
+  );
+}
