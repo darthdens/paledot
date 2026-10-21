@@ -222,6 +222,14 @@ All colors MUST be HSL.
     cursor: none !important;
   }
 
+  /* Pale Dot uses the normal system cursor (no custom cursor there) */
+  .paledot, .paledot *, .paledot *::before, .paledot *::after, .paledot canvas {
+    cursor: auto !important;
+  }
+  .paledot a, .paledot button, .paledot [data-action] {
+    cursor: pointer !important;
+  }
+
   body {
     background-color: hsl(var(--background));
     color: hsl(var(--foreground));
