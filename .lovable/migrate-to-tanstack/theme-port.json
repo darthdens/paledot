@@ -1,0 +1,12 @@
+{
+  "customizations": [
+    { "token": "HSL design tokens (:root + .dark, warm paper palette)", "source": "src/index.css", "reappliedIn": "src/styles.css" },
+    { "token": "--font-sans/--font-serif/--font-mono (Space Grotesk, Playfair Display, JetBrains Mono)", "source": "tailwind.config.ts + src/index.css", "reappliedIn": "src/styles.css" },
+    { "token": "animate-scroll-vertical keyframes", "source": "tailwind.config.ts", "reappliedIn": "src/styles.css" },
+    { "token": "container (centered, 2rem padding, 1400px)", "source": "tailwind.config.ts", "reappliedIn": "src/styles.css" },
+    { "token": "custom cursor classes", "source": "src/index.css", "reappliedIn": "src/styles.css" },
+    { "token": "site-background / vignette layer", "source": "src/index.css", "reappliedIn": "src/styles.css" },
+    { "token": "prefers-reduced-motion rule", "source": "src/index.css", "reappliedIn": "src/styles.css" },
+    { "token": "@tailwindcss/typography plugin", "source": "tailwind.config.ts", "reappliedIn": "src/styles.css" }
+  ]
+}
