@@ -33,8 +33,9 @@ const reduced = () => typeof window !== "undefined" && window.matchMedia?.("(pre
 
 export function setupPaleDotMotion(stage: HTMLElement): PaleDotMotion {
   const S = PALEDOT_MOTION_SPEC;
-  const svg = stage.querySelector<SVGSVGElement>("svg.pd-stage-svg, .pd-stage-svg");
-  if (!svg) throw new Error("setupPaleDotMotion: no .pd-stage-svg inside the stage");
+  const svgEl = stage.querySelector<SVGSVGElement>("svg.pd-stage-svg, .pd-stage-svg");
+  if (!svgEl) throw new Error("setupPaleDotMotion: no .pd-stage-svg inside the stage");
+  const svg: SVGSVGElement = svgEl;
   const dot = svg.querySelector<SVGCircleElement>(".pd-dot")!;
   const halo = svg.querySelector<SVGCircleElement>(".pd-halo")!;
   const letters = Array.from(svg.querySelectorAll<SVGPathElement>(".pd-letter"));
