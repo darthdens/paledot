@@ -72,21 +72,22 @@ function RootShell({ children }: { children: ReactNode }) {
 // Echo AI chat widget (unchanged script). Added after the page is interactive,
 // because the widget adds its own elements to the page and must not race the
 // first render.
-function useEchoWidget() {
+function useEchoWidget(enabled: boolean) {
   useEffect(() => {
+    if (!enabled) return;
     if (document.querySelector('script[src="https://echoai.so/w.js"]')) return;
     const script = document.createElement("script");
     script.src = "https://echoai.so/w.js";
     script.async = true;
     script.setAttribute("data-echo", "dens");
     document.body.appendChild(script);
-  }, []);
+  }, [enabled]);
 }
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   const { brand } = Route.useLoaderData();
-  useEchoWidget();
+  useEchoWidget(brand === "cosmos");
   return (
     <SiteBrandContext.Provider value={brand}>
       <QueryClientProvider client={queryClient}>
