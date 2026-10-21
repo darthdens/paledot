@@ -316,7 +316,7 @@ export const CosmosLoader = ({
   return (
     <div 
       className={`absolute inset-0 z-50 flex flex-col items-center justify-center transition-opacity duration-600 ${fadeOut ? 'opacity-0' : 'opacity-100'}`}
-      style={{ backgroundColor: '#050510' }}
+      style={{ backgroundColor: 'var(--cosmos-loader-bg, #050510)' }}
     >
       {/* Animated stars background */}
       <div className="absolute inset-0 overflow-hidden">
