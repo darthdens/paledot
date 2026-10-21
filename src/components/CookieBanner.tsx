@@ -18,11 +18,13 @@ export const CookieBanner = () => {
 
   const handleAccept = () => {
     localStorage.setItem(COOKIE_CONSENT_KEY, "accepted");
+    notifyConsentChange("accepted");
     setIsVisible(false);
   };
 
   const handleDecline = () => {
     localStorage.setItem(COOKIE_CONSENT_KEY, "declined");
+    notifyConsentChange("declined");
     setIsVisible(false);
   };
 

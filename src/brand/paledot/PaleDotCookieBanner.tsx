@@ -23,6 +23,7 @@ export function PaleDotCookieBanner() {
 
   const choose = (value: "accepted" | "declined") => {
     localStorage.setItem(COOKIE_CONSENT_KEY, value);
+    notifyConsentChange(value);
     setIsVisible(false);
   };
 
