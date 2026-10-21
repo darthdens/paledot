@@ -279,7 +279,7 @@ export const CosmosLoader = ({
       const lastGeometry = Array.from(geometriesReady).pop();
       if (lastGeometry) {
         const name = (GEOMETRY_NAMES[lastGeometry] ? tr(GEOMETRY_NAMES[lastGeometry]) : undefined) || lastGeometry;
-        return tx(`Building: ${name}`, `Génération: ${name}`);
+        return `${tx('Building', 'Génération')}: ${name}`;
       }
       return tx('Building galaxies…', 'Génération des galaxies…');
     } else {
