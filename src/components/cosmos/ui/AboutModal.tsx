@@ -1,12 +1,12 @@
 import { useLanguage } from '@/i18n/LanguageContext';
 import { Button } from '@/components/ui/button';
 import { Globe, X, MapPin, Heart } from 'lucide-react';
-import portraitAsset from '@/assets/dens-portrait.jpg.asset.json';
+import portraitImg from '@/assets/dens-portrait.jpg';
 
 const APP_VERSION = '1.0.0';
 
-// Profile picture (served from the CDN)
-const PROFILE_PIC = portraitAsset.url;
+// Profile picture (bundled with the app)
+const PROFILE_PIC = portraitImg;
 
 // Social links
 const SOCIAL_LINKS = {
