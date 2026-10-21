@@ -2,7 +2,7 @@ import { useLanguage } from '@/i18n/LanguageContext';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { HelpCircle, Compass, Maximize, Minimize, CircleDot, CircleOff, Clock, Timer, TimerOff, Orbit, Activity, Home, Scaling, BarChart3, Info, MoreVertical } from 'lucide-react';
+import { HelpCircle, Compass, Maximize, Minimize, CircleDot, CircleOff, Clock, Timer, TimerOff, Orbit, Activity, Home, Scaling, BarChart3, Info, MoreVertical, Globe } from 'lucide-react';
 import { useCosmosStore } from '../store/useCosmosStore';
 import { useFullscreenStore } from '../store/useFullscreenStore';
 import { useCallback, useEffect, useRef, useState } from 'react';
@@ -12,7 +12,7 @@ import { AboutModal } from './AboutModal';
 import { AmbientMusicController } from './AmbientMusicController';
 import { isNativeApp } from '@/lib/platform';
 import { useSiteBrand } from '@/lib/site-brand';
-import { LanguageButton, LanguageMenuRow } from './LanguagePicker';
+import { LanguageButton, LanguageMenuList } from './LanguagePicker';
 const translations = {
   en: {
     startTour: 'Start Guided Tour',
@@ -138,11 +138,14 @@ export const CosmosUI = () => {
   const { isFullscreen, setIsFullscreen } = useFullscreenStore();
   const [showTimeSlider, setShowTimeSlider] = useState(false);
   const [showMoreMenu, setShowMoreMenu] = useState(false);
+  const [showLanguageMenu, setShowLanguageMenu] = useState(false);
   const [showAbout, setShowAbout] = useState(false);
   
   const timeSliderRef = useRef<HTMLDivElement | null>(null);
   const moreMenuRef = useRef<HTMLDivElement | null>(null);
   const moreMenuButtonRef = useRef<HTMLButtonElement | null>(null);
+  const languageMenuRef = useRef<HTMLDivElement | null>(null);
+  const languageMenuButtonRef = useRef<HTMLButtonElement | null>(null);
   const timeSpeedButtonRef = useRef<HTMLButtonElement | null>(null);
 
   // Click-outside and Escape key handlers for dropdowns
@@ -161,12 +164,19 @@ export const CosmosUI = () => {
           moreMenuButtonRef.current && !moreMenuButtonRef.current.contains(target)) {
         setShowMoreMenu(false);
       }
+
+      // Close language menu if clicking outside
+      if (showLanguageMenu && languageMenuRef.current && !languageMenuRef.current.contains(target) &&
+          languageMenuButtonRef.current && !languageMenuButtonRef.current.contains(target)) {
+        setShowLanguageMenu(false);
+      }
     };
 
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         if (showTimeSlider) setShowTimeSlider(false);
         if (showMoreMenu) setShowMoreMenu(false);
+        if (showLanguageMenu) setShowLanguageMenu(false);
         if (showQuickJump) toggleQuickJump();
       }
     };
@@ -178,7 +188,7 @@ export const CosmosUI = () => {
       document.removeEventListener('mousedown', handleClickOutside);
       document.removeEventListener('keydown', handleEscape);
     };
-  }, [showTimeSlider, showMoreMenu, showQuickJump, toggleQuickJump]);
+  }, [showTimeSlider, showMoreMenu, showLanguageMenu, showQuickJump, toggleQuickJump]);
 
   const handleQuickJumpClick = () => {
     const el = quickJumpButtonRef.current;
@@ -741,6 +751,24 @@ export const CosmosUI = () => {
               <LanguageButton />
             </div>
 
+            {/* Mobile & Tablet language button */}
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  ref={languageMenuButtonRef}
+                  size="icon"
+                  variant="ghost"
+                  onClick={() => { setShowMoreMenu(false); setShowLanguageMenu(!showLanguageMenu); }}
+                  className={`lg:hidden h-8 w-8 sm:h-9 sm:w-9 backdrop-blur-xs text-white ${showLanguageMenu ? 'bg-white/25' : 'bg-white/10 hover:bg-white/20'}`}
+                >
+                  <Globe className="w-4 h-4 sm:w-5 sm:h-5" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent variant="dark" side="bottom">
+                {tx('Language', 'Langue')}
+              </TooltipContent>
+            </Tooltip>
+
             {/* Mobile & Tablet more button */}
             <Tooltip>
               <TooltipTrigger asChild>
@@ -748,7 +776,7 @@ export const CosmosUI = () => {
                   ref={moreMenuButtonRef}
                   size="icon" 
                   variant="ghost" 
-                  onClick={() => setShowMoreMenu(!showMoreMenu)} 
+                  onClick={() => { setShowLanguageMenu(false); setShowMoreMenu(!showMoreMenu); }} 
                   className={`lg:hidden h-8 w-8 sm:h-9 sm:w-9 backdrop-blur-xs text-white ${showMoreMenu ? 'bg-white/25' : 'bg-white/10 hover:bg-white/20'}`}
                 >
                   <MoreVertical className="w-4 h-4 sm:w-5 sm:h-5" />
@@ -847,7 +875,33 @@ export const CosmosUI = () => {
                 <span className="text-sm text-white/90">{t.about}</span>
               </button>
 
-              <LanguageMenuRow />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Mobile & Tablet language menu - same style as More menu */}
+      <div
+        ref={languageMenuRef}
+        className={`lg:hidden ${isFullscreen ? 'fixed' : 'absolute'} z-[10001] bg-white/10 backdrop-blur-xs rounded-lg overflow-hidden transition-all duration-300 ease-out ${
+          showLanguageMenu ? 'opacity-100 scale-100' : 'opacity-0 scale-95 pointer-events-none'
+        }`}
+        style={
+          isFullscreen
+            ? {
+                top: `calc(0.5rem + env(safe-area-inset-top) + ${fullscreenDropdownOffsetPx}px)`,
+                right: 'calc(0.5rem + env(safe-area-inset-right))',
+              }
+            : {
+                top: isMobile ? '48px' : '68px',
+                right: isMobile ? '8px' : '16px',
+              }
+        }
+      >
+        <div className={`grid transition-all duration-300 ease-out ${showLanguageMenu ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'}`}>
+          <div className="overflow-hidden">
+            <div className="p-2 min-w-[180px] space-y-0.5">
+              <LanguageMenuList />
             </div>
           </div>
         </div>

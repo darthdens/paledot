@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { Check, ChevronDown, Globe } from 'lucide-react';
+import { Check, Globe } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { useLanguage } from '@/i18n/LanguageContext';
@@ -28,34 +28,27 @@ const LanguageList = ({ onPick }: { onPick?: () => void }) => {
   );
 };
 
-/** Row inside the mobile/tablet "More" menu; expands in place. */
-export const LanguageMenuRow = () => {
-  const { locale, tx } = useLanguage();
-  const [open, setOpen] = useState(false);
-  const current = LOCALES.find((l) => l.code === locale);
+/** List rows styled like the More-menu rows (Globe icon + label + active dot). */
+export const LanguageMenuList = ({ onPick }: { onPick?: () => void }) => {
+  const { locale, setLocale } = useLanguage();
   return (
-    <div>
-      <button
-        onClick={() => setOpen((o) => !o)}
-        aria-expanded={open}
-        className="w-full flex items-center justify-between p-2 rounded-[4px] hover:bg-white/10 transition-colors"
-      >
-        <div className="flex items-center gap-2">
-          <Globe className="w-4 h-4 text-white/70" />
-          <span className="text-sm text-white/90">{tx('Language', 'Langue')}</span>
-        </div>
-        <div className="flex items-center gap-1 text-xs text-white/60">
-          {current?.label}
-          <ChevronDown className={`w-3.5 h-3.5 transition-transform ${open ? 'rotate-180' : ''}`} />
-        </div>
-      </button>
-      <div className={`grid transition-all duration-300 ease-out ${open ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'}`}>
-        <div className="overflow-hidden">
-          <div className="pl-6 pr-1 py-1">
-            <LanguageList />
+    <div role="listbox" className="space-y-0.5">
+      {LOCALES.map((l) => (
+        <button
+          key={l.code}
+          role="option"
+          aria-selected={locale === l.code}
+          lang={l.code}
+          onClick={() => { setLocale(l.code); onPick?.(); }}
+          className="w-full flex items-center justify-between p-2 rounded-[4px] hover:bg-white/10 transition-colors"
+        >
+          <div className="flex items-center gap-2">
+            <Globe className="w-4 h-4 text-white/70" />
+            <span className="text-sm text-white/90">{l.label}</span>
           </div>
-        </div>
-      </div>
+          {locale === l.code && <div className="w-2 h-2 rounded-full bg-green-400" />}
+        </button>
+      ))}
     </div>
   );
 };
