@@ -111,7 +111,7 @@ export const AmbientMusicController = () => {
           variant="ghost"
           size="icon"
           onClick={handleMuteToggle}
-          className="h-6 w-6 flex-shrink-0 backdrop-blur-sm text-foreground bg-foreground/10 hover:bg-foreground/20"
+          className="h-6 w-6 flex-shrink-0 backdrop-blur-xs text-foreground bg-foreground/10 hover:bg-foreground/20"
           aria-label={language === 'fr' ? 'Couper le son' : 'Mute'}
         >
           <VolumeX className="h-3 w-3" />
@@ -134,7 +134,7 @@ export const AmbientMusicController = () => {
             variant="ghost"
             size="icon"
             onClick={handleButtonClick}
-            className={`h-8 w-8 sm:h-9 sm:w-9 backdrop-blur-sm text-foreground ${
+            className={`h-8 w-8 sm:h-9 sm:w-9 backdrop-blur-xs text-foreground ${
               !isMuted ? 'bg-foreground/25' : 'bg-foreground/10 hover:bg-foreground/20'
             }`}
           >

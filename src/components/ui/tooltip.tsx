@@ -71,7 +71,7 @@ const TooltipContent = React.forwardRef<
           sticky="partial"
           className={cn(
             "overflow-hidden max-w-[min(calc(100vw-2rem),280px)] whitespace-normal break-words rounded-md px-3 py-1.5 text-sm shadow-md animate-in fade-in-0 zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
-            "z-[2147483647] bg-white/10 text-white/90 border-0 backdrop-blur-sm",
+            "z-[2147483647] bg-white/10 text-white/90 border-0 backdrop-blur-xs",
             className,
           )}
           {...props}

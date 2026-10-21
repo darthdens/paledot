@@ -118,7 +118,7 @@ export const ObjectSearch = ({ isFullscreen }: ObjectSearchProps) => {
     <div
       ref={containerRef}
       className={cn(
-        'z-[10001] bg-black/90 backdrop-blur-sm rounded-lg shadow-lg border border-white/20',
+        'z-[10001] bg-black/90 backdrop-blur-xs rounded-lg shadow-lg border border-white/20',
         isFullscreen ? 'fixed' : 'absolute',
         'top-2 sm:top-4 left-2 sm:left-4 right-2 sm:right-auto w-auto sm:w-80'
       )}

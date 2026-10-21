@@ -383,7 +383,7 @@ export const TourOverlay = () => {
 
   return (
     <div 
-      className={`${isFullscreen ? 'fixed' : 'absolute'} z-[10001] bg-white/10 backdrop-blur-sm rounded-lg overflow-hidden animate-slide-in-right
+      className={`${isFullscreen ? 'fixed' : 'absolute'} z-[10001] bg-white/10 backdrop-blur-xs rounded-lg overflow-hidden animate-slide-in-right
         bottom-2 left-2 right-2
         sm:bottom-4 sm:top-auto sm:left-auto sm:right-4 sm:w-80
         md:w-96`}

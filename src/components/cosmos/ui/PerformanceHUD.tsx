@@ -46,7 +46,7 @@ export const PerformanceHUD = () => {
       }}
       zIndexRange={[100, 0]}
     >
-      <div className="bg-background/80 backdrop-blur-sm border border-border rounded-lg px-3 py-2 font-mono text-xs text-foreground shadow-lg">
+      <div className="bg-background/80 backdrop-blur-xs border border-border rounded-lg px-3 py-2 font-mono text-xs text-foreground shadow-lg">
         <div className="flex flex-col gap-0.5">
           <span className={stats.fps < 30 ? 'text-destructive' : stats.fps < 50 ? 'text-yellow-500' : 'text-green-500'}>
             FPS: {stats.fps}

@@ -196,7 +196,7 @@ export const InfoCard = () => {
 
   const card = (
     <div 
-      className={`${isFullscreen ? 'fixed' : 'absolute'} bottom-2 left-2 right-2 sm:bottom-4 sm:left-4 sm:right-auto z-[10001] w-auto sm:w-72 md:w-80 bg-white/10 backdrop-blur-sm rounded-lg animate-scale-in origin-bottom-left overflow-hidden`}
+      className={`${isFullscreen ? 'fixed' : 'absolute'} bottom-2 left-2 right-2 sm:bottom-4 sm:left-4 sm:right-auto z-[10001] w-auto sm:w-72 md:w-80 bg-white/10 backdrop-blur-xs rounded-lg animate-scale-in origin-bottom-left overflow-hidden`}
       style={isFullscreen ? { 
         bottom: 'calc(0.5rem + env(safe-area-inset-bottom))',
         left: 'calc(0.5rem + env(safe-area-inset-left))',
@@ -250,13 +250,13 @@ export const InfoCard = () => {
 
             {/* Stats */}
             <div className="grid grid-cols-2 gap-2 text-xs sm:text-sm">
-              <div className="bg-white/5 rounded p-2">
+              <div className="bg-white/5 rounded-[4px] p-2">
                 <div className="text-white/50 text-xs">{t.distance}</div>
                 <div className="text-white font-medium">
                   {formatDistance(selectedObject.distanceFromEarth, selectedObject.distanceUnit, language)}
                 </div>
               </div>
-              <div className="bg-white/5 rounded p-2">
+              <div className="bg-white/5 rounded-[4px] p-2">
                 <div className="text-white/50 text-xs">{t.size}</div>
                 <div className="text-white font-medium">
                   {formatSize(selectedObject.size, language)}
@@ -268,7 +268,7 @@ export const InfoCard = () => {
             {showRealPeriods && (orbitalPeriodDays || rotationPeriodHours) && (
               <div className="grid grid-cols-2 gap-2 text-xs sm:text-sm">
                 {orbitalPeriodDays && (
-                  <div className="bg-white/5 rounded p-2">
+                  <div className="bg-white/5 rounded-[4px] p-2">
                     <div className="text-white/50 text-xs">{t.orbitalPeriod}</div>
                     <div className="text-white font-medium">
                       {formatOrbitalPeriod(orbitalPeriodDays, language, t)}
@@ -276,7 +276,7 @@ export const InfoCard = () => {
                   </div>
                 )}
                 {rotationPeriodHours && (
-                  <div className="bg-white/5 rounded p-2">
+                  <div className="bg-white/5 rounded-[4px] p-2">
                     <div className="text-white/50 text-xs">{t.rotationPeriod}</div>
                     <div className="text-white font-medium">
                       {formatRotationPeriod(rotationPeriodHours, language, t)}

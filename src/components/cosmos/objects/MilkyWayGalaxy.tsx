@@ -559,7 +559,7 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
               style={{ pointerEvents: 'auto' }}
             >
               <div
-                className="bg-white/10 backdrop-blur-sm px-3 py-1.5 rounded-lg whitespace-nowrap cursor-pointer"
+                className="bg-white/10 backdrop-blur-xs px-3 py-1.5 rounded-lg whitespace-nowrap cursor-pointer"
                 onClick={handleYouAreHereLabelClick}
               >
                 <span className="text-white text-sm font-semibold">
@@ -646,7 +646,7 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
             style={{ pointerEvents: 'auto' }}
           >
             <div
-              className="bg-black/80 backdrop-blur-sm px-3 py-1.5 rounded-lg border border-orange-500/50 whitespace-nowrap shadow-lg cursor-pointer"
+              className="bg-black/80 backdrop-blur-xs px-3 py-1.5 rounded-lg border border-orange-500/50 whitespace-nowrap shadow-lg cursor-pointer"
               onClick={handleProximaLabelClick}
             >
               <span className="text-orange-400 text-sm font-semibold drop-shadow-md">
