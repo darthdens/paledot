@@ -12,7 +12,7 @@ import { AboutModal } from './AboutModal';
 import { AmbientMusicController } from './AmbientMusicController';
 import { isNativeApp } from '@/lib/platform';
 import { useSiteBrand } from '@/lib/site-brand';
-import { LanguageButton, LanguageMenuRow } from './LanguagePicker';
+import { LanguageButton, LanguageMenuList } from './LanguagePicker';
 const translations = {
   en: {
     startTour: 'Start Guided Tour',
@@ -138,11 +138,14 @@ export const CosmosUI = () => {
   const { isFullscreen, setIsFullscreen } = useFullscreenStore();
   const [showTimeSlider, setShowTimeSlider] = useState(false);
   const [showMoreMenu, setShowMoreMenu] = useState(false);
+  const [showLanguageMenu, setShowLanguageMenu] = useState(false);
   const [showAbout, setShowAbout] = useState(false);
   
   const timeSliderRef = useRef<HTMLDivElement | null>(null);
   const moreMenuRef = useRef<HTMLDivElement | null>(null);
   const moreMenuButtonRef = useRef<HTMLButtonElement | null>(null);
+  const languageMenuRef = useRef<HTMLDivElement | null>(null);
+  const languageMenuButtonRef = useRef<HTMLButtonElement | null>(null);
   const timeSpeedButtonRef = useRef<HTMLButtonElement | null>(null);
 
   // Click-outside and Escape key handlers for dropdowns
@@ -161,12 +164,19 @@ export const CosmosUI = () => {
           moreMenuButtonRef.current && !moreMenuButtonRef.current.contains(target)) {
         setShowMoreMenu(false);
       }
+
+      // Close language menu if clicking outside
+      if (showLanguageMenu && languageMenuRef.current && !languageMenuRef.current.contains(target) &&
+          languageMenuButtonRef.current && !languageMenuButtonRef.current.contains(target)) {
+        setShowLanguageMenu(false);
+      }
     };
 
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         if (showTimeSlider) setShowTimeSlider(false);
         if (showMoreMenu) setShowMoreMenu(false);
+        if (showLanguageMenu) setShowLanguageMenu(false);
         if (showQuickJump) toggleQuickJump();
       }
     };
