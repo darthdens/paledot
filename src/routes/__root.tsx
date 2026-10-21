@@ -23,21 +23,26 @@ import NotFound from "@/pages/NotFound";
 import { getSiteBrand } from "@/lib/get-site-brand";
 import { SiteBrandContext } from "@/lib/site-brand";
 import { buildHead } from "@/lib/site-meta";
+import { PALEDOT_HEAD_LINKS } from "@/brand/paledot/siteMeta.paledot";
 import { reportLovableError } from "@/lib/lovable-error-reporting";
 
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
   loader: () => ({ brand: getSiteBrand() }),
   head: ({ loaderData }) => {
-    const { meta, canonical, jsonLd } = buildHead(loaderData?.brand ?? "cosmos");
+    const brand = loaderData?.brand ?? "cosmos";
+    const { meta, canonical, jsonLd } = buildHead(brand);
+    const icons = brand === "paledot" ? PALEDOT_HEAD_LINKS : [
+        { rel: "icon", href: "/favicon.ico", sizes: "48x48" },
+        { rel: "icon", type: "image/png", sizes: "64x64", href: "/favicon.png" },
+        { rel: "icon", type: "image/png", sizes: "192x192", href: "/favicon-192.png" },
+        { rel: "apple-touch-icon", type: "image/png", sizes: "180x180", href: "/apple-touch-icon.png" },
+      ];
     return {
       meta,
       links: [
         { rel: "stylesheet", href: appCss },
         { rel: "canonical", href: canonical },
-        { rel: "icon", href: "/favicon.ico", sizes: "48x48" },
-        { rel: "icon", type: "image/png", sizes: "64x64", href: "/favicon.png" },
-        { rel: "icon", type: "image/png", sizes: "192x192", href: "/favicon-192.png" },
-        { rel: "apple-touch-icon", type: "image/png", sizes: "180x180", href: "/apple-touch-icon.png" },
+        ...icons,
       ],
       scripts: [
         { type: "application/ld+json", children: jsonLd },

@@ -19,7 +19,7 @@ function Home() {
 
   const fallback =
     brand === "paledot" ? (
-      <div className="fixed inset-0" style={{ backgroundColor: "#0a0a0f" }} />
+      <div className="fixed inset-0" style={{ backgroundColor: "#0A0B10" }} />
     ) : null;
 
   if (!mounted) return fallback;
