@@ -57,12 +57,15 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 });
 
 function RootShell({ children }: { children: ReactNode }) {
+  const brand = Route.useLoaderData({ select: (d) => d?.brand }) as string | undefined;
+  // Safari tints its top/bottom bars from the page background: match Pale Dot's night sky.
+  const pageBg = brand === "paledot" ? { backgroundColor: "#0A0B10", colorScheme: "dark" as const } : undefined;
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning style={pageBg}>
       <head>
         <HeadContent />
       </head>
-      <body>
+      <body style={pageBg}>
         {children}
         <Scripts />
       </body>
