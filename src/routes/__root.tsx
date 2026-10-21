@@ -93,7 +93,7 @@ function RootComponent() {
       <QueryClientProvider client={queryClient}>
         <LanguageProvider>
           <TooltipProvider>
-            <CustomCursor />
+            {brand === "cosmos" && <CustomCursor />}
             {brand === "cosmos" && <BackgroundLayer />}
             <Toaster richColors position="bottom-left" />
             <GoogleAnalytics />
