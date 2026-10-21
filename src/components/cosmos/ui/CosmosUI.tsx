@@ -900,8 +900,8 @@ export const CosmosUI = () => {
       >
         <div className={`grid transition-all duration-300 ease-out ${showLanguageMenu ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'}`}>
           <div className="overflow-hidden">
-            <div className="p-2 min-w-[180px] space-y-0.5">
-              <LanguageMenuList />
+            <div className="p-2 min-w-[200px] space-y-0.5">
+              <LanguageMenuList onPick={() => setShowLanguageMenu(false)} />
             </div>
           </div>
         </div>
