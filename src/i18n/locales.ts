@@ -40,7 +40,7 @@ const BRITISH_REGIONS = new Set([
   "jm", "tt", "bb", "bs", "gy", "bz", "ag", "dm", "gd", "kn", "lc", "vc",
   "ai", "vg", "ky", "ms", "tc", "bm", "fk", "sh",
   // Europe / Middle East
-  "mt2", "il", "ae", "qa", "kw", "bh", "om", "jo",
+  "mt", "cy", "il", "ae", "qa", "kw", "bh", "om", "jo",
 ]);
 
 /** Pull the region subtag out of a lowercase BCP-47 tag, if any. */
