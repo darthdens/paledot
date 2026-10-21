@@ -27,8 +27,8 @@ const PaleDot = () => {
     const prevMeta = metas.map((m) => m.content);
     metas.forEach((m) => (m.content = color));
     return () => {
-      els.forEach((el, i) => (el.style.backgroundColor = prev[i]));
-      metas.forEach((m, i) => (m.content = prevMeta[i]));
+      els.forEach((el, i) => (el.style.backgroundColor = prev[i] ?? ""));
+      metas.forEach((m, i) => (m.content = prevMeta[i] ?? ""));
     };
   }, [started]);
 
