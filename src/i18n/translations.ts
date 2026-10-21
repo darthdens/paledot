@@ -112,8 +112,8 @@ export const translations = {
     about: {
       title: "About Me",
       intro1: "Hi! I'm",
-      name: "Dénis (or Dens) Akoka",
-      intro2: ", a multidisciplinary creative professional based in Dundee, Scotland. I've spent the past 7+ years working at the intersection of design, technology, and marketing.",
+      name: "Dens Akoka",
+      intro2: ", a multidisciplinary creative professional based in Dundee, Scotland. I've spent the past 8+ years working at the intersection of design, technology, and marketing.",
       paragraph2: "My journey has taken me through the worlds of blockchain technology, startup ecosystems, and digital product development. I love building things that matter and helping others bring their visions to life.",
       paragraph3: "When I'm not working, you'll find me exploring new technologies, learning languages, or contributing to open-source projects. I believe in continuous learning and staying curious.",
       coreSkills: "Core Skills",
@@ -139,7 +139,7 @@ export const translations = {
       testimonials: "What People Say",
       testimonialsList: [
         {
-          quote: "Working with Dénis was a pleasure. His deep understanding of blockchain technology and marketing expertise helped Calileo secure funding and build a strong community.",
+          quote: "Working with Dens was a pleasure. His deep understanding of blockchain technology and marketing expertise helped Calileo secure funding and build a strong community.",
           author: "Florian Vagner",
           company: "Calileo",
         },
@@ -1092,8 +1092,8 @@ export const translations = {
     about: {
       title: "À propos de moi",
       intro1: "Salut ! Je suis",
-      name: "Dénis (ou Dens) Akoka",
-      intro2: ", un professionnel créatif pluridisciplinaire basé à Dundee, en Écosse. J'ai passé les 7+ dernières années à travailler à l'intersection du design, de la technologie et du marketing.",
+      name: "Dens Akoka",
+      intro2: ", un professionnel créatif pluridisciplinaire basé à Dundee, en Écosse. J'ai passé les 8+ dernières années à travailler à l'intersection du design, de la technologie et du marketing.",
       paragraph2: "Mon parcours m'a mené à travers les mondes de la technologie blockchain, des écosystèmes de startups et du développement de produits numériques. J'aime construire des choses qui comptent et aider les autres à concrétiser leurs visions.",
       paragraph3: "Quand je ne travaille pas, vous me trouverez en train d'explorer de nouvelles technologies, d'apprendre des langues ou de contribuer à des projets open-source. Je crois en l'apprentissage continu et en la curiosité.",
       coreSkills: "Compétences clés",
@@ -1119,7 +1119,7 @@ export const translations = {
       testimonials: "Ce qu'on dit de moi",
       testimonialsList: [
         {
-          quote: "Travailler avec Dénis a été un plaisir. Sa compréhension approfondie de la technologie blockchain et son expertise en marketing ont aidé Calileo à obtenir des financements et à construire une communauté solide.",
+          quote: "Travailler avec Dens a été un plaisir. Sa compréhension approfondie de la technologie blockchain et son expertise en marketing ont aidé Calileo à obtenir des financements et à construire une communauté solide.",
           author: "Florian Vagner",
           company: "Calileo",
         },
