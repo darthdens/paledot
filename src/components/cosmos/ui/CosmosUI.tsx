@@ -101,7 +101,7 @@ const translations = {
 };
 
 export const CosmosUI = () => {
-  const { language, tr, tx, numberLocale } = useLanguage();
+  const { language, tr, tx, numberLocale, locale } = useLanguage();
   const t = tr(translations);
   const isMobile = useIsMobile();
   // In the native iOS / iPadOS / macOS / visionOS app the experience is
@@ -761,7 +761,7 @@ export const CosmosUI = () => {
                   onClick={() => { setShowMoreMenu(false); setShowLanguageMenu(!showLanguageMenu); }}
                   className={`lg:hidden h-8 w-8 sm:h-9 sm:w-9 backdrop-blur-xs text-white ${showLanguageMenu ? 'bg-white/25' : 'bg-white/10 hover:bg-white/20'}`}
                 >
-                  <Globe className="w-4 h-4 sm:w-5 sm:h-5" />
+                  <FlagIcon locale={locale} className="w-4 h-4 sm:w-5 sm:h-5" />
                 </Button>
               </TooltipTrigger>
               <TooltipContent variant="dark" side="bottom">
