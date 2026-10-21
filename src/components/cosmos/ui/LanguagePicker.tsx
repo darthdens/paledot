@@ -40,13 +40,13 @@ export const LanguageMenuList = ({ onPick }: { onPick?: () => void }) => {
           aria-selected={locale === l.code}
           lang={l.code}
           onClick={() => { setLocale(l.code); onPick?.(); }}
-          className="w-full flex items-center justify-between p-2 rounded-[4px] hover:bg-white/10 transition-colors"
+          className="w-full flex items-center justify-between gap-3 p-2 rounded-[4px] hover:bg-white/10 transition-colors"
         >
-          <div className="flex items-center gap-2">
-            <Globe className="w-4 h-4 text-white/70" />
-            <span className="text-sm text-white/90">{l.label}</span>
+          <div className="flex items-center gap-2 min-w-0">
+            <Globe className="w-4 h-4 shrink-0 text-white/70" />
+            <span className="text-sm text-white/90 whitespace-nowrap">{l.label}</span>
           </div>
-          {locale === l.code && <div className="w-2 h-2 rounded-full bg-green-400" />}
+          {locale === l.code && <div className="w-2 h-2 shrink-0 rounded-full bg-green-400" />}
         </button>
       ))}
     </div>
@@ -93,7 +93,7 @@ export const LanguageButton = () => {
         </TooltipContent>
       </Tooltip>
       <div
-        className={`absolute right-0 top-11 z-[10001] min-w-[180px] p-2 bg-white/10 backdrop-blur-xs rounded-lg transition-all duration-200 ease-out origin-top-right ${
+        className={`absolute right-0 top-11 z-[10001] min-w-[200px] p-2 bg-white/10 backdrop-blur-xs rounded-lg transition-all duration-200 ease-out origin-top-right ${
           open ? 'opacity-100 scale-100' : 'opacity-0 scale-95 pointer-events-none'
         }`}
       >
