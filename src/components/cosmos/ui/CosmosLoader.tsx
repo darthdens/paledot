@@ -466,7 +466,7 @@ export const CosmosLoader = ({
         )}
 
         {/* Rotating tips */}
-        <RotatingTip isMobile={isMobile} language={language} />
+        <RotatingTip isMobile={isMobile} />
       </div>
     </div>
   );
