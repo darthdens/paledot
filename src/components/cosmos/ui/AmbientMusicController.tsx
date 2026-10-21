@@ -28,7 +28,7 @@ export const AmbientMusicController = () => {
 
   const handleVolumeChange = useCallback(
     (value: number[]) => {
-      setVolume(value[0]);
+      setVolume(value[0]!);
     },
     [setVolume]
   );

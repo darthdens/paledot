@@ -878,7 +878,7 @@ export const CosmosUI = () => {
                 </div>
                 <Slider
                   value={[timeSpeed]}
-                  onValueChange={([value]) => setTimeSpeed(value)}
+                  onValueChange={([value]) => setTimeSpeed(value!)}
                   min={0}
                   max={10}
                   step={0.5}
