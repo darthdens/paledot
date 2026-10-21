@@ -1,0 +1,117 @@
+import { useEffect, type ReactNode } from "react";
+import type { QueryClient } from "@tanstack/react-query";
+import { QueryClientProvider } from "@tanstack/react-query";
+import {
+  HeadContent,
+  Link,
+  Outlet,
+  Scripts,
+  createRootRouteWithContext,
+  useRouter,
+} from "@tanstack/react-router";
+
+import appCss from "../styles.css?url";
+import { BackgroundLayer } from "@/components/BackgroundLayer";
+import { CookieBanner } from "@/components/CookieBanner";
+import CustomCursor from "@/components/CustomCursor";
+import { GoogleAnalytics } from "@/components/GoogleAnalytics";
+import { Toaster } from "@/components/ui/sonner";
+import { TooltipProvider } from "@/components/ui/tooltip";
+import { LanguageProvider } from "@/i18n/LanguageContext";
+import NotFound from "@/pages/NotFound";
+import { getSiteBrand } from "@/lib/get-site-brand";
+import { SiteBrandContext } from "@/lib/site-brand";
+import { buildHead } from "@/lib/site-meta";
+import { reportLovableError } from "@/lib/lovable-error-reporting";
+
+export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
+  loader: () => ({ brand: getSiteBrand() }),
+  head: ({ loaderData }) => {
+    const { meta, canonical, jsonLd } = buildHead(loaderData?.brand ?? "cosmos");
+    return {
+      meta,
+      links: [
+        { rel: "stylesheet", href: appCss },
+        { rel: "canonical", href: canonical },
+        { rel: "icon", href: "/favicon.ico", sizes: "48x48" },
+        { rel: "icon", type: "image/png", sizes: "64x64", href: "/favicon.png" },
+        { rel: "icon", type: "image/png", sizes: "192x192", href: "/favicon-192.png" },
+        { rel: "apple-touch-icon", type: "image/png", sizes: "180x180", href: "/apple-touch-icon.png" },
+      ],
+      scripts: [
+        { type: "application/ld+json", children: jsonLd },
+        // Echo AI chat widget (unchanged)
+        { src: "https://echoai.so/w.js", "data-echo": "dens", async: true },
+      ],
+    };
+  },
+  shellComponent: RootShell,
+  component: RootComponent,
+  notFoundComponent: NotFound,
+  errorComponent: RootError,
+});
+
+function RootShell({ children }: { children: ReactNode }) {
+  return (
+    <html lang="en" suppressHydrationWarning>
+      <head>
+        <HeadContent />
+      </head>
+      <body>
+        {children}
+        <Scripts />
+      </body>
+    </html>
+  );
+}
+
+function RootComponent() {
+  const { queryClient } = Route.useRouteContext();
+  const { brand } = Route.useLoaderData();
+  return (
+    <SiteBrandContext.Provider value={brand}>
+      <QueryClientProvider client={queryClient}>
+        <LanguageProvider>
+          <TooltipProvider>
+            <CustomCursor />
+            {brand === "cosmos" && <BackgroundLayer />}
+            <Toaster richColors position="bottom-left" />
+            <GoogleAnalytics />
+            <CookieBanner />
+            <Outlet />
+          </TooltipProvider>
+        </LanguageProvider>
+      </QueryClientProvider>
+    </SiteBrandContext.Provider>
+  );
+}
+
+function RootError({ error, reset }: { error: Error; reset: () => void }) {
+  const router = useRouter();
+  useEffect(() => {
+    console.error(error);
+    reportLovableError(error, { boundary: "tanstack_root_error_component" });
+  }, [error]);
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-background text-foreground p-6">
+      <div className="text-center max-w-md space-y-4">
+        <h1 className="text-xl font-semibold">This page didn't load</h1>
+        <p className="text-muted-foreground">Something went wrong. You can try again or go home.</p>
+        <div className="flex gap-2 justify-center">
+          <button
+            className="px-4 py-2 rounded-md bg-primary text-primary-foreground border border-border"
+            onClick={() => {
+              router.invalidate();
+              reset();
+            }}
+          >
+            Try again
+          </button>
+          <Link to="/" className="px-4 py-2 rounded-md border border-border">
+            Go home
+          </Link>
+        </div>
+      </div>
+    </div>
+  );
+}
