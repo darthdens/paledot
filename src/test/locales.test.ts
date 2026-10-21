@@ -24,7 +24,7 @@ describe("pickLocale", () => {
   });
 
   it("uses the region hint from other device languages when English has none", () => {
-    expect(pickLocale(["en", "fr-GB".replace("fr-", "fr-")] ?? ["en"])).toBe("en-GB");
+    expect(pickLocale(["en", "en-GB"])).toBe("en-GB");
     expect(pickLocale(["en", "fr-FR"])).toBe("en-US");
     expect(pickLocale(["en", "de-DE"])).toBe("en-US");
   });
