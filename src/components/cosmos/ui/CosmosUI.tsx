@@ -2,7 +2,7 @@ import { useLanguage } from '@/i18n/LanguageContext';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { HelpCircle, Compass, Maximize, Minimize, CircleDot, CircleOff, Clock, Timer, TimerOff, Orbit, Activity, Home, Scaling, BarChart3, Info, MoreVertical } from 'lucide-react';
+import { HelpCircle, Compass, Maximize, Minimize, CircleDot, CircleOff, Clock, Timer, TimerOff, Orbit, Activity, Home, Scaling, BarChart3, Info, MoreVertical, Globe } from 'lucide-react';
 import { useCosmosStore } from '../store/useCosmosStore';
 import { useFullscreenStore } from '../store/useFullscreenStore';
 import { useCallback, useEffect, useRef, useState } from 'react';
@@ -875,7 +875,33 @@ export const CosmosUI = () => {
                 <span className="text-sm text-white/90">{t.about}</span>
               </button>
 
-              <LanguageMenuRow />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Mobile & Tablet language menu - same style as More menu */}
+      <div
+        ref={languageMenuRef}
+        className={`lg:hidden ${isFullscreen ? 'fixed' : 'absolute'} z-[10001] bg-white/10 backdrop-blur-xs rounded-lg overflow-hidden transition-all duration-300 ease-out ${
+          showLanguageMenu ? 'opacity-100 scale-100' : 'opacity-0 scale-95 pointer-events-none'
+        }`}
+        style={
+          isFullscreen
+            ? {
+                top: `calc(0.5rem + env(safe-area-inset-top) + ${fullscreenDropdownOffsetPx}px)`,
+                right: 'calc(0.5rem + env(safe-area-inset-right))',
+              }
+            : {
+                top: isMobile ? '48px' : '68px',
+                right: isMobile ? '8px' : '16px',
+              }
+        }
+      >
+        <div className={`grid transition-all duration-300 ease-out ${showLanguageMenu ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'}`}>
+          <div className="overflow-hidden">
+            <div className="p-2 min-w-[180px] space-y-0.5">
+              <LanguageMenuList />
             </div>
           </div>
         </div>
