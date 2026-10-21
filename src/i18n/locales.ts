@@ -25,15 +25,46 @@ export const contentLangOf = (locale: Locale): ContentLang =>
 export const numberLocaleOf = (locale: Locale): string =>
   ({ "en-GB": "en-GB", "en-US": "en-US", fr: "fr-FR", es: "es-ES", pt: "pt-PT", it: "it-IT", de: "de-DE" })[locale];
 
-/** Pick the best browser language on first visit. */
-export const detectLocale = (): Locale => {
-  const langs = [navigator.language, ...(navigator.languages || [])].filter(Boolean).map((l) => l.toLowerCase());
-  for (const l of langs) {
-    if (l === "en-us") return "en-US";
-    if (l.startsWith("en")) return "en-GB";
+/** Regions where British spelling is standard (kept on UK English). */
+const BRITISH_REGIONS = new Set([
+  // British Isles
+  "gb", "uk", "ie", "im", "je", "gg", "gi",
+  // Oceania
+  "au", "nz", "fj", "pg", "sb", "vu", "ws", "to", "ki", "tv", "nr", "pw",
+  // Africa (anglophone)
+  "za", "ng", "gh", "ke", "ug", "tz", "zw", "zm", "mw", "bw", "ls", "sz", "na",
+  "gm", "sl", "lr", "rw", "mu", "sc", "so",
+  // South & Southeast Asia
+  "in", "pk", "bd", "lk", "np", "bt", "mv", "my", "sg", "bn", "hk", "mo",
+  // Caribbean & Atlantic
+  "jm", "tt", "bb", "bs", "gy", "bz", "ag", "dm", "gd", "kn", "lc", "vc",
+  "ai", "vg", "ky", "ms", "tc", "bm", "fk", "sh", "mt", "cy",
+  // Europe / Middle East
+  "mt2", "il", "ae", "qa", "kw", "bh", "om", "jo",
+]);
+
+/** Pull the region subtag out of a lowercase BCP-47 tag, if any. */
+const regionOf = (tag: string): string | undefined => {
+  const m = tag.match(/-([a-z]{2})(?:$|-)/);
+  return m?.[1];
+};
+
+/** Pure locale picker over browser language tags (testable). */
+export const pickLocale = (langs: string[]): Locale => {
+  const tags = langs.filter(Boolean).map((l) => l.toLowerCase());
+  // A non-English preferred language wins outright.
+  for (const l of tags) {
     for (const c of ["fr", "es", "pt", "it", "de"] as const) if (l.startsWith(c)) return c;
   }
-  return "en-GB";
+  // English (or no match): region decides between UK and US spelling.
+  const region = tags.map(regionOf).find(Boolean);
+  return region !== undefined && BRITISH_REGIONS.has(region) ? "en-GB" : "en-US";
+};
+
+/** Pick the best browser language on first visit. */
+export const detectLocale = (): Locale => {
+  const langs = [navigator.language, ...(navigator.languages || [])].filter(Boolean);
+  return pickLocale(langs);
 };
 
 // ---- US spelling ---------------------------------------------------------
