@@ -11,6 +11,7 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import { AboutModal } from './AboutModal';
 import { AmbientMusicController } from './AmbientMusicController';
 import { isNativeApp } from '@/lib/platform';
+import { useSiteBrand } from '@/lib/site-brand';
 const translations = {
   en: {
     startTour: 'Start Guided Tour',
@@ -104,7 +105,9 @@ export const CosmosUI = () => {
   const isMobile = useIsMobile();
   // In the native iOS / iPadOS / macOS / visionOS app the experience is
   // already full-bleed, so the fullscreen toggle is unnecessary.
-  const native = isNativeApp();
+  const brand = useSiteBrand();
+  // Pale Dot is always full-bleed too, so it hides the fullscreen toggle like the native app.
+  const native = isNativeApp() || brand === 'paledot';
   // In fullscreen, dropdowns appear directly below the button row (h-8 = 32px + gap)
   const fullscreenDropdownOffsetPx = isMobile ? 40 : 44;
   const quickJumpButtonRef = useRef<HTMLButtonElement | null>(null);
@@ -526,7 +529,7 @@ export const CosmosUI = () => {
       {showControlHints && (
         <div className="absolute inset-0 flex items-center justify-center bg-black z-[20000] p-3 animate-fade-in">
           <div className="text-center space-y-3 sm:space-y-5 max-w-sm sm:max-w-lg px-4">
-            <h1 className="text-xl sm:text-3xl md:text-4xl font-bold text-white leading-tight">{t.welcome}</h1>
+            <h1 className="text-xl sm:text-3xl md:text-4xl font-bold text-white leading-tight">{brand === 'paledot' ? (language === 'fr' ? 'Bienvenue dans Pale Dot' : 'Welcome to Pale Dot') : t.welcome}</h1>
             <p className="text-sm sm:text-base text-white/70">{t.subtitle}</p>
 
             <div className={`grid gap-3 text-left ${isMobile ? 'grid-cols-1' : 'grid-cols-1 sm:grid-cols-2'}`}>

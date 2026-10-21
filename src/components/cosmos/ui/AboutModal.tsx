@@ -1,4 +1,5 @@
 import { useLanguage } from '@/i18n/LanguageContext';
+import { useSiteBrand } from '@/lib/site-brand';
 import { Button } from '@/components/ui/button';
 import { Globe, X, MapPin, Heart } from 'lucide-react';
 import portraitImg from '@/assets/dens-portrait.jpg';
@@ -110,6 +111,7 @@ interface AboutModalProps {
 
 export const AboutModal = ({ open, onOpenChange }: AboutModalProps) => {
   const { language } = useLanguage();
+  const brand = useSiteBrand();
   const t = translations[language];
   const currentYear = new Date().getFullYear();
 
@@ -130,7 +132,7 @@ export const AboutModal = ({ open, onOpenChange }: AboutModalProps) => {
         {/* Header - no emoji */}
         <div className="space-y-3">
           <h1 className="text-2xl sm:text-3xl font-bold text-white">
-            Cosmos Explorer
+            {brand === 'paledot' ? 'Pale Dot' : 'Cosmos Explorer'}
           </h1>
           <p className="text-sm text-white/60 max-w-md mx-auto">
             {t.description}

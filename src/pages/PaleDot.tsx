@@ -46,7 +46,7 @@ const PaleDot = () => {
         style={{ backgroundColor: "#0a0a0f", colorScheme: "dark", minHeight: "100dvh" }}
         data-cosmos-container
       >
-        <div className="max-w-xl text-center space-y-6 py-12 animate-fade-in">
+        <div className="max-w-xl text-center space-y-6 py-12 animate-in fade-in duration-700">
           <div
             aria-hidden="true"
             className="mx-auto h-2 w-2 rounded-full"
