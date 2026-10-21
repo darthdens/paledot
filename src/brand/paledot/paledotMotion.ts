@@ -42,7 +42,10 @@ export function setupPaleDotMotion(stage: HTMLElement): PaleDotMotion {
   const actions = stage.querySelector<HTMLElement>(".pd-actions");
   const readout = stage.querySelector<HTMLElement>(".pd-readout");
   const vb = svg.viewBox.baseVal;
-  const fin = { cx: +dot.getAttribute("cx")!, cy: +dot.getAttribute("cy")!, r: +dot.getAttribute("r")!, rh: +halo.getAttribute("r")! };
+  // Remember the finished geometry once, so a remount (dev double-mount, re-render) never reads mid-animation values.
+  if (!dot.dataset["fin"]) dot.dataset["fin"] = [dot.getAttribute("cx"), dot.getAttribute("cy"), dot.getAttribute("r"), halo.getAttribute("r")].join(",");
+  const [fcx, fcy, fr, frh] = dot.dataset["fin"].split(",").map(Number) as [number, number, number, number];
+  const fin = { cx: fcx, cy: fcy, r: fr, rh: frh };
   const order = letters
     .map((el) => { const b = el.getBBox(); return { el, x: b.x + b.width / 2 }; })
     .sort((a, b) => Math.abs(a.x - fin.cx) - Math.abs(b.x - fin.cx));
