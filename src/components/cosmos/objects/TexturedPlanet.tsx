@@ -331,7 +331,7 @@ export const TexturedPlanet = ({
 
   const isMoon = !!object.parentId;
   
-  // Get parent planet size for shadow calculations (moons only)
+  // Get parent planet size for shadow-sm calculations (moons only)
   const parentPlanetSize = useMemo(() => {
     if (!isMoon || !object.parentId) return 0;
     // Planet sizes in km - need to match celestialObjects data
@@ -556,7 +556,7 @@ export const TexturedPlanet = ({
     // Now that motion is applied, compute world position and update shader uniforms
     groupRef.current.getWorldPosition(worldPos.current);
 
-    // Get parent position for shadow calculations (moons only)
+    // Get parent position for shadow-sm calculations (moons only)
     if (isMoon && object.parentId) {
       const parentPosArr = useCosmosStore.getState().objectWorldPositions[object.parentId];
       if (parentPosArr) {
@@ -565,31 +565,31 @@ export const TexturedPlanet = ({
     }
 
     if (planetMaterialRef.current) {
-      planetMaterialRef.current.uniforms.time.value = time;
-      planetMaterialRef.current.uniforms.objectCenter.value.copy(worldPos.current);
+      planetMaterialRef.current.uniforms["time"]!.value = time;
+      planetMaterialRef.current.uniforms["objectCenter"]!.value.copy(worldPos.current);
       if (isMoon) {
-        planetMaterialRef.current.uniforms.parentCenter.value.copy(parentPos.current);
-        planetMaterialRef.current.uniforms.parentRadius.value = parentPlanetSize;
+        planetMaterialRef.current.uniforms["parentCenter"]!.value.copy(parentPos.current);
+        planetMaterialRef.current.uniforms["parentRadius"]!.value = parentPlanetSize;
       }
     }
     if (cloudMaterialRef.current) {
-      cloudMaterialRef.current.uniforms.time.value = time;
-      cloudMaterialRef.current.uniforms.objectCenter.value.copy(worldPos.current);
+      cloudMaterialRef.current.uniforms["time"]!.value = time;
+      cloudMaterialRef.current.uniforms["objectCenter"]!.value.copy(worldPos.current);
       if (isMoon) {
-        cloudMaterialRef.current.uniforms.parentCenter.value.copy(parentPos.current);
-        cloudMaterialRef.current.uniforms.parentRadius.value = parentPlanetSize;
+        cloudMaterialRef.current.uniforms["parentCenter"]!.value.copy(parentPos.current);
+        cloudMaterialRef.current.uniforms["parentRadius"]!.value = parentPlanetSize;
       }
     }
     if (atmosphereMaterialRef.current) {
-      atmosphereMaterialRef.current.uniforms.objectCenter.value.copy(worldPos.current);
+      atmosphereMaterialRef.current.uniforms["objectCenter"]!.value.copy(worldPos.current);
       if (isMoon) {
-        atmosphereMaterialRef.current.uniforms.parentCenter.value.copy(parentPos.current);
-        atmosphereMaterialRef.current.uniforms.parentRadius.value = parentPlanetSize;
+        atmosphereMaterialRef.current.uniforms["parentCenter"]!.value.copy(parentPos.current);
+        atmosphereMaterialRef.current.uniforms["parentRadius"]!.value = parentPlanetSize;
       }
     }
     if (ringMaterialRef.current) {
-      ringMaterialRef.current.uniforms.objectCenter.value.copy(worldPos.current);
-      ringMaterialRef.current.uniforms.planetRadius.value = planetSize;
+      ringMaterialRef.current.uniforms["objectCenter"]!.value.copy(worldPos.current);
+      ringMaterialRef.current.uniforms["planetRadius"]!.value = planetSize;
     }
 
     // Keep a live world-position for camera targeting (planets/moons move).
@@ -815,9 +815,9 @@ export const TexturedPlanet = ({
                   return value;
                 }
                 
-                // Check if point is in shadow of parent planet (for moons)
+                // Check if point is in shadow-sm of parent planet (for moons)
                 float calculateShadow(vec3 fragWorldPos, vec3 sunDir) {
-                  if (isMoon < 0.5) return 1.0; // Not a moon, no shadow
+                  if (isMoon < 0.5) return 1.0; // Not a moon, no shadow-sm
                   
                   vec3 toParent = parentCenter - fragWorldPos;
                   float distAlongRay = dot(toParent, sunDir);
@@ -833,9 +833,9 @@ export const TexturedPlanet = ({
                   return 1.0;
                 }
                 
-              // Check if point is in shadow of the rings with soft penumbra
+              // Check if point is in shadow-sm of the rings with soft penumbra
                 float calculateRingShadow(vec3 fragWorldPos, vec3 sunDir) {
-                  // ringStyle=1 (Uranus-like): no visible ring shadow due to extreme tilt + dark narrow rings
+                  // ringStyle=1 (Uranus-like): no visible ring-3 shadow-sm due to extreme tilt + dark narrow rings
                   if (hasRings < 0.5 || ringStyle > 0.5) return 1.0;
                   
                   // Get fragment position relative to planet center
@@ -846,21 +846,21 @@ export const TexturedPlanet = ({
                   float cosT = cos(-planetTilt); // Negative to undo the tilt
                   float sinT = sin(-planetTilt);
 
-                  // Transform to ring's local frame (undo X-axis tilt)
+                  // Transform to ring-3's local frame (undo X-axis tilt)
                   // Ring plane is XZ in local space after rotation
                   vec3 ringFramePos;
                   ringFramePos.x = relPos.x;
                   ringFramePos.y = relPos.y * cosT - relPos.z * sinT;
                   ringFramePos.z = relPos.y * sinT + relPos.z * cosT;
                   
-                  // Transform sun direction to ring frame
+                  // Transform sun direction to ring-3 frame
                   vec3 ringFrameSunDir;
                   ringFrameSunDir.x = sunDir.x;
                   ringFrameSunDir.y = sunDir.y * cosT - sunDir.z * sinT;
                   ringFrameSunDir.z = sunDir.y * sinT + sunDir.z * cosT;
                   
-                  // How aligned the sun is with the ring plane.
-                  // When the sun is nearly in the ring plane (edge-on), ring shadows should fade smoothly
+                  // How aligned the sun is with the ring-3 plane.
+                  // When the sun is nearly in the ring-3 plane (edge-on), ring-3 shadows should fade smoothly
                   // rather than abruptly popping off.
                   float sunPlane = abs(ringFrameSunDir.y);
                   float planeFactor = smoothstep(0.0005, 0.02, sunPlane);
@@ -874,7 +874,7 @@ export const TexturedPlanet = ({
                   vec3 hitPoint = ringFramePos + ringFrameSunDir * t;
                   float distFromCenter = length(vec2(hitPoint.x, hitPoint.z));
                   
-                  // Check if within ring bounds with penumbra zones
+                  // Check if within ring-3 bounds with penumbra zones
                   float ringWidth = ringOuterRadius - ringInnerRadius;
                   
                   // Calculate penumbra softness - fixed value for stability
@@ -890,12 +890,12 @@ export const TexturedPlanet = ({
                   if (inRing > 0.001) {
                     float ringPos = (distFromCenter - ringInnerRadius) / ringWidth;
                     
-                    // Multi-layer ring density with soft transitions
+                    // Multi-layer ring-3 density with soft transitions
                     float mainBands = 0.5 + 0.5 * sin(ringPos * 80.0);
                     float fineBands = 0.7 + 0.3 * sin(ringPos * 200.0);
                     float microBands = 0.85 + 0.15 * sin(ringPos * 500.0);
                     
-                    // Base density varies across ring
+                    // Base density varies across ring-3
                     float baseDensity = 0.35 + 0.45 * (1.0 - ringPos * 0.5);
                     float ringDensity = baseDensity * mainBands * fineBands * microBands;
                     
@@ -909,7 +909,7 @@ export const TexturedPlanet = ({
                     float enckeGap = 1.0 - 0.5 * exp(-pow((ringPos - 0.82) / 0.02, 2.0));
                     ringDensity *= enckeGap;
                     
-                    // Shadow strength combines density, ring coverage, ring opacity, and plane alignment
+                    // Shadow strength combines density, ring-3 coverage, ring-3 opacity, and plane alignment
                     float shadowStrength = ringDensity * inRing * ringOpacity * planeFactor * 0.9;
                     float maxShadow = 0.75 * ringOpacity;
                     
@@ -927,7 +927,7 @@ export const TexturedPlanet = ({
                   vec3 fragSunDir = normalize(-vWorldPosition);
                   float NdotL = dot(worldNormal, fragSunDir);
 
-                  // Calculate shadows - use planet-center sun direction for ring shadow
+                  // Calculate shadows - use planet-center sun direction for ring-3 shadow-sm
                   float moonShadow = calculateShadow(vWorldPosition, fragSunDir);
                   float ringShadow = calculateRingShadow(vWorldPosition, sunDir);
                   float totalShadow = min(moonShadow, ringShadow);
@@ -1852,7 +1852,7 @@ export const TexturedPlanet = ({
                     vec3 worldNormal = normalize(vWorldNormal);
                     vec3 sunDir = normalize(-vWorldPosition);
                     float NdotL = max(dot(worldNormal, sunDir), 0.0);
-                    float shadow = calculateShadow(vWorldPosition, sunDir);
+                    float shadow-sm = calculateShadow(vWorldPosition, sunDir);
                     
                     float cloudCoverage;
                     
@@ -1958,7 +1958,7 @@ export const TexturedPlanet = ({
                     vec3 worldNormal = normalize(vWorldNormal);
                     vec3 sunDir = normalize(-vWorldPosition);
                     float NdotL = max(dot(worldNormal, sunDir), 0.0);
-                    float shadow = calculateShadow(vWorldPosition, sunDir);
+                    float shadow-sm = calculateShadow(vWorldPosition, sunDir);
                     
                     vec3 viewDir = normalize(cameraPosition - vWorldPosition);
                     
@@ -1987,7 +1987,7 @@ export const TexturedPlanet = ({
             </mesh>
           )}
 
-          {/* Rings (Saturn, Uranus) - enhanced with lighting and planet shadow */}
+          {/* Rings (Saturn, Uranus) - enhanced with lighting and planet shadow-sm */}
             {visuals.hasRings && (
               <mesh rotation={[Math.PI / 2, 0, 0]} renderOrder={1}>
                 <ringGeometry args={[ringInnerRadius, ringOuterRadius, 256]} />
@@ -2045,7 +2045,7 @@ export const TexturedPlanet = ({
                   varying vec3 vLocalPosition;
                   varying vec3 vWorldCenter;
                   
-                  // Noise functions for ring detail
+                  // Noise functions for ring-3 detail
                   float hash(float n) { return fract(sin(n) * 43758.5453); }
                   float hash2(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
                   
@@ -2078,7 +2078,7 @@ export const TexturedPlanet = ({
                     return value;
                   }
                   
-                  // Check if ring fragment is in shadow of the planet
+                  // Check if ring-3 fragment is in shadow-sm of the planet
                   float calculatePlanetShadow(vec3 fragWorldPos, vec3 sunDir) {
                     vec3 toPlanet = vWorldCenter - fragWorldPos;
                     float distAlongRay = dot(toPlanet, sunDir);
@@ -2097,7 +2097,7 @@ export const TexturedPlanet = ({
                   
                   void main() {
                     vec3 sunDir = normalize(-vWorldPosition);
-                    float shadow = calculatePlanetShadow(vWorldPosition, sunDir);
+                    float shadow-sm = calculatePlanetShadow(vWorldPosition, sunDir);
 
                     vec3 fragFromPlanet = vWorldPosition - vWorldCenter;
                     float distFromPlanet = length(fragFromPlanet);
@@ -2128,8 +2128,8 @@ export const TexturedPlanet = ({
                     float ringC = smoothstep(0.0, 0.03, normalizedDist) * smoothstep(0.33, 0.30, normalizedDist);
                     
                     float ringADensity = 0.85;
-                    float ringBDensity = 1.0;  // B ring is densest
-                    float ringCDensity = 0.4;  // C ring is faint
+                    float ringBDensity = 1.0;  // B ring-3 is densest
+                    float ringCDensity = 0.4;  // C ring-3 is faint
                     
                     // Fine radial structure - moderate frequencies to avoid aliasing/flickering
                     float fineStructure = 0.75 + 0.25 * sin(normalizedDist * 200.0 + fbm(normalizedDist * 30.0) * 1.5);
@@ -2151,30 +2151,30 @@ export const TexturedPlanet = ({
                     float maxwellGap = 1.0 - 0.5 * exp(-pow((normalizedDist - 0.22) / 0.008, 2.0));
                     ringDensitySaturn *= cassiniGap * enckeGap * keelerGap * colomboGap * maxwellGap;
                     
-                    // Uranus rings based on Voyager 2 data (normalized to our ring geometry)
+                    // Uranus rings based on Voyager 2 data (normalized to our ring-3 geometry)
                     // Uranus radius: 25,559 km, inner ring: 1.4x, outer: 2.1x
                     // Positions calculated as (ringRadius - innerEdge) / ringWidth
                     float uranusBands = 0.0;
                     
-                    // Epsilon ring - brightest, widest (19.7-96.4 km width)
+                    // Epsilon ring-3 - brightest, widest (19.7-96.4 km width)
                     uranusBands += 1.00 * exp(-pow((normalizedDist - 0.859) / 0.035, 2.0));
                     
-                    // Lambda ring - narrow, dusty
+                    // Lambda ring-3 - narrow, dusty
                     uranusBands += 0.25 * exp(-pow((normalizedDist - 0.796) / 0.012, 2.0));
                     
-                    // Delta ring - narrow with shoulder
+                    // Delta ring-3 - narrow with shoulder
                     uranusBands += 0.50 * exp(-pow((normalizedDist - 0.700) / 0.018, 2.0));
                     
-                    // Gamma ring - narrow, optically dense
+                    // Gamma ring-3 - narrow, optically dense
                     uranusBands += 0.55 * exp(-pow((normalizedDist - 0.662) / 0.015, 2.0));
                     
-                    // Eta ring - narrow core + wide outer component
+                    // Eta ring-3 - narrow core + wide outer component
                     uranusBands += 0.40 * exp(-pow((normalizedDist - 0.636) / 0.020, 2.0));
                     
-                    // Beta ring - eccentric, bright
+                    // Beta ring-3 - eccentric, bright
                     uranusBands += 0.65 * exp(-pow((normalizedDist - 0.552) / 0.018, 2.0));
                     
-                    // Alpha ring - eccentric, bright
+                    // Alpha ring-3 - eccentric, bright
                     uranusBands += 0.60 * exp(-pow((normalizedDist - 0.499) / 0.016, 2.0));
                     
                     // Inner rings 4, 5, 6 - very narrow
@@ -2195,11 +2195,11 @@ export const TexturedPlanet = ({
                     vec3 outerColor = ringColor * vec3(0.95, 0.98, 1.05);
                     vec3 finalColor = mix(innerColor, outerColor, normalizedDist);
                     
-                    // B ring has slightly different hue (more golden)
+                    // B ring-3 has slightly different hue (more golden)
                     vec3 bRingTint = vec3(1.02, 1.0, 0.95);
                     finalColor = mix(finalColor, finalColor * bRingTint, ringB * 0.3);
                     
-                    // C ring is darker/grayer
+                    // C ring-3 is darker/grayer
                     vec3 cRingTint = vec3(0.85, 0.85, 0.88);
                     finalColor = mix(finalColor, finalColor * cRingTint, ringC * 0.5);
 
@@ -2218,7 +2218,7 @@ export const TexturedPlanet = ({
                     float edgeFade = smoothstep(0.0, 0.05, normalizedDist) * smoothstep(1.0, 0.95, normalizedDist);
                     float alpha = clamp(ringOpacity * edgeFade, 0.0, 0.95);
                     
-                    // Lit ring with enhanced brightness
+                    // Lit ring-3 with enhanced brightness
                     float ringBrightness = mix(1.8, 1.8, ringStyle);
                     vec3 litRing = finalColor * totalLight * ringBrightness;
                     

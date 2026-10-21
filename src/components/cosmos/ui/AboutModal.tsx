@@ -1,4 +1,5 @@
 import { useLanguage } from '@/i18n/LanguageContext';
+import { useSiteBrand } from '@/lib/site-brand';
 import { Button } from '@/components/ui/button';
 import { Globe, X, MapPin, Heart } from 'lucide-react';
 import portraitImg from '@/assets/dens-portrait.jpg';
@@ -110,6 +111,7 @@ interface AboutModalProps {
 
 export const AboutModal = ({ open, onOpenChange }: AboutModalProps) => {
   const { language } = useLanguage();
+  const brand = useSiteBrand();
   const t = translations[language];
   const currentYear = new Date().getFullYear();
 
@@ -130,7 +132,7 @@ export const AboutModal = ({ open, onOpenChange }: AboutModalProps) => {
         {/* Header - no emoji */}
         <div className="space-y-3">
           <h1 className="text-2xl sm:text-3xl font-bold text-white">
-            Cosmos Explorer
+            {brand === 'paledot' ? 'Pale Dot' : 'Cosmos Explorer'}
           </h1>
           <p className="text-sm text-white/60 max-w-md mx-auto">
             {t.description}
@@ -258,7 +260,7 @@ export const AboutModal = ({ open, onOpenChange }: AboutModalProps) => {
             {CHANGELOG.map((entry) => (
               <div key={entry.version} className="space-y-1">
                 <div className="flex items-center gap-2">
-                  <span className="px-1.5 py-0.5 bg-blue-500/20 text-blue-300 text-[10px] font-medium rounded">
+                  <span className="px-1.5 py-0.5 bg-blue-500/20 text-blue-300 text-[10px] font-medium rounded-[4px]">
                     v{entry.version}
                   </span>
                   <span className="text-white/40 text-[10px]">{entry.date}</span>
@@ -282,12 +284,12 @@ export const AboutModal = ({ open, onOpenChange }: AboutModalProps) => {
             <div className="bg-white/10 rounded-lg p-3 sm:p-4 space-y-2">
               <p className="text-white/90 font-medium text-sm">{t.techStack}</p>
               <div className="flex flex-wrap gap-1.5">
-                <span className="px-2 py-0.5 bg-blue-500/20 text-blue-300 text-[10px] font-medium rounded">React</span>
-                <span className="px-2 py-0.5 bg-blue-500/20 text-blue-300 text-[10px] font-medium rounded">TypeScript</span>
-                <span className="px-2 py-0.5 bg-blue-500/20 text-blue-300 text-[10px] font-medium rounded">Three.js</span>
-                <span className="px-2 py-0.5 bg-blue-500/20 text-blue-300 text-[10px] font-medium rounded">Tailwind CSS</span>
-                <span className="px-2 py-0.5 bg-white/10 text-white/60 text-[10px] font-medium rounded">Vite</span>
-                <span className="px-2 py-0.5 bg-white/10 text-white/60 text-[10px] font-medium rounded">Zustand</span>
+                <span className="px-2 py-0.5 bg-blue-500/20 text-blue-300 text-[10px] font-medium rounded-[4px]">React</span>
+                <span className="px-2 py-0.5 bg-blue-500/20 text-blue-300 text-[10px] font-medium rounded-[4px]">TypeScript</span>
+                <span className="px-2 py-0.5 bg-blue-500/20 text-blue-300 text-[10px] font-medium rounded-[4px]">Three.js</span>
+                <span className="px-2 py-0.5 bg-blue-500/20 text-blue-300 text-[10px] font-medium rounded-[4px]">Tailwind CSS</span>
+                <span className="px-2 py-0.5 bg-white/10 text-white/60 text-[10px] font-medium rounded-[4px]">Vite</span>
+                <span className="px-2 py-0.5 bg-white/10 text-white/60 text-[10px] font-medium rounded-[4px]">Zustand</span>
               </div>
             </div>
 

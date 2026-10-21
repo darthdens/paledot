@@ -11,6 +11,7 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import { AboutModal } from './AboutModal';
 import { AmbientMusicController } from './AmbientMusicController';
 import { isNativeApp } from '@/lib/platform';
+import { useSiteBrand } from '@/lib/site-brand';
 const translations = {
   en: {
     startTour: 'Start Guided Tour',
@@ -104,7 +105,9 @@ export const CosmosUI = () => {
   const isMobile = useIsMobile();
   // In the native iOS / iPadOS / macOS / visionOS app the experience is
   // already full-bleed, so the fullscreen toggle is unnecessary.
-  const native = isNativeApp();
+  const brand = useSiteBrand();
+  // Pale Dot is always full-bleed too, so it hides the fullscreen toggle like the native app.
+  const native = isNativeApp() || brand === 'paledot';
   // In fullscreen, dropdowns appear directly below the button row (h-8 = 32px + gap)
   const fullscreenDropdownOffsetPx = isMobile ? 40 : 44;
   const quickJumpButtonRef = useRef<HTMLButtonElement | null>(null);
@@ -230,14 +233,14 @@ export const CosmosUI = () => {
     const echoContainer = document.getElementById('echo-chat-container') as HTMLElement | null;
     if (echoContainer) {
       if (isFullscreen) {
-        if (echoContainer.dataset.cosmosPrevDisplay === undefined) {
-          echoContainer.dataset.cosmosPrevDisplay = echoContainer.style.display || '';
-          echoContainer.dataset.cosmosPrevDisplayPriority = echoContainer.style.getPropertyPriority('display') || '';
+        if (echoContainer.dataset["cosmosPrevDisplay"] === undefined) {
+          echoContainer.dataset["cosmosPrevDisplay"] = echoContainer.style.display || '';
+          echoContainer.dataset["cosmosPrevDisplayPriority"] = echoContainer.style.getPropertyPriority('display') || '';
         }
         echoContainer.style.setProperty('display', 'none', 'important');
-      } else if (echoContainer.dataset.cosmosPrevDisplay !== undefined) {
-        const prevDisplay = echoContainer.dataset.cosmosPrevDisplay || '';
-        const prevPriority = echoContainer.dataset.cosmosPrevDisplayPriority || '';
+      } else if (echoContainer.dataset["cosmosPrevDisplay"] !== undefined) {
+        const prevDisplay = echoContainer.dataset["cosmosPrevDisplay"] || '';
+        const prevPriority = echoContainer.dataset["cosmosPrevDisplayPriority"] || '';
 
         if (!prevDisplay) {
           echoContainer.style.removeProperty('display');
@@ -245,20 +248,20 @@ export const CosmosUI = () => {
           echoContainer.style.setProperty('display', prevDisplay, prevPriority || undefined);
         }
 
-        delete echoContainer.dataset.cosmosPrevDisplay;
-        delete echoContainer.dataset.cosmosPrevDisplayPriority;
+        delete echoContainer.dataset["cosmosPrevDisplay"];
+        delete echoContainer.dataset["cosmosPrevDisplayPriority"];
       }
     }
 
     return () => {
       setPageChromeHidden(false);
-      if (echoContainer && echoContainer.dataset.cosmosPrevDisplay !== undefined) {
-        const prevDisplay = echoContainer.dataset.cosmosPrevDisplay || '';
-        const prevPriority = echoContainer.dataset.cosmosPrevDisplayPriority || '';
+      if (echoContainer && echoContainer.dataset["cosmosPrevDisplay"] !== undefined) {
+        const prevDisplay = echoContainer.dataset["cosmosPrevDisplay"] || '';
+        const prevPriority = echoContainer.dataset["cosmosPrevDisplayPriority"] || '';
         if (!prevDisplay) echoContainer.style.removeProperty('display');
         else echoContainer.style.setProperty('display', prevDisplay, prevPriority || undefined);
-        delete echoContainer.dataset.cosmosPrevDisplay;
-        delete echoContainer.dataset.cosmosPrevDisplayPriority;
+        delete echoContainer.dataset["cosmosPrevDisplay"];
+        delete echoContainer.dataset["cosmosPrevDisplayPriority"];
       }
     };
   }, [isFullscreen, setPageChromeHidden]);
@@ -277,7 +280,7 @@ export const CosmosUI = () => {
     ] as const;
 
     keys.forEach((key) => {
-      const datasetKey = `cosmosPrev${key[0].toUpperCase()}${key.slice(1)}`;
+      const datasetKey = `cosmosPrev${key[0]!.toUpperCase()}${key.slice(1)}`;
       if ((el.dataset as any)[datasetKey] === undefined) {
         (el.dataset as any)[datasetKey] = (el.style as any)[key] ?? '';
       }
@@ -298,7 +301,7 @@ export const CosmosUI = () => {
     ] as const;
 
     keys.forEach((key) => {
-      const datasetKey = `cosmosPrev${key[0].toUpperCase()}${key.slice(1)}`;
+      const datasetKey = `cosmosPrev${key[0]!.toUpperCase()}${key.slice(1)}`;
       const prev = (el.dataset as any)[datasetKey];
       (el.style as any)[key] = prev ?? '';
       delete (el.dataset as any)[datasetKey];
@@ -330,9 +333,9 @@ export const CosmosUI = () => {
       // Hide Echo widget in fullscreen (we do not modify the widget itself; we only hide its container)
       const echoContainer = document.getElementById('echo-chat-container') as HTMLElement | null;
       if (echoContainer) {
-        if (echoContainer.dataset.cosmosPrevDisplay === undefined) {
-          echoContainer.dataset.cosmosPrevDisplay = echoContainer.style.display || '';
-          echoContainer.dataset.cosmosPrevDisplayPriority = echoContainer.style.getPropertyPriority('display') || '';
+        if (echoContainer.dataset["cosmosPrevDisplay"] === undefined) {
+          echoContainer.dataset["cosmosPrevDisplay"] = echoContainer.style.display || '';
+          echoContainer.dataset["cosmosPrevDisplayPriority"] = echoContainer.style.getPropertyPriority('display') || '';
         }
         echoContainer.style.setProperty('display', 'none', 'important');
       }
@@ -355,9 +358,9 @@ export const CosmosUI = () => {
 
       // Restore Echo widget
       const echoContainer = document.getElementById('echo-chat-container') as HTMLElement | null;
-      if (echoContainer && echoContainer.dataset.cosmosPrevDisplay !== undefined) {
-        const prevDisplay = echoContainer.dataset.cosmosPrevDisplay || '';
-        const prevPriority = echoContainer.dataset.cosmosPrevDisplayPriority || '';
+      if (echoContainer && echoContainer.dataset["cosmosPrevDisplay"] !== undefined) {
+        const prevDisplay = echoContainer.dataset["cosmosPrevDisplay"] || '';
+        const prevPriority = echoContainer.dataset["cosmosPrevDisplayPriority"] || '';
 
         if (!prevDisplay) {
           echoContainer.style.removeProperty('display');
@@ -365,8 +368,8 @@ export const CosmosUI = () => {
           echoContainer.style.setProperty('display', prevDisplay, prevPriority || undefined);
         }
 
-        delete echoContainer.dataset.cosmosPrevDisplay;
-        delete echoContainer.dataset.cosmosPrevDisplayPriority;
+        delete echoContainer.dataset["cosmosPrevDisplay"];
+        delete echoContainer.dataset["cosmosPrevDisplayPriority"];
       }
 
       document.documentElement.style.overflow = '';
@@ -526,7 +529,7 @@ export const CosmosUI = () => {
       {showControlHints && (
         <div className="absolute inset-0 flex items-center justify-center bg-black z-[20000] p-3 animate-fade-in">
           <div className="text-center space-y-3 sm:space-y-5 max-w-sm sm:max-w-lg px-4">
-            <h1 className="text-xl sm:text-3xl md:text-4xl font-bold text-white leading-tight">{t.welcome}</h1>
+            <h1 className="text-xl sm:text-3xl md:text-4xl font-bold text-white leading-tight">{brand === 'paledot' ? (language === 'fr' ? 'Bienvenue dans Pale Dot' : 'Welcome to Pale Dot') : t.welcome}</h1>
             <p className="text-sm sm:text-base text-white/70">{t.subtitle}</p>
 
             <div className={`grid gap-3 text-left ${isMobile ? 'grid-cols-1' : 'grid-cols-1 sm:grid-cols-2'}`}>
@@ -623,7 +626,7 @@ export const CosmosUI = () => {
             {!native && (
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Button size="icon" variant="ghost" onClick={toggleFullscreen} className="h-8 w-8 sm:h-9 sm:w-9 bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white">
+                  <Button size="icon" variant="ghost" onClick={toggleFullscreen} className="h-8 w-8 sm:h-9 sm:w-9 bg-white/10 hover:bg-white/20 backdrop-blur-xs text-white">
                     {isFullscreen ? <Minimize className="w-4 h-4 sm:w-5 sm:h-5" /> : <Maximize className="w-4 h-4 sm:w-5 sm:h-5" />}
                   </Button>
                 </TooltipTrigger>
@@ -635,7 +638,7 @@ export const CosmosUI = () => {
 
             <Tooltip>
               <TooltipTrigger asChild>
-                <Button ref={quickJumpButtonRef} size="icon" variant="ghost" onClick={handleQuickJumpClick} className={`h-8 w-8 sm:h-9 sm:w-9 backdrop-blur-sm text-white ${showQuickJump ? 'bg-white/25' : 'bg-white/10 hover:bg-white/20'}`}>
+                <Button ref={quickJumpButtonRef} size="icon" variant="ghost" onClick={handleQuickJumpClick} className={`h-8 w-8 sm:h-9 sm:w-9 backdrop-blur-xs text-white ${showQuickJump ? 'bg-white/25' : 'bg-white/10 hover:bg-white/20'}`}>
                   <Compass className="w-4 h-4 sm:w-5 sm:h-5" />
                 </Button>
               </TooltipTrigger>
@@ -646,7 +649,7 @@ export const CosmosUI = () => {
 
             <Tooltip>
               <TooltipTrigger asChild>
-                <Button size="icon" variant="ghost" onClick={goHome} className="h-8 w-8 sm:h-9 sm:w-9 bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white">
+                <Button size="icon" variant="ghost" onClick={goHome} className="h-8 w-8 sm:h-9 sm:w-9 bg-white/10 hover:bg-white/20 backdrop-blur-xs text-white">
                   <Home className="w-4 h-4 sm:w-5 sm:h-5" />
                 </Button>
               </TooltipTrigger>
@@ -669,7 +672,7 @@ export const CosmosUI = () => {
               
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Button size="icon" variant="ghost" onClick={toggleOrbits} className={`h-9 w-9 backdrop-blur-sm text-white ${showOrbits ? 'bg-white/25' : 'bg-white/10 hover:bg-white/20'}`}>
+                  <Button size="icon" variant="ghost" onClick={toggleOrbits} className={`h-9 w-9 backdrop-blur-xs text-white ${showOrbits ? 'bg-white/25' : 'bg-white/10 hover:bg-white/20'}`}>
                     {showOrbits ? <CircleDot className="w-5 h-5" /> : <CircleOff className="w-5 h-5" />}
                   </Button>
                 </TooltipTrigger>
@@ -680,7 +683,7 @@ export const CosmosUI = () => {
 
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Button size="icon" variant="ghost" onClick={toggleTrails} className={`h-9 w-9 backdrop-blur-sm text-white ${showTrails ? 'bg-white/25' : 'bg-white/10 hover:bg-white/20'}`}>
+                  <Button size="icon" variant="ghost" onClick={toggleTrails} className={`h-9 w-9 backdrop-blur-xs text-white ${showTrails ? 'bg-white/25' : 'bg-white/10 hover:bg-white/20'}`}>
                     <Orbit className="w-5 h-5" />
                   </Button>
                 </TooltipTrigger>
@@ -691,7 +694,7 @@ export const CosmosUI = () => {
 
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Button ref={timeSpeedButtonRef} size="icon" variant="ghost" onClick={() => setShowTimeSlider(!showTimeSlider)} className={`h-9 w-9 backdrop-blur-sm text-white ${showTimeSlider ? 'bg-white/25' : 'bg-white/10 hover:bg-white/20'}`}>
+                  <Button ref={timeSpeedButtonRef} size="icon" variant="ghost" onClick={() => setShowTimeSlider(!showTimeSlider)} className={`h-9 w-9 backdrop-blur-xs text-white ${showTimeSlider ? 'bg-white/25' : 'bg-white/10 hover:bg-white/20'}`}>
                     <Clock className="w-5 h-5" />
                   </Button>
                 </TooltipTrigger>
@@ -702,7 +705,7 @@ export const CosmosUI = () => {
 
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Button size="icon" variant="ghost" onClick={toggleSizeComparison} className="h-9 w-9 bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white">
+                  <Button size="icon" variant="ghost" onClick={toggleSizeComparison} className="h-9 w-9 bg-white/10 hover:bg-white/20 backdrop-blur-xs text-white">
                     <BarChart3 className="w-5 h-5" />
                   </Button>
                 </TooltipTrigger>
@@ -715,7 +718,7 @@ export const CosmosUI = () => {
               
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Button size="icon" variant="ghost" onClick={() => setShowControlHints(true)} className="h-9 w-9 bg-blue-500/30 hover:bg-blue-500/50 backdrop-blur-sm text-white">
+                  <Button size="icon" variant="ghost" onClick={() => setShowControlHints(true)} className="h-9 w-9 bg-blue-500/30 hover:bg-blue-500/50 backdrop-blur-xs text-white">
                     <HelpCircle className="w-5 h-5" />
                   </Button>
                 </TooltipTrigger>
@@ -726,7 +729,7 @@ export const CosmosUI = () => {
 
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Button size="icon" variant="ghost" onClick={() => setShowAbout(true)} className="h-9 w-9 bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white">
+                  <Button size="icon" variant="ghost" onClick={() => setShowAbout(true)} className="h-9 w-9 bg-white/10 hover:bg-white/20 backdrop-blur-xs text-white">
                     <Info className="w-5 h-5" />
                   </Button>
                 </TooltipTrigger>
@@ -744,7 +747,7 @@ export const CosmosUI = () => {
                   size="icon" 
                   variant="ghost" 
                   onClick={() => setShowMoreMenu(!showMoreMenu)} 
-                  className={`lg:hidden h-8 w-8 sm:h-9 sm:w-9 backdrop-blur-sm text-white ${showMoreMenu ? 'bg-white/25' : 'bg-white/10 hover:bg-white/20'}`}
+                  className={`lg:hidden h-8 w-8 sm:h-9 sm:w-9 backdrop-blur-xs text-white ${showMoreMenu ? 'bg-white/25' : 'bg-white/10 hover:bg-white/20'}`}
                 >
                   <MoreVertical className="w-4 h-4 sm:w-5 sm:h-5" />
                 </Button>
@@ -760,7 +763,7 @@ export const CosmosUI = () => {
       {/* Mobile & Tablet more menu - same style as QuickJump */}
       <div
         ref={moreMenuRef}
-        className={`lg:hidden ${isFullscreen ? 'fixed' : 'absolute'} z-[10001] bg-white/10 backdrop-blur-sm rounded-lg overflow-hidden transition-all duration-300 ease-out ${
+        className={`lg:hidden ${isFullscreen ? 'fixed' : 'absolute'} z-[10001] bg-white/10 backdrop-blur-xs rounded-lg overflow-hidden transition-all duration-300 ease-out ${
           showMoreMenu ? 'opacity-100 scale-100' : 'opacity-0 scale-95 pointer-events-none'
         }`}
         style={
@@ -781,7 +784,7 @@ export const CosmosUI = () => {
               {/* Toggle options */}
               <button
                 onClick={() => { toggleOrbits(); }}
-                className="w-full flex items-center justify-between p-2 rounded hover:bg-white/10 transition-colors"
+                className="w-full flex items-center justify-between p-2 rounded-[4px] hover:bg-white/10 transition-colors"
               >
                 <div className="flex items-center gap-2">
                   {showOrbits ? <CircleDot className="w-4 h-4 text-white/70" /> : <CircleOff className="w-4 h-4 text-white/70" />}
@@ -792,7 +795,7 @@ export const CosmosUI = () => {
 
               <button
                 onClick={() => { toggleTrails(); }}
-                className="w-full flex items-center justify-between p-2 rounded hover:bg-white/10 transition-colors"
+                className="w-full flex items-center justify-between p-2 rounded-[4px] hover:bg-white/10 transition-colors"
               >
                 <div className="flex items-center gap-2">
                   <Orbit className="w-4 h-4 text-white/70" />
@@ -803,7 +806,7 @@ export const CosmosUI = () => {
 
               <button
                 onClick={() => { setShowTimeSlider(!showTimeSlider); setShowMoreMenu(false); }}
-                className="w-full flex items-center justify-between p-2 rounded hover:bg-white/10 transition-colors"
+                className="w-full flex items-center justify-between p-2 rounded-[4px] hover:bg-white/10 transition-colors"
               >
                 <div className="flex items-center gap-2">
                   <Clock className="w-4 h-4 text-white/70" />
@@ -814,7 +817,7 @@ export const CosmosUI = () => {
 
               <button
                 onClick={() => { toggleSizeComparison(); setShowMoreMenu(false); }}
-                className="w-full flex items-center gap-2 p-2 rounded hover:bg-white/10 transition-colors"
+                className="w-full flex items-center gap-2 p-2 rounded-[4px] hover:bg-white/10 transition-colors"
               >
                 <BarChart3 className="w-4 h-4 text-white/70" />
                 <span className="text-sm text-white/90">{t.sizeComparison}</span>
@@ -825,7 +828,7 @@ export const CosmosUI = () => {
 
               <button
                 onClick={() => { setShowControlHints(true); setShowMoreMenu(false); }}
-                className="w-full flex items-center justify-between p-2 rounded hover:bg-white/10 transition-colors"
+                className="w-full flex items-center justify-between p-2 rounded-[4px] hover:bg-white/10 transition-colors"
               >
                 <div className="flex items-center gap-2">
                   <HelpCircle className="w-4 h-4 text-white/70" />
@@ -836,7 +839,7 @@ export const CosmosUI = () => {
 
               <button
                 onClick={() => { setShowAbout(true); setShowMoreMenu(false); }}
-                className="w-full flex items-center gap-2 p-2 rounded hover:bg-white/10 transition-colors"
+                className="w-full flex items-center gap-2 p-2 rounded-[4px] hover:bg-white/10 transition-colors"
               >
                 <Info className="w-4 h-4 text-white/70" />
                 <span className="text-sm text-white/90">{t.about}</span>
@@ -850,7 +853,7 @@ export const CosmosUI = () => {
       {!showControlHints && (
         <div
           ref={timeSliderRef}
-          className={`${isFullscreen ? 'fixed' : 'absolute'} top-12 right-2 sm:top-[68px] sm:right-4 z-[10000] bg-white/10 backdrop-blur-sm rounded-lg overflow-hidden transition-all duration-300 ease-out ${
+          className={`${isFullscreen ? 'fixed' : 'absolute'} top-12 right-2 sm:top-[68px] sm:right-4 z-[10000] bg-white/10 backdrop-blur-xs rounded-lg overflow-hidden transition-all duration-300 ease-out ${
             showTimeSlider ? 'opacity-100 scale-100' : 'opacity-0 scale-95 pointer-events-none'
           }`}
           style={
@@ -875,7 +878,7 @@ export const CosmosUI = () => {
                 </div>
                 <Slider
                   value={[timeSpeed]}
-                  onValueChange={([value]) => setTimeSpeed(value)}
+                  onValueChange={([value]) => setTimeSpeed(value!)}
                   min={0}
                   max={10}
                   step={0.5}

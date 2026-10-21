@@ -180,7 +180,7 @@ export const QuickJumpMenu = () => {
   const menu = (
     <div
       ref={menuRef}
-      className={`${isFullscreen ? 'fixed' : 'absolute'} z-[10001] bg-white/10 backdrop-blur-sm rounded-lg overflow-hidden transition-all duration-300 ease-out ${
+      className={`${isFullscreen ? 'fixed' : 'absolute'} z-[10001] bg-white/10 backdrop-blur-xs rounded-lg overflow-hidden transition-all duration-300 ease-out ${
         showQuickJump ? 'opacity-100 scale-100' : 'opacity-0 scale-95 pointer-events-none'
       }`}
       style={
@@ -241,7 +241,7 @@ export const QuickJumpMenu = () => {
                   <button
                     key={id}
                     onClick={() => handleJump(id)}
-                    className="px-2 py-0.5 bg-white/10 hover:bg-white/20 rounded text-xs text-white/80 hover:text-white transition-colors"
+                    className="px-2 py-0.5 bg-white/10 hover:bg-white/20 rounded-[4px] text-xs text-white/80 hover:text-white transition-colors"
                   >
                     {obj.name[language]}
                   </button>
@@ -261,7 +261,7 @@ export const QuickJumpMenu = () => {
                 {/* Category header */}
                 <button
                   onClick={() => toggleCategory(category.id)}
-                  className={`w-full flex items-center justify-between p-1.5 sm:p-2 rounded transition-colors ${
+                  className={`w-full flex items-center justify-between p-1.5 sm:p-2 rounded-[4px] transition-colors ${
                     !expandable 
                       ? 'opacity-60 cursor-not-allowed' 
                       : 'hover:bg-white/10'
@@ -273,7 +273,7 @@ export const QuickJumpMenu = () => {
                       {category.name[language]}
                     </span>
                     {!expandable && (
-                      <span className="flex items-center gap-1 px-1.5 py-0.5 bg-amber-500/20 border border-amber-500/30 rounded text-[10px] text-amber-400">
+                      <span className="flex items-center gap-1 px-1.5 py-0.5 bg-amber-500/20 border border-amber-500/30 rounded-[4px] text-[10px] text-amber-400">
                         <Clock className="w-2.5 h-2.5" />
                         {t.comingSoon}
                       </span>
@@ -307,7 +307,7 @@ export const QuickJumpMenu = () => {
                               key={locationId}
                               onClick={() => implemented && handleJump(locationId)}
                               disabled={!implemented}
-                              className={`w-full flex items-center gap-2 p-1.5 rounded transition-colors text-left ${
+                              className={`w-full flex items-center gap-2 p-1.5 rounded-[4px] transition-colors text-left ${
                                 implemented 
                                   ? 'hover:bg-white/10 cursor-pointer' 
                                   : 'opacity-50 cursor-not-allowed'
@@ -321,7 +321,7 @@ export const QuickJumpMenu = () => {
                                 {obj.name[language]}
                               </span>
                               {!implemented && (
-                                <span className="flex items-center gap-0.5 px-1 py-0.5 bg-amber-500/20 border border-amber-500/30 rounded text-[8px] text-amber-400 ml-auto shrink-0">
+                                <span className="flex items-center gap-0.5 px-1 py-0.5 bg-amber-500/20 border border-amber-500/30 rounded-[4px] text-[8px] text-amber-400 ml-auto shrink-0">
                                   <Clock className="w-2 h-2" />
                                 </span>
                               )}

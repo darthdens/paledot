@@ -18,5 +18,6 @@ export const useGeometryReady = (geometryId: string, isReady: boolean = true) =>
       }, 0);
       return () => window.clearTimeout(id);
     }
+    return undefined;
   }, [isReady, geometryId, markGeometryReady]);
 };

@@ -61,9 +61,9 @@ const seededRandom = (seed: number) => {
 
 const isInVoid = (x: number, y: number, z: number): boolean => {
   for (const v of COSMIC_VOIDS) {
-    const dx = x - v.position[0];
-    const dy = y - v.position[1];
-    const dz = z - v.position[2];
+    const dx = x - v.position[0]!;
+    const dy = y - v.position[1]!;
+    const dz = z - v.position[2]!;
     if (dx * dx + dy * dy + dz * dz < v.radius * v.radius * 0.5) {
       return true;
     }
@@ -77,13 +77,13 @@ const generateSuperclusterFilaments = (structures: Supercluster[], maxDist: numb
   
   for (let i = 0; i < structures.length; i++) {
     for (let j = i + 1; j < structures.length; j++) {
-      const from = new THREE.Vector3(...structures[i].position);
-      const to = new THREE.Vector3(...structures[j].position);
+      const from = new THREE.Vector3(...structures[i]!.position);
+      const to = new THREE.Vector3(...structures[j]!.position);
       const dist = from.distanceTo(to);
       
       if (dist < maxDist && dist > 30) {
         const strength = (1 - dist / maxDist) * 
-          structures[i].galaxyDensity * structures[j].galaxyDensity;
+          structures[i]!.galaxyDensity * structures[j]!.galaxyDensity;
         filaments.push({ from, to, strength });
       }
     }
@@ -296,10 +296,10 @@ export const Laniakea = ({ visualScale }: LaniakeaProps) => {
     const opacity = Math.min(fadeIn, fadeOut);
     
     if (superclusterPointsRef.current) {
-      (superclusterMaterial as THREE.ShaderMaterial).uniforms.uOpacity.value = opacity * 0.85;
+      (superclusterMaterial as THREE.ShaderMaterial).uniforms["uOpacity"]!.value = opacity * 0.85;
     }
     if (filamentPointsRef.current) {
-      (filamentMaterial as THREE.ShaderMaterial).uniforms.uOpacity.value = opacity * 0.7;
+      (filamentMaterial as THREE.ShaderMaterial).uniforms["uOpacity"]!.value = opacity * 0.7;
     }
   });
   

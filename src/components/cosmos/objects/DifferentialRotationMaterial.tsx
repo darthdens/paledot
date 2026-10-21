@@ -112,18 +112,18 @@ export const useDifferentialRotationMaterial = ({
   // Update uniforms when props change (without recreating material)
   useEffect(() => {
     if (materialRef.current) {
-      materialRef.current.uniforms.uSize.value = size;
-      materialRef.current.uniforms.uOpacity.value = opacity;
-      materialRef.current.uniforms.uMaxRadius.value = maxRadius;
-      materialRef.current.uniforms.uRotationMultiplier.value = rotationMultiplier;
-      materialRef.current.uniforms.uDifferentialStrength.value = differentialStrength;
+      materialRef.current.uniforms["uSize"]!.value = size;
+      materialRef.current.uniforms["uOpacity"]!.value = opacity;
+      materialRef.current.uniforms["uMaxRadius"]!.value = maxRadius;
+      materialRef.current.uniforms["uRotationMultiplier"]!.value = rotationMultiplier;
+      materialRef.current.uniforms["uDifferentialStrength"]!.value = differentialStrength;
     }
   }, [size, opacity, maxRadius, rotationMultiplier, differentialStrength]);
 
   // Only sync time from global - don't update global here
   useFrame(() => {
     if (materialRef.current) {
-      materialRef.current.uniforms.uTime.value = globalGalaxyTime.value;
+      materialRef.current.uniforms["uTime"]!.value = globalGalaxyTime.value;
     }
   });
 

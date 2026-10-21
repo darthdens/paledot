@@ -54,7 +54,7 @@ export const celestialObjects: CelestialObject[] = [
     distanceUnit: 'AU',
     category: 'solarSystem',
     orbitRadius: 0.39 * UNITS.KM_PER_AU,
-    orbitPeriodDays: ORBITAL_PERIODS.mercury,
+    orbitPeriodDays: ORBITAL_PERIODS["mercury"]!,
     facts: {
       en: ['Smallest planet in solar system', 'Orbital period: 88 days', 'No atmosphere'],
       fr: ['Plus petite planète du système solaire', 'Période orbitale: 88 jours', 'Pas d\'atmosphère'],
@@ -72,7 +72,7 @@ export const celestialObjects: CelestialObject[] = [
     distanceUnit: 'AU',
     category: 'solarSystem',
     orbitRadius: 0.72 * UNITS.KM_PER_AU,
-    orbitPeriodDays: ORBITAL_PERIODS.venus,
+    orbitPeriodDays: ORBITAL_PERIODS["venus"]!,
     facts: {
       en: ['Hottest planet (462°C)', 'Rotates backwards', 'Day longer than year'],
       fr: ['Planète la plus chaude (462°C)', 'Rotation rétrograde', 'Jour plus long que l\'année'],
@@ -90,7 +90,7 @@ export const celestialObjects: CelestialObject[] = [
     distanceUnit: 'km',
     category: 'solarSystem',
     orbitRadius: UNITS.KM_PER_AU,
-    orbitPeriodDays: ORBITAL_PERIODS.earth,
+    orbitPeriodDays: ORBITAL_PERIODS["earth"]!,
     facts: {
       en: ['Only known planet with life', 'Age: 4.5 billion years', '71% covered by water'],
       fr: ['Seule planète connue avec la vie', 'Âge: 4,5 milliards d\'années', '71% couverte d\'eau'],
@@ -108,7 +108,7 @@ export const celestialObjects: CelestialObject[] = [
     distanceUnit: 'km',
     category: 'solarSystem',
     orbitRadius: 384400,
-    orbitPeriodDays: ORBITAL_PERIODS.moon,
+    orbitPeriodDays: ORBITAL_PERIODS["moon"]!,
     parentId: 'earth',
     facts: {
       en: ['Earth\'s only natural satellite', 'Formed 4.5 billion years ago', 'Causes tides on Earth'],
@@ -127,7 +127,7 @@ export const celestialObjects: CelestialObject[] = [
     distanceUnit: 'AU',
     category: 'solarSystem',
     orbitRadius: 1.52 * UNITS.KM_PER_AU,
-    orbitPeriodDays: ORBITAL_PERIODS.mars,
+    orbitPeriodDays: ORBITAL_PERIODS["mars"]!,
     facts: {
       en: ['The Red Planet', 'Has the largest volcano (Olympus Mons)', 'Fourth planet from the Sun'],
       fr: ['La planète rouge', 'Possède le plus grand volcan (Olympus Mons)', 'Quatrième planète du Soleil'],
@@ -145,7 +145,7 @@ export const celestialObjects: CelestialObject[] = [
     distanceUnit: 'AU',
     category: 'solarSystem',
     orbitRadius: 2.77 * UNITS.KM_PER_AU,
-    orbitPeriodDays: ORBITAL_PERIODS.ceres,
+    orbitPeriodDays: ORBITAL_PERIODS["ceres"]!,
     facts: {
       en: ['Largest object in asteroid belt', 'Only dwarf planet in inner solar system', 'Contains 1/3 of asteroid belt mass'],
       fr: ['Plus gros objet de la ceinture', 'Seule planète naine interne', 'Contient 1/3 de la masse de la ceinture'],
@@ -163,7 +163,7 @@ export const celestialObjects: CelestialObject[] = [
     distanceUnit: 'AU',
     category: 'solarSystem',
     orbitRadius: 5.2 * UNITS.KM_PER_AU,
-    orbitPeriodDays: ORBITAL_PERIODS.jupiter,
+    orbitPeriodDays: ORBITAL_PERIODS["jupiter"]!,
     facts: {
       en: ['Largest planet in solar system', 'Great Red Spot storm', '95 known moons'],
       fr: ['Plus grande planète du système solaire', 'Grande Tache Rouge', '95 lunes connues'],
@@ -181,7 +181,7 @@ export const celestialObjects: CelestialObject[] = [
     distanceUnit: 'AU',
     category: 'solarSystem',
     orbitRadius: 421800,
-    orbitPeriodDays: ORBITAL_PERIODS.io,
+    orbitPeriodDays: ORBITAL_PERIODS["io"]!,
     parentId: 'jupiter',
     facts: {
       en: ['Most volcanically active body', 'Over 400 active volcanoes', 'Sulfur-covered surface'],
@@ -199,7 +199,7 @@ export const celestialObjects: CelestialObject[] = [
     distanceUnit: 'AU',
     category: 'solarSystem',
     orbitRadius: 671100,
-    orbitPeriodDays: ORBITAL_PERIODS.europa,
+    orbitPeriodDays: ORBITAL_PERIODS["europa"]!,
     parentId: 'jupiter',
     facts: {
       en: ['Has subsurface ocean', 'Possible conditions for life', 'Smoothest surface in solar system'],
@@ -217,7 +217,7 @@ export const celestialObjects: CelestialObject[] = [
     distanceUnit: 'AU',
     category: 'solarSystem',
     orbitRadius: 1070400,
-    orbitPeriodDays: ORBITAL_PERIODS.ganymede,
+    orbitPeriodDays: ORBITAL_PERIODS["ganymede"]!,
     parentId: 'jupiter',
     facts: {
       en: ['Largest moon in solar system', 'Larger than Mercury', 'Has its own magnetic field'],
@@ -235,7 +235,7 @@ export const celestialObjects: CelestialObject[] = [
     distanceUnit: 'AU',
     category: 'solarSystem',
     orbitRadius: 1882700,
-    orbitPeriodDays: ORBITAL_PERIODS.callisto,
+    orbitPeriodDays: ORBITAL_PERIODS["callisto"]!,
     parentId: 'jupiter',
     facts: {
       en: ['Most heavily cratered object', 'May have subsurface ocean', 'Ancient, geologically dead'],
@@ -254,7 +254,7 @@ export const celestialObjects: CelestialObject[] = [
     distanceUnit: 'AU',
     category: 'solarSystem',
     orbitRadius: 9.5 * UNITS.KM_PER_AU,
-    orbitPeriodDays: ORBITAL_PERIODS.saturn,
+    orbitPeriodDays: ORBITAL_PERIODS["saturn"]!,
     facts: {
       en: ['Famous for its rings', 'Could float on water', '146 known moons'],
       fr: ['Célèbre pour ses anneaux', 'Pourrait flotter sur l\'eau', '146 lunes connues'],
@@ -272,7 +272,7 @@ export const celestialObjects: CelestialObject[] = [
     distanceUnit: 'AU',
     category: 'solarSystem',
     orbitRadius: 238042,
-    orbitPeriodDays: ORBITAL_PERIODS.enceladus,
+    orbitPeriodDays: ORBITAL_PERIODS["enceladus"]!,
     parentId: 'saturn',
     facts: {
       en: ['Brightest object in solar system', 'Has water geysers', 'Possible conditions for life'],
@@ -291,7 +291,7 @@ export const celestialObjects: CelestialObject[] = [
     distanceUnit: 'AU',
     category: 'solarSystem',
     orbitRadius: 1221870,
-    orbitPeriodDays: ORBITAL_PERIODS.titan,
+    orbitPeriodDays: ORBITAL_PERIODS["titan"]!,
     parentId: 'saturn',
     facts: {
       en: ['Only moon with dense atmosphere', 'Lakes of liquid methane', 'Larger than Mercury'],
@@ -310,7 +310,7 @@ export const celestialObjects: CelestialObject[] = [
     distanceUnit: 'AU',
     category: 'solarSystem',
     orbitRadius: 3560854,
-    orbitPeriodDays: ORBITAL_PERIODS.iapetus,
+    orbitPeriodDays: ORBITAL_PERIODS["iapetus"]!,
     parentId: 'saturn',
     facts: {
       en: ['Two-toned coloring (light/dark)', 'Has an equatorial ridge', 'Third largest moon of Saturn'],
@@ -329,7 +329,7 @@ export const celestialObjects: CelestialObject[] = [
     distanceUnit: 'AU',
     category: 'solarSystem',
     orbitRadius: 19.2 * UNITS.KM_PER_AU,
-    orbitPeriodDays: ORBITAL_PERIODS.uranus,
+    orbitPeriodDays: ORBITAL_PERIODS["uranus"]!,
     facts: {
       en: ['Rotates on its side', 'Ice giant', 'Coldest atmosphere (-224°C)'],
       fr: ['Tourne sur le côté', 'Géante de glace', 'Atmosphère la plus froide (-224°C)'],
@@ -347,7 +347,7 @@ export const celestialObjects: CelestialObject[] = [
     distanceUnit: 'AU',
     category: 'solarSystem',
     orbitRadius: 30.1 * UNITS.KM_PER_AU,
-    orbitPeriodDays: ORBITAL_PERIODS.neptune,
+    orbitPeriodDays: ORBITAL_PERIODS["neptune"]!,
     facts: {
       en: ['Strongest winds in solar system', 'Discovered mathematically', '14 known moons'],
       fr: ['Vents les plus forts du système', 'Découverte mathématiquement', '14 lunes connues'],
@@ -365,7 +365,7 @@ export const celestialObjects: CelestialObject[] = [
     distanceUnit: 'AU',
     category: 'solarSystem',
     orbitRadius: 354759,
-    orbitPeriodDays: ORBITAL_PERIODS.triton,
+    orbitPeriodDays: ORBITAL_PERIODS["triton"]!,
     parentId: 'neptune',
     facts: {
       en: ['Only large moon with retrograde orbit', 'Coldest known object (-235°C)', 'Has nitrogen geysers'],
@@ -384,7 +384,7 @@ export const celestialObjects: CelestialObject[] = [
     distanceUnit: 'AU',
     category: 'solarSystem',
     orbitRadius: 39.5 * UNITS.KM_PER_AU,
-    orbitPeriodDays: ORBITAL_PERIODS.pluto,
+    orbitPeriodDays: ORBITAL_PERIODS["pluto"]!,
     facts: {
       en: ['Reclassified as dwarf planet in 2006', 'Has a heart-shaped glacier', '5 known moons'],
       fr: ['Reclassée planète naine en 2006', 'Glacier en forme de cœur', '5 lunes connues'],

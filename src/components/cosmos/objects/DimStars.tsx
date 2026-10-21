@@ -110,9 +110,9 @@ export const DimStars = forwardRef<THREE.Points, DimStarsProps>(
 
     useFrame((state) => {
       if (!materialRef.current) return;
-      materialRef.current.uniforms.time.value = state.clock.elapsedTime * speed;
-      materialRef.current.uniforms.uOpacity.value = opacity;
-      materialRef.current.uniforms.fade.value = fade ? 1.0 : 0.0;
+      materialRef.current.uniforms["time"]!.value = state.clock.elapsedTime * speed;
+      materialRef.current.uniforms["uOpacity"]!.value = opacity;
+      materialRef.current.uniforms["fade"]!.value = fade ? 1.0 : 0.0;
     });
 
     const threeBlending = blending === "additive" ? THREE.AdditiveBlending : THREE.NormalBlending;

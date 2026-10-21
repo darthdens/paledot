@@ -1,0 +1,3 @@
+{"functions": [
+  {"name": "send-contact-notification", "classification": "unknown", "signal": "no call sites in src/ and no signature check; URL may be called externally", "outcome": "left"}
+]}

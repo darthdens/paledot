@@ -184,20 +184,20 @@ export const AsteroidBelt = ({
     
     simTime.current += delta * timeSpeed;
     
-    const positions = pointsRef.current.geometry.attributes.position.array as Float32Array;
+    const positions = pointsRef.current.geometry.attributes["position"]!.array as Float32Array;
     const { radii, heights, speeds, phases } = asteroidData;
     
     // Update positions based on orbital motion using stored radii
     for (let i = 0; i < count; i++) {
       const radius = radii[i];
-      const currentAngle = phases[i] + simTime.current * speeds[i];
+      const currentAngle = phases[i]! + simTime.current * speeds[i]!;
       
-      positions[i * 3] = Math.cos(currentAngle) * radius;
-      positions[i * 3 + 1] = heights[i]; // Keep original height
-      positions[i * 3 + 2] = Math.sin(currentAngle) * radius;
+      positions[i * 3] = Math.cos(currentAngle) * radius!;
+      positions[i * 3 + 1] = heights[i]!; // Keep original height
+      positions[i * 3 + 2] = Math.sin(currentAngle) * radius!;
     }
     
-    pointsRef.current.geometry.attributes.position.needsUpdate = true;
+    pointsRef.current.geometry.attributes["position"]!.needsUpdate = true;
   });
   
   return (

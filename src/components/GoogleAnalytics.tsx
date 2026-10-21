@@ -19,7 +19,7 @@ export const GoogleAnalytics = () => {
     }
 
     // Check if gtag is already loaded
-    if (window.gtag) {
+    if (typeof window.gtag === "function") {
       return;
     }
 

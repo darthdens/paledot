@@ -110,7 +110,7 @@ export const ScaleBarUI = () => {
   
   return (
     <div className="absolute bottom-4 left-4 z-20 pointer-events-none">
-      <div className="bg-black/60 backdrop-blur-sm rounded-lg px-3 py-2 border border-white/10">
+      <div className="bg-black/60 backdrop-blur-xs rounded-lg px-3 py-2 border border-white/10">
         {/* Scale bar */}
         <div className="flex items-center gap-2">
           <div 
@@ -125,7 +125,7 @@ export const ScaleBarUI = () => {
         
         {/* Scale label */}
         <div className="text-xs text-white/70 mt-1 text-center">
-          {scaleLevel.label(t)}
+          {scaleLevel!.label(t)}
         </div>
       </div>
     </div>

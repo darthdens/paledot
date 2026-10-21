@@ -95,12 +95,12 @@ export const KeyboardShortcuts = () => {
           if (selectedObject) {
             const currentIndex = planets.findIndex(p => p.id === selectedObject.id);
             if (currentIndex >= 0 && currentIndex < planets.length - 1) {
-              setSelectedObject(planets[currentIndex + 1]);
+              setSelectedObject(planets[currentIndex + 1]!);
             } else if (currentIndex === -1) {
-              setSelectedObject(planets[0]);
+              setSelectedObject(planets[0]!);
             }
           } else {
-            setSelectedObject(planets[0]);
+            setSelectedObject(planets[0]!);
           }
           e.preventDefault();
           break;
@@ -110,10 +110,10 @@ export const KeyboardShortcuts = () => {
           if (selectedObject) {
             const currentIndex = planets.findIndex(p => p.id === selectedObject.id);
             if (currentIndex > 0) {
-              setSelectedObject(planets[currentIndex - 1]);
+              setSelectedObject(planets[currentIndex - 1]!);
             }
           } else {
-            setSelectedObject(planets[planets.length - 1]);
+            setSelectedObject(planets[planets.length - 1]!);
           }
           e.preventDefault();
           break;

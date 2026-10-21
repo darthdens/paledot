@@ -144,10 +144,10 @@ export const GalaxySkyGlow = () => {
       currentOpacity.current = targetOpacity;
     }
     
-    material.uniforms.uOpacity.value = currentOpacity.current;
+    material.uniforms["uOpacity"]!.value = currentOpacity.current;
     
     // Keep inverse projection up to date (FOV/resize).
-    (material.uniforms.uInvProjection.value as THREE.Matrix4).copy(camera.projectionMatrixInverse);
+    (material.uniforms["uInvProjection"]!.value as THREE.Matrix4).copy(camera.projectionMatrixInverse);
 
     // Update galactic center direction (world -> view)
     if (centerPos) {
@@ -159,7 +159,7 @@ export const GalaxySkyGlow = () => {
       tmpMat3.current.setFromMatrix4(camera.matrixWorldInverse);
       tmpCenterView.current.copy(tmpDirWorld.current).applyMatrix3(tmpMat3.current).normalize();
 
-      (material.uniforms.uCenterDirView.value as THREE.Vector3).copy(tmpCenterView.current);
+      (material.uniforms["uCenterDirView"]!.value as THREE.Vector3).copy(tmpCenterView.current);
     }
   });
 

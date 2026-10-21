@@ -50,7 +50,7 @@ const generateFilaments = (nodes: THREE.Vector3[], maxConnectionDist: number) =>
     
     const nearby: { idx: number; dist: number }[] = [];
     for (let j = i + 1; j < nodes.length; j++) {
-      const dist = node.distanceTo(nodes[j]);
+      const dist = node!.distanceTo(nodes[j]!);
       if (dist < maxConnectionDist && dist > maxConnectionDist * 0.015) {
         nearby.push({ idx: j, dist });
       }
@@ -61,9 +61,9 @@ const generateFilaments = (nodes: THREE.Vector3[], maxConnectionDist: number) =>
     const connectionCount = Math.min(5 + Math.floor(seededRandom(i * 123) * 5), nearby.length);
     
     for (let c = 0; c < connectionCount; c++) {
-      const target = nodes[nearby[c].idx];
-      const strength = 1 - (nearby[c].dist / maxConnectionDist);
-      connections.push({ from: node, to: target, strength });
+      const target = nodes[nearby[c]!.idx];
+      const strength = 1 - (nearby[c]!.dist / maxConnectionDist);
+      connections.push({ from: node!, to: target!, strength });
     }
   }
   
@@ -297,10 +297,10 @@ export const CosmicWeb = ({ visualScale }: CosmicWebProps) => {
     const nodeOpacity = fadeIn * 0.85;
     
     if (filamentPointsRef.current) {
-      (filamentMaterial as THREE.ShaderMaterial).uniforms.uOpacity.value = filamentOpacity;
+      (filamentMaterial as THREE.ShaderMaterial).uniforms["uOpacity"]!.value = filamentOpacity;
     }
     if (nodePointsRef.current) {
-      (nodeMaterial as THREE.ShaderMaterial).uniforms.uOpacity.value = nodeOpacity;
+      (nodeMaterial as THREE.ShaderMaterial).uniforms["uOpacity"]!.value = nodeOpacity;
     }
   });
   

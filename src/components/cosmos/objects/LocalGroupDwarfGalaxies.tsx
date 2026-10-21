@@ -291,7 +291,7 @@ export const LocalGroupDwarfGalaxies = ({ visualScale }: LocalGroupDwarfGalaxies
     if (!pointsRef.current) return;
     const sizeAttr = pointsRef.current.geometry.getAttribute('size') as THREE.BufferAttribute;
     for (let i = 0; i < ALL_DWARFS.length; i++) {
-      sizeAttr.setX(i, baseSizes[i]);
+      sizeAttr.setX(i, baseSizes[i]!);
     }
     sizeAttr.needsUpdate = true;
   });

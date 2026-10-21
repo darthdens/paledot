@@ -1,0 +1,27 @@
+import { createFileRoute } from "@tanstack/react-router";
+import { Suspense, lazy, useEffect, useState } from "react";
+
+import { useSiteBrand } from "@/lib/site-brand";
+
+// The 3D explorer only runs in the browser, so both pages load after the
+// first paint. Page titles and link previews are already set by the server.
+const Cosmos = lazy(() => import("@/pages/Cosmos"));
+const PaleDot = lazy(() => import("@/pages/PaleDot"));
+
+export const Route = createFileRoute("/")({
+  component: Home,
+});
+
+function Home() {
+  const brand = useSiteBrand();
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+
+  const fallback =
+    brand === "paledot" ? (
+      <div className="fixed inset-0" style={{ backgroundColor: "#0a0a0f" }} />
+    ) : null;
+
+  if (!mounted) return fallback;
+  return <Suspense fallback={fallback}>{brand === "paledot" ? <PaleDot /> : <Cosmos />}</Suspense>;
+}

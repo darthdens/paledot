@@ -21,7 +21,7 @@ const MILKY_WAY = {
 const FADE_DURATION = 1.0;
 
 /**
- * A ring showing the solar system's orbital path around the galactic center.
+ * A ring-3 showing the solar system's orbital path around the galactic center.
  * Only visible at stellar scale and above (not in solar system view).
  * Fades smoothly when transitioning between scales.
  */
@@ -63,7 +63,7 @@ export const GalacticOrbitRing = ({ visualScale, visible = true }: GalacticOrbit
   const markerX = Math.cos(MILKY_WAY.sunAngle) * orbitRadius;
   const markerZ = Math.sin(MILKY_WAY.sunAngle) * orbitRadius;
 
-  // Create a dashed ring geometry
+  // Create a dashed ring-3 geometry
   const ringGeometry = useMemo(() => {
     const segments = 128;
     const points: THREE.Vector3[] = [];
@@ -110,9 +110,9 @@ export const GalacticOrbitRing = ({ visualScale, visible = true }: GalacticOrbit
 
   return (
     <group position={galaxyCenter}>
-      {/* Main orbit ring removed - keeping only marker, line and label */}
+      {/* Main orbit ring-3 removed - keeping only marker, line and label */}
 
-      {/* Current position marker on the ring */}
+      {/* Current position marker on the ring-3 */}
       <mesh
         position={[markerX, 0, markerZ]}
         onPointerOver={() => setIsHovered(true)}
@@ -131,24 +131,19 @@ export const GalacticOrbitRing = ({ visualScale, visible = true }: GalacticOrbit
       {/* Vertical line connecting marker to label */}
       <line>
         <bufferGeometry>
-          <bufferAttribute
-            attach="attributes-position"
-            count={2}
-            array={new Float32Array([
+          <bufferAttribute attach="attributes-position" args={[new Float32Array([
               markerX,
               markerRadius,
               markerZ,
               markerX,
               markerRadius * 10,
               markerZ,
-            ])}
-            itemSize={3}
-          />
+            ]), 3]} />
         </bufferGeometry>
         <lineBasicMaterial ref={lineMaterialRef} color="#ffffff" transparent opacity={0} />
       </line>
 
-      {/* Tooltip label - always visible when ring is visible */}
+      {/* Tooltip label - always visible when ring-3 is visible */}
       {currentOpacity.current > 0.1 && (
         <Html
           position={[markerX, markerRadius * 12, markerZ]}
@@ -161,7 +156,7 @@ export const GalacticOrbitRing = ({ visualScale, visible = true }: GalacticOrbit
             transition: 'opacity 0.1s ease-out',
           }}
         >
-          <div className="bg-white/10 backdrop-blur-sm px-3 py-1.5 rounded-lg whitespace-nowrap">
+          <div className="bg-white/10 backdrop-blur-xs px-3 py-1.5 rounded-lg whitespace-nowrap">
             <span className="text-white text-sm font-semibold">
               {language === 'fr' ? 'Nous sommes ici' : 'We are here'}
             </span>

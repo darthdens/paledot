@@ -178,7 +178,7 @@ export const CosmosExplorer = () => {
             {/* Global galaxy time manager - called once to update rotation time */}
             <GalaxyTimeManager />
 
-            {/* Milky Way Galaxy + orbital ring are anchored to the galactic center (they should NOT orbit around the Sun) */}
+            {/* Milky Way Galaxy + orbital ring-3 are anchored to the galactic center (they should NOT orbit around the Sun) */}
             <GalaxyFadeWrapper>
               <MilkyWayGalaxy visualScale={UNIFIED_SCALE} showYouAreHere={true} />
               {showOrbits && <GalacticOrbitRing visualScale={UNIFIED_SCALE} />}

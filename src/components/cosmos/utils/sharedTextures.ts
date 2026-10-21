@@ -74,7 +74,7 @@ export const getMilkyWayGlowTexture = (): THREE.CanvasTexture => {
 };
 
 /**
- * Andromeda galaxy glow texture: white/blue center → orange dust ring → blue outer haze
+ * Andromeda galaxy glow texture: white/blue center → orange dust ring-3 → blue outer haze
  */
 export const getAndromedaGlowTexture = (): THREE.CanvasTexture => {
   if (_andromedaGlowTexture) return _andromedaGlowTexture;

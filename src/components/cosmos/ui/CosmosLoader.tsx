@@ -343,7 +343,7 @@ export const CosmosLoader = ({
         
         {/* Earth orbiting Sun animation - polished */}
         <div className="relative w-32 h-32 flex items-center justify-center">
-          {/* Orbit ring */}
+          {/* Orbit ring-3 */}
           <div 
             className="absolute w-28 h-28 rounded-full border border-white/15"
             style={{
@@ -396,7 +396,7 @@ export const CosmosLoader = ({
             </div>
           </div>
           
-          {/* Subtle outer glow ring */}
+          {/* Subtle outer glow ring-3 */}
           <div 
             className="absolute w-32 h-32 rounded-full"
             style={{
@@ -493,7 +493,7 @@ const RotatingTip = ({ isMobile, language }: { isMobile: boolean; language: 'en'
     const shuffled = [...filteredTips];
     for (let i = shuffled.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
-      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+      [shuffled[i], shuffled[j]] = [shuffled[j]!, shuffled[i]!];
     }
     return shuffled;
   }, [filteredTips]);

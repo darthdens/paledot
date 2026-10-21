@@ -74,8 +74,8 @@ function updateMaterialOpacity(material: THREE.Material, fadeOpacity: number) {
   const originalOpacity = originalOpacities.get(material) ?? 1;
   
   // For shader materials, check for uOpacity uniform
-  if (material instanceof THREE.ShaderMaterial && material.uniforms?.uOpacity) {
-    material.uniforms.uOpacity.value = fadeOpacity;
+  if (material instanceof THREE.ShaderMaterial && material.uniforms?.["uOpacity"]) {
+    material.uniforms["uOpacity"].value = fadeOpacity;
     return;
   }
 

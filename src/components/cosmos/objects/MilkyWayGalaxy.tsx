@@ -512,18 +512,8 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
         <group ref={markerGroupRef}>
           <points>
             <bufferGeometry>
-              <bufferAttribute
-                attach="attributes-position"
-                count={1}
-                array={new Float32Array([0, 0, 0])}
-                itemSize={3}
-              />
-              <bufferAttribute
-                attach="attributes-color"
-                count={1}
-                array={new Float32Array([1, 1, 1])}
-                itemSize={3}
-              />
+              <bufferAttribute attach="attributes-position" args={[new Float32Array([0, 0, 0]), 3]} />
+              <bufferAttribute attach="attributes-color" args={[new Float32Array([1, 1, 1]), 3]} />
             </bufferGeometry>
             <pointsMaterial
               size={gs * 120}
@@ -559,7 +549,7 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
               style={{ pointerEvents: 'auto' }}
             >
               <div
-                className="bg-white/10 backdrop-blur-sm px-3 py-1.5 rounded-lg whitespace-nowrap cursor-pointer"
+                className="bg-white/10 backdrop-blur-xs px-3 py-1.5 rounded-lg whitespace-nowrap cursor-pointer"
                 onClick={handleYouAreHereLabelClick}
               >
                 <span className="text-white text-sm font-semibold">
@@ -600,18 +590,8 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
         <group ref={proximaMarkerRef}>
           <points>
             <bufferGeometry>
-              <bufferAttribute
-                attach="attributes-position"
-                count={1}
-                array={new Float32Array([0, 0, 0])}
-                itemSize={3}
-              />
-              <bufferAttribute
-                attach="attributes-color"
-                count={1}
-                array={new Float32Array([1, 0.8, 0.8])}
-                itemSize={3}
-              />
+              <bufferAttribute attach="attributes-position" args={[new Float32Array([0, 0, 0]), 3]} />
+              <bufferAttribute attach="attributes-color" args={[new Float32Array([1, 0.8, 0.8]), 3]} />
             </bufferGeometry>
             <pointsMaterial
               size={gs * 120}
@@ -646,7 +626,7 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
             style={{ pointerEvents: 'auto' }}
           >
             <div
-              className="bg-black/80 backdrop-blur-sm px-3 py-1.5 rounded-lg border border-orange-500/50 whitespace-nowrap shadow-lg cursor-pointer"
+              className="bg-black/80 backdrop-blur-xs px-3 py-1.5 rounded-lg border border-orange-500/50 whitespace-nowrap shadow-lg cursor-pointer"
               onClick={handleProximaLabelClick}
             >
               <span className="text-orange-400 text-sm font-semibold drop-shadow-md">
