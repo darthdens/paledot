@@ -1,3 +1,5 @@
+import { BackgroundLayer } from "@/components/BackgroundLayer";
+import { ScrollToTop } from "@/components/ScrollToTop";
 import { CookieBanner } from "@/components/CookieBanner";
 import CustomCursor from "@/components/CustomCursor";
 import { GoogleAnalytics } from "@/components/GoogleAnalytics";
@@ -17,6 +19,8 @@ const App = () => (
       <LanguageProvider>
         <TooltipProvider>
           <CustomCursor />
+          <BackgroundLayer />
+          <ScrollToTop />
           <Toaster richColors position="bottom-left" />
           <GoogleAnalytics />
           <CookieBanner />
