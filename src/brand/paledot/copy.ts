@@ -19,6 +19,13 @@ export const PALEDOT_COPY = {
     about1:
       "Pale Dot is an interactive 3D journey. It starts on Earth and zooms out through the Solar System, the Milky Way, the Local Group and the cosmic web, all the way to the edge of the observable universe, 46.5 billion light-years away.",
     about2: "Built by Dens Akoka for students, teachers and anyone who wants to feel how big it all is.",
+    cookies: {
+      label: "Cookies",
+      message: "Pale Dot uses cookies to count visits and improve the journey. Nothing is sold or shared.",
+      privacy: "Privacy",
+      accept: "Accept",
+      decline: "Decline",
+    },
   },
   fr: {
     name: "Pale Dot",
@@ -38,6 +45,13 @@ export const PALEDOT_COPY = {
     about1:
       "Pale Dot est un voyage 3D interactif. Il commence sur Terre et s'éloigne à travers le Système solaire, la Voie lactée, le Groupe local et la toile cosmique, jusqu'au bord de l'univers observable, à 46,5 milliards d'années-lumière.", // review
     about2: "Créé par Dens Akoka pour les élèves, les enseignants et tous ceux qui veulent sentir à quel point tout cela est grand.", // review
+    cookies: {
+      label: "Cookies",
+      message: "Pale Dot utilise des cookies pour compter les visites et améliorer le voyage. Rien n'est vendu ni partagé.", // review
+      privacy: "Confidentialité",
+      accept: "Accepter",
+      decline: "Refuser",
+    },
   },
 } as const;
 
