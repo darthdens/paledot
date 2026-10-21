@@ -59,7 +59,8 @@ export const pickLocale = (langs: string[]): Locale => {
   const tags = langs.filter(Boolean).map((l) => l.toLowerCase());
   // English device (or nothing to go on): region decides UK vs US spelling.
   // Secondary languages serve only as region hints here, never as a switch.
-  if (tags.length === 0 || tags[0].startsWith("en")) return englishOrFallback(tags);
+  const first = tags[0];
+  if (!first || first.startsWith("en")) return englishOrFallback(tags);
   // Non-English device: the first supported language wins.
   for (const l of tags) {
     for (const c of ["fr", "es", "pt", "it", "de"] as const) if (l.startsWith(c)) return c;
