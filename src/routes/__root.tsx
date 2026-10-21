@@ -41,8 +41,6 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       ],
       scripts: [
         { type: "application/ld+json", children: jsonLd },
-        // Echo AI chat widget (unchanged)
-        { src: "https://echoai.so/w.js", "data-echo": "dens", async: true },
       ],
     };
   },
@@ -66,9 +64,24 @@ function RootShell({ children }: { children: ReactNode }) {
   );
 }
 
+// Echo AI chat widget (unchanged script). Added after the page is interactive,
+// because the widget adds its own elements to the page and must not race the
+// first render.
+function useEchoWidget() {
+  useEffect(() => {
+    if (document.querySelector('script[src="https://echoai.so/w.js"]')) return;
+    const script = document.createElement("script");
+    script.src = "https://echoai.so/w.js";
+    script.async = true;
+    script.setAttribute("data-echo", "dens");
+    document.body.appendChild(script);
+  }, []);
+}
+
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   const { brand } = Route.useLoaderData();
+  useEchoWidget();
   return (
     <SiteBrandContext.Provider value={brand}>
       <QueryClientProvider client={queryClient}>
