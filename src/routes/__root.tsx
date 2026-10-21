@@ -14,6 +14,7 @@ import {
 import appCss from "../styles.css?url";
 import { BackgroundLayer } from "@/components/BackgroundLayer";
 import { CookieBanner } from "@/components/CookieBanner";
+import { PaleDotCookieBanner } from "@/brand/paledot/PaleDotCookieBanner";
 import CustomCursor from "@/components/CustomCursor";
 import { GoogleAnalytics } from "@/components/GoogleAnalytics";
 import { Toaster } from "@/components/ui/sonner";
@@ -97,7 +98,7 @@ function RootComponent() {
             {brand === "cosmos" && <BackgroundLayer />}
             <Toaster richColors position="bottom-left" />
             <GoogleAnalytics />
-            {brand === "cosmos" && <CookieBanner />}
+            {brand === "cosmos" ? <CookieBanner /> : <PaleDotCookieBanner />}
             <Outlet />
           </TooltipProvider>
         </LanguageProvider>
