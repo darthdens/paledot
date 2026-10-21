@@ -11,7 +11,7 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    --background: 43 19% 93%;
+    --background: 36 30% 93%;
     --foreground: 240 6% 13%;
 
     --card: 0 0% 100%;
@@ -265,6 +265,62 @@ All colors MUST be HSL.
 .custom-cursor.is-cosmos.is-pointer .custom-cursor__icon {
   color: hsl(43 19% 93%);
 }
+/* Shared fixed page background, in line with dens.so.
+   Flat page colour + faint hairline grid + paper grain + soft vignette.
+   All values live here as CSS variables — components never hardcode them. */
+:root {
+  --page-bg: #f2eee8;
+  --bg-grid-line: rgba(31, 31, 34, 0.012); /* text colour at 1.2% */
+  --bg-grain-opacity: 0.05;
+  --bg-vignette: 0.12;
+}
+
+.dark {
+  --page-bg: #1a1a1e;
+  --bg-grid-line: rgba(239, 234, 225, 0.03); /* text colour at 3% */
+  --bg-grain-opacity: 0.07;
+  --bg-vignette: 0.12;
+}
+
+.site-background {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-color: var(--page-bg);
+}
+
+/* Faint hairline grid: 1px lines every 32px */
+.site-background::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(to right, var(--bg-grid-line) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--bg-grid-line) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+
+/* Paper-grain texture */
+.site-background::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  opacity: var(--bg-grain-opacity);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='128' height='128'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* Soft vignette that darkens the edges a little */
+.site-background-vignette {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    ellipse at center,
+    transparent 55%,
+    rgba(0, 0, 0, var(--bg-vignette)) 100%
+  );
+}
+
 /* Honor reduced-motion for non-explorer UI (Three.js scene unaffected). */
 @media (prefers-reduced-motion: reduce) {
   *:not([data-cosmos-container] *) {

@@ -1,4 +1,5 @@
-import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
@@ -8,12 +9,35 @@ import { ExternalLink } from "lucide-react";
 
 export const Navigation = () => {
   const { t } = useLanguage();
+  const location = useLocation();
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 12);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  // The logo always goes to the top of the homepage, even when already there.
+  const handleLogoClick = () => {
+    if (location.pathname === "/") {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  };
 
   return (
-    <nav data-app-nav className="fixed top-0 left-0 right-0 z-50 border-b border-border bg-background/80 backdrop-blur-md">
+    <nav
+      data-app-nav
+      className={`fixed top-0 left-0 right-0 z-50 border-b transition-colors duration-300 ${
+        scrolled
+          ? "bg-background/80 backdrop-blur-md border-border"
+          : "bg-transparent border-transparent"
+      }`}
+    >
       <div className="container mx-auto px-4 sm:px-6 py-4">
         <div className="flex items-center justify-between">
-          <Link to="/" className="flex items-center">
+          <Link to="/" className="flex items-center" onClick={handleLogoClick}>
             <Logo className="w-8 h-8" />
           </Link>
 
@@ -21,9 +45,9 @@ export const Navigation = () => {
           <div className="flex items-center gap-4">
             <ThemeToggle />
             <LanguageSwitcher />
-            
+
             <div className="w-px h-4 bg-border" />
-            
+
             <Button
               variant="secondary"
               size="sm"

@@ -1,6 +1,5 @@
 import { Navigation } from '@/components/Navigation';
 import { Footer } from '@/components/Footer';
-import { Starfield } from '@/components/Starfield';
 import { CosmosExplorer } from '@/components/cosmos/CosmosExplorer';
 import { WebGLBoundary } from '@/components/cosmos/WebGLBoundary';
 import { useLanguage } from '@/i18n/LanguageContext';
@@ -44,8 +43,7 @@ const Cosmos = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background text-foreground relative flex flex-col">
-      <Starfield />
+    <div className="min-h-screen text-foreground relative flex flex-col">
       <Navigation />
 
       <main className="flex-1 relative z-10 pt-16">

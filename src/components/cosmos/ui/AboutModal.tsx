@@ -1,16 +1,17 @@
 import { useLanguage } from '@/i18n/LanguageContext';
 import { Button } from '@/components/ui/button';
 import { Globe, X, MapPin, Heart } from 'lucide-react';
+import portraitAsset from '@/assets/dens-portrait.jpg.asset.json';
 
 const APP_VERSION = '1.0.0';
 
-// Profile picture
-const PROFILE_PIC = 'https://images.spr.so/cdn-cgi/imagedelivery/j42No7y-dcokJuNgXeA0ig/6364ed24-d073-426f-9f7a-5f679c6b957f/dens-new-pfp/w=512,quality=90,fit=scale-down';
+// Profile picture (served from the CDN)
+const PROFILE_PIC = portraitAsset.url;
 
 // Social links
 const SOCIAL_LINKS = {
   website: 'https://dens.so',
-  twitter: 'https://x.com/densweb3',
+  twitter: 'https://x.com/densecho',
   linkedin: 'https://www.linkedin.com/in/denisakoka/',
   telegram: 'https://t.me/densakoka',
   instagram: 'https://www.instagram.com/densakoka/',
@@ -46,7 +47,7 @@ const translations = {
     about: 'About',
     version: 'Version',
     createdBy: 'Created by',
-    bioPart1: "Multidisciplinary creative with 7+ years of experience at the intersection of design, technology, and marketing. Co-Founder at",
+    bioPart1: "Multidisciplinary creative with 8+ years of experience at the intersection of design, technology, and marketing. Co-Founder at",
     bioPart2: "I'm also a huge space fan and nerd — I love everything about it, its terrifying scale, and how it grounds and humbles us.",
     location: 'Dundee, Scotland',
     description: 'An interactive 3D exploration of our solar system and beyond. Navigate through planets, moons, and distant galaxies with scientifically accurate data.',
@@ -75,7 +76,7 @@ const translations = {
     about: 'À propos',
     version: 'Version',
     createdBy: 'Créé par',
-    bioPart1: "Créatif pluridisciplinaire avec plus de 7 ans d'expérience à l'intersection du design, de la technologie et du marketing. Co-fondateur d'",
+    bioPart1: "Créatif pluridisciplinaire avec plus de 8 ans d'expérience à l'intersection du design, de la technologie et du marketing. Co-fondateur d'",
     bioPart2: "Je suis aussi un grand fan de l'espace — j'aime tout ce qui le concerne, son échelle terrifiante, et comment il nous ancre et nous rend humbles.",
     location: 'Dundee, Écosse',
     description: "Une exploration 3D interactive de notre système solaire et au-delà. Naviguez à travers les planètes, lunes et galaxies avec des données scientifiquement précises.",

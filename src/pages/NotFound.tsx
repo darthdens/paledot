@@ -4,7 +4,6 @@ import { useLanguage } from "@/i18n/LanguageContext";
 import { Button } from "@/components/ui/button";
 import { Navigation } from "@/components/Navigation";
 import { Footer } from "@/components/Footer";
-import { Starfield } from "@/components/Starfield";
 import { Home } from "iconoir-react";
 
 const NotFound = () => {
@@ -17,8 +16,7 @@ const NotFound = () => {
   }, [location.pathname]);
 
   return (
-    <div className="min-h-screen bg-background relative flex flex-col">
-      <Starfield />
+    <div className="min-h-screen relative flex flex-col">
       <Navigation />
       <main className="flex flex-1 items-center justify-center">
         <div className="text-center px-6">
