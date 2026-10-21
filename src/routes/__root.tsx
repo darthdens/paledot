@@ -97,7 +97,7 @@ function RootComponent() {
             {brand === "cosmos" && <CustomCursor />}
             {brand === "cosmos" && <BackgroundLayer />}
             <Toaster richColors position="bottom-left" />
-            <GoogleAnalytics />
+            <GoogleAnalytics brand={brand} />
             {brand === "cosmos" ? <CookieBanner /> : <PaleDotCookieBanner />}
             <Outlet />
           </TooltipProvider>

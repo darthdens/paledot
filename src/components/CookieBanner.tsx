@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { notifyConsentChange } from "@/components/GoogleAnalytics";
 import { Link } from "@/lib/router-compat";
 import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/i18n/LanguageContext";
@@ -18,11 +19,13 @@ export const CookieBanner = () => {
 
   const handleAccept = () => {
     localStorage.setItem(COOKIE_CONSENT_KEY, "accepted");
+    notifyConsentChange("accepted");
     setIsVisible(false);
   };
 
   const handleDecline = () => {
     localStorage.setItem(COOKIE_CONSENT_KEY, "declined");
+    notifyConsentChange("declined");
     setIsVisible(false);
   };
 
