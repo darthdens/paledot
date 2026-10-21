@@ -24,9 +24,9 @@ const parseRgb = (value: string) => {
     .replace(/\s+/g, '')
     .match(/^rgba?\((\d+),(\d+),(\d+)(?:,(\d*\.?\d+))?\)$/i);
   if (!m) return null;
-  const r = clamp(parseInt(m[1], 10), 0, 255);
-  const g = clamp(parseInt(m[2], 10), 0, 255);
-  const b = clamp(parseInt(m[3], 10), 0, 255);
+  const r = clamp(parseInt(m[1]!, 10), 0, 255);
+  const g = clamp(parseInt(m[2]!, 10), 0, 255);
+  const b = clamp(parseInt(m[3]!, 10), 0, 255);
   return { r, g, b };
 };
 

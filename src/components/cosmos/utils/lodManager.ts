@@ -154,13 +154,13 @@ export const createLODGeometry = (
     const srcIdx = indices[i]! * 3;
     const dstIdx = i * 3;
 
-    newPositions[dstIdx] = positions.array[srcIdx];
-    newPositions[dstIdx + 1] = positions.array[srcIdx + 1];
-    newPositions[dstIdx + 2] = positions.array[srcIdx + 2];
+    newPositions[dstIdx] = positions.array[srcIdx]!;
+    newPositions[dstIdx + 1] = positions.array[srcIdx + 1]!;
+    newPositions[dstIdx + 2] = positions.array[srcIdx + 2]!;
 
-    newColors[dstIdx] = colors.array[srcIdx];
-    newColors[dstIdx + 1] = colors.array[srcIdx + 1];
-    newColors[dstIdx + 2] = colors.array[srcIdx + 2];
+    newColors[dstIdx] = colors.array[srcIdx]!;
+    newColors[dstIdx + 1] = colors.array[srcIdx + 1]!;
+    newColors[dstIdx + 2] = colors.array[srcIdx + 2]!;
   }
 
   const reducedGeo = new THREE.BufferGeometry();

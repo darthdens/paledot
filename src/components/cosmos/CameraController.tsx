@@ -212,6 +212,7 @@ export const CameraController = () => {
     }
 
     startFlyTo(currentLivePos);
+    return undefined;
   }, [selectedObject, camera, controls, isTouring]);
 
   useFrame((_, delta) => {

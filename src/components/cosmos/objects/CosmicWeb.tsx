@@ -50,7 +50,7 @@ const generateFilaments = (nodes: THREE.Vector3[], maxConnectionDist: number) =>
     
     const nearby: { idx: number; dist: number }[] = [];
     for (let j = i + 1; j < nodes.length; j++) {
-      const dist = node!.distanceTo(nodes[j]);
+      const dist = node!.distanceTo(nodes[j]!);
       if (dist < maxConnectionDist && dist > maxConnectionDist * 0.015) {
         nearby.push({ idx: j, dist });
       }
@@ -63,7 +63,7 @@ const generateFilaments = (nodes: THREE.Vector3[], maxConnectionDist: number) =>
     for (let c = 0; c < connectionCount; c++) {
       const target = nodes[nearby[c]!.idx];
       const strength = 1 - (nearby[c]!.dist / maxConnectionDist);
-      connections.push({ from: node, to: target, strength });
+      connections.push({ from: node!, to: target!, strength });
     }
   }
   

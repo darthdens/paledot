@@ -36,7 +36,7 @@ export const WorldPositionTracker = ({
   }, -1);
 
   return (
-    <group ref={groupRef} position={position}>
+    <group ref={groupRef} {...(position ? { position } : {})}>
       {children}
     </group>
   );

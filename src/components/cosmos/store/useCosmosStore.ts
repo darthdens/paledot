@@ -13,11 +13,11 @@ interface TourCameraTarget {
   position: [number, number, number];
   lookAt: [number, number, number];
   /** Explicitly declare which coordinate space these vectors are in. */
-  space?: 'scene' | 'km';
+  space?: 'scene' | 'km' | undefined;
   /** When set, the camera controller will keep the tour centered on this object's live world position (handles scene rotation / motion). */
-  followObjectId?: string;
+  followObjectId?: string | undefined;
   /** Scene-space offset from the followed object's position to the camera position. */
-  offset?: [number, number, number];
+  offset?: [number, number, number] | undefined;
 }
 
 // Loading progress tracking - which major components have signaled readiness

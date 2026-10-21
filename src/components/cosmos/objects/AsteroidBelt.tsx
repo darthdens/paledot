@@ -193,7 +193,7 @@ export const AsteroidBelt = ({
       const currentAngle = phases[i]! + simTime.current * speeds[i]!;
       
       positions[i * 3] = Math.cos(currentAngle) * radius!;
-      positions[i * 3 + 1] = heights[i]; // Keep original height
+      positions[i * 3 + 1] = heights[i]!; // Keep original height
       positions[i * 3 + 2] = Math.sin(currentAngle) * radius!;
     }
     
