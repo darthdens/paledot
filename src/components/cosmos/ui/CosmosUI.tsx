@@ -188,7 +188,7 @@ export const CosmosUI = () => {
       document.removeEventListener('mousedown', handleClickOutside);
       document.removeEventListener('keydown', handleEscape);
     };
-  }, [showTimeSlider, showMoreMenu, showQuickJump, toggleQuickJump]);
+  }, [showTimeSlider, showMoreMenu, showLanguageMenu, showQuickJump, toggleQuickJump]);
 
   const handleQuickJumpClick = () => {
     const el = quickJumpButtonRef.current;
