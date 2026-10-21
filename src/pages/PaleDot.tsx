@@ -73,7 +73,7 @@ const PaleDot = () => {
               href="https://dens.so"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-foreground/85 underline decoration-white/25 underline-offset-4 transition-colors hover:text-foreground hover:decoration-white/60"
+              className="text-foreground/90 underline decoration-white/50 underline-offset-2 transition-colors hover:text-foreground hover:decoration-white/80"
             >
               {t.name}
             </a>
