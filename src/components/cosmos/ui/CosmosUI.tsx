@@ -751,6 +751,24 @@ export const CosmosUI = () => {
               <LanguageButton />
             </div>
 
+            {/* Mobile & Tablet language button */}
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  ref={languageMenuButtonRef}
+                  size="icon"
+                  variant="ghost"
+                  onClick={() => { setShowMoreMenu(false); setShowLanguageMenu(!showLanguageMenu); }}
+                  className={`lg:hidden h-8 w-8 sm:h-9 sm:w-9 backdrop-blur-xs text-white ${showLanguageMenu ? 'bg-white/25' : 'bg-white/10 hover:bg-white/20'}`}
+                >
+                  <Globe className="w-4 h-4 sm:w-5 sm:h-5" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent variant="dark" side="bottom">
+                {tx('Language', 'Langue')}
+              </TooltipContent>
+            </Tooltip>
+
             {/* Mobile & Tablet more button */}
             <Tooltip>
               <TooltipTrigger asChild>
@@ -758,7 +776,7 @@ export const CosmosUI = () => {
                   ref={moreMenuButtonRef}
                   size="icon" 
                   variant="ghost" 
-                  onClick={() => setShowMoreMenu(!showMoreMenu)} 
+                  onClick={() => { setShowLanguageMenu(false); setShowMoreMenu(!showMoreMenu); }} 
                   className={`lg:hidden h-8 w-8 sm:h-9 sm:w-9 backdrop-blur-xs text-white ${showMoreMenu ? 'bg-white/25' : 'bg-white/10 hover:bg-white/20'}`}
                 >
                   <MoreVertical className="w-4 h-4 sm:w-5 sm:h-5" />
