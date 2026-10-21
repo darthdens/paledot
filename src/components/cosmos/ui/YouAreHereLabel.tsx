@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { useLanguage } from '@/i18n/LanguageContext';
 import { useCosmosStore } from '../store/useCosmosStore';
+import { useFullscreenStore } from '../store/useFullscreenStore';
+import { Button } from '@/components/ui/button';
 import { Globe, Sun, Star, Sparkles, Circle, Infinity, ChevronDown, ChevronUp, Hexagon, Waypoints } from 'lucide-react';
 import type { ScaleLevel } from '../types';
 
@@ -132,6 +134,7 @@ export const YouAreHereLabel = () => {
   const currentScale: ScaleLevel = useCosmosStore((state) => state.currentScale as ScaleLevel);
   const selectedObject = useCosmosStore((state) => state.selectedObject);
   const [isMinimized, setIsMinimized] = useState(true);
+  const isFullscreen = useFullscreenStore((state) => state.isFullscreen);
 
   // Determine which cosmic structure we're viewing from
   const getGalaxyStructure = () => {
@@ -215,22 +218,25 @@ export const YouAreHereLabel = () => {
   const locationInfo = getLocationInfo();
   
   return (
-    <div className="absolute top-12 right-2 sm:right-auto sm:left-4 sm:top-4 z-10 animate-fade-in">
+    <div className={`${isFullscreen
+      ? 'fixed top-[calc(3rem+env(safe-area-inset-top))] sm:top-[calc(4rem+env(safe-area-inset-top))] lg:top-[calc(0.5rem+env(safe-area-inset-top))] right-[calc(0.5rem+env(safe-area-inset-right))] lg:right-auto lg:left-[calc(0.5rem+env(safe-area-inset-left))]'
+      : 'absolute top-12 sm:top-16 lg:top-4 right-2 sm:right-4 lg:right-auto lg:left-4'} z-10 max-w-[calc(100%-2rem)] animate-fade-in`}>
       <div className="bg-white/10 backdrop-blur-md rounded-lg overflow-hidden max-w-[220px] sm:max-w-none">
-        <button
+        <Button
+          variant="ghost"
           onClick={() => setIsMinimized(!isMinimized)}
-          className="w-full flex items-center justify-between gap-2 px-3 py-2 hover:bg-white/5 transition-colors"
+          className="h-auto w-full grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-3 py-2 hover:bg-white/5 transition-colors"
         >
-          <div className="flex items-center gap-2 text-white">
-            {getScaleIcon(currentScale)}
-            <span className="text-sm font-semibold">{locationInfo.title}</span>
+          <div className="flex min-w-0 items-center gap-2 text-white">
+            <span className="shrink-0">{getScaleIcon(currentScale)}</span>
+            <span className="truncate text-sm font-semibold">{locationInfo.title}</span>
           </div>
           {isMinimized ? (
-            <ChevronDown className="w-4 h-4 text-white/60" />
+            <ChevronDown className="w-4 h-4 shrink-0 text-white/60" />
           ) : (
-            <ChevronUp className="w-4 h-4 text-white/60" />
+            <ChevronUp className="w-4 h-4 shrink-0 text-white/60" />
           )}
-        </button>
+        </Button>
         
         <div 
           className={`grid transition-all duration-300 ease-out ${isMinimized ? 'grid-rows-[0fr]' : 'grid-rows-[1fr]'}`}
