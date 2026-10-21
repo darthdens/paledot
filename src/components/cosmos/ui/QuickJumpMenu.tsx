@@ -32,8 +32,8 @@ const IMPLEMENTED_OBJECTS: Record<string, string[]> = {
 };
 
 export const QuickJumpMenu = () => {
-  const { language } = useLanguage();
-  const t = translations[language];
+  const { language, tr, tx, numberLocale } = useLanguage();
+  const t = tr(translations);
   const [expandedCategory, setExpandedCategory] = useState<string | null>('solarSystem');
 
   const [isSmUp, setIsSmUp] = useState<boolean>(() => {
@@ -243,7 +243,7 @@ export const QuickJumpMenu = () => {
                     onClick={() => handleJump(id)}
                     className="px-2 py-0.5 bg-white/10 hover:bg-white/20 rounded-[4px] text-xs text-white/80 hover:text-white transition-colors"
                   >
-                    {obj.name[language]}
+                    {tr(obj.name)}
                   </button>
                 );
               })}
@@ -270,7 +270,7 @@ export const QuickJumpMenu = () => {
                 >
                   <div className="flex items-center gap-2">
                     <span className={`text-xs sm:text-sm font-medium ${!expandable ? 'text-white/50' : 'text-white/90'}`}>
-                      {category.name[language]}
+                      {tr(category.name)}
                     </span>
                     {!expandable && (
                       <span className="flex items-center gap-1 px-1.5 py-0.5 bg-amber-500/20 border border-amber-500/30 rounded-[4px] text-[10px] text-amber-400">
@@ -318,7 +318,7 @@ export const QuickJumpMenu = () => {
                                 style={{ backgroundColor: obj.color }}
                               />
                               <span className={`text-xs truncate ${implemented ? 'text-white/70 hover:text-white' : 'text-white/40'}`}>
-                                {obj.name[language]}
+                                {tr(obj.name)}
                               </span>
                               {!implemented && (
                                 <span className="flex items-center gap-0.5 px-1 py-0.5 bg-amber-500/20 border border-amber-500/30 rounded-[4px] text-[8px] text-amber-400 ml-auto shrink-0">

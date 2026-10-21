@@ -39,7 +39,7 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
   const [lodLevel, setLodLevel] = useState<LODLevel>('high');
   const lodLevelRef = useRef<LODLevel>('high');
   
-  const { language } = useLanguage();
+  const { language, tr, tx, numberLocale } = useLanguage();
   const { camera } = useThree();
 
   const setObjectWorldPosition = useCosmosStore((s) => s.setObjectWorldPosition);
@@ -553,7 +553,7 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
                 onClick={handleYouAreHereLabelClick}
               >
                 <span className="text-white text-sm font-semibold">
-                  {language === 'fr' ? 'Nous sommes ici' : 'We are here'}
+                  {tx('We are here', 'Nous sommes ici')}
                 </span>
               </div>
             </Html>
@@ -630,7 +630,7 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
               onClick={handleProximaLabelClick}
             >
               <span className="text-orange-400 text-sm font-semibold drop-shadow-md">
-                {language === 'fr' ? 'Proxima du Centaure' : 'Proxima Centauri'}
+                {tx('Proxima Centauri', 'Proxima du Centaure')}
               </span>
             </div>
           </Html>

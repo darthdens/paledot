@@ -110,9 +110,9 @@ interface AboutModalProps {
 }
 
 export const AboutModal = ({ open, onOpenChange }: AboutModalProps) => {
-  const { language } = useLanguage();
+  const { language, tr, tx, numberLocale } = useLanguage();
   const brand = useSiteBrand();
-  const t = translations[language];
+  const t = tr(translations);
   const currentYear = new Date().getFullYear();
 
   if (!open) return null;
@@ -266,11 +266,11 @@ export const AboutModal = ({ open, onOpenChange }: AboutModalProps) => {
                   <span className="text-white/40 text-[10px]">{entry.date}</span>
                 </div>
                 <ul className="space-y-0.5">
-                  {(language === 'fr' ? entry.changes_fr : entry.changes_en).slice(0, 3).map((change, idx) => (
+                  {tr({ en: entry.changes_en, fr: entry.changes_fr }).slice(0, 3).map((change, idx) => (
                     <li key={idx} className="text-white/50 text-[11px]">• {change}</li>
                   ))}
-                  {(language === 'fr' ? entry.changes_fr : entry.changes_en).length > 3 && (
-                    <li className="text-white/40 text-[11px]">+ {(language === 'fr' ? entry.changes_fr : entry.changes_en).length - 3} more...</li>
+                  {tr({ en: entry.changes_en, fr: entry.changes_fr }).length > 3 && (
+                    <li className="text-white/40 text-[11px]">+ {tr({ en: entry.changes_en, fr: entry.changes_fr }).length - 3} more...</li>
                   )}
                 </ul>
               </div>

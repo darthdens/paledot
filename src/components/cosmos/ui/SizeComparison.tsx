@@ -49,8 +49,8 @@ const COMPARISON_OBJECTS = [
 ];
 
 export const SizeComparison = () => {
-  const { language } = useLanguage();
-  const t = translations[language];
+  const { language, tr, tx, numberLocale } = useLanguage();
+  const t = tr(translations);
   const showSizeComparison = useCosmosStore(state => state.showSizeComparison);
   const toggleSizeComparison = useCosmosStore(state => state.toggleSizeComparison);
   const setSelectedObject = useCosmosStore(state => state.setSelectedObject);
@@ -124,7 +124,7 @@ export const SizeComparison = () => {
               }`}
               style={selectedIds.includes(obj.id) ? { borderColor: obj.color, borderWidth: 1 } : undefined}
             >
-              {obj.name[language]}
+              {tr(obj.name)}
             </button>
           ))}
         </div>
@@ -159,13 +159,13 @@ export const SizeComparison = () => {
                 
                 {/* Name */}
                 <span className="text-white text-xs font-medium text-center">
-                  {obj.name[language]}
+                  {tr(obj.name)}
                   {obj.scaleDown && <span className="text-white/50 text-[10px] block">(÷{obj.scaleDown})</span>}
                 </span>
                 
                 {/* Size */}
                 <span className="text-white/50 text-[10px]">
-                  {obj.size.toLocaleString(language === 'fr' ? 'fr-FR' : 'en-US')} km
+                  {obj.size.toLocaleString(numberLocale)} km
                 </span>
               </div>
             );
@@ -176,9 +176,7 @@ export const SizeComparison = () => {
       {/* Legend */}
       <div className="p-4 border-t border-white/10 text-center">
         <p className="text-white/40 text-xs">
-          {language === 'fr' 
-            ? 'Cliquez sur un objet pour naviguer vers lui'
-            : 'Click an object to navigate to it'}
+          {tx('Click an object to navigate to it', 'Cliquez sur un objet pour naviguer vers lui')}
         </p>
       </div>
     </div>

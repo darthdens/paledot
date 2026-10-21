@@ -1,0 +1,94 @@
+// Supported interface languages. English (source) and French have hand-written
+// copy everywhere; the other languages are looked up in per-language
+// dictionaries keyed by the English text (see src/i18n/dict/*.json).
+
+export type Locale = "en-GB" | "en-US" | "fr" | "es" | "pt" | "it" | "de";
+export type ContentLang = "en" | "fr" | "es" | "pt" | "it" | "de";
+export type DictLang = "es" | "pt" | "it" | "de";
+
+export const LOCALES: { code: Locale; label: string; short: string }[] = [
+  { code: "en-GB", label: "English (UK)", short: "EN" },
+  { code: "en-US", label: "English (US)", short: "EN" },
+  { code: "fr", label: "Français", short: "FR" },
+  { code: "es", label: "Español", short: "ES" },
+  { code: "pt", label: "Português", short: "PT" },
+  { code: "it", label: "Italiano", short: "IT" },
+  { code: "de", label: "Deutsch", short: "DE" },
+];
+
+export const isLocale = (v: unknown): v is Locale =>
+  typeof v === "string" && LOCALES.some((l) => l.code === v);
+
+export const contentLangOf = (locale: Locale): ContentLang =>
+  locale === "en-GB" || locale === "en-US" ? "en" : locale;
+
+export const numberLocaleOf = (locale: Locale): string =>
+  ({ "en-GB": "en-GB", "en-US": "en-US", fr: "fr-FR", es: "es-ES", pt: "pt-PT", it: "it-IT", de: "de-DE" })[locale];
+
+/** Pick the best browser language on first visit. */
+export const detectLocale = (): Locale => {
+  const langs = [navigator.language, ...(navigator.languages || [])].filter(Boolean).map((l) => l.toLowerCase());
+  for (const l of langs) {
+    if (l === "en-us") return "en-US";
+    if (l.startsWith("en")) return "en-GB";
+    for (const c of ["fr", "es", "pt", "it", "de"] as const) if (l.startsWith(c)) return c;
+  }
+  return "en-GB";
+};
+
+// ---- US spelling ---------------------------------------------------------
+const US_WORDS: [RegExp, string][] = [
+  [/\bcolour/g, "color"], [/\bColour/g, "Color"],
+  [/\bcentre/g, "center"], [/\bCentre/g, "Center"],
+  [/metre/g, "meter"], [/\bgrey/g, "gray"], [/\bGrey/g, "Gray"],
+  [/\bfavourite/g, "favorite"], [/\bbehaviour/g, "behavior"],
+  [/\btravell(ing|ed|er)/g, "travel$1"], [/\bTravell(ing|ed|er)/g, "Travel$1"],
+  [/\bneighbour/g, "neighbor"], [/\bNeighbour/g, "Neighbor"],
+  [/\banalys(e|ed|ing)\b/g, "analyz$1"],
+  [/\b(organ|real|visual|recogn|special|optim|categor|summar|harmon|stabil|vapor)is(e|ed|es|ing|ation)\b/gi, "$1iz$2"],
+];
+export const toUS = (s: string) => US_WORDS.reduce((acc, [re, rep]) => acc.replace(re, rep), s);
+
+// ---- Deep localisation ---------------------------------------------------
+type Dict = Record<string, string>;
+
+const mapStrings = <T,>(value: T, fn: (s: string) => string): T => {
+  if (typeof value === "string") return fn(value) as unknown as T;
+  if (Array.isArray(value)) return value.map((v) => mapStrings(v, fn)) as unknown as T;
+  if (value && typeof value === "object") {
+    const out: Record<string, unknown> = {};
+    for (const [k, v] of Object.entries(value as Record<string, unknown>)) out[k] = mapStrings(v, fn);
+    return out as T;
+  }
+  return value;
+};
+
+const cache = new Map<string, WeakMap<object, unknown>>();
+
+/**
+ * Localise an English value (string, array or nested table) for a locale.
+ * `fr` is the hand-written French version when available.
+ */
+export function localize<T>(en: T, fr: T | undefined, locale: Locale, dict: Dict | null): T {
+  if (locale === "en-GB") return en;
+  if (locale === "fr") return fr ?? en;
+  const fn = locale === "en-US" ? toUS : (s: string) => (dict && dict[s]) || s;
+  if (en && typeof en === "object") {
+    const key = locale + (dict ? ":d" : "");
+    let m = cache.get(key);
+    if (!m) cache.set(key, (m = new WeakMap()));
+    if (m.has(en as object)) return m.get(en as object) as T;
+    const out = mapStrings(en, fn);
+    m.set(en as object, out);
+    return out;
+  }
+  return mapStrings(en, fn);
+}
+
+export const loadDict = (lang: DictLang): Promise<Dict> =>
+  ({
+    es: () => import("./dict/es.json"),
+    pt: () => import("./dict/pt.json"),
+    it: () => import("./dict/it.json"),
+    de: () => import("./dict/de.json"),
+  })[lang]().then((m) => (m.default ?? m) as Dict);

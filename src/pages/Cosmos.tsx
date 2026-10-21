@@ -7,14 +7,12 @@ import { useEffect } from 'react';
 import { isNativeApp } from '@/lib/platform';
 
 const Cosmos = () => {
-  const { language } = useLanguage();
+  const { language, tr, tx, numberLocale } = useLanguage();
   const native = isNativeApp();
 
   useEffect(() => {
     document.title =
-      language === 'fr'
-        ? 'Explorateur du Cosmos | Par Dens'
-        : 'Cosmos Explorer | By Dens';
+      tx('Cosmos Explorer | By Dens', 'Explorateur du Cosmos | Par Dens');
   }, [language]);
 
   // Native iOS / iPadOS / macOS / visionOS app: render the explorer
@@ -52,17 +50,13 @@ const Cosmos = () => {
           <div className="container mx-auto px-4 sm:px-6">
             <div className="max-w-3xl mx-auto text-center space-y-4">
               <h1 className="font-serif text-3xl sm:text-4xl md:text-5xl font-bold leading-tight">
-                {language === 'fr' ? 'Explorateur du Cosmos' : 'Cosmos Explorer'}
+                {tx('Cosmos Explorer', 'Explorateur du Cosmos')}
               </h1>
               <p className="text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed px-2">
-                {language === 'fr' 
-                  ? 'Un voyage interactif de la Terre aux confins de l\'univers observable'
-                  : 'An interactive journey from Earth to the edge of the observable universe'}
+                {tx('An interactive journey from Earth to the edge of the observable universe', 'Un voyage interactif de la Terre aux confins de l\'univers observable')}
               </p>
               <p className="text-sm text-muted-foreground/70 italic">
-                {language === 'fr' 
-                  ? '— Toujours et à jamais un travail en cours —'
-                  : '— Always and forever a work in progress —'}
+                {tx('— Always and forever a work in progress —', '— Toujours et à jamais un travail en cours —')}
               </p>
             </div>
           </div>

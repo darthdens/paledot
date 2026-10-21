@@ -95,8 +95,8 @@ const translations = {
   },
 };
 
-const formatDistance = (distance: number, unit: string, language: string): string => {
-  const locale = language === 'fr' ? 'fr-FR' : 'en-US';
+const formatDistance = (distance: number, unit: string, lc: { numberLocale: string; tx: (en: string, fr: string) => string }): string => {
+  const locale = lc.numberLocale;
   
   if (unit === 'km') {
     if (distance >= 1e9) {
@@ -113,22 +113,22 @@ const formatDistance = (distance: number, unit: string, language: string): strin
   }
   
   if (unit === 'ly') {
-    return `${distance.toLocaleString(locale, { maximumFractionDigits: 2 })} ${language === 'fr' ? 'a.l.' : 'ly'}`;
+    return `${distance.toLocaleString(locale, { maximumFractionDigits: 2 })} ${lc.tx('ly', 'a.l.')}`;
   }
   
   if (unit === 'Mly') {
-    return `${distance.toLocaleString(locale, { maximumFractionDigits: 2 })} M ${language === 'fr' ? 'a.l.' : 'ly'}`;
+    return `${distance.toLocaleString(locale, { maximumFractionDigits: 2 })} M ${lc.tx('ly', 'a.l.')}`;
   }
   
   if (unit === 'Bly') {
-    return `${distance.toLocaleString(locale, { maximumFractionDigits: 2 })} B ${language === 'fr' ? 'a.l.' : 'ly'}`;
+    return `${distance.toLocaleString(locale, { maximumFractionDigits: 2 })} B ${lc.tx('ly', 'a.l.')}`;
   }
   
   return `${distance.toLocaleString(locale)}`;
 };
 
-const formatSize = (size: number, language: string): string => {
-  const locale = language === 'fr' ? 'fr-FR' : 'en-US';
+const formatSize = (size: number, lc: { numberLocale: string; tx: (en: string, fr: string) => string }): string => {
+  const locale = lc.numberLocale;
   
   if (size >= 1e9) {
     return `${(size / 1e9).toLocaleString(locale, { maximumFractionDigits: 2 })} B km`;
@@ -142,10 +142,10 @@ const formatSize = (size: number, language: string): string => {
   return `${size.toLocaleString(locale)} km`;
 };
 
-const formatRotationPeriod = (hours: number, language: string, t: typeof translations['en']): string => {
+const formatRotationPeriod = (hours: number, lc: { numberLocale: string; tx: (en: string, fr: string) => string }, t: typeof translations['en']): string => {
   const isRetrograde = hours < 0;
   const absHours = Math.abs(hours);
-  const locale = language === 'fr' ? 'fr-FR' : 'en-US';
+  const locale = lc.numberLocale;
   
   if (absHours >= 24) {
     const days = absHours / 24;
@@ -156,18 +156,18 @@ const formatRotationPeriod = (hours: number, language: string, t: typeof transla
   return `${absHours.toLocaleString(locale, { maximumFractionDigits: 1 })} ${t.hours}${suffix}`;
 };
 
-const formatOrbitalPeriod = (days: number, language: string, t: typeof translations['en']): string => {
-  const locale = language === 'fr' ? 'fr-FR' : 'en-US';
+const formatOrbitalPeriod = (days: number, lc: { numberLocale: string; tx: (en: string, fr: string) => string }, t: typeof translations['en']): string => {
+  const locale = lc.numberLocale;
   if (days >= 365) {
     const years = days / 365.25;
-    return `${years.toLocaleString(locale, { maximumFractionDigits: 2 })} ${language === 'fr' ? 'ans' : 'years'}`;
+    return `${years.toLocaleString(locale, { maximumFractionDigits: 2 })} ${lc.tx('years', 'ans')}`;
   }
   return `${days.toLocaleString(locale, { maximumFractionDigits: 1 })} ${t.days}`;
 };
 
 export const InfoCard = () => {
-  const { language } = useLanguage();
-  const t = translations[language];
+  const { language, tr, tx, numberLocale } = useLanguage();
+  const t = tr(translations);
   const selectedObject = useCosmosStore(state => state.selectedObject);
   const setSelectedObject = useCosmosStore(state => state.setSelectedObject);
   const jumpToObject = useCosmosStore(state => state.jumpToObject);
@@ -188,7 +188,7 @@ export const InfoCard = () => {
   };
 
   const objectType = t[selectedObject.type as keyof typeof t] || selectedObject.type;
-  const facts = selectedObject.facts?.[language] || [];
+  const facts = (selectedObject.facts ? tr(selectedObject.facts) : undefined) || [];
   
   // Get real periods for the selected object
   const orbitalPeriodDays = ORBITAL_PERIODS[selectedObject.id];
@@ -211,7 +211,7 @@ export const InfoCard = () => {
         onClick={() => setIsMinimized(!isMinimized)}
       >
         <h3 className="text-white font-semibold text-sm sm:text-base truncate flex-1 mr-2">
-          {selectedObject.name[language]}
+          {tr(selectedObject.name)}
         </h3>
         <div className="flex items-center gap-1">
           <div className="h-6 w-6 flex items-center justify-center text-white/70">
@@ -253,13 +253,13 @@ export const InfoCard = () => {
               <div className="bg-white/5 rounded-[4px] p-2">
                 <div className="text-white/50 text-xs">{t.distance}</div>
                 <div className="text-white font-medium">
-                  {formatDistance(selectedObject.distanceFromEarth, selectedObject.distanceUnit, language)}
+                  {formatDistance(selectedObject.distanceFromEarth, selectedObject.distanceUnit, { numberLocale, tx })}
                 </div>
               </div>
               <div className="bg-white/5 rounded-[4px] p-2">
                 <div className="text-white/50 text-xs">{t.size}</div>
                 <div className="text-white font-medium">
-                  {formatSize(selectedObject.size, language)}
+                  {formatSize(selectedObject.size, { numberLocale, tx })}
                 </div>
               </div>
             </div>
@@ -271,7 +271,7 @@ export const InfoCard = () => {
                   <div className="bg-white/5 rounded-[4px] p-2">
                     <div className="text-white/50 text-xs">{t.orbitalPeriod}</div>
                     <div className="text-white font-medium">
-                      {formatOrbitalPeriod(orbitalPeriodDays, language, t)}
+                      {formatOrbitalPeriod(orbitalPeriodDays, { numberLocale, tx }, t)}
                     </div>
                   </div>
                 )}
@@ -279,7 +279,7 @@ export const InfoCard = () => {
                   <div className="bg-white/5 rounded-[4px] p-2">
                     <div className="text-white/50 text-xs">{t.rotationPeriod}</div>
                     <div className="text-white font-medium">
-                      {formatRotationPeriod(rotationPeriodHours, language, t)}
+                      {formatRotationPeriod(rotationPeriodHours, { numberLocale, tx }, t)}
                     </div>
                   </div>
                 )}

@@ -11,8 +11,8 @@ import { PALEDOT_COPY } from "./copy";
  * The lone dot holds, then the wordmark reveals from it. No stars here: the dot is the last thing left.
  */
 export function PaleDotEndFrame({ distance, onAgain, onShare }: { distance: string; onAgain: () => void; onShare?: () => void }) {
-  const { language } = useLanguage();
-  const t = PALEDOT_COPY[language as "en" | "fr"] ?? PALEDOT_COPY.en;
+  const { language, tr } = useLanguage();
+  const t = tr(PALEDOT_COPY as unknown as { en: typeof PALEDOT_COPY.en });
   const stageRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
