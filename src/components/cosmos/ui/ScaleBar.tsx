@@ -125,7 +125,7 @@ export const ScaleBarUI = () => {
         
         {/* Scale label */}
         <div className="text-xs text-white/70 mt-1 text-center">
-          {scaleLevel.label(t)}
+          {scaleLevel!.label(t)}
         </div>
       </div>
     </div>

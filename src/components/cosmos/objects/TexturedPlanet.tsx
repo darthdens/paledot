@@ -565,31 +565,31 @@ export const TexturedPlanet = ({
     }
 
     if (planetMaterialRef.current) {
-      planetMaterialRef.current.uniforms.time.value = time;
-      planetMaterialRef.current.uniforms.objectCenter.value.copy(worldPos.current);
+      planetMaterialRef.current.uniforms["time"]!.value = time;
+      planetMaterialRef.current.uniforms["objectCenter"]!.value.copy(worldPos.current);
       if (isMoon) {
-        planetMaterialRef.current.uniforms.parentCenter.value.copy(parentPos.current);
-        planetMaterialRef.current.uniforms.parentRadius.value = parentPlanetSize;
+        planetMaterialRef.current.uniforms["parentCenter"]!.value.copy(parentPos.current);
+        planetMaterialRef.current.uniforms["parentRadius"]!.value = parentPlanetSize;
       }
     }
     if (cloudMaterialRef.current) {
-      cloudMaterialRef.current.uniforms.time.value = time;
-      cloudMaterialRef.current.uniforms.objectCenter.value.copy(worldPos.current);
+      cloudMaterialRef.current.uniforms["time"]!.value = time;
+      cloudMaterialRef.current.uniforms["objectCenter"]!.value.copy(worldPos.current);
       if (isMoon) {
-        cloudMaterialRef.current.uniforms.parentCenter.value.copy(parentPos.current);
-        cloudMaterialRef.current.uniforms.parentRadius.value = parentPlanetSize;
+        cloudMaterialRef.current.uniforms["parentCenter"]!.value.copy(parentPos.current);
+        cloudMaterialRef.current.uniforms["parentRadius"]!.value = parentPlanetSize;
       }
     }
     if (atmosphereMaterialRef.current) {
-      atmosphereMaterialRef.current.uniforms.objectCenter.value.copy(worldPos.current);
+      atmosphereMaterialRef.current.uniforms["objectCenter"]!.value.copy(worldPos.current);
       if (isMoon) {
-        atmosphereMaterialRef.current.uniforms.parentCenter.value.copy(parentPos.current);
-        atmosphereMaterialRef.current.uniforms.parentRadius.value = parentPlanetSize;
+        atmosphereMaterialRef.current.uniforms["parentCenter"]!.value.copy(parentPos.current);
+        atmosphereMaterialRef.current.uniforms["parentRadius"]!.value = parentPlanetSize;
       }
     }
     if (ringMaterialRef.current) {
-      ringMaterialRef.current.uniforms.objectCenter.value.copy(worldPos.current);
-      ringMaterialRef.current.uniforms.planetRadius.value = planetSize;
+      ringMaterialRef.current.uniforms["objectCenter"]!.value.copy(worldPos.current);
+      ringMaterialRef.current.uniforms["planetRadius"]!.value = planetSize;
     }
 
     // Keep a live world-position for camera targeting (planets/moons move).

@@ -5,9 +5,9 @@ const clamp = (n: number, min: number, max: number) => Math.min(max, Math.max(mi
 const parseHex = (hex: string) => {
   const raw = hex.replace('#', '').trim();
   if (raw.length === 3) {
-    const r = parseInt(raw[0] + raw[0], 16);
-    const g = parseInt(raw[1] + raw[1], 16);
-    const b = parseInt(raw[2] + raw[2], 16);
+    const r = parseInt(raw[0]! + raw[0]!, 16);
+    const g = parseInt(raw[1]! + raw[1]!, 16);
+    const b = parseInt(raw[2]! + raw[2]!, 16);
     return { r, g, b };
   }
   if (raw.length === 6) {

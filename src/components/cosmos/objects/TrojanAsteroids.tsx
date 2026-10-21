@@ -161,18 +161,18 @@ export const TrojanAsteroids = ({
     jupiterAngle: number
   ) => {
     if (!ref.current) return;
-    const positions = ref.current.geometry.attributes.position.array as Float32Array;
+    const positions = ref.current.geometry.attributes["position"]!.array as Float32Array;
     const { radii, heights, angleOffsets } = data;
     
     for (let i = 0; i < count; i++) {
       // Each Trojan orbits at Jupiter's speed, maintaining its offset from Jupiter
-      const currentAngle = jupiterAngle + angleOffsets[i];
-      positions[i * 3] = Math.cos(currentAngle) * radii[i];
+      const currentAngle = jupiterAngle + angleOffsets[i]!;
+      positions[i * 3] = Math.cos(currentAngle) * radii[i]!;
       positions[i * 3 + 1] = heights[i];
-      positions[i * 3 + 2] = Math.sin(currentAngle) * radii[i];
+      positions[i * 3 + 2] = Math.sin(currentAngle) * radii[i]!;
     }
     
-    ref.current.geometry.attributes.position.needsUpdate = true;
+    ref.current.geometry.attributes["position"]!.needsUpdate = true;
   };
   
   useFrame((_, delta) => {

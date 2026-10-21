@@ -85,14 +85,14 @@ const generateFilaments = (clusters: GalaxyCluster[], maxDist: number) => {
   
   for (let i = 0; i < clusters.length; i++) {
     for (let j = i + 1; j < clusters.length; j++) {
-      const from = new THREE.Vector3(...clusters[i].position);
-      const to = new THREE.Vector3(...clusters[j].position);
+      const from = new THREE.Vector3(...clusters[i]!.position);
+      const to = new THREE.Vector3(...clusters[j]!.position);
       const dist = from.distanceTo(to);
       
       if (dist < maxDist && dist > 3) {
         const strength = (1 - dist / maxDist) * 
-          (clusters[i].type === 'rich' ? 1.5 : 1) * 
-          (clusters[j].type === 'rich' ? 1.5 : 1);
+          (clusters[i]!.type === 'rich' ? 1.5 : 1) * 
+          (clusters[j]!.type === 'rich' ? 1.5 : 1);
         filaments.push({ from, to, strength });
       }
     }
@@ -301,10 +301,10 @@ export const VirgoSupercluster = ({ visualScale }: VirgoSuperclusterProps) => {
     const opacity = Math.min(fadeIn, fadeOut);
     
     if (clusterPointsRef.current) {
-      (clusterMaterial as THREE.ShaderMaterial).uniforms.uOpacity.value = opacity * 0.9;
+      (clusterMaterial as THREE.ShaderMaterial).uniforms["uOpacity"]!.value = opacity * 0.9;
     }
     if (filamentPointsRef.current) {
-      (filamentMaterial as THREE.ShaderMaterial).uniforms.uOpacity.value = opacity * 0.7;
+      (filamentMaterial as THREE.ShaderMaterial).uniforms["uOpacity"]!.value = opacity * 0.7;
     }
   });
   

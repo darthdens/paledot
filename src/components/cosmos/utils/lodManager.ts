@@ -151,7 +151,7 @@ export const createLODGeometry = (
   const newColors = new Float32Array(newCount * 3);
 
   for (let i = 0; i < newCount; i++) {
-    const srcIdx = indices[i] * 3;
+    const srcIdx = indices[i]! * 3;
     const dstIdx = i * 3;
 
     newPositions[dstIdx] = positions.array[srcIdx];

@@ -233,14 +233,14 @@ export const CosmosUI = () => {
     const echoContainer = document.getElementById('echo-chat-container') as HTMLElement | null;
     if (echoContainer) {
       if (isFullscreen) {
-        if (echoContainer.dataset.cosmosPrevDisplay === undefined) {
-          echoContainer.dataset.cosmosPrevDisplay = echoContainer.style.display || '';
-          echoContainer.dataset.cosmosPrevDisplayPriority = echoContainer.style.getPropertyPriority('display') || '';
+        if (echoContainer.dataset["cosmosPrevDisplay"] === undefined) {
+          echoContainer.dataset["cosmosPrevDisplay"] = echoContainer.style.display || '';
+          echoContainer.dataset["cosmosPrevDisplayPriority"] = echoContainer.style.getPropertyPriority('display') || '';
         }
         echoContainer.style.setProperty('display', 'none', 'important');
-      } else if (echoContainer.dataset.cosmosPrevDisplay !== undefined) {
-        const prevDisplay = echoContainer.dataset.cosmosPrevDisplay || '';
-        const prevPriority = echoContainer.dataset.cosmosPrevDisplayPriority || '';
+      } else if (echoContainer.dataset["cosmosPrevDisplay"] !== undefined) {
+        const prevDisplay = echoContainer.dataset["cosmosPrevDisplay"] || '';
+        const prevPriority = echoContainer.dataset["cosmosPrevDisplayPriority"] || '';
 
         if (!prevDisplay) {
           echoContainer.style.removeProperty('display');
@@ -248,20 +248,20 @@ export const CosmosUI = () => {
           echoContainer.style.setProperty('display', prevDisplay, prevPriority || undefined);
         }
 
-        delete echoContainer.dataset.cosmosPrevDisplay;
-        delete echoContainer.dataset.cosmosPrevDisplayPriority;
+        delete echoContainer.dataset["cosmosPrevDisplay"];
+        delete echoContainer.dataset["cosmosPrevDisplayPriority"];
       }
     }
 
     return () => {
       setPageChromeHidden(false);
-      if (echoContainer && echoContainer.dataset.cosmosPrevDisplay !== undefined) {
-        const prevDisplay = echoContainer.dataset.cosmosPrevDisplay || '';
-        const prevPriority = echoContainer.dataset.cosmosPrevDisplayPriority || '';
+      if (echoContainer && echoContainer.dataset["cosmosPrevDisplay"] !== undefined) {
+        const prevDisplay = echoContainer.dataset["cosmosPrevDisplay"] || '';
+        const prevPriority = echoContainer.dataset["cosmosPrevDisplayPriority"] || '';
         if (!prevDisplay) echoContainer.style.removeProperty('display');
         else echoContainer.style.setProperty('display', prevDisplay, prevPriority || undefined);
-        delete echoContainer.dataset.cosmosPrevDisplay;
-        delete echoContainer.dataset.cosmosPrevDisplayPriority;
+        delete echoContainer.dataset["cosmosPrevDisplay"];
+        delete echoContainer.dataset["cosmosPrevDisplayPriority"];
       }
     };
   }, [isFullscreen, setPageChromeHidden]);
@@ -280,7 +280,7 @@ export const CosmosUI = () => {
     ] as const;
 
     keys.forEach((key) => {
-      const datasetKey = `cosmosPrev${key[0].toUpperCase()}${key.slice(1)}`;
+      const datasetKey = `cosmosPrev${key[0]!.toUpperCase()}${key.slice(1)}`;
       if ((el.dataset as any)[datasetKey] === undefined) {
         (el.dataset as any)[datasetKey] = (el.style as any)[key] ?? '';
       }
@@ -301,7 +301,7 @@ export const CosmosUI = () => {
     ] as const;
 
     keys.forEach((key) => {
-      const datasetKey = `cosmosPrev${key[0].toUpperCase()}${key.slice(1)}`;
+      const datasetKey = `cosmosPrev${key[0]!.toUpperCase()}${key.slice(1)}`;
       const prev = (el.dataset as any)[datasetKey];
       (el.style as any)[key] = prev ?? '';
       delete (el.dataset as any)[datasetKey];
@@ -333,9 +333,9 @@ export const CosmosUI = () => {
       // Hide Echo widget in fullscreen (we do not modify the widget itself; we only hide its container)
       const echoContainer = document.getElementById('echo-chat-container') as HTMLElement | null;
       if (echoContainer) {
-        if (echoContainer.dataset.cosmosPrevDisplay === undefined) {
-          echoContainer.dataset.cosmosPrevDisplay = echoContainer.style.display || '';
-          echoContainer.dataset.cosmosPrevDisplayPriority = echoContainer.style.getPropertyPriority('display') || '';
+        if (echoContainer.dataset["cosmosPrevDisplay"] === undefined) {
+          echoContainer.dataset["cosmosPrevDisplay"] = echoContainer.style.display || '';
+          echoContainer.dataset["cosmosPrevDisplayPriority"] = echoContainer.style.getPropertyPriority('display') || '';
         }
         echoContainer.style.setProperty('display', 'none', 'important');
       }
@@ -358,9 +358,9 @@ export const CosmosUI = () => {
 
       // Restore Echo widget
       const echoContainer = document.getElementById('echo-chat-container') as HTMLElement | null;
-      if (echoContainer && echoContainer.dataset.cosmosPrevDisplay !== undefined) {
-        const prevDisplay = echoContainer.dataset.cosmosPrevDisplay || '';
-        const prevPriority = echoContainer.dataset.cosmosPrevDisplayPriority || '';
+      if (echoContainer && echoContainer.dataset["cosmosPrevDisplay"] !== undefined) {
+        const prevDisplay = echoContainer.dataset["cosmosPrevDisplay"] || '';
+        const prevPriority = echoContainer.dataset["cosmosPrevDisplayPriority"] || '';
 
         if (!prevDisplay) {
           echoContainer.style.removeProperty('display');
@@ -368,8 +368,8 @@ export const CosmosUI = () => {
           echoContainer.style.setProperty('display', prevDisplay, prevPriority || undefined);
         }
 
-        delete echoContainer.dataset.cosmosPrevDisplay;
-        delete echoContainer.dataset.cosmosPrevDisplayPriority;
+        delete echoContainer.dataset["cosmosPrevDisplay"];
+        delete echoContainer.dataset["cosmosPrevDisplayPriority"];
       }
 
       document.documentElement.style.overflow = '';
