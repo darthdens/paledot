@@ -100,8 +100,8 @@ const translations = {
 };
 
 export const CosmosUI = () => {
-  const { language } = useLanguage();
-  const t = translations[language];
+  const { language, tr, tx, numberLocale } = useLanguage();
+  const t = tr(translations);
   const isMobile = useIsMobile();
   // In the native iOS / iPadOS / macOS / visionOS app the experience is
   // already full-bleed, so the fullscreen toggle is unnecessary.
@@ -529,7 +529,7 @@ export const CosmosUI = () => {
       {showControlHints && (
         <div className="absolute inset-0 flex items-center justify-center bg-black z-[20000] p-3 animate-fade-in">
           <div className="text-center space-y-3 sm:space-y-5 max-w-sm sm:max-w-lg px-4">
-            <h1 className="text-xl sm:text-3xl md:text-4xl font-bold text-white leading-tight">{brand === 'paledot' ? (language === 'fr' ? 'Bienvenue dans Pale Dot' : 'Welcome to Pale Dot') : t.welcome}</h1>
+            <h1 className="text-xl sm:text-3xl md:text-4xl font-bold text-white leading-tight">{brand === 'paledot' ? (tx('Welcome to Pale Dot', 'Bienvenue dans Pale Dot')) : t.welcome}</h1>
             <p className="text-sm sm:text-base text-white/70">{t.subtitle}</p>
 
             <div className={`grid gap-3 text-left ${isMobile ? 'grid-cols-1' : 'grid-cols-1 sm:grid-cols-2'}`}>
@@ -556,13 +556,13 @@ export const CosmosUI = () => {
               {!isMobile && (
                 <div className="bg-white/10 rounded-lg p-3 sm:p-4 space-y-1.5">
                   <p className="text-white/90 font-medium text-sm sm:text-base">
-                    {language === 'fr' ? 'Raccourcis:' : 'Shortcuts:'}
+                    {tx('Shortcuts:', 'Raccourcis:')}
                   </p>
-                  <p className="text-white/70 text-xs sm:text-sm">• 1-9: {language === 'fr' ? 'Planètes' : 'Planets'}</p>
-                  <p className="text-white/70 text-xs sm:text-sm">• 0/S: {language === 'fr' ? 'Soleil' : 'Sun'}</p>
-                  <p className="text-white/70 text-xs sm:text-sm">• ←/→: {language === 'fr' ? 'Naviguer' : 'Navigate'}</p>
-                  <p className="text-white/70 text-xs sm:text-sm">• +/-: {language === 'fr' ? 'Vitesse' : 'Speed'}</p>
-                  <p className="text-white/70 text-xs sm:text-sm">• {language === 'fr' ? 'Espace' : 'Space'}: {language === 'fr' ? 'Pause' : 'Pause'}</p>
+                  <p className="text-white/70 text-xs sm:text-sm">• 1-9: {tx('Planets', 'Planètes')}</p>
+                  <p className="text-white/70 text-xs sm:text-sm">• 0/S: {tx('Sun', 'Soleil')}</p>
+                  <p className="text-white/70 text-xs sm:text-sm">• ←/→: {tx('Navigate', 'Naviguer')}</p>
+                  <p className="text-white/70 text-xs sm:text-sm">• +/-: {tx('Speed', 'Vitesse')}</p>
+                  <p className="text-white/70 text-xs sm:text-sm">• {tx('Space', 'Espace')}: {tx('Pause', 'Pause')}</p>
                 </div>
               )}
 
@@ -570,7 +570,7 @@ export const CosmosUI = () => {
               {isMobile && (
                 <div className="bg-white/10 rounded-lg p-3 sm:p-4 space-y-1.5">
                   <p className="text-white/90 font-medium text-sm sm:text-base">
-                    {language === 'fr' ? 'Astuce:' : 'Tip:'}
+                    {tx('Tip:', 'Astuce:')}
                   </p>
                   <p className="text-white/70 text-xs sm:text-sm">• {t.useButtons}</p>
                 </div>
@@ -753,7 +753,7 @@ export const CosmosUI = () => {
                 </Button>
               </TooltipTrigger>
               <TooltipContent variant="dark" side="bottom">
-                {language === 'fr' ? 'Plus d\'options' : 'More options'}
+                {tx('More options', 'Plus d\'options')}
               </TooltipContent>
             </Tooltip>
           </div>

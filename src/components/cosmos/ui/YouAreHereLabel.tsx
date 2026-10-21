@@ -127,8 +127,8 @@ const translations = {
 };
 
 export const YouAreHereLabel = () => {
-  const { language } = useLanguage();
-  const t = translations[language];
+  const { language, tr, tx, numberLocale } = useLanguage();
+  const t = tr(translations);
   const currentScale: ScaleLevel = useCosmosStore((state) => state.currentScale as ScaleLevel);
   const selectedObject = useCosmosStore((state) => state.selectedObject);
   const [isMinimized, setIsMinimized] = useState(true);

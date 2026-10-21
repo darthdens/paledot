@@ -96,7 +96,7 @@ const translations = {
 };
 
 const formatDistance = (distance: number, unit: string, language: string): string => {
-  const locale = language === 'fr' ? 'fr-FR' : 'en-US';
+  const locale = numberLocale;
   
   if (unit === 'km') {
     if (distance >= 1e9) {
@@ -113,22 +113,22 @@ const formatDistance = (distance: number, unit: string, language: string): strin
   }
   
   if (unit === 'ly') {
-    return `${distance.toLocaleString(locale, { maximumFractionDigits: 2 })} ${language === 'fr' ? 'a.l.' : 'ly'}`;
+    return `${distance.toLocaleString(locale, { maximumFractionDigits: 2 })} ${tx('ly', 'a.l.')}`;
   }
   
   if (unit === 'Mly') {
-    return `${distance.toLocaleString(locale, { maximumFractionDigits: 2 })} M ${language === 'fr' ? 'a.l.' : 'ly'}`;
+    return `${distance.toLocaleString(locale, { maximumFractionDigits: 2 })} M ${tx('ly', 'a.l.')}`;
   }
   
   if (unit === 'Bly') {
-    return `${distance.toLocaleString(locale, { maximumFractionDigits: 2 })} B ${language === 'fr' ? 'a.l.' : 'ly'}`;
+    return `${distance.toLocaleString(locale, { maximumFractionDigits: 2 })} B ${tx('ly', 'a.l.')}`;
   }
   
   return `${distance.toLocaleString(locale)}`;
 };
 
 const formatSize = (size: number, language: string): string => {
-  const locale = language === 'fr' ? 'fr-FR' : 'en-US';
+  const locale = numberLocale;
   
   if (size >= 1e9) {
     return `${(size / 1e9).toLocaleString(locale, { maximumFractionDigits: 2 })} B km`;
@@ -145,7 +145,7 @@ const formatSize = (size: number, language: string): string => {
 const formatRotationPeriod = (hours: number, language: string, t: typeof translations['en']): string => {
   const isRetrograde = hours < 0;
   const absHours = Math.abs(hours);
-  const locale = language === 'fr' ? 'fr-FR' : 'en-US';
+  const locale = numberLocale;
   
   if (absHours >= 24) {
     const days = absHours / 24;
@@ -157,17 +157,17 @@ const formatRotationPeriod = (hours: number, language: string, t: typeof transla
 };
 
 const formatOrbitalPeriod = (days: number, language: string, t: typeof translations['en']): string => {
-  const locale = language === 'fr' ? 'fr-FR' : 'en-US';
+  const locale = numberLocale;
   if (days >= 365) {
     const years = days / 365.25;
-    return `${years.toLocaleString(locale, { maximumFractionDigits: 2 })} ${language === 'fr' ? 'ans' : 'years'}`;
+    return `${years.toLocaleString(locale, { maximumFractionDigits: 2 })} ${tx('years', 'ans')}`;
   }
   return `${days.toLocaleString(locale, { maximumFractionDigits: 1 })} ${t.days}`;
 };
 
 export const InfoCard = () => {
-  const { language } = useLanguage();
-  const t = translations[language];
+  const { language, tr, tx, numberLocale } = useLanguage();
+  const t = tr(translations);
   const selectedObject = useCosmosStore(state => state.selectedObject);
   const setSelectedObject = useCosmosStore(state => state.setSelectedObject);
   const jumpToObject = useCosmosStore(state => state.jumpToObject);
@@ -188,7 +188,7 @@ export const InfoCard = () => {
   };
 
   const objectType = t[selectedObject.type as keyof typeof t] || selectedObject.type;
-  const facts = selectedObject.facts?.[language] || [];
+  const facts = (selectedObject.facts ? tr(selectedObject.facts) : undefined) || [];
   
   // Get real periods for the selected object
   const orbitalPeriodDays = ORBITAL_PERIODS[selectedObject.id];
@@ -211,7 +211,7 @@ export const InfoCard = () => {
         onClick={() => setIsMinimized(!isMinimized)}
       >
         <h3 className="text-white font-semibold text-sm sm:text-base truncate flex-1 mr-2">
-          {selectedObject.name[language]}
+          {tr(selectedObject.name)}
         </h3>
         <div className="flex items-center gap-1">
           <div className="h-6 w-6 flex items-center justify-center text-white/70">

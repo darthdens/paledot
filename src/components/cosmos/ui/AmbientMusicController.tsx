@@ -8,7 +8,7 @@ import { useAmbientMusic } from '../hooks/useAmbientMusic';
 import { useLanguage } from '@/i18n/LanguageContext';
 
 export const AmbientMusicController = () => {
-  const { language } = useLanguage();
+  const { language, tr, tx, numberLocale } = useLanguage();
 
   const store = useCosmosStore();
   const volume = store.volume;
@@ -88,12 +88,8 @@ export const AmbientMusicController = () => {
   const isMuted = !isPlaying || volume === 0;
 
   const tooltipLabel = isMuted
-    ? language === 'fr'
-      ? 'Activer le son'
-      : 'Enable sound'
-    : language === 'fr'
-      ? 'Désactiver le son'
-      : 'Disable sound';
+    ? tx('Enable sound', 'Activer le son')
+    : tx('Disable sound', 'Désactiver le son');
 
   // Get appropriate volume icon based on volume level
   const VolumeIcon = isMuted ? VolumeX : volume < 0.5 ? Volume1 : Volume2;
@@ -112,7 +108,7 @@ export const AmbientMusicController = () => {
           size="icon"
           onClick={handleMuteToggle}
           className="h-6 w-6 flex-shrink-0 backdrop-blur-xs text-foreground bg-foreground/10 hover:bg-foreground/20"
-          aria-label={language === 'fr' ? 'Couper le son' : 'Mute'}
+          aria-label={tx('Mute', 'Couper le son')}
         >
           <VolumeX className="h-3 w-3" />
         </Button>
@@ -123,7 +119,7 @@ export const AmbientMusicController = () => {
           step={0.05}
           variant="light"
           className="flex-1 [&_[data-radix-slider-range]]:bg-foreground/25"
-          aria-label={language === 'fr' ? 'Volume' : 'Volume'}
+          aria-label={tx('Volume', 'Volume')}
         />
       </div>
 

@@ -11,17 +11,15 @@ class ErrorBoundary extends Component<{ fallback: ReactNode; children: ReactNode
 }
 
 function Fallback() {
-  const { language } = useLanguage();
+  const { language, tr, tx, numberLocale } = useLanguage();
   return (
     <div className="w-full h-full flex items-center justify-center p-8 text-center">
       <div className="max-w-md space-y-3 text-neutral-200">
         <h2 className="font-serif text-2xl">
-          {language === 'fr' ? 'Le cosmos ne peut pas s\u2019afficher' : 'The cosmos can\u2019t be displayed'}
+          {tx('The cosmos can\u2019t be displayed', 'Le cosmos ne peut pas s\u2019afficher')}
         </h2>
         <p className="text-sm text-neutral-400">
-          {language === 'fr'
-            ? 'Votre navigateur ne semble pas prendre en charge WebGL. Essayez Chrome, Safari ou Firefox \u00e0 jour, et activez l\u2019acc\u00e9l\u00e9ration mat\u00e9rielle.'
-            : 'Your browser doesn\u2019t appear to support WebGL. Try an up-to-date Chrome, Safari, or Firefox with hardware acceleration enabled.'}
+          {tx('Your browser doesn\u2019t appear to support WebGL. Try an up-to-date Chrome, Safari, or Firefox with hardware acceleration enabled.', 'Votre navigateur ne semble pas prendre en charge WebGL. Essayez Chrome, Safari ou Firefox \u00e0 jour, et activez l\u2019acc\u00e9l\u00e9ration mat\u00e9rielle.')}
         </p>
       </div>
     </div>

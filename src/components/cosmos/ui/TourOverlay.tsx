@@ -34,8 +34,8 @@ const translations = {
 };
 
 export const TourOverlay = () => {
-  const { language } = useLanguage();
-  const t = translations[language];
+  const { language, tr, tx, numberLocale } = useLanguage();
+  const t = tr(translations);
   const [isCollapsed, setIsCollapsed] = useState(false);
   
   // Swipe gesture handling
@@ -440,7 +440,7 @@ export const TourOverlay = () => {
             {tourIndex + 1}/{totalStops}
           </span>
           <h2 className="text-white font-semibold text-sm truncate min-w-0">
-            {currentStop.title[language]}
+            {tr(currentStop.title)}
           </h2>
         </div>
         <div className="flex items-center gap-1 flex-shrink-0">
@@ -500,7 +500,7 @@ export const TourOverlay = () => {
           {/* Content area */}
           <div className="p-3 sm:p-4 space-y-2 sm:space-y-3 max-h-[25vh] sm:max-h-none overflow-y-auto">
             <p className="text-white/80 text-xs sm:text-sm leading-relaxed line-clamp-4 sm:line-clamp-none">
-              {currentStop.narration[language]}
+              {tr(currentStop.narration)}
             </p>
           </div>
           

@@ -89,8 +89,8 @@ export const ScaleBarInner = () => {
 
 // UI component to be rendered outside the Canvas
 export const ScaleBarUI = () => {
-  const { language } = useLanguage();
-  const t = translations[language];
+  const { language, tr, tx, numberLocale } = useLanguage();
+  const t = tr(translations);
   const [distance, setDistance] = useState(0);
   
   useEffect(() => {

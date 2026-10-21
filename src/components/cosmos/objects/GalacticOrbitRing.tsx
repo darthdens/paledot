@@ -26,7 +26,7 @@ const FADE_DURATION = 1.0;
  * Fades smoothly when transitioning between scales.
  */
 export const GalacticOrbitRing = ({ visualScale, visible = true }: GalacticOrbitRingProps) => {
-  const { language } = useLanguage();
+  const { language, tr, tx, numberLocale } = useLanguage();
   const [isHovered, setIsHovered] = useState(false);
   const currentOpacity = useRef(0);
   const ringMaterialRef = useRef<THREE.LineBasicMaterial>(null);
@@ -158,7 +158,7 @@ export const GalacticOrbitRing = ({ visualScale, visible = true }: GalacticOrbit
         >
           <div className="bg-white/10 backdrop-blur-xs px-3 py-1.5 rounded-lg whitespace-nowrap">
             <span className="text-white text-sm font-semibold">
-              {language === 'fr' ? 'Nous sommes ici' : 'We are here'}
+              {tx('We are here', 'Nous sommes ici')}
             </span>
           </div>
         </Html>

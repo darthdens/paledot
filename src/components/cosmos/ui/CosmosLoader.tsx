@@ -133,7 +133,7 @@ export const CosmosLoader = ({
   onDismissed,
   onSkip,
 }: CosmosLoaderProps) => {
-  const { language } = useLanguage();
+  const { language, tr, tx, numberLocale } = useLanguage();
   const isMobile = useIsMobile();
   const [fadeOut, setFadeOut] = useState(false);
   const [stage, setStage] = useState<LoadingStage>('textures');
@@ -177,7 +177,7 @@ export const CosmosLoader = ({
 
     const loadTexture = (url: string): Promise<void> => {
       return new Promise((resolve) => {
-        const name = textureNames[url]?.[language] || 'Unknown';
+        const name = (textureNames[url] ? tr(textureNames[url]) : undefined) || 'Unknown';
         setTextureProgress(loaded, total, name);
 
         textureLoader.load(
@@ -274,16 +274,16 @@ export const CosmosLoader = ({
   const getCurrentItemDisplay = useCallback(() => {
     if (stage === 'textures') {
       const name = loadingProgress.currentItem;
-      return language === 'fr' ? `Texture: ${name}` : `Texture: ${name}`;
+      return tx(`Texture: ${name}`, `Texture: ${name}`);
     } else if (stage === 'geometries') {
       const lastGeometry = Array.from(geometriesReady).pop();
       if (lastGeometry) {
-        const name = GEOMETRY_NAMES[lastGeometry]?.[language] || lastGeometry;
-        return language === 'fr' ? `Génération: ${name}` : `Building: ${name}`;
+        const name = (GEOMETRY_NAMES[lastGeometry] ? tr(GEOMETRY_NAMES[lastGeometry]) : undefined) || lastGeometry;
+        return tx(`Building: ${name}`, `Génération: ${name}`);
       }
-      return language === 'fr' ? 'Génération des galaxies…' : 'Building galaxies…';
+      return tx('Building galaxies…', 'Génération des galaxies…');
     } else {
-      return language === 'fr' ? 'Compilation des shaders…' : 'Compiling shaders…';
+      return tx('Compiling shaders…', 'Compilation des shaders…');
     }
   }, [stage, loadingProgress.currentItem, geometriesReady, language]);
 
@@ -408,26 +408,24 @@ export const CosmosLoader = ({
 
         {/* Title */}
         <h2 className="text-xl font-serif text-white/90 tracking-wide">
-          {language === 'fr' ? 'Chargement du Cosmos' : 'Loading the Cosmos'}
+          {tx('Loading the Cosmos', 'Chargement du Cosmos')}
         </h2>
         <p className="text-xs text-white/40 -mt-6 italic">
-          {language === 'fr' 
-            ? 'Je sais, c\'est long... mais ça vaut le coup, promis !'
-            : 'I know it\'s long... but trust me, it\'s worth the wait!'}
+          {tx('I know it\'s long... but trust me, it\'s worth the wait!', 'Je sais, c\'est long... mais ça vaut le coup, promis !')}
         </p>
 
         {/* Stage indicator */}
         <div className="flex items-center gap-3 text-xs text-white/50">
           <span className={stage === 'textures' ? 'text-white/90' : 'text-white/30'}>
-            {language === 'fr' ? 'Textures' : 'Textures'}
+            {tx('Textures', 'Textures')}
           </span>
           <span className="text-white/20">→</span>
           <span className={stage === 'geometries' ? 'text-white/90' : 'text-white/30'}>
-            {language === 'fr' ? 'Galaxies' : 'Galaxies'}
+            {tx('Galaxies', 'Galaxies')}
           </span>
           <span className="text-white/20">→</span>
           <span className={stage === 'finalizing' ? 'text-white/90' : 'text-white/30'}>
-            {language === 'fr' ? 'Shaders' : 'Shaders'}
+            {tx('Shaders', 'Shaders')}
           </span>
         </div>
 
@@ -463,7 +461,7 @@ export const CosmosLoader = ({
             onClick={onSkip}
             className="mt-4 px-4 py-2 text-xs text-white/50 hover:text-white/90 hover:bg-white/10 rounded-md transition-all duration-200 border border-white/10 hover:border-white/30"
           >
-            {language === 'fr' ? 'Passer le chargement' : 'Skip loading'}
+            {tx('Skip loading', 'Passer le chargement')}
           </button>
         )}
 
@@ -519,8 +517,8 @@ const RotatingTip = ({ isMobile, language }: { isMobile: boolean; language: 'en'
   const currentTip = shuffledTips[currentTipIndex];
   if (!currentTip) return null;
 
-  const prefix = language === 'fr' ? 'Astuce: ' : 'Tip: ';
-  const tipText = currentTip[language];
+  const prefix = tx('Tip: ', 'Astuce: ');
+  const tipText = tr(currentTip);
   // Don't add prefix if tip already has an emoji (space facts)
   const displayText = tipText.match(/^[^\w]/) ? tipText : prefix + tipText;
 

@@ -35,8 +35,8 @@ interface ObjectSearchProps {
 }
 
 export const ObjectSearch = ({ isFullscreen }: ObjectSearchProps) => {
-  const { language } = useLanguage();
-  const t = translations[language];
+  const { language, tr, tx, numberLocale } = useLanguage();
+  const t = tr(translations);
   const [isOpen, setIsOpen] = useState(false);
   const [query, setQuery] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
@@ -46,7 +46,7 @@ export const ObjectSearch = ({ isFullscreen }: ObjectSearchProps) => {
   // Filter celestial objects by name
   const filteredObjects = celestialObjects.filter((obj) => {
     if (!query.trim()) return false;
-    const name = obj.name[language].toLowerCase();
+    const name = tr(obj.name).toLowerCase();
     return name.includes(query.toLowerCase());
   });
 
@@ -168,7 +168,7 @@ export const ObjectSearch = ({ isFullscreen }: ObjectSearchProps) => {
                     className="w-full px-3 py-2 text-left hover:bg-white/10 flex items-center justify-between gap-2 transition-colors"
                   >
                     <span className="text-white text-sm truncate">
-                      {obj.name[language]}
+                      {tr(obj.name)}
                     </span>
                     <span className="text-white/40 text-xs flex-shrink-0">
                       {getTypeLabel(obj.type)}

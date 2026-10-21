@@ -6,14 +6,12 @@ import { useLanguage } from "@/i18n/LanguageContext";
 import { PaleDotTitleScreen } from "@/brand/paledot/PaleDotTitleScreen";
 
 const PaleDot = () => {
-  const { language } = useLanguage();
+  const { language, tr, tx, numberLocale } = useLanguage();
   const [started, setStarted] = useState(false);
 
   useEffect(() => {
     document.title =
-      language === "fr"
-        ? "Pale Dot — De la Terre aux confins de tout"
-        : "Pale Dot — From Earth to the edge of everything";
+      tx("Pale Dot — From Earth to the edge of everything", "Pale Dot — De la Terre aux confins de tout");
   }, [language]);
 
   // Once inside the explorer, paint Safari's top/bottom strips the same black as the 3D sky.
