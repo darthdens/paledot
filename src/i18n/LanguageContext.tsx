@@ -1,12 +1,35 @@
-import { createContext, useContext, useEffect, useState, ReactNode } from "react";
-import { translations, Language } from "./translations";
+import { createContext, useCallback, useContext, useEffect, useMemo, useState, ReactNode } from "react";
+import { translations } from "./translations";
+import {
+  type ContentLang,
+  type DictLang,
+  type Locale,
+  contentLangOf,
+  detectLocale,
+  isLocale,
+  loadDict,
+  localize,
+  numberLocaleOf,
+} from "./locales";
 
 type TranslationType = typeof translations.en;
+type Rec<T> = { en: T; fr?: T };
 
 interface LanguageContextType {
-  language: Language;
-  setLanguage: (lang: Language) => void;
+  /** Content language: 'en' | 'fr' | 'es' | 'pt' | 'it' | 'de'. */
+  language: ContentLang;
+  /** Full chosen locale, incl. en-GB vs en-US. */
+  locale: Locale;
+  setLocale: (l: Locale) => void;
+  /** Back-compat: accepts a locale or 'en'. */
+  setLanguage: (l: Locale | "en") => void;
+  /** Number formatting locale, e.g. 'de-DE'. */
+  numberLocale: string;
   t: TranslationType;
+  /** Localise an { en, fr } record (strings, arrays or tables). */
+  tr: <T>(rec: Rec<T>) => T;
+  /** Inline English/French pair. */
+  tx: (en: string, fr: string) => string;
 }
 
 const LANGUAGE_CONTEXT_KEY = "__language_context_singleton__";
@@ -20,48 +43,53 @@ const getLanguageContext = () => {
 };
 
 const LanguageContext = getLanguageContext();
-const detectFrench = (): boolean => {
-  const browserLang = navigator.language || (navigator as any).userLanguage || "";
-  if (browserLang.toLowerCase().startsWith("fr")) {
-    return true;
-  }
-
-  const languages = navigator.languages || [];
-  for (const lang of languages) {
-    if (lang.toLowerCase().startsWith("fr")) {
-      return true;
-    }
-  }
-
-  return false;
-};
 
 export const LanguageProvider = ({ children }: { children: ReactNode }) => {
-  const [language, setLanguageState] = useState<Language>("en");
+  const [locale, setLocaleState] = useState<Locale>("en-GB");
+  const [dict, setDict] = useState<Record<string, string> | null>(null);
 
   useEffect(() => {
-    const savedLang = localStorage.getItem("lang") as Language | null;
-
-    if (savedLang && (savedLang === "en" || savedLang === "fr")) {
-      setLanguageState(savedLang);
-    } else {
-      const isFrench = detectFrench();
-      setLanguageState(isFrench ? "fr" : "en");
-    }
+    const saved = localStorage.getItem("lang");
+    if (saved === "en") setLocaleState("en-GB");
+    else if (isLocale(saved)) setLocaleState(saved);
+    else setLocaleState(detectLocale());
   }, []);
 
-  const setLanguage = (lang: Language) => {
-    setLanguageState(lang);
-    localStorage.setItem("lang", lang);
-  };
+  const language = contentLangOf(locale);
 
-  const t = translations[language] as TranslationType;
+  useEffect(() => {
+    document.documentElement.lang = locale;
+    if (language === "en" || language === "fr") {
+      setDict(null);
+      return;
+    }
+    let alive = true;
+    loadDict(language as DictLang).then((d) => alive && setDict(d));
+    return () => {
+      alive = false;
+    };
+  }, [locale, language]);
 
-  return (
-    <LanguageContext.Provider value={{ language, setLanguage, t }}>
-      {children}
-    </LanguageContext.Provider>
-  );
+  const setLocale = useCallback((l: Locale) => {
+    setLocaleState(l);
+    localStorage.setItem("lang", l);
+  }, []);
+
+  const value = useMemo<LanguageContextType>(() => {
+    const tr = <T,>(rec: Rec<T>) => localize(rec.en, rec.fr, locale, dict);
+    return {
+      language,
+      locale,
+      setLocale,
+      setLanguage: (l) => setLocale(l === "en" ? "en-GB" : l),
+      numberLocale: numberLocaleOf(locale),
+      t: localize(translations.en, translations.fr as unknown as TranslationType, locale, dict),
+      tr,
+      tx: (en, fr) => localize(en, fr, locale, dict),
+    };
+  }, [language, locale, dict, setLocale]);
+
+  return <LanguageContext.Provider value={value}>{children}</LanguageContext.Provider>;
 };
 
 export const useLanguage = () => {
