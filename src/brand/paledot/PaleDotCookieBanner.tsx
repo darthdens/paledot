@@ -12,8 +12,8 @@ const COOKIE_CONSENT_KEY = "cookie-consent";
  * Sits bottom-left so it never covers the "by Dens Akoka" credit at bottom-right.
  */
 export function PaleDotCookieBanner() {
-  const { language } = useLanguage();
-  const t = (PALEDOT_COPY[language as "en" | "fr"] ?? PALEDOT_COPY.en).cookies;
+  const { language, tr } = useLanguage();
+  const t = tr(PALEDOT_COPY as unknown as { en: typeof PALEDOT_COPY.en }).cookies;
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {

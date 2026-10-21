@@ -4,7 +4,7 @@ export const LanguageSwitcher = () => {
   const { language, setLanguage } = useLanguage();
 
   const toggleLang = () => {
-    setLanguage(language === "en" ? "fr" : "en");
+    setLanguage(language === "fr" ? "en" : "fr");
   };
 
   return (

@@ -12,6 +12,7 @@ import { AboutModal } from './AboutModal';
 import { AmbientMusicController } from './AmbientMusicController';
 import { isNativeApp } from '@/lib/platform';
 import { useSiteBrand } from '@/lib/site-brand';
+import { LanguageButton, LanguageMenuRow } from './LanguagePicker';
 const translations = {
   en: {
     startTour: 'Start Guided Tour',
@@ -737,6 +738,7 @@ export const CosmosUI = () => {
                   {t.about}
                 </TooltipContent>
               </Tooltip>
+              <LanguageButton />
             </div>
 
             {/* Mobile & Tablet more button */}
@@ -844,6 +846,8 @@ export const CosmosUI = () => {
                 <Info className="w-4 h-4 text-white/70" />
                 <span className="text-sm text-white/90">{t.about}</span>
               </button>
+
+              <LanguageMenuRow />
             </div>
           </div>
         </div>

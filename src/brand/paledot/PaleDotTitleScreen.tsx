@@ -12,8 +12,8 @@ import { PaleDotStars } from "./PaleDotStars";
  * "Begin at Earth" pill follow. Click anywhere to skip. Credit links to dens.so in a new tab.
  */
 export function PaleDotTitleScreen({ onBegin }: { onBegin: () => void }) {
-  const { language } = useLanguage();
-  const t = PALEDOT_COPY[language as "en" | "fr"] ?? PALEDOT_COPY.en;
+  const { language, tr } = useLanguage();
+  const t = tr(PALEDOT_COPY as unknown as { en: typeof PALEDOT_COPY.en });
   const stageRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
