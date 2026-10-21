@@ -101,7 +101,10 @@ const mapStrings = <T,>(value: T, fn: (s: string) => string): T => {
   return value;
 };
 
-const cache = new Map<string, WeakMap<object, unknown>>();
+// Cache keyed by dict identity first, then locale, then source object — so a
+// stale dict from a previous language can never poison another locale's entries.
+const NO_DICT = {};
+const cache = new WeakMap<object, Map<string, WeakMap<object, unknown>>>();
 
 /**
  * Localise an English value (string, array or nested table) for a locale.
@@ -112,9 +115,11 @@ export function localize<T>(en: T, fr: T | undefined, locale: Locale, dict: Dict
   if (locale === "fr") return fr ?? en;
   const fn = locale === "en-US" ? toUS : (s: string) => (dict && dict[s]) || s;
   if (en && typeof en === "object") {
-    const key = locale + (dict ? ":d" : "");
-    let m = cache.get(key);
-    if (!m) cache.set(key, (m = new WeakMap()));
+    const dictKey = (dict as object) ?? NO_DICT;
+    let byLocale = cache.get(dictKey);
+    if (!byLocale) cache.set(dictKey, (byLocale = new Map()));
+    let m = byLocale.get(locale);
+    if (!m) byLocale.set(locale, (m = new WeakMap()));
     if (m.has(en as object)) return m.get(en as object) as T;
     const out = mapStrings(en, fn);
     m.set(en as object, out);
