@@ -1852,7 +1852,7 @@ export const TexturedPlanet = ({
                     vec3 worldNormal = normalize(vWorldNormal);
                     vec3 sunDir = normalize(-vWorldPosition);
                     float NdotL = max(dot(worldNormal, sunDir), 0.0);
-                    float shadow-sm = calculateShadow(vWorldPosition, sunDir);
+                    float shadow = calculateShadow(vWorldPosition, sunDir);
                     
                     float cloudCoverage;
                     
