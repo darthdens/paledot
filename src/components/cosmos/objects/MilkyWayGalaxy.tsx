@@ -512,18 +512,8 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
         <group ref={markerGroupRef}>
           <points>
             <bufferGeometry>
-              <bufferAttribute
-                attach="attributes-position"
-                count={1}
-                array={new Float32Array([0, 0, 0])}
-                itemSize={3}
-              />
-              <bufferAttribute
-                attach="attributes-color"
-                count={1}
-                array={new Float32Array([1, 1, 1])}
-                itemSize={3}
-              />
+              <bufferAttribute attach="attributes-position" args={[new Float32Array([0, 0, 0]), 3]} />
+              <bufferAttribute attach="attributes-color" args={[new Float32Array([1, 1, 1]), 3]} />
             </bufferGeometry>
             <pointsMaterial
               size={gs * 120}
@@ -600,18 +590,8 @@ export const MilkyWayGalaxy = ({ visualScale, showYouAreHere = true }: MilkyWayG
         <group ref={proximaMarkerRef}>
           <points>
             <bufferGeometry>
-              <bufferAttribute
-                attach="attributes-position"
-                count={1}
-                array={new Float32Array([0, 0, 0])}
-                itemSize={3}
-              />
-              <bufferAttribute
-                attach="attributes-color"
-                count={1}
-                array={new Float32Array([1, 0.8, 0.8])}
-                itemSize={3}
-              />
+              <bufferAttribute attach="attributes-position" args={[new Float32Array([0, 0, 0]), 3]} />
+              <bufferAttribute attach="attributes-color" args={[new Float32Array([1, 0.8, 0.8]), 3]} />
             </bufferGeometry>
             <pointsMaterial
               size={gs * 120}

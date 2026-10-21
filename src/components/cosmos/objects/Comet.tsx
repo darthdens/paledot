@@ -234,18 +234,8 @@ const Comet = ({ comet, scale }: CometProps) => {
       {/* Dust tail */}
       <points ref={tailRef}>
         <bufferGeometry>
-          <bufferAttribute
-            attach="attributes-position"
-            count={dustTailPositions.length / 3}
-            array={dustTailPositions}
-            itemSize={3}
-          />
-          <bufferAttribute
-            attach="attributes-color"
-            count={dustTailColors.length / 3}
-            array={dustTailColors}
-            itemSize={3}
-          />
+          <bufferAttribute attach="attributes-position" args={[dustTailPositions, 3]} />
+          <bufferAttribute attach="attributes-color" args={[dustTailColors, 3]} />
         </bufferGeometry>
         <pointsMaterial
           size={coreSize * 0.5}
@@ -260,18 +250,8 @@ const Comet = ({ comet, scale }: CometProps) => {
       {/* Ion tail */}
       <points ref={ionTailRef}>
         <bufferGeometry>
-          <bufferAttribute
-            attach="attributes-position"
-            count={ionTailPositions.length / 3}
-            array={ionTailPositions}
-            itemSize={3}
-          />
-          <bufferAttribute
-            attach="attributes-color"
-            count={ionTailColors.length / 3}
-            array={ionTailColors}
-            itemSize={3}
-          />
+          <bufferAttribute attach="attributes-position" args={[ionTailPositions, 3]} />
+          <bufferAttribute attach="attributes-color" args={[ionTailColors, 3]} />
         </bufferGeometry>
         <pointsMaterial
           size={coreSize * 0.3}

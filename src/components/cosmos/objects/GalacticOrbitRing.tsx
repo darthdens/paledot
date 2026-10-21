@@ -131,19 +131,14 @@ export const GalacticOrbitRing = ({ visualScale, visible = true }: GalacticOrbit
       {/* Vertical line connecting marker to label */}
       <line>
         <bufferGeometry>
-          <bufferAttribute
-            attach="attributes-position"
-            count={2}
-            array={new Float32Array([
+          <bufferAttribute attach="attributes-position" args={[new Float32Array([
               markerX,
               markerRadius,
               markerZ,
               markerX,
               markerRadius * 10,
               markerZ,
-            ])}
-            itemSize={3}
-          />
+            ]), 3]} />
         </bufferGeometry>
         <lineBasicMaterial ref={lineMaterialRef} color="#ffffff" transparent opacity={0} />
       </line>
