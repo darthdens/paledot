@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useSiteBrand } from '@/lib/site-brand';
 import * as THREE from 'three';
 import { useLanguage } from '@/i18n/LanguageContext';
 import { useCosmosStore, EXPECTED_GEOMETRIES } from '../store/useCosmosStore';
@@ -134,6 +135,7 @@ export const CosmosLoader = ({
   onSkip,
 }: CosmosLoaderProps) => {
   const { language, tr, tx, numberLocale } = useLanguage();
+  const brand = useSiteBrand();
   const isMobile = useIsMobile();
   const [fadeOut, setFadeOut] = useState(false);
   const [stage, setStage] = useState<LoadingStage>('textures');
@@ -312,6 +314,31 @@ export const CosmosLoader = ({
     })),
     []
   );
+
+  if (brand === 'paledot') {
+    return (
+      <div
+        className={`absolute inset-0 z-50 flex flex-col items-center justify-center transition-opacity duration-600 ${fadeOut ? 'opacity-0' : 'opacity-100'}`}
+        style={{ backgroundColor: 'var(--cosmos-loader-bg, #000000)' }}
+      >
+        <div className="pd-loader-dot" />
+        <div className="mt-10 w-[min(240px,60vw)]">
+          <div className="pd-progress">
+            <div style={{ width: `${Math.min(overallProgress, 100)}%` }} />
+          </div>
+          <div className="mt-3 flex items-center justify-between gap-3">
+            <span className="pd-hud-label truncate">{getCurrentItemDisplay()}</span>
+            <span className="pd-hud-label tabular-nums">{Math.round(overallProgress)}%</span>
+          </div>
+        </div>
+        {!dismiss && stage !== 'finalizing' && (
+          <button type="button" onClick={onSkip} className="pd-pill mt-8" style={{ fontSize: 13, padding: '8px 16px' }}>
+            {tx('Skip loading', 'Passer le chargement')}
+          </button>
+        )}
+      </div>
+    );
+  }
 
   return (
     <div 
