@@ -32,12 +32,24 @@ export function PaleDotTitleScreen({ onBegin }: { onBegin: () => void }) {
       data-cosmos-container
     >
       <PaleDotStars />
+      <div className="pd-hud-corner tl">
+        <span className="pd-hud-label">{t.youAreHere}</span>
+        <span className="pd-hud-value">{t.earthLocation}</span>
+      </div>
+      <div className="pd-hud-corner tr">
+        <span className="pd-hud-label">{t.scaleLabel}</span>
+        <span className="pd-hud-value">1 px = 10 km</span>
+      </div>
       <PaleDotWordmark lit />
       <p className="pd-desc">{t.descriptor}</p>
       <div className="pd-actions">
         <button type="button" data-action className="pd-pill" onClick={onBegin}>
           {t.begin}
         </button>
+      </div>
+      <div className="pd-readout">
+        <div className="pd-hud-label">{t.distanceLabel}</div>
+        <div className="pd-hud-readout">0 km</div>
       </div>
       <p className="pd-credit">
         {t.credit}{" "}

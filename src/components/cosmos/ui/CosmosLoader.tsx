@@ -578,25 +578,13 @@ const RotatingTip = ({ isMobile, variant = 'cosmos' }: { isMobile: boolean; vari
   );
 };
 
-// Pale Dot loader mark: the dot breathes at the centre while a tiny companion
-// orbits it, and a hairline ring fills in with the loading progress.
-const PaleDotLoaderMark = ({ progress }: { progress: number }) => {
-  const r = 34;
-  const c = 2 * Math.PI * r;
-  const p = Math.max(0, Math.min(progress, 100)) / 100;
-  return (
-    <div className="pd-loader-mark" aria-hidden="true">
-      <svg viewBox="0 0 80 80" className="pd-loader-ring">
-        <circle cx="40" cy="40" r={r} className="pd-loader-ring-track" />
-        <circle
-          cx="40" cy="40" r={r}
-          className="pd-loader-ring-fill"
-          strokeDasharray={c}
-          strokeDashoffset={c * (1 - p)}
-        />
-      </svg>
-      <div className="pd-loader-orbit"><span /></div>
-      <div className="pd-loader-dot" />
-    </div>
-  );
-};
+// Pale Dot loader mark: the dot holds still (the progress bar does the loading). Hairline
+// orbits unfold out of it one after another, like the journey zooming out from Earth.
+const PaleDotLoaderMark = (_props: { progress: number }) => (
+  <div className="pd-loader-mark" aria-hidden="true">
+    <span className="pd-loader-wave" />
+    <span className="pd-loader-wave" style={{ animationDelay: '1.2s' }} />
+    <span className="pd-loader-wave" style={{ animationDelay: '2.4s' }} />
+    <div className="pd-loader-dot pd-loader-dot-still" />
+  </div>
+);

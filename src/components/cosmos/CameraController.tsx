@@ -261,8 +261,23 @@ export const CameraController = () => {
         }
       }
 
-      camera.position.lerpVectors(startPosition.current, endPosition.current, eased);
       orbitControls.target.lerpVectors(startTarget.current, endTarget.current, eased);
+
+      // Huge jumps (e.g. edge of the universe -> Earth): a straight lerp stays light-years away
+      // until the very last frame and then snaps. Interpolate the viewing distance in log space instead.
+      const startOff = tmpDelta.current.subVectors(startPosition.current, startTarget.current);
+      const endOff = tmpTarget.current.subVectors(endPosition.current, endTarget.current);
+      const d0 = startOff.length();
+      const d1 = endOff.length();
+      if (d0 > 0 && d1 > 0 && (d0 / d1 > 100 || d1 / d0 > 100)) {
+        const dist = Math.exp(Math.log(d0) + (Math.log(d1) - Math.log(d0)) * eased);
+        startOff.normalize().lerp(endOff.normalize(), eased);
+        if (startOff.lengthSq() < 1e-12) startOff.copy(endOff);
+        startOff.normalize().multiplyScalar(dist);
+        camera.position.copy(orbitControls.target).add(startOff);
+      } else {
+        camera.position.lerpVectors(startPosition.current, endPosition.current, eased);
+      }
       orbitControls.update();
       return;
     }

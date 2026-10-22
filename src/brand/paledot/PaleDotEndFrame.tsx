@@ -89,9 +89,9 @@ export function PaleDotEndFrame({
           {copied ? t.copied : t.share}
         </button>
       </div>
-      <div className="pd-readout" style={{ bottom: "calc(max(20px, env(safe-area-inset-bottom, 0px)) + 36px)" }}>
+      <div className="pd-readout">
         <div className="pd-hud-label">{t.distanceLabel}</div>
-        <div className="pd-hud-readout" style={{ fontSize: "clamp(18px, 5.2vw, 28px)", lineHeight: 1.2, whiteSpace: "nowrap" }}>
+        <div className="pd-hud-readout">
           {distance}
         </div>
       </div>
