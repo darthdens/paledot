@@ -545,7 +545,7 @@ export const CosmosUI = () => {
             <p className="text-sm sm:text-base text-white/70">{t.subtitle}</p>
 
             <div className={`grid gap-3 text-left ${isMobile ? 'grid-cols-1' : 'grid-cols-1 sm:grid-cols-2'}`}>
-              <div className="bg-white/10 rounded-lg p-3 sm:p-4 space-y-1.5">
+              <div className={`rounded-lg p-3 sm:p-4 space-y-1.5 ${brand === 'paledot' ? 'pd-card' : 'bg-white/10'}`}>
                 <p className="text-white/90 font-medium text-sm sm:text-base">{t.controls}:</p>
                 {isMobile ? (
                   <>
@@ -566,7 +566,7 @@ export const CosmosUI = () => {
 
               {/* Keyboard shortcuts - only on desktop */}
               {!isMobile && (
-                <div className="bg-white/10 rounded-lg p-3 sm:p-4 space-y-1.5">
+                <div className={`rounded-lg p-3 sm:p-4 space-y-1.5 ${brand === 'paledot' ? 'pd-card' : 'bg-white/10'}`}>
                   <p className="text-white/90 font-medium text-sm sm:text-base">
                     {tx('Shortcuts:', 'Raccourcis:')}
                   </p>
@@ -580,7 +580,7 @@ export const CosmosUI = () => {
 
               {/* Mobile tip - use UI buttons */}
               {isMobile && (
-                <div className="bg-white/10 rounded-lg p-3 sm:p-4 space-y-1.5">
+                <div className={`rounded-lg p-3 sm:p-4 space-y-1.5 ${brand === 'paledot' ? 'pd-card' : 'bg-white/10'}`}>
                   <p className="text-white/90 font-medium text-sm sm:text-base">
                     {tx('Tip:', 'Astuce:')}
                   </p>
@@ -596,7 +596,7 @@ export const CosmosUI = () => {
                   setShowControlHints(false);
                   startTour();
                 }}
-                className="text-xs sm:text-sm bg-blue-600 hover:bg-blue-700 text-white border-0"
+                className={brand === 'paledot' ? "pd-pill pd-primary" : "text-xs sm:text-sm bg-blue-600 hover:bg-blue-700 text-white border-0"}
               >
                 {t.startTour}
               </Button>
@@ -607,7 +607,7 @@ export const CosmosUI = () => {
                   setShowControlHints(false);
                   goHome();
                 }}
-                className="text-xs sm:text-sm bg-transparent border-white/30 text-white hover:bg-white/10 hover:text-white"
+                className={brand === 'paledot' ? "pd-pill" : "text-xs sm:text-sm bg-transparent border-white/30 text-white hover:bg-white/10 hover:text-white"}
               >
                 {t.explore}
               </Button>

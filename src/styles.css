@@ -551,3 +551,5 @@ All colors MUST be HSL.
 .paledot .border-white\/10 { border-color: hsl(var(--border)); }
 .paledot [role="menu"], .paledot [role="dialog"] { font-family: var(--pd-font-sans); }
 .paledot .tabular-nums, .paledot .font-mono { font-family: var(--pd-font-mono); }
+.paledot .pd-card { background: hsl(var(--surface) / .7); box-shadow: inset 0 0 0 1px hsl(var(--border)); }
+.paledot .pd-pill.pd-primary:hover { background: hsl(var(--dot) / .9); }
