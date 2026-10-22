@@ -73,7 +73,7 @@ export function PaleDotCookieBanner() {
             type="button"
             data-action
             onClick={() => choose("declined")}
-            className="rounded-full border px-4 py-1.5 text-sm font-medium transition-colors"
+            className="rounded-lg border px-4 py-1.5 text-sm font-medium transition-colors"
             style={{
               borderColor: "hsl(var(--border-strong))",
               color: "hsl(var(--foreground))",
@@ -86,7 +86,7 @@ export function PaleDotCookieBanner() {
             type="button"
             data-action
             onClick={() => choose("accepted")}
-            className="rounded-full px-4 py-1.5 text-sm font-medium transition-opacity hover:opacity-90"
+            className="rounded-lg px-4 py-1.5 text-sm font-medium transition-opacity hover:opacity-90"
             style={{ background: "hsl(var(--dot))", color: "hsl(var(--on-dot))" }}
           >
             {t.accept}
