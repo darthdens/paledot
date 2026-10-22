@@ -4,6 +4,7 @@ import { CosmosExplorer } from "@/components/cosmos/CosmosExplorer";
 import { WebGLBoundary } from "@/components/cosmos/WebGLBoundary";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { PaleDotTitleScreen } from "@/brand/paledot/PaleDotTitleScreen";
+import { useCosmosStore } from "@/components/cosmos/store/useCosmosStore";
 
 const PaleDot = () => {
   const { language, tr, tx, numberLocale } = useLanguage();
@@ -17,6 +18,8 @@ const PaleDot = () => {
   // Once inside the explorer, paint Safari's top/bottom strips the same black as the 3D sky.
   useEffect(() => {
     if (!started) return;
+    // Always land on "Welcome to Pale Dot" (guided tour / explore) once loading ends.
+    useCosmosStore.getState().setShowControlHints(true);
     const color = "#000000";
     const els = [document.documentElement, document.body];
     const prev = els.map((el) => el.style.backgroundColor);
