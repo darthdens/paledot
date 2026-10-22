@@ -321,7 +321,7 @@ export const CosmosLoader = ({
         className={`absolute inset-0 z-50 flex flex-col items-center justify-center transition-opacity duration-600 ${fadeOut ? 'opacity-0' : 'opacity-100'}`}
         style={{ backgroundColor: 'var(--cosmos-loader-bg, #000000)' }}
       >
-        <div className="pd-loader-dot" />
+        <PaleDotLoaderMark progress={overallProgress} />
         <div className="mt-10 w-[min(240px,60vw)]">
           <div className="pd-progress">
             <div style={{ width: `${Math.min(overallProgress, 100)}%` }} />
@@ -331,8 +331,9 @@ export const CosmosLoader = ({
             <span className="pd-hud-label tabular-nums">{Math.round(overallProgress)}%</span>
           </div>
         </div>
+        <RotatingTip isMobile={isMobile} variant="paledot" />
         {!dismiss && stage !== 'finalizing' && (
-          <button type="button" onClick={onSkip} className="pd-pill mt-8" style={{ fontSize: 13, padding: '8px 16px' }}>
+          <button type="button" onClick={onSkip} className="pd-pill mt-6" style={{ fontSize: 13, padding: '8px 16px' }}>
             {tx('Skip loading', 'Passer le chargement')}
           </button>
         )}
@@ -500,7 +501,7 @@ export const CosmosLoader = ({
 };
 
 // Separate component for rotating tips to manage its own state
-const RotatingTip = ({ isMobile }: { isMobile: boolean }) => {
+const RotatingTip = ({ isMobile, variant = 'cosmos' }: { isMobile: boolean; variant?: 'cosmos' | 'paledot' }) => {
   const { tr, tx } = useLanguage();
   const [currentTipIndex, setCurrentTipIndex] = useState(0);
   const [isVisible, setIsVisible] = useState(true);
@@ -510,9 +511,11 @@ const RotatingTip = ({ isMobile }: { isMobile: boolean }) => {
     return LOADING_TIPS.filter(tip => {
       if (isMobile && tip.desktopOnly) return false;
       if (!isMobile && tip.mobileOnly) return false;
+      // Pale Dot brand rules: no Voyager references.
+      if (variant === 'paledot' && /voyager/i.test(tip.en)) return false;
       return true;
     });
-  }, [isMobile]);
+  }, [isMobile, variant]);
 
   // Shuffle tips on mount for variety
   const shuffledTips = useMemo(() => {
@@ -550,6 +553,21 @@ const RotatingTip = ({ isMobile }: { isMobile: boolean }) => {
   // Don't add prefix if tip already has an emoji (space facts)
   const displayText = tipText.match(/^[^\w]/) ? tipText : prefix + tipText;
 
+  if (variant === 'paledot') {
+    // Brand voice: no emoji, small sans line with a mono label.
+    const clean = tipText.replace(/^[^\p{L}\p{N}]+/u, '').trim();
+    const isFact = clean !== tipText;
+    return (
+      <div
+        className="mt-10 max-w-[min(360px,80vw)] min-h-[64px] text-center transition-opacity duration-300"
+        style={{ opacity: isVisible ? 1 : 0 }}
+      >
+        <div className="pd-hud-label mb-2">{isFact ? tx('Did you know', 'Le saviez-vous') : tx('Tip', 'Astuce')}</div>
+        <p className="text-sm leading-relaxed" style={{ color: 'hsl(var(--muted-foreground))' }}>{clean}</p>
+      </div>
+    );
+  }
+
   return (
     <p 
       className="text-xs text-white/30 text-center max-w-xs mt-2 h-8 flex items-center justify-center transition-opacity duration-300"
@@ -557,5 +575,28 @@ const RotatingTip = ({ isMobile }: { isMobile: boolean }) => {
     >
       {displayText}
     </p>
+  );
+};
+
+// Pale Dot loader mark: the dot breathes at the centre while a tiny companion
+// orbits it, and a hairline ring fills in with the loading progress.
+const PaleDotLoaderMark = ({ progress }: { progress: number }) => {
+  const r = 34;
+  const c = 2 * Math.PI * r;
+  const p = Math.max(0, Math.min(progress, 100)) / 100;
+  return (
+    <div className="pd-loader-mark" aria-hidden="true">
+      <svg viewBox="0 0 80 80" className="pd-loader-ring">
+        <circle cx="40" cy="40" r={r} className="pd-loader-ring-track" />
+        <circle
+          cx="40" cy="40" r={r}
+          className="pd-loader-ring-fill"
+          strokeDasharray={c}
+          strokeDashoffset={c * (1 - p)}
+        />
+      </svg>
+      <div className="pd-loader-orbit"><span /></div>
+      <div className="pd-loader-dot" />
+    </div>
   );
 };
