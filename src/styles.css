@@ -584,3 +584,17 @@ All colors MUST be HSL.
 }
 /* Rows inside menus stay softly rounded inside the 10px panel. */
 .paledot div.bg-white\/10 button, .paledot [role="menu"] button { border-radius: 6px; }
+
+/* ---- Pale Dot: map legacy Cosmos accent colours onto the brand palette ---- */
+.paledot .bg-blue-400, .paledot .bg-blue-500, .paledot .bg-blue-600, .paledot .bg-green-400 { background-color: hsl(var(--dot)) !important; }
+.paledot .bg-blue-500\/20, .paledot .bg-blue-500\/30 { background-color: hsl(var(--dot) / .12) !important; }
+.paledot .hover\:bg-blue-500\/30:hover, .paledot .hover\:bg-blue-500\/50:hover, .paledot .hover\:bg-blue-700:hover { background-color: hsl(var(--dot) / .2) !important; }
+.paledot .text-blue-200, .paledot .text-blue-300, .paledot .hover\:text-blue-200:hover { color: hsl(var(--dot)) !important; }
+.paledot .bg-amber-500\/20 { background-color: hsl(var(--warning) / .14) !important; }
+.paledot .border-amber-500\/30 { border-color: hsl(var(--warning) / .3) !important; }
+.paledot .text-amber-400 { color: hsl(var(--warning)) !important; }
+.paledot .text-red-400 { color: hsl(var(--danger)) !important; }
+.paledot .fill-red-400 { fill: hsl(var(--danger)) !important; }
+.paledot .text-green-500 { color: hsl(var(--success)) !important; }
+.paledot .text-yellow-500 { color: hsl(var(--warning)) !important; }
+.paledot [stroke="#3b82f6"] { stroke: hsl(var(--dot)) !important; }
