@@ -40,7 +40,7 @@ export function PaleDotEndFrame({ distance, onAgain, onShare }: { distance: stri
         <button type="button" data-action className="pd-pill pd-primary" onClick={onAgain}>{t.again}</button>
         <button type="button" data-action className="pd-pill" onClick={share}>{t.share}</button>
       </div>
-      <div className="pd-readout">
+      <div className="pd-readout max-sm:!bottom-[calc(max(20px,env(safe-area-inset-bottom))+36px)]">
         <div className="pd-hud-label">{t.distanceLabel}</div>
         <div className="pd-hud-readout" style={{ fontSize: "clamp(18px, 5.2vw, 28px)", lineHeight: 1.2, whiteSpace: "nowrap" }}>{distance}</div>
       </div>
