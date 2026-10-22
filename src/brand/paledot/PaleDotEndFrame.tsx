@@ -4,6 +4,7 @@ import { useLanguage } from "@/i18n/LanguageContext";
 import { PaleDotWordmark } from "./PaleDotWordmark";
 import { setupPaleDotMotion } from "./paledotMotion";
 import { PALEDOT_COPY } from "./copy";
+import { PaleDotSocialShare } from "./PaleDotSocialShare";
 
 /**
  * End-of-journey frame. Mounted over the explorer after the guided tour finishes or when the
@@ -38,7 +39,7 @@ export function PaleDotEndFrame({
     const url = "https://paledot.org/";
     if (navigator.share) {
       try {
-        await navigator.share({ title: "Pale Dot", text: t.descriptor, url });
+        await navigator.share({ title: "Pale Dot", text: t.shareMessage, url });
         return;
       } catch (e) {
         if ((e as Error)?.name === "AbortError") return;
@@ -80,14 +81,17 @@ export function PaleDotEndFrame({
     >
       <PaleDotWordmark lit idPrefix="pd-end" />
       <p className="pd-desc">{t.descriptor}</p>
-      <div className="pd-actions">
-        <button type="button" data-action className="pd-pill pd-primary" onClick={onAgain}>{t.again}</button>
-        {onHome && (
-          <button type="button" data-action className="pd-pill" onClick={onHome}>{t.home}</button>
-        )}
-        <button type="button" data-action className="pd-pill" onClick={share} aria-live="polite">
-          {copied ? t.copied : t.share}
-        </button>
+      <div className="pd-actions" style={{ flexDirection: "column", alignItems: "center" }}>
+        <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: 10 }}>
+          <button type="button" data-action className="pd-pill pd-primary" onClick={onAgain}>{t.again}</button>
+          {onHome && (
+            <button type="button" data-action className="pd-pill" onClick={onHome}>{t.home}</button>
+          )}
+          <button type="button" data-action className="pd-pill" onClick={share} aria-live="polite">
+            {copied ? t.copied : t.share}
+          </button>
+        </div>
+        <PaleDotSocialShare message={t.shareMessage} label={t.shareOn} copiedLabel={t.copiedForInstagram} />
       </div>
       <div className="pd-readout">
         <div className="pd-hud-label">{t.distanceLabel}</div>
