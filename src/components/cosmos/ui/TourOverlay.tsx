@@ -287,6 +287,7 @@ export const TourOverlay = () => {
       } else {
         // Tour complete - stop
         stopTour();
+        window.dispatchEvent(new Event('cosmos:journey-end'));
       }
     }, duration);
     
@@ -338,6 +339,7 @@ export const TourOverlay = () => {
       goToStop(tourIndex + 1);
     } else {
       stopTour();
+      window.dispatchEvent(new Event('cosmos:journey-end'));
     }
   };
   

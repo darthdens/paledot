@@ -5,10 +5,36 @@ import { WebGLBoundary } from "@/components/cosmos/WebGLBoundary";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { PaleDotTitleScreen } from "@/brand/paledot/PaleDotTitleScreen";
 import { useCosmosStore } from "@/components/cosmos/store/useCosmosStore";
+import { PaleDotEndFrame } from "@/brand/paledot/PaleDotEndFrame";
+import { getObjectById } from "@/components/cosmos/data/celestialObjects";
 
 const PaleDot = () => {
   const { language, tr, tx, numberLocale } = useLanguage();
   const [started, setStarted] = useState(false);
+  const [ended, setEnded] = useState(false);
+
+  // End frame: after the guided tour finishes, or when an explorer reaches the edge of the observable universe.
+  useEffect(() => {
+    if (!started) return;
+    const show = () => setEnded(true);
+    window.addEventListener("cosmos:journey-end", show);
+    const unsub = useCosmosStore.subscribe((s, prev) => {
+      const id = s.selectedObject?.id;
+      if (id === "observable-universe" && prev.selectedObject?.id !== id && !s.isTouring) {
+        window.setTimeout(show, 2500); // let the camera arrive first
+      }
+    });
+    return () => {
+      window.removeEventListener("cosmos:journey-end", show);
+      unsub();
+    };
+  }, [started]);
+
+  const goAgain = () => {
+    setEnded(false);
+    const earth = getObjectById("earth");
+    if (earth) useCosmosStore.getState().setSelectedObject(earth);
+  };
 
   useEffect(() => {
     document.title =
@@ -55,6 +81,12 @@ const PaleDot = () => {
       <WebGLBoundary>
         <CosmosExplorer />
       </WebGLBoundary>
+      {ended && (
+        <PaleDotEndFrame
+          distance={tx("46.5 billion light-years", "46,5 milliards d’années-lumière")}
+          onAgain={goAgain}
+        />
+      )}
     </div>
   );
 };

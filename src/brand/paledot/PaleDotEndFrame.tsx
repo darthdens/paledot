@@ -33,16 +33,16 @@ export function PaleDotEndFrame({ distance, onAgain, onShare }: { distance: stri
   };
 
   return (
-    <div ref={stageRef} className="paledot dark pd-stage fixed inset-0 z-50" style={{ height: "100dvh" }} data-cosmos-container>
+    <div ref={stageRef} className="paledot dark pd-stage fixed inset-0 z-50" style={{ position: "fixed", inset: 0, zIndex: 30000, height: "100dvh" }} data-cosmos-container>
       <PaleDotWordmark lit idPrefix="pd-end" />
       <p className="pd-desc">{t.descriptor}</p>
       <div className="pd-actions">
         <button type="button" data-action className="pd-pill pd-primary" onClick={onAgain}>{t.again}</button>
         <button type="button" data-action className="pd-pill" onClick={share}>{t.share}</button>
       </div>
-      <div className="pd-readout">
+      <div className="pd-readout" style={{ bottom: "calc(max(20px, env(safe-area-inset-bottom, 0px)) + 36px)" }}>
         <div className="pd-hud-label">{t.distanceLabel}</div>
-        <div className="pd-hud-readout">{distance}</div>
+        <div className="pd-hud-readout" style={{ fontSize: "clamp(18px, 5.2vw, 28px)", lineHeight: 1.2, whiteSpace: "nowrap" }}>{distance}</div>
       </div>
       <p className="pd-credit">
         {t.credit}{" "}
