@@ -224,11 +224,11 @@ All colors MUST be HSL.
 
   /* Pale Dot uses the normal system cursor (no custom cursor there) */
   .paledot, .paledot *, .paledot *::before, .paledot *::after, .paledot canvas,
-  html.pd-cursor, html.pd-cursor *, html.pd-cursor *::before, html.pd-cursor *::after {
+  html[data-pd-cursor], html[data-pd-cursor] *, html[data-pd-cursor] *::before, html[data-pd-cursor] *::after {
     cursor: auto !important;
   }
   .paledot a, .paledot button, .paledot [data-action],
-  html.pd-cursor a, html.pd-cursor button, html.pd-cursor [role="menuitem"], html.pd-cursor [role="option"] {
+  html[data-pd-cursor] a, html[data-pd-cursor] button, html[data-pd-cursor] [role="menuitem"], html[data-pd-cursor] [role="option"] {
     cursor: pointer !important;
   }
 

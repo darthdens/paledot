@@ -15,8 +15,8 @@ const PaleDot = () => {
 
   // Normal system cursor everywhere on Pale Dot, including menus and tooltips rendered outside the page wrapper.
   useEffect(() => {
-    document.documentElement.classList.add("pd-cursor");
-    return () => document.documentElement.classList.remove("pd-cursor");
+    document.documentElement.setAttribute("data-pd-cursor", "");
+    return () => document.documentElement.removeAttribute("data-pd-cursor");
   }, []);
 
   // End frame: after the guided tour finishes, or when an explorer reaches the edge of the observable universe.
