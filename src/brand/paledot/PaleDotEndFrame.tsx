@@ -33,7 +33,7 @@ export function PaleDotEndFrame({ distance, onAgain, onShare }: { distance: stri
   };
 
   return (
-    <div ref={stageRef} className="paledot dark pd-stage fixed inset-0 z-50" style={{ height: "100dvh" }} data-cosmos-container>
+    <div ref={stageRef} className="paledot dark pd-stage fixed inset-0 z-50" style={{ position: "fixed", inset: 0, zIndex: 30000, height: "100dvh" }} data-cosmos-container>
       <PaleDotWordmark lit idPrefix="pd-end" />
       <p className="pd-desc">{t.descriptor}</p>
       <div className="pd-actions">
