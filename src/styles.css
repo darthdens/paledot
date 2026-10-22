@@ -223,10 +223,12 @@ All colors MUST be HSL.
   }
 
   /* Pale Dot uses the normal system cursor (no custom cursor there) */
-  .paledot, .paledot *, .paledot *::before, .paledot *::after, .paledot canvas {
+  .paledot, .paledot *, .paledot *::before, .paledot *::after, .paledot canvas,
+  html.pd-cursor, html.pd-cursor *, html.pd-cursor *::before, html.pd-cursor *::after {
     cursor: auto !important;
   }
-  .paledot a, .paledot button, .paledot [data-action] {
+  .paledot a, .paledot button, .paledot [data-action],
+  html.pd-cursor a, html.pd-cursor button, html.pd-cursor [role="menuitem"], html.pd-cursor [role="option"] {
     cursor: pointer !important;
   }
 
