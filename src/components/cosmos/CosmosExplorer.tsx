@@ -84,6 +84,13 @@ export const CosmosExplorer = () => {
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
+    // Pale Dot uses the normal system pointer: undo any inline "none" and don't enforce it.
+    if (document.documentElement.hasAttribute('data-pd-cursor') || container.closest('.paledot')) {
+      const c = container.querySelector('canvas');
+      if (c) c.style.removeProperty('cursor');
+      return;
+    }
+
 
     const observer = new MutationObserver(() => {
       const canvas = container.querySelector('canvas');
