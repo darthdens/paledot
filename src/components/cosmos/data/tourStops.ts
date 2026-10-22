@@ -242,7 +242,7 @@ export const tourStops: TourStop[] = [
       fr: 'La Ceinture de Kuiper',
     },
     narration: {
-      en: 'Beyond Neptune stretches the Kuiper Belt, a vast ring-3 of icy bodies and dwarf planets extending billions of kilometers into space. This frozen frontier contains remnants from the solar system\'s birth, including countless comets waiting to be discovered.',
+      en: 'Beyond Neptune stretches the Kuiper Belt, a vast ring of icy bodies and dwarf planets extending billions of kilometers into space. This frozen frontier contains remnants from the solar system\'s birth, including countless comets waiting to be discovered.',
       fr: 'Au-delà de Neptune s\'étend la ceinture de Kuiper, un vaste anneau de corps glacés et de planètes naines s\'étendant sur des milliards de kilomètres dans l\'espace. Cette frontière gelée contient des vestiges de la naissance du système solaire, y compris d\'innombrables comètes attendant d\'être découvertes.',
     },
     duration: 8,

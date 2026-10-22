@@ -63,6 +63,9 @@ export const LanguageProvider = ({ children }: { children: ReactNode }) => {
       setDict(null);
       return;
     }
+    // Clear the previous language's dictionary immediately so the UI never
+    // shows the old language while the new one loads.
+    setDict(null);
     let alive = true;
     loadDict(language as DictLang).then((d) => alive && setDict(d));
     return () => {
