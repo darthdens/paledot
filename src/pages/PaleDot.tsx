@@ -32,6 +32,11 @@ const PaleDot = () => {
 
   const goAgain = () => {
     setEnded(false);
+    useCosmosStore.getState().startTour();
+  };
+
+  const goHome = () => {
+    setEnded(false);
     const earth = getObjectById("earth");
     if (earth) useCosmosStore.getState().setSelectedObject(earth);
   };
@@ -85,6 +90,7 @@ const PaleDot = () => {
         <PaleDotEndFrame
           distance={tx("46.5 billion light-years", "46,5 milliards d’années-lumière")}
           onAgain={goAgain}
+          onHome={goHome}
         />
       )}
     </div>
