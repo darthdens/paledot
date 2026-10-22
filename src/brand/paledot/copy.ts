@@ -15,6 +15,8 @@ export const PALEDOT_COPY = {
     skipLoading: "Skip loading",
     distanceLabel: "Distance from Earth",
     youAreHere: "You are here",
+    earthLocation: "Earth · 1 AU from the Sun",
+    scaleLabel: "Scale",
     reached: "You reached",
     edge: "The edge of the observable universe",
     // Optional About copy. Factual, no "pale blue dot" wording, no Sagan quotes.
@@ -44,6 +46,8 @@ export const PALEDOT_COPY = {
     skipLoading: "Passer le chargement",
     distanceLabel: "Distance depuis la Terre",
     youAreHere: "Vous êtes ici",
+    earthLocation: "Terre · 1 UA du Soleil",
+    scaleLabel: "Échelle",
     reached: "Vous avez atteint",
     edge: "Le bord de l'univers observable",
     about1:

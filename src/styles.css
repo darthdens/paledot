@@ -608,7 +608,7 @@ All colors MUST be HSL.
 .paledot [stroke="#3b82f6"] { stroke: hsl(var(--dot)) !important; }
 
 /* Title / end frame HUD corners, matching the brand-kit frames (48px insets on desktop). */
-.pd-hud-corner { position: absolute; opacity: 0; display: flex; flex-direction: column; gap: 2px; }
+.pd-hud-corner { position: absolute; opacity: 0; animation: pd-corner-in .6s ease-out 2.1s forwards; display: flex; flex-direction: column; gap: 2px; }
 .pd-hud-corner.tl { left: max(clamp(20px, 2.5vw, 48px), env(safe-area-inset-left, 0px)); top: max(clamp(20px, 3.7vw, 40px), env(safe-area-inset-top, 0px)); }
 .pd-hud-corner.tr { right: max(clamp(20px, 2.5vw, 48px), env(safe-area-inset-right, 0px)); top: max(clamp(20px, 3.7vw, 40px), env(safe-area-inset-top, 0px)); text-align: right; align-items: flex-end; }
 .pd-stage .pd-readout { left: max(clamp(20px, 2.5vw, 48px), env(safe-area-inset-left, 0px)); bottom: max(clamp(20px, 3.7vw, 40px), env(safe-area-inset-bottom, 0px)); }
@@ -618,3 +618,6 @@ All colors MUST be HSL.
 .pd-stage .pd-hud-value { font-size: clamp(12px, 0.75vw + 4px, 14px); }
 .pd-stage .pd-hud-readout { font-size: clamp(18px, 1.46vw, 28px) !important; line-height: 1.2 !important; white-space: nowrap; }
 @media (max-width: 640px) { .pd-hud-corner.tr { display: none; } }
+@keyframes pd-corner-in { to { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .pd-hud-corner { animation-delay: 0s; } }
+.pd-stage-svg { width: clamp(220px, 31.5vw, 620px); }
