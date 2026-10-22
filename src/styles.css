@@ -569,8 +569,8 @@ All colors MUST be HSL.
 .paledot .pd-loader-mark { width: 120px; height: 120px; }
 .paledot .pd-loader-dot-still { animation: pd-glow 3.6s ease-in-out infinite; }
 @keyframes pd-glow { 0%, 100% { box-shadow: 0 0 22px 4px hsl(var(--dot-glow) / .3); } 50% { box-shadow: 0 0 34px 8px hsl(var(--dot-glow) / .45); } }
-.paledot .pd-loader-wave { width: 12px; height: 12px; border-radius: 50%; border: 1px solid hsl(var(--dot) / .7); opacity: 0; transform: scale(1) rotateX(62deg); animation: pd-unfold 3.6s cubic-bezier(.2,.6,.3,1) infinite; }
-@keyframes pd-unfold { 0% { opacity: 0; transform: scale(1) rotateX(62deg); } 12% { opacity: .9; } 100% { opacity: 0; transform: scale(10) rotateX(62deg); border-color: hsl(var(--border)); } }
+.paledot .pd-loader-wave { width: 12px; height: 12px; border-radius: 50%; border: 1px solid hsl(var(--dot) / .7); opacity: 0; transform: rotateX(62deg); animation: pd-unfold 3.6s cubic-bezier(.2,.6,.3,1) infinite; }
+@keyframes pd-unfold { 0% { opacity: 0; width: 12px; height: 12px; } 12% { opacity: .9; } 100% { opacity: 0; width: 120px; height: 120px; border-color: hsl(var(--border)); } }
 @media (prefers-reduced-motion: reduce) { .paledot .pd-loader-wave, .paledot .pd-loader-dot-still { animation: none; } }
 
 /* ---- Pale Dot: one consistent shape language across controls ---- */
@@ -606,3 +606,15 @@ All colors MUST be HSL.
 .paledot .text-green-500 { color: hsl(var(--success)) !important; }
 .paledot .text-yellow-500 { color: hsl(var(--warning)) !important; }
 .paledot [stroke="#3b82f6"] { stroke: hsl(var(--dot)) !important; }
+
+/* Title / end frame HUD corners, matching the brand-kit frames (48px insets on desktop). */
+.pd-hud-corner { position: absolute; opacity: 0; display: flex; flex-direction: column; gap: 2px; }
+.pd-hud-corner.tl { left: max(clamp(20px, 2.5vw, 48px), env(safe-area-inset-left, 0px)); top: max(clamp(20px, 3.7vw, 40px), env(safe-area-inset-top, 0px)); }
+.pd-hud-corner.tr { right: max(clamp(20px, 2.5vw, 48px), env(safe-area-inset-right, 0px)); top: max(clamp(20px, 3.7vw, 40px), env(safe-area-inset-top, 0px)); text-align: right; align-items: flex-end; }
+.pd-stage .pd-readout { left: max(clamp(20px, 2.5vw, 48px), env(safe-area-inset-left, 0px)); bottom: max(clamp(20px, 3.7vw, 40px), env(safe-area-inset-bottom, 0px)); }
+.pd-stage .pd-credit { right: max(clamp(20px, 2.5vw, 48px), env(safe-area-inset-right, 0px)); bottom: max(clamp(20px, 3.7vw, 40px), env(safe-area-inset-bottom, 0px)); color: hsl(var(--faint)); }
+.pd-stage .pd-credit a { color: inherit; }
+.pd-stage .pd-credit a:hover { color: hsl(var(--foreground-strong)); }
+.pd-stage .pd-hud-value { font-size: clamp(12px, 0.75vw + 4px, 14px); }
+.pd-stage .pd-hud-readout { font-size: clamp(18px, 1.46vw, 28px) !important; line-height: 1.2 !important; white-space: nowrap; }
+@media (max-width: 640px) { .pd-hud-corner.tr { display: none; } }
