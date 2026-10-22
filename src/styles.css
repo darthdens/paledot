@@ -499,7 +499,7 @@ All colors MUST be HSL.
 .paledot .pd-hud-label { font: 500 11px/16px var(--pd-font-mono); letter-spacing: .08em; text-transform: uppercase; color: hsl(var(--muted-foreground)); }
 .paledot .pd-hud-value { font: 400 14px/20px var(--pd-font-mono); font-variant-numeric: tabular-nums; color: hsl(var(--foreground)); }
 .paledot .pd-hud-readout { font: 400 28px/32px var(--pd-font-mono); letter-spacing: -.01em; font-variant-numeric: tabular-nums; color: hsl(var(--foreground-strong)); }
-.paledot .pd-pill { display: inline-flex; align-items: center; gap: 8px; border: 1px solid hsl(var(--border-strong)); border-radius: 9999px; padding: 10px 20px; font: 500 15px/20px var(--pd-font-sans); color: hsl(var(--foreground-strong)); background: hsl(var(--surface) / .7); backdrop-filter: blur(12px); transition: border-color .15s ease, background .15s ease; }
+.paledot .pd-pill { display: inline-flex; align-items: center; gap: 8px; border: 1px solid hsl(var(--border-strong)); border-radius: 8px; padding: 10px 20px; font: 500 15px/20px var(--pd-font-sans); color: hsl(var(--foreground-strong)); background: hsl(var(--surface) / .7); backdrop-filter: blur(12px); transition: border-color .15s ease, background .15s ease; }
 .paledot .pd-pill:hover { border-color: hsl(var(--dot) / .6); }
 .paledot .pd-pill.pd-primary { background: hsl(var(--dot)); color: hsl(var(--on-dot)); border-color: hsl(var(--dot)); }
 .paledot :focus-visible { outline: 2px solid hsl(var(--ring) / .7); outline-offset: 2px; }
@@ -566,8 +566,8 @@ All colors MUST be HSL.
 @media (prefers-reduced-motion: reduce) { .paledot .pd-loader-orbit { animation: none; } }
 
 /* ---- Pale Dot: one consistent shape language across controls ---- */
-/* Buttons in the explorer: pills. */
-.paledot button[class*="bg-white/"], .paledot button[class*="bg-blue-"], .paledot a[class*="bg-white/"] { border-radius: 9999px; }
+/* Buttons in the explorer: softly squared. */
+.paledot button[class*="bg-white/"], .paledot button[class*="bg-blue-"], .paledot a[class*="bg-white/"] { border-radius: 8px; }
 .paledot button[class*="bg-blue-"] {
   background-color: hsl(var(--surface) / .7);
   box-shadow: inset 0 0 0 1px hsl(var(--border-strong));
@@ -576,11 +576,11 @@ All colors MUST be HSL.
 .paledot button[class*="bg-blue-"]:hover { box-shadow: inset 0 0 0 1px hsl(var(--dot) / .6); }
 /* Panels, dropdowns, cards and tooltips: same surface, hairline and radius. */
 .paledot div[class*="bg-white/10"], .paledot div[class*="bg-black/"][class*="backdrop-blur"], .paledot [role="menu"], .paledot [role="dialog"], .paledot [data-radix-popper-content-wrapper] > * {
-  border-radius: 16px;
+  border-radius: 10px;
 }
 .paledot div.bg-white\/10, .paledot div[class*="bg-black/"][class*="backdrop-blur"] {
   background-color: hsl(var(--surface) / .72);
   box-shadow: inset 0 0 0 1px hsl(var(--border));
 }
-/* Rows inside menus stay softly rounded inside the 16px panel. */
-.paledot div.bg-white\/10 button, .paledot [role="menu"] button { border-radius: 10px; }
+/* Rows inside menus stay softly rounded inside the 10px panel. */
+.paledot div.bg-white\/10 button, .paledot [role="menu"] button { border-radius: 6px; }
