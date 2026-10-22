@@ -584,4 +584,3 @@ All colors MUST be HSL.
 }
 /* Rows inside menus stay softly rounded inside the 10px panel. */
 .paledot div.bg-white\/10 button, .paledot [role="menu"] button { border-radius: 6px; }
-@media (max-width: 640px) { .paledot .pd-readout .pd-hud-readout { font-size: 20px; line-height: 26px; white-space: nowrap; } }

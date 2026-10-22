@@ -42,7 +42,7 @@ export function PaleDotEndFrame({ distance, onAgain, onShare }: { distance: stri
       </div>
       <div className="pd-readout">
         <div className="pd-hud-label">{t.distanceLabel}</div>
-        <div className="pd-hud-readout">{distance}</div>
+        <div className="pd-hud-readout" style={{ fontSize: "clamp(18px, 5.2vw, 28px)", lineHeight: 1.2, whiteSpace: "nowrap" }}>{distance}</div>
       </div>
       <p className="pd-credit">
         {t.credit}{" "}
