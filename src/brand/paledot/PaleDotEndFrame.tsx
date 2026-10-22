@@ -47,14 +47,14 @@ export function PaleDotEndFrame({
     }
     let ok = false;
     try {
-      await navigator.clipboard.writeText(url);
+      await navigator.clipboard.writeText(`${t.shareMessage} ${url}`);
       ok = true;
     } catch {
       /* fall through */
     }
     if (!ok) {
       const ta = document.createElement("textarea");
-      ta.value = url;
+      ta.value = `${t.shareMessage} ${url}`;
       ta.style.position = "fixed";
       ta.style.opacity = "0";
       document.body.appendChild(ta);

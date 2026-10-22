@@ -16,7 +16,7 @@ const NETS: Net[] = [
     id: "x",
     label: "X",
     path: "M18.9 1.15h3.68l-8.04 9.19L24 22.85h-7.4l-5.8-7.58-6.63 7.58H.48l8.6-9.83L0 1.15h7.59l5.24 6.93zm-1.29 19.5h2.04L6.48 3.24H4.3z",
-    href: (u, m) => `https://x.com/intent/post?text=${encodeURIComponent(m)}&url=${encodeURIComponent(u)}`,
+    href: (u, m) => `https://x.com/intent/post?text=${encodeURIComponent(`${m} ${u}`)}`,
   },
   {
     id: "facebook",
