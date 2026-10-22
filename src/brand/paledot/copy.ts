@@ -6,6 +6,8 @@ export const PALEDOT_COPY = {
     begin: "Begin at Earth",
     again: "Go again",
     share: "Share",
+    home: "Back to Earth",
+    copied: "Link copied",
     credit: "by",
     author: "Dens Akoka",
     loading: "Loading",
@@ -33,6 +35,8 @@ export const PALEDOT_COPY = {
     begin: "Commencer sur Terre", // review
     again: "Recommencer",
     share: "Partager",
+    home: "Retour sur Terre",
+    copied: "Lien copié",
     credit: "par",
     author: "Dens Akoka",
     loading: "Chargement",
