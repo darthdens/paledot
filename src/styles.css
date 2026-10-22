@@ -517,7 +517,9 @@ All colors MUST be HSL.
 .custom-cursor.is-paledot .custom-cursor__icon { color: hsl(220 14% 77%); }
 
 /* ---- Motion stage (title screen + end of journey). Markup: see PaleDotTitleScreen.tsx ---- */
-.pd-stage { position: relative; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; -webkit-tap-highlight-color: transparent; background: hsl(var(--background)); }
+.pd-stage { position: relative; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; -webkit-tap-highlight-color: transparent; background: radial-gradient(ellipse 45% 40% at 50% 48%, hsl(var(--dot-glow) / .07), transparent 70%), hsl(var(--background)); transform: translateZ(0); isolation: isolate; }
+/* One composited layer for the whole stage: stops the full-width band that appeared where animated children got their own GPU layer. */
+.pd-stage > * { will-change: auto; }
 .pd-stage-svg { width: clamp(220px, 32vw, 520px); height: auto; display: block; overflow: visible; }
 .pd-desc { font: 400 clamp(13px, 1.9vw, 31px)/1.3 var(--pd-font-sans); color: hsl(var(--muted-foreground)); margin-top: clamp(16px, 2.3vw, 37px); opacity: 0; text-align: center; letter-spacing: -.005em; } /* size = 5.9% and gap = 7.2% of the wordmark width (32vw), the lock-up's proportions */
 .pd-actions { display: flex; gap: 10px; margin-top: clamp(20px, 3vw, 48px); opacity: 0; }
