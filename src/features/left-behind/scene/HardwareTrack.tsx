@@ -1,4 +1,5 @@
 // Left Behind · built during NASA Space Apps Challenge 2026 (14–15 Nov 2026) · AI-assisted (Lovable, Claude)
+import { refreshOccluders, isOccluded } from '../lib/occlusion';
 import { Component, Suspense, useEffect, useMemo, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
 import { Html } from '@react-three/drei';
@@ -85,7 +86,8 @@ export function HardwareTrack({ data, nearest }: { data: Trajectory; nearest: bo
   useEffect(()=>()=>{lead.geometry.dispose();lead.material.dispose();},[lead]);
   useEffect(()=>()=>{tip.geometry.dispose();tip.material.dispose();},[tip]);
   useEffect(()=>()=>{ for(const g of graphics){g.past.geometry.dispose();g.past.material.dispose();g.future.geometry.dispose();g.future.material.dispose();} delete useCosmosStore.getState().objectWorldPositions[`hw:${data.id}`]; },[graphics,data.id]);
-  useFrame(({camera,size,controls})=> {
+  useFrame(({camera,size,controls,scene})=> {
+    refreshOccluders(scene);
     const time=useSimClock.getState().simDate;
     const trails=useCosmosStore.getState().showTrails;
     for(const g of graphics) {
@@ -139,6 +141,7 @@ export function HardwareTrack({ data, nearest }: { data: Trajectory; nearest: bo
       // Followed machine: measure from the orbit target, which the camera locks to after this frame step.
       const distance=selected&&orbitTarget?cam.position.distanceTo(orbitTarget):cam.position.distanceTo(world);
       const px=span/(2*distance*Math.tan(THREE.MathUtils.degToRad((cam.fov??60)/2)))*size.height;anchor.current.hidden=px>18;}
+    if(anchor.current&&!anchor.current.hidden&&isOccluded(camera.position,world))anchor.current.hidden=true;
     useCosmosStore.getState().setObjectWorldPosition(`hw:${data.id}`,[world.x,world.y,world.z]);
   },-0.25);
   const model=nasaModels[data.id];

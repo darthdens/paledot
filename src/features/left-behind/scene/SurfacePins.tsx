@@ -1,4 +1,5 @@
 // Left Behind · built during NASA Space Apps Challenge 2026 (14–15 Nov 2026) · AI-assisted (Lovable, Claude)
+import { refreshOccluders, isOccluded } from '../lib/occlusion';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { Html } from '@react-three/drei';
@@ -38,7 +39,8 @@ function SurfacePin({ spec }: { spec: PinSpec }) {
   }, []);
   useEffect(() => () => { line.geometry.dispose(); (line.material as THREE.Material).dispose(); landedPins.delete(spec.trajId); }, [line, spec.trajId]);
   const tmp = useMemo(() => ({ a: new THREE.Vector3(), b: new THREE.Vector3(), c: new THREE.Vector3() }), []);
-  useFrame(() => {
+  useFrame(({ camera, scene }) => {
+    refreshOccluders(scene);
     const node = group.current, mesh = node?.parent?.parent?.parent as THREE.Mesh | undefined;
     if (!node || !mesh || !top.current) return;
     const radius = (mesh.geometry as THREE.SphereGeometry | undefined)?.parameters?.radius ?? 1;
@@ -59,6 +61,7 @@ function SurfacePin({ spec }: { spec: PinSpec }) {
     const world = tmp.a.set(...p).applyMatrix4(node.matrixWorld), centre = tmp.b.setFromMatrixPosition(node.matrixWorld);
     const normal = tmp.c.subVectors(world, centre).normalize();
     landedPins.set(spec.trajId, { world: [world.x, world.y, world.z], body: spec.body, normal: [normal.x, normal.y, normal.z] });
+    if (ring.current && !ring.current.hidden && isOccluded(camera.position, world)) ring.current.hidden = true;
   }, -0.3);
   return <group ref={group} name={`pin-${spec.trajId}`} visible={false}>
     <primitive object={line} />
