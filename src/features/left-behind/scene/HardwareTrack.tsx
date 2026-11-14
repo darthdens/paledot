@@ -93,7 +93,7 @@ export function HardwareTrack({ data, nearest }: { data: Trajectory; nearest: bo
     for(const g of graphics){
       for(const line of [g.past,g.future]){
         const attr=line.geometry.getAttribute('position') as THREE.BufferAttribute;const arr=attr.array as Float32Array;
-        for(let i=0;i<arr.length;i++)arr[i]=g.scene[i]-here[i%3];
+        for(let i=0;i<arr.length;i++)arr[i]=(g.scene[i] ?? 0)-(here[i%3] ?? 0);
         attr.needsUpdate=true;line.position.set(...here);
       }
     }
