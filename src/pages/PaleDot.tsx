@@ -8,6 +8,7 @@ import { useCosmosStore } from "@/components/cosmos/store/useCosmosStore";
 import { PaleDotEndFrame } from "@/brand/paledot/PaleDotEndFrame";
 import { getObjectById } from "@/components/cosmos/data/celestialObjects";
 import { useLeftBehindStore } from '@/features/left-behind/state/useLeftBehindStore';
+import { SimulationDateReadout } from '@/features/left-behind/ui/SimulationDateReadout';
 
 const LeftBehindAdmin = lazy(() => import('@/features/left-behind/data/LeftBehindAdmin'));
 
@@ -86,7 +87,7 @@ const PaleDot = () => {
   }, [started]);
 
   if (!started) {
-    return <><PaleDotTitleScreen onBegin={() => setStarted(true)} onLeftBehind={() => { useLeftBehindStore.getState().setMenuOpen(true); setStarted(true); }} />{dataAdmin && <Suspense fallback={null}><LeftBehindAdmin /></Suspense>}</>;
+    return <><PaleDotTitleScreen onBegin={() => setStarted(true)} onLeftBehind={() => { useLeftBehindStore.getState().setMenuOpen(true); setStarted(true); }} />{dataAdmin && <Suspense fallback={null}><LeftBehindAdmin /></Suspense>}<SimulationDateReadout /></>;
   }
 
   return (
@@ -104,9 +105,11 @@ const PaleDot = () => {
       data-cosmos-container
       data-cosmos-native="true"
     >
-      <WebGLBoundary>
-        <CosmosExplorer />
-      </WebGLBoundary>
+      <div className="absolute inset-x-0 bottom-0 top-[calc(1.5rem+env(safe-area-inset-top))]">
+        <WebGLBoundary>
+          <CosmosExplorer />
+        </WebGLBoundary>
+      </div>
       {dataAdmin && <Suspense fallback={null}><LeftBehindAdmin /></Suspense>}
       {ended && (
         <PaleDotEndFrame
@@ -115,6 +118,7 @@ const PaleDot = () => {
           onHome={goHome}
         />
       )}
+      <SimulationDateReadout />
     </div>
   );
 };

@@ -13,4 +13,4 @@
 
 - Welcome and Left Behind menus share TourChoices; only implemented tours are launchable. Why: every entry offers the same options without substituting another tour for unfinished machine tours.
 
-- The existing Clock control reveals UTC date/time in its tooltip and mobile More item; DateControl edits separate second-precision fields. Why: avoid duplicate clock controls and covering adjacent toolbar buttons.
+- Pale Dot renders one persistent second-precision simulation-date readout above every page state, with reserved explorer space; DateControl remains on the existing Clock control. Why: the simulation date must stay visible without hover or overlapping controls.
