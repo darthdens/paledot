@@ -1829,8 +1829,8 @@ export const TexturedPlanet = ({
                     litColor += spec * (1.0 - roughness) * 0.3 * max(NdotL, 0.0) * totalShadow;
                   }
                   
-                  // True inverse-square sunlight (1/d^2 vs Earth), softened for on-screen visibility (^0.2)
-                  litColor = min(litColor * pow(1.0 / max(dot(vWorldPosition, vWorldPosition) / (149597.87 * 149597.87), 0.01), 0.2), vec3(1.0));
+                  // True inverse-square sunlight (1/d^2 vs Earth), softened for on-screen visibility (^0.12)
+                  litColor = min(litColor * pow(1.0 / max(dot(vWorldPosition, vWorldPosition) / (149597.87 * 149597.87), 0.01), 0.12), vec3(1.0));
                   gl_FragColor = vec4(litColor, 1.0);
                   // Light in linear space, then encode for the screen (sRGB): sunlit ground reads as bright as photos.
                   #include <colorspace_fragment>
@@ -1950,7 +1950,7 @@ export const TexturedPlanet = ({
                     // Clouds glow slightly at terminator
                     litCloud += sunsetOrange * terminatorZone * 0.15;
                     
-                    litCloud = min(litCloud * pow(1.0 / max(dot(vWorldPosition, vWorldPosition) / (149597.87 * 149597.87), 0.01), 0.2), vec3(1.0));
+                    litCloud = min(litCloud * pow(1.0 / max(dot(vWorldPosition, vWorldPosition) / (149597.87 * 149597.87), 0.01), 0.12), vec3(1.0));
                     gl_FragColor = vec4(litCloud, min(cloudCoverage * 1.1, 0.95) * max(NdotL, terminatorZone * 0.3) * shadow);
                     #include <colorspace_fragment>
                   }
@@ -2279,7 +2279,7 @@ export const TexturedPlanet = ({
                     float ringBrightness = mix(1.8, 1.8, ringStyle);
                     vec3 litRing = finalColor * totalLight * ringBrightness;
                     
-                    litRing *= pow(1.0 / max(dot(vWorldPosition, vWorldPosition) / (149597.87 * 149597.87), 0.01), 0.2);
+                    litRing *= pow(1.0 / max(dot(vWorldPosition, vWorldPosition) / (149597.87 * 149597.87), 0.01), 0.12);
                     gl_FragColor = vec4(litRing, alpha);
                   }
                 `}
