@@ -41,6 +41,7 @@ import { UNITS } from './types';
 import { useCosmosStore } from './store/useCosmosStore';
 import { useGalaxyTimeManager } from './objects/DifferentialRotationMaterial';
 import { CosmosBootGate } from './ui/CosmosBootGate';
+import { preloadAllRelief } from './lib/relief';
 import { useSiteBrand } from '@/lib/site-brand';
 import { SimulationClock } from '@/features/left-behind/scene/SimulationClock';
 import { useLeftBehindStore } from '@/features/left-behind/state/useLeftBehindStore';
@@ -68,6 +69,9 @@ export const CosmosExplorer = () => {
   const [sceneReady, setSceneReady] = useState(false);
   const [showLoader, setShowLoader] = useState(true);
   const [skippedLoading, setSkippedLoading] = useState(false);
+  // Real terrain height maps load during the opening screen so flying close never stalls; Skip keeps loading them in the background.
+  const [reliefLoaded, setReliefLoaded] = useState(false);
+  useEffect(() => { let on = true; preloadAllRelief().then(() => { if (on) setReliefLoaded(true); }); return () => { on = false; }; }, []);
 
   const selectedObject = useCosmosStore((state) => state.selectedObject);
   const showOrbits = useCosmosStore((state) => state.showOrbits);
@@ -83,7 +87,7 @@ export const CosmosExplorer = () => {
     setShowLoader(false);
   }, []);
 
-  const bootDone = (texturesReady && sceneReady) || skippedLoading;
+  const bootDone = (texturesReady && sceneReady && reliefLoaded) || skippedLoading;
   const initialHomeSet = useRef(false);
   useEffect(() => {
     if (!sceneReady || initialHomeSet.current) return;
@@ -160,7 +164,7 @@ export const CosmosExplorer = () => {
       {showLoader && (
         <CosmosLoader
           onTexturesComplete={handleTexturesReady}
-          dismiss={(texturesReady && sceneReady)}
+          dismiss={texturesReady && sceneReady && reliefLoaded}
           onDismissed={() => setShowLoader(false)}
           onSkip={handleSkipLoading}
         />
