@@ -22,7 +22,7 @@ const createSunGlowTexture = () => {
   const gradient = ctx.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2);
   
   // Bright white center → Yellow → Orange → Fade
-  gradient.addColorStop(0, 'rgba(255, 255, 240, 1)');       // Bright white-yellow center
+  gradient.addColorStop(0, 'rgba(255, 225, 150, 1)');       // Bright white-yellow center
   gradient.addColorStop(0.08, 'rgba(255, 245, 180, 0.9)');  // Warm white
   gradient.addColorStop(0.18, 'rgba(255, 220, 100, 0.7)');  // Yellow
   gradient.addColorStop(0.35, 'rgba(255, 180, 50, 0.45)');  // Yellow-orange
@@ -50,7 +50,7 @@ const createOuterGlowTexture = () => {
   const gradient = ctx.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2);
   
   // More subtle, natural gradient
-  gradient.addColorStop(0, 'rgba(255, 240, 200, 0.6)');
+  gradient.addColorStop(0, 'rgba(255, 200, 120, 0.6)');
   gradient.addColorStop(0.1, 'rgba(255, 210, 130, 0.4)');
   gradient.addColorStop(0.25, 'rgba(255, 180, 80, 0.2)');
   gradient.addColorStop(0.45, 'rgba(255, 140, 50, 0.08)');
