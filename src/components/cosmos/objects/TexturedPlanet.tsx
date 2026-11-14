@@ -29,7 +29,7 @@ const MOBILE_TEXTURE_WHITELIST = [
 
 // Import NASA texture maps - only essential ones are used on mobile
 import { maybeUpgradeSurface } from '@/components/cosmos/lib/hdSurfaces';
-import { hasRelief, loadRelief, reliefSync, METRE, RELIEF_GLSL, RELIEF_NEAR_RADII } from '@/components/cosmos/lib/relief';
+import { hasRelief, loadRelief, reliefSync, METRE, RELIEF_GLSL } from '@/components/cosmos/lib/relief';
 
 const FLAT_HEIGHT = (() => { const t = new THREE.DataTexture(new Uint16Array([0]), 1, 1, THREE.RedFormat, THREE.HalfFloatType); t.needsUpdate = true; return t; })();
 const sphereRaycast = new THREE.Sphere();
