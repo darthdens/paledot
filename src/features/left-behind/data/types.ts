@@ -7,6 +7,8 @@ export type TrajectorySettings = {
 export type Machine = {
   id: string; name: string; kind?: string; launchDate: string; landingDate: string | null;
   followDistanceKm?: number;
+  /** Largest span of the hardware; drives true-scale model rendering. */
+  trueSize?: { spanM: number; label: string; note: string; sourceUrl: string };
   trajectories: TrajectorySettings[];
   photos: { nasaId?: string; query?: string; role?: string }[];
 };

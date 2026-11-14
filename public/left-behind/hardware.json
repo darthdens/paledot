@@ -99,7 +99,13 @@
           "title": "JPL: The Apollo Experiment That Keeps on Giving",
           "url": "https://jpl.nasa.gov/news/the-apollo-experiment-that-keeps-on-giving/"
         }
-      ]
+      ],
+      "trueSize": {
+        "spanM": 9.4,
+        "label": "NASA-reported",
+        "note": "Across the extended landing gear (31 ft)",
+        "sourceUrl": "https://www.nasa.gov/wp-content/uploads/static/history/alsj/lm04_lunar_module_pplv1-17.pdf"
+      }
     },
     {
       "id": "lunar-rovers",
@@ -333,7 +339,13 @@
           "title": "HiRISE: Viking Lander 1",
           "url": "https://www.uahirise.org/PSP_001521_2025"
         }
-      ]
+      ],
+      "trueSize": {
+        "spanM": 3.0,
+        "label": "NASA-reported",
+        "note": "Widest point",
+        "sourceUrl": "https://ntrs.nasa.gov/api/citations/19840027185/downloads/19840027185.pdf"
+      }
     },
     {
       "id": "opportunity",
@@ -452,7 +464,13 @@
           "url": "https://pds-geosciences.wustl.edu/mer/urn-nasa-pds-mer_documentation/document/mission/mer_mission.txt"
         }
       ],
-      "verifyNotes": "No verified coordinates were found for the final location, so that site has no pin."
+      "verifyNotes": "No verified coordinates were found for the final location, so that site has no pin.",
+      "trueSize": {
+        "spanM": 2.3,
+        "label": "NASA-reported",
+        "note": "Width",
+        "sourceUrl": "https://www.jpl.nasa.gov/news/press_kits/merlandings.pdf"
+      }
     },
     {
       "id": "ingenuity",
@@ -569,7 +587,13 @@
           "url": "https://phys.org/news/2024-01-years-mars-nasa-ingenuity-helicopter.html"
         }
       ],
-      "verifyNotes": "No verified coordinates were found for the final airfield, so that site has no pin."
+      "verifyNotes": "No verified coordinates were found for the final airfield, so that site has no pin.",
+      "trueSize": {
+        "spanM": 1.2,
+        "label": "NASA-reported",
+        "note": "Rotor span",
+        "sourceUrl": "https://www.jpl.nasa.gov/news/press_kits/ingenuity/landing/mission/spacecraft/"
+      }
     },
     {
       "id": "voyager-2",
@@ -688,7 +712,13 @@
           "title": "Johns Hopkins APL: Voyager 2 Illuminates Boundary of Interstellar Space",
           "url": "https://www.jhuapl.edu/news/news-releases/191106-voyager-2-illuminates-boundary-interstellar-space"
         }
-      ]
+      ],
+      "trueSize": {
+        "spanM": 12.4,
+        "label": "Calculated",
+        "note": "Scaled so the NASA model’s high-gain antenna matches its NASA-reported 3.7 m diameter",
+        "sourceUrl": "https://science.nasa.gov/mission/voyager/spacecraft/"
+      }
     },
     {
       "id": "voyager-1",
@@ -843,7 +873,13 @@
           "title": "NASA: Pale Blue Dot Revisited",
           "url": "https://science.nasa.gov/photojournal/pale-blue-dot-revisited"
         }
-      ]
+      ],
+      "trueSize": {
+        "spanM": 12.4,
+        "label": "Calculated",
+        "note": "Scaled so the NASA model’s high-gain antenna matches its NASA-reported 3.7 m diameter",
+        "sourceUrl": "https://science.nasa.gov/mission/voyager/spacecraft/"
+      }
     }
   ],
   "shared": {

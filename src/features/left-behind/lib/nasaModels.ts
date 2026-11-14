@@ -10,3 +10,12 @@ export const nasaModels: Record<string, { url: string }> = {
   'voyager-1': voyager, 'voyager-2': voyager, ingenuity, opportunity, 'viking-1': viking, 'apollo-11': apollo,
 };
 export function hasNasaModel(id: string) { return !!nasaModels[id]; }
+
+import { getHardware } from '../data/dataClient';
+/** True span in scene units (1 unit = 1000 km), loaded from hardware.json. */
+export const trueSpanUnits = new Map<string, number>();
+let spans: Promise<void> | null = null;
+export function loadTrueSpans() {
+  spans ??= getHardware().then(h => { for (const m of h.machines) if (m.trueSize) trueSpanUnits.set(m.id, m.trueSize.spanM * 1e-6); }).catch(() => { spans = null; });
+  return spans;
+}
