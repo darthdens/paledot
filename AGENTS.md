@@ -22,3 +22,4 @@
 
 - Earth/Moon/Mars HD global maps (public/textures/hd) swap in near the body via hdSurfaces.ts; landing-site NASA imagery (public/left-behind/terrain, built by scripts/left-behind/fetch_surfaces.py) renders as SitePatch caps that modulate the global colour. Why: boot stays fast and real detail blends with the body.
 - App images and textures are WebP (only favicons, app icons and og/social preview images stay PNG); keep each file under 10 MB. Why: faster loading, and some platforms require PNG icons/previews.
+- Earth/Moon/Mars real relief: global height maps (src/assets/relief, CDN assets) displace a denser body sphere and drive per-fragment normals via lib/relief.ts once near; landing sites add DTM heights to near SitePatch caps, the body discards fragments under the mid cap (holeRect), and pins/camera/scale use pin.centre + pin.groundAt. Why: true-scale terrain with millimetre-stable caps and no coarse sphere poking through.
