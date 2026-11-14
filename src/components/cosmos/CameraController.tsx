@@ -5,6 +5,8 @@ import { useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import { useCosmosStore } from './store/useCosmosStore';
 import { UNITS } from './types';
+import { useLeftBehindStore } from '@/features/left-behind/state/useLeftBehindStore';
+import { getHardware } from '@/features/left-behind/data/dataClient';
 
 const UNIFIED_SCALE = 0.001;
 
@@ -15,6 +17,7 @@ export const CameraController = () => {
   const isFollowing = useCosmosStore((state) => state.isFollowing);
   const tourCameraTarget = useCosmosStore((state) => state.tourCameraTarget);
   const isTouring = useCosmosStore((state) => state.isTouring);
+  const hardwareId = useLeftBehindStore(state => state.followTargetId);
 
   const isAnimating = useRef(false);
   const animationProgress = useRef(0);
@@ -66,6 +69,32 @@ export const CameraController = () => {
   }, [camera, controls, scene]);
 
   useFrame(() => { gl.domElement.setAttribute('data-scene-ready', 'true'); });
+
+  useEffect(() => {
+    // Planet navigation and the original tour take precedence over a machine follow.
+    if (selectedObject || isTouring) useLeftBehindStore.getState().selectHardware(null);
+  }, [selectedObject, isTouring]);
+  useEffect(() => {
+    if (!hardwareId || !controls || isTouring) return;
+    const orbit = controls as unknown as { target: THREE.Vector3 };
+    let cancelled = false;
+    void getHardware().then(hardware => {
+      if (cancelled) return;
+      const live = useCosmosStore.getState().objectWorldPositions[`hw:${hardwareId}`];
+      if (!live) return;
+      const machine = hardware.machines.find(m => m.trajectories.some(t => t.id === hardwareId));
+      const distance = (machine?.followDistanceKm ?? 5000000) * UNIFIED_SCALE;
+      startPosition.current.copy(camera.position); startTarget.current.copy(orbit.target);
+      endTarget.current.set(...live); cameraOffset.current.set(distance*.5,distance*.3,distance);
+      endPosition.current.copy(endTarget.current).add(cameraOffset.current);
+      isTourAnimation.current = false; animationProgress.current = 0;
+      isAnimating.current = true; animationTriggerId.current = `hw:${hardwareId}`;
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        camera.position.copy(endPosition.current); orbit.target.copy(endTarget.current); isAnimating.current = false;
+      }
+    }).catch(() => { /* Static-data failure must not disturb normal navigation. */ });
+    return () => { cancelled = true; if (animationTriggerId.current === `hw:${hardwareId}`) isAnimating.current = false; };
+  }, [hardwareId, controls, camera, isTouring]);
 
   // Handle tour camera target changes
   useEffect(() => {
@@ -268,6 +297,11 @@ export const CameraController = () => {
     };
 
     if (isAnimating.current) {
+      if (hardwareId && !isTouring) {
+        const live = useCosmosStore.getState().objectWorldPositions[`hw:${hardwareId}`];
+        if (live) { endTarget.current.set(...live); endPosition.current.copy(endTarget.current).add(cameraOffset.current); }
+        else { isAnimating.current = false; useLeftBehindStore.getState().selectHardware(null); return; }
+      }
       // Slower animation speed for tour (more cinematic), faster for object selection
       const animSpeed = isTourAnimation.current ? 0.4 : 1.2;
       animationProgress.current += delta * animSpeed;
@@ -350,6 +384,14 @@ export const CameraController = () => {
     }
 
     ensureBodyClearance();
+
+    if (hardwareId && !isTouring) {
+      const live = useCosmosStore.getState().objectWorldPositions[`hw:${hardwareId}`];
+      if (!live) { useLeftBehindStore.getState().selectHardware(null); return; }
+      tmpTarget.current.set(...live); tmpDelta.current.subVectors(tmpTarget.current, orbitControls.target);
+      orbitControls.target.copy(tmpTarget.current); camera.position.add(tmpDelta.current);
+      ensureBodyClearance(); orbitControls.update(); return;
+    }
 
     // After fly-to: continuously follow the selected object (keep it centered)
     // Follow objects that can move due to orbits/galactic rotation

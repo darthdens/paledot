@@ -21,3 +21,13 @@ it('maps ecliptic kilometres with the single required orientation and scale', ()
   expect(UNIFIED_SCALE).toBe(0.001);
   expect(eclipticKmToScene(1000,2000,3000)).toEqual([1,3,-2]);
 });
+it('hiding machines clears only hardware following and preserves clock state', () => {
+  const clock=useSimClock.getState();
+  useLeftBehindStore.getState().selectHardware('voyager-1');
+  expect(useLeftBehindStore.getState().followTargetId).toBe('voyager-1');
+  useLeftBehindStore.getState().toggleMachines();
+  expect(useLeftBehindStore.getState().selectedHardwareId).toBeNull();
+  expect(useLeftBehindStore.getState().followTargetId).toBeNull();
+  expect(useSimClock.getState()).toBe(clock);
+  useLeftBehindStore.getState().toggleMachines();
+});
