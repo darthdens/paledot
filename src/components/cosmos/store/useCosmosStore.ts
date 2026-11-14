@@ -185,8 +185,8 @@ export const useCosmosStore = create<CosmosStore>()(
       showQuickJump: false,
       quickJumpAnchorRect: null,
       showSizeComparison: false,
-      showOrbits: true,
-      showTrails: true,
+      showOrbits: false,
+      showTrails: false,
       showRealPeriods: false,
       showPerformanceHUD: false,
 
