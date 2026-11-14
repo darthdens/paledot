@@ -78,7 +78,6 @@ export function MachineCard({ machine, following = false, extra = [], unfollowLa
   return <div className="space-y-4" data-machine-card>
     <div className="space-y-1.5">
       <p className={heading}>{[kind, place, year].filter(Boolean).join(' · ')}</p>
-      <h3 className="text-base font-semibold text-foreground">{T(machine.name)}</h3>
       {statusText && <span className="inline-flex rounded-full border border-border px-2.5 py-0.5 text-xs text-muted-foreground" data-machine-status>{statusText}</span>}
     </div>
 
