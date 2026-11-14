@@ -1,6 +1,6 @@
 // Left Behind · built during NASA Space Apps Challenge 2026 (14–15 Nov 2026) · AI-assisted (Lovable, Claude)
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { CalendarClock, Compass, ExternalLink, Map } from 'lucide-react';
+import { CalendarClock, Compass, ExternalLink, EyeOff, Map } from 'lucide-react';
 import type { Machine, Photo } from '../data/types';
 import { getPhotoManifest } from '../data/dataClient';
 import { Button } from '@/components/ui/button';
@@ -35,7 +35,8 @@ function PhotoBox({ photo, caption, onOpen, label, missing }: { photo: ManifestP
   </figure>;
 }
 
-export function MachineCard({ machine }: { machine: CardMachine }) {
+type Action = { key: string; icon: React.ReactNode; label: string; onClick?: () => void; disabled?: boolean };
+export function MachineCard({ machine, following = false, extra = [], unfollowLabel }: { machine: CardMachine; following?: boolean; extra?: Action[]; unfollowLabel?: string }) {
   const { language, numberLocale } = useLanguage();
   const t = cardCopy[language];
   const [photos, setPhotos] = useState<ManifestPhoto[] | null>(null);
@@ -97,11 +98,18 @@ export function MachineCard({ machine }: { machine: CardMachine }) {
     </section> : null}
     {machine.sources?.length ? <section className="space-y-1.5"><h4 className={heading}>{t.sources}</h4><ul className="space-y-1 text-xs">{machine.sources.map(s => <li key={s.url}><a href={s.url} target="_blank" rel="noopener noreferrer" className="inline-flex items-start gap-1 text-foreground underline-offset-2 hover:underline">{s.title}<ExternalLink className="mt-0.5 h-3 w-3 shrink-0" aria-hidden /></a></li>)}</ul></section> : null}
 
-    <div className="grid grid-cols-2 gap-2 border-t border-border pt-3">
-      <Button size="sm" variant="ghost" className="h-9 max-sm:h-11 gap-1.5 text-xs bg-muted/50 text-foreground hover:bg-muted col-span-2" disabled><Map className="w-3.5 h-3.5" />{t.takeTour}</Button>
-      <Button size="sm" variant="ghost" className="h-9 max-sm:h-11 gap-1.5 text-xs bg-muted/50 text-foreground hover:bg-muted" onClick={() => { const st = useLeftBehindStore.getState(); if (st.followTargetId === null) st.toggleHardwareFollow(); }}><Compass className="w-3.5 h-3.5" />{t.flyTo}</Button>
-      <Button size="sm" variant="ghost" className="h-9 max-sm:h-11 gap-1.5 text-xs bg-muted/50 text-foreground hover:bg-muted" onClick={() => useSimClock.getState().setSimDate(Date.parse(machine.landingDate ?? machine.launchDate))}><CalendarClock className="w-3.5 h-3.5" />{t.showTimeline}</Button>
-    </div>
+    {(() => {
+      const actions: Action[] = [
+        { key: 'tour', icon: <Map className="w-3.5 h-3.5" />, label: t.takeTour, disabled: true },
+        following && unfollowLabel
+          ? { key: 'fly', icon: <EyeOff className="w-3.5 h-3.5" />, label: unfollowLabel, onClick: () => useLeftBehindStore.getState().toggleHardwareFollow() }
+          : { key: 'fly', icon: <Compass className="w-3.5 h-3.5" />, label: t.flyTo, onClick: () => { const st = useLeftBehindStore.getState(); if (st.followTargetId === null) st.toggleHardwareFollow(); } },
+        { key: 'time', icon: <CalendarClock className="w-3.5 h-3.5" />, label: t.showTimeline, onClick: () => useSimClock.getState().setSimDate(Date.parse(machine.landingDate ?? machine.launchDate)) },
+        ...extra,
+      ];
+      // Two columns; with an odd count the first action takes the full row.
+      return <div className="grid grid-cols-2 gap-2 border-t border-border pt-3">{actions.map((a, i) => <Button key={a.key} size="sm" variant="ghost" disabled={a.disabled} onClick={a.onClick} className={`h-9 max-sm:h-11 gap-1.5 text-xs bg-muted/50 text-foreground hover:bg-muted ${i === 0 && actions.length % 2 ? 'col-span-2' : ''}`}>{a.icon}<span className="truncate">{a.label}</span></Button>)}</div>;
+    })()}
 
     <Dialog open={!!open} onOpenChange={o => !o && setOpen(null)}>
       <DialogContent className="paledot dark max-w-[min(96vw,1100px)] border-border bg-background p-3">
