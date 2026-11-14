@@ -17,3 +17,9 @@ Verification: 24 tests pass; four Pale Dot entries and desktop/360px date checks
 - [x] Remove duplicate date chip; reveal date from existing Clock control.
 - [x] Style date/time fields, show seconds and add 1 minute/s.
 - [x] Verify desktop/mobile controls and speed tests.
+
+## Machines layer
+- [ ] Add cached trajectory interpolation, simplified arcs and Voyager extrapolation.
+- [ ] Draw paths and screen-size markers; add camera following and full-path toggle.
+- [ ] Add translated selected-machine measurements and dismissible scale note.
+- [ ] Verify Voyager milestones, selection, visibility and desktop/mobile layout.

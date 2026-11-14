@@ -6,6 +6,7 @@ export type TrajectorySettings = {
 };
 export type Machine = {
   id: string; name: string; launchDate: string; landingDate: string | null;
+  followDistanceKm?: number;
   trajectories: TrajectorySettings[];
   photos: { nasaId?: string; query?: string; role?: string }[];
 };

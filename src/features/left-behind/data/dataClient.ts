@@ -1,13 +1,14 @@
 // Left Behind · built during NASA Space Apps Challenge 2026 (14–15 Nov 2026) · AI-assisted (Lovable, Claude)
-import type { Photo, Trajectory } from './types';
+import type { Machine, Photo, Trajectory } from './types';
 
-const cache = new Map<string, Promise<Trajectory | Photo[]>>();
-async function read(path: string): Promise<Trajectory | Photo[]> {
+type StaticData = Trajectory | Photo[] | { machines: Machine[] };
+const cache = new Map<string, Promise<StaticData>>();
+async function read(path: string): Promise<StaticData> {
   const response = await fetch(`/left-behind/${path}`);
   if (!response.ok) throw new Error('TODO(source): Left Behind static data unavailable');
   return response.json();
 }
-function cached(key: string, build: () => Promise<Trajectory | Photo[]>) {
+function cached(key: string, build: () => Promise<StaticData>) {
   let promise = cache.get(key);
   if (!promise) {
     promise = build().catch(error => { cache.delete(key); throw error; });
@@ -20,5 +21,8 @@ export function getTrajectory(id: string) {
 }
 export function getPhotoManifest() {
   return cached('photos', () => read('photos/manifest.json')) as Promise<Photo[]>;
+}
+export function getHardware() {
+  return cached('hardware', () => read('hardware.json')) as Promise<{ machines: Machine[] }>;
 }
 export function clearDataCache() { cache.clear(); }
