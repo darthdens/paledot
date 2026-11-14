@@ -1,5 +1,6 @@
 // Left Behind · built during NASA Space Apps Challenge 2026 (14–15 Nov 2026) · AI-assisted (Lovable, Claude)
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { Component, Suspense, useEffect, useMemo, useRef, useState } from 'react';
+import type { ReactNode } from 'react';
 import { Html } from '@react-three/drei';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
@@ -13,6 +14,16 @@ import type { Trajectory } from '../data/types';
 import { eclipticKmToScene } from '../lib/units';
 import { followHardware } from '../lib/hardwareNavigation';
 import { machineCopy } from '../lib/machineCopy';
+import { nasaModels } from '../lib/nasaModels';
+import { HardwareModel } from './HardwareModel';
+
+class SceneBoundary extends Component<{ children: ReactNode }, { failed: boolean }> {
+  override state = { failed: false };
+  static getDerivedStateFromError() { return { failed: true }; }
+  // A model failure falls back to the ring marker; the universe keeps running.
+  override render() { return this.state.failed ? null : this.props.children; }
+}
+const PARENTS: Record<string, 'moon' | 'mars'> = { 'apollo-11': 'moon', 'apollo-15': 'moon', 'apollo-16': 'moon', 'apollo-17': 'moon', 'viking-1': 'mars', opportunity: 'mars', ingenuity: 'mars' };
 
 export function HardwareTrack({ data, nearest }: { data: Trajectory; nearest: boolean }) {
   const marker = useRef<THREE.Group>(null);
@@ -80,15 +91,17 @@ export function HardwareTrack({ data, nearest }: { data: Trajectory; nearest: bo
     node.updateWorldMatrix(true,false);node.getWorldPosition(world);
     useCosmosStore.getState().setObjectWorldPosition(`hw:${data.id}`,[world.x,world.y,world.z]);
   },-0.25);
+  const model=nasaModels[data.id];
   const label=data.id.replaceAll('-',' ').toUpperCase();
   return <group name={`hardware-track-${data.id}`}>
     <primitive object={tip}/>
     {graphics.map((g,i)=><group key={i}><primitive object={g.past}/><primitive object={g.future}/></group>)}
     <group ref={marker} visible={false} name={`hw:${data.id}`}>
+      {model&&<SceneBoundary><Suspense fallback={null}><HardwareModel url={model.url} selected={selected} parent={PARENTS[data.id]}/></Suspense></SceneBoundary>}
       <Html center zIndexRange={[40,30]}>
         <div ref={anchor} hidden className="paledot dark pd-hardware-anchor" onPointerEnter={()=>setHover(true)} onPointerLeave={()=>setHover(false)}>
           <Button variant="ghost" className="pd-hardware-hit" aria-label={`${machineCopy[language].select} ${label}`} aria-pressed={selected} onClick={()=>followHardware(data.id)}>
-            <span className={`pd-hardware-ring ${selected?'pd-hardware-selected':''}`} />
+            <span className={`pd-hardware-ring ${selected?'pd-hardware-selected':''} ${model?'pd-hardware-ring-model':''}`} />
           </Button>
           {(hover||selected||nearest)&&<span className="pd-hardware-label">{label}{data.source==='simplified'&&<small>{machineCopy[language].simplified}</small>}</span>}
         </div>
