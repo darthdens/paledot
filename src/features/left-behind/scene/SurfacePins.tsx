@@ -83,7 +83,7 @@ function DescentArc({ trajId }: { trajId: string }) {
   useEffect(() => { let live = true; void loadTrajectory(trajId).then(d => { const last = sampleTrajectory(d).at(-1); if (live && last) setEnd(eclipticKmToScene(...last.km)); }).catch(() => {}); return () => { live = false; }; }, [trajId]);
   const line = useMemo(() => {
     const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.BufferAttribute(new Float32Array(48 * 3), 3));
-    const l = new THREE.Line(g, new THREE.LineBasicMaterial({ transparent: true, opacity: .25, depthWrite: false, depthTest: false }));
+    const l = new THREE.Line(g, new THREE.LineBasicMaterial({ transparent: true, opacity: .25, depthWrite: false }));
     l.frustumCulled = false; l.visible = false; l.raycast = noRaycast; return l;
   }, []);
   useEffect(() => () => { line.geometry.dispose(); (line.material as THREE.Material).dispose(); }, [line]);

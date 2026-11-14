@@ -60,10 +60,10 @@ export function HardwareTrack({ data, nearest }: { data: Trajectory; nearest: bo
       const origin=eclipticKmToScene(...(points[0]?.km ?? [0,0,0]));
       // Local origins retain metre-level precision far beyond the outer planets.
       const geometry=new THREE.BufferGeometry().setFromPoints(points.map(p=>{const v=eclipticKmToScene(...p.km);return new THREE.Vector3(v[0]-origin[0],v[1]-origin[1],v[2]-origin[2]);}));
-      const future=new THREE.Line(geometry.clone(),new THREE.LineBasicMaterial({color,transparent:true,opacity:.2,depthWrite:false,depthTest:false}));
+      const future=new THREE.Line(geometry.clone(),new THREE.LineBasicMaterial({color,transparent:true,opacity:.2,depthWrite:false}));
       // Solid, fainter line: dash patterns on million-unit segments shimmer at close zoom.
       future.frustumCulled=false;future.position.set(...origin);future.renderOrder=2;
-      const past=new THREE.Line(geometry,new THREE.LineBasicMaterial({color,transparent:true,opacity:.45,linewidth:1,depthWrite:false,depthTest:false}));
+      const past=new THREE.Line(geometry,new THREE.LineBasicMaterial({color,transparent:true,opacity:.45,linewidth:1,depthWrite:false}));
       past.frustumCulled=false;past.position.set(...origin);past.renderOrder=1;
       const scene=new Float64Array(points.length*3);
       points.forEach((pt,i)=>{const v=eclipticKmToScene(...pt.km);scene[i*3]=v[0];scene[i*3+1]=v[1];scene[i*3+2]=v[2];});
@@ -75,7 +75,7 @@ export function HardwareTrack({ data, nearest }: { data: Trajectory; nearest: bo
   const makeLocal=(opacity:number)=>{
     const geometry=new THREE.BufferGeometry();
     geometry.setAttribute('position',new THREE.BufferAttribute(new Float32Array(LOCAL_POINTS*3),3));
-    const material=new THREE.LineBasicMaterial({transparent:true,opacity,depthWrite:false,depthTest:false});
+    const material=new THREE.LineBasicMaterial({transparent:true,opacity,depthWrite:false});
     const first=graphics[0];if(first)material.color.copy(first.past.material.color);
     const line=new THREE.Line(geometry,material);line.frustumCulled=false;line.visible=false;
     return line;
