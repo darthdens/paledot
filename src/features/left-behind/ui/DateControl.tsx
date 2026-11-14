@@ -20,8 +20,8 @@ export function DateControl() {
       <Button variant="outline" size="icon" className="pd-pill min-h-11 min-w-11" aria-label={text(state.isPlaying ? copy.pause : copy.play)} title={text(state.isPlaying ? copy.pause : copy.play)} onClick={state.togglePlaying}>{state.isPlaying ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}</Button>
       <Button variant="outline" className="pd-pill min-h-11" onClick={() => state.setSimDate(Date.now())}>{text(copy.today)}</Button>
     </div>
-    <div className="flex flex-wrap gap-1">
-      {CLOCK_RATES.map((rate, i) => <Button key={rate} variant="outline" className={`pd-pill flex-1 min-h-11 px-1 text-[11px] ${state.rate === rate ? 'pd-primary' : ''}`} aria-pressed={state.rate === rate} onClick={() => state.setRate(rate)}>{text(labels[i] ?? copy.day)}</Button>)}
+    <div className="grid grid-cols-2 gap-1">
+      {CLOCK_RATES.map((rate, i) => <Button key={rate} variant="outline" className={`pd-pill min-w-0 min-h-11 px-2 text-[11px] ${state.rate === rate ? 'pd-primary' : ''}`} aria-pressed={state.rate === rate} onClick={() => state.setRate(rate)}>{text(labels[i] ?? copy.day)}</Button>)}
     </div>
     <input type="range" aria-label={text(copy.date)} min={CLOCK_START} max={CLOCK_END} step={3600000} value={state.simDate} onChange={e => state.setSimDate(Number(e.target.value))} className="w-full h-11 accent-primary focus-visible:ring-2 focus-visible:ring-ring" />
     <div className="relative h-5 font-mono text-[8px] text-muted-foreground tabular-nums">
