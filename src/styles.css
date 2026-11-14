@@ -627,3 +627,15 @@ All colors MUST be HSL.
 .pd-social-btn { display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 10px; border: 1px solid hsl(var(--border)); background: hsl(var(--card) / .6); color: hsl(var(--muted-foreground)); cursor: pointer; transition: color .2s, border-color .2s, background .2s; }
 .pd-social-btn:hover, .pd-social-btn:focus-visible { color: hsl(var(--foreground-strong)); border-color: hsl(var(--primary)); outline: none; }
 .pd-social-note { flex-basis: 100%; text-align: center; font: 500 11px/16px var(--pd-font-mono); letter-spacing: .08em; text-transform: uppercase; color: hsl(var(--faint)); }
+
+/* Left Behind machine toggle: selected Pale Dot accent, no global switch change. */
+.paledot .pd-machine-switch[data-state="checked"] {
+  background-color: hsl(var(--dot));
+  border-color: hsl(var(--dot));
+}
+.paledot .pd-machine-switch[data-state="checked"] > span {
+  background-color: hsl(var(--on-dot));
+}
+.paledot .pd-machine-switch[data-state="unchecked"] {
+  background-color: hsl(var(--surface-2));
+}
