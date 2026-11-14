@@ -14,6 +14,6 @@ Verification: 24 tests pass; four Pale Dot entries and desktop/360px date checks
 - [x] Verify menu styling, selection and original tour launch at desktop and 360px.
 
 ## Single clock control
-- [ ] Remove duplicate date chip; reveal date from existing Clock control.
-- [ ] Style date/time fields, show seconds and add 1 minute/s.
-- [ ] Verify desktop/mobile controls and speed tests.
+- [x] Remove duplicate date chip; reveal date from existing Clock control.
+- [x] Style date/time fields, show seconds and add 1 minute/s.
+- [x] Verify desktop/mobile controls and speed tests.

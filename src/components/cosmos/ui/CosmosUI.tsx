@@ -730,11 +730,10 @@ export const CosmosUI = () => {
                 <TooltipTrigger asChild>
                   <Button ref={timeSpeedButtonRef} data-clock-trigger aria-label={clockName} aria-expanded={timeMenuOpen} size="icon" variant="ghost" onClick={toggleTimeMenu} className={`group relative h-9 w-9 backdrop-blur-xs text-foreground ${timeMenuOpen ? 'bg-white/25' : 'bg-white/10 hover:bg-white/20'}`}>
                     <Clock className="w-5 h-5" />
-                    <span className="pointer-events-none absolute right-full top-0 mr-1 hidden h-9 items-center whitespace-nowrap rounded-lg border border-border bg-popover px-3 font-mono text-[11px] tabular-nums text-popover-foreground group-hover:flex group-focus-visible:flex">{formatSimDate(simSecond * 1000, locale)}</span>
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent variant="dark" side="bottom">
-                  {clockName}
+                  <span className="font-mono text-[11px] tabular-nums">{formatSimDate(simSecond * 1000, locale)}</span>
                 </TooltipContent>
               </Tooltip>
 

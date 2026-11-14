@@ -12,3 +12,5 @@
 - Both brands share useSimClock and dynamically loaded ephemerides; one pre-motion useFrame advances UTC time in simulated seconds per real second, and Begin at Earth saves/restores clock playback. Why: every Solar System object uses one real-date universe.
 
 - Welcome and Left Behind menus share TourChoices; only implemented tours are launchable. Why: every entry offers the same options without substituting another tour for unfinished machine tours.
+
+- The existing Clock control reveals UTC date/time in its tooltip and mobile More item; DateControl edits separate second-precision fields. Why: avoid duplicate clock controls and covering adjacent toolbar buttons.
