@@ -132,7 +132,7 @@ function CrowdChip({ body }: { body: Body }) {
   }, -0.2);
   const text = (body === 'moon' ? copy.sites : copy.machinesCount).replace('{n}', String(count));
   return <group ref={group}><Html center zIndexRange={[40, 30]}>
-    <div ref={el} hidden className="paledot dark">
+    <div ref={el} hidden className="paledot dark pd-pin-chip-anchor">
       <button type="button" className="pd-pin-chip" onClick={() => { const target = celestialObjects.find(o => o.id === body); useLeftBehindStore.getState().selectHardware(null); if (target) useCosmosStore.getState().setSelectedObject(target); }}><span className="pd-pin-chip-dot" aria-hidden />{text}</button>
     </div>
   </Html></group>;
