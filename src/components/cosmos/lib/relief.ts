@@ -55,6 +55,8 @@ export function loadRelief(id: string): Promise<Relief> {
       // Image rows run north to south; flip so v = 1 is north like SphereGeometry uvs.
       const data = new Float32Array(values.length);
       for (let y = 0; y < height; y++) data.set(values.subarray((height - 1 - y) * width, (height - y) * width), y * width);
+      // Earth: oceans are drawn at their surface (sea level); ETOPO's sea floor stays in the data, not the globe.
+      if (id === 'earth') for (let i = 0; i < data.length; i++) if (data[i]! < 0) data[i] = 0;
       let maxM = 0; for (let i = 0; i < data.length; i++) if (data[i]! > maxM) maxM = data[i]!;
       const r: Relief = { width, height, data, texture: heightTexture(width, height, data), maxM };
       ready.set(id, r);
