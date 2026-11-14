@@ -8,7 +8,7 @@ async function read(path: string, action: 'trajectory' | 'photos', id?: string):
   const response = await fetch(url);
   if (response.ok) return response.json();
   if (response.status !== 400 && response.status !== 404) throw new Error('Storage read failed');
-  await leftBehindData({ data: { action, id } });
+  await leftBehindData({ data: { action, ...(id ? { id } : {}) } });
   const built = await fetch(url, { cache: 'no-store' });
   if (!built.ok) throw new Error('Left Behind data unavailable');
   return built.json();
