@@ -656,7 +656,9 @@ All colors MUST be HSL.
 @media (prefers-reduced-motion: reduce) { .paledot .pd-pin-pulse .pd-pin-ring::after { animation: none; display: none; } }
 .paledot .pd-pin-chip { display: inline-flex; align-items: center; gap: 8px; min-height: 32px; padding: 6px 12px; border: 0; border-radius: 0.5rem; background: hsl(var(--foreground) / .1); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); font: 500 11px/16px var(--pd-font-mono); letter-spacing: .08em; text-transform: uppercase; white-space: nowrap; color: hsl(var(--foreground-strong)); cursor: pointer; transition: background .15s ease; }
 .paledot .pd-pin-chip::after { content: ""; position: absolute; inset: -6px 0; }
-.paledot .pd-pin-chip { position: relative; }
+.paledot .pd-pin-chip { position: relative; pointer-events: auto; cursor: pointer !important; }
+.paledot.pd-pin-chip-anchor { background: transparent !important; border: 0; box-shadow: none; padding: 0; pointer-events: none; }
+.paledot.pd-pin-chip-anchor[hidden] { display: none; }
 .paledot .pd-pin-chip-dot { width: 8px; height: 8px; border: 1px solid currentColor; border-radius: 50%; }
 .paledot .pd-pin-chip:hover { background: hsl(var(--foreground) / .16); }
 .paledot .pd-descent-label { display: block; white-space: nowrap; font: 400 10px/14px var(--pd-font-mono); color: hsl(var(--muted-foreground)); pointer-events: none; }
