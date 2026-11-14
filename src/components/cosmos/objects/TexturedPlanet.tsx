@@ -5,6 +5,7 @@ import { bodyRadius, UNIFIED_SCALE } from '@/features/left-behind/lib/bodyScale'
 // TexturedPlanet - Renders planets with realistic lighting and shadows
 import { useRef, useMemo, useEffect, useState } from 'react';
 import { useFrame, useLoader } from '@react-three/fiber';
+import { SurfaceSlot } from '@/features/left-behind/scene/SurfaceSlot';
 import * as THREE from 'three';
 import { CelestialObject } from '../types';
 import { useCosmosStore } from '../store/useCosmosStore';
@@ -652,6 +653,8 @@ export const TexturedPlanet = ({
             onPointerOut={handlePointerOut}
           >
             <sphereGeometry args={[planetSize, 128, 128]} />
+            {/* Left Behind surface pins (registry is empty unless the Pale Dot machines layer is on). */}
+            <SurfaceSlot bodyId={object.id} />
             <shaderMaterial
               ref={planetMaterialRef}
               uniforms={{
