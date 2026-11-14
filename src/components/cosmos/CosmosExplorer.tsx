@@ -234,7 +234,7 @@ export const CosmosExplorer = () => {
               />
 
               {/* Sun's light - moves with the solar system */}
-              <pointLight position={[0, 0, 0]} intensity={5} distance={0} decay={1} color="#FFF8E7" />
+              <pointLight position={[0, 0, 0]} intensity={5} distance={0} decay={1} color="#FFF6EC" />
 
               {/* Track solar system position for camera following at all scales */}
               <SolarSystemTracker />
