@@ -17,7 +17,7 @@ export function hasHdSurface(id: string) { return id in HD; }
 
 function load(name: string, gl: THREE.WebGLRenderer) {
   const width = gl.capabilities.maxTextureSize >= 8192 && !/Mobi|Android|iPhone|iPad/.test(navigator.userAgent) ? 8192 : 4096;
-  const url = `/textures/hd/${name}-${width}.jpg`;
+  const url = `/textures/hd/${name}-${width}.webp`;
   let p = cache.get(url);
   if (!p) {
     p = new THREE.TextureLoader().loadAsync(url).then(tex => {

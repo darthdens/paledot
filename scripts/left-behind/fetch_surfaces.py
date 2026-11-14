@@ -93,14 +93,14 @@ def globals_():
     if out in sys.argv[2:] or not sys.argv[2:]:
       im = gibs_global(layer, time, ext)
       for w in (8192, 4096):
-        im.resize((w, w // 2), Image.LANCZOS).save(f"public/textures/hd/{out}-{w}.jpg", quality=88, optimize=True, progressive=True)
+        im.resize((w, w // 2), Image.LANCZOS).save(f"public/textures/hd/{out}-{w}.webp", quality=85, method=6)
       print("global", out, im.size)
   for key, out in (("wac", "moon"), ("mdim", "mars")):
     if sys.argv[2:] and out not in sys.argv[2:]: continue
     im, _ = region(key, 4, -180, -90, 180, 90)
     im = im.convert("RGB")
     for w in (8192, 4096):
-      im.resize((w, w // 2), Image.LANCZOS).save(f"public/textures/hd/{out}-{w}.jpg", quality=88, optimize=True, progressive=True)
+      im.resize((w, w // 2), Image.LANCZOS).save(f"public/textures/hd/{out}-{w}.webp", quality=85, method=6)
     print("global", out, im.size)
 
 SITES = [
@@ -133,7 +133,7 @@ def patch(site, tier, lat, lon, layer, km, px, base, body):
     under = Image.composite(coarse, under, coarse.getchannel("A").point(lambda v: 255 if v > 250 else 0))
   a = img.getchannel("A"); coverage = sum(1 for v in a.resize((64, 64)).get_flattened_data() if v > 200) / 4096
   out = Image.composite(img, under, a.point(lambda v: 255 if v > 250 else 0)).convert("L")
-  fn = f"{site}-{tier}.jpg"; out.save(f"public/left-behind/terrain/{fn}", quality=86, optimize=True, progressive=True)
+  fn = f"{site}-{tier}.webp"; out.save(f"public/left-behind/terrain/{fn}", quality=85, method=6)
   mpp = dpp * kpd * 1000
   L = LAYERS[layer]
   return {"file": fn, "tier": tier, "west": w, "south": s, "east": e, "north": n, "px": px,

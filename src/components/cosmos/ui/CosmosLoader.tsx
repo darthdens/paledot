@@ -6,24 +6,24 @@ import { useCosmosStore, EXPECTED_GEOMETRIES } from '../store/useCosmosStore';
 import { useIsMobile } from '@/hooks/use-mobile';
 
 // Import all textures that need to be preloaded
-import earthDayTexture from '@/assets/textures/earth-day.jpg';
-import earthNightTexture from '@/assets/textures/earth-night.jpg';
-import earthCloudsTexture from '@/assets/textures/earth-clouds.jpg';
-import moonTexture from '@/assets/textures/moon.jpg';
-import mercuryTexture from '@/assets/textures/mercury.jpg';
-import venusTexture from '@/assets/textures/venus.jpg';
-import marsTexture from '@/assets/textures/mars.jpg';
-import jupiterTexture from '@/assets/textures/jupiter.jpg';
-import saturnTexture from '@/assets/textures/saturn.jpg';
-import uranusTexture from '@/assets/textures/uranus.jpg';
-import neptuneTexture from '@/assets/textures/neptune.jpg';
-import plutoTexture from '@/assets/textures/pluto.jpg';
-import titanTexture from '@/assets/textures/titan.jpg';
-import europaTexture from '@/assets/textures/europa.jpg';
-import ceresTexture from '@/assets/textures/ceres.jpg';
-import enceladusTexture from '@/assets/textures/enceladus.jpg';
-import tritonTexture from '@/assets/textures/triton.jpg';
-import iapetusTexture from '@/assets/textures/iapetus.jpg';
+import earthDayTexture from '@/assets/textures/earth-day.webp';
+import earthNightTexture from '@/assets/textures/earth-night.webp';
+import earthCloudsTexture from '@/assets/textures/earth-clouds.webp';
+import moonTexture from '@/assets/textures/moon.webp';
+import mercuryTexture from '@/assets/textures/mercury.webp';
+import venusTexture from '@/assets/textures/venus.webp';
+import marsTexture from '@/assets/textures/mars.webp';
+import jupiterTexture from '@/assets/textures/jupiter.webp';
+import saturnTexture from '@/assets/textures/saturn.webp';
+import uranusTexture from '@/assets/textures/uranus.webp';
+import neptuneTexture from '@/assets/textures/neptune.webp';
+import plutoTexture from '@/assets/textures/pluto.webp';
+import titanTexture from '@/assets/textures/titan.webp';
+import europaTexture from '@/assets/textures/europa.webp';
+import ceresTexture from '@/assets/textures/ceres.webp';
+import enceladusTexture from '@/assets/textures/enceladus.webp';
+import tritonTexture from '@/assets/textures/triton.webp';
+import iapetusTexture from '@/assets/textures/iapetus.webp';
 
 // All texture paths to preload
 const ALL_TEXTURES = [
