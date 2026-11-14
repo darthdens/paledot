@@ -120,15 +120,15 @@
   {
     "id": "ingenuity-2",
     "machineId": "ingenuity",
-    "nasaId": "PIA24593",
-    "title": "First Aerial Color Image of Mars",
+    "nasaId": "PIA24586",
+    "title": "Perseverance's Navcam View of Ingenuity's First Flight",
     "credit": "NASA/JPL-Caltech",
-    "sourceUrl": "https://images.nasa.gov/details/PIA24593",
-    "imageUrl": "http://images-assets.nasa.gov/image/PIA24593/PIA24593~medium.jpg",
-    "dateTaken": "2021-04-23T00:00:00Z",
-    "alt": "First Aerial Color Image of Mars.",
-    "caption": "First Aerial Color Image of Mars",
-    "description": "This is the first color image of the Martian surface taken by an aerial vehicle while it was aloft. The Ingenuity Mars Helicopter captured it with its color camera during its second successful flight test on April 22, 2021. At the time this image, Ingenuity was 17 feet (5.2 meters) above the surface and pitching (moving the camera's field of view upward) so the helicopter could begin its 7-foot (2-meter) translation to the west — away from the rover. The image demonstrates the utility of scouting Martian terrain from an aerial perspective.  The winding parallel discolorations in the surface reveal the tread of the six-wheeled rover. Perseverance itself is located top center, just out frame. \"Wright Brothers Field\" is in the vicinity of the helicopter's shadow, bottom center, with the actual point of takeoff of the helicopter just below the image. A portion of the landing pads on two of the helicopter's four landing legs can be seen in on the left and right sides of the image, and a small portion of the horizon can be seen at the upper right and left corners.  Mounted in the helicopter's fuselage and pointed approximately 22 degree below the horizon, Ingenuity's high-resolution color camera contains a 4208-by-3120-pixel sensor.   https://photojournal.jpl.nasa.gov/catalog/PIA24593"
+    "sourceUrl": "https://images.nasa.gov/details/PIA24586",
+    "imageUrl": "http://images-assets.nasa.gov/image/PIA24586/PIA24586~orig.jpg",
+    "dateTaken": "2021-04-19T00:00:00Z",
+    "alt": "Perseverance's Navcam View of Ingenuity's First Flight.",
+    "caption": "Perseverance's Navcam View of Ingenuity's First Flight",
+    "description": "NASA's Ingenuity Mars Helicopter achieves powered, controlled flight for the first time on another planet, hovering for several seconds before touching back down on April 19, 2021. The image was taken by the left Navigation Camera, or Navcam, aboard the agency's Perseverance Mars rover from a distance of 210 feet (64 meters). A short movie was also recorded and can be downloaded here as a GIF.  The Ingenuity Mars Helicopter was built by JPL, which also manages this technology demonstration project for NASA Headquarters. It is supported by NASA's Science Mission Directorate, Aeronautics Research Mission Directorate, and Space Technology Mission Directorate. NASA's Ames Research Center and Langley Research Center provided significant flight performance analysis and technical assistance during Ingenuity's development.  A key objective for Perseverance's mission on Mars is astrobiology, including the search for signs of ancient microbial life. The rover will characterize the planet's geology and past climate, pave the way for human exploration of the Red Planet, and be the first mission to collect and cache Martian rock and regolith (broken rock and dust).  Subsequent NASA missions, in cooperation with ESA (European Space Agency), would send spacecraft to Mars to collect these sealed samples from the surface and return them to Earth for in-depth analysis.  The Mars 2020 Perseverance mission is part of NASA's Moon to Mars exploration approach, which includes Artemis missions to the Moon that will help prepare for human exploration of the Red Planet.  Animation available at https://photojournal.jpl.nasa.gov/catalog/PIA24586"
   },
   {
     "id": "voyager-2-1",
@@ -146,16 +146,15 @@
   {
     "id": "voyager-2-2",
     "machineId": "voyager-2",
-    "nasaId": "",
-    "title": "TODO(source)",
-    "credit": "TODO(source)",
-    "sourceUrl": "https://images-api.nasa.gov/search?q=Voyager%20spacecraft&media_type=image",
-    "imageUrl": "",
-    "dateTaken": null,
-    "alt": "",
-    "caption": "",
-    "todo": true,
-    "note": "TODO(source): no qualifying NASA photo for voyager-2: Voyager spacecraft"
+    "nasaId": "PIA21743",
+    "title": "Voyager 2 Encapsulation",
+    "credit": "NASA/JPL-Caltech/KSC",
+    "sourceUrl": "https://images.nasa.gov/details/PIA21743",
+    "imageUrl": "http://images-assets.nasa.gov/image/PIA21743/PIA21743~medium.jpg",
+    "dateTaken": "2017-07-05T00:00:00Z",
+    "alt": "Voyager 2 Encapsulation.",
+    "caption": "Voyager 2 Encapsulation",
+    "description": "The Voyager 2 spacecraft, which was the first of the two Voyagers to launch, is seen at the Spacecraft Assembly and Encapsulation Facility-1 at NASA's Kennedy Space Center in Cape Canaveral, Florida. This archival photo is from August 1977. The spacecraft was put into this shroud on August 2, 1977, to protect it during flight through the atmosphere.   https://photojournal.jpl.nasa.gov/catalog/PIA21743"
   },
   {
     "id": "voyager-1-1",
