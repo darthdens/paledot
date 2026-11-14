@@ -22,9 +22,11 @@ const createSunGlowTexture = () => {
   const gradient = ctx.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2);
   
   // Bright white center → Yellow → Orange → Fade
-  gradient.addColorStop(0, 'rgba(255, 225, 150, 1)');       // Bright white-yellow center
-  gradient.addColorStop(0.08, 'rgba(255, 245, 180, 0.9)');  // Warm white
-  gradient.addColorStop(0.18, 'rgba(255, 220, 100, 0.7)');  // Yellow
+  // Transparent over the disc itself (sprite is 6 radii wide -> disc edge at 0.167) so the halo never whitens the Sun's face
+  gradient.addColorStop(0, 'rgba(255, 170, 60, 0)');
+  gradient.addColorStop(0.15, 'rgba(255, 170, 60, 0)');
+  gradient.addColorStop(0.17, 'rgba(255, 170, 60, 0.8)');
+  gradient.addColorStop(0.25, 'rgba(255, 150, 50, 0.5)');
   gradient.addColorStop(0.35, 'rgba(255, 180, 50, 0.45)');  // Yellow-orange
   gradient.addColorStop(0.55, 'rgba(255, 130, 30, 0.25)');  // Orange
   gradient.addColorStop(0.75, 'rgba(255, 100, 20, 0.1)');   // Deep orange
@@ -50,7 +52,7 @@ const createOuterGlowTexture = () => {
   const gradient = ctx.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2);
   
   // More subtle, natural gradient
-  gradient.addColorStop(0, 'rgba(255, 200, 120, 0.6)');
+  gradient.addColorStop(0, 'rgba(255, 150, 60, 0.35)');
   gradient.addColorStop(0.1, 'rgba(255, 210, 130, 0.4)');
   gradient.addColorStop(0.25, 'rgba(255, 180, 80, 0.2)');
   gradient.addColorStop(0.45, 'rgba(255, 140, 50, 0.08)');
@@ -164,7 +166,7 @@ const PHOTO_FS = `
     float px = length(fwidth(pg));            // cells per pixel
     float gFade = 1.0 - smoothstep(0.06, 0.25, px);
     float g = granules(pg, uTime / 480.0);
-    float gran = mix(1.0, 0.72 + 0.4 * g, gFade * 0.9);
+    float gran = mix(1.0, 0.6 + 0.5 * g, gFade);
 
     // Supergranulation: ~30,000 km, very subtle
     vec3 ps = vObj * 22.0;
@@ -172,10 +174,11 @@ const PHOTO_FS = `
     float sg = worley(ps, 3.0);
     float sup = mix(1.0, 0.94 + 0.08 * sg, sFade);
 
-    vec3 base = vec3(1.0, 0.72, 0.28);         // familiar golden-orange look (filtered-photo style, not true colour)
+    vec3 base = vec3(1.0, 0.55, 0.12);         // familiar golden-orange look (filtered-photo style, not true colour)
     vec3 col = base * limb * gran * sup;
-    vec3 core = mix(col, vec3(1.0, 0.92, 0.7), pow(mu, 6.0) * 0.35);
-    gl_FragColor = vec4(core * 1.6, 1.0);       // HDR so bloom picks it up
+    // Keep output within displayable range so the colour never clips to white
+    vec3 core = mix(col, vec3(1.0, 0.78, 0.38), pow(mu, 4.0) * 0.45);
+    gl_FragColor = vec4(min(core, vec3(1.0)), 1.0);       // HDR so bloom picks it up
   }
 `;
 
