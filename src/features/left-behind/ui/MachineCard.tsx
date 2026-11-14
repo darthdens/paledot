@@ -78,7 +78,7 @@ export function MachineCard({ machine, following = false, extra = [], unfollowLa
 
   return <div className="space-y-3" data-machine-card>
     <div className="flex flex-wrap items-center gap-2">
-      <p className="sr-only">{[kind, place, year].filter(Boolean).join(' · ')}</p>
+      <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-white/10 text-white/80 border border-white/20">{[kind, place, year].filter(Boolean).join(' · ')}</span>
       {statusText && <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-white/10 text-white/80 border border-white/20" data-machine-status>{statusText}</span>}
     </div>
 
