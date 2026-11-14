@@ -13,13 +13,19 @@ const words = {
   de: ['Left Behind · Daten', 'Flugbahnen', 'Wird geladen…', 'Eintrag', 'Quelle', 'Punkte', 'Zeitraum (UTC)', 'Fotografien', 'NASA-ID', 'Titel', 'Bildnachweis', 'Vereinfachte Flugbahn', 'Aus JPL-Horizons-Daten berechnet'],
 };
 const ids = ['voyager-1', 'voyager-2', 'ingenuity', 'opportunity', 'viking-1', 'apollo-11', 'apollo-15', 'apollo-16', 'apollo-17'];
+type PreviewPhoto = Omit<Photo, 'caption'> & { caption: string | { en: string; fr: string } };
+const photoLabels = {
+  en: ['Thumbnail', 'Caption'], fr: ['Miniature', 'Légende'],
+  es: ['Miniatura', 'Leyenda'], pt: ['Miniatura', 'Legenda'],
+  it: ['Miniatura', 'Didascalia'], de: ['Vorschaubild', 'Bildunterschrift'],
+};
 
 export default function LeftBehindAdmin() {
   const { language, tr } = useLanguage();
   const text = words[language];
   const label = (index: number) => tr({ en: text[index] ?? '', fr: text[index] ?? '' });
   const [rows, setRows] = useState<Trajectory[]>([]);
-  const [photos, setPhotos] = useState<Photo[]>([]);
+  const [photos, setPhotos] = useState<PreviewPhoto[]>([]);
   const [error, setError] = useState(false);
   const [enabled, setEnabled] = useState(false);
   useEffect(() => { setEnabled(new URLSearchParams(window.location.search).get('lb-admin') === '1'); }, []);
@@ -45,6 +51,9 @@ export default function LeftBehindAdmin() {
       return <tr key={row.id} className="border-t border-border"><td className="px-2 py-3 whitespace-nowrap">{row.id}</td><td className="px-2 py-3">{row.source}<div className="text-xs text-muted-foreground">{label(row.source === 'simplified' ? 11 : 12)}</div></td><td className="px-2 py-3 font-mono text-xs whitespace-nowrap">{start} → {end}</td><td className="px-2 py-3 font-mono tabular-nums">{segments.reduce((sum, s) => sum + s.positions.length, 0)}</td></tr>;
     })}</tbody></table></div>
     <h3 className="mt-4">{label(7)}</h3>
-    <div className="overflow-x-auto" tabIndex={0}><table className="w-full text-left text-sm" aria-label={label(7)}><thead><tr>{[3, 8, 9, 10].map(index => <th className="px-2 py-3" key={index}>{label(index)}</th>)}</tr></thead><tbody>{photos.map(photo => <tr key={photo.id} className="border-t border-border"><td className="px-2 py-3 whitespace-nowrap">{photo.machineId}</td><td className="px-2 py-3">{photo.nasaId || 'TODO(source)'}</td><td className="px-2 py-3 min-w-48">{photo.title}</td><td className="px-2 py-3">{photo.credit}</td></tr>)}</tbody></table></div>
+    <div className="overflow-x-auto" tabIndex={0}><table className="w-full text-left text-sm" aria-label={label(7)}><thead><tr><th className="px-2 py-3">{photoLabels[language][0]}</th>{[3, 8].map(index => <th className="px-2 py-3" key={index}>{label(index)}</th>)}<th className="px-2 py-3">{photoLabels[language][1]}</th><th className="px-2 py-3">{label(10)}</th></tr></thead><tbody>{photos.map(photo => {
+      const caption = typeof photo.caption === 'string' ? photo.caption : tr(photo.caption);
+      return <tr key={photo.id} className="border-t border-border"><td className="px-2 py-3"><div className="h-16 w-20">{photo.imageUrl && <img src={photo.imageUrl} alt={caption} width={80} height={64} loading="lazy" className="h-full w-full rounded-sm object-contain" />}</div></td><td className="px-2 py-3 whitespace-nowrap">{photo.machineId}</td><td className="px-2 py-3">{photo.nasaId || 'TODO(source)'}</td><td className="px-2 py-3 min-w-48">{caption}</td><td className="px-2 py-3 min-w-48 text-xs text-muted-foreground">{photo.credit} · {photo.title}</td></tr>;
+    })}</tbody></table></div>
   </section>;
 }
