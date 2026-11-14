@@ -41,7 +41,7 @@ export function MachineCard({ machine }: { machine: CardMachine }) {
   const [photos, setPhotos] = useState<ManifestPhoto[] | null>(null);
   const [open, setOpen] = useState<ManifestPhoto | null>(null);
   useEffect(() => { let live = true; void getPhotoManifest().then(list => { if (live) setPhotos((list as ManifestPhoto[]).filter(p => p.machineId === machine.id && !PALE_BLUE.test(p.role ?? ''))); }).catch(() => live && setPhotos([])); return () => { live = false; }; }, [machine.id]);
-  const capt = (p: ManifestPhoto) => typeof p.caption === 'string' ? p.caption : (p.caption[language] ?? p.caption.en ?? p.title);
+  const capt = (p: ManifestPhoto) => typeof p.caption === 'string' ? p.caption : (p.caption[language] ?? p.caption['en'] ?? p.title);
 
   const year = new Date(machine.landingDate ?? machine.launchDate).getUTCFullYear();
   const kind = machine.kind ? machineKinds[machine.kind]?.[language] ?? machine.kind : '';
