@@ -8,6 +8,7 @@ import { leftBehindCopy } from '../lib/copy';
 import { useLeftBehindStore } from '../state/useLeftBehindStore';
 import { useCosmosStore } from '@/components/cosmos/store/useCosmosStore';
 import { TourChoices } from './TourChoices';
+import { machineCopy } from '../lib/machineCopy';
 export function LeftBehindMenu() {
   const ref = useRef<HTMLDivElement>(null);
   const [toursOpen, setToursOpen] = useState(false);
@@ -15,6 +16,7 @@ export function LeftBehindMenu() {
   const copy = leftBehindCopy[language];
   const text = (value: string) => tr({ en: value, fr: value });
   const machinesVisible = useLeftBehindStore(s => s.machinesVisible);
+  const fullPathsVisible = useLeftBehindStore(s => s.fullPathsVisible);
   useEffect(() => {
     const close = (event: MouseEvent) => {
       if (event.target instanceof Element && !ref.current?.contains(event.target) && !event.target.closest('[data-lb-menu-trigger]')) useLeftBehindStore.getState().setMenuOpen(false);
@@ -29,6 +31,9 @@ export function LeftBehindMenu() {
     {toursOpen && <TourChoices onBegin={() => { useLeftBehindStore.getState().setMenuOpen(false); useCosmosStore.getState().startTour(); }} />}
     <label className="flex min-h-11 items-center justify-between gap-3 text-sm text-foreground">
       <span>{text(copy.machines)}</span><Switch className="pd-machine-switch" aria-label={text(copy.machines)} checked={machinesVisible} onCheckedChange={() => useLeftBehindStore.getState().toggleMachines()} />
+    </label>
+    <label className="flex min-h-11 items-center justify-between gap-3 text-sm text-foreground">
+      <span>{machineCopy[language].full}</span><Switch className="pd-machine-switch" aria-label={machineCopy[language].full} checked={fullPathsVisible} onCheckedChange={() => useLeftBehindStore.getState().toggleFullPaths()} />
     </label>
     <Button variant="ghost" disabled className="w-full min-h-11 justify-start">{text(copy.signal)}</Button>
     <Button variant="ghost" disabled className="w-full min-h-11 justify-start">{text(copy.know)}</Button>

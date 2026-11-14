@@ -45,6 +45,7 @@ import { useSiteBrand } from '@/lib/site-brand';
 import { SimulationClock } from '@/features/left-behind/scene/SimulationClock';
 import { useLeftBehindStore } from '@/features/left-behind/state/useLeftBehindStore';
 const LeftBehindLayer = lazy(() => import('@/features/left-behind/scene/LeftBehindLayer').then(m => ({ default: m.LeftBehindLayer })));
+const HardwareReadout = lazy(() => import('@/features/left-behind/ui/HardwareReadout').then(m => ({ default: m.HardwareReadout })));
 
 // Allow loaders (R3F + our preload) to reuse texture requests.
 THREE.Cache.enabled = true;
@@ -306,6 +307,7 @@ export const CosmosExplorer = () => {
           <KeyboardShortcuts />
           <SizeComparison />
           <YouAreHereLabel />
+          {brand === 'paledot' && machinesVisible && <Suspense fallback={null}><HardwareReadout /></Suspense>}
         </>
       )}
     </div>

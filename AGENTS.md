@@ -14,3 +14,4 @@
 - Welcome and Left Behind menus share TourChoices; only implemented tours are launchable. Why: every entry offers the same options without substituting another tour for unfinished machine tours.
 
 - Pale Dot renders one persistent second-precision simulation-date readout above every page state, with reserved explorer space; DateControl remains on the existing Clock control. Why: the simulation date must stay visible without hover or overlapping controls.
+- Machine tracks load static data after boot, evaluate positions in heliocentric ecliptic kilometres, and use the single frame helper; markers publish hw-prefixed world positions for the existing camera. Why: paths, measurements and navigation must share the planets' frame without changing ordinary exploration.
