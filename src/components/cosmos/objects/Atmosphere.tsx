@@ -16,25 +16,26 @@ export type AtmosphereSpec = {
   beta: [number, number, number];
   /** Henyey–Greenstein asymmetry: 0 = gas (Rayleigh-like), ~0.7 = dust/haze (forward scattering). */
   g: number;
+  /** Sunlight scale: π maps a white Lambert surface to display white; a bit more for visibility. */
   sun: number;
 };
 
 export const ATMOSPHERES: Record<string, AtmosphereSpec> = {
   // Rayleigh at sea level: 5.8, 13.5, 33.1 (×10⁻³ /km) — blue sky, thin blue limb, red sunsets.
-  earth: { scaleHeightKm: 8.5, beta: [5.8e-3, 13.5e-3, 33.1e-3], g: 0, sun: 22 },
+  earth: { scaleHeightKm: 8.5, beta: [5.8e-3, 13.5e-3, 33.1e-3], g: 0, sun: 6 },
   // Thin CO₂ with suspended dust: butterscotch haze by day, bluish forward-scattered glow near sunset.
-  mars: { scaleHeightKm: 11.1, beta: [2.6e-3, 1.9e-3, 1.3e-3], g: 0.65, sun: 24 },
+  mars: { scaleHeightKm: 11.1, beta: [45e-3, 33e-3, 22e-3], g: 0.65, sun: 4 },
   // Above the cloud deck the drawn sphere represents: sulphuric haze, pale yellow.
-  venus: { scaleHeightKm: 15.9, beta: [6e-3, 5e-3, 3e-3], g: 0.6, sun: 14 },
+  venus: { scaleHeightKm: 15.9, beta: [20e-3, 17e-3, 11e-3], g: 0.6, sun: 4 },
   // Thick orange organic haze extending hundreds of km.
-  titan: { scaleHeightKm: 40, beta: [2.2e-3, 1.1e-3, 0.4e-3], g: 0.6, sun: 18 },
-  jupiter: { scaleHeightKm: 27, beta: [0.6e-3, 0.9e-3, 1.6e-3], g: 0.2, sun: 16 },
-  saturn: { scaleHeightKm: 59.5, beta: [0.5e-3, 0.65e-3, 0.9e-3], g: 0.2, sun: 16 },
-  uranus: { scaleHeightKm: 27.7, beta: [0.6e-3, 1.4e-3, 1.8e-3], g: 0.1, sun: 16 },
-  neptune: { scaleHeightKm: 19.7, beta: [0.6e-3, 1.3e-3, 2.6e-3], g: 0.1, sun: 16 },
+  titan: { scaleHeightKm: 40, beta: [60e-3, 30e-3, 10e-3], g: 0.6, sun: 4 },
+  jupiter: { scaleHeightKm: 27, beta: [0.6e-3, 0.9e-3, 1.6e-3], g: 0.2, sun: 6 },
+  saturn: { scaleHeightKm: 59.5, beta: [0.5e-3, 0.65e-3, 0.9e-3], g: 0.2, sun: 6 },
+  uranus: { scaleHeightKm: 27.7, beta: [0.6e-3, 1.4e-3, 1.8e-3], g: 0.1, sun: 6 },
+  neptune: { scaleHeightKm: 19.7, beta: [0.6e-3, 1.3e-3, 2.6e-3], g: 0.1, sun: 6 },
   // Very thin, blue nitrogen haze layers seen by New Horizons.
-  pluto: { scaleHeightKm: 50, beta: [0.05e-3, 0.1e-3, 0.22e-3], g: 0.5, sun: 20 },
-  triton: { scaleHeightKm: 14, beta: [0.02e-3, 0.04e-3, 0.08e-3], g: 0.3, sun: 20 },
+  pluto: { scaleHeightKm: 50, beta: [0.05e-3, 0.1e-3, 0.22e-3], g: 0.5, sun: 6 },
+  triton: { scaleHeightKm: 14, beta: [0.02e-3, 0.04e-3, 0.08e-3], g: 0.3, sun: 6 },
 };
 
 const SHELL_HEIGHTS = 10; // shell top in scale heights (density e⁻¹⁰ ≈ nothing beyond)
@@ -105,7 +106,7 @@ export function Atmosphere({ id, radius }: { id: string; radius: number }) {
             float mu = dot(rd, sunDir);
             float ray = 0.0596831 * (1.0 + mu * mu);
             float hg = 0.0795775 * (1.0 - g * g) / pow(1.0 + g * g - 2.0 * g * mu, 1.5);
-            vec3 col = sunI * beta * sum * mix(ray, hg, step(0.01, g)) * 12.566;
+            vec3 col = sunI * beta * sum * mix(ray, hg, step(0.01, g));
             col = 1.0 - exp(-col); // soft exposure, never clips
             gl_FragColor = vec4(col, 1.0);
             #include <colorspace_fragment>
