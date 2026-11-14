@@ -84,8 +84,8 @@ SITES = [
   ("apollo-16", "moon", -8.9729, 15.5037, "a16", 3.0, 4096, 40.0, 2048, "wac"),
   ("apollo-17", "moon", 20.1896, 30.7769, "a17", 3.0, 4096, 40.0, 2048, "wac"),
   ("viking-1", "mars", 22.27, 312.05 - 360, "ctxg", 8.0, 4096, 60.0, 2048, "mdim"),
-  ("opportunity", "mars", -1.9462, 354.4734 - 360, "mer", 8.0, 4096, 60.0, 2048, "mdim"),
-  ("ingenuity", "mars", 18.4447, 77.4508, "jez", 2.0, 4096, 40.0, 2048, "mdim"),
+  ("opportunity", "mars", -1.9462, 354.4734 - 360, "ctxg", 8.0, 4096, 60.0, 2048, "mdim", "mer"),
+  ("ingenuity", "mars", 18.4447, 77.4508, "jez", 2.0, 4096, 40.0, 2048, "mdim", "ctxg"),
 ]
 
 def patch(site, tier, lat, lon, layer, km, px, base, body):
@@ -98,10 +98,15 @@ def patch(site, tier, lat, lon, layer, km, px, base, body):
   img = img.resize((px, px), Image.LANCZOS)
   # Underlay: global mosaic where the site layer has no data (transparent).
   zb = level_for(base, dpp_target); under, _ = region(base, zb, w, s, e, n)
-  under = under.resize((px, px), Image.LANCZOS).convert("L").convert("RGBA")
-  a = img.getchannel("A"); coverage = sum(1 for v in a.resize((64, 64)).getdata() if v > 200) / 4096
-  # Lone dark nodata (some layers use black, not alpha).
-  out = Image.composite(img, under, a).convert("L")
+  under = under.resize((px, px), Image.LANCZOS).convert("RGBA")
+  # Fill gaps first from the same layer at coarser levels, then from the global mosaic.
+  for dz in (2, 4):
+    if z - dz < 0: break
+    coarse, _ = region(layer, z - dz, w, s, e, n)
+    coarse = coarse.resize((px, px), Image.LANCZOS)
+    under = Image.composite(coarse, under, coarse.getchannel("A").point(lambda v: 255 if v > 250 else 0))
+  a = img.getchannel("A"); coverage = sum(1 for v in a.resize((64, 64)).get_flattened_data() if v > 200) / 4096
+  out = Image.composite(img, under, a.point(lambda v: 255 if v > 250 else 0)).convert("L")
   fn = f"{site}-{tier}.jpg"; out.save(f"public/left-behind/terrain/{fn}", quality=86, optimize=True, progressive=True)
   mpp = dpp * kpd * 1000
   L = LAYERS[layer]
@@ -112,8 +117,12 @@ def patch(site, tier, lat, lon, layer, km, px, base, body):
 
 def sites():
   idx = {"generated": "2026-11-14", "note": "Greyscale luminance; the app colours it with the global map. Bounds in degrees, longitude east -180..180.", "sites": []}
-  for site, body, lat, lon, layer, nkm, npx, mkm, mpx, base in SITES:
-    tiers = [patch(site, "near", lat, lon, layer, nkm, npx, base, body), patch(site, "mid", lat, lon, layer, mkm, mpx, base, body)]
+  only = sys.argv[2:] 
+  try: old = {x["id"]: x for x in json.load(open("public/left-behind/terrain/index.json"))["sites"]}
+  except Exception: old = {}
+  for site, body, lat, lon, layer, nkm, npx, mkm, mpx, base, *mid in SITES:
+    if only and site not in only and site in old: idx["sites"].append(old[site]); continue
+    tiers = [patch(site, "near", lat, lon, layer, nkm, npx, base, body), patch(site, "mid", lat, lon, mid[0] if mid else layer, mkm, mpx, base, body)]
     idx["sites"].append({"id": site, "body": body, "lat": lat, "lon": lon, "tiers": tiers})
     print(site, [(t["tier"], t["sourceMetresPerPixel"], t["coverage"]) for t in tiers])
   json.dump(idx, open("public/left-behind/terrain/index.json", "w"), indent=1)

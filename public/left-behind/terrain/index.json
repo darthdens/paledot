@@ -216,12 +216,12 @@
      "east": -5.458945361521523,
      "north": -1.878584387652359,
      "px": 4096,
-     "sourceMetresPerPixel": 10.16,
+     "sourceMetresPerPixel": 5.08,
      "shownMetresPerPixel": 1.95,
      "coverage": 1.0,
-     "source": "MRO CTX Meridiani Planum mosaic",
-     "credit": "NASA/JPL/MSSS, via NASA Mars Trek",
-     "trekLayer": "S_Meridiani_Sinus_Planium_CTX_BlockAdj_dd",
+     "source": "MRO CTX global mosaic (beta01, ~5 m)",
+     "credit": "NASA/JPL/MSSS, Caltech Murray Lab, via NASA Mars Trek",
+     "trekLayer": "CTX_beta01_uncontrolled_5m_Caltech",
      "fallback": "Viking MDIM 2.1 colour mosaic (232 m)"
     },
     {
@@ -274,10 +274,10 @@
      "px": 2048,
      "sourceMetresPerPixel": 10.16,
      "shownMetresPerPixel": 19.53,
-     "coverage": 0.17,
-     "source": "MRO HiRISE Jezero controlled mosaic (25 cm)",
-     "credit": "NASA/JPL-Caltech/University of Arizona, via NASA Mars Trek",
-     "trekLayer": "JEZ_hirise_soc_006_orthoMosaic_25cm_Eqc_latTs0_lon0_first_dd",
+     "coverage": 0.567,
+     "source": "MRO CTX global mosaic (beta01, ~5 m)",
+     "credit": "NASA/JPL/MSSS, Caltech Murray Lab, via NASA Mars Trek",
+     "trekLayer": "CTX_beta01_uncontrolled_5m_Caltech",
      "fallback": "Viking MDIM 2.1 colour mosaic (232 m)"
     }
    ]
