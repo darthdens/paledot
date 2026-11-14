@@ -90,70 +90,32 @@ export const QuickJumpMenu = () => {
     };
   }, [showQuickJump, toggleQuickJump]);
 
+  // Max height for both modes: bottom gap equals the gap between the button row and the menu (8px),
+  // measured to the screen/safe area or to the top of any bottom card (InfoCard, machine card) under the menu.
   useLayoutEffect(() => {
-    if (!showQuickJump || isFullscreen) return;
-
-    const container = document.querySelector('[data-explorer-ui-root]') as HTMLElement | null;
-    if (!container) return;
-
-    const gapPx = 8;
-    const fallbackTop = isSmUp ? 60 : 48;
-    const fallbackRight = isSmUp ? 16 : 8;
-
-    const measure = () => {
-      const containerRect = container.getBoundingClientRect();
-      const anchor = quickJumpAnchorRect;
-
-      if (anchor) {
-        const top = Math.round(anchor.top - containerRect.top + anchor.height + gapPx);
-        const right = Math.round(containerRect.right - (anchor.left + anchor.width));
-        setAnchorStyle({ top, right });
-      } else {
-        setAnchorStyle({ top: fallbackTop, right: fallbackRight });
-      }
-    };
-
-    measure();
-
-    window.addEventListener('resize', measure);
-    const ro = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(measure) : null;
-    ro?.observe(container);
-
-    return () => {
-      window.removeEventListener('resize', measure);
-      ro?.disconnect();
-    };
-  }, [showQuickJump, isFullscreen, isSmUp, quickJumpAnchorRect]);
-
-  useLayoutEffect(() => {
-    if (!showQuickJump || isFullscreen) return;
-
-    const container = document.querySelector('[data-explorer-ui-root]') as HTMLElement | null;
+    if (!showQuickJump) return;
     const scrollEl = scrollAreaRef.current;
-    if (!container || !scrollEl) return;
-
-    // Use consistent margins matching the right edge
-    const bottomMarginPx = isSmUp ? 16 : 8;
-
+    if (!scrollEl) return;
+    const gapPx = 8;
     const measure = () => {
-      const containerRect = container.getBoundingClientRect();
       const scrollRect = scrollEl.getBoundingClientRect();
-      const next = Math.max(160, Math.floor(containerRect.bottom - scrollRect.top - bottomMarginPx));
-      setMaxHeightNonFullscreenPx(next);
+      const vv = window.visualViewport;
+      const probe = document.createElement('div');
+      probe.style.cssText = 'position:fixed;bottom:0;height:env(safe-area-inset-bottom);visibility:hidden';
+      document.body.appendChild(probe); const safeBottom = probe.getBoundingClientRect().height; probe.remove();
+      let limit = (vv?.height ?? window.innerHeight) - safeBottom;
+      document.querySelectorAll<HTMLElement>('[data-bottom-card],[data-machine-readout],[data-machine-note]').forEach(el => {
+        const r = el.getBoundingClientRect();
+        if (r.height === 0 || r.top <= scrollRect.top) return;
+        if (r.right > scrollRect.left && r.left < scrollRect.right) limit = Math.min(limit, r.top);
+      });
+      const next = Math.max(120, Math.floor(limit - scrollRect.top - gapPx));
+      setMaxHeightNonFullscreenPx(prev => (prev === next ? prev : next));
     };
-
-    // Let the anchorStyle apply before measuring
     const raf = window.requestAnimationFrame(measure);
-
+    const iv = window.setInterval(measure, 300);
     window.addEventListener('resize', measure);
-    const ro = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(measure) : null;
-    ro?.observe(container);
-
-    return () => {
-      window.cancelAnimationFrame(raf);
-      window.removeEventListener('resize', measure);
-      ro?.disconnect();
-    };
+    return () => { window.cancelAnimationFrame(raf); window.clearInterval(iv); window.removeEventListener('resize', measure); };
   }, [showQuickJump, isFullscreen, isSmUp, anchorStyle]);
 
   const handleJump = (objectId: string) => {
@@ -207,16 +169,7 @@ export const QuickJumpMenu = () => {
         <div
           ref={scrollAreaRef}
           className="overflow-y-auto w-[calc(100vw-1rem)] max-w-56 sm:w-[calc(100vw-2rem)] sm:max-w-64"
-          style={
-            isFullscreen
-              ? {
-                  // In fullscreen, bottom should align with right margin (0.5rem + safe-area)
-                  maxHeight: `calc(100dvh - ${fullscreenDropdownOffsetPx}px - 0.5rem - env(safe-area-inset-top) - 0.5rem - env(safe-area-inset-bottom))`,
-                }
-              : {
-                  maxHeight: `${maxHeightNonFullscreenPx}px`,
-                }
-          }
+          style={{ maxHeight: `${maxHeightNonFullscreenPx}px` }}
         >
       {/* Header */}
       <div className="flex items-center justify-between p-2 sm:p-3 border-b border-white/10 shrink-0">
@@ -258,7 +211,7 @@ export const QuickJumpMenu = () => {
         )}
 
         {/* Categories */}
-        <div className="p-1 sm:p-2">
+        <div className="p-2 [&>*:last-child]:mb-0">
           {brand==='paledot' && showQuickJump && <HardwareJumpChoices expanded={expandedCategory==='hardware'} onToggle={()=>setExpandedCategory(expandedCategory==='hardware'?null:'hardware')} />}
           {quickJumpCategories.map(category => {
             const expandable = isCategoryExpandable(category.id);
