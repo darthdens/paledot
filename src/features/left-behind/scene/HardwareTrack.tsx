@@ -24,6 +24,15 @@ class SceneBoundary extends Component<{ children: ReactNode }, { failed: boolean
   // A model failure falls back to the ring marker; the universe keeps running.
   override render() { return this.state.failed ? null : this.props.children; }
 }
+const LOCAL_POINTS=40;
+/** Fill a line with points from the origin to v, spaced geometrically (1e-10 .. 1 of v). */
+function fillLocal(line:THREE.Line,v:[number,number,number]){
+  const a=line.geometry.getAttribute('position') as THREE.BufferAttribute;
+  a.setXYZ(0,0,0,0);
+  for(let k=1;k<LOCAL_POINTS;k++){const f=Math.pow(10,-10+10*(k-1)/(LOCAL_POINTS-2));a.setXYZ(k,v[0]*f,v[1]*f,v[2]*f);}
+  a.needsUpdate=true;
+}
+
 const PARENTS: Record<string, 'moon' | 'mars'> = { 'apollo-11': 'moon', 'apollo-15': 'moon', 'apollo-16': 'moon', 'apollo-17': 'moon', 'viking-1': 'mars', opportunity: 'mars', ingenuity: 'mars' };
 
 export function HardwareTrack({ data, nearest }: { data: Trajectory; nearest: boolean }) {
@@ -60,16 +69,19 @@ export function HardwareTrack({ data, nearest }: { data: Trajectory; nearest: bo
       return { points,past,future,scene };
     });
   },[data]);
-  const tip = useMemo(()=> {
+  // Path pieces touching the machine are log-subdivided so every segment is short relative to its
+  // distance from a close camera; one long segment passing metres from the camera jitters when clipped.
+  const makeLocal=(opacity:number)=>{
     const geometry=new THREE.BufferGeometry();
-    geometry.setAttribute('position',new THREE.BufferAttribute(new Float32Array(6),3));
-    const material=new THREE.LineBasicMaterial({transparent:true,opacity:.45,depthWrite:false,depthTest:false});
+    geometry.setAttribute('position',new THREE.BufferAttribute(new Float32Array(LOCAL_POINTS*3),3));
+    const material=new THREE.LineBasicMaterial({transparent:true,opacity,depthWrite:false,depthTest:false});
     const first=graphics[0];if(first)material.color.copy(first.past.material.color);
-    const line=new THREE.Line(geometry,material);
-    line.frustumCulled=false;
+    const line=new THREE.Line(geometry,material);line.frustumCulled=false;line.visible=false;
     return line;
-  },[graphics]);
-  useEffect(()=>{ void loadTrueSpans(); },[]);
+  };
+  const tip = useMemo(()=>makeLocal(.45),[graphics]);
+  const lead = useMemo(()=>makeLocal(.2),[graphics]);
+  useEffect(()=>()=>{lead.geometry.dispose();lead.material.dispose();},[lead]);
   useEffect(()=>()=>{tip.geometry.dispose();tip.material.dispose();},[tip]);
   useEffect(()=>()=>{ for(const g of graphics){g.past.geometry.dispose();g.past.material.dispose();g.future.geometry.dispose();g.future.material.dispose();} delete useCosmosStore.getState().objectWorldPositions[`hw:${data.id}`]; },[graphics,data.id]);
   useFrame(({camera,size,controls})=> {
@@ -81,11 +93,11 @@ export function HardwareTrack({ data, nearest }: { data: Trajectory; nearest: bo
       while(low<high){const middle=(low+high)>>>1;if((g.points[middle]?.time ?? Infinity)<=time)low=middle+1;else high=middle;}
       g.past.geometry.setDrawRange(0,low);
       g.future.visible=full&&trails;
-      g.future.geometry.setDrawRange(Math.max(0,low-1),g.points.length-Math.max(0,low-1));
+      g.future.geometry.setDrawRange(low,Math.max(0,g.points.length-low));
     }
     const node=marker.current;if(!node)return;
     const p=positionAt(data.id,new Date(time)); node.visible=!!p;
-    tip.visible=false;
+    tip.visible=false;lead.visible=false;
     if(anchor.current)anchor.current.hidden=!p;
     if (!p) { delete useCosmosStore.getState().objectWorldPositions[`hw:${data.id}`]; return; }
     const here=eclipticKmToScene(...p.km);
@@ -102,8 +114,13 @@ export function HardwareTrack({ data, nearest }: { data: Trajectory; nearest: bo
     const chunk=[...graphics].reverse().find(g=>(g.points[0]?.time ?? Infinity)<=time);
     const last=chunk?.points.filter(point=>point.time<=time).at(-1);
     if(last && positionAt(data.id,new Date((last.time+time)/2))) {
-      const a=eclipticKmToScene(...last.km),b=here;tip.position.set(...b);
-      const attribute=tip.geometry.getAttribute('position');attribute.setXYZ(0,a[0]-b[0],a[1]-b[1],a[2]-b[2]);attribute.setXYZ(1,0,0,0);attribute.needsUpdate=true;tip.visible=trails;
+      const a=eclipticKmToScene(...last.km);tip.position.set(...here);
+      fillLocal(tip,[a[0]-here[0],a[1]-here[1],a[2]-here[2]]);tip.visible=trails;
+    }
+    const next=chunk?.points.find(point=>point.time>time);
+    if(full&&trails&&next&&positionAt(data.id,new Date((next.time+time)/2))){
+      const n=eclipticKmToScene(...next.km);lead.position.set(...here);
+      fillLocal(lead,[n[0]-here[0],n[1]-here[1],n[2]-here[2]]);lead.visible=true;
     }
     node.updateWorldMatrix(true,false);node.getWorldPosition(world);
     // Hide the ring once the true-size model is bigger on screen than the ring itself.
@@ -118,6 +135,7 @@ export function HardwareTrack({ data, nearest }: { data: Trajectory; nearest: bo
   const label=data.id.replaceAll('-',' ').toUpperCase();
   return <group name={`hardware-track-${data.id}`}>
     <primitive object={tip}/>
+    <primitive object={lead}/>
     {graphics.map((g,i)=><group key={i}><primitive object={g.past}/><primitive object={g.future}/></group>)}
     <group ref={marker} visible={false} name={`hw:${data.id}`}>
       {model&&<SceneBoundary><Suspense fallback={null}><HardwareModel id={data.id} url={model.url} selected={selected} parent={PARENTS[data.id]}/></Suspense></SceneBoundary>}
