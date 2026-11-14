@@ -42,6 +42,14 @@ export function HardwareTrack({ data, nearest }: { data: Trajectory; nearest: bo
       return { points,past,future };
     });
   },[data]);
+  const tip = useMemo(()=> {
+    const geometry=new THREE.BufferGeometry();
+    geometry.setAttribute('position',new THREE.BufferAttribute(new Float32Array(6),3));
+    const line=new THREE.Line(geometry,new THREE.LineBasicMaterial({color:graphics[0]?.past.material.color,transparent:true,opacity:.45,depthWrite:false}));
+    line.frustumCulled=false;
+    return line;
+  },[graphics]);
+  useEffect(()=>()=>{tip.geometry.dispose();tip.material.dispose();},[tip]);
   useEffect(()=>()=>{ for(const g of graphics){g.past.geometry.dispose();g.past.material.dispose();g.future.geometry.dispose();g.future.material.dispose();} delete useCosmosStore.getState().objectWorldPositions[`hw:${data.id}`]; },[graphics,data.id]);
   useFrame(()=> {
     const time=useSimClock.getState().simDate;
@@ -54,14 +62,22 @@ export function HardwareTrack({ data, nearest }: { data: Trajectory; nearest: bo
     }
     const node=marker.current;if(!node)return;
     const p=positionAt(data.id,new Date(time)); node.visible=!!p;
+    tip.visible=false;
     if(anchor.current)anchor.current.hidden=!p;
     if (!p) { delete useCosmosStore.getState().objectWorldPositions[`hw:${data.id}`]; return; }
     node.position.set(...eclipticKmToScene(...p.km));
+    const chunk=[...graphics].reverse().find(g=>(g.points[0]?.time ?? Infinity)<=time);
+    const last=chunk?.points.filter(point=>point.time<=time).at(-1);
+    if(last && positionAt(data.id,new Date((last.time+time)/2))) {
+      const a=eclipticKmToScene(...last.km),b=eclipticKmToScene(...p.km);
+      const attribute=tip.geometry.getAttribute('position');attribute.setXYZ(0,...a);attribute.setXYZ(1,...b);attribute.needsUpdate=true;tip.visible=true;
+    }
     node.updateWorldMatrix(true,false);node.getWorldPosition(world);
     useCosmosStore.getState().setObjectWorldPosition(`hw:${data.id}`,[world.x,world.y,world.z]);
   },-0.25);
   const label=data.id.replaceAll('-',' ').toUpperCase();
   return <group name={`hardware-track-${data.id}`}>
+    <primitive object={tip}/>
     {graphics.map((g,i)=><group key={i}><primitive object={g.past}/><primitive object={g.future}/></group>)}
     <group ref={marker} visible={false} name={`hw:${data.id}`}>
       <Html center zIndexRange={[40,30]}>

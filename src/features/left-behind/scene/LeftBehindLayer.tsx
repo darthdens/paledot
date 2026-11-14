@@ -1,5 +1,5 @@
 // Left Behind · built during NASA Space Apps Challenge 2026 (14–15 Nov 2026) · AI-assisted (Lovable, Claude)
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { getHardware } from '../data/dataClient';
 import type { Trajectory } from '../data/types';
@@ -9,6 +9,7 @@ import { useCosmosStore } from '@/components/cosmos/store/useCosmosStore';
 export function LeftBehindLayer() {
   const [tracks,setTracks]=useState<Trajectory[]>([]);
   const [nearest,setNearest]=useState<string[]>([]);
+  const lastNearestUpdate=useRef(-1);
   useEffect(()=> {
     let cancelled=false;
     void getHardware().then(async h=> {
@@ -19,7 +20,8 @@ export function LeftBehindLayer() {
     return ()=>{cancelled=true;};
   },[]);
   useFrame(({camera,clock})=> {
-    if(Math.floor(clock.elapsedTime*4)%4!==0)return;
+    if(clock.elapsedTime-lastNearestUpdate.current<.5)return;
+    lastNearestUpdate.current=clock.elapsedTime;
     const positions=useCosmosStore.getState().objectWorldPositions;
     const ids=tracks.filter(t=>positions[`hw:${t.id}`]).sort((a,b)=> {
       const distance=(id:string)=>{const p=positions[`hw:${id}`];return p?Math.hypot(p[0]-camera.position.x,p[1]-camera.position.y,p[2]-camera.position.z):Infinity;};
