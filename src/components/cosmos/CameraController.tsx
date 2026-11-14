@@ -91,7 +91,9 @@ export const CameraController = () => {
       const live = useCosmosStore.getState().objectWorldPositions[`hw:${hardwareId}`];
       if (!live) return;
       const machine = hardware.machines.find(m => m.trajectories.some(t => t.id === hardwareId));
-      const distance = (machine?.followDistanceKm ?? 5000000) * UNIFIED_SCALE;
+      // Frame the machine at its true size so it fills the view; fall back to the data's follow distance.
+      const span = trueSpanUnits.get(hardwareId);
+      const distance = span ? span * 2.2 : (machine?.followDistanceKm ?? 5000000) * UNIFIED_SCALE;
       startPosition.current.copy(camera.position); startTarget.current.copy(orbit.target);
       endTarget.current.set(...live); cameraOffset.current.set(distance*.5,distance*.3,distance);
       endPosition.current.copy(endTarget.current).add(cameraOffset.current);
