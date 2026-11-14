@@ -29,6 +29,17 @@ const MOBILE_TEXTURE_WHITELIST = [
 
 // Import NASA texture maps - only essential ones are used on mobile
 import { maybeUpgradeSurface } from '@/components/cosmos/lib/hdSurfaces';
+import { hasRelief, loadRelief, METRE, RELIEF_GLSL, RELIEF_NEAR_RADII } from '@/components/cosmos/lib/relief';
+
+const FLAT_HEIGHT = (() => { const t = new THREE.DataTexture(new Uint16Array([0]), 1, 1, THREE.RedFormat, THREE.HalfFloatType); t.needsUpdate = true; return t; })();
+const sphereRaycast = new THREE.Sphere();
+/** Cheap bounding-sphere raycast for the dense relief meshes (clicks only need the body). */
+function raycastSphere(this: THREE.Mesh, raycaster: THREE.Raycaster, hits: THREE.Intersection[]) {
+  const g = this.geometry; if (!g.boundingSphere) g.computeBoundingSphere();
+  sphereRaycast.copy(g.boundingSphere!).applyMatrix4(this.matrixWorld);
+  const point = raycaster.ray.intersectSphere(sphereRaycast, new THREE.Vector3());
+  if (point) hits.push({ distance: raycaster.ray.origin.distanceTo(point), point, object: this });
+}
 import earthDayTexture from '@/assets/textures/earth-day.webp';
 import earthNightTexture from '@/assets/textures/earth-night.webp';
 import earthCloudsTexture from '@/assets/textures/earth-clouds.webp';
@@ -334,6 +345,9 @@ export const TexturedPlanet = ({
   const worldPosUpdateAccumulator = useRef(0);
   const rotationAngle = useRef(0);
   const hdState = useRef({ requested: false });
+  // Real elevation (Earth/Moon/Mars): loaded near the body; denser sphere once it is ready.
+  const reliefState = useRef({ requested: false });
+  const [reliefReady, setReliefReady] = useState(false);
   
   const setSelectedObject = useCosmosStore(state => state.setSelectedObject);
   const setHoveredObject = useCosmosStore(state => state.setHoveredObject);
@@ -537,6 +551,16 @@ export const TexturedPlanet = ({
 
     if (planetMaterialRef.current) {
       maybeUpgradeSurface(object.id, hdState.current, state.camera.position.distanceTo(worldPos.current), planetSize, state.gl, planetMaterialRef.current);
+      if (hasRelief(object.id) && !reliefState.current.requested && state.camera.position.distanceTo(worldPos.current) < planetSize * RELIEF_NEAR_RADII) {
+        reliefState.current.requested = true;
+        const material = planetMaterialRef.current;
+        loadRelief(object.id).then(r => {
+          material.uniforms['heightMap']!.value = r.texture;
+          (material.uniforms['reliefTexel']!.value as THREE.Vector2).set(1 / r.width, 1 / r.height);
+          material.uniforms['reliefOn']!.value = 1;
+          setReliefReady(true);
+        }).catch(() => { reliefState.current.requested = false; });
+      }
       planetMaterialRef.current.uniforms["time"]!.value = time;
       planetMaterialRef.current.uniforms["objectCenter"]!.value.copy(worldPos.current);
       if (isMoon) {
@@ -656,11 +680,12 @@ export const TexturedPlanet = ({
           <mesh 
             name={`body-${object.id}`}
             ref={planetRef}
+            raycast={reliefReady ? raycastSphere : THREE.Mesh.prototype.raycast}
             onClick={handleClick}
             onPointerOver={handlePointerOver}
             onPointerOut={handlePointerOut}
           >
-            <sphereGeometry args={[planetSize, 128, 128]} />
+            <sphereGeometry args={reliefReady ? [planetSize, 640, 320] : [planetSize, 128, 128]} />
             {/* Left Behind surface pins (registry is empty unless the Pale Dot machines layer is on). */}
             <SurfaceSlot bodyId={object.id} />
             <shaderMaterial
@@ -716,6 +741,12 @@ export const TexturedPlanet = ({
                 planetMapSecondary: { value: planetTextures.secondary || placeholderTexture },
                 cloudMap: { value: earthCloudsMap },
                 useProcedural: { value: planetTextures.useProcedural ? 1.0 : 0.0 },
+                heightMap: { value: FLAT_HEIGHT },
+                reliefOn: { value: 0 },
+                reliefTexel: { value: new THREE.Vector2(1, 1) },
+                reliefRadiusM: { value: planetSize / METRE },
+                reliefScale: { value: METRE },
+                holeRect: { value: new THREE.Vector4(0, 0, 0, 0) },
               }}
               vertexShader={`
                 varying vec3 vNormal;
@@ -724,16 +755,24 @@ export const TexturedPlanet = ({
                 varying vec3 vWorldNormal;
                 varying vec3 vWorldPosition;
                 varying vec3 vWorldCenter;
+                varying vec3 vEastW;
+                uniform sampler2D heightMap;
+                uniform float reliefOn;
+                uniform float reliefScale;
                 
                 void main() {
                   vUv = uv;
-                  vPosition = position;
+                  // True-scale real elevation along the normal (metres -> scene units).
+                  vec3 p = position;
+                  if (reliefOn > 0.5) p += normal * texture2D(heightMap, uv).r * reliefScale;
+                  vPosition = p;
                   vNormal = normal;
                   vWorldNormal = normalize((modelMatrix * vec4(normal, 0.0)).xyz);
-                  vec4 worldPos = modelMatrix * vec4(position, 1.0);
+                  vEastW = normalize(mat3(modelMatrix) * vec3(position.z, 0.0, -position.x) + vec3(1e-9));
+                  vec4 worldPos = modelMatrix * vec4(p, 1.0);
                   vWorldPosition = worldPos.xyz;
                   vWorldCenter = (modelMatrix * vec4(0.0, 0.0, 0.0, 1.0)).xyz;
-                  gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+                  gl_Position = projectionMatrix * modelViewMatrix * vec4(p, 1.0);
                 }
               `}
               fragmentShader={`
@@ -762,12 +801,19 @@ export const TexturedPlanet = ({
                 uniform sampler2D planetMapSecondary;
                 uniform sampler2D cloudMap;
                 uniform float useProcedural;
+                uniform sampler2D heightMap;
+                uniform float reliefOn;
+                uniform vec2 reliefTexel;
+                uniform float reliefRadiusM;
+                uniform vec4 holeRect;
                 varying vec3 vNormal;
                 varying vec3 vPosition;
                 varying vec2 vUv;
                 varying vec3 vWorldNormal;
                 varying vec3 vWorldPosition;
                 varying vec3 vWorldCenter;
+                varying vec3 vEastW;
+                ${RELIEF_GLSL}
 
                 // Simple noise function for surface detail
                 float hash(vec2 p) {
@@ -902,7 +948,14 @@ export const TexturedPlanet = ({
                 }
                 
                 void main() {
+                  // A landing-site cap draws this patch of ground with finer real terrain.
+                  if (holeRect.z > holeRect.x && vUv.x > holeRect.x && vUv.x < holeRect.z && vUv.y > holeRect.y && vUv.y < holeRect.w) discard;
                   vec3 worldNormal = normalize(vWorldNormal);
+                  if (reliefOn > 0.5) {
+                    float cosLat = max(cos((vUv.y - 0.5) * 3.14159265), 0.02);
+                    worldNormal = reliefPerturb(worldNormal, vEastW, heightMap, vUv, reliefTexel, vec2(6.2831853 * reliefRadiusM * cosLat, 3.14159265 * reliefRadiusM));
+                  }
+                  vec3 rNormal = worldNormal;
                   // Sun is at origin - use the mesh-derived center for stable sun direction
                   vec3 sunDir = normalize(-vWorldCenter);
                   
@@ -1196,7 +1249,7 @@ export const TexturedPlanet = ({
                     float heightD = dot(texture2D(planetMap, vUv + vec2(0.0, -texelSize)).rgb, vec3(0.299, 0.587, 0.114));
                     
                     // Stronger bump for Moon's cratered surface
-                    float bumpStrength = 2.5;
+                    float bumpStrength = reliefOn > 0.5 ? 0.0 : 2.5; // real LOLA relief replaces the image bump
                     vec3 bumpNormal = normalize(vec3(
                       (heightL - heightR) * bumpStrength,
                       (heightD - heightU) * bumpStrength,
@@ -1204,7 +1257,7 @@ export const TexturedPlanet = ({
                     ));
                     
                     // Perturb the world normal
-                    vec3 worldNormal = normalize(vWorldNormal);
+                    vec3 worldNormal = rNormal;
                     vec3 tangent = normalize(cross(worldNormal, vec3(0.0, 1.0, 0.0)));
                     vec3 bitangent = normalize(cross(worldNormal, tangent));
                     vec3 perturbedNormal = normalize(
