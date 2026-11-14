@@ -1,3 +1,5 @@
+import { useLeftBehindStore } from '@/features/left-behind/state/useLeftBehindStore';
+import { landedPins } from '@/features/left-behind/lib/pinRegistry';
 import { useSimClock } from '@/features/left-behind/state/useSimClock';
 import { loadEphemeris, getEphemeris } from '@/features/left-behind/engine/runtime';
 import { eclipticKmToScene } from '@/features/left-behind/lib/units';
@@ -609,6 +611,9 @@ export const TexturedPlanet = ({
 
   const handleClick = (e: { stopPropagation: () => void }) => {
     e.stopPropagation();
+    // While following a NASA machine landed on this body, a click on the ground keeps the machine in focus.
+    const followId = useLeftBehindStore.getState().followTargetId;
+    if (followId && landedPins.get(followId)?.body === object.id) return;
     setSelectedObject(object);
   };
 
