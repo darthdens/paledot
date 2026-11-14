@@ -8,6 +8,7 @@ type LeftBehindState = {
   setMenuOpen: (open: boolean) => void; toggleMachines: () => void;
   toggleFullPaths: () => void; selectHardware: (id: string | null) => void;
   toggleHardwareFollow: () => void;
+  surfaceViewNonce: number; requestSurfaceView: () => void;
 };
 export const useLeftBehindStore = create<LeftBehindState>(set => ({
   machinesVisible: true, menuOpen: false, selectedHardwareId: null,
@@ -17,5 +18,7 @@ export const useLeftBehindStore = create<LeftBehindState>(set => ({
   toggleMachines: () => set(s => ({ machinesVisible: !s.machinesVisible, selectedHardwareId: null, followTargetId: null })),
   toggleFullPaths: () => set(s => ({ fullPathsVisible: !s.fullPathsVisible })),
   selectHardware: id => set({ selectedHardwareId: id, followTargetId: id }),
+  surfaceViewNonce: 0,
+  requestSurfaceView: () => set(s => ({ surfaceViewNonce: s.surfaceViewNonce + 1, followTargetId: s.selectedHardwareId })),
   toggleHardwareFollow:()=>set(s=>({followTargetId:s.followTargetId?null:s.selectedHardwareId})),
 }));
