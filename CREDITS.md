@@ -98,6 +98,18 @@ Confirm each licence against package metadata (Prompt 11 check 12).
 | --- | --- | --- |
 | Astronomy Engine | https://github.com/cosinekitty/astronomy | MIT; heliocentric planet positions and geocentric Moon positions, rotated from J2000 equatorial to ecliptic coordinates |
 
+### NASA surface imagery (fetched once on 14 Nov 2026, stored in public/textures/hd and public/left-behind/terrain)
+
+| Link text | URL | Licence / notes |
+| --- | --- | --- |
+| NASA Moon Trek: LRO WAC global mosaic (303 ppd, ~100 m/px) | https://trek.nasa.gov/moon/ | NASA/GSFC/Arizona State University; public domain (NASA); global Moon map |
+| NASA Moon Trek: LRO NAC Apollo 11, 15, 16, 17 mosaics (60x60 km) | https://trek.nasa.gov/moon/ | NASA/GSFC/Arizona State University; site patches, source 0.65 m/px near, 10.4 m/px mid |
+| NASA Mars Trek: Viking MDIM 2.1 colour mosaic (232 m/px) | https://trek.nasa.gov/mars/ | NASA/JPL/USGS; global Mars map and gap fill |
+| NASA Mars Trek: MRO HiRISE Jezero controlled mosaic (25 cm) | https://trek.nasa.gov/mars/ | NASA/JPL-Caltech/University of Arizona; Ingenuity near patch, 0.32 m/px |
+| NASA Mars Trek: MRO CTX global mosaic (beta01) and Meridiani mosaic | https://trek.nasa.gov/mars/ | NASA/JPL/MSSS, Caltech Murray Lab; Viking 1 and Opportunity patches (~5 m/px), Ingenuity mid patch |
+| NASA GIBS: Blue Marble Next Generation | https://earthdata.nasa.gov/gibs | NASA Earth Observatory; global Earth day map |
+| NASA GIBS: VIIRS Black Marble 2016 | https://earthdata.nasa.gov/gibs | NASA Earth Observatory/NOAA; global Earth night map |
+
 ### AI tools
 
 | Link text | URL | How it was used |

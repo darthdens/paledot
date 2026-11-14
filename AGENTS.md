@@ -19,3 +19,5 @@
 - Pale Dot menus use the explorer's reserved-date-strip coordinate space; trail buffers store parent-local points from index zero. Why: fixed viewport offsets and unfilled/world-space buffer prefixes produce displaced menus and lines.
 - Pale Dot Quick Jump categories share JumpCategory and selected-body/machine panels share ObjectPanelHeader. Why: one category expansion state and shared controls prevent NASA UI from drifting from the explorer.
 - Moon/Mars pins render through SurfaceSlot (inside each body's spinning mesh) from the useSurfaceAttachments registry, positioned with lib/geo latLonToLocal and per-body texture offsets; landed pins publish world positions in pinRegistry for tracks, descent arcs and the camera. Why: pins must turn with the texture, and only the Pale Dot machines layer may register them.
+
+- Earth/Moon/Mars HD global maps (public/textures/hd) swap in near the body via hdSurfaces.ts; landing-site NASA imagery (public/left-behind/terrain, built by scripts/left-behind/fetch_surfaces.py) renders as SitePatch caps that modulate the global colour. Why: boot stays fast and real detail blends with the body.

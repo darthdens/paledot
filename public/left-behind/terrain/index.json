@@ -1,0 +1,286 @@
+{
+ "generated": "2026-11-14",
+ "note": "Greyscale luminance; the app colours it with the global map. Bounds in degrees, longitude east -180..180.",
+ "sites": [
+  {
+   "id": "apollo-11",
+   "body": "moon",
+   "lat": 0.67416,
+   "lon": 23.47314,
+   "tiers": [
+    {
+     "file": "apollo-11-near.jpg",
+     "tier": "near",
+     "west": 23.42366974623268,
+     "south": 0.6246931706747879,
+     "east": 23.522610253767322,
+     "north": 0.723626829325212,
+     "px": 4096,
+     "sourceMetresPerPixel": 0.65,
+     "shownMetresPerPixel": 0.73,
+     "coverage": 1.0,
+     "source": "LRO NAC mosaic, Apollo 11 (60x60 km)",
+     "credit": "NASA/GSFC/Arizona State University, via NASA Moon Trek",
+     "trekLayer": "A11_60x60km.eq",
+     "fallback": "LRO Wide Angle Camera global mosaic (303 ppd)"
+    },
+    {
+     "file": "apollo-11-mid.jpg",
+     "tier": "mid",
+     "west": 22.813536616435698,
+     "south": 0.01460227566383876,
+     "east": 24.132743383564303,
+     "north": 1.3337177243361613,
+     "px": 2048,
+     "sourceMetresPerPixel": 10.41,
+     "shownMetresPerPixel": 19.53,
+     "coverage": 1.0,
+     "source": "LRO NAC mosaic, Apollo 11 (60x60 km)",
+     "credit": "NASA/GSFC/Arizona State University, via NASA Moon Trek",
+     "trekLayer": "A11_60x60km.eq",
+     "fallback": "LRO Wide Angle Camera global mosaic (303 ppd)"
+    }
+   ]
+  },
+  {
+   "id": "apollo-15",
+   "body": "moon",
+   "lat": 26.13174,
+   "lon": 3.63803,
+   "tiers": [
+    {
+     "file": "apollo-15-near.jpg",
+     "tier": "near",
+     "west": 3.582931173975441,
+     "south": 26.08227317067479,
+     "east": 3.693128826024559,
+     "north": 26.181206829325212,
+     "px": 4096,
+     "sourceMetresPerPixel": 0.65,
+     "shownMetresPerPixel": 0.73,
+     "coverage": 1.0,
+     "source": "LRO NAC mosaic, Apollo 15 (60x60 km)",
+     "credit": "NASA/GSFC/Arizona State University, via NASA Moon Trek",
+     "trekLayer": "A15_60x60km.0_2.eq",
+     "fallback": "LRO Wide Angle Camera global mosaic (303 ppd)"
+    },
+    {
+     "file": "apollo-15-mid.jpg",
+     "tier": "mid",
+     "west": 2.903378986339215,
+     "south": 25.47218227566384,
+     "east": 4.3726810136607845,
+     "north": 26.79129772433616,
+     "px": 2048,
+     "sourceMetresPerPixel": 10.41,
+     "shownMetresPerPixel": 19.53,
+     "coverage": 1.0,
+     "source": "LRO NAC mosaic, Apollo 15 (60x60 km)",
+     "credit": "NASA/GSFC/Arizona State University, via NASA Moon Trek",
+     "trekLayer": "A15_60x60km.0_2.eq",
+     "fallback": "LRO Wide Angle Camera global mosaic (303 ppd)"
+    }
+   ]
+  },
+  {
+   "id": "apollo-16",
+   "body": "moon",
+   "lat": -8.9729,
+   "lon": 15.5037,
+   "tiers": [
+    {
+     "file": "apollo-16-near.jpg",
+     "tier": "near",
+     "west": 15.453620306460225,
+     "south": -9.022366829325211,
+     "east": 15.553779693539775,
+     "north": -8.923433170674787,
+     "px": 4096,
+     "sourceMetresPerPixel": 0.65,
+     "shownMetresPerPixel": 0.73,
+     "coverage": 1.0,
+     "source": "LRO NAC mosaic, Apollo 16 (60x60 km)",
+     "credit": "NASA/GSFC/Arizona State University, via NASA Moon Trek",
+     "trekLayer": "A16_60x60km.eq",
+     "fallback": "LRO Wide Angle Camera global mosaic (303 ppd)"
+    },
+    {
+     "file": "apollo-16-mid.jpg",
+     "tier": "mid",
+     "west": 14.835970752803,
+     "south": -9.63245772433616,
+     "east": 16.171429247197,
+     "north": -8.313342275663839,
+     "px": 2048,
+     "sourceMetresPerPixel": 10.41,
+     "shownMetresPerPixel": 19.53,
+     "coverage": 1.0,
+     "source": "LRO NAC mosaic, Apollo 16 (60x60 km)",
+     "credit": "NASA/GSFC/Arizona State University, via NASA Moon Trek",
+     "trekLayer": "A16_60x60km.eq",
+     "fallback": "LRO Wide Angle Camera global mosaic (303 ppd)"
+    }
+   ]
+  },
+  {
+   "id": "apollo-17",
+   "body": "moon",
+   "lat": 20.1896,
+   "lon": 30.7769,
+   "tiers": [
+    {
+     "file": "apollo-17-near.jpg",
+     "tier": "near",
+     "west": 30.724194731493352,
+     "south": 20.140133170674787,
+     "east": 30.82960526850665,
+     "north": 20.23906682932521,
+     "px": 4096,
+     "sourceMetresPerPixel": 0.65,
+     "shownMetresPerPixel": 0.73,
+     "coverage": 1.0,
+     "source": "LRO NAC mosaic, Apollo 17 (60x60 km)",
+     "credit": "NASA/GSFC/Arizona State University, via NASA Moon Trek",
+     "trekLayer": "A17_60x60km.eq",
+     "fallback": "LRO Wide Angle Camera global mosaic (303 ppd)"
+    },
+    {
+     "file": "apollo-17-mid.jpg",
+     "tier": "mid",
+     "west": 30.07416308657801,
+     "south": 19.53004227566384,
+     "east": 31.47963691342199,
+     "north": 20.84915772433616,
+     "px": 2048,
+     "sourceMetresPerPixel": 10.41,
+     "shownMetresPerPixel": 19.53,
+     "coverage": 1.0,
+     "source": "LRO NAC mosaic, Apollo 17 (60x60 km)",
+     "credit": "NASA/GSFC/Arizona State University, via NASA Moon Trek",
+     "trekLayer": "A17_60x60km.eq",
+     "fallback": "LRO Wide Angle Camera global mosaic (303 ppd)"
+    }
+   ]
+  },
+  {
+   "id": "viking-1",
+   "body": "mars",
+   "lat": 22.27,
+   "lon": -47.94999999999999,
+   "tiers": [
+    {
+     "file": "viking-1-near.jpg",
+     "tier": "near",
+     "west": -48.02306570972307,
+     "south": 22.20238438765236,
+     "east": -47.87693429027691,
+     "north": 22.33761561234764,
+     "px": 4096,
+     "sourceMetresPerPixel": 5.08,
+     "shownMetresPerPixel": 1.95,
+     "coverage": 0.922,
+     "source": "MRO CTX global mosaic (beta01, ~5 m)",
+     "credit": "NASA/JPL/MSSS, Caltech Murray Lab, via NASA Mars Trek",
+     "trekLayer": "CTX_beta01_uncontrolled_5m_Caltech",
+     "fallback": "Viking MDIM 2.1 colour mosaic (232 m)"
+    },
+    {
+     "file": "viking-1-mid.jpg",
+     "tier": "mid",
+     "west": -48.497992822923095,
+     "south": 21.76288290739269,
+     "east": -47.40200717707688,
+     "north": 22.77711709260731,
+     "px": 2048,
+     "sourceMetresPerPixel": 20.31,
+     "shownMetresPerPixel": 29.3,
+     "coverage": 0.915,
+     "source": "MRO CTX global mosaic (beta01, ~5 m)",
+     "credit": "NASA/JPL/MSSS, Caltech Murray Lab, via NASA Mars Trek",
+     "trekLayer": "CTX_beta01_uncontrolled_5m_Caltech",
+     "fallback": "Viking MDIM 2.1 colour mosaic (232 m)"
+    }
+   ]
+  },
+  {
+   "id": "opportunity",
+   "body": "mars",
+   "lat": -1.9462,
+   "lon": -5.5265999999999735,
+   "tiers": [
+    {
+     "file": "opportunity-near.jpg",
+     "tier": "near",
+     "west": -5.594254638478424,
+     "south": -2.013815612347641,
+     "east": -5.458945361521523,
+     "north": -1.878584387652359,
+     "px": 4096,
+     "sourceMetresPerPixel": 5.08,
+     "shownMetresPerPixel": 1.95,
+     "coverage": 1.0,
+     "source": "MRO CTX global mosaic (beta01, ~5 m)",
+     "credit": "NASA/JPL/MSSS, Caltech Murray Lab, via NASA Mars Trek",
+     "trekLayer": "CTX_beta01_uncontrolled_5m_Caltech",
+     "fallback": "Viking MDIM 2.1 colour mosaic (232 m)"
+    },
+    {
+     "file": "opportunity-mid.jpg",
+     "tier": "mid",
+     "west": -6.03400978858835,
+     "south": -2.453317092607308,
+     "east": -5.019190211411597,
+     "north": -1.439082907392692,
+     "px": 2048,
+     "sourceMetresPerPixel": 20.31,
+     "shownMetresPerPixel": 29.3,
+     "coverage": 1.0,
+     "source": "MRO CTX Meridiani Planum mosaic",
+     "credit": "NASA/JPL/MSSS, via NASA Mars Trek",
+     "trekLayer": "S_Meridiani_Sinus_Planium_CTX_BlockAdj_dd",
+     "fallback": "Viking MDIM 2.1 colour mosaic (232 m)"
+    }
+   ]
+  },
+  {
+   "id": "ingenuity",
+   "body": "mars",
+   "lat": 18.4447,
+   "lon": 77.4508,
+   "tiers": [
+    {
+     "file": "ingenuity-near.jpg",
+     "tier": "near",
+     "west": 77.43298071048565,
+     "south": 18.42779609691309,
+     "east": 77.46861928951435,
+     "north": 18.46160390308691,
+     "px": 4096,
+     "sourceMetresPerPixel": 0.32,
+     "shownMetresPerPixel": 0.49,
+     "coverage": 1.0,
+     "source": "MRO HiRISE Jezero controlled mosaic (25 cm)",
+     "credit": "NASA/JPL-Caltech/University of Arizona, via NASA Mars Trek",
+     "trekLayer": "JEZ_hirise_soc_006_orthoMosaic_25cm_Eqc_latTs0_lon0_first_dd",
+     "fallback": "Viking MDIM 2.1 colour mosaic (232 m)"
+    },
+    {
+     "file": "ingenuity-mid.jpg",
+     "tier": "mid",
+     "west": 77.094414209713,
+     "south": 18.106621938261796,
+     "east": 77.80718579028701,
+     "north": 18.782778061738206,
+     "px": 2048,
+     "sourceMetresPerPixel": 10.16,
+     "shownMetresPerPixel": 19.53,
+     "coverage": 0.567,
+     "source": "MRO CTX global mosaic (beta01, ~5 m)",
+     "credit": "NASA/JPL/MSSS, Caltech Murray Lab, via NASA Mars Trek",
+     "trekLayer": "CTX_beta01_uncontrolled_5m_Caltech",
+     "fallback": "Viking MDIM 2.1 colour mosaic (232 m)"
+    }
+   ]
+  }
+ ]
+}

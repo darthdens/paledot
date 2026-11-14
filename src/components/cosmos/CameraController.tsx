@@ -48,6 +48,7 @@ export const CameraController = () => {
     if (!import.meta.env.DEV) return;
     const host = window as typeof window & { __cosmosCheck?: unknown };
     host.__cosmosCheck = {
+      scene,
       state: () => useCosmosStore.getState(),
       finishFlight: () => {
         if (!controls || !isAnimating.current) return;
