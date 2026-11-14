@@ -9,6 +9,9 @@ import apollo from '../assets/apollo.glb.asset.json';
 export const nasaModels: Record<string, { url: string }> = {
   'voyager-1': voyager, 'voyager-2': voyager, ingenuity, opportunity, 'viking-1': viking, 'apollo-11': apollo,
 };
+import { buildLunarRover } from '../scene/simplifiedModels';
+/** No NASA model exists: true-size simplified stand-ins built from NASA-published dimensions. */
+export const simplifiedModels: Record<string, () => import('three').Object3D> = { 'apollo-15': buildLunarRover, 'apollo-16': buildLunarRover, 'apollo-17': buildLunarRover };
 export function hasNasaModel(id: string) { return !!nasaModels[id]; }
 
 import { getHardware } from '../data/dataClient';

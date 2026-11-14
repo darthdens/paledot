@@ -228,7 +228,13 @@
           "url": "https://nssdc.gsfc.nasa.gov/planetary/lunar/lunar_artifact_impacts.html"
         }
       ],
-      "verifyNotes": "Launch and landing times (UTC) are from the standard Apollo mission records; check them against NASA's Apollo pages if you can."
+      "verifyNotes": "Launch and landing times (UTC) are from the standard Apollo mission records; check them against NASA's Apollo pages if you can.",
+      "trueSize": {
+        "spanM": 3.1,
+        "label": "NASA-reported",
+        "note": "Frame length (simplified model; no NASA 3D model exists)",
+        "sourceUrl": "https://nssdc.gsfc.nasa.gov/planetary/lunar/apollo_lrv.html"
+      }
     },
     {
       "id": "viking-1",
