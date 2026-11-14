@@ -37,14 +37,14 @@ export function LeftBehindMenu() {
       <JumpCategory title={text(copy.tours)} expanded={toursOpen} onToggle={() => setToursOpen(!toursOpen)}>
         <TourChoices onBegin={() => { useLeftBehindStore.getState().setMenuOpen(false); useCosmosStore.getState().startTour(); }} />
       </JumpCategory>
-      <div className="my-1 border-t border-white/10" />
+      <div className="my-2 border-t border-white/10" />
       <label className={row}>
         <span>{text(copy.machines)}</span><Switch className="pd-machine-switch" aria-label={text(copy.machines)} checked={machinesVisible} onCheckedChange={() => useLeftBehindStore.getState().toggleMachines()} />
       </label>
       <label className={row}>
         <span>{machineCopy[language].full}</span><Switch className="pd-machine-switch" aria-label={machineCopy[language].full} checked={fullPathsVisible} onCheckedChange={() => useLeftBehindStore.getState().toggleFullPaths()} />
       </label>
-      <div className="my-1 border-t border-white/10" />
+      <div className="my-2 border-t border-white/10" />
       <Button variant="ghost" disabled className={`${row} justify-start font-normal`}>{text(copy.signal)}</Button>
       <Button variant="ghost" disabled className={`${row} justify-start font-normal`}>{text(copy.know)}</Button>
     </div>
