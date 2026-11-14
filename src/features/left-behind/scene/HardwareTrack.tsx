@@ -45,7 +45,9 @@ export function HardwareTrack({ data, nearest }: { data: Trajectory; nearest: bo
   const tip = useMemo(()=> {
     const geometry=new THREE.BufferGeometry();
     geometry.setAttribute('position',new THREE.BufferAttribute(new Float32Array(6),3));
-    const line=new THREE.Line(geometry,new THREE.LineBasicMaterial({color:graphics[0]?.past.material.color,transparent:true,opacity:.45,depthWrite:false}));
+    const material=new THREE.LineBasicMaterial({transparent:true,opacity:.45,depthWrite:false});
+    const first=graphics[0];if(first)material.color.copy(first.past.material.color);
+    const line=new THREE.Line(geometry,material);
     line.frustumCulled=false;
     return line;
   },[graphics]);

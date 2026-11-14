@@ -19,7 +19,7 @@ Verification: 24 tests pass; four Pale Dot entries and desktop/360px date checks
 - [x] Verify desktop/mobile controls and speed tests.
 
 ## Machines layer
-- [ ] Add cached trajectory interpolation, simplified arcs and Voyager extrapolation.
-- [ ] Draw paths and screen-size markers; add camera following and full-path toggle.
-- [ ] Add translated selected-machine measurements and dismissible scale note.
-- [ ] Verify Voyager milestones, selection, visibility and desktop/mobile layout.
+- [x] Add cached trajectory interpolation, simplified arcs and Voyager extrapolation.
+- [x] Draw paths and screen-size markers; add camera following and full-path toggle.
+- [x] Add translated selected-machine measurements and dismissible scale note.
+- [x] Verify Voyager milestones and actual marker selection/readout; desktop scene loads without runtime errors. Mobile screenshot and full visibility-flow checks remain unverified because the software-GPU browser timed out.
