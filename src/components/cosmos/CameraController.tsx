@@ -56,6 +56,12 @@ export const CameraController = () => {
         isAnimating.current = false;
         orbit.update();
       },
+      zoomTo: (distance: number) => {
+        const orbit = controls as unknown as { target: THREE.Vector3; update: () => void } | null;
+        if (!orbit) return;
+        const dir = camera.position.clone().sub(orbit.target).normalize();
+        camera.position.copy(orbit.target).addScaledVector(dir, distance); orbit.update();
+      },
       snapshot: () => {
         const orbit = controls as unknown as { target?: THREE.Vector3 } | null;
         const radii: Record<string, number> = {};
