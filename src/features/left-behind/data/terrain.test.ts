@@ -8,7 +8,7 @@ const wrap = (l: number) => ((l + 540) % 360) - 180;
 
 describe('landing-site terrain', () => {
   const pins = hw.machines.flatMap((m: any) => (m.sites ?? []).filter((s: any) => s.lat != null && s.kind !== 'final' || (s.lat != null && m.id === 'lunar-rovers')));
-  it.each(pins.map((p: any) => [p.label, p]))('%s has a near and a mid patch containing the pin', (_l, p: any) => {
+  it.each(pins.map((p: any) => [p.label, p] as [string, any]))('%s has a near and a mid patch containing the pin', (_l: string, p: any) => {
     for (const tier of ['near', 'mid']) {
       const hit = idx.sites.flatMap((s: any) => s.tiers).filter((t: any) => t.tier === tier
         && p.lat >= t.south && p.lat <= t.north && wrap(p.lon) >= t.west && wrap(p.lon) <= t.east);
