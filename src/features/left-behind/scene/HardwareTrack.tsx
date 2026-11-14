@@ -141,6 +141,8 @@ export function HardwareTrack({ data, nearest }: { data: Trajectory; nearest: bo
       // Followed machine: measure from the orbit target, which the camera locks to after this frame step.
       const distance=selected&&orbitTarget?cam.position.distanceTo(orbitTarget):cam.position.distanceTo(world);
       const px=span/(2*distance*Math.tan(THREE.MathUtils.degToRad((cam.fov??60)/2)))*size.height;anchor.current.hidden=px>18;}
+    // Like surface pins: no machine markers or labels beyond Solar System scale.
+    if(anchor.current&&!['earth','solarSystem'].includes(useCosmosStore.getState().currentScale))anchor.current.hidden=true;
     if(anchor.current&&!anchor.current.hidden&&isOccluded(camera.position,world))anchor.current.hidden=true;
     useCosmosStore.getState().setObjectWorldPosition(`hw:${data.id}`,[world.x,world.y,world.z]);
   },-0.25);
