@@ -69,7 +69,7 @@ function SurfacePin({ spec }: { spec: PinSpec }) {
     if (ring.current && !ring.current.hidden && isOccluded(camera.position, world)) ring.current.hidden = true;
   }, -0.3);
   return <group ref={group} name={`pin-${spec.trajId}`} visible={false}>
-    {patch && <SitePatch local={patch.local} radius={patch.radius} mesh={patch.mesh} />}
+    {patch && <SitePatch body={spec.body} lat={spec.lat} lon={spec.lon} radius={patch.radius} mesh={patch.mesh} />}
     <primitive object={line} visible={!followed} />
     <group ref={top}>
       <Html center zIndexRange={[40, 30]}>
