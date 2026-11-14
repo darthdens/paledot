@@ -9,7 +9,7 @@ import { PHOTO_VS, makePhotoFS } from './Sun';
 import { useSimClock } from '@/features/left-behind/state/useSimClock';
 
 // Proxima is a ~3,000 K red dwarf: deep orange-red, with stronger reddening toward the limb.
-const PROXIMA_FS = makePhotoFS('vec3(1.0, 0.30, 0.10)', 'vec3(0.55, 0.80, 0.95)', 'vec3(1.0, 0.55, 0.30)');
+const PROXIMA_FS = makePhotoFS('vec3(1.0, 0.20, 0.07)', 'vec3(0.55, 0.80, 0.95)', 'vec3(1.0, 0.38, 0.20)');
 
 interface ProximaCentauriProps {
   visualScale?: number;
