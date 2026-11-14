@@ -52,7 +52,7 @@ export function buildLunarRover(): THREE.Group {
   for (const sx of [-1, 1]) for (const sz of [-1, 1]) {
     const w = new THREE.Group(); w.position.set(sx * WB / 2, WHEEL_R, sz * TRACK / 2);
     const tread = new THREE.Mesh(new THREE.CylinderGeometry(WHEEL_R, WHEEL_R, WHEEL_W, 40, 1, true), wire);
-    (tread.material as THREE.MeshStandardMaterial).map!.repeat.set(10, 1.5); tread.rotation.x = Math.PI / 2; w.add(tread);
+    (tread.material as THREE.MeshStandardMaterial).map!.repeat.set(22, 3); tread.rotation.x = Math.PI / 2; w.add(tread);
     for (let i = 0; i < 18; i++) { // chevrons: two halves angled into a V
       const a = (i / 18) * Math.PI * 2;
       for (const side of [-1, 1]) {
@@ -63,7 +63,7 @@ export function buildLunarRover(): THREE.Group {
     }
     const inner = new THREE.Mesh(new THREE.CylinderGeometry(WHEEL_R * 0.78, WHEEL_R * 0.78, WHEEL_W * 0.7, 24, 1, true), wire);
     inner.rotation.x = Math.PI / 2; w.add(inner);
-    const hub = new THREE.Mesh(new THREE.CylinderGeometry(0.14, 0.16, WHEEL_W + 0.03, 20), al); hub.rotation.x = Math.PI / 2; w.add(hub);
+    const hub = new THREE.Mesh(new THREE.CylinderGeometry(0.09, 0.11, WHEEL_W * 0.8, 20), al); hub.rotation.x = Math.PI / 2; w.add(hub);
     for (let i = 0; i < 8; i++) { const a = i / 8 * Math.PI * 2; w.add(tube(V(0, 0, sz * 0.1), V(Math.cos(a) * WHEEL_R * 0.78, Math.sin(a) * WHEEL_R * 0.78, sz * 0.1), 0.008, alBright)); }
     g.add(w);
     // Fender over the top of the wheel (theta = π points up after the X rotation)
