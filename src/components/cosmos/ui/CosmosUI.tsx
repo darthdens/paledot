@@ -1,3 +1,5 @@
+import { lazy, Suspense } from 'react';
+const LeftBehindDateControl = lazy(() => import('@/features/left-behind/ui/DateControl').then(m => ({ default: m.DateControl })));
 import { useLanguage } from '@/i18n/LanguageContext';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
@@ -111,6 +113,12 @@ export const CosmosUI = () => {
   // already full-bleed, so the fullscreen toggle is unnecessary.
   const brand = useSiteBrand();
   const leftBehindActive = useLeftBehindStore(s => s.active);
+  const dateControlOpen = useLeftBehindStore(s => s.dateControlOpen);
+  
+  const toggleTimeMenu = () => {
+    if (leftBehindActive) useLeftBehindStore.getState().setDateControlOpen(!dateControlOpen);
+    else setShowTimeSlider(value => !value);
+  };
   const lbCopy = leftBehindCopy[language];
   const lbName = tr({ en: lbCopy.name, fr: lbCopy.name });
   const toggleLeftBehind = () => {
@@ -145,6 +153,7 @@ export const CosmosUI = () => {
   } = useCosmosStore();
   const { isFullscreen, setIsFullscreen } = useFullscreenStore();
   const [showTimeSlider, setShowTimeSlider] = useState(false);
+  const timeMenuOpen = leftBehindActive ? dateControlOpen : showTimeSlider;
   const [showMoreMenu, setShowMoreMenu] = useState(false);
   const [showLanguageMenu, setShowLanguageMenu] = useState(false);
   const [showAbout, setShowAbout] = useState(false);
@@ -162,9 +171,10 @@ export const CosmosUI = () => {
       const target = e.target as Node;
       
       // Close time slider if clicking outside
-      if (showTimeSlider && timeSliderRef.current && !timeSliderRef.current.contains(target) && 
+      if (timeMenuOpen && !(target instanceof Element && target.closest('[data-lb-date-chip]')) && timeSliderRef.current && !timeSliderRef.current.contains(target) && 
           timeSpeedButtonRef.current && !timeSpeedButtonRef.current.contains(target)) {
         setShowTimeSlider(false);
+        useLeftBehindStore.getState().setDateControlOpen(false);
       }
       
       // Close more menu if clicking outside
@@ -182,7 +192,7 @@ export const CosmosUI = () => {
 
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
-        if (showTimeSlider) setShowTimeSlider(false);
+        if (timeMenuOpen) { setShowTimeSlider(false); useLeftBehindStore.getState().setDateControlOpen(false); }
         if (showMoreMenu) setShowMoreMenu(false);
         if (showLanguageMenu) setShowLanguageMenu(false);
         if (showQuickJump) toggleQuickJump();
@@ -196,7 +206,7 @@ export const CosmosUI = () => {
       document.removeEventListener('mousedown', handleClickOutside);
       document.removeEventListener('keydown', handleEscape);
     };
-  }, [showTimeSlider, showMoreMenu, showLanguageMenu, showQuickJump, toggleQuickJump]);
+  }, [timeMenuOpen, showMoreMenu, showLanguageMenu, showQuickJump, toggleQuickJump]);
 
   const handleQuickJumpClick = () => {
     const el = quickJumpButtonRef.current;
@@ -720,7 +730,7 @@ export const CosmosUI = () => {
 
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Button ref={timeSpeedButtonRef} size="icon" variant="ghost" onClick={() => setShowTimeSlider(!showTimeSlider)} className={`h-9 w-9 backdrop-blur-xs text-white ${showTimeSlider ? 'bg-white/25' : 'bg-white/10 hover:bg-white/20'}`}>
+                  <Button ref={timeSpeedButtonRef} size="icon" variant="ghost" onClick={toggleTimeMenu} className={`h-9 w-9 backdrop-blur-xs text-white ${timeMenuOpen ? 'bg-white/25' : 'bg-white/10 hover:bg-white/20'}`}>
                     <Clock className="w-5 h-5" />
                   </Button>
                 </TooltipTrigger>
@@ -851,7 +861,7 @@ export const CosmosUI = () => {
               </button>
 
               <button
-                onClick={() => { setShowTimeSlider(!showTimeSlider); setShowMoreMenu(false); }}
+                onClick={() => { toggleTimeMenu(); setShowMoreMenu(false); }}
                 className="w-full flex items-center justify-between p-2 rounded-[4px] hover:bg-white/10 transition-colors"
               >
                 <div className="flex items-center gap-2">
@@ -928,7 +938,7 @@ export const CosmosUI = () => {
         <div
           ref={timeSliderRef}
           className={`${isFullscreen ? 'fixed' : 'absolute'} top-12 right-2 sm:top-[68px] sm:right-4 z-[10000] bg-white/10 backdrop-blur-xs rounded-lg overflow-hidden transition-all duration-300 ease-out ${
-            showTimeSlider ? 'opacity-100 scale-100' : 'opacity-0 scale-95 pointer-events-none'
+            timeMenuOpen ? 'opacity-100 scale-100' : 'opacity-0 scale-95 pointer-events-none'
           }`}
           style={
             isFullscreen
@@ -940,10 +950,10 @@ export const CosmosUI = () => {
           }
         >
           <div 
-            className={`grid transition-all duration-300 ease-out ${showTimeSlider ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'}`}
+            className={`grid transition-all duration-300 ease-out ${timeMenuOpen ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'}`}
           >
             <div className="overflow-hidden">
-              <div className="p-3 sm:p-4 min-w-[180px] sm:min-w-[220px] space-y-3">
+              {leftBehindActive ? <Suspense fallback={null}><LeftBehindDateControl /></Suspense> : <div className="p-3 sm:p-4 min-w-[180px] sm:min-w-[220px] space-y-3">
                 <div className="flex items-center justify-between">
                   <span className="text-white text-xs sm:text-sm font-medium">{t.timeSpeed}</span>
                   <span className="text-white/70 text-xs">
@@ -963,7 +973,7 @@ export const CosmosUI = () => {
                   <span>{t.paused}</span>
                   <span>10×</span>
                 </div>
-              </div>
+              </div>}
             </div>
           </div>
         </div>

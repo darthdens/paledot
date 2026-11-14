@@ -1,3 +1,4 @@
+import { useLeftBehindStore } from '@/features/left-behind/state/useLeftBehindStore';
 // KeyboardShortcuts - Handle keyboard navigation in Cosmos Explorer
 import { useEffect } from 'react';
 import { useCosmosStore } from '../store/useCosmosStore';
@@ -15,6 +16,13 @@ export const KeyboardShortcuts = () => {
         return;
       }
       
+      const lb = useLeftBehindStore.getState();
+      if (lb.active && [' ', '+', '=', '-', '_'].includes(e.key)) {
+        e.preventDefault();
+        if (e.key === ' ') lb.togglePlaying();
+        else lb.changeSpeed(e.key === '+' || e.key === '=' ? 1 : -1);
+        return;
+      }
       const planets = celestialObjects.filter(obj => 
         obj.type === 'planet' || obj.type === 'dwarf-planet'
       ).sort((a, b) => (a.orbitRadius || 0) - (b.orbitRadius || 0));
