@@ -1,6 +1,5 @@
 // Left Behind · built during NASA Space Apps Challenge 2026 (14–15 Nov 2026) · AI-assisted (Lovable, Claude)
 import { useEffect,useState } from 'react';
-import { Navigation } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/i18n/LanguageContext';
 import { getHardware } from '../data/dataClient';
@@ -9,7 +8,8 @@ import { canFollowHardware,followHardware } from '../lib/hardwareNavigation';
 import { machineCopy } from '../lib/machineCopy';
 import { useSimClock } from '../state/useSimClock';
 import { useLeftBehindStore } from '../state/useLeftBehindStore';
-export function HardwareJumpChoices(){
+import { JumpCategory } from './JumpCategory';
+export function HardwareJumpChoices({expanded,onToggle}:{expanded:boolean;onToggle:()=>void}){
   const {language,tr}=useLanguage();const copy=machineCopy[language];
   const second=useSimClock(s=>Math.floor(s.simDate/1000));
   const selected=useLeftBehindStore(s=>s.selectedHardwareId);
@@ -17,9 +17,8 @@ export function HardwareJumpChoices(){
   useEffect(()=>{let alive=true;void getHardware().then(async h=>{
     const ids=h.machines.flatMap(m=>m.trajectories.map(t=>t.id));await Promise.allSettled(ids.map(loadTrajectory));if(alive)setIds(ids);
   });return()=>{alive=false;};},[]);
-  return <div className="border-t border-border p-2" data-hardware-jumps>
-    <h3 className="px-2 py-2 text-xs font-medium text-muted-foreground">{tr({en:copy.machines,fr:copy.machines})}</h3>
-    {ids.map(id=>{const available=canFollowHardware(id,second*1000);return <Button key={id} variant="ghost" disabled={!available} aria-label={`${copy.select} ${id.replaceAll('-',' ').toUpperCase()}`} onClick={()=>followHardware(id)} className={`w-full min-h-11 justify-between px-2 text-xs ${selected===id?'bg-primary/15 text-primary':'text-foreground'}`}><span>{id.replaceAll('-',' ').toUpperCase()}</span><Navigation className="h-3.5 w-3.5"/></Button>;})}
-    <p className="px-2 pt-2 text-[10px] text-muted-foreground">{tr({en:copy.availability,fr:copy.availability})}</p>
+  return <div data-hardware-jumps><JumpCategory title={copy.machines} expanded={expanded} onToggle={onToggle}>
+    {ids.map(id=>{const available=canFollowHardware(id,second*1000);const name=id.replaceAll('-',' ').replace(/\b\w/g,c=>c.toUpperCase());return <Button key={id} variant="ghost" disabled={!available} title={!available?copy.availability:undefined} aria-label={`${copy.select} ${name}`} onClick={()=>followHardware(id)} className={`w-full h-auto min-h-7 max-sm:min-h-11 justify-start gap-2 p-1.5 rounded-[4px] text-xs font-normal ${selected===id?'bg-primary/15 text-primary':'text-muted-foreground hover:text-foreground hover:bg-accent/60'}`}><span className={`w-2 h-2 rounded-full shrink-0 ${selected===id?'bg-primary':'bg-muted-foreground'}`}/><span className="truncate">{name}</span></Button>;})}
+    </JumpCategory>
   </div>;
 }
