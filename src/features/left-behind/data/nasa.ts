@@ -95,7 +95,7 @@ type LibraryItem = { data?: { nasa_id: string; title: string; description?: stri
 export function acceptablePhoto(item: LibraryItem, machine: Machine, query?: string) {
   const data = item.data?.[0];
   if (!data || /\b(logo|insignia|patch|emblem)\b/i.test([data.title, ...(data.keywords ?? [])].join(' '))) return false;
-  if (query && /\b(simulations?|trainer|artists?|concept|chart|team|logbook|logs?|montage)\b/i.test(data.title)) return false;
+  if (query && /\b(simulations?|trainer|artists?|concept|illustration|animation|diagram|chart|team|logbook|logs?|montage|3D)\b/i.test(data.title)) return false;
   if (/Voyager [12]/i.test(data.title) && !data.title.includes(machine.name) && machine.id.startsWith('voyager')) return false;
   if (!query) return true;
   const name = machine.id === 'lunar-rovers' ? query.match(/Apollo \d+/i)?.[0] ?? 'Apollo' : machine.id.startsWith('voyager') ? 'Voyager' : machine.id.replaceAll('-', ' ');
@@ -110,7 +110,7 @@ export async function buildPhotos(machines: Machine[]): Promise<Photo[]> {
     const items: LibraryItem[] = response.collection?.items ?? [];
     const score = (item: LibraryItem) => {
       const title = item.data?.[0]?.title.toLowerCase() ?? '';
-      return (title.includes(machine.name.toLowerCase()) ? 10 : 0) + (entry.query?.toLowerCase().includes('first flight') && title.includes('first') ? 5 : 0) + (entry.query?.toLowerCase().includes('self-portrait') && title.includes('self') ? 5 : 0);
+      return (title.includes(machine.name.toLowerCase()) ? 2 : 0) + (entry.query?.toLowerCase().includes('first flight') && title.includes('first') ? 10 : 0) + (entry.query?.toLowerCase().includes('self-portrait') && title.includes('self') ? 5 : 0);
     };
     const item = items.filter(item => acceptablePhoto(item, machine, entry.query)).sort((a, b) => score(b) - score(a))[0];
     const data = item?.data?.[0];
