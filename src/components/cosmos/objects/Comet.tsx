@@ -1,3 +1,4 @@
+import { useSimClock } from '@/features/left-behind/state/useSimClock';
 import { useRef, useMemo } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
@@ -59,7 +60,6 @@ const Comet = ({ comet, scale }: CometProps) => {
   const tailRef = useRef<THREE.Points>(null);
   const ionTailRef = useRef<THREE.Points>(null);
   
-  const timeSpeed = useCosmosStore(state => state.timeSpeed);
   const setSelectedObject = useCosmosStore(state => state.setSelectedObject);
   const setHoveredObject = useCosmosStore(state => state.setHoveredObject);
   const setObjectWorldPosition = useCosmosStore(state => state.setObjectWorldPosition);
@@ -140,7 +140,7 @@ const Comet = ({ comet, scale }: CometProps) => {
   useFrame((state) => {
     if (!groupRef.current) return;
     
-    const time = state.clock.getElapsedTime() * timeSpeed * 0.0025;
+    const time = (useSimClock.getState().simDate - Date.UTC(2000,0,1,12)) / (365.25 * 86400000);
     
     // Elliptical orbit calculation
     const a = comet.semiMajorAxis * scale;

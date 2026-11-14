@@ -1,3 +1,4 @@
+import { useSimClock } from '@/features/left-behind/state/useSimClock';
 // KuiperBelt - Renders icy objects beyond Neptune
 import { useRef, useMemo } from 'react';
 import { useFrame } from '@react-three/fiber';
@@ -75,7 +76,7 @@ const generateKuiperObjects = (count: number, innerRadius: number, outerRadius: 
     // Kepler's third law: periodYears = a^(3/2)
     const periodDays = 365.25 * Math.pow(semiMajorAxisAu, 1.5);
     // Scale: 1 Earth year (365.25 days) = 240 seconds at 1x speed
-    speeds[i] = (2 * Math.PI * 365.25) / (periodDays * 240);
+    speeds[i] = (2 * Math.PI) / (periodDays * 86400);
     
     phases[i] = angle;
     
@@ -115,8 +116,6 @@ export const KuiperBelt = ({
   scale = 1 
 }: KuiperBeltProps) => {
   const pointsRef = useRef<THREE.Points>(null);
-  const timeSpeed = useCosmosStore(state => state.timeSpeed);
-  const simTime = useRef(0);
   
   const kuiperData = useMemo(() => 
     generateKuiperObjects(count, innerRadius, outerRadius, scale),
@@ -175,7 +174,7 @@ export const KuiperBelt = ({
   useFrame((_, delta) => {
     if (!pointsRef.current) return;
     
-    simTime.current += delta * timeSpeed;
+    const simulatedSeconds = (useSimClock.getState().simDate - Date.UTC(2000,0,1,12)) / 1000;
     
     const positions = pointsRef.current.geometry.attributes["position"]!.array as Float32Array;
     const { radii, heights, speeds, phases } = kuiperData;
@@ -183,7 +182,7 @@ export const KuiperBelt = ({
     // Update positions using stored radii (same approach as AsteroidBelt)
     for (let i = 0; i < count; i++) {
       const radius = radii[i];
-      const currentAngle = phases[i]! + simTime.current * speeds[i]!;
+      const currentAngle = phases[i]! + simulatedSeconds * speeds[i]!;
       
       positions[i * 3] = Math.cos(currentAngle) * radius!;
       positions[i * 3 + 1] = heights[i]!; // Keep original height

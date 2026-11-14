@@ -1,3 +1,6 @@
+import { useSimClock } from '@/features/left-behind/state/useSimClock';
+import { getEphemeris } from '@/features/left-behind/engine/runtime';
+import { eclipticKmToScene } from '@/features/left-behind/lib/units';
 // TrojanAsteroids - Renders asteroids at Jupiter's L4 and L5 Lagrange points
 import { useRef, useMemo } from 'react';
 import { useFrame } from '@react-three/fiber';
@@ -82,8 +85,6 @@ export const TrojanAsteroids = ({
 }: TrojanAsteroidsProps) => {
   const l4Ref = useRef<THREE.Points>(null);
   const l5Ref = useRef<THREE.Points>(null);
-  const timeSpeed = useCosmosStore(state => state.timeSpeed);
-  const simTime = useRef(0);
   
   // L4 is 60° ahead of Jupiter, L5 is 60° behind
   const l4Angle = Math.PI / 3; // 60°
@@ -176,8 +177,10 @@ export const TrojanAsteroids = ({
   };
   
   useFrame((_, delta) => {
-    simTime.current += delta * timeSpeed;
-    const jupiterAngle = simTime.current * jupiterAngularVelocity;
+    const position = getEphemeris()?.positionsAt(useSimClock.getState().simDate).jupiter;
+    if (!position) return;
+    const [x,,z] = eclipticKmToScene(...position);
+    const jupiterAngle = Math.atan2(z,x);
     
     // Update both L4 and L5 Trojan positions
     updateTrojanPositions(l4Ref, l4Data, jupiterAngle);

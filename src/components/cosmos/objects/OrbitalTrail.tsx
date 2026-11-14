@@ -1,3 +1,4 @@
+import { useSimClock } from '@/features/left-behind/state/useSimClock';
 import { useEffect, useMemo, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
@@ -36,7 +37,7 @@ export const OrbitalTrail = ({
   const geometryRef = useRef<THREE.BufferGeometry | null>(null);
   const glowGeometryRef = useRef<THREE.BufferGeometry | null>(null);
 
-  const timeSpeed = useCosmosStore((state) => state.timeSpeed);
+  const lastDate = useRef(useSimClock.getState().simDate);
 
   // Main trail line
   const { line, geometry, material, positionAttr, positions } = useMemo(() => {
@@ -112,8 +113,11 @@ export const OrbitalTrail = ({
   }, [geometry, material, glowLine]);
 
   useFrame(() => {
+    const clock = useSimClock.getState();
+    const scrubbed = Math.abs(clock.simDate - lastDate.current) > Math.max(60000, clock.rate * 2000);
+    lastDate.current = clock.simDate;
     // Clear trail when re-enabled after being disabled (prevents old trail from showing at wrong position)
-    if (enabled && !wasEnabledRef.current) {
+    if (scrubbed || (enabled && !wasEnabledRef.current)) {
       // Reset trail data
       countRef.current = 0;
       lastPosRef.current = null;
@@ -132,7 +136,7 @@ export const OrbitalTrail = ({
     wasEnabledRef.current = enabled;
 
     // Only record when enabled and time is moving
-    if (!enabled || timeSpeed === 0) return;
+    if (!enabled || !clock.isPlaying) return;
 
     const worldPos = useCosmosStore.getState().objectWorldPositions[objectId];
     if (!worldPos || !geometryRef.current) return;

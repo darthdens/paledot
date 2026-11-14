@@ -947,7 +947,6 @@ export const CosmosUI = () => {
           >
             <div className="overflow-hidden">
               {timeMenuOpen && <Suspense fallback={null}><LeftBehindDateControl /></Suspense>}
-            </div>}
             </div>
           </div>
         </div>
