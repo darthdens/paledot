@@ -38,7 +38,7 @@ export const QuickJumpMenu = () => {
   const { language, tr, tx, numberLocale } = useLanguage();
   const t = tr(translations);
   const brand=useSiteBrand();
-  const [expandedCategory, setExpandedCategory] = useState<string | null>('solarSystem');
+  const [expandedCategory, setExpandedCategory] = useState<string | null>(brand === 'paledot' ? 'hardware' : 'solarSystem');
 
   const [isSmUp, setIsSmUp] = useState<boolean>(() => {
     if (typeof window === 'undefined') return false;

@@ -118,7 +118,7 @@ const createCoronaRaysTexture = () => {
 // Sunlight colour: the Sun's ~5772 K photosphere seen from space is near-white with a faint warm tint.
 export const SUNLIGHT_COLOR = '#FFF6EC';
 
-const PHOTO_VS = `
+export const PHOTO_VS = `
   varying vec3 vObj; varying vec3 vN; varying vec3 vV;
   void main() {
     vObj = normalize(position);
@@ -131,7 +131,7 @@ const PHOTO_VS = `
 
 // Photosphere: Worley-cell granulation (~1,000 km cells, as observed) plus faint supergranulation,
 // wavelength-dependent limb darkening (limb is darker and redder), faded by screen size to avoid shimmer.
-const PHOTO_FS = `
+export const makePhotoFS = (base: string, limbU: string, centre: string) => `
   uniform float uTime;
   varying vec3 vObj; varying vec3 vN; varying vec3 vV;
   vec3 h3(vec3 p) {
@@ -158,7 +158,7 @@ const PHOTO_FS = `
     vec3 n = normalize(vN);
     float mu = clamp(dot(n, normalize(vV)), 0.0, 1.0);
     // Linear limb darkening, I(mu) = 1 - u(1 - mu), with u larger at shorter wavelengths
-    vec3 u = vec3(0.45, 0.70, 0.90);
+    vec3 u = ${limbU};
     vec3 limb = 1.0 - u * (1.0 - mu);
 
     // Granulation: unit sphere * 600 -> cells ~1,150 km across on the real Sun
@@ -174,13 +174,14 @@ const PHOTO_FS = `
     float sg = worley(ps, 3.0);
     float sup = mix(1.0, 0.94 + 0.08 * sg, sFade);
 
-    vec3 base = vec3(1.0, 0.55, 0.12);         // familiar golden-orange look (filtered-photo style, not true colour)
+    vec3 base = ${base};         // familiar golden-orange look (filtered-photo style, not true colour)
     vec3 col = base * limb * gran * sup;
     // Keep output within displayable range so the colour never clips to white
-    vec3 core = mix(col, vec3(1.0, 0.78, 0.38), pow(mu, 4.0) * 0.45);
+    vec3 core = mix(col, ${centre}, pow(mu, 4.0) * 0.45);
     gl_FragColor = vec4(min(core, vec3(1.0)), 1.0);       // HDR so bloom picks it up
   }
 `;
+const PHOTO_FS = makePhotoFS('vec3(1.0, 0.55, 0.12)', 'vec3(0.45, 0.70, 0.90)', 'vec3(1.0, 0.78, 0.38)');
 
 // Sun's real diameter is 1,392,700 km
 const SUN_DIAMETER = 1392700;

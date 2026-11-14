@@ -5,6 +5,11 @@ import { Select } from '@react-three/postprocessing';
 import * as THREE from 'three';
 import { useCosmosStore } from '../store/useCosmosStore';
 import { getObjectById } from '../data/celestialObjects';
+import { PHOTO_VS, makePhotoFS } from './Sun';
+import { useSimClock } from '@/features/left-behind/state/useSimClock';
+
+// Proxima is a ~3,000 K red dwarf: deep orange-red, with stronger reddening toward the limb.
+const PROXIMA_FS = makePhotoFS('vec3(1.0, 0.30, 0.10)', 'vec3(0.55, 0.80, 0.95)', 'vec3(1.0, 0.55, 0.30)');
 
 interface ProximaCentauriProps {
   visualScale?: number;
@@ -21,9 +26,11 @@ const createRedDwarfGlowTexture = () => {
   const gradient = ctx.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2);
 
   // Red dwarf colors: pink-white center → salmon → red → fade
-  gradient.addColorStop(0, 'rgba(255, 220, 210, 1)');       // Warm white-pink center
-  gradient.addColorStop(0.08, 'rgba(255, 200, 190, 0.9)');  // Light salmon
-  gradient.addColorStop(0.18, 'rgba(255, 160, 150, 0.7)');  // Salmon
+  // Transparent over the disc so the halo never whitens the star's face
+  gradient.addColorStop(0, 'rgba(255, 90, 40, 0)');
+  gradient.addColorStop(0.11, 'rgba(255, 90, 40, 0)');
+  gradient.addColorStop(0.13, 'rgba(255, 100, 50, 0.8)');
+  gradient.addColorStop(0.22, 'rgba(255, 90, 50, 0.5)');
   gradient.addColorStop(0.35, 'rgba(255, 120, 110, 0.45)'); // Coral
   gradient.addColorStop(0.55, 'rgba(220, 80, 70, 0.25)');   // Red
   gradient.addColorStop(0.75, 'rgba(180, 60, 50, 0.1)');    // Deep red
@@ -50,6 +57,11 @@ export const ProximaCentauri = ({ visualScale = 0.001 }: ProximaCentauriProps) =
   const coronaRef = useRef<THREE.Mesh>(null);
   const glowRef = useRef<THREE.Mesh>(null);
 
+  const matRef = useRef<THREE.ShaderMaterial>(null);
+  const spriteRef = useRef<THREE.Sprite>(null);
+  const shellRef = useRef<THREE.Mesh>(null);
+  const uniforms = useMemo(() => ({ uTime: { value: 0 } }), []);
+  const wp = useMemo(() => new THREE.Vector3(), []);
   const glowTexture = useMemo(() => createRedDwarfGlowTexture(), []);
   const proxima = useMemo(() => getObjectById('proxima-centauri'), []);
 
@@ -59,9 +71,16 @@ export const ProximaCentauri = ({ visualScale = 0.001 }: ProximaCentauriProps) =
   useFrame((state) => {
     const time = state.clock.getElapsedTime();
 
+    void time;
     if (starRef.current) starRef.current.rotation.y += 0.0005;
-    if (coronaRef.current) coronaRef.current.scale.setScalar(1 + Math.sin(time * 1.5) * 0.015);
-    if (glowRef.current) glowRef.current.scale.setScalar(1 + Math.sin(time * 0.4) * 0.04);
+    if (matRef.current) uniforms.uTime.value = (useSimClock.getState().simDate / 1000) % 4.8e5;
+    if (starRef.current) {
+      starRef.current.getWorldPosition(wp);
+      const d = state.camera.position.distanceTo(wp) / starSize;
+      const far = THREE.MathUtils.smoothstep(d, 2.5, 20);
+      if (spriteRef.current) { (spriteRef.current.material as THREE.SpriteMaterial).opacity = 0.8 * far; spriteRef.current.visible = far > 0.001; }
+      if (shellRef.current) shellRef.current.visible = d > 1.4;
+    }
   });
 
   // Physical stellar radius; glow layers remain relative to it.
@@ -94,138 +113,43 @@ export const ProximaCentauri = ({ visualScale = 0.001 }: ProximaCentauriProps) =
         onPointerOut={handlePointerOut}
       >
         <sphereGeometry args={[starSize, 48, 48]} />
-        <shaderMaterial
-          uniforms={{
-            time: { value: 0 },
-          }}
-          vertexShader={`
-            varying vec2 vUv;
-            varying vec3 vNormal;
-            void main() {
-              vUv = uv;
-              vNormal = normalize(normalMatrix * normal);
-              gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-            }
-          `}
-          fragmentShader={`
-            uniform float time;
-            varying vec2 vUv;
-            varying vec3 vNormal;
-
-            float hash(vec2 p) {
-              return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453);
-            }
-
-            float noise(vec2 p) {
-              vec2 i = floor(p);
-              vec2 f = fract(p);
-              f = f * f * (3.0 - 2.0 * f);
-              float a = hash(i);
-              float b = hash(i + vec2(1.0, 0.0));
-              float c = hash(i + vec2(0.0, 1.0));
-              float d = hash(i + vec2(1.0, 1.0));
-              return mix(mix(a, b, f.x), mix(c, d, f.x), f.y);
-            }
-
-            void main() {
-              vec2 uv = vUv * 6.0;
-              float n = noise(uv) * 0.5 + noise(uv * 2.0) * 0.25 + noise(uv * 4.0) * 0.125;
-
-              vec3 coreColor = vec3(1.0, 0.85, 0.82);
-              vec3 coolColor = vec3(0.95, 0.55, 0.5);
-              vec3 surfaceColor = mix(coolColor, coreColor, n);
-
-              surfaceColor *= 1.3;
-              gl_FragColor = vec4(surfaceColor, 1.0);
-            }
-          `}
-        />
+        <shaderMaterial ref={matRef} uniforms={uniforms} vertexShader={PHOTO_VS} fragmentShader={PROXIMA_FS} />
       </mesh>
 
-      {/* Inner corona - soft pink */}
-      <mesh ref={coronaRef} renderOrder={1}>
-        <sphereGeometry args={[starSize * 1.06, 48, 48]} />
-        <meshBasicMaterial 
-          color="#FFB0A8" 
-          transparent 
-          opacity={0.5} 
-          depthWrite={false} 
-        />
-      </mesh>
-
-      {/* Middle glow layer - coral */}
-      <mesh renderOrder={2}>
-        <sphereGeometry args={[starSize * 1.15, 32, 32]} />
-        <meshBasicMaterial 
-          color="#FF8878" 
-          transparent 
-          opacity={0.3} 
-          depthWrite={false} 
-        />
-      </mesh>
-
-      {/* Outer glow - reddish */}
-      <mesh ref={glowRef} renderOrder={3}>
-        <sphereGeometry args={[starSize * 1.4, 32, 32]} />
+      {/* Thin glow hugging the limb */}
+      <mesh ref={shellRef} renderOrder={1}>
+        <sphereGeometry args={[starSize * 1.15, 48, 48]} />
         <shaderMaterial
           transparent
           depthWrite={false}
+          blending={THREE.AdditiveBlending}
           side={THREE.BackSide}
-          uniforms={{
-            glowColor: { value: new THREE.Color('#E05040') },
-          }}
           vertexShader={`
-            varying vec3 vNormal;
+            varying vec3 vN; varying vec3 vV;
             void main() {
-              vNormal = normalize(normalMatrix * normal);
-              gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+              vec4 wp = modelMatrix * vec4(position, 1.0);
+              vN = normalize(mat3(modelMatrix) * normal);
+              vV = normalize(cameraPosition - wp.xyz);
+              gl_Position = projectionMatrix * viewMatrix * wp;
             }
           `}
           fragmentShader={`
-            varying vec3 vNormal;
-            uniform vec3 glowColor;
+            varying vec3 vN; varying vec3 vV;
             void main() {
-              float intensity = pow(max(0.0, 0.6 - dot(vNormal, vec3(0.0, 0.0, 1.0))), 1.5);
-              gl_FragColor = vec4(glowColor, intensity * 0.6);
-            }
-          `}
-        />
-      </mesh>
-
-      {/* Far outer glow - deep red, very soft */}
-      <mesh renderOrder={4}>
-        <sphereGeometry args={[starSize * 1.8, 24, 24]} />
-        <shaderMaterial
-          transparent
-          depthWrite={false}
-          side={THREE.BackSide}
-          uniforms={{
-            glowColor: { value: new THREE.Color('#B03020') },
-          }}
-          vertexShader={`
-            varying vec3 vNormal;
-            void main() {
-              vNormal = normalize(normalMatrix * normal);
-              gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-            }
-          `}
-          fragmentShader={`
-            varying vec3 vNormal;
-            uniform vec3 glowColor;
-            void main() {
-              float intensity = pow(max(0.0, 0.5 - dot(vNormal, vec3(0.0, 0.0, 1.0))), 2.0);
-              gl_FragColor = vec4(glowColor, intensity * 0.35);
+              float r = 1.0 - abs(dot(vN, vV));
+              float a = pow(1.0 - r, 4.0) * 1.2;
+              gl_FragColor = vec4(vec3(1.0, 0.32, 0.12) * a, a);
             }
           `}
         />
       </mesh>
 
       {/* Sprite-based gradient glow */}
-      <sprite renderOrder={10} scale={[starSize * 4, starSize * 4, 1]}>
+      <sprite ref={spriteRef} renderOrder={10} scale={[starSize * 8, starSize * 8, 1]}>
         <spriteMaterial
           map={glowTexture}
           transparent
-          opacity={0.35}
+          opacity={0.8}
           blending={THREE.AdditiveBlending}
           depthWrite={false}
           depthTest={true}
@@ -233,7 +157,7 @@ export const ProximaCentauri = ({ visualScale = 0.001 }: ProximaCentauriProps) =
       </sprite>
 
       {/* Dimmer point light */}
-      <pointLight intensity={1} distance={0} decay={1} color="#FFD0C8" />
+      <pointLight intensity={1} distance={0} decay={1} color="#FFB08A" />
       </group>
     </Select>
   );
