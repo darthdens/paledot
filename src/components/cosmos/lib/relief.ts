@@ -10,7 +10,7 @@ import meta from '@/assets/relief/relief.json';
 /**
  * True-scale global relief (real elevation data, metres): Moon LRO LOLA, Mars MGS MOLA, Earth NOAA ETOPO1,
  * Mercury MESSENGER (USGS DEM), Ceres Dawn (DLR HAMO DTM).
- * Built by scripts/relief/build_globals.py. Loaded once the camera nears the body, never at boot.
+ * Built by scripts/relief/build_globals.py. Preloaded behind the opening loader (preloadAllRelief); applied once the camera nears the body.
  * Encoding: equirectangular, north up, lon -180..180; (metres + 32768) split into R (high) and G (low).
  */
 const URLS: Record<string, string> = { earth: earthHeight.url, moon: moonHeight.url, mars: marsHeight.url, mercury: mercuryHeight.url, ceres: ceresHeight.url };
