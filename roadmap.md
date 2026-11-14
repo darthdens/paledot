@@ -11,4 +11,4 @@ Verification: 24 tests pass; four Pale Dot entries and desktop/360px date checks
 - [x] Match Satellite and welcome button dimensions; use the same glass menu skin.
 - [x] Give enabled machine toggle the selected Pale Dot accent.
 - [x] Add shared original/machine tour chooser; unfinished machine tours stay disabled.
-- [ ] Verify menu styling, selection and original tour launch at desktop and 360px.
+- [x] Verify menu styling, selection and original tour launch at desktop and 360px.
