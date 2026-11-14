@@ -9,3 +9,4 @@
 
 - Solid-body renderers and close-up navigation use the shared bodyScale helpers; catalogue sizes remain diameters and positions are untouched. Why: both brands/modes must agree on radius, camera clearance and portrait framing.
 - In development only, window.__cosmosCheck exposes live state(), snapshot() and finishFlight(); the canvas marks data-scene-ready after drawing. Why: verify complete tours and true radii without duplicating stores or waiting for software-GPU animation time.
+- Left Behind dynamically imports ephemerides only on activation, caches all body positions by date and orbit samples by body, and advances its clock in one pre-motion useFrame. Why: normal loading stays isolated and scrubbing does not rebuild orbit geometry.
