@@ -15,6 +15,7 @@ import { machineCopy } from '../lib/machineCopy';
 
 export function HardwareTrack({ data, nearest }: { data: Trajectory; nearest: boolean }) {
   const marker = useRef<THREE.Group>(null);
+  const anchor = useRef<HTMLDivElement>(null);
   const [hover, setHover] = useState(false);
   const selected = useLeftBehindStore(s=>s.selectedHardwareId===data.id);
   const full = useLeftBehindStore(s=>s.fullPathsVisible);
@@ -53,6 +54,7 @@ export function HardwareTrack({ data, nearest }: { data: Trajectory; nearest: bo
     }
     const node=marker.current;if(!node)return;
     const p=positionAt(data.id,new Date(time)); node.visible=!!p;
+    if(anchor.current)anchor.current.hidden=!p;
     if (!p) { delete useCosmosStore.getState().objectWorldPositions[`hw:${data.id}`]; return; }
     node.position.set(...eclipticKmToScene(...p.km));
     node.updateWorldMatrix(true,false);node.getWorldPosition(world);
@@ -63,7 +65,7 @@ export function HardwareTrack({ data, nearest }: { data: Trajectory; nearest: bo
     {graphics.map((g,i)=><group key={i}><primitive object={g.past}/><primitive object={g.future}/></group>)}
     <group ref={marker} visible={false} name={`hw:${data.id}`}>
       <Html center zIndexRange={[40,30]}>
-        <div className="paledot dark pd-hardware-anchor" onPointerEnter={()=>setHover(true)} onPointerLeave={()=>setHover(false)}>
+        <div ref={anchor} hidden className="paledot dark pd-hardware-anchor" onPointerEnter={()=>setHover(true)} onPointerLeave={()=>setHover(false)}>
           <Button variant="ghost" className="pd-hardware-hit" aria-label={`${machineCopy[language].select} ${label}`} aria-pressed={selected} onClick={()=>{useCosmosStore.getState().setSelectedObject(null);useLeftBehindStore.getState().selectHardware(data.id);}}>
             <span className={`pd-hardware-ring ${selected?'pd-hardware-selected':''}`} />
           </Button>
