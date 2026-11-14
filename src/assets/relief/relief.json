@@ -1,0 +1,29 @@
+{
+ "moon": {
+  "width": 5760,
+  "height": 2880,
+  "minM": -8981,
+  "maxM": 10685,
+  "datum": "sphere 1737.4 km",
+  "credit": "NASA/GSFC/LOLA (LRO), NASA SVS CGI Moon Kit LDEM_16",
+  "sourceUrl": "https://svs.gsfc.nasa.gov/4720"
+ },
+ "mars": {
+  "width": 5760,
+  "height": 2880,
+  "minM": -8177,
+  "maxM": 21171,
+  "datum": "MOLA areoid",
+  "credit": "NASA/JPL/GSFC MOLA (Mars Global Surveyor) MEGDR 16 px/deg",
+  "sourceUrl": "https://pds-geosciences.wustl.edu/missions/mgs/megdr.html"
+ },
+ "earth": {
+  "width": 4320,
+  "height": 2161,
+  "minM": -10750,
+  "maxM": 7512,
+  "datum": "sea level",
+  "credit": "NOAA NCEI ETOPO1 Global Relief Model (ice surface)",
+  "sourceUrl": "https://www.ncei.noaa.gov/products/etopo-global-relief-model"
+ }
+}
