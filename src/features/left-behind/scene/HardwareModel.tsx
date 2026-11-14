@@ -50,8 +50,10 @@ export function HardwareModel({ id, url, selected, parent }: { id: string; url: 
     const distance = camera.position.distanceTo(tmp.world);
     const fov = (camera as THREE.PerspectiveCamera).fov ?? 60;
     const worldSize = 2 * distance * Math.tan(THREE.MathUtils.degToRad(fov / 2)) * (selected ? SELECTED_PX : MARKER_PX) / Math.max(size.height, 1);
-    // Far away: a readable screen-size marker. Close up: the hardware's true size (hardware.json trueSize).
-    const scale = Math.max(worldSize, trueSpanUnits.get(id) ?? 0);
+    // The model is always drawn at its true size (hardware.json trueSize); the ring/pin marker keeps it findable.
+    const trueSpan = trueSpanUnits.get(id);
+    node.visible = trueSpan !== undefined;
+    const scale = trueSpan ?? worldSize;
     node.scale.setScalar(scale);
     node.position.set(0, 0, 0);
     if (parent) {
@@ -67,7 +69,7 @@ export function HardwareModel({ id, url, selected, parent }: { id: string; url: 
         }
       }
     }
-    if (scale === worldSize) node.rotation.y += Math.min(delta, 0.05) * 0.15;
+    if (false) node.rotation.y += Math.min(delta, 0.05) * 0.15;
   }, -0.2);
   return <group ref={group} renderOrder={3}><primitive object={model} /></group>;
 }
