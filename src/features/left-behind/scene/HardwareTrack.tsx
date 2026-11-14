@@ -16,7 +16,7 @@ import { followHardware } from '../lib/hardwareNavigation';
 import { machineCopy } from '../lib/machineCopy';
 import { nasaModels } from '../lib/nasaModels';
 import { HardwareModel } from './HardwareModel';
-import { trueSpanUnits } from '../lib/nasaModels';
+import { loadTrueSpans, trueSpanUnits } from '../lib/nasaModels';
 
 class SceneBoundary extends Component<{ children: ReactNode }, { failed: boolean }> {
   override state = { failed: false };
@@ -68,6 +68,7 @@ export function HardwareTrack({ data, nearest }: { data: Trajectory; nearest: bo
     line.frustumCulled=false;
     return line;
   },[graphics]);
+  useEffect(()=>{ void loadTrueSpans(); },[]);
   useEffect(()=>()=>{tip.geometry.dispose();tip.material.dispose();},[tip]);
   useEffect(()=>()=>{ for(const g of graphics){g.past.geometry.dispose();g.past.material.dispose();g.future.geometry.dispose();g.future.material.dispose();} delete useCosmosStore.getState().objectWorldPositions[`hw:${data.id}`]; },[graphics,data.id]);
   useFrame(({camera,size})=> {
