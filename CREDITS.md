@@ -116,3 +116,5 @@ Confirm each licence against package metadata (Prompt 11 check 12).
 | --- | --- | --- |
 | Lovable (AI app builder) | https://lovable.dev | Wrote the code from my prompts |
 | Claude | https://claude.ai | Research (including compiling hardware.json from NASA sources), planning and debugging |
+
+- Simplified Lunar Roving Vehicle and Apollo 11 laser reflector models (built in code, no external asset) use dimensions from [NSSDCA: The Apollo Lunar Roving Vehicle](https://nssdc.gsfc.nasa.gov/planetary/lunar/apollo_lrv.html) (US Government work), the [Boeing LRV press kit](http://www.ninfinger.org/karld/LRV%20Documents/A17_LunarRover2.pdf) (track width) and [NASA JPL: Apollo 11 Experiment Continues to Return Valuable Data](https://www.jpl.nasa.gov/news/apollo-11-experiment-continues-to-return-valuable-data/).
