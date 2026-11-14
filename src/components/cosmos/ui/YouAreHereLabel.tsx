@@ -1,3 +1,4 @@
+import { LeftBehindOverlay } from '@/features/left-behind/ui/LeftBehindOverlay';
 import { useState } from 'react';
 import { useLanguage } from '@/i18n/LanguageContext';
 import { useCosmosStore } from '../store/useCosmosStore';
@@ -253,6 +254,7 @@ export const YouAreHereLabel = () => {
           </div>
         </div>
       </div>
+      <LeftBehindOverlay />
     </div>
   );
 };

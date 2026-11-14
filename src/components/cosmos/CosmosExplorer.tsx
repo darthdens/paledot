@@ -45,7 +45,6 @@ import { useSiteBrand } from '@/lib/site-brand';
 import { SimulationClock } from '@/features/left-behind/scene/SimulationClock';
 import { useLeftBehindStore } from '@/features/left-behind/state/useLeftBehindStore';
 const LeftBehindLayer = lazy(() => import('@/features/left-behind/scene/LeftBehindLayer').then(m => ({ default: m.LeftBehindLayer })));
-const LeftBehindOverlay = lazy(() => import('@/features/left-behind/ui/LeftBehindOverlay').then(m => ({ default: m.LeftBehindOverlay })));
 
 // Allow loaders (R3F + our preload) to reuse texture requests.
 THREE.Cache.enabled = true;
@@ -307,7 +306,6 @@ export const CosmosExplorer = () => {
           <KeyboardShortcuts />
           <SizeComparison />
           <YouAreHereLabel />
-          <Suspense fallback={null}><LeftBehindOverlay /></Suspense>
         </>
       )}
     </div>
