@@ -31,3 +31,12 @@ it('hiding machines clears only hardware following and preserves clock state', (
   expect(useSimClock.getState()).toBe(clock);
   useLeftBehindStore.getState().toggleMachines();
 });
+it('unfollowing a machine keeps its selection and restores following when requested',()=>{
+  useLeftBehindStore.getState().selectHardware('voyager-1');
+  useLeftBehindStore.getState().toggleHardwareFollow();
+  expect(useLeftBehindStore.getState().selectedHardwareId).toBe('voyager-1');
+  expect(useLeftBehindStore.getState().followTargetId).toBeNull();
+  useLeftBehindStore.getState().toggleHardwareFollow();
+  expect(useLeftBehindStore.getState().followTargetId).toBe('voyager-1');
+  useLeftBehindStore.getState().selectHardware(null);
+});

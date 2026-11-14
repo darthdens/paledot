@@ -48,6 +48,19 @@ Data was fetched from the JPL Horizons API and NASA Image and Video Library API 
 
 ## Other data and resources (form field: Space Agency Partner & Other Data)
 
+### NASA model inspection (added during the event)
+
+NASA models are public-domain US-government resources according to the [NASA 3D Resources README](https://github.com/nasa/NASA-3D-Resources) and [NASA media usage guidelines](https://www.nasa.gov/nasa-brand-center/images-and-media/); educational inspection only, with NASA credit and no endorsement. Draco compression was decoded without changing mesh shape; the model inspection view is explicitly not to scale.
+
+| Link text | URL | Licence / use |
+| --- | --- | --- |
+| NASA Voyager Probe (A) | https://github.com/nasa/NASA-3D-Resources/tree/master/3D%20Models/Voyager%20Probe%20(A) | Public domain; Voyager 1 and 2 inspection |
+| NASA Ingenuity Mars Helicopter | https://github.com/nasa/NASA-3D-Resources/tree/master/3D%20Models/Ingenuity%20Mars%20Helicopter | Public domain; inspection |
+| NASA Opportunity MER-B | https://github.com/nasa/NASA-3D-Resources/tree/master/3D%20Models/Mars%20Exploration%20Rover%20-%20Opportunity%20(MER-B) | Public domain; inspection |
+| NASA Viking Lander | https://github.com/nasa/NASA-3D-Resources/tree/master/3D%20Models/Viking%20Lander | Public domain; inspection |
+| NASA Apollo Lunar Module | https://github.com/nasa/NASA-3D-Resources/tree/master/3D%20Models/Apollo%20Lunar%20Module | Public domain; complete lunar module inspection, not a representation of the remaining descent stage |
+| glTF Transform | https://gltf-transform.dev/ | MIT; sandbox-only asset decoding tool, not an app dependency |
+
 ### Pre-existing work and assets
 
 | Link text | URL | Licence / notes |

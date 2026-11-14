@@ -23,3 +23,10 @@ Verification: 24 tests pass; four Pale Dot entries and desktop/360px date checks
 - [x] Draw paths and screen-size markers; add camera following and full-path toggle.
 - [x] Add translated selected-machine measurements and dismissible scale note.
 - [x] Verify Voyager milestones and actual marker selection/readout; desktop scene loads without runtime errors. Mobile screenshot and full visibility-flow checks remain unverified because the software-GPU browser timed out.
+
+## Navigation and visual consistency audit
+- [x] Add available NASA machines to Quick Jump with follow navigation; Voyager selection/readout checked through the actual menu.
+- [x] Anchor dropdowns to the explorer and match machine cards to InfoCard spacing/actions; desktop/360px explorer screenshots checked.
+- [x] Correct trail buffer/local coordinates, orbit epoch alignment, and machine-path precision/sorting.
+- [x] Add credited NASA model inspection without changing true-scale universe objects; five GLBs validated and decoded. Lunar-rover model is not supplied, and models are inspection-only.
+- [x] Run focused tests and desktop/mobile scene checks. Real-device flicker and full model-inspection screenshots remain unverified: software-GPU interactions timed out.

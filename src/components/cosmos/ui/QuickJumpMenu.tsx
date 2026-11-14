@@ -4,6 +4,8 @@ import { X, ChevronRight, Clock } from 'lucide-react';
 import { useCosmosStore } from '../store/useCosmosStore';
 import { useFullscreenStore } from '../store/useFullscreenStore';
 import { quickJumpCategories, getObjectById } from '../data/celestialObjects';
+import { useSiteBrand } from '@/lib/site-brand';
+import { HardwareJumpChoices } from '@/features/left-behind/ui/HardwareJumpChoices';
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 
 const translations = {
@@ -34,6 +36,7 @@ const IMPLEMENTED_OBJECTS: Record<string, string[]> = {
 export const QuickJumpMenu = () => {
   const { language, tr, tx, numberLocale } = useLanguage();
   const t = tr(translations);
+  const brand=useSiteBrand();
   const [expandedCategory, setExpandedCategory] = useState<string | null>('solarSystem');
 
   const [isSmUp, setIsSmUp] = useState<boolean>(() => {
@@ -52,7 +55,8 @@ export const QuickJumpMenu = () => {
   const quickJumpAnchorRect = useCosmosStore(state => state.quickJumpAnchorRect);
   const jumpToObject = useCosmosStore(state => state.jumpToObject);
   const recentJumps = useCosmosStore(state => state.recentJumps);
-  const isFullscreen = useFullscreenStore(state => state.isFullscreen);
+  const fullscreenState = useFullscreenStore(state => state.isFullscreen);
+  const isFullscreen=fullscreenState && brand!=='paledot';
 
   useEffect(() => {
     const update = () => {
@@ -88,11 +92,11 @@ export const QuickJumpMenu = () => {
   useLayoutEffect(() => {
     if (!showQuickJump || isFullscreen) return;
 
-    const container = document.querySelector('[data-cosmos-container]') as HTMLElement | null;
+    const container = document.querySelector('[data-explorer-ui-root]') as HTMLElement | null;
     if (!container) return;
 
-    const gapPx = isSmUp ? 12 : 8;
-    const fallbackTop = isSmUp ? 68 : 48;
+    const gapPx = 8;
+    const fallbackTop = isSmUp ? 60 : 48;
     const fallbackRight = isSmUp ? 16 : 8;
 
     const measure = () => {
@@ -123,7 +127,7 @@ export const QuickJumpMenu = () => {
   useLayoutEffect(() => {
     if (!showQuickJump || isFullscreen) return;
 
-    const container = document.querySelector('[data-cosmos-container]') as HTMLElement | null;
+    const container = document.querySelector('[data-explorer-ui-root]') as HTMLElement | null;
     const scrollEl = scrollAreaRef.current;
     if (!container || !scrollEl) return;
 
@@ -180,6 +184,7 @@ export const QuickJumpMenu = () => {
   const menu = (
     <div
       ref={menuRef}
+      data-quick-jump
       className={`${isFullscreen ? 'fixed' : 'absolute'} z-[10001] bg-white/10 backdrop-blur-xs rounded-lg overflow-hidden transition-all duration-300 ease-out ${
         showQuickJump ? 'opacity-100 scale-100' : 'opacity-0 scale-95 pointer-events-none'
       }`}
@@ -190,7 +195,7 @@ export const QuickJumpMenu = () => {
               right: 'calc(0.5rem + env(safe-area-inset-right))',
             }
           : {
-              top: `${anchorStyle?.top ?? (isSmUp ? 68 : 48)}px`,
+              top: `${anchorStyle?.top ?? (isSmUp ? 60 : 48)}px`,
               right: `${isSmUp ? 16 : 8}px`,
             }
       }
@@ -250,6 +255,8 @@ export const QuickJumpMenu = () => {
             </div>
           </div>
         )}
+
+        {brand==='paledot' && showQuickJump && <HardwareJumpChoices />}
 
         {/* Categories */}
         <div className="p-1 sm:p-2">

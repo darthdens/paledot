@@ -3,6 +3,13 @@ import { expect, it } from 'vitest';
 import { AU_KM, helioPositionKm, moonPositionKm, sampleOrbitKm } from './ephemeris';
 const subtract = (a: number[], b: number[]) => a.map((v, i) => v - (b[i] ?? 0));
 const cosine = (a: number[], b: number[]) => a.reduce((s, v, i) => s + v * (b[i] ?? 0), 0) / (Math.hypot(...a) * Math.hypot(...b));
+it('orbit sampling uses the requested epoch rather than a previously cached date',()=>{
+  const first=Date.parse('1979-03-05'),second=Date.parse('2026-11-14');
+  const a=sampleOrbitKm('jupiter',first),b=sampleOrbitKm('jupiter',second);
+  expect(a[0]).toEqual(helioPositionKm('jupiter',new Date(first)));
+  expect(b[0]).toEqual(helioPositionKm('jupiter',new Date(second)));
+  expect(b[0]).not.toEqual(a[0]);
+});
 it('Earth remains about 1 AU from the Sun from 1969 to today', () => {
   for (const year of [1969,1980,2000,2025,2026]) for (const month of [0,3,6,9]) {
     const distance = Math.hypot(...helioPositionKm('earth', new Date(Date.UTC(year,month,1)))) / AU_KM;
@@ -32,8 +39,8 @@ it('Moon is opposite the Sun behind Earth during 14 March 2025 eclipse', () => {
   const date = new Date('2025-03-14T07:00:00Z'), earth = helioPositionKm('earth',date);
   expect(cosine(earth,subtract(moonPositionKm(date),earth))).toBeGreaterThan(0.9999);
 });
-it('memoises 360 orbit points rather than recalculating during scrubbing', () => {
+it('memoises 360 orbit points for repeated reads at the same epoch', () => {
   const points = sampleOrbitKm('earth', Date.UTC(2025,0,1));
   expect(points).toHaveLength(360);
-  expect(sampleOrbitKm('earth',Date.UTC(1969,6,1))).toBe(points);
+  expect(sampleOrbitKm('earth',Date.UTC(2025,0,1))).toBe(points);
 });

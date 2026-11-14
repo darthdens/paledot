@@ -311,6 +311,7 @@ export const TexturedPlanet = ({
   distanceScale = UNIFIED_SCALE 
 }: TexturedPlanetProps) => {
   const [ephemerisReady, setEphemerisReady] = useState(false);
+  const orbitEpoch=useSimClock(s=>Math.floor(s.simDate/86400000));
   useEffect(() => {
     let alive = true;
     loadEphemeris().then(() => { if (alive) setEphemerisReady(true); });
@@ -583,7 +584,8 @@ export const TexturedPlanet = ({
     if (!showOrbit || orbitRadius === 0 || isMoon) return null;
     const ephemeris = ephemerisReady ? getEphemeris() : null;
     if (ephemeris && ephemeris.isEphemerisBody(object.id) && object.id !== 'moon') {
-      return ephemeris.sampleOrbitKm(object.id, useSimClock.getState().simDate).map(p => new THREE.Vector3(...eclipticKmToScene(...p)));
+      // Include today's true position explicitly so close-up views meet the orbital curve.
+      return ephemeris.sampleOrbitKm(object.id, orbitEpoch*86400000).map(p => new THREE.Vector3(...eclipticKmToScene(...p)));
     }
     const points = [];
     // Scale segments based on orbit radius - larger orbits need more segments for smoothness
@@ -602,7 +604,7 @@ export const TexturedPlanet = ({
       );
     }
     return points;
-  }, [orbitRadius, showOrbit, isMoon, ephemerisReady, object.id]);
+  }, [orbitRadius, showOrbit, isMoon, ephemerisReady, object.id,orbitEpoch]);
 
   const handleClick = (e: { stopPropagation: () => void }) => {
     e.stopPropagation();

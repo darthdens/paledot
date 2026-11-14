@@ -155,7 +155,7 @@ export const CosmosExplorer = () => {
   ];
 
   return (
-    <div ref={containerRef} className="relative w-full h-full">
+    <div ref={containerRef} data-explorer-ui-root className="relative w-full h-full">
       {/* Loading screen */}
       {showLoader && (
         <CosmosLoader

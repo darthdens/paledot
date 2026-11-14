@@ -15,3 +15,5 @@
 
 - Pale Dot renders one persistent second-precision simulation-date readout above every page state, with reserved explorer space; DateControl remains on the existing Clock control. Why: the simulation date must stay visible without hover or overlapping controls.
 - Machine tracks load static data after boot, evaluate positions in heliocentric ecliptic kilometres, and use the single frame helper; markers publish hw-prefixed world positions for the existing camera. Why: paths, measurements and navigation must share the planets' frame without changing ordinary exploration.
+- NASA GLB models load only in a separately labelled inspection view, not as enlarged universe meshes; decoded assets are hosted through project pointers. Why: users can inspect authentic hardware without falsifying physical scale or delaying boot.
+- Pale Dot menus use the explorer's reserved-date-strip coordinate space; trail buffers store parent-local points from index zero. Why: fixed viewport offsets and unfilled/world-space buffer prefixes produce displaced menus and lines.

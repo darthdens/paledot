@@ -7,6 +7,7 @@ type LeftBehindState = {
   activeTourId: string | null; tourStepIndex: number;
   setMenuOpen: (open: boolean) => void; toggleMachines: () => void;
   toggleFullPaths: () => void; selectHardware: (id: string | null) => void;
+  toggleHardwareFollow: () => void;
 };
 export const useLeftBehindStore = create<LeftBehindState>(set => ({
   machinesVisible: true, menuOpen: false, selectedHardwareId: null,
@@ -16,4 +17,5 @@ export const useLeftBehindStore = create<LeftBehindState>(set => ({
   toggleMachines: () => set(s => ({ machinesVisible: !s.machinesVisible, selectedHardwareId: null, followTargetId: null })),
   toggleFullPaths: () => set(s => ({ fullPathsVisible: !s.fullPathsVisible })),
   selectHardware: id => set({ selectedHardwareId: id, followTargetId: id }),
+  toggleHardwareFollow:()=>set(s=>({followTargetId:s.followTargetId?null:s.selectedHardwareId})),
 }));

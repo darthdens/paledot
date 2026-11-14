@@ -21,6 +21,7 @@ import { LanguageButton, LanguageMenuList } from './LanguagePicker';
 import { FlagIcon } from './FlagIcon';
 import { useLeftBehindStore } from '@/features/left-behind/state/useLeftBehindStore';
 import { leftBehindCopy } from '@/features/left-behind/lib/copy';
+import { useShallow } from 'zustand/react/shallow';
 const translations = {
   en: {
     startTour: 'Start Guided Tour',
@@ -120,10 +121,10 @@ export const CosmosUI = () => {
   const rate = useSimClock(s => s.rate);
   const simSecond = useSimClock(s => Math.floor(s.simDate / 1000));
   const clockName = tr({ en: dateCopy[language].date, fr: dateCopy[language].date });
-  const toggleTimeMenu = () => { useLeftBehindStore.getState().setMenuOpen(false); useSimClock.getState().setDateControlOpen(!dateControlOpen); };
+  const toggleTimeMenu = () => { useLeftBehindStore.getState().setMenuOpen(false); useSimClock.getState().setDateControlOpen(!dateControlOpen); setShowMoreMenu(false); setShowLanguageMenu(false); useCosmosStore.setState({showQuickJump:false}); };
   const lbCopy = leftBehindCopy[language];
   const lbName = tr({ en: lbCopy.name, fr: lbCopy.name });
-  const toggleLeftBehind = () => { useSimClock.getState().setDateControlOpen(false); useLeftBehindStore.getState().setMenuOpen(!menuOpen); };
+  const toggleLeftBehind = () => { useSimClock.getState().setDateControlOpen(false); useLeftBehindStore.getState().setMenuOpen(!menuOpen); setShowMoreMenu(false); setShowLanguageMenu(false); useCosmosStore.setState({showQuickJump:false}); };
   // Pale Dot is always full-bleed too, so it hides the fullscreen toggle like the native app.
   const native = isNativeApp() || brand === 'paledot';
   // In fullscreen, dropdowns appear directly below the button row (h-8 = 32px + gap)
@@ -147,8 +148,17 @@ export const CosmosUI = () => {
     togglePerformanceHUD,
     toggleSizeComparison,
     goHome,
-  } = useCosmosStore();
+  } = useCosmosStore(useShallow(state=>({
+    startTour:state.startTour,isTouring:state.isTouring,showQuickJump:state.showQuickJump,
+    toggleQuickJump:state.toggleQuickJump,setQuickJumpAnchorRect:state.setQuickJumpAnchorRect,
+    showControlHints:state.showControlHints,setShowControlHints:state.setShowControlHints,
+    showOrbits:state.showOrbits,toggleOrbits:state.toggleOrbits,showTrails:state.showTrails,
+    toggleTrails:state.toggleTrails,showRealPeriods:state.showRealPeriods,toggleRealPeriods:state.toggleRealPeriods,
+    showPerformanceHUD:state.showPerformanceHUD,togglePerformanceHUD:state.togglePerformanceHUD,
+    toggleSizeComparison:state.toggleSizeComparison,goHome:state.goHome,
+  })));
   const { isFullscreen, setIsFullscreen } = useFullscreenStore();
+  const uiFixed = isFullscreen && brand !== 'paledot';
   const timeMenuOpen = dateControlOpen;
   const [showMoreMenu, setShowMoreMenu] = useState(false);
   const [showLanguageMenu, setShowLanguageMenu] = useState(false);
@@ -205,6 +215,7 @@ export const CosmosUI = () => {
   }, [timeMenuOpen, showMoreMenu, showLanguageMenu, showQuickJump, toggleQuickJump]);
 
   const handleQuickJumpClick = () => {
+    setShowMoreMenu(false); setShowLanguageMenu(false); useSimClock.getState().setDateControlOpen(false); useLeftBehindStore.getState().setMenuOpen(false);
     const el = quickJumpButtonRef.current;
     if (el) {
       const r = el.getBoundingClientRect();
@@ -639,9 +650,10 @@ export const CosmosUI = () => {
 
       {/* Top controls - icon buttons with tooltips */}
       <div
-        className={`${isFullscreen ? 'fixed' : 'absolute'} top-2 left-2 right-2 sm:top-4 sm:left-auto sm:right-4 z-[10000]`}
+        data-explorer-toolbar
+        className={`${uiFixed ? 'fixed' : 'absolute'} top-2 left-2 right-2 sm:top-4 sm:left-auto sm:right-4 z-[10000]`}
         style={
-          isFullscreen
+          uiFixed
             ? {
                 top: 'calc(0.5rem + env(safe-area-inset-top))',
                 left: 'calc(0.5rem + env(safe-area-inset-left))',
@@ -816,17 +828,17 @@ export const CosmosUI = () => {
       {/* Mobile & Tablet more menu - same style as QuickJump */}
       <div
         ref={moreMenuRef}
-        className={`lg:hidden ${isFullscreen ? 'fixed' : 'absolute'} z-[10001] bg-white/10 backdrop-blur-xs rounded-lg overflow-hidden transition-all duration-300 ease-out ${
+        className={`lg:hidden ${uiFixed ? 'fixed' : 'absolute'} z-[10001] bg-white/10 backdrop-blur-xs rounded-lg overflow-hidden transition-all duration-300 ease-out ${
           showMoreMenu ? 'opacity-100 scale-100' : 'opacity-0 scale-95 pointer-events-none'
         }`}
         style={
-          isFullscreen
+          uiFixed
             ? {
                 top: `calc(0.5rem + env(safe-area-inset-top) + ${fullscreenDropdownOffsetPx}px)`,
                 right: 'calc(0.5rem + env(safe-area-inset-right))',
               }
             : {
-                top: isMobile ? '48px' : '68px',
+                top: isMobile ? '48px' : '60px',
                 right: isMobile ? '8px' : '16px',
               }
         }
@@ -907,17 +919,17 @@ export const CosmosUI = () => {
       {/* Mobile & Tablet language menu - same style as More menu */}
       <div
         ref={languageMenuRef}
-        className={`lg:hidden ${isFullscreen ? 'fixed' : 'absolute'} z-[10001] bg-white/10 backdrop-blur-xs rounded-lg overflow-hidden transition-all duration-300 ease-out ${
+        className={`lg:hidden ${uiFixed ? 'fixed' : 'absolute'} z-[10001] bg-white/10 backdrop-blur-xs rounded-lg overflow-hidden transition-all duration-300 ease-out ${
           showLanguageMenu ? 'opacity-100 scale-100' : 'opacity-0 scale-95 pointer-events-none'
         }`}
         style={
-          isFullscreen
+          uiFixed
             ? {
                 top: `calc(0.5rem + env(safe-area-inset-top) + ${fullscreenDropdownOffsetPx}px)`,
                 right: 'calc(0.5rem + env(safe-area-inset-right))',
               }
             : {
-                top: isMobile ? '48px' : '68px',
+                top: isMobile ? '48px' : '60px',
                 right: isMobile ? '8px' : '16px',
               }
         }
@@ -935,11 +947,11 @@ export const CosmosUI = () => {
       {!showControlHints && (
         <div
           ref={timeSliderRef}
-          className={`${isFullscreen ? 'fixed' : 'absolute'} top-12 right-2 sm:top-[68px] sm:right-4 z-[10000] bg-white/10 backdrop-blur-xs rounded-lg overflow-hidden transition-all duration-300 ease-out ${
+          className={`${uiFixed ? 'fixed' : 'absolute'} top-12 right-2 sm:top-[60px] sm:right-4 z-[10000] bg-white/10 backdrop-blur-xs rounded-lg overflow-hidden transition-all duration-300 ease-out ${
             timeMenuOpen ? 'opacity-100 scale-100' : 'opacity-0 scale-95 pointer-events-none'
           }`}
           style={
-            isFullscreen
+            uiFixed
               ? {
                   top: `calc(0.5rem + env(safe-area-inset-top) + ${fullscreenDropdownOffsetPx}px)`,
                   right: 'calc(0.5rem + env(safe-area-inset-right))',
