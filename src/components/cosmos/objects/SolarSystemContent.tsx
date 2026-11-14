@@ -143,7 +143,7 @@ export const SolarSystemContent = ({
               key={moon.id} 
               object={moon} 
               showOrbit={false} 
-              visualScale={visualScale * 1.5}
+              visualScale={visualScale}
               distanceScale={visualScale}
             />
           ))}

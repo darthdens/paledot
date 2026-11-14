@@ -6,3 +6,6 @@
 - The Echo AI widget script is injected after hydration in `__root.tsx`, never as a head/body tag. Why: it adds DOM nodes to <body> that break React hydration.
 - Left Behind data is fetched from the JPL Horizons API and NASA Image and Video Library API during the event and saved as static files in `public/left-behind/`; feature code stays in `src/features/left-behind/` and reads only through its cached data client, with no Cloud storage, functions or auth. Why: keep the mode isolated, reproducible and available without a data service.
 - Left Behind has independent Zustand state; title/hash entry is queued until explorer boot completes, and its scene/UI load lazily only for active Pale Dot. Why: preserve the existing loader, tour state and Cosmos behavior.
+
+- Solid-body renderers and close-up navigation use the shared bodyScale helpers; catalogue sizes remain diameters and positions are untouched. Why: both brands/modes must agree on radius, camera clearance and portrait framing.
+- In development only, window.__cosmosCheck exposes live state(), snapshot() and finishFlight(); the canvas marks data-scene-ready after drawing. Why: verify complete tours and true radii without duplicating stores or waiting for software-GPU animation time.

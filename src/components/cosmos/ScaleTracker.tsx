@@ -1,3 +1,4 @@
+import { closeViewNear } from '@/features/left-behind/lib/bodyScale';
 import { useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import { useCosmosStore } from './store/useCosmosStore';
@@ -6,7 +7,7 @@ import { useRef } from 'react';
 const UNIFIED_SCALE = 0.001;
 
 export const ScaleTracker = () => {
-  const { camera } = useThree();
+  const { camera, controls } = useThree();
   const setCameraDistance = useCosmosStore(state => state.setCameraDistance);
   const lastUpdate = useRef(0);
   
@@ -26,7 +27,8 @@ export const ScaleTracker = () => {
     // Keep far/near planes adaptive so solar-system structures (e.g. Oort Cloud)
     // don't get clipped when zooming way out.
     const desiredFar = Math.max(1e12, distanceScene * 100);
-    const desiredNear = Math.max(0.1, distanceScene / 1e7);
+    const target = (controls as { target?: THREE.Vector3 } | null)?.target;
+    const desiredNear = closeViewNear(distanceScene, target ? cam.position.distanceTo(target) : distanceScene);
 
     const farChanged = Math.abs(cam.far - desiredFar) / Math.max(cam.far, 1) > 0.25;
     const nearChanged = Math.abs(cam.near - desiredNear) / Math.max(cam.near, 1) > 0.25;

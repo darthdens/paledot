@@ -1,3 +1,4 @@
+import { bodyRadius, UNIFIED_SCALE } from '@/features/left-behind/lib/bodyScale';
 import { useRef, useMemo } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { Select } from '@react-three/postprocessing';
@@ -63,8 +64,8 @@ export const ProximaCentauri = ({ visualScale = 0.001 }: ProximaCentauriProps) =
     if (glowRef.current) glowRef.current.scale.setScalar(1 + Math.sin(time * 0.4) * 0.04);
   });
 
-  // Visual boost for visibility at stellar distances (similar to nebula approach)
-  const starSize = PROXIMA_DIAMETER * visualScale * 500;
+  // Physical stellar radius; glow layers remain relative to it.
+  const starSize = bodyRadius(PROXIMA_DIAMETER);
 
   const handleClick = (e: { stopPropagation: () => void }) => {
     e.stopPropagation();
@@ -85,6 +86,7 @@ export const ProximaCentauri = ({ visualScale = 0.001 }: ProximaCentauriProps) =
       <group>
       {/* Star core - red dwarf surface with subtle texture */}
       <mesh 
+        name="body-proxima-centauri"
         ref={starRef} 
         renderOrder={0}
         onClick={handleClick} 

@@ -139,8 +139,6 @@ export const CosmosUI = () => {
     showPerformanceHUD,
     togglePerformanceHUD,
     toggleSizeComparison,
-    useExaggeratedScale,
-    toggleExaggeratedScale,
     goHome,
     timeSpeed,
     setTimeSpeed,

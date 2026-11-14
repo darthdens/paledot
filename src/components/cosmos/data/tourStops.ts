@@ -17,7 +17,7 @@ export const tourStops: TourStop[] = [
     },
     duration: 8,
     // Earth radius is 6371 km - closer view for better visibility
-    cameraPosition: [0, 10000, 30000],
+    cameraPosition: [0, 5000, 15000],
     // No lookAt - camera looks at the object
     scaleLevel: 'earth',
   },
@@ -34,7 +34,7 @@ export const tourStops: TourStop[] = [
     },
     duration: 7,
     // Moon radius is 1737 km - zoom in like Jupiter
-    cameraPosition: [0, 4500, 13500],
+    cameraPosition: [0, 1500, 4500],
     scaleLevel: 'earth',
   },
   {
@@ -50,7 +50,7 @@ export const tourStops: TourStop[] = [
     },
     duration: 7,
     // Venus radius is 6052 km - zoom in like Jupiter (2.5x radius for y, 7.5x for z)
-    cameraPosition: [0, 15000, 45000],
+    cameraPosition: [0, 7500, 22500],
     scaleLevel: 'solarSystem',
   },
   {
@@ -66,7 +66,7 @@ export const tourStops: TourStop[] = [
     },
     duration: 7,
     // Mercury radius is 2440 km - zoom in like Jupiter
-    cameraPosition: [0, 6000, 18000],
+    cameraPosition: [0, 3000, 9000],
     scaleLevel: 'solarSystem',
   },
   {
@@ -82,7 +82,7 @@ export const tourStops: TourStop[] = [
     },
     duration: 8,
     // Mars radius is 3390 km - zoom in like Jupiter
-    cameraPosition: [0, 8500, 25500],
+    cameraPosition: [0, 4250, 12750],
     scaleLevel: 'solarSystem',
   },
   {
@@ -131,7 +131,7 @@ export const tourStops: TourStop[] = [
     },
     duration: 8,
     // Jupiter radius is 69911 km - much larger, scale accordingly
-    cameraPosition: [0, 175000, 525000],
+    cameraPosition: [0, 87500, 262500],
     // No lookAt - center on Jupiter
     scaleLevel: 'solarSystem',
   },
@@ -148,7 +148,7 @@ export const tourStops: TourStop[] = [
     },
     duration: 7,
     // Europa radius is 1561 km - zoom in like Jupiter
-    cameraPosition: [0, 4000, 12000],
+    cameraPosition: [0, 1333.3333, 4000],
     scaleLevel: 'solarSystem',
   },
   {
@@ -164,7 +164,7 @@ export const tourStops: TourStop[] = [
     },
     duration: 7,
     // Saturn radius is 58232 km - large gas giant
-    cameraPosition: [0, 145000, 440000],
+    cameraPosition: [0, 72500, 220000],
     // No lookAt - center on Saturn
     scaleLevel: 'solarSystem',
   },
@@ -181,7 +181,7 @@ export const tourStops: TourStop[] = [
     },
     duration: 7,
     // Titan radius is 2575 km - zoom in like Jupiter
-    cameraPosition: [0, 6500, 19500],
+    cameraPosition: [0, 2166.6667, 6500],
     scaleLevel: 'solarSystem',
   },
   {
@@ -197,7 +197,7 @@ export const tourStops: TourStop[] = [
     },
     duration: 7,
     // Uranus radius is 25362 km - ice giant
-    cameraPosition: [0, 65000, 190000],
+    cameraPosition: [0, 32500, 95000],
     // No lookAt - center on Uranus
     scaleLevel: 'solarSystem',
   },
@@ -214,7 +214,7 @@ export const tourStops: TourStop[] = [
     },
     duration: 7,
     // Neptune radius is 24622 km - similar to Uranus
-    cameraPosition: [0, 62000, 185000],
+    cameraPosition: [0, 31000, 92500],
     // No lookAt - center on Neptune
     scaleLevel: 'solarSystem',
   },
@@ -231,7 +231,7 @@ export const tourStops: TourStop[] = [
     },
     duration: 7,
     // Pluto radius is 1188 km - zoom in like Jupiter
-    cameraPosition: [0, 3000, 9000],
+    cameraPosition: [0, 1500, 4500],
     scaleLevel: 'solarSystem',
   },
   {
@@ -280,8 +280,8 @@ export const tourStops: TourStop[] = [
       fr: 'À seulement 4,24 années-lumière, Proxima du Centaure est l\'étoile la plus proche de notre Soleil. Cette naine rouge abrite au moins deux planètes, dont Proxima b, qui orbite dans la zone habitable où l\'eau liquide pourrait exister.',
     },
     duration: 8,
-    // Offset from star position - large enough to frame the boosted (x500) star visuals
-    cameraPosition: [0, 300000000, 900000000],
+    // True-radius stellar close-up, without the former size boost
+    cameraPosition: [0, 300000, 900000],
     // No lookAt - center on Proxima Centauri
     scaleLevel: 'stellar',
   },
@@ -468,7 +468,7 @@ export const tourStops: TourStop[] = [
     },
     duration: 10,
     // Same view as intro - centered on Earth
-    cameraPosition: [0, 10000, 30000],
+    cameraPosition: [0, 5000, 15000],
     // No lookAt - center on Earth
     scaleLevel: 'earth',
   },

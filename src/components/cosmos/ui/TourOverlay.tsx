@@ -1,3 +1,4 @@
+import { portraitFramingFactor } from '@/features/left-behind/lib/bodyScale';
 import { useEffect, useCallback, useState, useRef } from 'react';
 import { useLanguage } from '@/i18n/LanguageContext';
 import { Button } from '@/components/ui/button';
@@ -64,10 +65,11 @@ export const TourOverlay = () => {
       if (index < 0 || index >= tourStops.length) return;
 
       const stop = tourStops[index];
+      if (!stop) return;
       setTourIndex(index);
 
       // Find and select the object for this stop
-      const targetObject = celestialObjects.find((obj) => obj.id === stop!.locationId);
+      const targetObject = celestialObjects.find((obj) => obj.id === stop.locationId);
       if (targetObject) {
         setSelectedObject(targetObject);
       }
@@ -117,14 +119,14 @@ export const TourOverlay = () => {
         // If lookAt is not defined, look at the target object
         // If lookAt is defined and not [0,0,0], use it (for milky way scale etc)
         let lookAtPos: [number, number, number];
-        if (stop!.lookAt && (stop!.lookAt[0] !== 0 || stop!.lookAt[1] !== 0 || stop!.lookAt[2] !== 0)) {
+        if (stop.lookAt && (stop.lookAt[0] !== 0 || stop.lookAt[1] !== 0 || stop.lookAt[2] !== 0)) {
           // lookAt is in km
           lookAtPos = [
-            stop!.lookAt[0] * UNIFIED_SCALE,
-            stop!.lookAt[1] * UNIFIED_SCALE,
-            stop!.lookAt[2] * UNIFIED_SCALE,
+            stop.lookAt[0] * UNIFIED_SCALE,
+            stop.lookAt[1] * UNIFIED_SCALE,
+            stop.lookAt[2] * UNIFIED_SCALE,
           ];
-        } else if (!stop!.lookAt) {
+        } else if (!stop.lookAt) {
           // No lookAt defined - look at the object itself
           lookAtPos = targetPos;
         } else {
@@ -133,10 +135,11 @@ export const TourOverlay = () => {
         }
 
         // Tour stop cameraPosition is treated as an offset vector in km
+        const framing = stop.lookAt ? 1 : portraitFramingFactor(window.innerWidth / window.innerHeight);
         const offsetScene: [number, number, number] = [
-          stop!.cameraPosition[0] * UNIFIED_SCALE,
-          stop!.cameraPosition[1] * UNIFIED_SCALE,
-          stop!.cameraPosition[2] * UNIFIED_SCALE,
+          stop.cameraPosition[0] * UNIFIED_SCALE * framing,
+          stop.cameraPosition[1] * UNIFIED_SCALE * framing,
+          stop.cameraPosition[2] * UNIFIED_SCALE * framing,
         ];
 
         let cameraPos: [number, number, number];
@@ -160,9 +163,9 @@ export const TourOverlay = () => {
             // Position camera on the sun-facing side with proper elevation
             // Use both the direction to sun AND the offset height for better framing
             cameraPos = [
-              targetPos[0] + dirToSun[0]! * dist * 0.8,
+              targetPos[0] + (dirToSun[0] ?? 0) * dist * 0.8,
               targetPos[1] + dist * 0.4, // Consistent elevation relative to distance
-              targetPos[2] + dirToSun[2]! * dist * 0.8,
+              targetPos[2] + (dirToSun[2] ?? 0) * dist * 0.8,
             ];
           } else {
             // Fallback if somehow at sun's position - use simple offset
@@ -172,12 +175,12 @@ export const TourOverlay = () => {
               targetPos[2] + offsetScene[2],
             ];
           }
-        } else if (stop!.scaleLevel === 'milkyWay') {
+        } else if (stop.scaleLevel === 'milkyWay') {
           // For milky way scale, use absolute positions from the stop
           cameraPos = [
-            stop!.cameraPosition[0] * UNIFIED_SCALE,
-            stop!.cameraPosition[1] * UNIFIED_SCALE,
-            stop!.cameraPosition[2] * UNIFIED_SCALE,
+            stop.cameraPosition[0] * UNIFIED_SCALE * framing,
+            stop.cameraPosition[1] * UNIFIED_SCALE * framing,
+            stop.cameraPosition[2] * UNIFIED_SCALE * framing,
           ];
         } else if (targetObject?.category === 'stars' && targetObject.id !== 'sun') {
           // For distant stars like Proxima Centauri, use the tour stop's camera position
@@ -197,7 +200,7 @@ export const TourOverlay = () => {
         }
 
         // Set tour camera target for the CameraController
-        const followObjectId = stop!.lookAt ? undefined : stop!.locationId;
+        const followObjectId = stop.lookAt ? undefined : stop.locationId;
         const offset: [number, number, number] = [
           cameraPos[0] - targetPos[0],
           cameraPos[1] - targetPos[1],
@@ -214,7 +217,7 @@ export const TourOverlay = () => {
       };
 
       const store = useCosmosStore.getState();
-      const livePos = store.objectWorldPositions[stop!.locationId];
+      const livePos = store.objectWorldPositions[stop.locationId];
 
       const getHasSunPos = (s: typeof store) =>
         !!(s.objectWorldPositions['sun'] || s.objectWorldPositions['solar-system-marker']);
@@ -246,7 +249,7 @@ export const TourOverlay = () => {
         let done = false;
         const unsubscribe = useCosmosStore.subscribe((state) => {
           if (done) return;
-          const objPos = state.objectWorldPositions[stop!.locationId];
+          const objPos = state.objectWorldPositions[stop.locationId];
           const sunOk = !needsSunPos || getHasSunPos(state);
           if (isValidLivePos(objPos) && sunOk) {
             done = true;

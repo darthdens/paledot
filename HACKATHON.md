@@ -16,6 +16,8 @@ Pale Dot (paledot.org) existed before the hackathon. The last commit before the 
 
 ## What was built during the event
 
+- Fixed body sizes to true scale across the whole app (planets, moons and the Sun had been drawn with their diameter as their radius).
+
 - Everything in `src/features/left-behind/` and `public/left-behind/` was created during the event, including `public/left-behind/hardware.json` (compiled on 14 November 2026 from NASA, JPL, NSSDCA, LROC and PDS sources, with research help from Claude). Data was fetched from the JPL Horizons API and NASA Image and Video Library API during the event and saved as static files in `public/left-behind/`. The app reads these files without Cloud storage, functions or sign-in; missing sources are explicitly marked TODO(source).
 - Every new code file starts with the comment `// Left Behind · built during NASA Space Apps Challenge 2026 (14–15 Nov 2026) · AI-assisted (Lovable, Claude)`.
 - Small, switched-off-by-default hooks were added to these existing files: `CosmosExplorer.tsx`, `TexturedPlanet.tsx`, `CameraController.tsx`, `CosmosUI.tsx`, `KeyboardShortcuts.tsx`, `PaleDot.tsx` (the #left-behind link) and `PaleDotTitleScreen.tsx` (one extra button). No new pages or routes: Left Behind is a mode inside the existing explorer.

@@ -1,3 +1,4 @@
+import { bodyRadius, UNIFIED_SCALE } from '@/features/left-behind/lib/bodyScale';
 import { useRef, useMemo } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { Select } from '@react-three/postprocessing';
@@ -114,7 +115,7 @@ const createCoronaRaysTexture = () => {
 // Sun's real diameter is 1,392,700 km
 const SUN_DIAMETER = 1392700;
 
-export const Sun = ({ position = [0, 0, 0], visualScale = 80 }: SunProps) => {
+export const Sun = ({ position = [0, 0, 0], visualScale = UNIFIED_SCALE }: SunProps) => {
   const sunRef = useRef<THREE.Mesh>(null);
   const coronaRef = useRef<THREE.Mesh>(null);
   const glowRef = useRef<THREE.Mesh>(null);
@@ -154,7 +155,7 @@ export const Sun = ({ position = [0, 0, 0], visualScale = 80 }: SunProps) => {
   }, -1);
 
   // Use the same unified scale as everything else - no caps needed when using true proportions
-  const sunSize = SUN_DIAMETER * visualScale;
+  const sunSize = bodyRadius(SUN_DIAMETER);
 
   const sunObject = {
     id: 'sun',
@@ -191,6 +192,7 @@ export const Sun = ({ position = [0, 0, 0], visualScale = 80 }: SunProps) => {
       <group ref={groupRef} position={position}>
       {/* Sun core - bright emissive */}
       <mesh 
+        name="body-sun"
         ref={sunRef}
         renderOrder={0}
         onClick={handleClick}
