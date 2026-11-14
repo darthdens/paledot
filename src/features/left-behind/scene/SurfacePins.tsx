@@ -155,10 +155,6 @@ export function SurfacePins() {
           keys.push([spec.body, `pin:${t.id}`]); ids.push(t.id);
         });
       }
-      // TEMP calibration pins (remove after checking): Tycho and Olympus Mons.
-      for (const spec of [{ trajId: 'debug-tycho', body: 'moon', lat: -43.31, lon: -11.36, date: 0, label: 'Tycho' }, { trajId: 'debug-olympus', body: 'mars', lat: 18.65, lon: -133.8, date: 0, label: 'Olympus Mons' }] as PinSpec[]) {
-        useSurfaceAttachmentStore.getState().set(spec.body, `pin:${spec.trajId}`, <SurfacePin spec={spec} />); keys.push([spec.body, `pin:${spec.trajId}`]);
-      }
       setArcs(ids);
     }).catch(() => console.warn('TODO(source): hardware unavailable'));
     return () => { live = false; for (const [b, k] of keys) useSurfaceAttachmentStore.getState().set(b, k, null); };
