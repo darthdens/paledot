@@ -1,3 +1,4 @@
+import { landedPins } from '@/features/left-behind/lib/pinRegistry';
 import { closeViewNear } from '@/features/left-behind/lib/bodyScale';
 import { useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
@@ -31,7 +32,12 @@ export const ScaleTracker = () => {
     const target = (controls as { target?: THREE.Vector3 } | null)?.target;
     const targetDistance = target ? cam.position.distanceTo(target) : distanceScene;
     // Following NASA hardware: allow metre-scale close-ups by tying near to the target distance.
-    const desiredNear = useLeftBehindStore.getState().followTargetId ? Math.max(1e-10, targetDistance / 1000) : closeViewNear(distanceScene, targetDistance);
+    const followId = useLeftBehindStore.getState().followTargetId;
+    // Near plane as far out as safely possible: depth precision scales with it, and a tiny near plane made
+    // landed-machine close-ups shimmer. Keep it under 5% of the target distance and half the ground clearance.
+    const pin = followId ? landedPins.get(followId) : undefined;
+    const altitude = pin ? Math.max(1e-10, groundClearance(cam.position, pin)) : Infinity;
+    const desiredNear = followId ? Math.max(1e-10, Math.min(targetDistance * 0.05, altitude * 0.5)) : closeViewNear(distanceScene, targetDistance);
 
     const farChanged = Math.abs(cam.far - desiredFar) / Math.max(cam.far, 1) > 0.25;
     const nearChanged = Math.abs(cam.near - desiredNear) / Math.max(cam.near, 1e-12) > 0.25;
@@ -48,3 +54,8 @@ export const ScaleTracker = () => {
   
   return null;
 };
+
+/** Height of the camera above the landed pin's local ground plane (scene units). */
+function groundClearance(p: THREE.Vector3, pin: { world: [number, number, number]; normal: [number, number, number] }) {
+  return (p.x - pin.world[0]) * pin.normal[0] + (p.y - pin.world[1]) * pin.normal[1] + (p.z - pin.world[2]) * pin.normal[2];
+}
