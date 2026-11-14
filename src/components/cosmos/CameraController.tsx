@@ -116,7 +116,7 @@ export const CameraController = () => {
     }).catch(() => { /* Static-data failure must not disturb normal navigation. */ });
     return () => { cancelled = true; if (animationTriggerId.current === `hw:${hardwareId}`) isAnimating.current = false; };
   }, [hardwareId, controls, camera, isTouring]);
-  // "View on the surface": about 3 body radii straight above the landed pin, looking down.
+  // "View on the surface": low and oblique over the landed pin, so the ground and horizon fill the view.
   const surfaceViewNonce = useLeftBehindStore(state => state.surfaceViewNonce);
   useEffect(() => {
     if (!surfaceViewNonce || !hardwareId || !controls || isTouring) return;
@@ -124,9 +124,11 @@ export const CameraController = () => {
     const body = pin && celestialObjects.find(o => o.id === pin.body);
     if (!pin || !body) return;
     const orbit = controls as unknown as { target: THREE.Vector3 };
-    const height = bodyRadius(body.size) * 3;
+    const height = bodyRadius(body.size) * 0.04;
+    const normal = new THREE.Vector3(...pin.normal);
+    const side = new THREE.Vector3(0, 1, 0).cross(normal); if (side.lengthSq() < 1e-6) side.set(1, 0, 0); side.normalize();
     startPosition.current.copy(camera.position); startTarget.current.copy(orbit.target);
-    endTarget.current.set(...pin.world); cameraOffset.current.set(...pin.normal).multiplyScalar(height);
+    endTarget.current.set(...pin.world); cameraOffset.current.copy(normal).multiplyScalar(height).addScaledVector(side, height * 2.5);
     endPosition.current.copy(endTarget.current).add(cameraOffset.current);
     isTourAnimation.current = false; animationProgress.current = 0;
     isAnimating.current = true; animationTriggerId.current = `hw:${hardwareId}`;
