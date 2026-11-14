@@ -17,7 +17,7 @@ export function refreshOccluders(scene: THREE.Object3D) {
     const g = m.geometry as THREE.SphereGeometry | undefined;
     if (!m.isMesh || g?.type !== 'SphereGeometry') return;
     const mats = Array.isArray(m.material) ? m.material : [m.material];
-    if (mats.some(mat => mat.transparent || mat.side === THREE.BackSide || mat.depthWrite === false || !mat.visible)) return;
+    if (mats.some(mat => mat.transparent || mat.side === THREE.BackSide)) return;
     list.push({ mesh: m, radius: g.parameters.radius });
   });
   occluders = list;
@@ -29,7 +29,7 @@ export function isOccluded(camera: THREE.Vector3, point: THREE.Vector3): boolean
   for (const { mesh, radius } of occluders) {
     if (!mesh.visible) continue;
     mesh.getWorldPosition(c); mesh.getWorldScale(s);
-    const r = radius * Math.max(s.x, s.y, s.z) * 0.995;
+    const r = radius * Math.max(s.x, s.y, s.z) * 0.999;
     const t = o.subVectors(c, camera).dot(d);
     if (t <= 0 || t - r >= len) continue;
     const closest = o.subVectors(c, camera).addScaledVector(d, -t).length();
