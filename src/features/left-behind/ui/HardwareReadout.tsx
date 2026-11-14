@@ -1,6 +1,6 @@
 // Left Behind · built during NASA Space Apps Challenge 2026 (14–15 Nov 2026) · AI-assisted (Lovable, Claude)
 import { useEffect, useState } from 'react';
-import { Box,ChevronDown,ChevronUp,Navigation,X } from 'lucide-react';
+import { Box, Eye, EyeOff, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/i18n/LanguageContext';
 import { useLeftBehindStore } from '../state/useLeftBehindStore';
@@ -9,27 +9,34 @@ import { measurementsAt, loadTrajectory } from '../engine/trajectory';
 import { AU_KM } from '../engine/ephemeris';
 import { machineCopy } from '../lib/machineCopy';
 import { hasNasaModel,NasaModelInspector } from './NasaModelInspector';
+import { ObjectPanelHeader } from './ObjectPanelHeader';
+import { useCosmosStore } from '@/components/cosmos/store/useCosmosStore';
 export function HardwareReadout() {
   const {language,numberLocale}=useLanguage();const copy=machineCopy[language];
   const id=useLeftBehindStore(s=>s.selectedHardwareId);
+  const selectedObject=useCosmosStore(s=>s.selectedObject);
+  const isTouring=useCosmosStore(s=>s.isTouring);
   const following=useLeftBehindStore(s=>s.followTargetId!==null);
   const second=useSimClock(s=>Math.floor(s.simDate/1000));
   const [ready,setReady]=useState('');const [note,setNote]=useState(false);
-  const [minimized,setMinimized]=useState(false);const [inspect,setInspect]=useState(false);
+  const [minimized,setMinimized]=useState(true);const [inspect,setInspect]=useState(false);
   useEffect(()=>{setNote(localStorage.getItem('pd-machine-scale-dismissed')!=='1');},[]);
   useEffect(()=>{if(id)void loadTrajectory(id).then(()=>setReady(id)).catch(()=>setReady(''));},[id]);
+  useEffect(()=>{setMinimized(true);setInspect(false);},[id]);
+  useEffect(()=>{if(selectedObject&&id)useLeftBehindStore.getState().selectHardware(null);},[selectedObject,id]);
   const p=id&&ready===id?measurementsAt(id,new Date(second*1000)):null;
   const format=(n:number,digits=0)=>n.toLocaleString(numberLocale,{maximumFractionDigits:digits});
   const source=p?.extrapolated?copy.estimate:p?.source==='simplified'?copy.simplified:copy.calculated;
+  if(isTouring||selectedObject)return null;
   return <>
     {note&&!id&&<div className="pd-card pd-machine-note flex items-center gap-2 text-muted-foreground" data-machine-note><span>{copy.note}</span><Button size="icon" variant="ghost" className="shrink-0 h-11 w-11" aria-label={copy.dismiss} onClick={()=>{setNote(false);localStorage.setItem('pd-machine-scale-dismissed','1');}}><X className="h-4 w-4"/></Button></div>}
     {id&&<section className="pd-card pd-machine-readout text-foreground" data-machine-readout aria-label={id.replaceAll('-',' ')}>
-      <div className="flex items-center gap-1 p-2"><Button variant="ghost" className="flex-1 min-w-0 h-11 justify-between px-2" aria-expanded={!minimized} onClick={()=>setMinimized(!minimized)}><h2>{id.replaceAll('-',' ').toUpperCase()}</h2>{minimized?<ChevronUp className="h-4 w-4"/>:<ChevronDown className="h-4 w-4"/>}</Button><Button size="icon" variant="ghost" aria-label={copy.cardClose} className="h-11 w-11 shrink-0" onClick={()=>useLeftBehindStore.getState().selectHardware(null)}><X className="h-4 w-4"/></Button></div>
-      {!minimized&&<div className="border-t border-border p-3 space-y-3 max-h-[45dvh] overflow-y-auto">
-      {p?<><dl className="grid grid-cols-2 gap-x-3 gap-y-3 font-mono text-[11px] tabular-nums"><div className="col-span-2"><dt className="text-muted-foreground mb-1">{copy.sun}</dt><dd>{format(p.sunKm/AU_KM,3)} {copy.au} · {format(p.sunKm)} km</dd></div><div className="col-span-2"><dt className="text-muted-foreground mb-1">{copy.earth}</dt><dd>{format(p.earthKm)} km</dd></div><div><dt className="text-muted-foreground mb-1">{copy.light}</dt><dd>{format(p.lightSeconds,1)} {copy.seconds}</dd></div><div><dt className="text-muted-foreground mb-1">{copy.speed}</dt><dd>{p.speed===null?copy.unavailable:`${format(p.speed,2)} km/s`}</dd></div></dl><p className="font-mono text-[10px] text-muted-foreground" aria-live="polite">{source}</p></>:<p className="font-mono text-xs">{copy.unavailable}</p>}
-      <div className="flex gap-2"><Button variant="outline" className="h-11 flex-1 border-border text-xs" onClick={()=>useLeftBehindStore.getState().toggleHardwareFollow()}><Navigation className="h-4 w-4"/>{following?copy.unfollow:copy.follow}</Button>{hasNasaModel(id)&&<Button variant="outline" className="h-11 flex-1 border-border text-xs" onClick={()=>setInspect(true)}><Box className="h-4 w-4"/>{copy.inspect}</Button>}</div>
+      <ObjectPanelHeader title={id.replaceAll('-',' ').replace(/\b\w/g,c=>c.toUpperCase())} minimized={minimized} onToggle={()=>setMinimized(!minimized)} onClose={()=>useLeftBehindStore.getState().selectHardware(null)} closeLabel={copy.cardClose} />
+      <div className={`grid transition-all duration-300 ease-out ${minimized?'grid-rows-[0fr]':'grid-rows-[1fr]'}`} inert={minimized}><div className="overflow-hidden"><div className="border-t border-border p-3 space-y-3 max-h-[40vh] sm:max-h-[45vh] overflow-y-auto">
+      {p?<><dl className="grid grid-cols-2 gap-2 text-xs sm:text-sm tabular-nums"><div className="rounded-[4px] bg-muted/50 p-2"><dt className="text-muted-foreground text-xs">{copy.sun}</dt><dd className="font-medium">{format(p.sunKm/AU_KM,3)} {copy.au}<span className="block text-xs text-muted-foreground">{format(p.sunKm)} km</span></dd></div><div className="rounded-[4px] bg-muted/50 p-2"><dt className="text-muted-foreground text-xs">{copy.earth}</dt><dd className="font-medium break-words">{format(p.earthKm)} km</dd></div><div className="rounded-[4px] bg-muted/50 p-2"><dt className="text-muted-foreground text-xs">{copy.light}</dt><dd className="font-medium">{format(p.lightSeconds,1)} {copy.seconds}</dd></div><div className="rounded-[4px] bg-muted/50 p-2"><dt className="text-muted-foreground text-xs">{copy.speed}</dt><dd className="font-medium">{p.speed===null?copy.unavailable:`${format(p.speed,2)} km/s`}</dd></div></dl><p className="text-[10px] text-muted-foreground">{source}</p></>:<p className="text-xs">{copy.unavailable}</p>}
+      <div className="flex gap-2 pt-1"><Button size="sm" variant="ghost" className={`flex-1 text-xs max-sm:min-h-11 ${following?'bg-primary/15 text-primary hover:bg-primary/20':'bg-muted/50 text-foreground hover:bg-muted'}`} onClick={()=>useLeftBehindStore.getState().toggleHardwareFollow()}>{following?<EyeOff className="w-3 h-3"/>:<Eye className="w-3 h-3"/>}{following?copy.unfollow:copy.follow}</Button>{hasNasaModel(id)&&<Button size="sm" variant="ghost" className="flex-1 text-xs bg-muted/50 text-foreground hover:bg-muted max-sm:min-h-11 whitespace-normal" onClick={()=>setInspect(true)}><Box className="w-3 h-3"/>{copy.inspect}</Button>}</div>
       {note&&<div className="flex items-center gap-2 border-t border-border pt-2 text-[10px] text-muted-foreground"><span className="flex-1">{copy.note}</span><Button size="icon" variant="ghost" className="h-11 w-11 shrink-0" aria-label={copy.dismiss} onClick={()=>{setNote(false);localStorage.setItem('pd-machine-scale-dismissed','1');}}><X className="h-4 w-4"/></Button></div>}
-      </div>}
+      </div></div></div>
     </section>}
     {inspect&&id&&<NasaModelInspector id={id} onClose={()=>setInspect(false)}/>}
   </>;

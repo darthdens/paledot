@@ -8,6 +8,9 @@ import { useFullscreenStore } from '../store/useFullscreenStore';
 import { UNITS } from '../types';
 import { ORBITAL_PERIODS } from '../data/celestialObjects';
 import { useState } from 'react';
+import { ObjectPanelHeader } from '@/features/left-behind/ui/ObjectPanelHeader';
+import { useSiteBrand } from '@/lib/site-brand';
+import { useLeftBehindStore } from '@/features/left-behind/state/useLeftBehindStore';
 
 // Rotation periods in hours (negative = retrograde)
 const ROTATION_PERIODS_HOURS: Record<string, number> = {
@@ -168,6 +171,8 @@ const formatOrbitalPeriod = (days: number, lc: { numberLocale: string; tx: (en: 
 };
 
 export const InfoCard = () => {
+  const brand = useSiteBrand();
+  const hardwareId = useLeftBehindStore(s=>s.selectedHardwareId);
   const { language, tr, tx, numberLocale } = useLanguage();
   const t = tr(translations);
   const simDate = useSimClock(s => s.simDate);
@@ -182,7 +187,7 @@ export const InfoCard = () => {
   const [isMinimized, setIsMinimized] = useState(true);
 
   // Hide InfoCard when touring (TourOverlay shows the info instead)
-  if (!selectedObject || isTouring) return null;
+  if (!selectedObject || isTouring || (brand==='paledot' && hardwareId)) return null;
 
   const handleClose = () => setSelectedObject(null);
   
@@ -216,7 +221,7 @@ export const InfoCard = () => {
       } : undefined}
     >
       {/* Header - entire bar is clickable to toggle minimize */}
-      <div 
+      {brand==='paledot' ? <ObjectPanelHeader title={tr(selectedObject.name)} minimized={isMinimized} onToggle={()=>setIsMinimized(!isMinimized)} onClose={handleClose} closeLabel={t.close} /> : <div 
         className="flex items-center justify-between p-3 cursor-pointer hover:bg-white/5 transition-colors"
         onClick={() => setIsMinimized(!isMinimized)}
       >
@@ -236,7 +241,7 @@ export const InfoCard = () => {
             <X className="w-4 h-4" />
           </Button>
         </div>
-      </div>
+      </div>}
 
       {/* Content - collapsible with smooth animation */}
       <div 
