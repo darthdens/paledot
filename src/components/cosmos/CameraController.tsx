@@ -119,6 +119,7 @@ export const CameraController = () => {
   // "View on the surface": low and oblique over the landed pin, so the ground and horizon fill the view.
   const surfaceViewNonce = useLeftBehindStore(state => state.surfaceViewNonce);
   useEffect(() => {
+    if (import.meta.env.DEV) console.log('SVDBG', surfaceViewNonce, hardwareId, !!controls, isTouring);
     if (!surfaceViewNonce || !hardwareId || !controls || isTouring) return;
     let cancelled = false;
     // Queued behind the follow flight's own data read, so that flight can't override the surface view.
@@ -128,6 +129,7 @@ export const CameraController = () => {
   const surfaceView = (hardwareId: string) => {
     const pin = landedPins.get(hardwareId);
     const body = pin && celestialObjects.find(o => o.id === pin.body);
+    if (import.meta.env.DEV) console.log('SVDBG2', !!pin, !!body);
     if (!pin || !body) return;
     const orbit = controls as unknown as { target: THREE.Vector3 };
     // Eye level beside the machine (a few of its own sizes away), so it stands on the horizon at true scale.
