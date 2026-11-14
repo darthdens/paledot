@@ -17,6 +17,7 @@ import { machineCopy } from '../lib/machineCopy';
 import { nasaModels } from '../lib/nasaModels';
 import { HardwareModel } from './HardwareModel';
 import { loadTrueSpans, trueSpanUnits } from '../lib/nasaModels';
+import { landedPins, SURFACE_BODY } from '../lib/pinRegistry';
 
 class SceneBoundary extends Component<{ children: ReactNode }, { failed: boolean }> {
   override state = { failed: false };
@@ -33,7 +34,7 @@ function fillLocal(line:THREE.Line,v:[number,number,number]){
   a.needsUpdate=true;
 }
 
-const PARENTS: Record<string, 'moon' | 'mars'> = { 'apollo-11': 'moon', 'apollo-15': 'moon', 'apollo-16': 'moon', 'apollo-17': 'moon', 'viking-1': 'mars', opportunity: 'mars', ingenuity: 'mars' };
+const PARENTS = SURFACE_BODY;
 
 export function HardwareTrack({ data, nearest }: { data: Trajectory; nearest: boolean }) {
   const marker = useRef<THREE.Group>(null);
@@ -99,6 +100,15 @@ export function HardwareTrack({ data, nearest }: { data: Trajectory; nearest: bo
     const p=positionAt(data.id,new Date(time)); node.visible=!!p;
     tip.visible=false;lead.visible=false;
     if(anchor.current)anchor.current.hidden=!p;
+    const pin=p?undefined:landedPins.get(data.id);
+    // After touchdown the flown path stays as a faint line and the machine sits at its surface pin.
+    for(const g of graphics)(g.past.material as THREE.LineBasicMaterial).opacity=pin?.2:.45;
+    if (pin) {
+      node.visible=true;world.set(...pin.world);node.parent?.worldToLocal(world);node.position.copy(world);
+      if(anchor.current)anchor.current.hidden=true;
+      useCosmosStore.getState().setObjectWorldPosition(`hw:${data.id}`,pin.world);
+      return;
+    }
     if (!p) { delete useCosmosStore.getState().objectWorldPositions[`hw:${data.id}`]; return; }
     const here=eclipticKmToScene(...p.km);
     node.position.set(...here);

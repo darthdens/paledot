@@ -5,6 +5,7 @@ import { getHardware } from '../data/dataClient';
 import type { Trajectory } from '../data/types';
 import { loadTrajectory } from '../engine/trajectory';
 import { HardwareTrack } from './HardwareTrack';
+import { SurfacePins } from './SurfacePins';
 import { useCosmosStore } from '@/components/cosmos/store/useCosmosStore';
 export function LeftBehindLayer() {
   const [tracks,setTracks]=useState<Trajectory[]>([]);
@@ -29,5 +30,5 @@ export function LeftBehindLayer() {
     }).slice(0,2).map(t=>t.id);
     setNearest(old=>old.join()===ids.join()?old:ids);
   });
-  return <group name="left-behind-layer">{tracks.map(data=><HardwareTrack key={data.id} data={data} nearest={nearest.includes(data.id)}/>)}</group>;
+  return <group name="left-behind-layer">{tracks.map(data=><HardwareTrack key={data.id} data={data} nearest={nearest.includes(data.id)}/>)}<SurfacePins/></group>;
 }

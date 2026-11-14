@@ -7,6 +7,8 @@ import { useCosmosStore } from './store/useCosmosStore';
 import { UNITS } from './types';
 import { bodyRadius } from '@/features/left-behind/lib/bodyScale';
 import { trueSpanUnits } from '@/features/left-behind/lib/nasaModels';
+import { useSimClock } from '@/features/left-behind/state/useSimClock';
+import { landedPins } from '@/features/left-behind/lib/pinRegistry';
 import { useLeftBehindStore } from '@/features/left-behind/state/useLeftBehindStore';
 import { getHardware } from '@/features/left-behind/data/dataClient';
 
@@ -55,6 +57,15 @@ export const CameraController = () => {
         animationProgress.current = 1;
         isAnimating.current = false;
         orbit.update();
+      },
+      simClock: useSimClock,
+      viewPin: (id: string, radii = 1) => {
+        const orbit = controls as unknown as { target: THREE.Vector3; update: () => void } | null;
+        const pin = landedPins.get(id), body = pin && celestialObjects.find(o => o.id === pin.body);
+        if (!orbit || !pin || !body) return false;
+        orbit.target.set(...pin.world);
+        camera.position.set(...pin.normal).multiplyScalar(bodyRadius(body.size) * radii).add(orbit.target); orbit.update();
+        return true;
       },
       zoomTo: (distance: number) => {
         const orbit = controls as unknown as { target: THREE.Vector3; update: () => void } | null;
@@ -105,6 +116,24 @@ export const CameraController = () => {
     }).catch(() => { /* Static-data failure must not disturb normal navigation. */ });
     return () => { cancelled = true; if (animationTriggerId.current === `hw:${hardwareId}`) isAnimating.current = false; };
   }, [hardwareId, controls, camera, isTouring]);
+  // "View on the surface": about 3 body radii straight above the landed pin, looking down.
+  const surfaceViewNonce = useLeftBehindStore(state => state.surfaceViewNonce);
+  useEffect(() => {
+    if (!surfaceViewNonce || !hardwareId || !controls || isTouring) return;
+    const pin = landedPins.get(hardwareId);
+    const body = pin && celestialObjects.find(o => o.id === pin.body);
+    if (!pin || !body) return;
+    const orbit = controls as unknown as { target: THREE.Vector3 };
+    const height = bodyRadius(body.size) * 3;
+    startPosition.current.copy(camera.position); startTarget.current.copy(orbit.target);
+    endTarget.current.set(...pin.world); cameraOffset.current.set(...pin.normal).multiplyScalar(height);
+    endPosition.current.copy(endTarget.current).add(cameraOffset.current);
+    isTourAnimation.current = false; animationProgress.current = 0;
+    isAnimating.current = true; animationTriggerId.current = `hw:${hardwareId}`;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      camera.position.copy(endPosition.current); orbit.target.copy(endTarget.current); isAnimating.current = false;
+    }
+  }, [surfaceViewNonce]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Handle tour camera target changes
   useEffect(() => {
