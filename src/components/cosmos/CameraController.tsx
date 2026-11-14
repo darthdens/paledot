@@ -329,7 +329,8 @@ export const CameraController = () => {
         tmpTarget.current.set(...position);
         tmpDelta.current.subVectors(camera.position, tmpTarget.current);
         // Landed hardware sits on the surface, so following it only keeps the camera above ground.
-        const clearance = hardwareId ? bodyRadius(body.size) * 1.000001 + camera.near : bodyClearance(body.size, camera.near);
+        // Not tied to camera.near: near is derived from this clearance while following, which used to lock the camera ~10 km up.
+        const clearance = hardwareId ? bodyRadius(body.size) * 1.000001 : bodyClearance(body.size, camera.near);
         if (tmpDelta.current.length() < clearance) {
           if (tmpDelta.current.lengthSq() === 0) tmpDelta.current.set(0, 0, 1);
           camera.position.copy(tmpTarget.current).add(tmpDelta.current.setLength(clearance));
