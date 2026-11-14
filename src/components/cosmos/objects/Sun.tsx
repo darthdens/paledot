@@ -162,13 +162,13 @@ const PHOTO_FS = `
     // Granulation: unit sphere * 600 -> cells ~1,150 km across on the real Sun
     vec3 pg = vObj * 600.0;
     float px = length(fwidth(pg));            // cells per pixel
-    float gFade = 1.0 - smoothstep(0.25, 0.8, px);
+    float gFade = 1.0 - smoothstep(0.06, 0.25, px);
     float g = granules(pg, uTime / 480.0);
     float gran = mix(1.0, 0.72 + 0.4 * g, gFade * 0.9);
 
     // Supergranulation: ~30,000 km, very subtle
     vec3 ps = vObj * 22.0;
-    float sFade = 1.0 - smoothstep(0.25, 0.8, length(fwidth(ps)));
+    float sFade = 1.0 - smoothstep(0.06, 0.25, length(fwidth(ps)));
     float sg = worley(ps, 3.0);
     float sup = mix(1.0, 0.94 + 0.08 * sg, sFade);
 
@@ -189,6 +189,8 @@ export const Sun = ({ position = [0, 0, 0], visualScale = UNIFIED_SCALE }: SunPr
   const groupRef = useRef<THREE.Group>(null);
   const worldPos = useRef(new THREE.Vector3());
   
+  const s1 = useRef<THREE.Sprite>(null), s2 = useRef<THREE.Sprite>(null), s3 = useRef<THREE.Sprite>(null);
+  const coronaShellRef = useRef<THREE.Mesh>(null);
   const photoMatRef = useRef<THREE.ShaderMaterial>(null);
   const photoUniforms = useMemo(() => ({ uTime: { value: 0 } }), []);
   const glowTexture = useMemo(() => createSunGlowTexture(), []);
@@ -203,6 +205,16 @@ export const Sun = ({ position = [0, 0, 0], visualScale = UNIFIED_SCALE }: SunPr
     if (sunRef.current) {
       const clock = useSimClock.getState();
       sunRef.current.rotation.y += (2 * Math.PI / (609.12 * 3600)) * delta * (clock.isPlaying ? Math.min(clock.rate,86400) : 0);
+    }
+    // Halo is a far-view effect (how eyes/cameras see a bright point). Fade it out smoothly up close
+    // so camera-facing quads never cross the near plane and pop.
+    if (groupRef.current) {
+      groupRef.current.getWorldPosition(worldPos.current);
+      const d = state.camera.position.distanceTo(worldPos.current) / sunSize;
+      const far = THREE.MathUtils.smoothstep(d, 4, 30);
+      const sp = [[s1, 0.5], [s2, 0.25], [s3, 0.12]] as const;
+      for (const [r, o] of sp) if (r.current) { (r.current.material as THREE.SpriteMaterial).opacity = o * far; r.current.visible = far > 0.001; }
+      if (coronaShellRef.current) coronaShellRef.current.visible = d > 1.4;
     }
     if (photoMatRef.current) {
       // Granules evolve on the simulation clock (real lifetime ~5-10 min); wrapped to keep float precision
@@ -277,7 +289,7 @@ export const Sun = ({ position = [0, 0, 0], visualScale = UNIFIED_SCALE }: SunPr
       </mesh>
 
       {/* Inner corona: thin view-dependent glow just above the limb (not a solid shell) */}
-      <mesh renderOrder={1}>
+      <mesh ref={coronaShellRef} renderOrder={1}>
         <sphereGeometry args={[sunSize * 1.15, 64, 64]} />
         <shaderMaterial
           transparent
@@ -306,66 +318,8 @@ export const Sun = ({ position = [0, 0, 0], visualScale = UNIFIED_SCALE }: SunPr
         />
       </mesh>
 
-      {/* Outer glow - large and soft */}
-      <mesh ref={glowRef} renderOrder={3}>
-        <sphereGeometry args={[sunSize * 1.5, 32, 32]} />
-        <shaderMaterial
-          transparent
-          depthWrite={false}
-          side={THREE.BackSide}
-          uniforms={{
-            glowColor: { value: new THREE.Color('#FFD9A0') },
-          }}
-          vertexShader={`
-            varying vec3 vNormal;
-            void main() {
-              vNormal = normalize(normalMatrix * normal);
-              gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-            }
-          `}
-          fragmentShader={`
-            varying vec3 vNormal;
-            uniform vec3 glowColor;
-            void main() {
-              float d = max(0.0, 0.65 - dot(vNormal, vec3(0.0, 0.0, 1.0)));
-              float intensity = pow(d, 1.5);
-              gl_FragColor = vec4(glowColor, intensity * 0.8);
-            }
-          `}
-        />
-      </mesh>
-
-      {/* Far outer glow - very soft and large */}
-      <mesh renderOrder={4}>
-        <sphereGeometry args={[sunSize * 2.0, 32, 32]} />
-        <shaderMaterial
-          transparent
-          depthWrite={false}
-          side={THREE.BackSide}
-          uniforms={{
-            glowColor: { value: new THREE.Color('#FFC27A') },
-          }}
-          vertexShader={`
-            varying vec3 vNormal;
-            void main() {
-              vNormal = normalize(normalMatrix * normal);
-              gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-            }
-          `}
-          fragmentShader={`
-            varying vec3 vNormal;
-            uniform vec3 glowColor;
-            void main() {
-              float d = max(0.0, 0.5 - dot(vNormal, vec3(0.0, 0.0, 1.0)));
-              float intensity = pow(d, 2.0);
-              gl_FragColor = vec4(glowColor, intensity * 0.4);
-            }
-          `}
-        />
-      </mesh>
-
       {/* Core glow sprite - bright center (reduced) */}
-      <sprite renderOrder={12} scale={[sunSize * 6, sunSize * 6, 1]}>
+      <sprite ref={s1} renderOrder={12} scale={[sunSize * 6, sunSize * 6, 1]}>
         <spriteMaterial
           map={glowTexture}
           transparent
@@ -377,7 +331,7 @@ export const Sun = ({ position = [0, 0, 0], visualScale = UNIFIED_SCALE }: SunPr
       </sprite>
 
       {/* Medium glow sprite - extended corona (reduced) */}
-      <sprite ref={outerGlowRef} renderOrder={11} scale={[sunSize * 12, sunSize * 12, 1]}>
+      <sprite ref={s2} renderOrder={11} scale={[sunSize * 12, sunSize * 12, 1]}>
         <spriteMaterial
           map={outerGlowTexture}
           transparent
@@ -389,7 +343,7 @@ export const Sun = ({ position = [0, 0, 0], visualScale = UNIFIED_SCALE }: SunPr
       </sprite>
 
       {/* Large outer glow sprite - far reaching halo (reduced) */}
-      <sprite renderOrder={10} scale={[sunSize * 24, sunSize * 24, 1]}>
+      <sprite ref={s3} renderOrder={10} scale={[sunSize * 24, sunSize * 24, 1]}>
         <spriteMaterial
           map={outerGlowTexture}
           transparent
