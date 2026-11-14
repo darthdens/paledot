@@ -1,6 +1,5 @@
 // Left Behind · built during NASA Space Apps Challenge 2026 (14–15 Nov 2026) · AI-assisted (Lovable, Claude)
 import { useEffect, useMemo, useRef } from 'react';
-import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 
 const HALF_ANGLE = 0.02; // radians around the site (~35 km on the Moon, ~68 km on Mars)
@@ -31,6 +30,14 @@ export function SitePatch({ local, radius, mesh }: { local: [number, number, num
     return g;
   }, [local, radius]);
   useEffect(() => () => geometry.dispose(), [geometry]);
-  useFrame(() => { if (ref.current && ref.current.material !== mesh.material) ref.current.material = mesh.material; });
-  return <mesh ref={ref} geometry={geometry} material={mesh.material} renderOrder={1} raycast={() => null} />;
+  // Same shaders and the same live uniform objects as the body, pulled slightly towards the camera so the
+  // body's coarse facets underneath never win the depth test where they touch the cap.
+  const material = useMemo(() => {
+    const src = mesh.material as THREE.ShaderMaterial;
+    if (!src.isShaderMaterial) return src;
+    return new THREE.ShaderMaterial({ vertexShader: src.vertexShader, fragmentShader: src.fragmentShader, uniforms: src.uniforms,
+      transparent: src.transparent, side: src.side, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -8 });
+  }, [mesh.material]);
+  useEffect(() => () => { if (material !== mesh.material) material.dispose(); }, [material, mesh.material]);
+  return <mesh ref={ref} geometry={geometry} material={material} renderOrder={1} raycast={() => null} />;
 }

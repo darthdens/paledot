@@ -81,7 +81,7 @@ export const CameraController = () => {
             radii[node.name.slice(5)] = node.geometry.parameters.radius;
           }
         });
-        return { camera: camera.position.toArray(), target: orbit?.target?.toArray(), near: camera.near, radii, selected: useCosmosStore.getState().selectedObject?.id };
+        return { camera: camera.position.toArray(), target: orbit?.target?.toArray(), near: camera.near, radii, selected: useCosmosStore.getState().selectedObject?.id, animating: isAnimating.current, trigger: animationTriggerId.current, progress: animationProgress.current, minDistance: (controls as unknown as { minDistance?: number } | null)?.minDistance, span: trueSpanUnits.get(useLeftBehindStore.getState().selectedHardwareId ?? "") };
       },
     };
     return () => { delete host.__cosmosCheck; };
@@ -319,6 +319,10 @@ export const CameraController = () => {
     if (!controls) return;
     const orbitControls = controls as any;
     if (!orbitControls.target) return;
+    // On a landed machine, "up" is the local ground normal so the horizon is level; elsewhere world up.
+    const upPin = hardwareId && !isTouring ? landedPins.get(hardwareId) : undefined;
+    if (upPin) camera.up.set(...upPin.normal);
+    else if (camera.up.y !== 1) camera.up.set(0, 1, 0);
 
     const ensureBodyClearance = () => {
       const positions = useCosmosStore.getState().objectWorldPositions;
@@ -327,9 +331,14 @@ export const CameraController = () => {
         const position = positions[body.id];
         if (!position) continue;
         tmpTarget.current.set(...position);
+        // Published body positions are throttled (~0.1 s) and lag a moving Moon/Mars by many km; near a landed
+        // machine use the centre implied by its pin (same frame), or the camera gets shoved off the surface.
+        const pin = hardwareId ? landedPins.get(hardwareId) : undefined;
+        if (pin && pin.body === body.id) tmpTarget.current.set(...pin.world).addScaledVector(tmpDelta.current.set(...pin.normal), -bodyRadius(body.size));
         tmpDelta.current.subVectors(camera.position, tmpTarget.current);
         // Landed hardware sits on the surface, so following it only keeps the camera above ground.
-        const clearance = hardwareId ? bodyRadius(body.size) * 1.000001 + camera.near : bodyClearance(body.size, camera.near);
+        // Not tied to camera.near: near is derived from this clearance while following, which used to lock the camera ~10 km up.
+        const clearance = hardwareId ? bodyRadius(body.size) * 1.000001 : bodyClearance(body.size, camera.near);
         if (tmpDelta.current.length() < clearance) {
           if (tmpDelta.current.lengthSq() === 0) tmpDelta.current.set(0, 0, 1);
           camera.position.copy(tmpTarget.current).add(tmpDelta.current.setLength(clearance));
@@ -427,7 +436,9 @@ export const CameraController = () => {
       return;
     }
 
-    ensureBodyClearance();
+    // Following hardware: check clearance only after the camera has moved with the machine this frame;
+    // checking first compared last frame's camera with this frame's (moved) Moon/Mars and shoved it skywards.
+    if (!(hardwareId && !isTouring)) ensureBodyClearance();
 
     if (hardwareId && !isTouring) {
       const live = useCosmosStore.getState().objectWorldPositions[`hw:${hardwareId}`];

@@ -5,6 +5,7 @@ import { useGLTF } from '@react-three/drei';
 import * as THREE from 'three';
 import { useCosmosStore } from '@/components/cosmos/store/useCosmosStore';
 import { loadTrueSpans, trueSpanUnits } from '../lib/nasaModels';
+import { landedPins } from '../lib/pinRegistry';
 
 // True-scale NASA model; the HTML ring marker in HardwareTrack keeps it findable from afar.
 // (Only that ring is screen-size, per "markers not to scale".)
@@ -36,13 +37,14 @@ export function HardwareModel({ id, url, selected, parent }: { id: string; url: 
     const wrapper = new THREE.Group();
     clone.position.copy(center).multiplyScalar(-unit); clone.scale.setScalar(unit);
     wrapper.add(clone);
+    wrapper.userData['halfHeight'] = (size.y * unit) / 2;
     return wrapper;
   }, [scene]);
   useEffect(() => () => model.traverse(node => {
     const mesh = node as THREE.Mesh;
     if (mesh.isMesh) (Array.isArray(mesh.material) ? mesh.material : [mesh.material]).forEach(m => m.dispose());
   }), [model]);
-  const tmp = useMemo(() => ({ world: new THREE.Vector3(), dir: new THREE.Vector3(), parent: new THREE.Vector3() }), []);
+  const tmp = useMemo(() => ({ world: new THREE.Vector3(), dir: new THREE.Vector3(), parent: new THREE.Vector3(), q: new THREE.Quaternion(), up: new THREE.Vector3(0, 1, 0) }), []);
   useFrame(({ camera, size }, delta) => {
     const node = group.current, holder = node?.parent;
     if (!node || !holder) return;
@@ -56,7 +58,15 @@ export function HardwareModel({ id, url, selected, parent }: { id: string; url: 
     const scale = trueSpan ?? worldSize;
     node.scale.setScalar(scale);
     node.position.set(0, 0, 0);
-    if (parent) {
+    node.quaternion.identity();
+    const pin = landedPins.get(id);
+    if (pin) {
+      // Landed: stand upright on the local ground (model +Y along the surface normal), feet on the surface.
+      holder.getWorldQuaternion(tmp.q).invert();
+      tmp.dir.set(...pin.normal).applyQuaternion(tmp.q).normalize();
+      node.quaternion.setFromUnitVectors(tmp.up, tmp.dir);
+      node.position.copy(tmp.dir).multiplyScalar(scale * (model.userData['halfHeight'] ?? 0.5));
+    } else if (parent) {
       const p = useCosmosStore.getState().objectWorldPositions[parent];
       const radius = PARENT_RADIUS[parent] ?? 0;
       if (p) {
