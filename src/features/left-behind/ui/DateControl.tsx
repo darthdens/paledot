@@ -25,7 +25,7 @@ export function DateControl() {
     </div>
     <input type="range" aria-label={text(copy.date)} min={CLOCK_START} max={CLOCK_END} step={3600000} value={state.simDate} onChange={e => state.setSimDate(Number(e.target.value))} className="w-full h-11 accent-primary focus-visible:ring-2 focus-visible:ring-ring" />
     <div className="relative h-5 font-mono text-[8px] text-muted-foreground tabular-nums">
-      {[1960,1970,1980,1990,2000,2010,2020,2030,2040,2050,2060,2070,2080,2090,2100].map(year => <span key={year} className="absolute -translate-x-1/2" style={{ left: `${(Date.UTC(year,0,1)-CLOCK_START)/(CLOCK_END-CLOCK_START)*100}%` }}>{year}</span>)}
+      {[1960,1970,1980,1990,2000,2010,2020,2030,2040,2050,2060,2070,2080,2090,2100].map(year => <span key={year} className="absolute -translate-x-1/2" style={{ left: `${(Date.UTC(year,0,1)-CLOCK_START)/(CLOCK_END-CLOCK_START)*100}%` }}>{year % 30 === 0 ? year : '·'}</span>)}
     </div>
     <p className="text-[10px] text-muted-foreground">{text(copy.source)}</p>
   </div>;
