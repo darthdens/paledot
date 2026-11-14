@@ -1,6 +1,9 @@
 # Roadmap
 
 ## Left Behind setup
+- [ ] Fetch nine static trajectories and a photo manifest, retrying Opportunity and Viking coverage lookups.
+- [ ] Replace Cloud reads/rebuild with cached static reads and a read-only Pale Dot data table.
+- [ ] Update event provenance/credits and verify static data, preview tables, and photo suitability.
 - [x] Save the three supplied documents and data files byte-for-byte.
 - [ ] Create public left-behind storage — blocked by workspace public-bucket policy; owner/admin must enable public buckets in Settings → Privacy & Security.
 - [x] Implement NASA fetching with TanStack server functions, cached client reads, and a Pale Dot-only hidden rebuild view; eight data tests pass.
