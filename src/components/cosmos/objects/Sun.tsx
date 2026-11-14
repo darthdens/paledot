@@ -157,7 +157,9 @@ export const makePhotoFS = (base: string, limbU: string, centre: string) => `
   }
   void main() {
     vec3 n = normalize(vN);
-    float mu = clamp(dot(n, normalize(vV)), 0.0, 1.0);
+    float mu = dot(n, normalize(vV));
+    if (!(mu == mu)) mu = 1.0;               // guard against NaN at extreme distances
+    mu = clamp(mu, 0.15, 1.0);
     // Linear limb darkening, I(mu) = 1 - u(1 - mu), with u larger at shorter wavelengths
     vec3 u = ${limbU};
     vec3 limb = 1.0 - u * (1.0 - mu);
