@@ -49,7 +49,7 @@ function SurfacePin({ spec }: { spec: PinSpec }) {
       ring.current.classList.remove('pd-pin-pulse'); void ring.current.offsetWidth; ring.current.classList.add('pd-pin-pulse');
     }
     shown.current = visible;
-    if (ring.current) ring.current.hidden = !visible || crowded[spec.body];
+    if (ring.current) ring.current.hidden = !visible || crowded[spec.body] || !['earth', 'solarSystem'].includes(useCosmosStore.getState().currentScale);
     if (!visible) { landedPins.delete(spec.trajId); return; }
     const p = latLonToLocal(spec.lat, spec.lon, radius, TEXTURE_LON_OFFSET_DEG[spec.body] ?? 0);
     const attr = line.geometry.getAttribute('position') as THREE.BufferAttribute;
@@ -117,6 +117,8 @@ function CrowdChip({ body }: { body: Body }) {
   const tmp = useMemo(() => ({ v: new THREE.Vector3(), list: [] as THREE.Vector2[] }), []);
   useFrame(({ camera, size }) => {
     const pins = [...landedPins.values()].filter(p => p.body === body);
+    const scale = useCosmosStore.getState().currentScale;
+    if (scale !== 'earth' && scale !== 'solarSystem') { crowded[body] = false; if (el.current) el.current.hidden = true; return; }
     let close = false; tmp.list.length = 0;
     for (const p of pins) { tmp.v.set(...p.world).project(camera); tmp.list.push(new THREE.Vector2((tmp.v.x + 1) * size.width / 2, (1 - tmp.v.y) * size.height / 2)); }
     for (let i = 0; i < tmp.list.length && !close; i++) for (let j = i + 1; j < tmp.list.length; j++) if (tmp.list[i]!.distanceTo(tmp.list[j]!) < CROWD_PX) { close = true; break; }
@@ -131,7 +133,7 @@ function CrowdChip({ body }: { body: Body }) {
   const text = (body === 'moon' ? copy.sites : copy.machinesCount).replace('{n}', String(count));
   return <group ref={group}><Html center zIndexRange={[40, 30]}>
     <div ref={el} hidden className="paledot dark">
-      <Button variant="ghost" className="pd-pin-chip" aria-label={text} onClick={() => { const target = celestialObjects.find(o => o.id === body); useLeftBehindStore.getState().selectHardware(null); if (target) useCosmosStore.getState().setSelectedObject(target); }}><span className="pd-pin-chip-tag"><span className="pd-pin-chip-dot" aria-hidden />{text}</span></Button>
+      <button type="button" className="pd-pin-chip" onClick={() => { const target = celestialObjects.find(o => o.id === body); useLeftBehindStore.getState().selectHardware(null); if (target) useCosmosStore.getState().setSelectedObject(target); }}><span className="pd-pin-chip-dot" aria-hidden />{text}</button>
     </div>
   </Html></group>;
 }
