@@ -219,13 +219,13 @@ export const YouAreHereLabel = () => {
   
   return (
     <div className={`${isFullscreen
-      ? 'fixed top-[calc(3rem+env(safe-area-inset-top))] sm:top-[calc(4rem+env(safe-area-inset-top))] md:top-[calc(0.5rem+env(safe-area-inset-top))] right-[calc(0.5rem+env(safe-area-inset-right))] md:right-auto md:left-[calc(0.5rem+env(safe-area-inset-left))]'
-      : 'absolute top-12 sm:top-16 md:top-4 right-2 sm:right-4 md:right-auto md:left-4'} z-10 max-w-[calc(100%-2rem)] animate-fade-in`}>
-      <div className="bg-white/10 backdrop-blur-md rounded-lg overflow-hidden max-w-[220px] sm:max-w-none">
+      ? 'fixed top-[calc(0.5rem+env(safe-area-inset-top))] left-[calc(0.5rem+env(safe-area-inset-left))]'
+      : 'absolute top-2 sm:top-4 left-2 sm:left-4'} z-10 max-w-[calc(100%-13rem)] md:max-w-[calc(100%-2rem)] animate-fade-in`}>
+      <div className="bg-white/10 backdrop-blur-md rounded-lg overflow-hidden max-w-full md:max-w-none">
         <Button
           variant="ghost"
           onClick={() => setIsMinimized(!isMinimized)}
-          className="h-auto w-full grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-3 py-2 hover:bg-white/5 transition-colors"
+          className="h-auto w-full grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2 md:gap-3 px-2.5 md:px-3 min-h-8 py-1.5 md:py-2 hover:bg-white/5 transition-colors"
         >
           <div className="flex min-w-0 items-center gap-2 text-white">
             <span className="shrink-0">{getScaleIcon(currentScale)}</span>
