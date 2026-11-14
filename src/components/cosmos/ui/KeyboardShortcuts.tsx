@@ -1,4 +1,4 @@
-import { useLeftBehindStore } from '@/features/left-behind/state/useLeftBehindStore';
+import { useSimClock } from '@/features/left-behind/state/useSimClock';
 // KeyboardShortcuts - Handle keyboard navigation in Cosmos Explorer
 import { useEffect } from 'react';
 import { useCosmosStore } from '../store/useCosmosStore';
@@ -6,7 +6,6 @@ import { celestialObjects } from '../data/celestialObjects';
 
 export const KeyboardShortcuts = () => {
   const setSelectedObject = useCosmosStore(state => state.setSelectedObject);
-  const setTimeSpeed = useCosmosStore(state => state.timeSpeed);
   const selectedObject = useCosmosStore(state => state.selectedObject);
   
   useEffect(() => {
@@ -16,8 +15,8 @@ export const KeyboardShortcuts = () => {
         return;
       }
       
-      const lb = useLeftBehindStore.getState();
-      if (lb.active && [' ', '+', '=', '-', '_'].includes(e.key)) {
+      const lb = useSimClock.getState();
+      if ( [' ', '+', '=', '-', '_'].includes(e.key)) {
         e.preventDefault();
         if (e.key === ' ') lb.togglePlaying();
         else lb.changeSpeed(e.key === '+' || e.key === '=' ? 1 : -1);
@@ -70,26 +69,6 @@ export const KeyboardShortcuts = () => {
         case 'm':
         case 'M':
           setSelectedObject(celestialObjects.find(o => o.id === 'moon') || null);
-          break;
-          
-        // Time controls
-        case '+':
-        case '=':
-          useCosmosStore.getState().setTimeSpeed(Math.min(useCosmosStore.getState().timeSpeed * 2, 1000));
-          break;
-        case '-':
-        case '_':
-          useCosmosStore.getState().setTimeSpeed(Math.max(useCosmosStore.getState().timeSpeed / 2, 0.1));
-          break;
-        case ' ':
-          // Space to pause/play
-          const currentSpeed = useCosmosStore.getState().timeSpeed;
-          if (currentSpeed === 0) {
-            useCosmosStore.getState().setTimeSpeed(1);
-          } else {
-            useCosmosStore.getState().setTimeSpeed(0);
-          }
-          e.preventDefault();
           break;
           
         // Escape to deselect

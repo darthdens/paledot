@@ -2,7 +2,9 @@ import { lazy, Suspense } from 'react';
 const LeftBehindDateControl = lazy(() => import('@/features/left-behind/ui/DateControl').then(m => ({ default: m.DateControl })));
 import { useLanguage } from '@/i18n/LanguageContext';
 import { Button } from '@/components/ui/button';
-import { Slider } from '@/components/ui/slider';
+import { useSimClock } from '@/features/left-behind/state/useSimClock';
+import { dateCopy } from '@/features/left-behind/lib/dateCopy';
+import { LeftBehindMenu } from '@/features/left-behind/ui/LeftBehindMenu';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { HelpCircle, Compass, Satellite, Maximize, Minimize, CircleDot, CircleOff, Clock, Timer, TimerOff, Orbit, Activity, Home, Scaling, BarChart3, Info, MoreVertical } from 'lucide-react';
 import { useCosmosStore } from '../store/useCosmosStore';
@@ -112,19 +114,14 @@ export const CosmosUI = () => {
   // In the native iOS / iPadOS / macOS / visionOS app the experience is
   // already full-bleed, so the fullscreen toggle is unnecessary.
   const brand = useSiteBrand();
-  const leftBehindActive = useLeftBehindStore(s => s.active);
-  const dateControlOpen = useLeftBehindStore(s => s.dateControlOpen);
-  
-  const toggleTimeMenu = () => {
-    if (leftBehindActive) useLeftBehindStore.getState().setDateControlOpen(!dateControlOpen);
-    else setShowTimeSlider(value => !value);
-  };
+  const menuOpen = useLeftBehindStore(s => s.menuOpen);
+  const dateControlOpen = useSimClock(s => s.dateControlOpen);
+  const rate = useSimClock(s => s.rate);
+  const clockName = tr({ en: dateCopy[language].date, fr: dateCopy[language].date });
+  const toggleTimeMenu = () => { useLeftBehindStore.getState().setMenuOpen(false); useSimClock.getState().setDateControlOpen(!dateControlOpen); };
   const lbCopy = leftBehindCopy[language];
   const lbName = tr({ en: lbCopy.name, fr: lbCopy.name });
-  const toggleLeftBehind = () => {
-    if (leftBehindActive) useLeftBehindStore.getState().exit();
-    else { setShowControlHints(false); useLeftBehindStore.getState().enter(); }
-  };
+  const toggleLeftBehind = () => { useSimClock.getState().setDateControlOpen(false); useLeftBehindStore.getState().setMenuOpen(!menuOpen); };
   // Pale Dot is always full-bleed too, so it hides the fullscreen toggle like the native app.
   const native = isNativeApp() || brand === 'paledot';
   // In fullscreen, dropdowns appear directly below the button row (h-8 = 32px + gap)
@@ -148,12 +145,9 @@ export const CosmosUI = () => {
     togglePerformanceHUD,
     toggleSizeComparison,
     goHome,
-    timeSpeed,
-    setTimeSpeed,
   } = useCosmosStore();
   const { isFullscreen, setIsFullscreen } = useFullscreenStore();
-  const [showTimeSlider, setShowTimeSlider] = useState(false);
-  const timeMenuOpen = leftBehindActive ? dateControlOpen : showTimeSlider;
+  const timeMenuOpen = dateControlOpen;
   const [showMoreMenu, setShowMoreMenu] = useState(false);
   const [showLanguageMenu, setShowLanguageMenu] = useState(false);
   const [showAbout, setShowAbout] = useState(false);
@@ -173,8 +167,7 @@ export const CosmosUI = () => {
       // Close time slider if clicking outside
       if (timeMenuOpen && !(target instanceof Element && target.closest('[data-lb-date-chip]')) && timeSliderRef.current && !timeSliderRef.current.contains(target) && 
           timeSpeedButtonRef.current && !timeSpeedButtonRef.current.contains(target)) {
-        setShowTimeSlider(false);
-        useLeftBehindStore.getState().setDateControlOpen(false);
+        useSimClock.getState().setDateControlOpen(false);
       }
       
       // Close more menu if clicking outside
@@ -192,7 +185,7 @@ export const CosmosUI = () => {
 
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
-        if (timeMenuOpen) { setShowTimeSlider(false); useLeftBehindStore.getState().setDateControlOpen(false); }
+        if (timeMenuOpen) { useSimClock.getState().setDateControlOpen(false); }
         if (showMoreMenu) setShowMoreMenu(false);
         if (showLanguageMenu) setShowLanguageMenu(false);
         if (showQuickJump) toggleQuickJump();
@@ -628,7 +621,7 @@ export const CosmosUI = () => {
               >
                 {t.explore}
               </Button>
-              {brand === 'paledot' && <Button size="sm" variant="outline" className="pd-pill min-h-11" onClick={() => { setShowControlHints(false); useLeftBehindStore.getState().enter(); }}>
+              {brand === 'paledot' && <Button size="sm" variant="outline" className="pd-pill min-h-11" onClick={() => { setShowControlHints(false); useLeftBehindStore.getState().setMenuOpen(true); }}>
                 <Satellite className="h-4 w-4" />{tr({ en: lbCopy.entry, fr: lbCopy.entry })}
               </Button>}
             </div>
@@ -692,7 +685,7 @@ export const CosmosUI = () => {
 
             {/* Divider before sound */}
             {brand === 'paledot' && <Tooltip>
-              <TooltipTrigger asChild><Button size="icon" variant="ghost" aria-label={lbName} aria-pressed={leftBehindActive} onClick={toggleLeftBehind} className={`hidden lg:inline-flex h-11 w-11 backdrop-blur-xs text-foreground ${leftBehindActive ? 'bg-foreground/25' : 'bg-foreground/10 hover:bg-foreground/20'}`}><Satellite className="h-5 w-5" /></Button></TooltipTrigger>
+              <TooltipTrigger asChild><Button data-lb-menu-trigger size="icon" variant="ghost" aria-label={lbName} aria-pressed={menuOpen} onClick={toggleLeftBehind} className={`hidden lg:inline-flex h-11 w-11 backdrop-blur-xs text-foreground ${menuOpen ? 'bg-foreground/25' : 'bg-foreground/10 hover:bg-foreground/20'}`}><Satellite className="h-5 w-5" /></Button></TooltipTrigger>
               <TooltipContent variant="dark" side="bottom">{lbName}</TooltipContent>
             </Tooltip>}
             <div className="hidden lg:block w-px h-6 bg-white/20 mx-0.5" />
@@ -735,7 +728,7 @@ export const CosmosUI = () => {
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent variant="dark" side="bottom">
-                  {t.timeSpeed}
+                  {clockName}
                 </TooltipContent>
               </Tooltip>
 
@@ -837,7 +830,7 @@ export const CosmosUI = () => {
           <div className="overflow-hidden">
             <div className="p-2 min-w-[180px] space-y-0.5">
               {/* Toggle options */}
-              {brand === 'paledot' && <Button variant="ghost" aria-pressed={leftBehindActive} onClick={() => { toggleLeftBehind(); setShowMoreMenu(false); }} className={`w-full min-h-11 justify-start gap-2 text-foreground ${leftBehindActive ? 'bg-foreground/25' : 'hover:bg-foreground/10'}`}><Satellite className="h-4 w-4" />{lbName}</Button>}
+              {brand === 'paledot' && <Button data-lb-menu-trigger variant="ghost" aria-pressed={menuOpen} onClick={() => { toggleLeftBehind(); setShowMoreMenu(false); }} className={`w-full min-h-11 justify-start gap-2 text-foreground ${menuOpen ? 'bg-foreground/25' : 'hover:bg-foreground/10'}`}><Satellite className="h-4 w-4" />{lbName}</Button>}
               <button
                 onClick={() => { toggleOrbits(); }}
                 className="w-full flex items-center justify-between p-2 rounded-[4px] hover:bg-white/10 transition-colors"
@@ -866,9 +859,9 @@ export const CosmosUI = () => {
               >
                 <div className="flex items-center gap-2">
                   <Clock className="w-4 h-4 text-white/70" />
-                  <span className="text-sm text-white/90">{t.timeSpeed}</span>
+                  <span className="text-sm text-white/90">{clockName}</span>
                 </div>
-                {timeSpeed > 1 && <div className="w-2 h-2 rounded-full bg-green-400" />}
+                {rate > 1 && <div className="w-2 h-2 rounded-full bg-green-400" />}
               </button>
 
               <button
@@ -953,31 +946,14 @@ export const CosmosUI = () => {
             className={`grid transition-all duration-300 ease-out ${timeMenuOpen ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'}`}
           >
             <div className="overflow-hidden">
-              {leftBehindActive ? <Suspense fallback={null}><LeftBehindDateControl /></Suspense> : <div className="p-3 sm:p-4 min-w-[180px] sm:min-w-[220px] space-y-3">
-                <div className="flex items-center justify-between">
-                  <span className="text-white text-xs sm:text-sm font-medium">{t.timeSpeed}</span>
-                  <span className="text-white/70 text-xs">
-                    {timeSpeed === 0 ? t.paused : timeSpeed === 1 ? '1×' : `${timeSpeed}×`}
-                  </span>
-                </div>
-                <Slider
-                  value={[timeSpeed]}
-                  onValueChange={([value]) => setTimeSpeed(value!)}
-                  min={0}
-                  max={10}
-                  step={0.5}
-                  variant="light"
-                  className="w-full"
-                />
-                <div className="flex justify-between text-[10px] sm:text-xs text-white/50">
-                  <span>{t.paused}</span>
-                  <span>10×</span>
-                </div>
-              </div>}
+              {timeMenuOpen && <Suspense fallback={null}><LeftBehindDateControl /></Suspense>}
+            </div>}
             </div>
           </div>
         </div>
       )}
+
+      {brand === 'paledot' && menuOpen && !showControlHints && <LeftBehindMenu />}
 
       {/* About modal */}
       <AboutModal open={showAbout} onOpenChange={setShowAbout} />

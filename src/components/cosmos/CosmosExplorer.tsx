@@ -42,6 +42,7 @@ import { useCosmosStore } from './store/useCosmosStore';
 import { useGalaxyTimeManager } from './objects/DifferentialRotationMaterial';
 import { CosmosBootGate } from './ui/CosmosBootGate';
 import { useSiteBrand } from '@/lib/site-brand';
+import { SimulationClock } from '@/features/left-behind/scene/SimulationClock';
 import { useLeftBehindStore } from '@/features/left-behind/state/useLeftBehindStore';
 const LeftBehindLayer = lazy(() => import('@/features/left-behind/scene/LeftBehindLayer').then(m => ({ default: m.LeftBehindLayer })));
 const LeftBehindOverlay = lazy(() => import('@/features/left-behind/ui/LeftBehindOverlay').then(m => ({ default: m.LeftBehindOverlay })));
@@ -57,8 +58,8 @@ const GalaxyTimeManager = () => {
 
 export const CosmosExplorer = () => {
   const brand = useSiteBrand();
-  const leftBehindActive = useLeftBehindStore(s => s.active);
-  const pendingEntry = useLeftBehindStore(s => s.pendingEntry);
+  const machinesVisible = useLeftBehindStore(s => s.machinesVisible);
+  const menuOpen = useLeftBehindStore(s => s.menuOpen);
   const containerRef = useRef<HTMLDivElement>(null);
 
   // We separate "textures are loaded" vs "scene is warmed up" so the loader can actually
@@ -90,10 +91,9 @@ export const CosmosExplorer = () => {
     useCosmosStore.getState().goHome();
   }, [sceneReady]);
   useEffect(() => {
-    if (brand !== 'paledot' || !bootDone || !pendingEntry) return;
+    if (brand !== 'paledot' || !bootDone || !menuOpen) return;
     useCosmosStore.getState().setShowControlHints(false);
-    useLeftBehindStore.getState().enter();
-  }, [brand, bootDone, pendingEntry]);
+  }, [brand, bootDone, menuOpen]);
 
   // Hide distant galaxies when within solar system or Proxima Centauri system
   const showDistantGalaxies =
@@ -185,6 +185,7 @@ export const CosmosExplorer = () => {
             />
 
             {/* Camera fly-to controller */}
+            <SimulationClock />
             <CameraController />
 
             {/* Scale tracker - updates store with current scale level */}
@@ -240,7 +241,7 @@ export const CosmosExplorer = () => {
                 showTrails={showTrails}
                 selectedObject={selectedObject}
               />
-              {brand === 'paledot' && leftBehindActive && <Suspense fallback={null}><LeftBehindLayer /></Suspense>}
+              {brand === 'paledot' && bootDone && machinesVisible && <Suspense fallback={null}><LeftBehindLayer /></Suspense>}
 
               {/* Distant stars - tiny point-like spheres (very dim) */}
               {stars.map((star) => {
@@ -306,7 +307,7 @@ export const CosmosExplorer = () => {
           <KeyboardShortcuts />
           <SizeComparison />
           <YouAreHereLabel />
-          {brand === 'paledot' && leftBehindActive && <Suspense fallback={null}><LeftBehindOverlay /></Suspense>}
+          <Suspense fallback={null}><LeftBehindOverlay /></Suspense>
         </>
       )}
     </div>
