@@ -68,20 +68,21 @@ function TierCap({ tier, order, radius, mesh, body }: { tier: TerrainTier; order
         rect: { value: new THREE.Vector4(u0, v0, (tier.east - tier.west) / 360, (tier.north - tier.south) / 180) },
         texel: { value: 1 / tier.px },
         isMars: { value: body === 'mars' ? 1 : 0 },
+        sunDir: { value: new THREE.Vector3(1, 0, 0) },
       },
       vertexShader: /* glsl */`
-        varying vec2 vUv; varying vec3 vWorldPos; varying vec3 vNormalW; varying vec3 vEast;
+        varying vec2 vUv; varying vec3 vNormalW; varying vec3 vEast;
         void main() {
           vUv = uv;
-          vec4 w = modelMatrix * vec4(position, 1.0);
-          vWorldPos = w.xyz;
           vNormalW = normalize(mat3(modelMatrix) * normal);
           vEast = normalize(mat3(modelMatrix) * vec3(position.z, 0.0, -position.x));
-          gl_Position = projectionMatrix * viewMatrix * w;
+          // modelViewMatrix is composed on the CPU in double precision; world coordinates (~1e5 scene units)
+          // in float32 would snap these km-sized caps to a ~8 km grid.
+          gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
         }`,
       fragmentShader: /* glsl */`
-        uniform sampler2D detailMap; uniform sampler2D globalMap; uniform vec4 rect; uniform float texel; uniform float isMars;
-        varying vec2 vUv; varying vec3 vWorldPos; varying vec3 vNormalW; varying vec3 vEast;
+        uniform sampler2D detailMap; uniform sampler2D globalMap; uniform vec4 rect; uniform float texel; uniform float isMars; uniform vec3 sunDir;
+        varying vec2 vUv; varying vec3 vNormalW; varying vec3 vEast;
         float lum(vec3 c) { return dot(c, vec3(0.299, 0.587, 0.114)); }
         void main() {
           vec3 base = texture2D(globalMap, rect.xy + vUv * rect.zw).rgb;
@@ -96,7 +97,6 @@ function TierCap({ tier, order, radius, mesh, body }: { tier: TerrainTier; order
           float hD = texture2D(detailMap, vUv - vec2(0.0, texel)).r, hU = texture2D(detailMap, vUv + vec2(0.0, texel)).r;
           vec3 n = normalize(vNormalW), e = normalize(vEast), nn = normalize(cross(n, e));
           vec3 pn = normalize(n + (e * (hL - hR) + nn * (hD - hU)) * 1.2);
-          vec3 sunDir = normalize(-vWorldPos);
           float ndl = mix(max(dot(n, sunDir), 0.0), max(dot(pn, sunDir), 0.0), 0.5);
           float moonLift = isMars > 0.5 ? 1.0 : (0.7 + 0.5 * ndl);
           vec3 col = albedo * moonLift * (0.012 + 0.988 * ndl);
@@ -110,5 +110,7 @@ function TierCap({ tier, order, radius, mesh, body }: { tier: TerrainTier; order
   useEffect(() => { material.uniforms['detailMap']!.value = tex; }, [material, tex]);
   useEffect(() => () => material.dispose(), [material]);
   if (!tex) return null;
-  return <mesh geometry={geometry} material={material} renderOrder={1 + order} raycast={() => null} />;
+  // The Sun sits at the scene origin: light direction from the cap's own world position (CPU doubles).
+  return <mesh geometry={geometry} material={material} renderOrder={1 + order} raycast={() => null}
+    onBeforeRender={function (this: THREE.Mesh) { (material.uniforms['sunDir']!.value as THREE.Vector3).setFromMatrixPosition(this.matrixWorld).negate().normalize(); }} />;
 }
