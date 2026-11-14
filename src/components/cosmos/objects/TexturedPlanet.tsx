@@ -29,7 +29,7 @@ const MOBILE_TEXTURE_WHITELIST = [
 
 // Import NASA texture maps - only essential ones are used on mobile
 import { maybeUpgradeSurface } from '@/components/cosmos/lib/hdSurfaces';
-import { hasRelief, loadRelief, reliefSync, METRE, RELIEF_GLSL, RELIEF_NEAR_RADII } from '@/components/cosmos/lib/relief';
+import { hasRelief, loadRelief, reliefSync, METRE, RELIEF_GLSL } from '@/components/cosmos/lib/relief';
 
 const FLAT_HEIGHT = (() => { const t = new THREE.DataTexture(new Uint16Array([0]), 1, 1, THREE.RedFormat, THREE.HalfFloatType); t.needsUpdate = true; return t; })();
 const sphereRaycast = new THREE.Sphere();
@@ -554,11 +554,13 @@ export const TexturedPlanet = ({
 
     if (planetMaterialRef.current) {
       maybeUpgradeSurface(object.id, hdState.current, state.camera.position.distanceTo(worldPos.current), planetSize, state.gl, planetMaterialRef.current);
-      if (hasRelief(object.id) && !reliefState.current.requested && state.camera.position.distanceTo(worldPos.current) < planetSize * RELIEF_NEAR_RADII) {
+      // Relief is preloaded during the opening screen; apply it straight away so nothing rebuilds on approach.
+      if (hasRelief(object.id) && !reliefState.current.requested) {
         reliefState.current.requested = true;
         const material = planetMaterialRef.current;
         loadRelief(object.id).then(r => {
           material.uniforms['heightMap']!.value = r.texture;
+          state.gl.initTexture(r.texture);
           (material.uniforms['reliefTexel']!.value as THREE.Vector2).set(1 / r.width, 1 / r.height);
           material.uniforms['reliefOn']!.value = 1;
           setReliefReady(true);
