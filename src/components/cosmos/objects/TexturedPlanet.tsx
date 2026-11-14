@@ -336,6 +336,7 @@ export const TexturedPlanet = ({
   const groupRef = useRef<THREE.Group>(null);
   const atmosphereRef = useRef<THREE.Mesh>(null);
   const planetMaterialRef = useRef<THREE.ShaderMaterial>(null);
+  const cloudMeshRef = useRef<THREE.Mesh>(null);
   const cloudMaterialRef = useRef<THREE.ShaderMaterial>(null);
   const atmosphereMaterialRef = useRef<THREE.ShaderMaterial>(null);
   const ringMaterialRef = useRef<THREE.ShaderMaterial>(null);
@@ -398,6 +399,7 @@ export const TexturedPlanet = ({
       tex.wrapT = THREE.ClampToEdgeWrapping;
       tex.colorSpace = THREE.SRGBColorSpace;
     });
+    earthCloudsMap.colorSpace = THREE.NoColorSpace; // coverage data, not colour
     // Only configure secondary textures on desktop
     if (!isMobile) {
       [ceresMap, enceladusMap, tritonMap, iapetusMap].forEach(tex => {
@@ -570,7 +572,14 @@ export const TexturedPlanet = ({
         planetMaterialRef.current.uniforms["parentRadius"]!.value = parentPlanetSize;
       }
     }
+    // Clouds turn with the planet; on top, weather drifts ~10 m/s eastward on the simulation clock
+    // (so at real-time speed they barely move, as from orbit) and slowly reshapes over hours.
+    if (cloudMeshRef.current && planetRef.current) cloudMeshRef.current.rotation.y = planetRef.current.rotation.y;
     if (cloudMaterialRef.current) {
+      const simSeconds = clock.simDate / 1000;
+      const radiusM = planetSize / METRE;
+      cloudMaterialRef.current.uniforms["cloudDrift"]!.value = (simSeconds * 10 / (2 * Math.PI * radiusM)) % 1;
+      cloudMaterialRef.current.uniforms["cloudPhase"]!.value = (simSeconds / 21600) % (2 * Math.PI);
       cloudMaterialRef.current.uniforms["time"]!.value = time;
       cloudMaterialRef.current.uniforms["objectCenter"]!.value.copy(worldPos.current);
       if (isMoon) {
@@ -971,7 +980,7 @@ export const TexturedPlanet = ({
                   float ringShadow = calculateRingShadow(vWorldPosition, sunDir);
                   float totalShadow = min(moonShadow, ringShadow);
                   
-                  float ambient = 0.012;
+                  float ambient = 0.002; // night side stays dark once output is sRGB-encoded
                   float diffuse = max(NdotL, 0.0) * 0.988 * totalShadow;
                   
                   // Multi-scale noise for rich surface detail - offset by planetSeed for unique patterns
@@ -1823,6 +1832,8 @@ export const TexturedPlanet = ({
                   }
                   
                   gl_FragColor = vec4(litColor, 1.0);
+                  // Light in linear space, then encode for the screen (sRGB): sunlit ground reads as bright as photos.
+                  #include <colorspace_fragment>
                 }
               `}
             />
@@ -1830,8 +1841,9 @@ export const TexturedPlanet = ({
 
           {/* Cloud layer for planets with clouds - Earth clouds rotate independently */}
           {visuals.hasClouds && (
-            <mesh>
-              <sphereGeometry args={[planetSize * 1.02, 64, 64]} />
+            <mesh ref={cloudMeshRef}>
+              {/* Weather sits ~10 km up (true scale), not 2% of the radius. */}
+              <sphereGeometry args={[planetSize * (1 + 10000 / (planetSize / METRE)), 128, 128]} />
               <shaderMaterial
                 ref={cloudMaterialRef}
                 transparent
@@ -1845,6 +1857,8 @@ export const TexturedPlanet = ({
                   isMoon: { value: isMoon ? 1.0 : 0.0 },
                   cloudMap: { value: earthCloudsMap },
                   isEarth: { value: object.id === 'earth' ? 1.0 : 0.0 },
+                  cloudDrift: { value: 0 },
+                  cloudPhase: { value: 0 },
                 }}
                 vertexShader={`
                   varying vec3 vWorldNormal;
@@ -1868,6 +1882,8 @@ export const TexturedPlanet = ({
                   uniform float isMoon;
                   uniform sampler2D cloudMap;
                   uniform float isEarth;
+                  uniform float cloudDrift;
+                  uniform float cloudPhase;
                   
                   varying vec3 vWorldNormal;
                   varying vec3 vWorldPosition;
@@ -1898,8 +1914,7 @@ export const TexturedPlanet = ({
                     if (isEarth > 0.5) {
                       // === ANIMATED CLOUD ROTATION ===
                       // Clouds rotate slightly faster than Earth's surface (jet streams)
-                      float cloudRotationSpeed = 0.008;
-                      float cloudOffset = time * cloudRotationSpeed;
+                                            float cloudOffset = cloudDrift; // real-scale drift on the simulation clock
                       
                       // Apply rotation offset to UV (longitude only)
                       vec2 animatedUv = vUv;
@@ -1910,7 +1925,7 @@ export const TexturedPlanet = ({
                       cloudCoverage = cloudSample.r;
                       
                       // Subtle cloud evolution over time
-                      float cloudEvolve = sin(time * 0.02 + vUv.x * 10.0 + vUv.y * 8.0) * 0.08;
+                      float cloudEvolve = sin(cloudPhase + vUv.x * 10.0 + vUv.y * 8.0) * 0.08;
                       cloudCoverage = clamp(cloudCoverage + cloudEvolve, 0.0, 1.0);
                     } else {
                       // Procedural clouds for other planets with animation
@@ -1935,7 +1950,8 @@ export const TexturedPlanet = ({
                     // Clouds glow slightly at terminator
                     litCloud += sunsetOrange * terminatorZone * 0.15;
                     
-                    gl_FragColor = vec4(litCloud, cloudCoverage * 0.6 * max(NdotL, terminatorZone * 0.3) * shadow);
+                    gl_FragColor = vec4(litCloud, min(cloudCoverage * 1.1, 0.95) * max(NdotL, terminatorZone * 0.3) * shadow);
+                    #include <colorspace_fragment>
                   }
                 `}
               />
