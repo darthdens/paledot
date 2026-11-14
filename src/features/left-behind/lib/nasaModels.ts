@@ -16,6 +16,6 @@ import { getHardware } from '../data/dataClient';
 export const trueSpanUnits = new Map<string, number>();
 let spans: Promise<void> | null = null;
 export function loadTrueSpans() {
-  spans ??= getHardware().then(h => { for (const m of h.machines) if (m.trueSize) trueSpanUnits.set(m.id, m.trueSize.spanM * 1e-6); }).catch(() => { spans = null; });
+  spans ??= getHardware().then(h => { for (const m of h.machines) if (m.trueSize) { const span = m.trueSize.spanM * 1e-6; trueSpanUnits.set(m.id, span); for (const t of m.trajectories) trueSpanUnits.set(t.id, span); } }).catch(() => { spans = null; });
   return spans;
 }
