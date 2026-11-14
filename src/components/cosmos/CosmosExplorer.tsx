@@ -83,6 +83,12 @@ export const CosmosExplorer = () => {
   }, []);
 
   const bootDone = (texturesReady && sceneReady) || skippedLoading;
+  const initialHomeSet = useRef(false);
+  useEffect(() => {
+    if (!sceneReady || initialHomeSet.current) return;
+    initialHomeSet.current = true;
+    useCosmosStore.getState().goHome();
+  }, [sceneReady]);
   useEffect(() => {
     if (brand !== 'paledot' || !bootDone || !pendingEntry) return;
     useCosmosStore.getState().setShowControlHints(false);

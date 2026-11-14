@@ -86,6 +86,7 @@ export const ProximaCentauri = ({ visualScale = 0.001 }: ProximaCentauriProps) =
       <group>
       {/* Star core - red dwarf surface with subtle texture */}
       <mesh 
+        name="body-proxima-centauri"
         ref={starRef} 
         renderOrder={0}
         onClick={handleClick} 

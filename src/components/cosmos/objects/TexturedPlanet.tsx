@@ -670,6 +670,7 @@ export const TexturedPlanet = ({
         <group rotation={[tiltRadians, 0, 0]}>
           {/* Main planet sphere with enhanced shader for surface detail */}
           <mesh 
+            name={`body-${object.id}`}
             ref={planetRef}
             onClick={handleClick}
             onPointerOver={handlePointerOver}

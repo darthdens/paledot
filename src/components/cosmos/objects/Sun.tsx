@@ -192,6 +192,7 @@ export const Sun = ({ position = [0, 0, 0], visualScale = UNIFIED_SCALE }: SunPr
       <group ref={groupRef} position={position}>
       {/* Sun core - bright emissive */}
       <mesh 
+        name="body-sun"
         ref={sunRef}
         renderOrder={0}
         onClick={handleClick}

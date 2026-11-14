@@ -9,7 +9,7 @@ import { UNITS } from './types';
 const UNIFIED_SCALE = 0.001;
 
 export const CameraController = () => {
-  const { camera, controls, size } = useThree();
+  const { camera, controls, size, scene, gl } = useThree();
   const selectedObject = useCosmosStore((state) => state.selectedObject);
   const currentScale = useCosmosStore((state) => state.currentScale);
   const isFollowing = useCosmosStore((state) => state.isFollowing);
@@ -35,6 +35,37 @@ export const CameraController = () => {
   const smoothedTarget = useRef(new THREE.Vector3());
   const tmpTarget = useRef(new THREE.Vector3());
   const tmpDelta = useRef(new THREE.Vector3());
+
+  // Dev-only access to the live scene (not a second imported store) for acceptance checks.
+  useEffect(() => {
+    if (!import.meta.env.DEV) return;
+    const host = window as typeof window & { __cosmosCheck?: unknown };
+    host.__cosmosCheck = {
+      state: () => useCosmosStore.getState(),
+      finishFlight: () => {
+        if (!controls || !isAnimating.current) return;
+        const orbit = controls as unknown as { target: THREE.Vector3; update: () => void };
+        camera.position.copy(endPosition.current);
+        orbit.target.copy(endTarget.current);
+        animationProgress.current = 1;
+        isAnimating.current = false;
+        orbit.update();
+      },
+      snapshot: () => {
+        const orbit = controls as unknown as { target?: THREE.Vector3 } | null;
+        const radii: Record<string, number> = {};
+        scene.traverse(node => {
+          if (node instanceof THREE.Mesh && node.name.startsWith('body-') && node.geometry instanceof THREE.SphereGeometry) {
+            radii[node.name.slice(5)] = node.geometry.parameters.radius;
+          }
+        });
+        return { camera: camera.position.toArray(), target: orbit?.target?.toArray(), near: camera.near, radii, selected: useCosmosStore.getState().selectedObject?.id };
+      },
+    };
+    return () => { delete host.__cosmosCheck; };
+  }, [camera, controls, scene]);
+
+  useFrame(() => { gl.domElement.setAttribute('data-scene-ready', 'true'); });
 
   // Handle tour camera target changes
   useEffect(() => {
@@ -312,6 +343,7 @@ export const CameraController = () => {
         currentTarget.copy(tmpTarget.current);
         camera.position.add(tmpDelta.current);
 
+        ensureBodyClearance();
         orbitControls.update();
       }
       return;
@@ -344,6 +376,7 @@ export const CameraController = () => {
         currentTarget.copy(tmpTarget.current);
         camera.position.add(tmpDelta.current);
 
+        ensureBodyClearance();
         orbitControls.update();
       }
     }
