@@ -1,5 +1,11 @@
 # Roadmap
 
+## Whole-app true-scale sizes
+- [ ] Correct all solid-body radii and size-dependent effects; preserve positions and orbital distances.
+- [ ] Retune tour, selection, Home and initial framing; prevent body penetration and near-plane clipping.
+- [ ] Remove exaggerated scale, keep size comparison, test desktop and 390 px navigation.
+- [ ] Record event work and list every changed file with verification limitations.
+
 ## Left Behind setup
 - [x] Add isolated Left Behind mode state, empty scene layer and exit overlay.
 - [x] Connect Pale Dot Welcome, Satellite/More, title pill and #left-behind entry points after loading.
