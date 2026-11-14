@@ -50,8 +50,9 @@ export function HardwareTrack({ data, nearest }: { data: Trajectory; nearest: bo
       const origin=eclipticKmToScene(...(points[0]?.km ?? [0,0,0]));
       // Local origins retain metre-level precision far beyond the outer planets.
       const geometry=new THREE.BufferGeometry().setFromPoints(points.map(p=>{const v=eclipticKmToScene(...p.km);return new THREE.Vector3(v[0]-origin[0],v[1]-origin[1],v[2]-origin[2]);}));
-      const future=new THREE.Line(geometry.clone(),new THREE.LineDashedMaterial({color,transparent:true,opacity:.3,dashSize:10000,gapSize:10000,depthWrite:false,depthTest:false}));
-      future.computeLineDistances(); future.frustumCulled=false;future.position.set(...origin);future.renderOrder=2;
+      const future=new THREE.Line(geometry.clone(),new THREE.LineBasicMaterial({color,transparent:true,opacity:.2,depthWrite:false,depthTest:false}));
+      // Solid, fainter line: dash patterns on million-unit segments shimmer at close zoom.
+      future.frustumCulled=false;future.position.set(...origin);future.renderOrder=2;
       const past=new THREE.Line(geometry,new THREE.LineBasicMaterial({color,transparent:true,opacity:.45,linewidth:1,depthWrite:false,depthTest:false}));
       past.frustumCulled=false;past.position.set(...origin);past.renderOrder=1;
       const scene=new Float64Array(points.length*3);
