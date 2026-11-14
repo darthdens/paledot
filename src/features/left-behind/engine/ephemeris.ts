@@ -33,13 +33,13 @@ export function positionsAt(time: number) {
   cachedDate = time;
   return cachedPositions;
 }
-const orbitCache = new Map<PlanetId, [number, number, number][]>();
+const orbitCache = new Map<PlanetId, {epoch:number;points:[number, number, number][]}>();
 export function sampleOrbitKm(id: PlanetId, epoch: number): [number, number, number][] {
   const cached = orbitCache.get(id);
-  if (cached) return cached;
+  if (cached?.epoch===epoch) return cached.points;
   const period = Astronomy.PlanetOrbitalPeriod(bodies[id]);
   const points = Array.from({ length: 360 }, (_, i) => helioPositionKm(id, new Date(epoch + period * DAY_MS * i / 359)));
-  orbitCache.set(id, points);
+  orbitCache.set(id, {epoch,points});
   return points;
 }
 const moonOrbitCache = new Map<number, [number,number,number][]>();

@@ -3,6 +3,7 @@ import { useEffect, useMemo, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { useCosmosStore } from '../store/useCosmosStore';
+import { appendTrailPoint } from '@/features/left-behind/lib/trailBuffer';
 
 interface OrbitalTrailProps {
   objectId: string;
@@ -34,6 +35,8 @@ export const OrbitalTrail = ({
   glow = false,
   minMovementSq = 0.01,
 }: OrbitalTrailProps) => {
+  const groupRef=useRef<THREE.Group>(null);
+  const localPoint=useMemo(()=>new THREE.Vector3(),[]);
   const geometryRef = useRef<THREE.BufferGeometry | null>(null);
   const glowGeometryRef = useRef<THREE.BufferGeometry | null>(null);
 
@@ -108,6 +111,7 @@ export const OrbitalTrail = ({
       material.dispose();
       if (glowLine) {
         glowLine.geometry.dispose();
+        glowLine.line.material.dispose();
       }
     };
   }, [geometry, material, glowLine]);
@@ -155,30 +159,24 @@ export const OrbitalTrail = ({
     }
     lastPosRef.current = [worldPos[0], worldPos[1], worldPos[2]];
 
-    // Update main trail
-    positions.copyWithin(0, 3);
-    const tail = (maxPoints - 1) * 3;
-    positions[tail] = worldPos[0];
-    positions[tail + 1] = worldPos[1];
-    positions[tail + 2] = worldPos[2];
-
-    countRef.current = Math.min(maxPoints, countRef.current + 1);
+    // World-position entries must be transformed back into this line's parent space.
+    localPoint.set(...worldPos);groupRef.current?.worldToLocal(localPoint);
+    const point:[number,number,number]=[localPoint.x,localPoint.y,localPoint.z];
+    const previousCount=countRef.current;
+    countRef.current=appendTrailPoint(positions,previousCount,point);
     geometryRef.current.setDrawRange(0, countRef.current);
     positionAttr.needsUpdate = true;
 
     // Update glow trail (same positions)
     if (glowLine && glowGeometryRef.current) {
-      glowLine.positions.copyWithin(0, 3);
-      glowLine.positions[tail] = worldPos[0];
-      glowLine.positions[tail + 1] = worldPos[1];
-      glowLine.positions[tail + 2] = worldPos[2];
+      appendTrailPoint(glowLine.positions,previousCount,point);
       glowGeometryRef.current.setDrawRange(0, countRef.current);
       glowLine.positionAttr.needsUpdate = true;
     }
   });
 
   return (
-    <group visible={enabled}>
+    <group ref={groupRef} visible={enabled}>
       <primitive object={line} />
       {glowLine && <primitive object={glowLine.line} />}
     </group>
