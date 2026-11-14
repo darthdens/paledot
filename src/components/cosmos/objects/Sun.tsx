@@ -122,10 +122,11 @@ export const PHOTO_VS = `
   varying vec3 vObj; varying vec3 vN; varying vec3 vV;
   void main() {
     vObj = normalize(position);
-    vec4 wp = modelMatrix * vec4(position, 1.0);
-    vN = normalize(mat3(modelMatrix) * normal);
-    vV = normalize(cameraPosition - wp.xyz);
-    gl_Position = projectionMatrix * viewMatrix * wp;
+    // View space (matrix built on the CPU in double precision) stays exact even light-years from the origin
+    vec4 mv = modelViewMatrix * vec4(position, 1.0);
+    vN = normalize(normalMatrix * normal);
+    vV = normalize(-mv.xyz);
+    gl_Position = projectionMatrix * mv;
   }
 `;
 
@@ -304,10 +305,10 @@ export const Sun = ({ position = [0, 0, 0], visualScale = UNIFIED_SCALE }: SunPr
           vertexShader={`
             varying vec3 vN; varying vec3 vV;
             void main() {
-              vec4 wp = modelMatrix * vec4(position, 1.0);
-              vN = normalize(mat3(modelMatrix) * normal);
-              vV = normalize(cameraPosition - wp.xyz);
-              gl_Position = projectionMatrix * viewMatrix * wp;
+              vec4 mv = modelViewMatrix * vec4(position, 1.0);
+              vN = normalize(normalMatrix * normal);
+              vV = normalize(-mv.xyz);
+              gl_Position = projectionMatrix * mv;
             }
           `}
           fragmentShader={`
