@@ -215,8 +215,8 @@ export const Sun = ({ position = [0, 0, 0], visualScale = UNIFIED_SCALE }: SunPr
     if (groupRef.current) {
       groupRef.current.getWorldPosition(worldPos.current);
       const d = state.camera.position.distanceTo(worldPos.current) / sunSize;
-      const far = THREE.MathUtils.smoothstep(d, 4, 30);
-      const sp = [[s1, 0.5], [s2, 0.25], [s3, 0.12]] as const;
+      const far = THREE.MathUtils.smoothstep(d, 2.5, 20);
+      const sp = [[s1, 0.9], [s2, 0.5], [s3, 0.28]] as const;
       for (const [r, o] of sp) if (r.current) { (r.current.material as THREE.SpriteMaterial).opacity = o * far; r.current.visible = far > 0.001; }
       if (coronaShellRef.current) coronaShellRef.current.visible = d > 1.4;
     }
@@ -315,7 +315,7 @@ export const Sun = ({ position = [0, 0, 0], visualScale = UNIFIED_SCALE }: SunPr
               // Back faces: |dot| ~1 at the centre, ~0 at the shell edge
               float r = 1.0 - abs(dot(vN, vV));
               // Brightest right at the solar limb, falling off steeply outwards
-              float a = pow(1.0 - r, 6.0) * 0.9;
+              float a = pow(1.0 - r, 4.0) * 1.3;
               gl_FragColor = vec4(vec3(1.0, 0.6, 0.2) * a, a);
             }
           `}
