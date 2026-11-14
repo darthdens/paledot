@@ -702,7 +702,7 @@ export const CosmosUI = () => {
 
             {/* Divider before sound */}
             {brand === 'paledot' && <Tooltip>
-              <TooltipTrigger asChild><Button data-lb-menu-trigger size="icon" variant="ghost" aria-label={lbName} aria-pressed={menuOpen} onClick={toggleLeftBehind} className={`hidden lg:inline-flex h-9 w-9 backdrop-blur-xs text-foreground ${menuOpen ? 'bg-foreground/25' : 'bg-foreground/10 hover:bg-foreground/20'}`}><Satellite className="h-5 w-5" /></Button></TooltipTrigger>
+              <TooltipTrigger asChild><Button data-lb-menu-trigger size="icon" variant="ghost" aria-label={lbName} aria-pressed={menuOpen} onClick={toggleLeftBehind} className={`h-8 w-8 sm:h-9 sm:w-9 backdrop-blur-xs text-foreground ${menuOpen ? 'bg-foreground/25' : 'bg-foreground/10 hover:bg-foreground/20'}`}><Satellite className="w-4 h-4 sm:w-5 sm:h-5" /></Button></TooltipTrigger>
               <TooltipContent variant="dark" side="bottom">{lbName}</TooltipContent>
             </Tooltip>}
             <div className="hidden lg:block w-px h-6 bg-white/20 mx-0.5" />
@@ -847,20 +847,6 @@ export const CosmosUI = () => {
           <div className="overflow-hidden">
             <div className="p-2 min-w-[180px] space-y-0.5">
               {/* Toggle options */}
-              {brand === 'paledot' && (
-                <button
-                  data-lb-menu-trigger
-                  aria-pressed={menuOpen}
-                  onClick={() => { toggleLeftBehind(); setShowMoreMenu(false); }}
-                  className="w-full flex items-center justify-between p-2 rounded-[4px] hover:bg-white/10 transition-colors"
-                >
-                  <div className="flex items-center gap-2">
-                    <Satellite className="w-4 h-4 text-white/70" />
-                    <span className="text-sm text-white/90">{lbName}</span>
-                  </div>
-                  {menuOpen && <div className="w-2 h-2 rounded-full bg-green-400" />}
-                </button>
-              )}
               <button
                 onClick={() => { toggleOrbits(); }}
                 className="w-full flex items-center justify-between p-2 rounded-[4px] hover:bg-white/10 transition-colors"
