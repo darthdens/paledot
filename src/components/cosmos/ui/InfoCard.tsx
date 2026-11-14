@@ -210,7 +210,7 @@ export const InfoCard = () => {
   const rotationPeriodHours = ROTATION_PERIODS_HOURS[selectedObject.id];
 
   const card = (
-    <div 
+    <div data-bottom-card
       className={`${isFullscreen ? 'fixed' : 'absolute'} bottom-2 left-2 right-2 sm:bottom-4 sm:left-4 sm:right-auto z-[10001] w-auto sm:w-72 md:w-80 bg-white/10 backdrop-blur-xs rounded-lg animate-scale-in origin-bottom-left overflow-hidden`}
       style={isFullscreen ? { 
         bottom: 'calc(0.5rem + env(safe-area-inset-bottom))',
