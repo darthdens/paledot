@@ -59,6 +59,7 @@ export const CameraController = () => {
         orbit.update();
       },
       simClock: useSimClock,
+      leftBehind: useLeftBehindStore,
       viewPin: (id: string, radii = 1) => {
         const orbit = controls as unknown as { target: THREE.Vector3; update: () => void } | null;
         const pin = landedPins.get(id), body = pin && celestialObjects.find(o => o.id === pin.body);
@@ -120,13 +121,22 @@ export const CameraController = () => {
   const surfaceViewNonce = useLeftBehindStore(state => state.surfaceViewNonce);
   useEffect(() => {
     if (!surfaceViewNonce || !hardwareId || !controls || isTouring) return;
+    let cancelled = false;
+    // Queued behind the follow flight's own data read, so that flight can't override the surface view.
+    void getHardware().then(() => { if (!cancelled) surfaceView(hardwareId); }).catch(() => {});
+    return () => { cancelled = true; };
+  }, [surfaceViewNonce]); // eslint-disable-line react-hooks/exhaustive-deps
+  const surfaceView = (hardwareId: string) => {
     const pin = landedPins.get(hardwareId);
     const body = pin && celestialObjects.find(o => o.id === pin.body);
     if (!pin || !body) return;
     const orbit = controls as unknown as { target: THREE.Vector3 };
-    const height = bodyRadius(body.size) * 0.25;
+    // Eye level beside the machine (a few of its own sizes away), so it stands on the horizon at true scale.
+    const span = trueSpanUnits.get(hardwareId) ?? 3e-6;
+    const height = span * 0.6;
     const normal = new THREE.Vector3(...pin.normal);
     const side = new THREE.Vector3(0, 1, 0).cross(normal); if (side.lengthSq() < 1e-6) side.set(1, 0, 0); side.normalize();
+    side.multiplyScalar(span * 3 / (height * 1.5));
     startPosition.current.copy(camera.position); startTarget.current.copy(orbit.target);
     endTarget.current.set(...pin.world); cameraOffset.current.copy(normal).multiplyScalar(height).addScaledVector(side, height * 1.5);
     endPosition.current.copy(endTarget.current).add(cameraOffset.current);
@@ -135,7 +145,7 @@ export const CameraController = () => {
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
       camera.position.copy(endPosition.current); orbit.target.copy(endTarget.current); isAnimating.current = false;
     }
-  }, [surfaceViewNonce]); // eslint-disable-line react-hooks/exhaustive-deps
+  };
 
   // Handle tour camera target changes
   useEffect(() => {

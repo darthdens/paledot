@@ -99,7 +99,8 @@ function DescentArc({ trajId }: { trajId: string }) {
   const tmp = useMemo(() => new THREE.Vector3(), []);
   useFrame(() => {
     const pin = landedPins.get(trajId);
-    line.visible = !!pin && !!end && useCosmosStore.getState().showTrails;
+    // Hidden while following this machine: up close the arc slices through the view.
+    line.visible = !!pin && !!end && useCosmosStore.getState().showTrails && useLeftBehindStore.getState().followTargetId !== trajId;
     if (labelEl.current) labelEl.current.hidden = !line.visible || !selected;
     if (!pin || !end) return;
     // Rebased on the pin so the metre-scale end stays steady.
