@@ -125,10 +125,10 @@ export const ProximaCentauri = ({ visualScale = 0.001 }: ProximaCentauriProps) =
           vertexShader={`
             varying vec3 vN; varying vec3 vV;
             void main() {
-              vec4 wp = modelMatrix * vec4(position, 1.0);
-              vN = normalize(mat3(modelMatrix) * normal);
-              vV = normalize(cameraPosition - wp.xyz);
-              gl_Position = projectionMatrix * viewMatrix * wp;
+              vec4 mv = modelViewMatrix * vec4(position, 1.0);
+              vN = normalize(normalMatrix * normal);
+              vV = normalize(-mv.xyz);
+              gl_Position = projectionMatrix * mv;
             }
           `}
           fragmentShader={`
