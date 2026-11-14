@@ -119,7 +119,8 @@ function CrowdChip({ body }: { body: Body }) {
   const { language } = useLanguage(); const copy = machineCopy[language];
   const tmp = useMemo(() => ({ v: new THREE.Vector3(), list: [] as THREE.Vector2[] }), []);
   useFrame(({ camera, size }) => {
-    const pins = [...landedPins.values()].filter(p => p.body === body);
+    const occ = new THREE.Vector3();
+    const pins = [...landedPins.values()].filter(p => p.body === body && !isOccluded(camera.position, occ.set(...p.world)));
     const scale = useCosmosStore.getState().currentScale;
     if (scale !== 'earth' && scale !== 'solarSystem') { crowded[body] = false; if (el.current) el.current.hidden = true; return; }
     let close = false; tmp.list.length = 0;
