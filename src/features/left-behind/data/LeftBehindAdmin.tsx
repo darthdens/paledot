@@ -4,10 +4,9 @@ import { useServerFn } from '@tanstack/react-start';
 import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/i18n/LanguageContext';
 import { supabase } from '@/integrations/supabase/client';
-import hardware from '../../../../public/left-behind/hardware.json';
 import { leftBehindData } from './data.functions';
 import { clearDataCache } from './dataClient';
-import type { Photo, Trajectory } from './types';
+import type { Machine, Photo, Trajectory } from './types';
 
 const words = {
   en: ['Left Behind · data', 'Rebuild data', 'Building…', 'Item', 'Source', 'Points', 'Result', 'Administrator sign-in required', 'Data unavailable: check public storage and NASA sources', 'Saved'],
@@ -36,6 +35,9 @@ export default function LeftBehindAdmin() {
       const { data } = await supabase.auth.getSession();
       if (!data.session) { setRows([{ id: '—', source: '—', points: 0, result: label(7) }]); return; }
       const headers = { Authorization: `Bearer ${data.session.access_token}` };
+      const response = await fetch('/left-behind/hardware.json');
+      if (!response.ok) throw new Error('Hardware source unavailable');
+      const hardware: { machines: Machine[] } = await response.json();
       const jobs = [...hardware.machines.flatMap(machine => machine.trajectories.map(trajectory => ({ action: 'trajectory' as const, id: trajectory.id }))), { action: 'photos' as const }];
       for (const job of jobs) {
         const id = 'id' in job ? job.id : 'photos/manifest.json';

@@ -1,13 +1,11 @@
 // Left Behind · built during NASA Space Apps Challenge 2026 (14–15 Nov 2026) · AI-assisted (Lovable, Claude)
 import { createServerFn } from '@tanstack/react-start';
-import { getRequestHeader } from '@tanstack/react-start/server';
+import { getRequestHeader, getRequestUrl } from '@tanstack/react-start/server';
 import { createClient } from '@supabase/supabase-js';
-import hardware from '../../../../public/left-behind/hardware.json';
 import { buildPhotos, buildTrajectory } from './nasa';
 import type { Machine, Photo, Trajectory } from './types';
 
-const machines: Machine[] = hardware.machines;
-const ids = machines.flatMap(machine => machine.trajectories.map(trajectory => trajectory.id));
+const ids = ['apollo-11', 'apollo-15', 'apollo-16', 'apollo-17', 'viking-1', 'opportunity', 'ingenuity', 'voyager-1', 'voyager-2'];
 type RequestData = { action: 'trajectory' | 'photos'; id?: string; rebuild?: boolean };
 
 export const leftBehindData = createServerFn({ method: 'POST' })
@@ -42,6 +40,10 @@ export const leftBehindData = createServerFn({ method: 'POST' })
     const { data: bucket, error: bucketError } = await supabaseAdmin.storage.getBucket('left-behind');
     if (bucketError || !bucket?.public) throw new Error('Public Left Behind storage must be enabled before building data');
     if (!data.rebuild && read.status !== 400 && read.status !== 404) throw new Error('Storage read failed');
+    const hardwareResponse = await fetch(new URL('/left-behind/hardware.json', getRequestUrl()), { signal: AbortSignal.timeout(15000) });
+    if (!hardwareResponse.ok) throw new Error('Hardware source unavailable');
+    const hardware: { machines: Machine[] } = await hardwareResponse.json();
+    const machines = hardware.machines;
     const machine = machines.find(machine => machine.trajectories.some(trajectory => trajectory.id === data.id));
     const settings = machine?.trajectories.find(trajectory => trajectory.id === data.id);
     const result = data.action === 'photos' ? await buildPhotos(machines) : machine && settings ? await buildTrajectory(settings, machine) : null;
