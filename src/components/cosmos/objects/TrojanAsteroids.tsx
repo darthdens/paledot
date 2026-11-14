@@ -177,7 +177,7 @@ export const TrojanAsteroids = ({
   };
   
   useFrame((_, delta) => {
-    const position = getEphemeris()?.positionsAt(useSimClock.getState().simDate).jupiter;
+    const position = getEphemeris()?.positionsAt(useSimClock.getState().simDate)['jupiter'];
     if (!position) return;
     const [x,,z] = eclipticKmToScene(...position);
     const jupiterAngle = Math.atan2(z,x);

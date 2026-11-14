@@ -1,3 +1,4 @@
+import { useSimClock } from '@/features/left-behind/state/useSimClock';
 import { bodyRadius, UNIFIED_SCALE } from '@/features/left-behind/lib/bodyScale';
 import { useRef, useMemo } from 'react';
 import { useFrame } from '@react-three/fiber';
@@ -130,10 +131,11 @@ export const Sun = ({ position = [0, 0, 0], visualScale = UNIFIED_SCALE }: SunPr
   const setHoveredObject = useCosmosStore(state => state.setHoveredObject);
   const setObjectWorldPosition = useCosmosStore(state => state.setObjectWorldPosition);
 
-  useFrame((state) => {
+  useFrame((state, delta) => {
     const time = state.clock.getElapsedTime();
     if (sunRef.current) {
-      sunRef.current.rotation.y += 0.001;
+      const clock = useSimClock.getState();
+      sunRef.current.rotation.y += (2 * Math.PI / (609.12 * 3600)) * delta * (clock.isPlaying ? Math.min(clock.rate,86400) : 0);
     }
     if (coronaRef.current) {
       coronaRef.current.scale.setScalar(1 + Math.sin(time * 2) * 0.02);

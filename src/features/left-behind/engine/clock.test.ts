@@ -17,7 +17,7 @@ it('offers real time, hour, day, month and year per second', () => {
 it('clamps scrubbing to 1 January 1957 through 31 December 2100', () => {
   expect(CLOCK_START).toBe(Date.UTC(1957,0,1));
   expect(CLOCK_END).toBe(Date.UTC(2100,11,31,23,59,59,999));
-  useSimClock.getState().setSimDate(0); expect(useSimClock.getState().simDate).toBe(CLOCK_START);
+  useSimClock.getState().setSimDate(Date.UTC(1956,0,1)); expect(useSimClock.getState().simDate).toBe(CLOCK_START);
   useSimClock.getState().setSimDate(Date.UTC(2102,0,1)); expect(useSimClock.getState().simDate).toBe(CLOCK_END);
 });
 it('paused clock never advances', () => {

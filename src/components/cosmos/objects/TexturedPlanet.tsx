@@ -328,8 +328,6 @@ export const TexturedPlanet = ({
   // Throttle world-position writes using real frame time so it still works when timeSpeed is 0 (tour pauses time).
   const worldPosUpdateAccumulator = useRef(0);
   const rotationAngle = useRef(0);
-  const simTime = useRef(0);
-  const simTimeInitialized = useRef(false);
   
   const setSelectedObject = useCosmosStore(state => state.setSelectedObject);
   const setHoveredObject = useCosmosStore(state => state.setHoveredObject);
@@ -514,8 +512,8 @@ export const TexturedPlanet = ({
       const angle = clock.simDate / 86400000 * Math.PI * 2 / (object.orbitPeriodDays || 365.25);
       groupRef.current.position.set(Math.cos(angle)*orbitRadius, 0, Math.sin(angle)*orbitRadius);
     }
-    if (object.id === 'moon' && planetRef.current && positions?.earth) {
-      const earth = eclipticKmToScene(...positions.earth);
+    if (object.id === 'moon' && planetRef.current && positions?.['earth']) {
+      const earth = eclipticKmToScene(...positions['earth']);
       // SphereGeometry's u=0.5 (0° longitude) is +X; align it toward Earth.
       planetRef.current.rotation.y = Math.atan2(-(earth[2]-groupRef.current.position.z), earth[0]-groupRef.current.position.x);
     }

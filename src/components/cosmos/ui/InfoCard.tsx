@@ -192,8 +192,10 @@ export const InfoCard = () => {
 
   const ephemeris = getEphemeris();
   const positions = ephemeris?.positionsAt(simDate);
-  const calculatedDistance = positions?.[selectedObject.id] && positions.earth
-    ? Math.hypot(...positions[selectedObject.id].map((v,i) => v - (positions.earth?.[i] ?? 0))) : null;
+  const bodyPosition = positions?.[selectedObject.id];
+  const earthPosition = positions?.['earth'];
+  const calculatedDistance = bodyPosition && earthPosition
+    ? Math.hypot(bodyPosition[0]-earthPosition[0], bodyPosition[1]-earthPosition[1], bodyPosition[2]-earthPosition[2]) : null;
   const calculated = { en: 'Calculated', fr: 'Calculé', es: 'Calculado', pt: 'Calculado', it: 'Calcolato', de: 'Berechnet' };
   const objectType = t[selectedObject.type as keyof typeof t] || selectedObject.type;
   const facts = (selectedObject.facts ? tr(selectedObject.facts) : undefined) || [];
