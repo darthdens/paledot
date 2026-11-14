@@ -81,7 +81,7 @@ export const CameraController = () => {
             radii[node.name.slice(5)] = node.geometry.parameters.radius;
           }
         });
-        return { camera: camera.position.toArray(), target: orbit?.target?.toArray(), near: camera.near, radii, selected: useCosmosStore.getState().selectedObject?.id };
+        return { camera: camera.position.toArray(), target: orbit?.target?.toArray(), near: camera.near, radii, selected: useCosmosStore.getState().selectedObject?.id, animating: isAnimating.current, trigger: animationTriggerId.current, progress: animationProgress.current };
       },
     };
     return () => { delete host.__cosmosCheck; };
