@@ -10,7 +10,7 @@ import { useSimClock } from '../state/useSimClock';
 import { useLeftBehindStore } from '../state/useLeftBehindStore';
 import { JumpCategory } from './JumpCategory';
 export function HardwareJumpChoices({expanded,onToggle}:{expanded:boolean;onToggle:()=>void}){
-  const {language,tr}=useLanguage();const copy=machineCopy[language];
+  const {language}=useLanguage();const copy=machineCopy[language];
   const second=useSimClock(s=>Math.floor(s.simDate/1000));
   const selected=useLeftBehindStore(s=>s.selectedHardwareId);
   const [ids,setIds]=useState<string[]>([]);
