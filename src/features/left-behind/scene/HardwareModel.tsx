@@ -6,8 +6,8 @@ import * as THREE from 'three';
 import { useCosmosStore } from '@/components/cosmos/store/useCosmosStore';
 import { loadTrueSpans, trueSpanUnits } from '../lib/nasaModels';
 
-// Screen-size marker built from the real NASA model: metre-scale hardware cannot be drawn at true
-// scale beside 1 unit = 1000 km bodies, so it follows the "markers not to scale" rule.
+// True-scale NASA model; the HTML ring marker in HardwareTrack keeps it findable from afar.
+// (Only that ring is screen-size, per "markers not to scale".)
 const MARKER_PX = 40, SELECTED_PX = 76;
 const PARENT_RADIUS: Record<string, number> = { moon: 1.7374, mars: 3.3895 };
 
@@ -69,7 +69,6 @@ export function HardwareModel({ id, url, selected, parent }: { id: string; url: 
         }
       }
     }
-    if (false) node.rotation.y += Math.min(delta, 0.05) * 0.15;
   }, -0.2);
   return <group ref={group} renderOrder={3}><primitive object={model} /></group>;
 }
