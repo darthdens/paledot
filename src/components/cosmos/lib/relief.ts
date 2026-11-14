@@ -3,14 +3,17 @@ import * as THREE from 'three';
 import earthHeight from '@/assets/relief/earth-height.webp.asset.json';
 import moonHeight from '@/assets/relief/moon-height.webp.asset.json';
 import marsHeight from '@/assets/relief/mars-height.webp.asset.json';
+import mercuryHeight from '@/assets/relief/mercury-height.webp.asset.json';
+import ceresHeight from '@/assets/relief/ceres-height.webp.asset.json';
 import meta from '@/assets/relief/relief.json';
 
 /**
- * True-scale global relief (real elevation data, metres): Moon LRO LOLA, Mars MGS MOLA, Earth NOAA ETOPO1.
+ * True-scale global relief (real elevation data, metres): Moon LRO LOLA, Mars MGS MOLA, Earth NOAA ETOPO1,
+ * Mercury MESSENGER (USGS DEM), Ceres Dawn (DLR HAMO DTM).
  * Built by scripts/relief/build_globals.py. Loaded once the camera nears the body, never at boot.
  * Encoding: equirectangular, north up, lon -180..180; (metres + 32768) split into R (high) and G (low).
  */
-const URLS: Record<string, string> = { earth: earthHeight.url, moon: moonHeight.url, mars: marsHeight.url };
+const URLS: Record<string, string> = { earth: earthHeight.url, moon: moonHeight.url, mars: marsHeight.url, mercury: mercuryHeight.url, ceres: ceresHeight.url };
 export const METRE = 1e-6; // scene units per metre (1 unit = 1000 km)
 export const RELIEF_NEAR_RADII = 60;
 
