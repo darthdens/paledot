@@ -1,0 +1,865 @@
+{
+  "_note": "Left Behind data, compiled 14 Nov 2026 during NASA Space Apps Challenge 2026 (AI-assisted research with Claude). Each fact links to its source; 'verify': true marks facts whose source page should be opened and checked once.",
+  "machines": [
+    {
+      "id": "apollo-11",
+      "name": "Apollo 11 \"Eagle\" landing site",
+      "kind": "Landing site",
+      "place": "Moon",
+      "body": "moon",
+      "launchDate": "1969-07-16T13:32:00Z",
+      "landingDate": "1969-07-20T20:17:00Z",
+      "sites": [
+        {
+          "label": "Tranquility Base (Lunar Module descent stage)",
+          "lat": 0.67416,
+          "lon": 23.47314,
+          "kind": "landing",
+          "date": "1969-07-20T20:17:00Z"
+        },
+        {
+          "label": "Laser Ranging Retroreflector",
+          "lat": 0.67345,
+          "lon": 23.47307,
+          "kind": "final",
+          "date": "1969-07-21T03:00:00Z"
+        }
+      ],
+      "status": {
+        "type": "in-use",
+        "since": null,
+        "text": "Still in use: scientists still bounce lasers off its reflector"
+      },
+      "followDistanceKm": 20000,
+      "trajectories": [
+        {
+          "id": "apollo-11",
+          "horizonsTarget": null,
+          "lookup": null,
+          "fallback": "simplified",
+          "center": "earth",
+          "arrivalBody": "moon"
+        }
+      ],
+      "keyDates": [
+        {
+          "label": "Launch",
+          "date": "1969-07-16",
+          "factId": "a11-dates"
+        },
+        {
+          "label": "Landing",
+          "date": "1969-07-20",
+          "factId": "a11-dates"
+        }
+      ],
+      "leftBehind": [
+        "Lunar Module descent stage",
+        "Laser Ranging Retroreflector",
+        "Seismometer",
+        "Flag"
+      ],
+      "whereNow": "Tranquility Base, in the Sea of Tranquility on the Moon's near side.",
+      "photos": [
+        {
+          "nasaId": "as11-40-5903"
+        },
+        {
+          "query": "Apollo 11 laser ranging retroreflector"
+        }
+      ],
+      "facts": [
+        {
+          "id": "a11-dates",
+          "text": "Apollo 11 launched on 16 July 1969 and landed in the Sea of Tranquility on 20 July 1969.",
+          "sourceUrl": "https://nssdc.gsfc.nasa.gov/planetary/lunar/lunar_artifact_impacts.html"
+        },
+        {
+          "id": "a11-coords",
+          "text": "The Lunar Module landed at about 0.674° N, 23.473° E; the laser reflector stands a few dozen metres away.",
+          "sourceUrl": "https://nssdc.gsfc.nasa.gov/planetary/lunar/lunar_sites.html"
+        },
+        {
+          "id": "a11-llr",
+          "text": "The laser reflectors left by Apollo astronauts began lunar laser ranging, an experiment that is still producing results today.",
+          "sourceUrl": "https://jpl.nasa.gov/news/the-apollo-experiment-that-keeps-on-giving/"
+        },
+        {
+          "id": "a11-recede",
+          "text": "Lunar laser ranging shows the Moon is moving away from Earth by about 3.8 cm (1.5 inches) a year.",
+          "sourceUrl": "https://jpl.nasa.gov/news/the-apollo-experiment-that-keeps-on-giving/"
+        }
+      ],
+      "sources": [
+        {
+          "title": "NSSDCA: Apollo Landing Site Coordinates",
+          "url": "https://nssdc.gsfc.nasa.gov/planetary/lunar/lunar_sites.html"
+        },
+        {
+          "title": "JPL: The Apollo Experiment That Keeps on Giving",
+          "url": "https://jpl.nasa.gov/news/the-apollo-experiment-that-keeps-on-giving/"
+        }
+      ]
+    },
+    {
+      "id": "lunar-rovers",
+      "name": "Lunar Roving Vehicles",
+      "kind": "Rover",
+      "place": "Moon",
+      "body": "moon",
+      "launchDate": "1971-07-26T13:34:00Z",
+      "landingDate": "1971-07-30T22:16:00Z",
+      "sites": [
+        {
+          "label": "Apollo 15 rover (Hadley-Apennine)",
+          "lat": 26.13174,
+          "lon": 3.63803,
+          "kind": "final",
+          "date": "1971-07-30T22:16:00Z"
+        },
+        {
+          "label": "Apollo 16 rover (Descartes Highlands)",
+          "lat": -8.9729,
+          "lon": 15.5037,
+          "kind": "final",
+          "date": "1972-04-21T02:23:00Z"
+        },
+        {
+          "label": "Apollo 17 rover (Taurus-Littrow)",
+          "lat": 20.1896,
+          "lon": 30.7769,
+          "kind": "final",
+          "date": "1972-12-11T19:55:00Z"
+        }
+      ],
+      "status": {
+        "type": "silent",
+        "since": "1972-12",
+        "text": "Silent; all three are still parked on the Moon"
+      },
+      "followDistanceKm": 20000,
+      "trajectories": [
+        {
+          "id": "apollo-15",
+          "horizonsTarget": null,
+          "lookup": null,
+          "fallback": "simplified",
+          "center": "earth",
+          "arrivalBody": "moon",
+          "launch": "1971-07-26T13:34:00Z",
+          "arrival": "1971-07-30T22:16:00Z"
+        },
+        {
+          "id": "apollo-16",
+          "horizonsTarget": null,
+          "lookup": null,
+          "fallback": "simplified",
+          "center": "earth",
+          "arrivalBody": "moon",
+          "launch": "1972-04-16T17:54:00Z",
+          "arrival": "1972-04-21T02:23:00Z"
+        },
+        {
+          "id": "apollo-17",
+          "horizonsTarget": null,
+          "lookup": null,
+          "fallback": "simplified",
+          "center": "earth",
+          "arrivalBody": "moon",
+          "launch": "1972-12-07T05:33:00Z",
+          "arrival": "1972-12-11T19:55:00Z"
+        }
+      ],
+      "keyDates": [
+        {
+          "label": "Apollo 15 landing",
+          "date": "1971-07-30",
+          "factId": "lrv-dates"
+        },
+        {
+          "label": "Apollo 16 landing",
+          "date": "1972-04-21",
+          "factId": "lrv-dates"
+        },
+        {
+          "label": "Apollo 17 landing",
+          "date": "1972-12-11",
+          "factId": "lrv-dates"
+        }
+      ],
+      "leftBehind": [
+        "Three Lunar Roving Vehicles",
+        "Three Lunar Module descent stages"
+      ],
+      "whereNow": "Each rover is parked near its landing site, where orbiter cameras have photographed them.",
+      "photos": [
+        {
+          "query": "Apollo 15 lunar roving vehicle"
+        },
+        {
+          "query": "Apollo 17 lunar roving vehicle"
+        }
+      ],
+      "facts": [
+        {
+          "id": "lrv-dates",
+          "text": "Apollo 15, 16 and 17 landed in 1971 and 1972 at Hadley-Apennine, Descartes and Taurus-Littrow, each carrying a Lunar Roving Vehicle.",
+          "sourceUrl": "https://nssdc.gsfc.nasa.gov/planetary/lunar/lunar_artifact_impacts.html"
+        },
+        {
+          "id": "lrv-coords",
+          "text": "The Lunar Reconnaissance Orbiter team measured where each rover was finally parked: about 26.132° N, 3.638° E (Apollo 15); 8.973° S, 15.504° E (Apollo 16); 20.190° N, 30.777° E (Apollo 17).",
+          "sourceUrl": "https://www.lroc.asu.edu/data/support/downloads/2016_LROC_Coordinates_of_Human_Features.pdf"
+        }
+      ],
+      "sources": [
+        {
+          "title": "LROC: 2016 Coordinates of Human Features",
+          "url": "https://www.lroc.asu.edu/data/support/downloads/2016_LROC_Coordinates_of_Human_Features.pdf"
+        },
+        {
+          "title": "NSSDCA: Lunar artifacts and landings",
+          "url": "https://nssdc.gsfc.nasa.gov/planetary/lunar/lunar_artifact_impacts.html"
+        }
+      ],
+      "verifyNotes": "Launch and landing times (UTC) are from the standard Apollo mission records; check them against NASA's Apollo pages if you can."
+    },
+    {
+      "id": "viking-1",
+      "name": "Viking 1 lander",
+      "kind": "Lander",
+      "place": "Mars",
+      "body": "mars",
+      "launchDate": "1975-08-20T21:22:00Z",
+      "landingDate": "1976-07-20T11:53:00Z",
+      "sites": [
+        {
+          "label": "Chryse Planitia (Thomas Mutch Memorial Station)",
+          "lat": 22.27,
+          "lon": 312.05,
+          "kind": "landing",
+          "date": "1976-07-20T11:53:00Z"
+        }
+      ],
+      "status": {
+        "type": "silent",
+        "since": "1982-11",
+        "text": "Silent since November 1982"
+      },
+      "followDistanceKm": 30000,
+      "trajectories": [
+        {
+          "id": "viking-1",
+          "horizonsTarget": null,
+          "lookup": "Viking 1",
+          "fallback": "simplified",
+          "center": "sun",
+          "arrivalBody": "mars",
+          "launch": "1975-08-20T21:22:00Z",
+          "arrival": "1976-06-19T00:00:00Z"
+        }
+      ],
+      "keyDates": [
+        {
+          "label": "Launch",
+          "date": "1975-08-20",
+          "factId": "v1l-dates"
+        },
+        {
+          "label": "Mars orbit",
+          "date": "1976-06-19",
+          "factId": "v1l-dates"
+        },
+        {
+          "label": "Landing",
+          "date": "1976-07-20",
+          "factId": "v1l-dates"
+        },
+        {
+          "label": "Last contact",
+          "date": "1982-11-13",
+          "factId": "v1l-end"
+        }
+      ],
+      "leftBehind": [
+        "Viking 1 lander"
+      ],
+      "whereNow": "Chryse Planitia on Mars, where the HiRISE camera has photographed it from orbit.",
+      "photos": [
+        {
+          "nasaId": "PIA00563"
+        },
+        {
+          "query": "Viking 1 lander first image surface of Mars"
+        }
+      ],
+      "facts": [
+        {
+          "id": "v1l-dates",
+          "text": "Viking 1 launched on 20 August 1975, reached Mars orbit on 19 June 1976, and its lander touched down on 20 July 1976.",
+          "sourceUrl": "https://nssdc.gsfc.nasa.gov/planetary/viking.html"
+        },
+        {
+          "id": "v1l-coords",
+          "text": "The lander touched down in Chryse Planitia at 22.27° N, 312.05° E (planetocentric).",
+          "sourceUrl": "https://nssdc.gsfc.nasa.gov/planetary/viking.html"
+        },
+        {
+          "id": "v1l-first",
+          "text": "Viking 1 took the first photograph ever taken on the surface of Mars, minutes after landing.",
+          "sourceUrl": "https://science.nasa.gov/mission/viking"
+        },
+        {
+          "id": "v1l-end",
+          "text": "The Viking 1 lander ended communications on 13 November 1982, after the two landers had sent back more than 1,400 images.",
+          "sourceUrl": "https://nssdc.gsfc.nasa.gov/planetary/viking.html"
+        },
+        {
+          "id": "v1l-hirise",
+          "text": "NASA's HiRISE camera on Mars Reconnaissance Orbiter has photographed the Viking 1 lander on the surface.",
+          "sourceUrl": "https://www.uahirise.org/PSP_001521_2025"
+        }
+      ],
+      "sources": [
+        {
+          "title": "NSSDCA: Viking Mission to Mars",
+          "url": "https://nssdc.gsfc.nasa.gov/planetary/viking.html"
+        },
+        {
+          "title": "NASA: Viking",
+          "url": "https://science.nasa.gov/mission/viking"
+        },
+        {
+          "title": "HiRISE: Viking Lander 1",
+          "url": "https://www.uahirise.org/PSP_001521_2025"
+        }
+      ]
+    },
+    {
+      "id": "opportunity",
+      "name": "Opportunity rover",
+      "kind": "Rover",
+      "place": "Mars",
+      "body": "mars",
+      "launchDate": "2003-07-08T03:18:00Z",
+      "landingDate": "2004-01-25T05:05:00Z",
+      "sites": [
+        {
+          "label": "Eagle crater, Meridiani Planum (landing)",
+          "lat": -1.9462,
+          "lon": 354.4734,
+          "kind": "landing",
+          "date": "2004-01-25T05:05:00Z"
+        },
+        {
+          "label": "Perseverance Valley, Endeavour crater rim (final location)",
+          "lat": null,
+          "lon": null,
+          "kind": "final",
+          "date": "2018-06-10T00:00:00Z"
+        }
+      ],
+      "status": {
+        "type": "silent",
+        "since": "2018-06",
+        "text": "Silent since June 2018"
+      },
+      "followDistanceKm": 30000,
+      "trajectories": [
+        {
+          "id": "opportunity",
+          "horizonsTarget": null,
+          "lookup": "MER-1",
+          "fallback": "simplified",
+          "center": "sun",
+          "arrivalBody": "mars",
+          "launch": "2003-07-08T03:18:00Z",
+          "arrival": "2004-01-25T05:05:00Z"
+        }
+      ],
+      "keyDates": [
+        {
+          "label": "Launch",
+          "date": "2003-07-07",
+          "factId": "mer-launch"
+        },
+        {
+          "label": "Landing",
+          "date": "2004-01-25",
+          "factId": "mer-coords"
+        },
+        {
+          "label": "Last contact",
+          "date": "2018-06-10",
+          "factId": "mer-end"
+        },
+        {
+          "label": "Mission declared complete",
+          "date": "2019-02-13",
+          "factId": "mer-end"
+        }
+      ],
+      "leftBehind": [
+        "Opportunity rover",
+        "Landing platform",
+        "Heat shield",
+        "Parachute"
+      ],
+      "whereNow": "Perseverance Valley, on the western rim of Endeavour crater.",
+      "photos": [
+        {
+          "query": "Opportunity rover self-portrait"
+        },
+        {
+          "query": "Opportunity rover Perseverance Valley"
+        }
+      ],
+      "facts": [
+        {
+          "id": "mer-launch",
+          "text": "Opportunity launched from Cape Canaveral on 7 July 2003 (US time).",
+          "sourceUrl": "https://science.nasa.gov/missions/mer/nasas-opportunity-rover-mission-on-mars-comes-to-end/",
+          "verify": true
+        },
+        {
+          "id": "mer-coords",
+          "text": "Opportunity landed in a small crater, Eagle, in Meridiani Planum, at 1.9462° S, 354.4734° E.",
+          "sourceUrl": "https://pds-geosciences.wustl.edu/mer/urn-nasa-pds-mer_documentation/document/mission/mer_mission.txt"
+        },
+        {
+          "id": "mer-design",
+          "text": "It was designed to last 90 Martian days and travel about 1,000 metres; it drove more than 45 kilometres.",
+          "sourceUrl": "https://science.nasa.gov/missions/mer/nasas-opportunity-rover-mission-on-mars-comes-to-end/"
+        },
+        {
+          "id": "mer-end",
+          "text": "Its final communication was received on 10 June 2018, during a planet-wide dust storm; NASA declared the mission complete on 13 February 2019.",
+          "sourceUrl": "https://science.nasa.gov/missions/mer/nasas-opportunity-rover-mission-on-mars-comes-to-end/"
+        },
+        {
+          "id": "mer-final",
+          "text": "Its final resting place is Perseverance Valley, on the western rim of Endeavour crater.",
+          "sourceUrl": "https://science.nasa.gov/missions/mer/nasas-opportunity-rover-mission-on-mars-comes-to-end/"
+        }
+      ],
+      "sources": [
+        {
+          "title": "NASA: Opportunity rover mission on Mars comes to end",
+          "url": "https://science.nasa.gov/missions/mer/nasas-opportunity-rover-mission-on-mars-comes-to-end/"
+        },
+        {
+          "title": "NASA PDS: MER mission description",
+          "url": "https://pds-geosciences.wustl.edu/mer/urn-nasa-pds-mer_documentation/document/mission/mer_mission.txt"
+        }
+      ],
+      "verifyNotes": "No verified coordinates were found for the final location, so that site has no pin."
+    },
+    {
+      "id": "ingenuity",
+      "name": "Ingenuity helicopter",
+      "kind": "Helicopter",
+      "place": "Mars",
+      "body": "mars",
+      "launchDate": "2020-07-30T11:50:00Z",
+      "landingDate": "2021-02-18T20:55:00Z",
+      "sites": [
+        {
+          "label": "Octavia E. Butler Landing, Jezero crater (landed with Perseverance)",
+          "lat": 18.4447,
+          "lon": 77.4508,
+          "kind": "landing",
+          "date": "2021-02-18T20:55:00Z"
+        },
+        {
+          "label": "Final airfield (flight 72)",
+          "lat": null,
+          "lon": null,
+          "kind": "final",
+          "date": "2024-01-18T00:00:00Z"
+        }
+      ],
+      "status": {
+        "type": "silent",
+        "since": "2024-01",
+        "text": "Mission ended January 2024"
+      },
+      "followDistanceKm": 30000,
+      "trajectories": [
+        {
+          "id": "ingenuity",
+          "horizonsTarget": "-168",
+          "lookup": "Mars 2020",
+          "fallback": "simplified",
+          "center": "sun",
+          "arrivalBody": "mars",
+          "launch": "2020-07-30T11:50:00Z",
+          "arrival": "2021-02-18T20:55:00Z"
+        }
+      ],
+      "keyDates": [
+        {
+          "label": "Launch (inside Mars 2020)",
+          "date": "2020-07-30",
+          "factId": "ing-launch"
+        },
+        {
+          "label": "Landing",
+          "date": "2021-02-18",
+          "factId": "ing-landing"
+        },
+        {
+          "label": "First flight",
+          "date": "2021-04-19",
+          "factId": "ing-first"
+        },
+        {
+          "label": "Last flight (72nd)",
+          "date": "2024-01-18",
+          "factId": "ing-end"
+        }
+      ],
+      "leftBehind": [
+        "Ingenuity helicopter (Perseverance itself is still working)"
+      ],
+      "whereNow": "Its final airfield in Jezero crater, where it landed after its 72nd flight.",
+      "photos": [
+        {
+          "query": "Ingenuity helicopter Perseverance Mastcam-Z"
+        },
+        {
+          "query": "Ingenuity Mars helicopter first flight"
+        }
+      ],
+      "facts": [
+        {
+          "id": "ing-launch",
+          "text": "Ingenuity travelled to Mars attached to the belly of the Perseverance rover, launched on 30 July 2020.",
+          "sourceUrl": "https://phys.org/news/2024-01-years-mars-nasa-ingenuity-helicopter.html",
+          "verify": true
+        },
+        {
+          "id": "ing-landing",
+          "text": "Ingenuity landed on Mars on 18 February 2021, attached to Perseverance, in Jezero crater.",
+          "sourceUrl": "https://phys.org/news/2024-01-years-mars-nasa-ingenuity-helicopter.html"
+        },
+        {
+          "id": "ing-first",
+          "text": "On 19 April 2021 it became the first aircraft to make a powered, controlled flight on another planet.",
+          "sourceUrl": "https://phys.org/news/2024-01-years-mars-nasa-ingenuity-helicopter.html"
+        },
+        {
+          "id": "ing-design",
+          "text": "It was designed as a technology demonstration for up to five test flights over 30 days.",
+          "sourceUrl": "https://phys.org/news/2024-01-years-mars-nasa-ingenuity-helicopter.html"
+        },
+        {
+          "id": "ing-record",
+          "text": "It made 72 flights, flew more than 14 times farther than planned and logged more than two hours of flight time.",
+          "sourceUrl": "https://phys.org/news/2024-01-years-mars-nasa-ingenuity-helicopter.html"
+        },
+        {
+          "id": "ing-end",
+          "text": "After its 72nd flight on 18 January 2024, images showed rotor-blade damage, and NASA ended the mission on 25 January 2024.",
+          "sourceUrl": "https://phys.org/news/2024-01-years-mars-nasa-ingenuity-helicopter.html"
+        }
+      ],
+      "sources": [
+        {
+          "title": "NASA/JPL release: After three years on Mars, NASA's Ingenuity helicopter mission ends (via Phys.org)",
+          "url": "https://phys.org/news/2024-01-years-mars-nasa-ingenuity-helicopter.html"
+        }
+      ],
+      "verifyNotes": "No verified coordinates were found for the final airfield, so that site has no pin."
+    },
+    {
+      "id": "voyager-2",
+      "name": "Voyager 2",
+      "kind": "Spacecraft",
+      "place": "Interstellar space",
+      "body": null,
+      "launchDate": "1977-08-20T14:29:00Z",
+      "landingDate": null,
+      "sites": [],
+      "status": {
+        "type": "transmitting",
+        "since": null,
+        "text": "Still transmitting"
+      },
+      "followDistanceKm": 5000000,
+      "trajectories": [
+        {
+          "id": "voyager-2",
+          "horizonsTarget": "-32",
+          "lookup": "Voyager 2",
+          "fallback": null,
+          "center": "sun",
+          "start": "1977-08-21",
+          "stop": "2030-01-01",
+          "encounters": [
+            "1979-07-09",
+            "1981-08-25",
+            "1986-01-24",
+            "1989-08-25"
+          ]
+        }
+      ],
+      "keyDates": [
+        {
+          "label": "Launch",
+          "date": "1977-08-20",
+          "factId": "v2-launch"
+        },
+        {
+          "label": "Jupiter",
+          "date": "1979-07-09",
+          "factId": "v2-jup-sat"
+        },
+        {
+          "label": "Saturn",
+          "date": "1981-08-25",
+          "factId": "v2-jup-sat"
+        },
+        {
+          "label": "Uranus",
+          "date": "1986-01-24",
+          "factId": "v2-uranus"
+        },
+        {
+          "label": "Neptune",
+          "date": "1989-08-25",
+          "factId": "v2-neptune"
+        },
+        {
+          "label": "Heliopause",
+          "date": "2018-11-05",
+          "factId": "v2-helio"
+        }
+      ],
+      "leftBehind": [
+        "The spacecraft itself, carrying a Golden Record"
+      ],
+      "whereNow": "Interstellar space, still sending data to Earth.",
+      "photos": [
+        {
+          "query": "Voyager 2 Neptune"
+        },
+        {
+          "query": "Voyager spacecraft"
+        }
+      ],
+      "facts": [
+        {
+          "id": "v2-launch",
+          "text": "Voyager 2 launched first, on 20 August 1977, from Cape Canaveral.",
+          "sourceUrl": "https://science.nasa.gov/mission/voyager/planetary-voyage"
+        },
+        {
+          "id": "v2-jup-sat",
+          "text": "Voyager 2 flew past Jupiter on 9 July 1979 and Saturn on 25 August 1981.",
+          "sourceUrl": "https://science.nasa.gov/mission/voyager/planetary-voyage"
+        },
+        {
+          "id": "v2-uranus",
+          "text": "Voyager 2 flew past Uranus on 24 January 1986.",
+          "sourceUrl": "https://science.nasa.gov/missions/voyager-program/voyager-celebrates-its-10th-anniversary/"
+        },
+        {
+          "id": "v2-neptune",
+          "text": "Voyager 2 encountered Neptune in August 1989; it remains the only spacecraft to have visited Uranus and Neptune.",
+          "sourceUrl": "https://nssdc.gsfc.nasa.gov/planetary/voyager.html"
+        },
+        {
+          "id": "v2-helio",
+          "text": "Voyager 2 crossed the heliopause into interstellar space on 5 November 2018, about 119 AU from the Sun.",
+          "sourceUrl": "https://www.jhuapl.edu/news/news-releases/191106-voyager-2-illuminates-boundary-interstellar-space",
+          "verify": true
+        }
+      ],
+      "sources": [
+        {
+          "title": "NASA: Voyager Planetary Voyage",
+          "url": "https://science.nasa.gov/mission/voyager/planetary-voyage"
+        },
+        {
+          "title": "NSSDCA: Voyager Project Information",
+          "url": "https://nssdc.gsfc.nasa.gov/planetary/voyager.html"
+        },
+        {
+          "title": "Johns Hopkins APL: Voyager 2 Illuminates Boundary of Interstellar Space",
+          "url": "https://www.jhuapl.edu/news/news-releases/191106-voyager-2-illuminates-boundary-interstellar-space"
+        }
+      ]
+    },
+    {
+      "id": "voyager-1",
+      "name": "Voyager 1",
+      "kind": "Spacecraft",
+      "place": "Interstellar space",
+      "body": null,
+      "launchDate": "1977-09-05T12:56:00Z",
+      "landingDate": null,
+      "sites": [],
+      "status": {
+        "type": "transmitting",
+        "since": null,
+        "text": "Still transmitting"
+      },
+      "followDistanceKm": 5000000,
+      "trajectories": [
+        {
+          "id": "voyager-1",
+          "horizonsTarget": "-31",
+          "lookup": "Voyager 1",
+          "fallback": null,
+          "center": "sun",
+          "start": "1977-09-06",
+          "stop": "2030-01-01",
+          "encounters": [
+            "1979-03-05",
+            "1980-11-12"
+          ]
+        }
+      ],
+      "keyDates": [
+        {
+          "label": "Launch",
+          "date": "1977-09-05",
+          "factId": "v1-launch"
+        },
+        {
+          "label": "Jupiter",
+          "date": "1979-03-05",
+          "factId": "v1-jup-sat"
+        },
+        {
+          "label": "Saturn and Titan",
+          "date": "1980-11-12",
+          "factId": "v1-jup-sat"
+        },
+        {
+          "label": "Family Portrait",
+          "date": "1990-02-14",
+          "factId": "v1-portrait"
+        },
+        {
+          "label": "Heliopause",
+          "date": "2012-08-25",
+          "factId": "v1-helio"
+        },
+        {
+          "label": "One light-day from Earth",
+          "date": "2026-11-18",
+          "factId": "v1-lightday"
+        }
+      ],
+      "leftBehind": [
+        "The spacecraft itself, carrying a Golden Record"
+      ],
+      "whereNow": "Interstellar space; the farthest human-made object, about one light-day from Earth.",
+      "photos": [
+        {
+          "nasaId": "PIA00452",
+          "role": "pale-blue-dot"
+        },
+        {
+          "nasaId": "PIA23645",
+          "role": "pale-blue-dot-revisited"
+        },
+        {
+          "nasaId": "PIA00451",
+          "role": "family-portrait"
+        },
+        {
+          "query": "Voyager spacecraft"
+        }
+      ],
+      "facts": [
+        {
+          "id": "v1-launch",
+          "text": "Voyager 1 launched on 5 September 1977 on a faster, shorter path than Voyager 2, overtaking its twin to reach Jupiter first.",
+          "sourceUrl": "https://science.nasa.gov/mission/voyager/planetary-voyage"
+        },
+        {
+          "id": "v1-jup-sat",
+          "text": "Voyager 1 reached Jupiter on 5 March 1979 and Saturn on 12 November 1980.",
+          "sourceUrl": "https://science.nasa.gov/mission/voyager/planetary-voyage"
+        },
+        {
+          "id": "v1-titan",
+          "text": "Voyager 1's Saturn encounter, close to the moon Titan, took it out of the plane of the planets, ending its planetary tour.",
+          "sourceUrl": "https://nssdc.gsfc.nasa.gov/planetary/voyager.html"
+        },
+        {
+          "id": "v1-portrait",
+          "text": "On 14 February 1990, Voyager 1 pointed its cameras back toward the Sun and took 60 frames: the first 'portrait' of our solar system seen from outside, from about 32 degrees above the plane of the planets.",
+          "sourceUrl": "https://photojournal.jpl.nasa.gov/catalog/pia00451"
+        },
+        {
+          "id": "v1-pbd",
+          "text": "In the narrow-angle image of Earth, our planet is a point of light only 0.12 pixel in size, seen from more than 6 billion kilometres (4 billion miles) away.",
+          "sourceUrl": "https://photojournal.jpl.nasa.gov/catalog/pia00452",
+          "verify": true
+        },
+        {
+          "id": "v1-pbd2020",
+          "text": "For the image's 30th anniversary in 2020, NASA/JPL published an updated version processed with modern techniques.",
+          "sourceUrl": "https://science.nasa.gov/photojournal/pale-blue-dot-revisited"
+        },
+        {
+          "id": "v1-helio",
+          "text": "Voyager 1 crossed the heliopause into interstellar space on 25 August 2012, the first spacecraft to do so.",
+          "sourceUrl": "https://www.jhuapl.edu/news/news-releases/191106-voyager-2-illuminates-boundary-interstellar-space",
+          "verify": true
+        },
+        {
+          "id": "v1-lightday",
+          "text": "On 18 November 2026 at 10:16:07 UTC, Voyager 1 will be 25,902,068,356 km from Earth: one light-day.",
+          "sourceUrl": "https://science.nasa.gov/?p=338314"
+        },
+        {
+          "id": "v1-instruments",
+          "text": "Two of Voyager 1's science instruments still operate: the magnetometer and the plasma wave instrument. The Low-Energy Charged Particles instrument was switched off on 17 April 2026 to save power.",
+          "sourceUrl": "https://science.nasa.gov/?p=338314"
+        }
+      ],
+      "sources": [
+        {
+          "title": "NASA: Voyager Planetary Voyage",
+          "url": "https://science.nasa.gov/mission/voyager/planetary-voyage"
+        },
+        {
+          "title": "NASA: Voyager mission status",
+          "url": "https://science.nasa.gov/?p=338314"
+        },
+        {
+          "title": "NASA/JPL Photojournal: PIA00451",
+          "url": "https://photojournal.jpl.nasa.gov/catalog/pia00451"
+        },
+        {
+          "title": "NASA/JPL Photojournal: PIA00452",
+          "url": "https://photojournal.jpl.nasa.gov/catalog/pia00452"
+        },
+        {
+          "title": "NASA: Pale Blue Dot Revisited",
+          "url": "https://science.nasa.gov/photojournal/pale-blue-dot-revisited"
+        }
+      ]
+    }
+  ],
+  "shared": {
+    "facts": [
+      {
+        "id": "dsn",
+        "text": "NASA talks to the Voyagers through the Deep Space Network, with antenna complexes at Goldstone (California), Madrid (Spain) and Canberra (Australia).",
+        "sourceUrl": "https://www.nasa.gov/communicating-with-missions/dsn/",
+        "verify": true
+      },
+      {
+        "id": "light-speed",
+        "text": "Light and radio signals travel 299,792.458 km every second.",
+        "sourceUrl": "https://physics.nist.gov/cgi-bin/cuu/Value?c",
+        "verify": true
+      }
+    ]
+  }
+}

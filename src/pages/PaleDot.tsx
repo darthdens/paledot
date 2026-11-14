@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { lazy, Suspense, useEffect, useState } from "react";
 
 import { CosmosExplorer } from "@/components/cosmos/CosmosExplorer";
 import { WebGLBoundary } from "@/components/cosmos/WebGLBoundary";
@@ -8,10 +8,14 @@ import { useCosmosStore } from "@/components/cosmos/store/useCosmosStore";
 import { PaleDotEndFrame } from "@/brand/paledot/PaleDotEndFrame";
 import { getObjectById } from "@/components/cosmos/data/celestialObjects";
 
+const LeftBehindAdmin = lazy(() => import('@/features/left-behind/data/LeftBehindAdmin'));
+
 const PaleDot = () => {
   const { language, tr, tx, numberLocale } = useLanguage();
   const [started, setStarted] = useState(false);
   const [ended, setEnded] = useState(false);
+  const [dataAdmin, setDataAdmin] = useState(false);
+  useEffect(() => { setDataAdmin(new URLSearchParams(window.location.search).get('lb-admin') === '1'); }, []);
 
   // Normal system cursor everywhere on Pale Dot, including menus and tooltips rendered outside the page wrapper.
   useEffect(() => {
@@ -71,7 +75,7 @@ const PaleDot = () => {
   }, [started]);
 
   if (!started) {
-    return <PaleDotTitleScreen onBegin={() => setStarted(true)} />;
+    return <><PaleDotTitleScreen onBegin={() => setStarted(true)} />{dataAdmin && <Suspense fallback={null}><LeftBehindAdmin /></Suspense>}</>;
   }
 
   return (
@@ -92,6 +96,7 @@ const PaleDot = () => {
       <WebGLBoundary>
         <CosmosExplorer />
       </WebGLBoundary>
+      {dataAdmin && <Suspense fallback={null}><LeftBehindAdmin /></Suspense>}
       {ended && (
         <PaleDotEndFrame
           distance={tx("46.5 billion light-years", "46,5 milliards d’années-lumière")}

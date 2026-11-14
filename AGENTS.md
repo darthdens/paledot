@@ -4,3 +4,4 @@
 - One app serves two brands; `src/lib/site-brand.ts` picks the brand from the request host (`?site=` overrides for previews), and `src/lib/site-meta.ts` holds per-brand head tags. Why: both domains must share every update but stay separately branded.
 - The 3D explorer and page components load client-only (lazy, after mount) from `src/routes/index.tsx`. Why: three.js/WebGL can't run during server rendering.
 - The Echo AI widget script is injected after hydration in `__root.tsx`, never as a head/body tag. Why: it adds DOM nodes to <body> that break React hydration.
+- Left Behind source data lives in `public/left-behind/` and feature code belongs in `src/features/left-behind/`; NASA calls must use TanStack server functions, not new Supabase Edge Functions. Why: isolate the new mode and respect the app's supported server runtime.
