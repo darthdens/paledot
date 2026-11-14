@@ -304,7 +304,9 @@ export const CameraController = () => {
           camera.position.copy(tmpTarget.current).add(tmpDelta.current.setLength(clearance));
         }
       }
-      orbitControls.minDistance = selectedObject && isSolidBody(selectedObject) ? bodyClearance(selectedObject.size, camera.near) : 0.001;
+      // Following hardware: allow zooming down to its true size (the generic 1 km floor hid it).
+      orbitControls.minDistance = hardwareId ? (trueSpanUnits.get(hardwareId) ?? 1e-5) * 0.8
+        : selectedObject && isSolidBody(selectedObject) ? bodyClearance(selectedObject.size, camera.near) : 0.001;
     };
 
     if (isAnimating.current) {
