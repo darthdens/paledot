@@ -22,7 +22,11 @@
      "source": "LRO NAC mosaic, Apollo 11 (60x60 km)",
      "credit": "NASA/GSFC/Arizona State University, via NASA Moon Trek",
      "trekLayer": "A11_60x60km.eq",
-     "fallback": "LRO Wide Angle Camera global mosaic (303 ppd)"
+     "fallback": "LRO Wide Angle Camera global mosaic (303 ppd)",
+     "heightFile": "apollo-11-height.webp",
+     "heightBaseM": -1920.0,
+     "heightScaleM": 0.1,
+     "heightSource": "LROC NAC DTM (87% coverage, datum shift 7.6 m)"
     },
     {
      "file": "apollo-11-mid.webp",
@@ -62,7 +66,11 @@
      "source": "LRO NAC mosaic, Apollo 15 (60x60 km)",
      "credit": "NASA/GSFC/Arizona State University, via NASA Moon Trek",
      "trekLayer": "A15_60x60km.0_2.eq",
-     "fallback": "LRO Wide Angle Camera global mosaic (303 ppd)"
+     "fallback": "LRO Wide Angle Camera global mosaic (303 ppd)",
+     "heightFile": "apollo-15-height.webp",
+     "heightBaseM": -1935.0,
+     "heightScaleM": 0.1,
+     "heightSource": "LROC NAC DTM (88% coverage, datum shift -8.4 m)"
     },
     {
      "file": "apollo-15-mid.webp",
@@ -102,7 +110,11 @@
      "source": "LRO NAC mosaic, Apollo 16 (60x60 km)",
      "credit": "NASA/GSFC/Arizona State University, via NASA Moon Trek",
      "trekLayer": "A16_60x60km.eq",
-     "fallback": "LRO Wide Angle Camera global mosaic (303 ppd)"
+     "fallback": "LRO Wide Angle Camera global mosaic (303 ppd)",
+     "heightFile": "apollo-16-height.webp",
+     "heightBaseM": 7.0,
+     "heightScaleM": 0.1,
+     "heightSource": "LROC NAC DTM (100% coverage, datum shift 1.0 m)"
     },
     {
      "file": "apollo-16-mid.webp",
@@ -142,7 +154,11 @@
      "source": "LRO NAC mosaic, Apollo 17 (60x60 km)",
      "credit": "NASA/GSFC/Arizona State University, via NASA Moon Trek",
      "trekLayer": "A17_60x60km.eq",
-     "fallback": "LRO Wide Angle Camera global mosaic (303 ppd)"
+     "fallback": "LRO Wide Angle Camera global mosaic (303 ppd)",
+     "heightFile": "apollo-17-height.webp",
+     "heightBaseM": -2619.0,
+     "heightScaleM": 0.1,
+     "heightSource": "LROC NAC DTM (100% coverage, datum shift 10.5 m)"
     },
     {
      "file": "apollo-17-mid.webp",
@@ -182,7 +198,11 @@
      "source": "MRO CTX global mosaic (beta01, ~5 m)",
      "credit": "NASA/JPL/MSSS, Caltech Murray Lab, via NASA Mars Trek",
      "trekLayer": "CTX_beta01_uncontrolled_5m_Caltech",
-     "fallback": "Viking MDIM 2.1 colour mosaic (232 m)"
+     "fallback": "Viking MDIM 2.1 colour mosaic (232 m)",
+     "heightFile": "viking-1-height.webp",
+     "heightBaseM": -3633.0,
+     "heightScaleM": 0.1,
+     "heightSource": "HiRISE DTM (73% coverage, datum shift 10.5 m)"
     },
     {
      "file": "viking-1-mid.webp",
@@ -222,7 +242,11 @@
      "source": "MRO CTX global mosaic (beta01, ~5 m)",
      "credit": "NASA/JPL/MSSS, Caltech Murray Lab, via NASA Mars Trek",
      "trekLayer": "CTX_beta01_uncontrolled_5m_Caltech",
-     "fallback": "Viking MDIM 2.1 colour mosaic (232 m)"
+     "fallback": "Viking MDIM 2.1 colour mosaic (232 m)",
+     "heightFile": "opportunity-height.webp",
+     "heightBaseM": -1384.0,
+     "heightScaleM": 0.1,
+     "heightSource": "MOLA global (no HiRISE DTM covers this site)"
     },
     {
      "file": "opportunity-mid.webp",
@@ -262,7 +286,11 @@
      "source": "MRO HiRISE Jezero controlled mosaic (25 cm)",
      "credit": "NASA/JPL-Caltech/University of Arizona, via NASA Mars Trek",
      "trekLayer": "JEZ_hirise_soc_006_orthoMosaic_25cm_Eqc_latTs0_lon0_first_dd",
-     "fallback": "Viking MDIM 2.1 colour mosaic (232 m)"
+     "fallback": "Viking MDIM 2.1 colour mosaic (232 m)",
+     "heightFile": "ingenuity-height.webp",
+     "heightBaseM": -2564.0,
+     "heightScaleM": 0.1,
+     "heightSource": "HiRISE DTM (100% coverage, datum shift 6.6 m)"
     },
     {
      "file": "ingenuity-mid.webp",
