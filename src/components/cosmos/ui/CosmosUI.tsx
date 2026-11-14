@@ -21,6 +21,7 @@ import { LanguageButton, LanguageMenuList } from './LanguagePicker';
 import { FlagIcon } from './FlagIcon';
 import { useLeftBehindStore } from '@/features/left-behind/state/useLeftBehindStore';
 import { leftBehindCopy } from '@/features/left-behind/lib/copy';
+import { useShallow } from 'zustand/react/shallow';
 const translations = {
   en: {
     startTour: 'Start Guided Tour',
@@ -147,7 +148,15 @@ export const CosmosUI = () => {
     togglePerformanceHUD,
     toggleSizeComparison,
     goHome,
-  } = useCosmosStore();
+  } = useCosmosStore(useShallow(state=>({
+    startTour:state.startTour,isTouring:state.isTouring,showQuickJump:state.showQuickJump,
+    toggleQuickJump:state.toggleQuickJump,setQuickJumpAnchorRect:state.setQuickJumpAnchorRect,
+    showControlHints:state.showControlHints,setShowControlHints:state.setShowControlHints,
+    showOrbits:state.showOrbits,toggleOrbits:state.toggleOrbits,showTrails:state.showTrails,
+    toggleTrails:state.toggleTrails,showRealPeriods:state.showRealPeriods,toggleRealPeriods:state.toggleRealPeriods,
+    showPerformanceHUD:state.showPerformanceHUD,togglePerformanceHUD:state.togglePerformanceHUD,
+    toggleSizeComparison:state.toggleSizeComparison,goHome:state.goHome,
+  })));
   const { isFullscreen, setIsFullscreen } = useFullscreenStore();
   const uiFixed = isFullscreen && brand !== 'paledot';
   const timeMenuOpen = dateControlOpen;
