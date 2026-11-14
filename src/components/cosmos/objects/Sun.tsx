@@ -164,7 +164,7 @@ const PHOTO_FS = `
     float px = length(fwidth(pg));            // cells per pixel
     float gFade = 1.0 - smoothstep(0.06, 0.25, px);
     float g = granules(pg, uTime / 480.0);
-    float gran = mix(1.0, 0.72 + 0.4 * g, gFade * 0.9);
+    float gran = mix(1.0, 0.6 + 0.5 * g, gFade);
 
     // Supergranulation: ~30,000 km, very subtle
     vec3 ps = vObj * 22.0;
@@ -172,10 +172,11 @@ const PHOTO_FS = `
     float sg = worley(ps, 3.0);
     float sup = mix(1.0, 0.94 + 0.08 * sg, sFade);
 
-    vec3 base = vec3(1.0, 0.72, 0.28);         // familiar golden-orange look (filtered-photo style, not true colour)
+    vec3 base = vec3(1.0, 0.55, 0.12);         // familiar golden-orange look (filtered-photo style, not true colour)
     vec3 col = base * limb * gran * sup;
-    vec3 core = mix(col, vec3(1.0, 0.92, 0.7), pow(mu, 6.0) * 0.35);
-    gl_FragColor = vec4(core * 1.6, 1.0);       // HDR so bloom picks it up
+    // Keep output within displayable range so the colour never clips to white
+    vec3 core = mix(col, vec3(1.0, 0.78, 0.38), pow(mu, 4.0) * 0.45);
+    gl_FragColor = vec4(min(core, vec3(1.0)), 1.0);       // HDR so bloom picks it up
   }
 `;
 
