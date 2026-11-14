@@ -26,7 +26,7 @@ export function LeftBehindMenu() {
     document.addEventListener('keydown', escape);
     return () => { document.removeEventListener('mousedown', close); document.removeEventListener('keydown', escape); };
   }, []);
-  return <div ref={ref} data-lb-menu role="region" aria-label={text(copy.name)} className="pd-card rounded-lg absolute top-12 right-2 sm:top-[68px] sm:right-4 z-[10002] w-[min(300px,calc(100vw-1rem))] max-h-[calc(100dvh-5rem)] overflow-y-auto bg-foreground/10 backdrop-blur-xs p-2">
+  return <div ref={ref} data-lb-menu role="region" aria-label={text(copy.name)} className="pd-card rounded-lg absolute top-12 right-2 sm:top-[60px] sm:right-4 z-[10002] w-[min(300px,calc(100vw-1rem))] max-h-[calc(100dvh-5rem)] overflow-y-auto bg-foreground/10 backdrop-blur-xs p-2">
     <Button variant="ghost" aria-expanded={toursOpen} onClick={() => setToursOpen(!toursOpen)} className="w-full min-h-11 justify-between px-3 text-sm"><span>{text(copy.tours)}</span><ChevronDown className={`h-4 w-4 ${toursOpen ? 'rotate-180' : ''}`} /></Button>
     {toursOpen && <TourChoices onBegin={() => { useLeftBehindStore.getState().setMenuOpen(false); useCosmosStore.getState().startTour(); }} />}
     <label className="flex min-h-11 items-center justify-between gap-3 text-sm text-foreground">
