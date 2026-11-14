@@ -5,13 +5,15 @@ import { PaleDotWordmark } from "./PaleDotWordmark";
 import { setupPaleDotMotion } from "./paledotMotion";
 import { PALEDOT_COPY } from "./copy";
 import { PaleDotStars } from "./PaleDotStars";
+import { Button } from '@/components/ui/button';
+import { leftBehindCopy } from '@/features/left-behind/lib/copy';
 
 /**
  * The paledot.org title screen. Replaces the intro in src/pages/PaleDot.tsx.
  * The wordmark reveals from a single dot at the centre of the screen; the descriptor and the
  * "Begin at Earth" pill follow. Click anywhere to skip. Credit links to dens.so in a new tab.
  */
-export function PaleDotTitleScreen({ onBegin }: { onBegin: () => void }) {
+export function PaleDotTitleScreen({ onBegin, onLeftBehind }: { onBegin: () => void; onLeftBehind: () => void }) {
   const { language, tr } = useLanguage();
   const t = tr(PALEDOT_COPY as unknown as { en: typeof PALEDOT_COPY.en });
   const stageRef = useRef<HTMLDivElement>(null);
@@ -46,6 +48,9 @@ export function PaleDotTitleScreen({ onBegin }: { onBegin: () => void }) {
         <button type="button" data-action className="pd-pill" onClick={onBegin}>
           {t.begin}
         </button>
+        <Button type="button" variant="outline" data-action className="pd-pill min-h-11" onClick={onLeftBehind}>
+          {tr({ en: leftBehindCopy[language].name, fr: leftBehindCopy[language].name })}
+        </Button>
       </div>
       <div className="pd-readout">
         <div className="pd-hud-label">{t.distanceLabel}</div>

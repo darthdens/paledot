@@ -3,7 +3,7 @@ import { Canvas } from '@react-three/fiber';
 import { OrbitControls, PerspectiveCamera } from '@react-three/drei';
 import { EffectComposer, SelectiveBloom, Selection } from '@react-three/postprocessing';
 import { DimStars } from './objects/DimStars';
-import { Suspense, useEffect, useRef, useState, useCallback, useMemo } from 'react';
+import { Suspense, lazy, useEffect, useRef, useState, useCallback, useMemo } from 'react';
 import * as THREE from 'three';
 import { ProximaSystem } from './objects/ProximaSystem';
 import { MilkyWayGalaxy } from './objects/MilkyWayGalaxy';
@@ -40,6 +40,10 @@ import { UNITS } from './types';
 import { useCosmosStore } from './store/useCosmosStore';
 import { useGalaxyTimeManager } from './objects/DifferentialRotationMaterial';
 import { CosmosBootGate } from './ui/CosmosBootGate';
+import { useSiteBrand } from '@/lib/site-brand';
+import { useLeftBehindStore } from '@/features/left-behind/state/useLeftBehindStore';
+const LeftBehindLayer = lazy(() => import('@/features/left-behind/scene/LeftBehindLayer').then(m => ({ default: m.LeftBehindLayer })));
+const LeftBehindOverlay = lazy(() => import('@/features/left-behind/ui/LeftBehindOverlay').then(m => ({ default: m.LeftBehindOverlay })));
 
 // Allow loaders (R3F + our preload) to reuse texture requests.
 THREE.Cache.enabled = true;
@@ -51,6 +55,9 @@ const GalaxyTimeManager = () => {
 };
 
 export const CosmosExplorer = () => {
+  const brand = useSiteBrand();
+  const leftBehindActive = useLeftBehindStore(s => s.active);
+  const pendingEntry = useLeftBehindStore(s => s.pendingEntry);
   const containerRef = useRef<HTMLDivElement>(null);
 
   // We separate "textures are loaded" vs "scene is warmed up" so the loader can actually
@@ -75,6 +82,11 @@ export const CosmosExplorer = () => {
   }, []);
 
   const bootDone = (texturesReady && sceneReady) || skippedLoading;
+  useEffect(() => {
+    if (brand !== 'paledot' || !bootDone || !pendingEntry) return;
+    useCosmosStore.getState().setShowControlHints(false);
+    useLeftBehindStore.getState().enter();
+  }, [brand, bootDone, pendingEntry]);
 
   // Hide distant galaxies when within solar system or Proxima Centauri system
   const showDistantGalaxies =
@@ -219,6 +231,7 @@ export const CosmosExplorer = () => {
                 showTrails={showTrails}
                 selectedObject={selectedObject}
               />
+              {brand === 'paledot' && leftBehindActive && <Suspense fallback={null}><LeftBehindLayer /></Suspense>}
 
               {/* Distant stars - tiny point-like spheres (very dim) */}
               {stars.map((star) => {
@@ -284,6 +297,7 @@ export const CosmosExplorer = () => {
           <KeyboardShortcuts />
           <SizeComparison />
           <YouAreHereLabel />
+          {brand === 'paledot' && leftBehindActive && <Suspense fallback={null}><LeftBehindOverlay /></Suspense>}
         </>
       )}
     </div>

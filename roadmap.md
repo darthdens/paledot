@@ -1,6 +1,9 @@
 # Roadmap
 
 ## Left Behind setup
+- [x] Add isolated Left Behind mode state, empty scene layer and exit overlay.
+- [x] Connect Pale Dot Welcome, Satellite/More, title pill and #left-behind entry points after loading.
+- [x] Verify entry/exit, unchanged normal mode and Cosmos isolation at desktop and 360px; three state/unit tests pass.
 - [x] Fetch nine static trajectories and a photo manifest, retrying Opportunity and Viking coverage lookups.
 - [x] Replace Cloud reads/rebuild with cached static reads and a read-only Pale Dot data table.
 - [x] Update event provenance/credits and verify static data, preview tables, and photo suitability.
