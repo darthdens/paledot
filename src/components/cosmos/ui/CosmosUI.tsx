@@ -794,7 +794,7 @@ export const CosmosUI = () => {
                   size="icon"
                   variant="ghost"
                   onClick={() => { setShowMoreMenu(false); setShowLanguageMenu(!showLanguageMenu); }}
-                  className={`lg:hidden h-8 w-8 sm:h-9 sm:w-9 backdrop-blur-xs text-white ${showLanguageMenu ? 'bg-white/25' : 'bg-white/10 hover:bg-white/20'}`}
+                  className={`hidden h-8 w-8 sm:h-9 sm:w-9 backdrop-blur-xs text-white ${showLanguageMenu ? 'bg-white/25' : 'bg-white/10 hover:bg-white/20'}`}
                 >
                   <FlagIcon locale={locale} className="w-4 h-4 sm:w-5 sm:h-5" />
                 </Button>
@@ -908,6 +908,14 @@ export const CosmosUI = () => {
               >
                 <Info className="w-4 h-4 text-white/70" />
                 <span className="text-sm text-white/90">{t.about}</span>
+              </button>
+
+              <button
+                onClick={() => { setShowMoreMenu(false); setTimeout(() => setShowLanguageMenu(true), 0); }}
+                className="w-full flex items-center gap-2 p-2 rounded-[4px] hover:bg-white/10 transition-colors"
+              >
+                <FlagIcon locale={locale} className="w-4 h-4" />
+                <span className="text-sm text-white/90">{tx('Language', 'Langue')}</span>
               </button>
 
             </div>
