@@ -29,7 +29,7 @@ export function positionsAt(time: number) {
   const date = new Date(time);
   cachedPositions = {};
   for (const id of Object.keys(bodies) as PlanetId[]) cachedPositions[id] = helioPositionKm(id, date);
-  cachedPositions.moon = moonPositionKm(date);
+  cachedPositions['moon'] = moonPositionKm(date);
   cachedDate = time;
   return cachedPositions;
 }

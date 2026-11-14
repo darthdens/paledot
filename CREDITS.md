@@ -79,7 +79,6 @@ Confirm each licence against package metadata (Prompt 11 check 12).
 | DM Mono (Google Fonts) | https://fonts.google.com/specimen/DM+Mono | SIL Open Font License 1.1 |
 | [anything else Prompt 11 reports] | [URL] | [licence] |
 
-### AI tools
 ### Real-date planetary calculations
 
 | Link text | URL | Licence / notes |
