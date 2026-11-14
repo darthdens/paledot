@@ -7,7 +7,7 @@ import { useCosmosStore } from '@/components/cosmos/store/useCosmosStore';
 
 // Screen-size marker built from the real NASA model: metre-scale hardware cannot be drawn at true
 // scale beside 1 unit = 1000 km bodies, so it follows the "markers not to scale" rule.
-const MARKER_PX = 34, SELECTED_PX = 56;
+const MARKER_PX = 40, SELECTED_PX = 76;
 const PARENT_RADIUS: Record<string, number> = { moon: 1.7374, mars: 3.3895 };
 
 export function HardwareModel({ url, selected, parent }: { url: string; selected: boolean; parent?: 'moon' | 'mars' | undefined }) {
