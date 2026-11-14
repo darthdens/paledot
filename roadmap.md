@@ -31,3 +31,7 @@ Verification: 24 tests pass; four Pale Dot entries and desktop/360px date checks
 - [x] Correct trail buffer/local coordinates, orbit epoch alignment, and machine-path precision/sorting.
 - [x] Add credited NASA model inspection without changing true-scale universe objects; five GLBs validated and decoded. Lunar-rover model is not supplied, and models are inspection-only.
 - [x] Run focused tests and desktop/mobile scene checks. Real-device flicker and full model-inspection screenshots remain unverified: software-GPU interactions timed out.
+
+## Machines in the universe
+- [x] Show NASA models in the 3D universe as screen-size markers (Voyager 1 checked in preview).
+- [x] Category badge in the selected-machine panel, all languages.

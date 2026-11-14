@@ -7,13 +7,8 @@ import * as THREE from 'three';
 import { Dialog,DialogContent,DialogTitle,DialogDescription } from '@/components/ui/dialog';
 import { useLanguage } from '@/i18n/LanguageContext';
 import { machineCopy } from '../lib/machineCopy';
-import voyager from '../assets/voyager.glb.asset.json';
-import ingenuity from '../assets/ingenuity.glb.asset.json';
-import opportunity from '../assets/opportunity.glb.asset.json';
-import viking from '../assets/viking.glb.asset.json';
-import apollo from '../assets/apollo.glb.asset.json';
-const models:Record<string,{url:string}>= {'voyager-1':voyager,'voyager-2':voyager,ingenuity,opportunity,'viking-1':viking,'apollo-11':apollo};
-export function hasNasaModel(id:string){return !!models[id];}
+import { nasaModels as models } from '../lib/nasaModels';
+export { hasNasaModel } from '../lib/nasaModels';
 class ModelBoundary extends Component<{children:ReactNode;fallback:ReactNode},{failed:boolean}>{
   override state={failed:false};static getDerivedStateFromError(){return {failed:true};}
   override render(){return this.state.failed?this.props.fallback:this.props.children;}
