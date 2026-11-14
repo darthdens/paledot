@@ -10,7 +10,7 @@ import { useCosmosStore } from '@/components/cosmos/store/useCosmosStore';
 const MARKER_PX = 34, SELECTED_PX = 56;
 const PARENT_RADIUS: Record<string, number> = { moon: 1.7374, mars: 3.3895 };
 
-export function HardwareModel({ url, selected, parent }: { url: string; selected: boolean; parent?: 'moon' | 'mars' }) {
+export function HardwareModel({ url, selected, parent }: { url: string; selected: boolean; parent?: 'moon' | 'mars' | undefined }) {
   const { scene } = useGLTF(url, false);
   const group = useRef<THREE.Group>(null);
   const model = useMemo(() => {
