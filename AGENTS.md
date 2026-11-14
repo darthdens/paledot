@@ -5,3 +5,4 @@
 - The 3D explorer and page components load client-only (lazy, after mount) from `src/routes/index.tsx`. Why: three.js/WebGL can't run during server rendering.
 - The Echo AI widget script is injected after hydration in `__root.tsx`, never as a head/body tag. Why: it adds DOM nodes to <body> that break React hydration.
 - Left Behind data is fetched from the JPL Horizons API and NASA Image and Video Library API during the event and saved as static files in `public/left-behind/`; feature code stays in `src/features/left-behind/` and reads only through its cached data client, with no Cloud storage, functions or auth. Why: keep the mode isolated, reproducible and available without a data service.
+- Left Behind has independent Zustand state; title/hash entry is queued until explorer boot completes, and its scene/UI load lazily only for active Pale Dot. Why: preserve the existing loader, tour state and Cosmos behavior.

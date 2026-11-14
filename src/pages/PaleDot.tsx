@@ -7,6 +7,7 @@ import { PaleDotTitleScreen } from "@/brand/paledot/PaleDotTitleScreen";
 import { useCosmosStore } from "@/components/cosmos/store/useCosmosStore";
 import { PaleDotEndFrame } from "@/brand/paledot/PaleDotEndFrame";
 import { getObjectById } from "@/components/cosmos/data/celestialObjects";
+import { useLeftBehindStore } from '@/features/left-behind/state/useLeftBehindStore';
 
 const LeftBehindAdmin = lazy(() => import('@/features/left-behind/data/LeftBehindAdmin'));
 
@@ -16,6 +17,16 @@ const PaleDot = () => {
   const [ended, setEnded] = useState(false);
   const [dataAdmin, setDataAdmin] = useState(false);
   useEffect(() => { setDataAdmin(new URLSearchParams(window.location.search).get('lb-admin') === '1'); }, []);
+  useEffect(() => {
+    const openHash = () => {
+      if (window.location.hash !== '#left-behind') return;
+      useLeftBehindStore.getState().requestEntry();
+      setStarted(true);
+    };
+    openHash();
+    window.addEventListener('hashchange', openHash);
+    return () => { window.removeEventListener('hashchange', openHash); useLeftBehindStore.getState().exit(); };
+  }, []);
 
   // Normal system cursor everywhere on Pale Dot, including menus and tooltips rendered outside the page wrapper.
   useEffect(() => {
@@ -75,7 +86,7 @@ const PaleDot = () => {
   }, [started]);
 
   if (!started) {
-    return <><PaleDotTitleScreen onBegin={() => setStarted(true)} />{dataAdmin && <Suspense fallback={null}><LeftBehindAdmin /></Suspense>}</>;
+    return <><PaleDotTitleScreen onBegin={() => setStarted(true)} onLeftBehind={() => { useLeftBehindStore.getState().requestEntry(); setStarted(true); }} />{dataAdmin && <Suspense fallback={null}><LeftBehindAdmin /></Suspense>}</>;
   }
 
   return (

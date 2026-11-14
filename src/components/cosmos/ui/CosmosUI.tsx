@@ -2,7 +2,7 @@ import { useLanguage } from '@/i18n/LanguageContext';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { HelpCircle, Compass, Maximize, Minimize, CircleDot, CircleOff, Clock, Timer, TimerOff, Orbit, Activity, Home, Scaling, BarChart3, Info, MoreVertical } from 'lucide-react';
+import { HelpCircle, Compass, Satellite, Maximize, Minimize, CircleDot, CircleOff, Clock, Timer, TimerOff, Orbit, Activity, Home, Scaling, BarChart3, Info, MoreVertical } from 'lucide-react';
 import { useCosmosStore } from '../store/useCosmosStore';
 import { useFullscreenStore } from '../store/useFullscreenStore';
 import { useCallback, useEffect, useRef, useState } from 'react';
@@ -14,6 +14,8 @@ import { isNativeApp } from '@/lib/platform';
 import { useSiteBrand } from '@/lib/site-brand';
 import { LanguageButton, LanguageMenuList } from './LanguagePicker';
 import { FlagIcon } from './FlagIcon';
+import { useLeftBehindStore } from '@/features/left-behind/state/useLeftBehindStore';
+import { leftBehindCopy } from '@/features/left-behind/lib/copy';
 const translations = {
   en: {
     startTour: 'Start Guided Tour',
@@ -108,6 +110,13 @@ export const CosmosUI = () => {
   // In the native iOS / iPadOS / macOS / visionOS app the experience is
   // already full-bleed, so the fullscreen toggle is unnecessary.
   const brand = useSiteBrand();
+  const leftBehindActive = useLeftBehindStore(s => s.active);
+  const lbCopy = leftBehindCopy[language];
+  const lbName = tr({ en: lbCopy.name, fr: lbCopy.name });
+  const toggleLeftBehind = () => {
+    if (leftBehindActive) useLeftBehindStore.getState().exit();
+    else { setShowControlHints(false); useLeftBehindStore.getState().enter(); }
+  };
   // Pale Dot is always full-bleed too, so it hides the fullscreen toggle like the native app.
   const native = isNativeApp() || brand === 'paledot';
   // In fullscreen, dropdowns appear directly below the button row (h-8 = 32px + gap)
@@ -611,6 +620,9 @@ export const CosmosUI = () => {
               >
                 {t.explore}
               </Button>
+              {brand === 'paledot' && <Button size="sm" variant="outline" className="pd-pill min-h-11" onClick={() => { setShowControlHints(false); useLeftBehindStore.getState().enter(); }}>
+                <Satellite className="h-4 w-4" />{tr({ en: lbCopy.entry, fr: lbCopy.entry })}
+              </Button>}
             </div>
           </div>
         </div>
@@ -671,6 +683,10 @@ export const CosmosUI = () => {
             </Tooltip>
 
             {/* Divider before sound */}
+            {brand === 'paledot' && <Tooltip>
+              <TooltipTrigger asChild><Button size="icon" variant="ghost" aria-label={lbName} aria-pressed={leftBehindActive} onClick={toggleLeftBehind} className={`hidden lg:inline-flex h-11 w-11 backdrop-blur-xs text-foreground ${leftBehindActive ? 'bg-foreground/25' : 'bg-foreground/10 hover:bg-foreground/20'}`}><Satellite className="h-5 w-5" /></Button></TooltipTrigger>
+              <TooltipContent variant="dark" side="bottom">{lbName}</TooltipContent>
+            </Tooltip>}
             <div className="hidden lg:block w-px h-6 bg-white/20 mx-0.5" />
 
             {/* Ambient Music Controller - always visible */}
@@ -813,6 +829,7 @@ export const CosmosUI = () => {
           <div className="overflow-hidden">
             <div className="p-2 min-w-[180px] space-y-0.5">
               {/* Toggle options */}
+              {brand === 'paledot' && <Button variant="ghost" aria-pressed={leftBehindActive} onClick={() => { toggleLeftBehind(); setShowMoreMenu(false); }} className={`w-full min-h-11 justify-start gap-2 text-foreground ${leftBehindActive ? 'bg-foreground/25' : 'hover:bg-foreground/10'}`}><Satellite className="h-4 w-4" />{lbName}</Button>}
               <button
                 onClick={() => { toggleOrbits(); }}
                 className="w-full flex items-center justify-between p-2 rounded-[4px] hover:bg-white/10 transition-colors"
