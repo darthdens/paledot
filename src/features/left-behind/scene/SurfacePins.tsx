@@ -19,6 +19,8 @@ import { useSurfaceAttachmentStore } from '../state/surfaceAttachments';
 import { useLeftBehindStore } from '../state/useLeftBehindStore';
 import { useSimClock } from '../state/useSimClock';
 import { SitePatch } from './SitePatch';
+import { groundHeightM, preloadSiteHeights } from '../lib/terrainHeights';
+import { METRE, reliefSync } from '@/components/cosmos/lib/relief';
 import { buildRetroreflector } from './simplifiedModels';
 
 /** True-size simplified hardware with no pin of its own (e.g. Apollo 11's laser reflector), shown while its site is followed. */
@@ -71,7 +73,10 @@ function SurfacePin({ spec }: { spec: PinSpec }) {
     shown.current = visible;
     if (ring.current) ring.current.hidden = !visible || crowded[spec.body] || !['earth', 'solarSystem'].includes(useCosmosStore.getState().currentScale);
     if (!visible) { landedPins.delete(spec.trajId); return; }
-    const p = latLonToLocal(spec.lat, spec.lon, radius, TEXTURE_LON_OFFSET_DEG[spec.body] ?? 0);
+    // Real ground height (site DTM / global map) once the body shows its relief; flat sphere before that.
+    if (reliefSync(spec.body)) preloadSiteHeights(spec.body);
+    const ground = radius + groundHeightM(spec.body, spec.lat, spec.lon) * METRE;
+    const p = latLonToLocal(spec.lat, spec.lon, ground, TEXTURE_LON_OFFSET_DEG[spec.body] ?? 0);
     if (followed && (!patch || patch.radius !== radius || patch.mesh !== mesh)) setPatch({ local: [p[0], p[1], p[2]], radius, mesh });
     else if (!followed && patch) setPatch(null);
     const attr = line.geometry.getAttribute('position') as THREE.BufferAttribute;
@@ -80,7 +85,13 @@ function SurfacePin({ spec }: { spec: PinSpec }) {
     node.updateWorldMatrix(true, false);
     const world = tmp.a.set(...p).applyMatrix4(node.matrixWorld), centre = tmp.b.setFromMatrixPosition(node.matrixWorld);
     const normal = tmp.c.subVectors(world, centre).normalize();
-    landedPins.set(spec.trajId, { world: [world.x, world.y, world.z], body: spec.body, normal: [normal.x, normal.y, normal.z] });
+    const inv = node.matrixWorld.clone().invert(), body = spec.body, offset = TEXTURE_LON_OFFSET_DEG[spec.body] ?? 0, v = new THREE.Vector3();
+    const groundAt = (x: number, y: number, z: number) => {
+      v.set(x, y, z).applyMatrix4(inv); const r = v.length() || 1;
+      const lat = Math.asin(v.y / r) * 180 / Math.PI, lon = Math.atan2(-v.z, v.x) * 180 / Math.PI - offset;
+      return radius + groundHeightM(body, lat, lon) * METRE;
+    };
+    landedPins.set(spec.trajId, { world: [world.x, world.y, world.z], body: spec.body, normal: [normal.x, normal.y, normal.z], centre: [centre.x, centre.y, centre.z], groundAt });
     if (ring.current && !ring.current.hidden && isOccluded(camera.position, world)) ring.current.hidden = true;
   }, -0.3);
   return <group ref={group} name={`pin-${spec.trajId}`} visible={false}>

@@ -118,3 +118,10 @@ Confirm each licence against package metadata (Prompt 11 check 12).
 | Claude | https://claude.ai | Research (including compiling hardware.json from NASA sources), planning and debugging |
 
 - Simplified Lunar Roving Vehicle and Apollo 11 laser reflector models (built in code, no external asset) use dimensions from [NSSDCA: The Apollo Lunar Roving Vehicle](https://nssdc.gsfc.nasa.gov/planetary/lunar/apollo_lrv.html) (US Government work), the [Boeing LRV press kit](http://www.ninfinger.org/karld/LRV%20Documents/A17_LunarRover2.pdf) (track width) and [NASA JPL: Apollo 11 Experiment Continues to Return Valuable Data](https://www.jpl.nasa.gov/news/apollo-11-experiment-continues-to-return-valuable-data/).
+
+## Real terrain heights
+- Moon global relief: [NASA SVS CGI Moon Kit, LRO LOLA LDEM_16](https://svs.gsfc.nasa.gov/4720) — NASA/GSFC/LRO/LOLA, NASA Scientific Visualization Studio (public domain).
+- Mars global relief: [MGS MOLA MEGDR 16 px/deg](https://pds-geosciences.wustl.edu/missions/mgs/megdr.html) — NASA/GSFC/MGS/MOLA Science Team, NASA PDS Geosciences Node (public domain).
+- Earth global relief: [NOAA NCEI ETOPO1 Global Relief Model](https://www.ncei.noaa.gov/products/etopo-global-relief-model) via [NOAA CoastWatch ERDDAP](https://coastwatch.pfeg.noaa.gov/erddap/griddap/etopo180.html) (US Government, public domain).
+- Apollo 11/15/16/17 site terrain: [LROC NAC DTMs](https://data.lroc.im-ldi.com/lroc/view_rdr_product/NAC_DTM_APOLLO11) — NASA/GSFC/Arizona State University (public domain).
+- Jezero (Ingenuity) and Viking 1 site terrain: [HiRISE DTMs](https://www.uahirise.org/dtm/ESP_045994_1985) ([Viking 1](https://www.uahirise.org/dtm/PSP_001521_2025)) — NASA/JPL-Caltech/UArizona (public domain).

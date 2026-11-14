@@ -57,10 +57,8 @@ export const ScaleTracker = () => {
 };
 
 /** Height of the camera above the landed pin's local ground plane (scene units). */
-function groundClearance(p: THREE.Vector3, pin: { world: [number, number, number]; normal: [number, number, number]; body: string }) {
-  // Altitude above the body's sphere (centre implied by the pin), so far-side views don't collapse the near plane.
-  const body = celestialObjects.find(o => o.id === pin.body);
-  const r = body ? bodyRadius(body.size) : 0;
-  const cx = pin.world[0] - pin.normal[0] * r, cy = pin.world[1] - pin.normal[1] * r, cz = pin.world[2] - pin.normal[2] * r;
-  return Math.hypot(p.x - cx, p.y - cy, p.z - cz) - r;
+function groundClearance(p: THREE.Vector3, pin: { centre: [number, number, number]; groundAt: (x: number, y: number, z: number) => number }) {
+  // Altitude above the real ground under the camera (site DTM / global relief), centre from the pin's own frame.
+  const [cx, cy, cz] = pin.centre;
+  return Math.hypot(p.x - cx, p.y - cy, p.z - cz) - pin.groundAt(p.x, p.y, p.z);
 }

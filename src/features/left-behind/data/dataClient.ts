@@ -2,7 +2,8 @@
 import type { Machine, Photo, Trajectory } from './types';
 
 export type TerrainTier = { file: string; tier: 'near' | 'mid'; west: number; south: number; east: number; north: number; px: number;
-  sourceMetresPerPixel: number; shownMetresPerPixel: number; source: string; credit: string };
+  sourceMetresPerPixel: number; shownMetresPerPixel: number; source: string; credit: string;
+  heightFile?: string; heightBaseM?: number; heightScaleM?: number; heightSource?: string };
 export type TerrainSite = { id: string; body: 'moon' | 'mars'; lat: number; lon: number; tiers: TerrainTier[] };
 type StaticData = Trajectory | Photo[] | { machines: Machine[] } | { sites: TerrainSite[] };
 const cache = new Map<string, Promise<StaticData>>();
