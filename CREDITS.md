@@ -6,6 +6,8 @@ Every resource used by Pale Dot: Left Behind. Each row is ready to copy into the
 
 ## NASA Data (form field: NASA Data)
 
+Data was fetched from the JPL Horizons API and NASA Image and Video Library API during the event and saved as static files in `public/left-behind/`. JPL Photojournal supplies metadata for the listed legacy image IDs. NASA media use guidance: https://www.nasa.gov/nasa-brand-center/images-and-media/ ; retain each manifest credit, respect third-party rights, and do not imply endorsement.
+
 | Link text | URL | Used for |
 | --- | --- | --- |
 | JPL Horizons System and API (NASA/JPL Solar System Dynamics) | https://ssd.jpl.nasa.gov/horizons/ | Every machine's real flight path, distance and light-time |
@@ -60,7 +62,6 @@ Confirm each licence against package metadata (Prompt 11 check 12).
 | vaul | https://github.com/emilkowalski/vaul | MIT |
 | DM Sans (Google Fonts) | https://fonts.google.com/specimen/DM+Sans | SIL Open Font License 1.1 |
 | DM Mono (Google Fonts) | https://fonts.google.com/specimen/DM+Mono | SIL Open Font License 1.1 |
-| Supabase (Edge Function and Storage for the data service) | https://supabase.com | Service used by the app |
 | [anything else Prompt 11 reports] | [URL] | [licence] |
 
 ### AI tools

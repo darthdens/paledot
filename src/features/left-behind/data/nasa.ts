@@ -100,6 +100,8 @@ export function acceptablePhoto(item: LibraryItem, machine: Machine, query?: str
   if (/\b(simulations?|trainer|model|artists?|concept|illustration|animation|diagram|chart|instruments|magnetic|team|logbook|logs?|montage|3D)\b/i.test(data.title)) return false;
   if (/Voyager [12]/i.test(data.title) && !data.title.includes(machine.name) && machine.id.startsWith('voyager')) return false;
   if (!query) return true;
+  if (query === 'Voyager spacecraft' && !/spacecraft/i.test(data.title)) return false;
+  if (machine.id === 'ingenuity' && query.includes('first flight') && /from the air|shadow/i.test(data.title)) return false;
   const name = machine.id === 'lunar-rovers' ? query.match(/Apollo \d+/i)?.[0] ?? 'Apollo' : machine.id.startsWith('voyager') ? 'Voyager' : machine.id.replaceAll('-', ' ');
   if (data.title.toLowerCase().includes(name.toLowerCase())) return true;
   // These searches require the actual hardware, not merely an image it took.
