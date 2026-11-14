@@ -17,6 +17,7 @@ export const RELIEF_NEAR_RADII = 60;
 export type Relief = { width: number; height: number; data: Float32Array; texture: THREE.DataTexture; maxM: number };
 const cache = new Map<string, Promise<Relief>>();
 const ready = new Map<string, Relief>();
+if (import.meta.env.DEV && typeof window !== 'undefined') { const w = window as unknown as { __reliefInstances?: Map<string, Relief>[] }; (w.__reliefInstances ??= []).push(ready); }
 
 export function hasRelief(id: string) { return id in URLS; }
 export function reliefSync(id: string) { return ready.get(id); }
