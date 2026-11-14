@@ -51,8 +51,14 @@ function TierCap({ tier, order, radius, mesh, body }: { tier: TerrainTier; order
     const d = Math.PI / 180;
     const phi0 = Math.PI + (tier.west + offset) * d, phiLen = (tier.east - tier.west) * d;
     const theta0 = Math.PI / 2 - tier.north * d, thetaLen = (tier.north - tier.south) * d;
-    return new THREE.SphereGeometry(radius, SEGMENTS, SEGMENTS, phi0, phiLen, theta0, thetaLen);
+    const g = new THREE.SphereGeometry(radius, SEGMENTS, SEGMENTS, phi0, phiLen, theta0, thetaLen);
+    // Rebase vertices on the cap's own centre: body-centred coordinates (~radius) in float32 only resolve
+    // ~0.1 m, which makes the ground shake at metre-scale views. Cap-local coordinates resolve millimetres.
+    g.computeBoundingBox(); const origin = g.boundingBox!.getCenter(new THREE.Vector3());
+    g.translate(-origin.x, -origin.y, -origin.z); g.userData['origin'] = origin;
+    return g;
   }, [tier, radius, offset]);
+  const origin = geometry.userData['origin'] as THREE.Vector3;
   useEffect(() => () => geometry.dispose(), [geometry]);
 
   const material = useMemo(() => {
@@ -69,13 +75,16 @@ function TierCap({ tier, order, radius, mesh, body }: { tier: TerrainTier; order
         texel: { value: 1 / tier.px },
         isMars: { value: body === 'mars' ? 1 : 0 },
         sunDir: { value: new THREE.Vector3(1, 0, 0) },
+        origin: { value: origin },
       },
       vertexShader: /* glsl */`
+        uniform vec3 origin;
         varying vec2 vUv; varying vec3 vNormalW; varying vec3 vEast;
         void main() {
           vUv = uv;
+          vec3 bodyPos = position + origin;
           vNormalW = normalize(mat3(modelMatrix) * normal);
-          vEast = normalize(mat3(modelMatrix) * vec3(position.z, 0.0, -position.x));
+          vEast = normalize(mat3(modelMatrix) * vec3(bodyPos.z, 0.0, -bodyPos.x));
           // modelViewMatrix is composed on the CPU in double precision; world coordinates (~1e5 scene units)
           // in float32 would snap these km-sized caps to a ~8 km grid.
           gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
@@ -107,11 +116,11 @@ function TierCap({ tier, order, radius, mesh, body }: { tier: TerrainTier; order
           gl_FragColor = vec4(col, a);
         }`,
     });
-  }, [mesh.material, tier, order, body, offset]);
+  }, [mesh.material, tier, order, body, offset, origin]);
   useEffect(() => { material.uniforms['detailMap']!.value = tex; }, [material, tex]);
   useEffect(() => () => material.dispose(), [material]);
   if (!tex) return null;
   // The Sun sits at the scene origin: light direction from the cap's own world position (CPU doubles).
-  return <mesh geometry={geometry} material={material} renderOrder={1 + order} raycast={() => null}
+  return <mesh position={origin} geometry={geometry} material={material} renderOrder={1 + order} raycast={() => null}
     onBeforeRender={function (this: THREE.Mesh) { (material.uniforms['sunDir']!.value as THREE.Vector3).setFromMatrixPosition(this.matrixWorld).negate().normalize(); }} />;
 }
