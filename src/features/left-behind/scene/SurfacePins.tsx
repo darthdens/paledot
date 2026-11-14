@@ -18,6 +18,7 @@ import { landedPins } from '../lib/pinRegistry';
 import { useSurfaceAttachmentStore } from '../state/surfaceAttachments';
 import { useLeftBehindStore } from '../state/useLeftBehindStore';
 import { useSimClock } from '../state/useSimClock';
+import { SitePatch } from './SitePatch';
 
 type Body = 'moon' | 'mars';
 type PinSpec = { trajId: string; body: Body; lat: number; lon: number; date: number; label: string };
@@ -31,6 +32,8 @@ function SurfacePin({ spec }: { spec: PinSpec }) {
   const group = useRef<THREE.Group>(null), top = useRef<THREE.Group>(null), ring = useRef<HTMLDivElement>(null);
   const shown = useRef<boolean | null>(null);
   const selected = useLeftBehindStore(s => s.selectedHardwareId === spec.trajId);
+  const followed = useLeftBehindStore(s => s.followTargetId === spec.trajId);
+  const [patch, setPatch] = useState<{ local: [number, number, number]; radius: number; mesh: THREE.Mesh } | null>(null);
   const { language } = useLanguage();
   const line = useMemo(() => {
     const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.BufferAttribute(new Float32Array(6), 3));
@@ -54,6 +57,8 @@ function SurfacePin({ spec }: { spec: PinSpec }) {
     if (ring.current) ring.current.hidden = !visible || crowded[spec.body] || !['earth', 'solarSystem'].includes(useCosmosStore.getState().currentScale);
     if (!visible) { landedPins.delete(spec.trajId); return; }
     const p = latLonToLocal(spec.lat, spec.lon, radius, TEXTURE_LON_OFFSET_DEG[spec.body] ?? 0);
+    if (followed && (!patch || patch.radius !== radius || patch.mesh !== mesh)) setPatch({ local: [p[0], p[1], p[2]], radius, mesh });
+    else if (!followed && patch) setPatch(null);
     const attr = line.geometry.getAttribute('position') as THREE.BufferAttribute;
     attr.setXYZ(0, p[0], p[1], p[2]); attr.setXYZ(1, p[0] * (1 + LEADER), p[1] * (1 + LEADER), p[2] * (1 + LEADER)); attr.needsUpdate = true;
     top.current.position.set(p[0] * (1 + LEADER), p[1] * (1 + LEADER), p[2] * (1 + LEADER));
@@ -64,7 +69,8 @@ function SurfacePin({ spec }: { spec: PinSpec }) {
     if (ring.current && !ring.current.hidden && isOccluded(camera.position, world)) ring.current.hidden = true;
   }, -0.3);
   return <group ref={group} name={`pin-${spec.trajId}`} visible={false}>
-    <primitive object={line} />
+    {patch && <SitePatch local={patch.local} radius={patch.radius} mesh={patch.mesh} />}
+    <primitive object={line} visible={!followed} />
     <group ref={top}>
       <Html center zIndexRange={[40, 30]}>
         <div ref={ring} hidden className="paledot dark pd-pin-anchor">
