@@ -12,8 +12,20 @@ import { landedPins } from '../lib/pinRegistry';
 const MARKER_PX = 40, SELECTED_PX = 76;
 const PARENT_RADIUS: Record<string, number> = { moon: 1.7374, mars: 3.3895 };
 
-export function HardwareModel({ id, url, selected, parent }: { id: string; url: string; selected: boolean; parent?: 'moon' | 'mars' | undefined }) {
+type Props = { id: string; selected: boolean; parent?: 'moon' | 'mars' | undefined };
+
+export function HardwareModel({ url, ...props }: Props & { url: string }) {
   const { scene } = useGLTF(url, false);
+  return <HardwareBody {...props} scene={scene} />;
+}
+
+/** True-size simplified stand-in (no NASA model exists), built from published dimensions. */
+export function SimplifiedHardwareModel({ build, ...props }: Props & { build: () => THREE.Object3D }) {
+  const scene = useMemo(build, [build]);
+  return <HardwareBody {...props} scene={scene} />;
+}
+
+function HardwareBody({ id, scene, selected, parent }: Props & { scene: THREE.Object3D }) {
   const group = useRef<THREE.Group>(null);
   useEffect(() => { void loadTrueSpans(); }, []);
   const model = useMemo(() => {

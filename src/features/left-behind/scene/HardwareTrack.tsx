@@ -16,7 +16,8 @@ import { eclipticKmToScene } from '../lib/units';
 import { followHardware } from '../lib/hardwareNavigation';
 import { machineCopy } from '../lib/machineCopy';
 import { nasaModels } from '../lib/nasaModels';
-import { HardwareModel } from './HardwareModel';
+import { HardwareModel, SimplifiedHardwareModel } from './HardwareModel';
+import { simplifiedModels } from '../lib/nasaModels';
 import { loadTrueSpans, trueSpanUnits } from '../lib/nasaModels';
 import { landedPins, SURFACE_BODY } from '../lib/pinRegistry';
 
@@ -153,13 +154,14 @@ export function HardwareTrack({ data, nearest }: { data: Trajectory; nearest: bo
     <primitive object={lead}/>
     {graphics.map((g,i)=><group key={i}><primitive object={g.past}/><primitive object={g.future}/></group>)}
     <group ref={marker} visible={false} name={`hw:${data.id}`}>
+      {!model&&simplifiedModels[data.id]&&<SceneBoundary><SimplifiedHardwareModel id={data.id} build={simplifiedModels[data.id]!} selected={selected} parent={PARENTS[data.id]}/></SceneBoundary>}
       {model&&<SceneBoundary><Suspense fallback={null}><HardwareModel id={data.id} url={model.url} selected={selected} parent={PARENTS[data.id]}/></Suspense></SceneBoundary>}
       <Html center zIndexRange={[40,30]}>
         <div ref={anchor} hidden className="paledot dark pd-hardware-anchor" onPointerEnter={()=>setHover(true)} onPointerLeave={()=>setHover(false)}>
           <Button variant="ghost" className="pd-hardware-hit" aria-label={`${machineCopy[language].select} ${label}`} aria-pressed={selected} onClick={()=>followHardware(data.id)}>
             <span className={`pd-hardware-ring ${selected?'pd-hardware-selected':''} ${model?'pd-hardware-ring-model':''}`} />
           </Button>
-          {(hover||selected||nearest)&&<span className="pd-hardware-label">{label}{data.source==='simplified'&&<small>{machineCopy[language].simplified}</small>}</span>}
+          {(hover||selected||nearest)&&<span className="pd-hardware-label">{label}{data.source==='simplified'&&<small>{machineCopy[language].simplified}</small>}{!model&&simplifiedModels[data.id]&&<small>{machineCopy[language].simplifiedModel}</small>}</span>}
         </div>
       </Html>
     </group>
