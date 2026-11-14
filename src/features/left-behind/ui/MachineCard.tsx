@@ -8,6 +8,7 @@ import { Carousel, CarouselContent, CarouselItem, type CarouselApi } from '@/com
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { useLanguage } from '@/i18n/LanguageContext';
 import { cardCopy, placeNames } from '../lib/cardCopy';
+import { dataText, captionText } from '../lib/dataText';
 import { machineKinds } from '../lib/machineCopy';
 import { helioPositionKm, moonPositionKm } from '../engine/ephemeris';
 import { measurementsAt } from '../engine/trajectory';
@@ -51,7 +52,8 @@ export function MachineCard({ machine, following = false, extra = [], unfollowLa
     if (d > 0) api.scrollNext(); else api.scrollPrev();
   };
   useEffect(() => { let live = true; void getPhotoManifest().then(list => { if (live) setPhotos((list as ManifestPhoto[]).filter(p => p.machineId === machine.id && !PALE_BLUE.test(p.role ?? ''))); }).catch(() => live && setPhotos([])); return () => { live = false; }; }, [machine.id]);
-  const capt = (p: ManifestPhoto) => typeof p.caption === 'string' ? p.caption : (p.caption[language] ?? p.caption['en'] ?? p.title);
+  const capt = (p: ManifestPhoto) => captionText(p.id, p.caption, language) || p.title;
+  const T = (x: string) => dataText(x, language);
 
   const year = new Date(machine.landingDate ?? machine.launchDate).getUTCFullYear();
   const kind = machine.kind ? machineKinds[machine.kind]?.[language] ?? machine.kind : '';
@@ -76,7 +78,7 @@ export function MachineCard({ machine, following = false, extra = [], unfollowLa
   return <div className="space-y-4" data-machine-card>
     <div className="space-y-1.5">
       <p className={heading}>{[kind, place, year].filter(Boolean).join(' · ')}</p>
-      <h3 className="text-base font-semibold text-foreground">{machine.name}</h3>
+      <h3 className="text-base font-semibold text-foreground">{T(machine.name)}</h3>
       {statusText && <span className="inline-flex rounded-full border border-border px-2.5 py-0.5 text-xs text-muted-foreground" data-machine-status>{statusText}</span>}
     </div>
 
@@ -87,16 +89,16 @@ export function MachineCard({ machine, following = false, extra = [], unfollowLa
       {photos && photos.length === 1 && <p className="mt-1 text-xs text-muted-foreground">TODO(source)</p>}
     </section>
 
-    {did.length > 0 && <section className="space-y-1.5"><h4 className={heading}>{t.whatItDid}</h4><ul className="list-disc space-y-1 pl-4 text-sm text-foreground">{did.map(f => <li key={f.id}>{f.text}</li>)}</ul></section>}
-    {machine.leftBehind?.length ? <section className="space-y-1.5"><h4 className={heading}>{t.leftBehind}</h4><ul className="list-disc space-y-1 pl-4 text-sm text-foreground">{machine.leftBehind.map(x => <li key={x}>{x}</li>)}</ul></section> : null}
+    {did.length > 0 && <section className="space-y-1.5"><h4 className={heading}>{t.whatItDid}</h4><ul className="list-disc space-y-1 pl-4 text-sm text-foreground">{did.map(f => <li key={f.id}>{T(f.text)}</li>)}</ul></section>}
+    {machine.leftBehind?.length ? <section className="space-y-1.5"><h4 className={heading}>{t.leftBehind}</h4><ul className="list-disc space-y-1 pl-4 text-sm text-foreground">{machine.leftBehind.map(x => <li key={x}>{T(x)}</li>)}</ul></section> : null}
     <section className="space-y-1.5"><h4 className={heading}>{t.whereNow}</h4>
-      <p className="text-sm text-foreground">{machine.whereNow ?? 'TODO(source)'}</p>
+      <p className="text-sm text-foreground">{machine.whereNow ? T(machine.whereNow) : 'TODO(source)'}</p>
       {distance !== null && <p className="pd-hud-value text-xs">{t.distanceToday}: {Math.round(distance).toLocaleString(numberLocale)} km <span className="text-muted-foreground">· {t.calculated}</span></p>}
     </section>
     {machine.keyDates?.length ? <section className="space-y-1.5"><h4 className={heading}>{t.keyDates}</h4>
-      <dl className="space-y-1 font-mono text-xs tabular-nums">{machine.keyDates.map(d => <div key={d.label + d.date} className="grid grid-cols-[minmax(0,1fr)_auto] gap-2"><dt className="text-foreground">{d.label}</dt><dd className="text-right text-foreground">{fmtDate(d.date)}<span className="block text-[10px] text-muted-foreground">{d.factId ? t.nasaReported : 'TODO(source)'}</span></dd></div>)}</dl>
+      <dl className="space-y-1 font-mono text-xs tabular-nums">{machine.keyDates.map(d => <div key={d.label + d.date} className="grid grid-cols-[minmax(0,1fr)_auto] gap-2"><dt className="text-foreground">{T(d.label)}</dt><dd className="text-right text-foreground">{fmtDate(d.date)}<span className="block text-[10px] text-muted-foreground">{d.factId ? t.nasaReported : 'TODO(source)'}</span></dd></div>)}</dl>
     </section> : null}
-    {machine.sources?.length ? <section className="space-y-1.5"><h4 className={heading}>{t.sources}</h4><ul className="space-y-1 text-xs">{machine.sources.map(s => <li key={s.url}><a href={s.url} target="_blank" rel="noopener noreferrer" className="inline-flex items-start gap-1 text-foreground underline-offset-2 hover:underline">{s.title}<ExternalLink className="mt-0.5 h-3 w-3 shrink-0" aria-hidden /></a></li>)}</ul></section> : null}
+    {machine.sources?.length ? <section className="space-y-1.5"><h4 className={heading}>{t.sources}</h4><ul className="space-y-1 text-xs">{machine.sources.map(s => <li key={s.url}><a href={s.url} target="_blank" rel="noopener noreferrer" className="inline-flex items-start gap-1 text-foreground underline-offset-2 hover:underline">{T(s.title)}<ExternalLink className="mt-0.5 h-3 w-3 shrink-0" aria-hidden /></a></li>)}</ul></section> : null}
 
     {(() => {
       const actions: Action[] = [
