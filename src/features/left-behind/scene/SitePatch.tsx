@@ -146,7 +146,7 @@ function TierCap({ tier, order, radius, mesh, body }: { tier: TerrainTier; order
           }
           float moonLift = isMars > 0.5 ? 1.0 : (0.7 + 0.5 * ndl);
           // Eye-adapted exposure for ground-level views: low sun angles stay readable, night stays dark.
-          vec3 col = albedo * moonLift * (0.012 + 0.988 * sqrt(ndl)) * 1.25;
+          vec3 col = albedo * moonLift * (0.002 + 0.998 * ndl); // linear light, sRGB-encoded below (matches the body)
           // Fade the edges into the body's own surface.
           vec2 edge = min(vUv, 1.0 - vUv);
           float a = smoothstep(0.0, 0.08, min(edge.x, edge.y));
