@@ -44,15 +44,17 @@ export function parseVectors(text: string): { start: string; positions: number[]
 export async function buildTrajectory(settings: TrajectorySettings, machine: Machine): Promise<Trajectory> {
   let target = settings.horizonsTarget;
   if (!target && settings.lookup) {
-    const lookupUrl = `https://ssd.jpl.nasa.gov/api/horizons_lookup.api?sstr=${encodeURIComponent(settings.lookup)}&group=sct`;
-    const lookup = await getJson(lookupUrl);
     const launch = (settings.launch ?? machine.launchDate).slice(0, 10);
     const arrival = (settings.arrival ?? machine.landingDate ?? settings.stop ?? '').slice(0, 10);
-    const record = (lookup.result ?? []).find((entry: { spkid?: string; name?: string }) => {
-      const dates = entry.name?.match(/\d{4}-\d{2}-\d{2}/g);
-      return dates && dates.length >= 2 && (dates[0] ?? '') <= launch && (dates[1] ?? '') >= arrival;
-    });
-    target = record?.spkid ? String(record.spkid) : null;
+    const searches = settings.id === 'opportunity' ? ['MER-1', 'Opportunity'] : [settings.lookup];
+    for (const search of searches) {
+      const lookup = await getJson(`https://ssd.jpl.nasa.gov/api/horizons_lookup.api?sstr=${encodeURIComponent(search)}&group=sct`);
+      const record = (lookup.result ?? []).find((entry: { spkid?: string; name?: string }) => {
+        const dates = entry.name?.match(/\d{4}-\d{2}-\d{2}/g);
+        return dates && dates.length >= 2 && (dates[0] ?? '') <= launch && (dates[1] ?? '') >= arrival;
+      });
+      if (record?.spkid) { target = String(record.spkid); break; }
+    }
   }
   if (!target) {
     if (settings.fallback !== 'simplified') throw new Error('TODO(source): no usable Horizons target');
@@ -95,11 +97,19 @@ type LibraryItem = { data?: { nasa_id: string; title: string; description?: stri
 export function acceptablePhoto(item: LibraryItem, machine: Machine, query?: string) {
   const data = item.data?.[0];
   if (!data || /\b(logo|insignia|patch|emblem)\b/i.test([data.title, ...(data.keywords ?? [])].join(' '))) return false;
-  if (query && /\b(simulations?|trainer|artists?|concept|illustration|animation|diagram|chart|team|logbook|logs?|montage|3D)\b/i.test(data.title)) return false;
+  if (/\b(simulations?|trainer|model|artists?|concept|illustration|animation|diagram|chart|instruments|magnetic|team|logbook|logs?|montage|3D)\b/i.test(data.title)) return false;
   if (/Voyager [12]/i.test(data.title) && !data.title.includes(machine.name) && machine.id.startsWith('voyager')) return false;
   if (!query) return true;
   const name = machine.id === 'lunar-rovers' ? query.match(/Apollo \d+/i)?.[0] ?? 'Apollo' : machine.id.startsWith('voyager') ? 'Voyager' : machine.id.replaceAll('-', ' ');
-  return data.title.toLowerCase().includes(name.toLowerCase());
+  if (data.title.toLowerCase().includes(name.toLowerCase())) return true;
+  // These searches require the actual hardware, not merely an image it took.
+  if (machine.id === 'apollo-11' && query.includes('retroreflector')) {
+    return /Apollo 11/i.test(data.description ?? '') && /retroreflector|laser ranging/i.test(data.title + ' ' + data.description);
+  }
+  if (machine.id === 'ingenuity' && query.includes('first flight')) {
+    return /Ingenuity/i.test(data.description ?? '') && /helicopter/i.test(data.title + ' ' + data.description) && /first flight|first.*flight/i.test(data.title + ' ' + data.description);
+  }
+  return false;
 }
 
 export async function buildPhotos(machines: Machine[]): Promise<Photo[]> {
@@ -130,7 +140,10 @@ export async function buildPhotos(machines: Machine[]): Promise<Photo[]> {
       const title = rawTitle?.replace(/\s+/g, ' ').replace(/^PIA\d+:\s*/, '').replace(/\s*\|.*$/, '').trim();
       if (!title) throw new Error(`TODO(source): missing Photojournal title for ${entry.nasaId}`);
       photo = { id: `${machine.id}-${index + 1}`, machineId: machine.id, nasaId: entry.nasaId, title, credit: 'NASA/JPL-Caltech', sourceUrl, imageUrl: `https://photojournal.jpl.nasa.gov/jpeg/${entry.nasaId}.jpg`, dateTaken: null, alt: title.replace(/[.!?]+$/, '') + '.', caption: title };
-    } else throw new Error(`TODO(source): no qualifying NASA photo for ${machine.id}: ${entry.query ?? entry.nasaId}`);
+    } else {
+      photo = { id: `${machine.id}-${index + 1}`, machineId: machine.id, nasaId: '', title: 'TODO(source)', credit: 'TODO(source)', sourceUrl: `https://images-api.nasa.gov/search?${search}`, imageUrl: '', dateTaken: null, alt: '', caption: '', todo: true, note: `TODO(source): no qualifying NASA photo for ${machine.id}: ${entry.query ?? entry.nasaId}` };
+    }
+    if (data?.description) photo.description = data.description;
     if (entry.role) photo.role = entry.role;
     if (entry.role === 'pale-blue-dot' || entry.role === 'pale-blue-dot-revisited') photo.earthMarker = null;
     manifest.push(photo);
