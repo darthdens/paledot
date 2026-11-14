@@ -49,7 +49,6 @@ export function buildLunarRover(): THREE.Group {
   g.add(mesh(new THREE.BoxGeometry(1.5, 0.015, 1.08), alBright, 0, deck - 0.01, 0));
 
   // Wheels: wire-mesh tyres with titanium chevron treads, spun-aluminium hubs, fibreglass fenders
-  const chevron = new THREE.BoxGeometry(0.05, 0.012, WHEEL_W * 0.9);
   for (const sx of [-1, 1]) for (const sz of [-1, 1]) {
     const w = new THREE.Group(); w.position.set(sx * WB / 2, WHEEL_R, sz * TRACK / 2);
     const tread = new THREE.Mesh(new THREE.CylinderGeometry(WHEEL_R, WHEEL_R, WHEEL_W, 40, 1, true), wire);
@@ -62,15 +61,14 @@ export function buildLunarRover(): THREE.Group {
         c.rotation.z = a + Math.PI / 2; c.rotateY(side * 0.45); w.add(c);
       }
     }
-    void chevron;
     const inner = new THREE.Mesh(new THREE.CylinderGeometry(WHEEL_R * 0.78, WHEEL_R * 0.78, WHEEL_W * 0.7, 24, 1, true), wire);
     inner.rotation.x = Math.PI / 2; w.add(inner);
     const hub = new THREE.Mesh(new THREE.CylinderGeometry(0.14, 0.16, WHEEL_W + 0.03, 20), al); hub.rotation.x = Math.PI / 2; w.add(hub);
     for (let i = 0; i < 8; i++) { const a = i / 8 * Math.PI * 2; w.add(tube(V(0, 0, sz * 0.1), V(Math.cos(a) * WHEEL_R * 0.78, Math.sin(a) * WHEEL_R * 0.78, sz * 0.1), 0.008, alBright)); }
     g.add(w);
-    const f = new THREE.Mesh(new THREE.CylinderGeometry(WHEEL_R + 0.07, WHEEL_R + 0.07, WHEEL_W + 0.1, 24, 1, true, -Math.PI * 0.42, Math.PI * 0.84), fender);
-    f.position.copy(w.position); f.rotation.x = Math.PI / 2; f.rotation.y = 0; f.rotateY(0); f.rotation.z = 0; f.rotateX(0);
-    f.rotation.set(Math.PI / 2, 0, 0); f.rotateOnWorldAxis(new THREE.Vector3(0, 0, 1), 0); g.add(f);
+    // Fender over the top of the wheel (theta = π points up after the X rotation)
+    const f = new THREE.Mesh(new THREE.CylinderGeometry(WHEEL_R + 0.07, WHEEL_R + 0.07, WHEEL_W + 0.1, 24, 1, true, Math.PI * 0.58, Math.PI * 0.84), fender);
+    f.position.copy(w.position); f.rotation.x = Math.PI / 2; g.add(f);
     // Double-wishbone suspension arms and torsion bar to the chassis
     for (const dy of [-0.05, 0.08]) g.add(tube(V(sx * WB / 2, WHEEL_R + dy * 0.3, sz * (TRACK / 2 - WHEEL_W / 2)), V(sx * (WB / 2 - 0.25), deck + dy, sz * 0.55), 0.018, al));
   }
