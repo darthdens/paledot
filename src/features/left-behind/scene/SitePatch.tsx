@@ -151,6 +151,7 @@ function TierCap({ tier, order, radius, mesh, body }: { tier: TerrainTier; order
           vec2 edge = min(vUv, 1.0 - vUv);
           float a = smoothstep(0.0, 0.08, min(edge.x, edge.y));
           gl_FragColor = vec4(col, a);
+          #include <colorspace_fragment>
         }`,
     });
   }, [mesh.material, tier, order, body, offset, origin]);
