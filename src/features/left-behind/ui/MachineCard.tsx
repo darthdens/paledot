@@ -1,10 +1,10 @@
 // Left Behind · built during NASA Space Apps Challenge 2026 (14–15 Nov 2026) · AI-assisted (Lovable, Claude)
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { CalendarClock, Compass, ExternalLink, Map } from 'lucide-react';
 import type { Machine, Photo } from '../data/types';
 import { getPhotoManifest } from '../data/dataClient';
 import { Button } from '@/components/ui/button';
-import { Carousel, CarouselContent, CarouselItem } from '@/components/ui/carousel';
+import { Carousel, CarouselContent, CarouselItem, type CarouselApi } from '@/components/ui/carousel';
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { useLanguage } from '@/i18n/LanguageContext';
 import { cardCopy, placeNames } from '../lib/cardCopy';
@@ -40,6 +40,15 @@ export function MachineCard({ machine }: { machine: CardMachine }) {
   const t = cardCopy[language];
   const [photos, setPhotos] = useState<ManifestPhoto[] | null>(null);
   const [open, setOpen] = useState<ManifestPhoto | null>(null);
+  const [api, setApi] = useState<CarouselApi>();
+  const wheelAt = useRef(0);
+  const onWheel = (e: React.WheelEvent) => {
+    if (!api) return; const d = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
+    if (Math.abs(d) < 4) return;
+    if ((d > 0 && !api.canScrollNext()) || (d < 0 && !api.canScrollPrev())) return;
+    e.stopPropagation(); const now = Date.now(); if (now - wheelAt.current < 350) return; wheelAt.current = now;
+    if (d > 0) api.scrollNext(); else api.scrollPrev();
+  };
   useEffect(() => { let live = true; void getPhotoManifest().then(list => { if (live) setPhotos((list as ManifestPhoto[]).filter(p => p.machineId === machine.id && !PALE_BLUE.test(p.role ?? ''))); }).catch(() => live && setPhotos([])); return () => { live = false; }; }, [machine.id]);
   const capt = (p: ManifestPhoto) => typeof p.caption === 'string' ? p.caption : (p.caption[language] ?? p.caption['en'] ?? p.title);
 
@@ -73,7 +82,7 @@ export function MachineCard({ machine }: { machine: CardMachine }) {
     <section aria-label={t.photos}>
       {photos === null ? <div className="aspect-[4/3] rounded-[6px] border border-border bg-muted/40" />
         : photos.length === 0 ? <p className="text-xs text-muted-foreground">TODO(source)</p>
-        : <Carousel opts={{ align: 'start' }}><CarouselContent className="-ml-2">{photos.map(p => <CarouselItem key={p.id} className="pl-2 basis-[85%]"><PhotoBox photo={p} caption={capt(p)} onOpen={() => setOpen(p)} label={t.openPhoto} missing={t.photoUnavailable} /></CarouselItem>)}</CarouselContent></Carousel>}
+        : <div onWheel={onWheel}><Carousel setApi={setApi} opts={{ align: 'start' }}><CarouselContent className="-ml-2">{photos.map(p => <CarouselItem key={p.id} className="pl-2 basis-[85%]"><PhotoBox photo={p} caption={capt(p)} onOpen={() => setOpen(p)} label={t.openPhoto} missing={t.photoUnavailable} /></CarouselItem>)}</CarouselContent></Carousel></div>}
       {photos && photos.length === 1 && <p className="mt-1 text-xs text-muted-foreground">TODO(source)</p>}
     </section>
 
@@ -88,10 +97,10 @@ export function MachineCard({ machine }: { machine: CardMachine }) {
     </section> : null}
     {machine.sources?.length ? <section className="space-y-1.5"><h4 className={heading}>{t.sources}</h4><ul className="space-y-1 text-xs">{machine.sources.map(s => <li key={s.url}><a href={s.url} target="_blank" rel="noopener noreferrer" className="inline-flex items-start gap-1 text-foreground underline-offset-2 hover:underline">{s.title}<ExternalLink className="mt-0.5 h-3 w-3 shrink-0" aria-hidden /></a></li>)}</ul></section> : null}
 
-    <div className="grid grid-cols-3 gap-2 border-t border-border pt-3">
-      <Button size="sm" variant="ghost" disabled className="text-xs bg-muted/50 text-foreground max-sm:min-h-11 whitespace-normal h-auto py-1.5"><Map className="w-3 h-3" />{t.takeTour}</Button>
-      <Button size="sm" variant="ghost" className="text-xs bg-muted/50 text-foreground hover:bg-muted max-sm:min-h-11 whitespace-normal h-auto py-1.5" onClick={() => { const st = useLeftBehindStore.getState(); if (st.followTargetId === null) st.toggleHardwareFollow(); }}><Compass className="w-3 h-3" />{t.flyTo}</Button>
-      <Button size="sm" variant="ghost" className="text-xs bg-muted/50 text-foreground hover:bg-muted max-sm:min-h-11 whitespace-normal h-auto py-1.5" onClick={() => useSimClock.getState().setSimDate(Date.parse(machine.landingDate ?? machine.launchDate))}><CalendarClock className="w-3 h-3" />{t.showTimeline}</Button>
+    <div className="grid grid-cols-2 gap-2 border-t border-border pt-3">
+      <Button size="sm" variant="ghost" className="h-9 max-sm:h-11 gap-1.5 text-xs bg-muted/50 text-foreground hover:bg-muted col-span-2" disabled><Map className="w-3.5 h-3.5" />{t.takeTour}</Button>
+      <Button size="sm" variant="ghost" className="h-9 max-sm:h-11 gap-1.5 text-xs bg-muted/50 text-foreground hover:bg-muted" onClick={() => { const st = useLeftBehindStore.getState(); if (st.followTargetId === null) st.toggleHardwareFollow(); }}><Compass className="w-3.5 h-3.5" />{t.flyTo}</Button>
+      <Button size="sm" variant="ghost" className="h-9 max-sm:h-11 gap-1.5 text-xs bg-muted/50 text-foreground hover:bg-muted" onClick={() => useSimClock.getState().setSimDate(Date.parse(machine.landingDate ?? machine.launchDate))}><CalendarClock className="w-3.5 h-3.5" />{t.showTimeline}</Button>
     </div>
 
     <Dialog open={!!open} onOpenChange={o => !o && setOpen(null)}>
