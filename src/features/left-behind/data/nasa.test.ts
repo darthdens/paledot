@@ -38,7 +38,7 @@ describe('Left Behind source and sampling rules', () => {
     if (!voyager) throw new Error('Missing Voyager');
     expect(acceptablePhoto({ data: [{ nasa_id: 'x', title: 'Voyager logo', keywords: [] }] }, voyager)).toBe(false);
     expect(acceptablePhoto({ data: [{ nasa_id: 'x', title: 'Voyager spacecraft', keywords: ['patch'] }] }, voyager)).toBe(false);
-    expect(acceptablePhoto({ data: [{ nasa_id: 'x', title: 'Voyager spacecraft', keywords: [] }] }, voyager, 'Voyager spacecraft')).toBe(true);
+    expect(acceptablePhoto({ data: [{ nasa_id: 'x', title: 'Voyager 1 spacecraft testing', description: 'Voyager 1 spacecraft before launch.', keywords: [] }] }, voyager, 'Voyager spacecraft')).toBe(true);
   });
   it('never assigns a Voyager 2 image to Voyager 1', () => {
     if (!voyager) throw new Error('Missing Voyager');

@@ -100,10 +100,11 @@ export function acceptablePhoto(item: LibraryItem, machine: Machine, query?: str
   if (/\b(simulations?|trainer|model|artists?|concept|illustration|animation|diagram|chart|instruments|magnetic|team|logbook|logs?|montage|3D)\b/i.test(data.title)) return false;
   if (/Voyager [12]/i.test(data.title) && !data.title.includes(machine.name) && machine.id.startsWith('voyager')) return false;
   if (!query) return true;
+  if (machine.id === 'viking-1' && /first.*(?:photograph|image)/i.test(data.title) && /Viking (?:Lander )?1/i.test(data.description ?? '')) return true;
   if (query === 'Voyager spacecraft') {
-    const physical = /encapsulation|testing|flight hardware|preparing for launch|system test|in Florida/i.test(data.title);
+    const physical = /encapsulat|testing|flight hardware|preparing for launch|system test|in Florida/i.test(data.title + ' ' + data.description);
     if (!physical || !/spacecraft/i.test(data.description ?? '')) return false;
-    if (!new RegExp(machine.name, 'i').test(data.title + ' ' + data.description)) return false;
+    if (!new RegExp(machine.name.replace(' ', '[ -]'), 'i').test(data.title + ' ' + data.description)) return false;
     return true;
   }
   if (machine.id === 'ingenuity' && query.includes('first flight')) {
@@ -125,7 +126,8 @@ export async function buildPhotos(machines: Machine[]): Promise<Photo[]> {
   const manifest: Photo[] = [];
   for (const machine of machines) for (const [index, entry] of machine.photos.entries()) {
     const search = entry.nasaId ? `nasa_id=${encodeURIComponent(entry.nasaId)}` : `q=${encodeURIComponent(entry.query ?? '')}&media_type=image`;
-    const response = await getJson(`https://images-api.nasa.gov/search?${search}`);
+    const alternateQuery = machine.id === 'voyager-1' && entry.query === 'Voyager spacecraft' ? 'Voyager 1 spacecraft assembly' : machine.id === 'viking-1' && entry.query ? 'Viking Lander 1 first image' : null;
+    const response = await getJson(`https://images-api.nasa.gov/search?${alternateQuery ? `q=${encodeURIComponent(alternateQuery)}&media_type=image` : search}`);
     const items: LibraryItem[] = response.collection?.items ?? [];
     const score = (item: LibraryItem) => {
       const title = item.data?.[0]?.title.toLowerCase() ?? '';
@@ -137,7 +139,7 @@ export async function buildPhotos(machines: Machine[]): Promise<Photo[]> {
     if (data) {
       const assets = await getJson(`https://images-api.nasa.gov/asset/${encodeURIComponent(data.nasa_id)}`);
       const urls: string[] = (assets.collection?.items ?? []).map((asset: { href: string }) => asset.href).filter((url: string) => /\.jpe?g($|\?)/i.test(url));
-      const imageUrl = urls.find(url => /~medium\./i.test(url)) ?? urls.find(url => /~large\./i.test(url)) ?? urls[0];
+      const imageUrl = (urls.find(url => /~medium\./i.test(url)) ?? urls.find(url => /~large\./i.test(url)) ?? urls[0])?.replace(/^http:/, 'https:');
       if (!imageUrl) throw new Error(`TODO(source): no JPEG for ${data.nasa_id}`);
       photo = { id: `${machine.id}-${index + 1}`, machineId: machine.id, nasaId: data.nasa_id, title: data.title, credit: data.secondary_creator ?? data.photographer ?? (data.center ? `NASA/${data.center}` : 'TODO(source): image credit'), sourceUrl: `https://images.nasa.gov/details/${data.nasa_id}`, imageUrl, dateTaken: data.date_created ?? null, alt: data.title.replace(/[.!?]+$/, '') + '.', caption: data.title };
     } else if (entry.nasaId && ['PIA00452', 'PIA23645', 'PIA00451', 'PIA00563'].includes(entry.nasaId)) {
