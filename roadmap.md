@@ -1,5 +1,11 @@
 # Roadmap
 
+## Left Behind real dates
+- [ ] Add astronomy-engine ephemerides, cached 360-point orbits and physical alignment tests.
+- [ ] Add one simulation-clock loop and guarded real-date planet/Moon positions.
+- [ ] Connect date dropdown, persistent date chip, mobile More entry and keyboard controls in all languages.
+- [ ] Verify date changes and exit restoration; report real-phone frame rate as unverified.
+
 ## Whole-app true-scale sizes
 - [ ] Correct all solid-body radii and size-dependent effects; preserve positions and orbital distances.
 - [ ] Retune tour, selection, Home and initial framing; prevent body penetration and near-plane clipping.
