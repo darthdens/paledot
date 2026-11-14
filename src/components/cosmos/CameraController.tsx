@@ -5,6 +5,8 @@ import { useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import { useCosmosStore } from './store/useCosmosStore';
 import { UNITS } from './types';
+import { bodyRadius } from '@/features/left-behind/lib/bodyScale';
+import { trueSpanUnits } from '@/features/left-behind/lib/nasaModels';
 import { useLeftBehindStore } from '@/features/left-behind/state/useLeftBehindStore';
 import { getHardware } from '@/features/left-behind/data/dataClient';
 
@@ -53,6 +55,12 @@ export const CameraController = () => {
         animationProgress.current = 1;
         isAnimating.current = false;
         orbit.update();
+      },
+      zoomTo: (distance: number) => {
+        const orbit = controls as unknown as { target: THREE.Vector3; update: () => void } | null;
+        if (!orbit) return;
+        const dir = camera.position.clone().sub(orbit.target).normalize();
+        camera.position.copy(orbit.target).addScaledVector(dir, distance); orbit.update();
       },
       snapshot: () => {
         const orbit = controls as unknown as { target?: THREE.Vector3 } | null;
@@ -287,7 +295,8 @@ export const CameraController = () => {
         if (!position) continue;
         tmpTarget.current.set(...position);
         tmpDelta.current.subVectors(camera.position, tmpTarget.current);
-        const clearance = bodyClearance(body.size, camera.near);
+        // Landed hardware sits on the surface, so following it only keeps the camera above ground.
+        const clearance = hardwareId ? bodyRadius(body.size) * 1.000001 + camera.near : bodyClearance(body.size, camera.near);
         if (tmpDelta.current.length() < clearance) {
           if (tmpDelta.current.lengthSq() === 0) tmpDelta.current.set(0, 0, 1);
           camera.position.copy(tmpTarget.current).add(tmpDelta.current.setLength(clearance));
@@ -390,7 +399,10 @@ export const CameraController = () => {
       if (!live) { useLeftBehindStore.getState().selectHardware(null); return; }
       tmpTarget.current.set(...live); tmpDelta.current.subVectors(tmpTarget.current, orbitControls.target);
       orbitControls.target.copy(tmpTarget.current); camera.position.add(tmpDelta.current);
-      ensureBodyClearance(); orbitControls.update(); return;
+      ensureBodyClearance();
+      // Zoom down to the hardware's true size (with a small margin), never inside it.
+      orbitControls.minDistance = (trueSpanUnits.get(hardwareId) ?? 1e-5) * 0.8;
+      orbitControls.update(); return;
     }
 
     // After fly-to: continuously follow the selected object (keep it centered)

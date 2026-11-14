@@ -4,15 +4,17 @@ import { useFrame } from '@react-three/fiber';
 import { useGLTF } from '@react-three/drei';
 import * as THREE from 'three';
 import { useCosmosStore } from '@/components/cosmos/store/useCosmosStore';
+import { loadTrueSpans, trueSpanUnits } from '../lib/nasaModels';
 
 // Screen-size marker built from the real NASA model: metre-scale hardware cannot be drawn at true
 // scale beside 1 unit = 1000 km bodies, so it follows the "markers not to scale" rule.
 const MARKER_PX = 40, SELECTED_PX = 76;
 const PARENT_RADIUS: Record<string, number> = { moon: 1.7374, mars: 3.3895 };
 
-export function HardwareModel({ url, selected, parent }: { url: string; selected: boolean; parent?: 'moon' | 'mars' | undefined }) {
+export function HardwareModel({ id, url, selected, parent }: { id: string; url: string; selected: boolean; parent?: 'moon' | 'mars' | undefined }) {
   const { scene } = useGLTF(url, false);
   const group = useRef<THREE.Group>(null);
+  useEffect(() => { void loadTrueSpans(); }, []);
   const model = useMemo(() => {
     const clone = scene.clone(true);
     clone.traverse(node => {
@@ -48,7 +50,9 @@ export function HardwareModel({ url, selected, parent }: { url: string; selected
     const distance = camera.position.distanceTo(tmp.world);
     const fov = (camera as THREE.PerspectiveCamera).fov ?? 60;
     const worldSize = 2 * distance * Math.tan(THREE.MathUtils.degToRad(fov / 2)) * (selected ? SELECTED_PX : MARKER_PX) / Math.max(size.height, 1);
-    node.scale.setScalar(worldSize);
+    // Far away: a readable screen-size marker. Close up: the hardware's true size (hardware.json trueSize).
+    const scale = Math.max(worldSize, trueSpanUnits.get(id) ?? 0);
+    node.scale.setScalar(scale);
     node.position.set(0, 0, 0);
     if (parent) {
       const p = useCosmosStore.getState().objectWorldPositions[parent];
@@ -58,12 +62,12 @@ export function HardwareModel({ url, selected, parent }: { url: string; selected
         tmp.dir.subVectors(tmp.world, tmp.parent);
         // Sit the screen-size marker on the surface instead of half inside the body.
         if (tmp.dir.length() < radius * 1.5) {
-          tmp.dir.normalize().multiplyScalar(worldSize * 0.55).add(tmp.world);
+          tmp.dir.normalize().multiplyScalar(scale * 0.55).add(tmp.world);
           holder.worldToLocal(tmp.dir); node.position.copy(tmp.dir);
         }
       }
     }
-    node.rotation.y += Math.min(delta, 0.05) * 0.15;
+    if (scale === worldSize) node.rotation.y += Math.min(delta, 0.05) * 0.15;
   }, -0.2);
   return <group ref={group} renderOrder={3}><primitive object={model} /></group>;
 }
