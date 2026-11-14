@@ -338,7 +338,6 @@ export const CameraController = () => {
         if (tmpDelta.current.length() < clearance) {
           if (tmpDelta.current.lengthSq() === 0) tmpDelta.current.set(0, 0, 1);
           camera.position.copy(tmpTarget.current).add(tmpDelta.current.setLength(clearance));
-          if (import.meta.env.DEV) (window as unknown as { __push?: unknown }).__push = [body.id, clearance, hardwareId];
         }
       }
       // Following hardware: allow zooming down to its true size (the generic 1 km floor hid it).
@@ -433,7 +432,9 @@ export const CameraController = () => {
       return;
     }
 
-    ensureBodyClearance();
+    // Following hardware: check clearance only after the camera has moved with the machine this frame;
+    // checking first compared last frame's camera with this frame's (moved) Moon/Mars and shoved it skywards.
+    if (!(hardwareId && !isTouring)) ensureBodyClearance();
 
     if (hardwareId && !isTouring) {
       const live = useCosmosStore.getState().objectWorldPositions[`hw:${hardwareId}`];
