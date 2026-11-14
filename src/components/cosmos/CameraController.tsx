@@ -7,6 +7,7 @@ import { useCosmosStore } from './store/useCosmosStore';
 import { UNITS } from './types';
 import { bodyRadius } from '@/features/left-behind/lib/bodyScale';
 import { trueSpanUnits } from '@/features/left-behind/lib/nasaModels';
+import { useSimClock } from '@/features/left-behind/state/useSimClock';
 import { landedPins } from '@/features/left-behind/lib/pinRegistry';
 import { useLeftBehindStore } from '@/features/left-behind/state/useLeftBehindStore';
 import { getHardware } from '@/features/left-behind/data/dataClient';
@@ -56,6 +57,15 @@ export const CameraController = () => {
         animationProgress.current = 1;
         isAnimating.current = false;
         orbit.update();
+      },
+      simClock: useSimClock,
+      viewPin: (id: string, radii = 1) => {
+        const orbit = controls as unknown as { target: THREE.Vector3; update: () => void } | null;
+        const pin = landedPins.get(id), body = pin && celestialObjects.find(o => o.id === pin.body);
+        if (!orbit || !pin || !body) return false;
+        orbit.target.set(...pin.world);
+        camera.position.set(...pin.normal).multiplyScalar(bodyRadius(body.size) * radii).add(orbit.target); orbit.update();
+        return true;
       },
       zoomTo: (distance: number) => {
         const orbit = controls as unknown as { target: THREE.Vector3; update: () => void } | null;
