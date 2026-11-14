@@ -319,6 +319,10 @@ export const CameraController = () => {
     if (!controls) return;
     const orbitControls = controls as any;
     if (!orbitControls.target) return;
+    // On a landed machine, "up" is the local ground normal so the horizon is level; elsewhere world up.
+    const upPin = hardwareId && !isTouring ? landedPins.get(hardwareId) : undefined;
+    if (upPin) camera.up.set(...upPin.normal);
+    else if (camera.up.y !== 1) camera.up.set(0, 1, 0);
 
     const ensureBodyClearance = () => {
       const positions = useCosmosStore.getState().objectWorldPositions;
