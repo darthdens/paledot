@@ -17,6 +17,8 @@ export function hasNasaModel(id: string) { return !!nasaModels[id]; }
 import { getHardware } from '../data/dataClient';
 /** True span in scene units (1 unit = 1000 km), loaded from hardware.json. */
 export const trueSpanUnits = new Map<string, number>();
+// Simplified stand-ins carry their own size (rover frame length 3.1 m, NSSDCA) so they never depend on a cached hardware.json.
+for (const id of ['apollo-15', 'apollo-16', 'apollo-17']) trueSpanUnits.set(id, 3.1e-6);
 let spans: Promise<void> | null = null;
 export function loadTrueSpans() {
   spans ??= getHardware().then(h => { for (const m of h.machines) if (m.trueSize) { const span = m.trueSize.spanM * 1e-6; trueSpanUnits.set(m.id, span); for (const t of m.trajectories) trueSpanUnits.set(t.id, span); } }).catch(() => { spans = null; });
