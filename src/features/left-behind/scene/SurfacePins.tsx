@@ -19,9 +19,24 @@ import { useSurfaceAttachmentStore } from '../state/surfaceAttachments';
 import { useLeftBehindStore } from '../state/useLeftBehindStore';
 import { useSimClock } from '../state/useSimClock';
 import { SitePatch } from './SitePatch';
+import { buildRetroreflector } from './simplifiedModels';
+
+/** True-size simplified hardware with no pin of its own (e.g. Apollo 11's laser reflector), shown while its site is followed. */
+function SiteExtra({ body, lat, lon, radius }: { body: Body; lat: number; lon: number; radius: number }) {
+  const object = useMemo(() => {
+    const g = buildRetroreflector(); g.scale.setScalar(1e-6); // metres -> scene units (1 unit = 1000 km)
+    const p = latLonToLocal(lat, lon, radius, TEXTURE_LON_OFFSET_DEG[body] ?? 0);
+    const n = new THREE.Vector3(p[0], p[1], p[2]).normalize();
+    g.position.set(p[0], p[1], p[2]); g.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), n);
+    g.traverse(o => { const m = o as THREE.Mesh; if (m.isMesh) { m.frustumCulled = false; m.raycast = noRaycast; } });
+    return g;
+  }, [body, lat, lon, radius]);
+  useEffect(() => () => object.traverse(o => { const m = o as THREE.Mesh; if (m.isMesh) { m.geometry.dispose(); (m.material as THREE.Material).dispose(); } }), [object]);
+  return <primitive object={object} />;
+}
 
 type Body = 'moon' | 'mars';
-type PinSpec = { trajId: string; body: Body; lat: number; lon: number; date: number; label: string };
+type PinSpec = { trajId: string; body: Body; lat: number; lon: number; date: number; label: string; extras?: { lat: number; lon: number }[] };
 const LEADER = 0.03; // leader line length as a fraction of the body radius
 const CROWD_PX = 24;
 const crowded: Record<Body, boolean> = { moon: false, mars: false };
@@ -70,6 +85,7 @@ function SurfacePin({ spec }: { spec: PinSpec }) {
   }, -0.3);
   return <group ref={group} name={`pin-${spec.trajId}`} visible={false}>
     {patch && <SitePatch body={spec.body} lat={spec.lat} lon={spec.lon} radius={patch.radius} mesh={patch.mesh} />}
+    {patch && spec.extras?.map((e, i) => <SiteExtra key={i} body={spec.body} lat={e.lat} lon={e.lon} radius={patch.radius} />)}
     <primitive object={line} visible={!followed} />
     <group ref={top}>
       <Html center zIndexRange={[40, 30]}>
@@ -164,6 +180,8 @@ export function SurfacePins() {
           const date = Date.parse(site.date ?? m.landingDate ?? '');
           if (!Number.isFinite(date)) return;
           const spec: PinSpec = { trajId: t.id, body: m.body as Body, lat: site.lat, lon: site.lon, date, label: site.label };
+          // Apollo 11: the laser reflector is an extra site beyond the trajectories, drawn with this pin.
+          if (i === m.trajectories.length - 1) spec.extras = (m.sites ?? []).slice(m.trajectories.length).filter(x => x.lat !== null && x.lon !== null && /retroreflector/i.test(x.label)).map(x => ({ lat: x.lat as number, lon: x.lon as number }));
           useSurfaceAttachmentStore.getState().set(spec.body, `pin:${t.id}`, <SurfacePin spec={spec} />);
           keys.push([spec.body, `pin:${t.id}`]); ids.push(t.id);
         });
