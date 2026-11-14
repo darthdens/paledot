@@ -8,7 +8,7 @@ import { useLanguage } from '@/i18n/LanguageContext';
 import { celestialObjects } from '@/components/cosmos/data/celestialObjects';
 import { useCosmosStore } from '@/components/cosmos/store/useCosmosStore';
 import { getHardware } from '../data/dataClient';
-import { eclipticKmToScene } from '../engine/ephemeris';
+import { eclipticKmToScene } from '../lib/units';
 import { loadTrajectory, sampleTrajectory } from '../engine/trajectory';
 import { latLonToLocal, TEXTURE_LON_OFFSET_DEG } from '../lib/geo';
 import { followHardware } from '../lib/hardwareNavigation';
