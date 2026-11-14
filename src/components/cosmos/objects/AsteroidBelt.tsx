@@ -1,3 +1,4 @@
+import { useSimClock } from '@/features/left-behind/state/useSimClock';
 // AsteroidBelt - Renders thousands of small asteroids between Mars and Jupiter
 import { useRef, useMemo } from 'react';
 import { useFrame } from '@react-three/fiber';
@@ -78,7 +79,7 @@ const generateAsteroids = (count: number, innerRadius: number, outerRadius: numb
     // Kepler's third law (assuming 1 solar mass): periodYears = a^(3/2)
     const periodDays = 365.25 * Math.pow(semiMajorAxisAu, 1.5);
     // Scale: 1 Earth year (365.25 days) = 240 seconds at 1x speed
-    speeds[i] = (2 * Math.PI * 365.25) / (periodDays * 240);
+    speeds[i] = (2 * Math.PI) / (periodDays * 86400);
 
     // Random starting phase
     phases[i] = angle;
@@ -115,8 +116,6 @@ export const AsteroidBelt = ({
   scale = 1 
 }: AsteroidBeltProps) => {
   const pointsRef = useRef<THREE.Points>(null);
-  const timeSpeed = useCosmosStore(state => state.timeSpeed);
-  const simTime = useRef(0);
   
   const asteroidData = useMemo(() => 
     generateAsteroids(count, innerRadius, outerRadius, scale),
@@ -182,7 +181,7 @@ export const AsteroidBelt = ({
   useFrame((_, delta) => {
     if (!pointsRef.current) return;
     
-    simTime.current += delta * timeSpeed;
+    const simulatedSeconds = (useSimClock.getState().simDate - Date.UTC(2000,0,1,12)) / 1000;
     
     const positions = pointsRef.current.geometry.attributes["position"]!.array as Float32Array;
     const { radii, heights, speeds, phases } = asteroidData;
@@ -190,7 +189,7 @@ export const AsteroidBelt = ({
     // Update positions based on orbital motion using stored radii
     for (let i = 0; i < count; i++) {
       const radius = radii[i];
-      const currentAngle = phases[i]! + simTime.current * speeds[i]!;
+      const currentAngle = phases[i]! + simulatedSeconds * speeds[i]!;
       
       positions[i * 3] = Math.cos(currentAngle) * radius!;
       positions[i * 3 + 1] = heights[i]!; // Keep original height

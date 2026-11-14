@@ -42,3 +42,16 @@ export function sampleOrbitKm(id: PlanetId, epoch: number): [number, number, num
   orbitCache.set(id, points);
   return points;
 }
+const moonOrbitCache = new Map<number, [number,number,number][]>();
+export function sampleMoonOrbitKm(epoch: number): [number,number,number][] {
+  const key = Math.floor(epoch / DAY_MS / 27.32);
+  const cached = moonOrbitCache.get(key);
+  if (cached) return cached;
+  const points = Array.from({ length: 360 }, (_,i) => {
+    const date = new Date(key * 27.32 * DAY_MS + 27.32 * DAY_MS * i/359);
+    const moon = moonPositionKm(date), earth = helioPositionKm('earth',date);
+    return [moon[0]-earth[0],moon[1]-earth[1],moon[2]-earth[2]] as [number,number,number];
+  });
+  moonOrbitCache.clear(); moonOrbitCache.set(key,points);
+  return points;
+}

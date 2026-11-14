@@ -1,33 +1,39 @@
 // Left Behind · built during NASA Space Apps Challenge 2026 (14–15 Nov 2026) · AI-assisted (Lovable, Claude)
-import { afterEach, expect, it, vi } from 'vitest';
-import { advanceDate, CLOCK_DAY_MS, CLOCK_START } from './clock';
-import { useLeftBehindStore } from '../state/useLeftBehindStore';
-afterEach(() => { vi.useRealTimers(); useLeftBehindStore.getState().exit(); });
-it('entry starts now and paused, including after re-entry', () => {
-  vi.spyOn(Date,'now').mockReturnValue(Date.UTC(2026,10,14,11,48));
-  useLeftBehindStore.getState().enter();
-  expect(useLeftBehindStore.getState().simDate).toBe(Date.UTC(2026,10,14,11,48));
-  expect(useLeftBehindStore.getState().isPlaying).toBe(false);
+import { beforeEach, expect, it } from 'vitest';
+import { advanceDate, CLOCK_RATES, CLOCK_START, CLOCK_END } from './clock';
+import { useSimClock } from '../state/useSimClock';
+import { useCosmosStore } from '@/components/cosmos/store/useCosmosStore';
+beforeEach(() => useSimClock.setState({ simDate: Date.now(), isPlaying: true, rate: 1, preTour: null }));
+it('opens today, playing at one simulated second per real second', () => {
+  expect(Math.abs(useSimClock.getState().simDate-Date.now())).toBeLessThan(1000);
+  expect(useSimClock.getState().isPlaying).toBe(true);
+  expect(useSimClock.getState().rate).toBe(1);
+  expect(advanceDate(CLOCK_START,1,1)).toBe(CLOCK_START+1000);
 });
-it('one real second advances exactly 1, 30 or 365 simulation days', () => {
-  for (const rate of [1,30,365]) expect(advanceDate(CLOCK_START,1,rate,CLOCK_START+1000*CLOCK_DAY_MS)).toBe(CLOCK_START+rate*CLOCK_DAY_MS);
+it('offers real time, hour, day, month and year per second', () => {
+  expect(CLOCK_RATES).toEqual([1,3600,86400,2592000,31557600]);
+  for (const rate of CLOCK_RATES) expect(advanceDate(CLOCK_START,1,rate)).toBe(CLOCK_START+rate*1000);
 });
-it('paused and exited clocks never advance', () => {
-  useLeftBehindStore.getState().enter();
-  useLeftBehindStore.getState().setSimDate(CLOCK_START);
-  useLeftBehindStore.getState().advanceClock(1);
-  expect(useLeftBehindStore.getState().simDate).toBe(CLOCK_START);
-  useLeftBehindStore.getState().togglePlaying(); useLeftBehindStore.getState().exit();
-  useLeftBehindStore.getState().advanceClock(1);
-  expect(useLeftBehindStore.getState().simDate).toBe(CLOCK_START);
+it('clamps scrubbing to 1 January 1957 through 31 December 2100', () => {
+  expect(CLOCK_START).toBe(Date.UTC(1957,0,1));
+  expect(CLOCK_END).toBe(Date.UTC(2100,11,31,23,59,59,999));
+  useSimClock.getState().setSimDate(Date.UTC(1956,0,1)); expect(useSimClock.getState().simDate).toBe(CLOCK_START);
+  useSimClock.getState().setSimDate(Date.UTC(2102,0,1)); expect(useSimClock.getState().simDate).toBe(CLOCK_END);
 });
-it('scrubbing and playback clamp to 1 July 1969 through today', () => {
-  expect(advanceDate(CLOCK_START-100,0,1,CLOCK_START+100)).toBe(CLOCK_START);
-  expect(advanceDate(CLOCK_START,100,365,CLOCK_START+100)).toBe(CLOCK_START+100);
+it('paused clock never advances', () => {
+  useSimClock.getState().togglePlaying(); const date = useSimClock.getState().simDate;
+  useSimClock.getState().advanceClock(1); expect(useSimClock.getState().simDate).toBe(date);
 });
-it('speed shortcuts step through 1, 30, 365 days/s', () => {
-  useLeftBehindStore.getState().setPlaybackRate(1);
-  useLeftBehindStore.getState().changeSpeed(1); expect(useLeftBehindStore.getState().playbackRate).toBe(30);
-  useLeftBehindStore.getState().changeSpeed(1); expect(useLeftBehindStore.getState().playbackRate).toBe(365);
-  useLeftBehindStore.getState().changeSpeed(-1); expect(useLeftBehindStore.getState().playbackRate).toBe(30);
+it('shortcuts step through the five rates without wrapping', () => {
+  useSimClock.getState().changeSpeed(1); expect(useSimClock.getState().rate).toBe(3600);
+  useSimClock.getState().changeSpeed(-1); expect(useSimClock.getState().rate).toBe(1);
+  useSimClock.getState().changeSpeed(-1); expect(useSimClock.getState().rate).toBe(1);
+});
+it('Begin at Earth pauses and restores the previous playing state and speed', () => {
+  useSimClock.getState().setRate(86400);
+  useCosmosStore.getState().startTour(); expect(useSimClock.getState().isPlaying).toBe(false);
+  useCosmosStore.getState().stopTour(); expect(useSimClock.getState().isPlaying).toBe(true);
+  expect(useSimClock.getState().rate).toBe(86400);
+  useSimClock.getState().togglePlaying(); useCosmosStore.getState().startTour(); useCosmosStore.getState().stopTour();
+  expect(useSimClock.getState().isPlaying).toBe(false);
 });

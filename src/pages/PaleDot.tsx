@@ -20,12 +20,12 @@ const PaleDot = () => {
   useEffect(() => {
     const openHash = () => {
       if (window.location.hash !== '#left-behind') return;
-      useLeftBehindStore.getState().requestEntry();
+      useLeftBehindStore.getState().setMenuOpen(true);
       setStarted(true);
     };
     openHash();
     window.addEventListener('hashchange', openHash);
-    return () => { window.removeEventListener('hashchange', openHash); useLeftBehindStore.getState().exit(); };
+    return () => { window.removeEventListener('hashchange', openHash); useLeftBehindStore.getState().setMenuOpen(false); };
   }, []);
 
   // Normal system cursor everywhere on Pale Dot, including menus and tooltips rendered outside the page wrapper.
@@ -71,7 +71,7 @@ const PaleDot = () => {
   useEffect(() => {
     if (!started) return;
     // Always land on "Welcome to Pale Dot" (guided tour / explore) once loading ends.
-    useCosmosStore.getState().setShowControlHints(true);
+    useCosmosStore.getState().setShowControlHints(!useLeftBehindStore.getState().menuOpen);
     const color = "#000000";
     const els = [document.documentElement, document.body];
     const prev = els.map((el) => el.style.backgroundColor);
@@ -86,7 +86,7 @@ const PaleDot = () => {
   }, [started]);
 
   if (!started) {
-    return <><PaleDotTitleScreen onBegin={() => setStarted(true)} onLeftBehind={() => { useLeftBehindStore.getState().requestEntry(); setStarted(true); }} />{dataAdmin && <Suspense fallback={null}><LeftBehindAdmin /></Suspense>}</>;
+    return <><PaleDotTitleScreen onBegin={() => setStarted(true)} onLeftBehind={() => { useLeftBehindStore.getState().setMenuOpen(true); setStarted(true); }} />{dataAdmin && <Suspense fallback={null}><LeftBehindAdmin /></Suspense>}</>;
   }
 
   return (

@@ -1,4 +1,4 @@
-import { useLeftBehindStore } from '@/features/left-behind/state/useLeftBehindStore';
+import { useSimClock } from '@/features/left-behind/state/useSimClock';
 import { loadEphemeris, getEphemeris } from '@/features/left-behind/engine/runtime';
 import { eclipticKmToScene } from '@/features/left-behind/lib/units';
 import { bodyRadius, UNIFIED_SCALE } from '@/features/left-behind/lib/bodyScale';
@@ -310,14 +310,12 @@ export const TexturedPlanet = ({
   visualScale = UNIFIED_SCALE,
   distanceScale = UNIFIED_SCALE 
 }: TexturedPlanetProps) => {
-  const leftBehindActive = useLeftBehindStore(s => s.active);
   const [ephemerisReady, setEphemerisReady] = useState(false);
   useEffect(() => {
-    if (!leftBehindActive) return;
     let alive = true;
     loadEphemeris().then(() => { if (alive) setEphemerisReady(true); });
     return () => { alive = false; };
-  }, [leftBehindActive]);
+  }, []);
   const planetRef = useRef<THREE.Mesh>(null);
   const groupRef = useRef<THREE.Group>(null);
   const atmosphereRef = useRef<THREE.Mesh>(null);
@@ -330,14 +328,11 @@ export const TexturedPlanet = ({
   // Throttle world-position writes using real frame time so it still works when timeSpeed is 0 (tour pauses time).
   const worldPosUpdateAccumulator = useRef(0);
   const rotationAngle = useRef(0);
-  const simTime = useRef(0);
-  const simTimeInitialized = useRef(false);
   
   const setSelectedObject = useCosmosStore(state => state.setSelectedObject);
   const setHoveredObject = useCosmosStore(state => state.setHoveredObject);
   const setObjectWorldPosition = useCosmosStore(state => state.setObjectWorldPosition);
   const selectedObject = useCosmosStore(state => state.selectedObject);
-  const timeSpeed = useCosmosStore(state => state.timeSpeed);
   const selectedObjectId = selectedObject?.id;
   const selectedParentId = selectedObject?.type === 'moon' ? selectedObject.parentId : null;
 
@@ -488,7 +483,7 @@ export const TexturedPlanet = ({
     const periodHours = rotationPeriodsHours[object.id] || 24;
     // Scale: 1 Earth day (24h) = 240 seconds at 1x speed (slower for better viewing)
     // radians per second = 2π / (periodHours * 10)
-    const radiansPerSecond = (2 * Math.PI) / (Math.abs(periodHours) * 10);
+    const radiansPerSecond = (2 * Math.PI) / (Math.abs(periodHours) * 3600);
     return periodHours < 0 ? -radiansPerSecond : radiansPerSecond;
   };
   
@@ -496,73 +491,31 @@ export const TexturedPlanet = ({
 
 
   useFrame((state, delta) => {
-    // Use an accumulated simulation time so changing timeSpeed doesn't "jump" positions/lighting.
-    if (!simTimeInitialized.current) {
-      simTime.current = state.clock.getElapsedTime();
-      simTimeInitialized.current = true;
-    }
-    simTime.current += delta * timeSpeed;
-    const time = simTime.current;
-
-    // Planet rotation with accurate real rotation speeds (delta in seconds)
-    rotationAngle.current += rotationSpeed * delta * timeSpeed;
-    if (planetRef.current) {
-      planetRef.current.rotation.y = rotationAngle.current;
-    }
-
+    const clock = useSimClock.getState();
+    const time = state.clock.getElapsedTime();
+    const spinRate = clock.isPlaying ? Math.min(clock.rate, 86400) : 0;
+    rotationAngle.current += rotationSpeed * delta * spinRate;
+    if (planetRef.current) planetRef.current.rotation.y = rotationAngle.current;
     if (!groupRef.current) return;
-
-    // Calculate orbital angular velocity from real orbital period
-    // Scale: 1 Earth year (365.25 days) = 240 seconds at 1x speed (slower for better viewing)
-    // angular velocity = 2π / (periodDays / 365.25 * 240) = 2π * 365.25 / (periodDays * 240)
-    const getOrbitalAngularVelocity = (periodDays: number) => {
-      return (2 * Math.PI * 365.25) / (periodDays * 240);
-    };
-
-    // Moons: orbit around their parent planet's world position
-    // Note: We read parent position directly from store which was updated this frame (planets render first)
-    const lb = useLeftBehindStore.getState();
-    const ephemeris = lb.active ? getEphemeris() : null;
-    if (ephemeris && ephemeris.isEphemerisBody(object.id)) {
-      const position = ephemeris.positionsAt(lb.simDate)[object.id];
-      if (position) groupRef.current.position.set(...eclipticKmToScene(...position));
-    } else if (isMoon && moonOrbitRadius > 0) {
-      const parentPosArr = useCosmosStore.getState().objectWorldPositions[object.parentId ?? ''];
-      if (parentPosArr) {
-        const periodDays = object.orbitPeriodDays || 27.32; // Default to Moon's period
-        const orbitalVelocity = getOrbitalAngularVelocity(periodDays);
-        const angle = time * orbitalVelocity;
-        // Position relative to parent - add orbital offset to parent's world position
-        const orbitalX = Math.cos(angle) * moonOrbitRadius;
-        const orbitalZ = Math.sin(angle) * moonOrbitRadius;
-        groupRef.current.position.x = parentPosArr[0] + orbitalX;
-        groupRef.current.position.y = parentPosArr[1];
-        groupRef.current.position.z = parentPosArr[2] + orbitalZ;
-      } else {
-        // Fallback: if parent position not yet available, place at initial position
-        // This can happen on the first frame before parent has updated
-        const periodDays = object.orbitPeriodDays || 27.32;
-        const orbitalVelocity = getOrbitalAngularVelocity(periodDays);
-        const angle = time * orbitalVelocity;
-        // Use object's initial position as a fallback reference point
-        const parentOrbitRadius = (celestialObjects.find(o => o.id === object.parentId)?.orbitRadius || 0) * distanceScale;
-        const parentAngle = time * getOrbitalAngularVelocity(
-          celestialObjects.find(o => o.id === object.parentId)?.orbitPeriodDays || 365.25
-        );
-        const estimatedParentX = Math.cos(parentAngle) * parentOrbitRadius;
-        const estimatedParentZ = Math.sin(parentAngle) * parentOrbitRadius;
-        groupRef.current.position.x = estimatedParentX + Math.cos(angle) * moonOrbitRadius;
-        groupRef.current.position.y = 0;
-        groupRef.current.position.z = estimatedParentZ + Math.sin(angle) * moonOrbitRadius;
+    const ephemeris = getEphemeris();
+    const positions = ephemeris?.positionsAt(clock.simDate);
+    const position = positions?.[object.id];
+    if (position) groupRef.current.position.set(...eclipticKmToScene(...position));
+    else if (isMoon && moonOrbitRadius > 0) {
+      const parent = positions?.[object.parentId ?? ''];
+      if (parent) {
+        const [x,y,z] = eclipticKmToScene(...parent);
+        const angle = clock.simDate / 86400000 * Math.PI * 2 / (object.orbitPeriodDays || 27.32);
+        groupRef.current.position.set(x + Math.cos(angle) * moonOrbitRadius, y, z + Math.sin(angle) * moonOrbitRadius);
       }
+    } else if (orbitRadius > 0) {
+      const angle = clock.simDate / 86400000 * Math.PI * 2 / (object.orbitPeriodDays || 365.25);
+      groupRef.current.position.set(Math.cos(angle)*orbitRadius, 0, Math.sin(angle)*orbitRadius);
     }
-    // Planets: orbit around the Sun (origin) with real Keplerian proportions
-    else if (orbitRadius > 0 && !isMoon) {
-      const periodDays = object.orbitPeriodDays || 365.25; // Default to Earth's period
-      const orbitalVelocity = getOrbitalAngularVelocity(periodDays);
-      const angle = time * orbitalVelocity;
-      groupRef.current.position.x = Math.cos(angle) * orbitRadius;
-      groupRef.current.position.z = Math.sin(angle) * orbitRadius;
+    if (object.id === 'moon' && planetRef.current && positions?.['earth']) {
+      const earth = eclipticKmToScene(...positions['earth']);
+      // SphereGeometry's u=0.5 (0° longitude) is +X; align it toward Earth.
+      planetRef.current.rotation.y = Math.atan2(-(earth[2]-groupRef.current.position.z), earth[0]-groupRef.current.position.x);
     }
 
     // Now that motion is applied, compute world position and update shader uniforms
@@ -628,9 +581,9 @@ export const TexturedPlanet = ({
   // Create orbit line (only for planets orbiting sun, not moons) with compressed distances
   const orbitPoints = useMemo(() => {
     if (!showOrbit || orbitRadius === 0 || isMoon) return null;
-    const ephemeris = leftBehindActive && ephemerisReady ? getEphemeris() : null;
+    const ephemeris = ephemerisReady ? getEphemeris() : null;
     if (ephemeris && ephemeris.isEphemerisBody(object.id) && object.id !== 'moon') {
-      return ephemeris.sampleOrbitKm(object.id, useLeftBehindStore.getState().simDate).map(p => new THREE.Vector3(...eclipticKmToScene(...p)));
+      return ephemeris.sampleOrbitKm(object.id, useSimClock.getState().simDate).map(p => new THREE.Vector3(...eclipticKmToScene(...p)));
     }
     const points = [];
     // Scale segments based on orbit radius - larger orbits need more segments for smoothness
@@ -649,7 +602,7 @@ export const TexturedPlanet = ({
       );
     }
     return points;
-  }, [orbitRadius, showOrbit, isMoon, leftBehindActive, ephemerisReady, object.id]);
+  }, [orbitRadius, showOrbit, isMoon, ephemerisReady, object.id]);
 
   const handleClick = (e: { stopPropagation: () => void }) => {
     e.stopPropagation();
@@ -687,7 +640,7 @@ export const TexturedPlanet = ({
 
       {/* Planet group */}
       <group ref={groupRef} position={scaledPosition}>
-        <group rotation={[tiltRadians, 0, 0]}>
+        <group rotation={[object.id === 'moon' ? 0 : tiltRadians, 0, 0]}>
           {/* Main planet sphere with enhanced shader for surface detail */}
           <mesh 
             name={`body-${object.id}`}

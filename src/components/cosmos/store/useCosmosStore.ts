@@ -1,3 +1,4 @@
+import { useSimClock } from '@/features/left-behind/state/useSimClock';
 import { bodyFlyToDistance, UNIFIED_SCALE, isSolidBody } from '@/features/left-behind/lib/bodyScale';
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
@@ -257,6 +258,7 @@ export const useCosmosStore = create<CosmosStore>()(
       }),
       
       startTour: () => {
+        useSimClock.getState().pauseForTour();
         const currentSpeed = get().timeSpeed;
         set({
           isTouring: true,
@@ -269,6 +271,7 @@ export const useCosmosStore = create<CosmosStore>()(
       },
       
       stopTour: () => {
+        useSimClock.getState().restoreAfterTour();
         const preTourSpeed = get().preTourTimeSpeed;
         set({
           isTouring: false,

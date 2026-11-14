@@ -1,3 +1,5 @@
+import { useSimClock } from '@/features/left-behind/state/useSimClock';
+import { getEphemeris } from '@/features/left-behind/engine/runtime';
 import { useLanguage } from '@/i18n/LanguageContext';
 import { Button } from '@/components/ui/button';
 import { X, Navigation, ChevronDown, ChevronUp, Eye, EyeOff } from 'lucide-react';
@@ -168,6 +170,7 @@ const formatOrbitalPeriod = (days: number, lc: { numberLocale: string; tx: (en: 
 export const InfoCard = () => {
   const { language, tr, tx, numberLocale } = useLanguage();
   const t = tr(translations);
+  const simDate = useSimClock(s => s.simDate);
   const selectedObject = useCosmosStore(state => state.selectedObject);
   const setSelectedObject = useCosmosStore(state => state.setSelectedObject);
   const jumpToObject = useCosmosStore(state => state.jumpToObject);
@@ -187,6 +190,13 @@ export const InfoCard = () => {
     jumpToObject(selectedObject);
   };
 
+  const ephemeris = getEphemeris();
+  const positions = ephemeris?.positionsAt(simDate);
+  const bodyPosition = positions?.[selectedObject.id];
+  const earthPosition = positions?.['earth'];
+  const calculatedDistance = bodyPosition && earthPosition
+    ? Math.hypot(bodyPosition[0]-earthPosition[0], bodyPosition[1]-earthPosition[1], bodyPosition[2]-earthPosition[2]) : null;
+  const calculated = { en: 'Calculated', fr: 'Calculé', es: 'Calculado', pt: 'Calculado', it: 'Calcolato', de: 'Berechnet' };
   const objectType = t[selectedObject.type as keyof typeof t] || selectedObject.type;
   const facts = (selectedObject.facts ? tr(selectedObject.facts) : undefined) || [];
   
@@ -253,7 +263,8 @@ export const InfoCard = () => {
               <div className="bg-white/5 rounded-[4px] p-2">
                 <div className="text-white/50 text-xs">{t.distance}</div>
                 <div className="text-white font-medium">
-                  {formatDistance(selectedObject.distanceFromEarth, selectedObject.distanceUnit, { numberLocale, tx })}
+                  {formatDistance(calculatedDistance ?? selectedObject.distanceFromEarth, calculatedDistance === null ? selectedObject.distanceUnit : 'km', { numberLocale, tx })}
+                  {calculatedDistance !== null && <span className="block text-[10px] text-muted-foreground">{tr(calculated)}</span>}
                 </div>
               </div>
               <div className="bg-white/5 rounded-[4px] p-2">
