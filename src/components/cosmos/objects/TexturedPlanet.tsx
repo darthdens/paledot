@@ -28,6 +28,7 @@ const MOBILE_TEXTURE_WHITELIST = [
 ];
 
 // Import NASA texture maps - only essential ones are used on mobile
+import { maybeUpgradeSurface } from '@/components/cosmos/lib/hdSurfaces';
 import earthDayTexture from '@/assets/textures/earth-day.jpg';
 import earthNightTexture from '@/assets/textures/earth-night.jpg';
 import earthCloudsTexture from '@/assets/textures/earth-clouds.jpg';
@@ -332,6 +333,7 @@ export const TexturedPlanet = ({
   // Throttle world-position writes using real frame time so it still works when timeSpeed is 0 (tour pauses time).
   const worldPosUpdateAccumulator = useRef(0);
   const rotationAngle = useRef(0);
+  const hdState = useRef({ requested: false });
   
   const setSelectedObject = useCosmosStore(state => state.setSelectedObject);
   const setHoveredObject = useCosmosStore(state => state.setHoveredObject);
@@ -534,6 +536,7 @@ export const TexturedPlanet = ({
     }
 
     if (planetMaterialRef.current) {
+      maybeUpgradeSurface(object.id, hdState.current, state.camera.position.distanceTo(worldPos.current), planetSize, state.gl, planetMaterialRef.current);
       planetMaterialRef.current.uniforms["time"]!.value = time;
       planetMaterialRef.current.uniforms["objectCenter"]!.value.copy(worldPos.current);
       if (isMoon) {
