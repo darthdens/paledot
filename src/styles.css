@@ -656,3 +656,4 @@ All colors MUST be HSL.
 }
 .pd-nasa-inspector { z-index: 30000; }
 .pd-nasa-inspector ~ * { letter-spacing: 0; }
+.paledot .pd-machine-readout button { white-space: normal; height: auto; min-height: 44px; }
