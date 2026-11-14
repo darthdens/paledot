@@ -71,6 +71,11 @@ export function loadRelief(id: string): Promise<Relief> {
   return p;
 }
 
+/** Opening load: fetch and decode every global height map behind the loader (failures don't block). */
+export function preloadAllRelief() {
+  return Promise.allSettled(Object.keys(URLS).map(loadRelief)).then(() => undefined);
+}
+
 /** Bilinear sample of a north-up-flipped (v = 1 north) grid at texture coordinates. */
 export function sampleGrid(data: Float32Array, width: number, height: number, u: number, v: number, wrap = true) {
   let x = u * width - 0.5, y = v * height - 0.5;
