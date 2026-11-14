@@ -113,6 +113,71 @@ const createCoronaRaysTexture = () => {
   return tex;
 };
 
+// Sunlight colour: the Sun's ~5772 K photosphere seen from space is near-white with a faint warm tint.
+export const SUNLIGHT_COLOR = '#FFF6EC';
+
+const PHOTO_VS = `
+  varying vec3 vObj; varying vec3 vN; varying vec3 vV;
+  void main() {
+    vObj = normalize(position);
+    vec4 wp = modelMatrix * vec4(position, 1.0);
+    vN = normalize(mat3(modelMatrix) * normal);
+    vV = normalize(cameraPosition - wp.xyz);
+    gl_Position = projectionMatrix * viewMatrix * wp;
+  }
+`;
+
+// Photosphere: Worley-cell granulation (~1,000 km cells, as observed) plus faint supergranulation,
+// wavelength-dependent limb darkening (limb is darker and redder), faded by screen size to avoid shimmer.
+const PHOTO_FS = `
+  uniform float uTime;
+  varying vec3 vObj; varying vec3 vN; varying vec3 vV;
+  vec3 h3(vec3 p) {
+    p = vec3(dot(p, vec3(127.1, 311.7, 74.7)), dot(p, vec3(269.5, 183.3, 246.1)), dot(p, vec3(113.5, 271.9, 124.6)));
+    return fract(sin(p) * 43758.5453);
+  }
+  // returns F2-F1 style edge metric: 0 at cell walls (dark lanes), ~1 in cell centres
+  float worley(vec3 p, float seed) {
+    vec3 i = floor(p); vec3 f = fract(p);
+    float d1 = 8.0, d2 = 8.0;
+    for (int x = -1; x <= 1; x++) for (int y = -1; y <= 1; y++) for (int z = -1; z <= 1; z++) {
+      vec3 g = vec3(float(x), float(y), float(z));
+      vec3 o = h3(i + g + seed * 17.13);
+      float d = length(g + o - f);
+      if (d < d1) { d2 = d1; d1 = d; } else if (d < d2) { d2 = d; }
+    }
+    return clamp((d2 - d1) * 1.6, 0.0, 1.0);
+  }
+  float granules(vec3 p, float t) {
+    float k = floor(t), w = fract(t);
+    return mix(worley(p, k), worley(p, k + 1.0), smoothstep(0.0, 1.0, w));
+  }
+  void main() {
+    vec3 n = normalize(vN);
+    float mu = clamp(dot(n, normalize(vV)), 0.0, 1.0);
+    // Linear limb darkening, I(mu) = 1 - u(1 - mu), with u larger at shorter wavelengths
+    vec3 u = vec3(0.50, 0.62, 0.74);
+    vec3 limb = 1.0 - u * (1.0 - mu);
+
+    // Granulation: unit sphere * 600 -> cells ~1,150 km across on the real Sun
+    vec3 pg = vObj * 600.0;
+    float px = length(fwidth(pg));            // cells per pixel
+    float gFade = 1.0 - smoothstep(0.25, 0.8, px);
+    float g = granules(pg, uTime / 480.0);
+    float gran = mix(1.0, 0.72 + 0.4 * g, gFade * 0.9);
+
+    // Supergranulation: ~30,000 km, very subtle
+    vec3 ps = vObj * 22.0;
+    float sFade = 1.0 - smoothstep(0.25, 0.8, length(fwidth(ps)));
+    float sg = worley(ps, 3.0);
+    float sup = mix(1.0, 0.94 + 0.08 * sg, sFade);
+
+    vec3 base = vec3(1.0, 0.96, 0.90);         // warm white photosphere
+    vec3 col = base * limb * gran * sup;
+    gl_FragColor = vec4(col * 3.2, 1.0);       // HDR so bloom picks it up
+  }
+`;
+
 // Sun's real diameter is 1,392,700 km
 const SUN_DIAMETER = 1392700;
 
@@ -124,6 +189,8 @@ export const Sun = ({ position = [0, 0, 0], visualScale = UNIFIED_SCALE }: SunPr
   const groupRef = useRef<THREE.Group>(null);
   const worldPos = useRef(new THREE.Vector3());
   
+  const photoMatRef = useRef<THREE.ShaderMaterial>(null);
+  const photoUniforms = useMemo(() => ({ uTime: { value: 0 } }), []);
   const glowTexture = useMemo(() => createSunGlowTexture(), []);
   const outerGlowTexture = useMemo(() => createOuterGlowTexture(), []);
   
@@ -136,6 +203,10 @@ export const Sun = ({ position = [0, 0, 0], visualScale = UNIFIED_SCALE }: SunPr
     if (sunRef.current) {
       const clock = useSimClock.getState();
       sunRef.current.rotation.y += (2 * Math.PI / (609.12 * 3600)) * delta * (clock.isPlaying ? Math.min(clock.rate,86400) : 0);
+    }
+    if (photoMatRef.current) {
+      // Granules evolve on the simulation clock (real lifetime ~5-10 min); wrapped to keep float precision
+      photoMatRef.current.uniforms.uTime.value = (useSimClock.getState().simDate / 1000) % 4.8e5;
     }
     if (coronaRef.current) {
       coronaRef.current.scale.setScalar(1 + Math.sin(time * 2) * 0.02);
@@ -202,77 +273,36 @@ export const Sun = ({ position = [0, 0, 0], visualScale = UNIFIED_SCALE }: SunPr
         onPointerOut={handlePointerOut}
       >
         <sphereGeometry args={[sunSize, 64, 64]} />
+        <shaderMaterial ref={photoMatRef} uniforms={photoUniforms} vertexShader={PHOTO_VS} fragmentShader={PHOTO_FS} />
+      </mesh>
+
+      {/* Inner corona: thin view-dependent glow just above the limb (not a solid shell) */}
+      <mesh renderOrder={1}>
+        <sphereGeometry args={[sunSize * 1.15, 64, 64]} />
         <shaderMaterial
-          uniforms={{
-            time: { value: 0 },
-          }}
+          transparent
+          depthWrite={false}
+          blending={THREE.AdditiveBlending}
+          side={THREE.BackSide}
           vertexShader={`
-            varying vec2 vUv;
-            varying vec3 vNormal;
+            varying vec3 vN; varying vec3 vV;
             void main() {
-              vUv = uv;
-              vNormal = normalize(normalMatrix * normal);
-              gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+              vec4 wp = modelMatrix * vec4(position, 1.0);
+              vN = normalize(mat3(modelMatrix) * normal);
+              vV = normalize(cameraPosition - wp.xyz);
+              gl_Position = projectionMatrix * viewMatrix * wp;
             }
           `}
           fragmentShader={`
-            uniform float time;
-            varying vec2 vUv;
-            varying vec3 vNormal;
-            
-            float hash(vec2 p) {
-              return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453);
-            }
-            
-            float noise(vec2 p) {
-              vec2 i = floor(p);
-              vec2 f = fract(p);
-              f = f * f * (3.0 - 2.0 * f);
-              float a = hash(i);
-              float b = hash(i + vec2(1.0, 0.0));
-              float c = hash(i + vec2(0.0, 1.0));
-              float d = hash(i + vec2(1.0, 1.0));
-              return mix(mix(a, b, f.x), mix(c, d, f.x), f.y);
-            }
-            
+            varying vec3 vN; varying vec3 vV;
             void main() {
-              // Animated solar surface
-              vec2 uv = vUv * 8.0;
-              float n = noise(uv) * 0.5 + noise(uv * 2.0) * 0.25 + noise(uv * 4.0) * 0.125;
-              
-              // Brighter, warmer core colors
-              vec3 coreColor = vec3(1.0, 1.0, 1.0);
-              vec3 hotColor = vec3(1.0, 0.95, 0.75);
-              vec3 surfaceColor = mix(hotColor, coreColor, n);
-              
-              // Make it extremely bright (HDR-like)
-              surfaceColor *= 4.0;
-              
-              gl_FragColor = vec4(surfaceColor, 1.0);
+              // Back faces: |dot| ~1 at the centre, ~0 at the shell edge
+              float r = 1.0 - abs(dot(vN, vV));
+              // Brightest right at the solar limb, falling off steeply outwards
+              float a = pow(1.0 - r, 6.0) * 0.9;
+              gl_FragColor = vec4(vec3(1.0, 0.97, 0.92) * a, a);
             }
           `}
-        />
-      </mesh>
-
-      {/* Inner corona - bright warm yellow */}
-      <mesh ref={coronaRef} renderOrder={1}>
-        <sphereGeometry args={[sunSize * 1.1, 64, 64]} />
-        <meshBasicMaterial
-          color="#FFFFF0"
-          transparent
-          opacity={0.85}
-          depthWrite={false}
-        />
-      </mesh>
-
-      {/* Middle glow layer */}
-      <mesh renderOrder={2}>
-        <sphereGeometry args={[sunSize * 1.2, 48, 48]} />
-        <meshBasicMaterial
-          color="#FFF080"
-          transparent
-          opacity={0.7}
-          depthWrite={false}
         />
       </mesh>
 
@@ -284,7 +314,7 @@ export const Sun = ({ position = [0, 0, 0], visualScale = UNIFIED_SCALE }: SunPr
           depthWrite={false}
           side={THREE.BackSide}
           uniforms={{
-            glowColor: { value: new THREE.Color('#FF8800') },
+            glowColor: { value: new THREE.Color('#FFD9A0') },
           }}
           vertexShader={`
             varying vec3 vNormal;
@@ -313,7 +343,7 @@ export const Sun = ({ position = [0, 0, 0], visualScale = UNIFIED_SCALE }: SunPr
           depthWrite={false}
           side={THREE.BackSide}
           uniforms={{
-            glowColor: { value: new THREE.Color('#FF6600') },
+            glowColor: { value: new THREE.Color('#FFC27A') },
           }}
           vertexShader={`
             varying vec3 vNormal;
@@ -375,7 +405,7 @@ export const Sun = ({ position = [0, 0, 0], visualScale = UNIFIED_SCALE }: SunPr
         intensity={12}
         distance={0}
         decay={1}
-        color="#FFFAF0"
+        color={SUNLIGHT_COLOR}
       />
       </group>
     </Select>
