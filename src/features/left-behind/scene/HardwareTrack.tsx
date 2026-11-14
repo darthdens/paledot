@@ -11,6 +11,7 @@ import { useSimClock } from '../state/useSimClock';
 import { positionAt, sampleTrajectory } from '../engine/trajectory';
 import type { Trajectory } from '../data/types';
 import { eclipticKmToScene } from '../lib/units';
+import { followHardware } from '../lib/hardwareNavigation';
 import { machineCopy } from '../lib/machineCopy';
 
 export function HardwareTrack({ data, nearest }: { data: Trajectory; nearest: boolean }) {
@@ -34,18 +35,20 @@ export function HardwareTrack({ data, nearest }: { data: Trajectory; nearest: bo
       else lastChunk.push(point);
     }
     return chunks.map(points=> {
-      const geometry=new THREE.BufferGeometry().setFromPoints(points.map(p=>new THREE.Vector3(...eclipticKmToScene(...p.km))));
-      const future=new THREE.Line(geometry.clone(),new THREE.LineDashedMaterial({color,transparent:true,opacity:.12,dashSize:10000,gapSize:10000,depthWrite:false}));
-      future.computeLineDistances(); future.frustumCulled=false;
-      const past=new THREE.Line(geometry,new THREE.LineBasicMaterial({color,transparent:true,opacity:.45,linewidth:1,depthWrite:false}));
-      past.frustumCulled=false;
+      const origin=eclipticKmToScene(...(points[0]?.km ?? [0,0,0]));
+      // Local origins retain metre-level precision far beyond the outer planets.
+      const geometry=new THREE.BufferGeometry().setFromPoints(points.map(p=>{const v=eclipticKmToScene(...p.km);return new THREE.Vector3(v[0]-origin[0],v[1]-origin[1],v[2]-origin[2]);}));
+      const future=new THREE.Line(geometry.clone(),new THREE.LineDashedMaterial({color,transparent:true,opacity:.12,dashSize:10000,gapSize:10000,depthWrite:false,depthTest:false}));
+      future.computeLineDistances(); future.frustumCulled=false;future.position.set(...origin);future.renderOrder=2;
+      const past=new THREE.Line(geometry,new THREE.LineBasicMaterial({color,transparent:true,opacity:.45,linewidth:1,depthWrite:false,depthTest:false}));
+      past.frustumCulled=false;past.position.set(...origin);past.renderOrder=1;
       return { points,past,future };
     });
   },[data]);
   const tip = useMemo(()=> {
     const geometry=new THREE.BufferGeometry();
     geometry.setAttribute('position',new THREE.BufferAttribute(new Float32Array(6),3));
-    const material=new THREE.LineBasicMaterial({transparent:true,opacity:.45,depthWrite:false});
+    const material=new THREE.LineBasicMaterial({transparent:true,opacity:.45,depthWrite:false,depthTest:false});
     const first=graphics[0];if(first)material.color.copy(first.past.material.color);
     const line=new THREE.Line(geometry,material);
     line.frustumCulled=false;
@@ -71,8 +74,8 @@ export function HardwareTrack({ data, nearest }: { data: Trajectory; nearest: bo
     const chunk=[...graphics].reverse().find(g=>(g.points[0]?.time ?? Infinity)<=time);
     const last=chunk?.points.filter(point=>point.time<=time).at(-1);
     if(last && positionAt(data.id,new Date((last.time+time)/2))) {
-      const a=eclipticKmToScene(...last.km),b=eclipticKmToScene(...p.km);
-      const attribute=tip.geometry.getAttribute('position');attribute.setXYZ(0,...a);attribute.setXYZ(1,...b);attribute.needsUpdate=true;tip.visible=true;
+      const a=eclipticKmToScene(...last.km),b=eclipticKmToScene(...p.km);tip.position.set(...a);
+      const attribute=tip.geometry.getAttribute('position');attribute.setXYZ(0,0,0,0);attribute.setXYZ(1,b[0]-a[0],b[1]-a[1],b[2]-a[2]);attribute.needsUpdate=true;tip.visible=true;
     }
     node.updateWorldMatrix(true,false);node.getWorldPosition(world);
     useCosmosStore.getState().setObjectWorldPosition(`hw:${data.id}`,[world.x,world.y,world.z]);
@@ -84,7 +87,7 @@ export function HardwareTrack({ data, nearest }: { data: Trajectory; nearest: bo
     <group ref={marker} visible={false} name={`hw:${data.id}`}>
       <Html center zIndexRange={[40,30]}>
         <div ref={anchor} hidden className="paledot dark pd-hardware-anchor" onPointerEnter={()=>setHover(true)} onPointerLeave={()=>setHover(false)}>
-          <Button variant="ghost" className="pd-hardware-hit" aria-label={`${machineCopy[language].select} ${label}`} aria-pressed={selected} onClick={()=>{useCosmosStore.getState().setSelectedObject(null);useLeftBehindStore.getState().selectHardware(data.id);}}>
+          <Button variant="ghost" className="pd-hardware-hit" aria-label={`${machineCopy[language].select} ${label}`} aria-pressed={selected} onClick={()=>followHardware(data.id)}>
             <span className={`pd-hardware-ring ${selected?'pd-hardware-selected':''}`} />
           </Button>
           {(hover||selected||nearest)&&<span className="pd-hardware-label">{label}{data.source==='simplified'&&<small>{machineCopy[language].simplified}</small>}</span>}
