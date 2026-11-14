@@ -212,11 +212,11 @@ export const Sun = ({ position = [0, 0, 0], visualScale = UNIFIED_SCALE }: SunPr
       coronaRef.current.scale.setScalar(1 + Math.sin(time * 2) * 0.02);
     }
     if (glowRef.current) {
-      glowRef.current.scale.setScalar(1 + Math.sin(time * 0.5) * 0.05);
+      glowRef.current.scale.setScalar(1);
     }
     // Animate outer glow - gentle pulse
     if (outerGlowRef.current) {
-      const pulseScale = 1 + Math.sin(time * 0.3) * 0.03;
+      const pulseScale = 1;
       outerGlowRef.current.scale.setScalar(pulseScale);
     }
 
