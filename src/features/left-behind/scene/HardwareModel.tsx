@@ -37,7 +37,7 @@ export function HardwareModel({ id, url, selected, parent }: { id: string; url: 
     const wrapper = new THREE.Group();
     clone.position.copy(center).multiplyScalar(-unit); clone.scale.setScalar(unit);
     wrapper.add(clone);
-    wrapper.userData.halfHeight = (size.y * unit) / 2;
+    wrapper.userData['halfHeight'] = (size.y * unit) / 2;
     return wrapper;
   }, [scene]);
   useEffect(() => () => model.traverse(node => {
@@ -65,7 +65,7 @@ export function HardwareModel({ id, url, selected, parent }: { id: string; url: 
       holder.getWorldQuaternion(tmp.q).invert();
       tmp.dir.set(...pin.normal).applyQuaternion(tmp.q).normalize();
       node.quaternion.setFromUnitVectors(tmp.up, tmp.dir);
-      node.position.copy(tmp.dir).multiplyScalar(scale * (model.userData.halfHeight ?? 0.5));
+      node.position.copy(tmp.dir).multiplyScalar(scale * (model.userData['halfHeight'] ?? 0.5));
     } else if (parent) {
       const p = useCosmosStore.getState().objectWorldPositions[parent];
       const radius = PARENT_RADIUS[parent] ?? 0;
