@@ -1,6 +1,7 @@
 // Left Behind · built during NASA Space Apps Challenge 2026 (14–15 Nov 2026) · AI-assisted (Lovable, Claude)
 import type { CelestialObject } from '@/components/cosmos/types';
 import { UNIFIED_SCALE } from './units';
+export { UNIFIED_SCALE } from './units';
 
 /** Catalogue solid-body sizes are diameters in kilometres, never radii. */
 export function bodyRadius(diameterKm: number, scale = UNIFIED_SCALE): number {
