@@ -49,7 +49,7 @@ function SurfacePin({ spec }: { spec: PinSpec }) {
       ring.current.classList.remove('pd-pin-pulse'); void ring.current.offsetWidth; ring.current.classList.add('pd-pin-pulse');
     }
     shown.current = visible;
-    if (ring.current) ring.current.hidden = !visible || crowded[spec.body];
+    if (ring.current) ring.current.hidden = !visible || crowded[spec.body] || !['earth', 'solarSystem'].includes(useCosmosStore.getState().currentScale);
     if (!visible) { landedPins.delete(spec.trajId); return; }
     const p = latLonToLocal(spec.lat, spec.lon, radius, TEXTURE_LON_OFFSET_DEG[spec.body] ?? 0);
     const attr = line.geometry.getAttribute('position') as THREE.BufferAttribute;
