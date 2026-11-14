@@ -15,8 +15,8 @@ import apollo from '../assets/apollo.glb.asset.json';
 const models:Record<string,{url:string}>= {'voyager-1':voyager,'voyager-2':voyager,ingenuity,opportunity,'viking-1':viking,'apollo-11':apollo};
 export function hasNasaModel(id:string){return !!models[id];}
 class ModelBoundary extends Component<{children:ReactNode;fallback:ReactNode},{failed:boolean}>{
-  state={failed:false};static getDerivedStateFromError(){return {failed:true};}
-  render(){return this.state.failed?this.props.fallback:this.props.children;}
+  override state={failed:false};static getDerivedStateFromError(){return {failed:true};}
+  override render(){return this.state.failed?this.props.fallback:this.props.children;}
 }
 function Model({url}:{url:string}){
   const {scene}=useGLTF(url,false);

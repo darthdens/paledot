@@ -128,7 +128,6 @@ export const CosmosUI = () => {
   const native = isNativeApp() || brand === 'paledot';
   // In fullscreen, dropdowns appear directly below the button row (h-8 = 32px + gap)
   const fullscreenDropdownOffsetPx = isMobile ? 40 : 44;
-  const uiFixed = isFullscreen && brand !== 'paledot';
   const quickJumpButtonRef = useRef<HTMLButtonElement | null>(null);
   const {
     startTour,
@@ -150,6 +149,7 @@ export const CosmosUI = () => {
     goHome,
   } = useCosmosStore();
   const { isFullscreen, setIsFullscreen } = useFullscreenStore();
+  const uiFixed = isFullscreen && brand !== 'paledot';
   const timeMenuOpen = dateControlOpen;
   const [showMoreMenu, setShowMoreMenu] = useState(false);
   const [showLanguageMenu, setShowLanguageMenu] = useState(false);
