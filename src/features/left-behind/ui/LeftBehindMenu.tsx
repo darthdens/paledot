@@ -1,12 +1,16 @@
 // Left Behind · built during NASA Space Apps Challenge 2026 (14–15 Nov 2026) · AI-assisted (Lovable, Claude)
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { ChevronDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { useLanguage } from '@/i18n/LanguageContext';
 import { leftBehindCopy } from '../lib/copy';
 import { useLeftBehindStore } from '../state/useLeftBehindStore';
+import { useCosmosStore } from '@/components/cosmos/store/useCosmosStore';
+import { TourChoices } from './TourChoices';
 export function LeftBehindMenu() {
   const ref = useRef<HTMLDivElement>(null);
+  const [toursOpen, setToursOpen] = useState(false);
   const { language, tr } = useLanguage();
   const copy = leftBehindCopy[language];
   const text = (value: string) => tr({ en: value, fr: value });
@@ -20,10 +24,11 @@ export function LeftBehindMenu() {
     document.addEventListener('keydown', escape);
     return () => { document.removeEventListener('mousedown', close); document.removeEventListener('keydown', escape); };
   }, []);
-  return <div ref={ref} data-lb-menu role="region" aria-label={text(copy.name)} className="pd-card absolute top-12 right-2 sm:top-[68px] sm:right-4 z-[10002] w-[min(300px,calc(100vw-1rem))] bg-foreground/10 backdrop-blur-xs p-3">
-    <div className="pd-hud-label border-b border-border pb-3">{text(copy.tours)}</div>
+  return <div ref={ref} data-lb-menu role="region" aria-label={text(copy.name)} className="pd-card rounded-lg absolute top-12 right-2 sm:top-[68px] sm:right-4 z-[10002] w-[min(300px,calc(100vw-1rem))] max-h-[calc(100dvh-5rem)] overflow-y-auto bg-foreground/10 backdrop-blur-xs p-2">
+    <Button variant="ghost" aria-expanded={toursOpen} onClick={() => setToursOpen(!toursOpen)} className="w-full min-h-11 justify-between px-3 text-sm"><span>{text(copy.tours)}</span><ChevronDown className={`h-4 w-4 ${toursOpen ? 'rotate-180' : ''}`} /></Button>
+    {toursOpen && <TourChoices onBegin={() => { useLeftBehindStore.getState().setMenuOpen(false); useCosmosStore.getState().startTour(); }} />}
     <label className="flex min-h-11 items-center justify-between gap-3 text-sm text-foreground">
-      <span>{text(copy.machines)}</span><Switch aria-label={text(copy.machines)} checked={machinesVisible} onCheckedChange={() => useLeftBehindStore.getState().toggleMachines()} />
+      <span>{text(copy.machines)}</span><Switch className="pd-machine-switch" aria-label={text(copy.machines)} checked={machinesVisible} onCheckedChange={() => useLeftBehindStore.getState().toggleMachines()} />
     </label>
     <Button variant="ghost" disabled className="w-full min-h-11 justify-start">{text(copy.signal)}</Button>
     <Button variant="ghost" disabled className="w-full min-h-11 justify-start">{text(copy.know)}</Button>

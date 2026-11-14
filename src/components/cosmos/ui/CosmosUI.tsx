@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { useSimClock } from '@/features/left-behind/state/useSimClock';
 import { dateCopy } from '@/features/left-behind/lib/dateCopy';
 import { LeftBehindMenu } from '@/features/left-behind/ui/LeftBehindMenu';
+import { TourChoices } from '@/features/left-behind/ui/TourChoices';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { HelpCircle, Compass, Satellite, Maximize, Minimize, CircleDot, CircleOff, Clock, Timer, TimerOff, Orbit, Activity, Home, Scaling, BarChart3, Info, MoreVertical } from 'lucide-react';
 import { useCosmosStore } from '../store/useCosmosStore';
@@ -151,6 +152,7 @@ export const CosmosUI = () => {
   const [showMoreMenu, setShowMoreMenu] = useState(false);
   const [showLanguageMenu, setShowLanguageMenu] = useState(false);
   const [showAbout, setShowAbout] = useState(false);
+  const [showTourChoices, setShowTourChoices] = useState(false);
   
   const timeSliderRef = useRef<HTMLDivElement | null>(null);
   const moreMenuRef = useRef<HTMLDivElement | null>(null);
@@ -602,9 +604,10 @@ export const CosmosUI = () => {
             <div className="flex gap-2 sm:gap-3 justify-center flex-wrap">
               <Button
                 size="sm"
+                aria-expanded={brand === 'paledot' ? showTourChoices : undefined}
                 onClick={() => {
-                  setShowControlHints(false);
-                  startTour();
+                  if (brand === 'paledot') setShowTourChoices(!showTourChoices);
+                  else { setShowControlHints(false); startTour(); }
                 }}
                 className={brand === 'paledot' ? "pd-pill pd-primary" : "text-xs sm:text-sm bg-blue-600 hover:bg-blue-700 text-white border-0"}
               >
@@ -621,10 +624,11 @@ export const CosmosUI = () => {
               >
                 {t.explore}
               </Button>
-              {brand === 'paledot' && <Button size="sm" variant="outline" className="pd-pill min-h-11" onClick={() => { setShowControlHints(false); useLeftBehindStore.getState().setMenuOpen(true); }}>
+              {brand === 'paledot' && <Button size="sm" variant="outline" className="pd-pill" onClick={() => { setShowControlHints(false); useLeftBehindStore.getState().setMenuOpen(true); }}>
                 <Satellite className="h-4 w-4" />{tr({ en: lbCopy.entry, fr: lbCopy.entry })}
               </Button>}
             </div>
+            {brand === 'paledot' && showTourChoices && <div className="pd-card rounded-lg p-2 max-h-[min(360px,40dvh)] overflow-y-auto mx-auto w-full max-w-sm"><TourChoices onBegin={() => { setShowTourChoices(false); setShowControlHints(false); startTour(); }} /></div>}
           </div>
         </div>
       )}
@@ -685,7 +689,7 @@ export const CosmosUI = () => {
 
             {/* Divider before sound */}
             {brand === 'paledot' && <Tooltip>
-              <TooltipTrigger asChild><Button data-lb-menu-trigger size="icon" variant="ghost" aria-label={lbName} aria-pressed={menuOpen} onClick={toggleLeftBehind} className={`hidden lg:inline-flex h-11 w-11 backdrop-blur-xs text-foreground ${menuOpen ? 'bg-foreground/25' : 'bg-foreground/10 hover:bg-foreground/20'}`}><Satellite className="h-5 w-5" /></Button></TooltipTrigger>
+              <TooltipTrigger asChild><Button data-lb-menu-trigger size="icon" variant="ghost" aria-label={lbName} aria-pressed={menuOpen} onClick={toggleLeftBehind} className={`hidden lg:inline-flex h-9 w-9 backdrop-blur-xs text-foreground ${menuOpen ? 'bg-foreground/25' : 'bg-foreground/10 hover:bg-foreground/20'}`}><Satellite className="h-5 w-5" /></Button></TooltipTrigger>
               <TooltipContent variant="dark" side="bottom">{lbName}</TooltipContent>
             </Tooltip>}
             <div className="hidden lg:block w-px h-6 bg-white/20 mx-0.5" />

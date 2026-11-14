@@ -10,3 +10,5 @@
 - Solid-body renderers and close-up navigation use the shared bodyScale helpers; catalogue sizes remain diameters and positions are untouched. Why: both brands/modes must agree on radius, camera clearance and portrait framing.
 - In development only, window.__cosmosCheck exposes live state(), snapshot() and finishFlight(); the canvas marks data-scene-ready after drawing. Why: verify complete tours and true radii without duplicating stores or waiting for software-GPU animation time.
 - Both brands share useSimClock and dynamically loaded ephemerides; one pre-motion useFrame advances UTC time in simulated seconds per real second, and Begin at Earth saves/restores clock playback. Why: every Solar System object uses one real-date universe.
+
+- Welcome and Left Behind menus share TourChoices; only implemented tours are launchable. Why: every entry offers the same options without substituting another tour for unfinished machine tours.
