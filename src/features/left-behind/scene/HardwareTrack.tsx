@@ -49,7 +49,7 @@ export function HardwareTrack({ data, nearest }: { data: Trajectory; nearest: bo
       const origin=eclipticKmToScene(...(points[0]?.km ?? [0,0,0]));
       // Local origins retain metre-level precision far beyond the outer planets.
       const geometry=new THREE.BufferGeometry().setFromPoints(points.map(p=>{const v=eclipticKmToScene(...p.km);return new THREE.Vector3(v[0]-origin[0],v[1]-origin[1],v[2]-origin[2]);}));
-      const future=new THREE.Line(geometry.clone(),new THREE.LineDashedMaterial({color,transparent:true,opacity:.12,dashSize:10000,gapSize:10000,depthWrite:false,depthTest:false}));
+      const future=new THREE.Line(geometry.clone(),new THREE.LineDashedMaterial({color,transparent:true,opacity:.3,dashSize:10000,gapSize:10000,depthWrite:false,depthTest:false}));
       future.computeLineDistances(); future.frustumCulled=false;future.position.set(...origin);future.renderOrder=2;
       const past=new THREE.Line(geometry,new THREE.LineBasicMaterial({color,transparent:true,opacity:.45,linewidth:1,depthWrite:false,depthTest:false}));
       past.frustumCulled=false;past.position.set(...origin);past.renderOrder=1;
@@ -69,11 +69,13 @@ export function HardwareTrack({ data, nearest }: { data: Trajectory; nearest: bo
   useEffect(()=>()=>{ for(const g of graphics){g.past.geometry.dispose();g.past.material.dispose();g.future.geometry.dispose();g.future.material.dispose();} delete useCosmosStore.getState().objectWorldPositions[`hw:${data.id}`]; },[graphics,data.id]);
   useFrame(()=> {
     const time=useSimClock.getState().simDate;
+    const trails=useCosmosStore.getState().showTrails;
     for(const g of graphics) {
+      g.past.visible=trails;
       let low=0,high=g.points.length;
       while(low<high){const middle=(low+high)>>>1;if((g.points[middle]?.time ?? Infinity)<=time)low=middle+1;else high=middle;}
       g.past.geometry.setDrawRange(0,low);
-      g.future.visible=full;
+      g.future.visible=full&&trails;
       g.future.geometry.setDrawRange(Math.max(0,low-1),g.points.length-Math.max(0,low-1));
     }
     const node=marker.current;if(!node)return;
@@ -86,7 +88,7 @@ export function HardwareTrack({ data, nearest }: { data: Trajectory; nearest: bo
     const last=chunk?.points.filter(point=>point.time<=time).at(-1);
     if(last && positionAt(data.id,new Date((last.time+time)/2))) {
       const a=eclipticKmToScene(...last.km),b=eclipticKmToScene(...p.km);tip.position.set(...a);
-      const attribute=tip.geometry.getAttribute('position');attribute.setXYZ(0,0,0,0);attribute.setXYZ(1,b[0]-a[0],b[1]-a[1],b[2]-a[2]);attribute.needsUpdate=true;tip.visible=true;
+      const attribute=tip.geometry.getAttribute('position');attribute.setXYZ(0,0,0,0);attribute.setXYZ(1,b[0]-a[0],b[1]-a[1],b[2]-a[2]);attribute.needsUpdate=true;tip.visible=trails;
     }
     node.updateWorldMatrix(true,false);node.getWorldPosition(world);
     useCosmosStore.getState().setObjectWorldPosition(`hw:${data.id}`,[world.x,world.y,world.z]);
