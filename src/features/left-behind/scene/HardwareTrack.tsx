@@ -106,7 +106,7 @@ export function HardwareTrack({ data, nearest }: { data: Trajectory; nearest: bo
     node.updateWorldMatrix(true,false);node.getWorldPosition(world);
     // Hide the ring once the true-size model is bigger on screen than the ring itself.
     const span=trueSpanUnits.get(data.id);
-    if(anchor.current&&span){const cam=camera as THREE.PerspectiveCamera;const px=span/(2*cam.position.distanceTo(world)*Math.tan(THREE.MathUtils.degToRad((cam.fov??60)/2)))*size.height;anchor.current.hidden=px>18;}
+    if(anchor.current&&span){const cam=camera as THREE.PerspectiveCamera;const px=span/(2*cam.position.distanceTo(world)*Math.tan(THREE.MathUtils.degToRad((cam.fov??60)/2)))*size.height;anchor.current.hidden=px>18;anchor.current.style.visibility=px>18?"hidden":"";}
     useCosmosStore.getState().setObjectWorldPosition(`hw:${data.id}`,[world.x,world.y,world.z]);
   },-0.25);
   const model=nasaModels[data.id];
