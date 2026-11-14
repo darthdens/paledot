@@ -2,15 +2,15 @@
   {
     "id": "apollo-11-1",
     "machineId": "apollo-11",
-    "nasaId": "as11-40-5903",
-    "title": "Astronaut Edwin Aldrin walks on lunar surface near leg of Lunar Module",
+    "nasaId": "as11-40-5917",
+    "title": "View of footpad of Apollo 11 Lunar Module as it rested on lunar surface",
     "credit": "NASA/JSC",
-    "sourceUrl": "https://images.nasa.gov/details/as11-40-5903",
-    "imageUrl": "https://images-assets.nasa.gov/image/as11-40-5903/as11-40-5903~medium.jpg",
+    "sourceUrl": "https://images.nasa.gov/details/as11-40-5917",
+    "imageUrl": "https://images-assets.nasa.gov/image/as11-40-5917/as11-40-5917~medium.jpg",
     "dateTaken": "1969-07-20T00:00:00Z",
-    "alt": "Astronaut Edwin Aldrin walks on lunar surface near leg of Lunar Module.",
-    "caption": "Astronaut Edwin Aldrin walks on lunar surface near leg of Lunar Module",
-    "description": "AS11-40-5903 (20 July 1969) --- Astronaut Edwin E. Aldrin Jr., lunar module pilot, walks on the surface of the moon near the leg of the Lunar Module (LM) \"Eagle\" during the Apollo 11 extravehicular activity (EVA). Astronaut Neil A. Armstrong, commander, took this photograph with a 70mm lunar surface camera. While astronauts Armstrong and Aldrin descended in the Lunar Module (LM) \"Eagle\" to explore the Sea of Tranquility region of the moon, astronaut Michael Collins, command module pilot, remained with the Command and Service Modules (CSM) \"Columbia\" in lunar orbit."
+    "alt": "View of footpad of Apollo 11 Lunar Module as it rested on lunar surface.",
+    "caption": "View of footpad of Apollo 11 Lunar Module as it rested on lunar surface",
+    "description": "A close-up view of a footpad of the Apollo 11 Lunar Module as it rested on the surface of the Moon. The stick-like protruding object is a lunar surface sensing probe. This photograph was take with a 70mm lunar surface camera during the extravehicular activity of Astronauts Neil Armstrong and Edwin Aldrin on July 20, 1969."
   },
   {
     "id": "apollo-11-2",
@@ -67,15 +67,15 @@
   {
     "id": "viking-1-2",
     "machineId": "viking-1",
-    "nasaId": "PIA00563",
-    "title": "First Color Image From Viking Lander 1",
+    "nasaId": "PIA00381",
+    "title": "First Photograph Taken On Mars Surface",
     "credit": "NASA/JPL",
-    "sourceUrl": "https://images.nasa.gov/details/PIA00563",
-    "imageUrl": "https://images-assets.nasa.gov/image/PIA00563/PIA00563~orig.jpg",
-    "dateTaken": "1997-02-28T03:03:04Z",
-    "alt": "First Color Image From Viking Lander 1.",
-    "caption": "First Color Image From Viking Lander 1",
-    "description": "First Color Image From Viking Lander 1"
+    "sourceUrl": "https://images.nasa.gov/details/PIA00381",
+    "imageUrl": "https://images-assets.nasa.gov/image/PIA00381/PIA00381~orig.jpg",
+    "dateTaken": "1996-12-12T03:03:02Z",
+    "alt": "First Photograph Taken On Mars Surface.",
+    "caption": "First Photograph Taken On Mars Surface",
+    "description": "This is the first photograph ever taken on the surface of the planet Mars. It was obtained by Viking 1 just minutes after the spacecraft landed successfully early today [July 20, 1976]. The center of the image is about 1.4 meters (five feet) from Viking Lander camera #2. We see both rocks and finely granulated material--sand or dust. Many of the small foreground rocks are flat with angular facets. Several larger rocks exhibit irregular surfaces with pits and the large rock at top left shows intersecting linear cracks. Extending from that rock toward the camera is a vertical linear dark band which may be due to a one-minute partial obscuration of the landscape due to clouds or dust intervening between the sun and the surface. Associated with several of the rocks are apparent signs of wind transport of granular material. The large rock in the center is about 10 centimeters (4 inches) across and shows three rough facets. To its lower right is a rock near a smooth portion of the Martian surface probably composed of very fine-grained material. It is possible that the rock was moved during Viking 1 descent maneuvers, revealing the finer-grained basement substratum; or that the fine-grained material has accumulated adjacent to the rock. There are a number of other furrows and depressions and places with fine-grained material elsewhere in the picture. At right is a portion of footpad #2. Small quantities of fine grained sand and dust are seen at the center of the footpad near the strut and were deposited at landing. The shadow to the left of the footpad clearly exhibits detail, due to scattering of light either from the Martian atmosphere or from the spacecraft, observable because the Martian sky scatters light into shadowed areas.  http://photojournal.jpl.nasa.gov/catalog/PIA00381"
   },
   {
     "id": "opportunity-1",
