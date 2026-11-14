@@ -206,7 +206,7 @@ export const Sun = ({ position = [0, 0, 0], visualScale = UNIFIED_SCALE }: SunPr
     }
     if (photoMatRef.current) {
       // Granules evolve on the simulation clock (real lifetime ~5-10 min); wrapped to keep float precision
-      photoMatRef.current.uniforms.uTime.value = (useSimClock.getState().simDate / 1000) % 4.8e5;
+      photoUniforms.uTime.value = (useSimClock.getState().simDate / 1000) % 4.8e5;
     }
     if (coronaRef.current) {
       coronaRef.current.scale.setScalar(1 + Math.sin(time * 2) * 0.02);
