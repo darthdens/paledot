@@ -1,3 +1,6 @@
+import { useLeftBehindStore } from '@/features/left-behind/state/useLeftBehindStore';
+import { loadEphemeris, getEphemeris } from '@/features/left-behind/engine/runtime';
+import { eclipticKmToScene } from '@/features/left-behind/lib/units';
 import { bodyRadius, UNIFIED_SCALE } from '@/features/left-behind/lib/bodyScale';
 // TexturedPlanet - Renders planets with realistic lighting and shadows
 import { useRef, useMemo, useEffect, useState } from 'react';
@@ -307,6 +310,14 @@ export const TexturedPlanet = ({
   visualScale = UNIFIED_SCALE,
   distanceScale = UNIFIED_SCALE 
 }: TexturedPlanetProps) => {
+  const leftBehindActive = useLeftBehindStore(s => s.active);
+  const [ephemerisReady, setEphemerisReady] = useState(false);
+  useEffect(() => {
+    if (!leftBehindActive) return;
+    let alive = true;
+    loadEphemeris().then(() => { if (alive) setEphemerisReady(true); });
+    return () => { alive = false; };
+  }, [leftBehindActive]);
   const planetRef = useRef<THREE.Mesh>(null);
   const groupRef = useRef<THREE.Group>(null);
   const atmosphereRef = useRef<THREE.Mesh>(null);
@@ -510,8 +521,13 @@ export const TexturedPlanet = ({
 
     // Moons: orbit around their parent planet's world position
     // Note: We read parent position directly from store which was updated this frame (planets render first)
-    if (isMoon && moonOrbitRadius > 0) {
-      const parentPosArr = useCosmosStore.getState().objectWorldPositions[object.parentId!];
+    const lb = useLeftBehindStore.getState();
+    const ephemeris = lb.active ? getEphemeris() : null;
+    if (ephemeris && ephemeris.isEphemerisBody(object.id)) {
+      const position = ephemeris.positionsAt(lb.simDate)[object.id];
+      if (position) groupRef.current.position.set(...eclipticKmToScene(...position));
+    } else if (isMoon && moonOrbitRadius > 0) {
+      const parentPosArr = useCosmosStore.getState().objectWorldPositions[object.parentId ?? ''];
       if (parentPosArr) {
         const periodDays = object.orbitPeriodDays || 27.32; // Default to Moon's period
         const orbitalVelocity = getOrbitalAngularVelocity(periodDays);
@@ -612,6 +628,10 @@ export const TexturedPlanet = ({
   // Create orbit line (only for planets orbiting sun, not moons) with compressed distances
   const orbitPoints = useMemo(() => {
     if (!showOrbit || orbitRadius === 0 || isMoon) return null;
+    const ephemeris = leftBehindActive && ephemerisReady ? getEphemeris() : null;
+    if (ephemeris && ephemeris.isEphemerisBody(object.id) && object.id !== 'moon') {
+      return ephemeris.sampleOrbitKm(object.id, useLeftBehindStore.getState().simDate).map(p => new THREE.Vector3(...eclipticKmToScene(...p)));
+    }
     const points = [];
     // Scale segments based on orbit radius - larger orbits need more segments for smoothness
     // Base of 4096 for small orbits, scaling up for larger ones
@@ -629,7 +649,7 @@ export const TexturedPlanet = ({
       );
     }
     return points;
-  }, [orbitRadius, showOrbit, isMoon]);
+  }, [orbitRadius, showOrbit, isMoon, leftBehindActive, ephemerisReady, object.id]);
 
   const handleClick = (e: { stopPropagation: () => void }) => {
     e.stopPropagation();
