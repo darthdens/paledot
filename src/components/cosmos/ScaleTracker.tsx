@@ -3,6 +3,7 @@ import { useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import { useCosmosStore } from './store/useCosmosStore';
 import { useRef } from 'react';
+import { useLeftBehindStore } from '@/features/left-behind/state/useLeftBehindStore';
 
 const UNIFIED_SCALE = 0.001;
 
@@ -28,10 +29,12 @@ export const ScaleTracker = () => {
     // don't get clipped when zooming way out.
     const desiredFar = Math.max(1e12, distanceScene * 100);
     const target = (controls as { target?: THREE.Vector3 } | null)?.target;
-    const desiredNear = closeViewNear(distanceScene, target ? cam.position.distanceTo(target) : distanceScene);
+    const targetDistance = target ? cam.position.distanceTo(target) : distanceScene;
+    // Following NASA hardware: allow metre-scale close-ups by tying near to the target distance.
+    const desiredNear = useLeftBehindStore.getState().followTargetId ? Math.max(1e-10, targetDistance / 1000) : closeViewNear(distanceScene, targetDistance);
 
     const farChanged = Math.abs(cam.far - desiredFar) / Math.max(cam.far, 1) > 0.25;
-    const nearChanged = Math.abs(cam.near - desiredNear) / Math.max(cam.near, 1) > 0.25;
+    const nearChanged = Math.abs(cam.near - desiredNear) / Math.max(cam.near, 1e-12) > 0.25;
 
     if (farChanged || nearChanged) {
       cam.far = desiredFar;

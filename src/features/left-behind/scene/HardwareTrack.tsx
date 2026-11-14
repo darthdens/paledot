@@ -99,7 +99,7 @@ export function HardwareTrack({ data, nearest }: { data: Trajectory; nearest: bo
     <primitive object={tip}/>
     {graphics.map((g,i)=><group key={i}><primitive object={g.past}/><primitive object={g.future}/></group>)}
     <group ref={marker} visible={false} name={`hw:${data.id}`}>
-      {model&&<SceneBoundary><Suspense fallback={null}><HardwareModel url={model.url} selected={selected} parent={PARENTS[data.id]}/></Suspense></SceneBoundary>}
+      {model&&<SceneBoundary><Suspense fallback={null}><HardwareModel id={data.id} url={model.url} selected={selected} parent={PARENTS[data.id]}/></Suspense></SceneBoundary>}
       <Html center zIndexRange={[40,30]}>
         <div ref={anchor} hidden className="paledot dark pd-hardware-anchor" onPointerEnter={()=>setHover(true)} onPointerLeave={()=>setHover(false)}>
           <Button variant="ghost" className="pd-hardware-hit" aria-label={`${machineCopy[language].select} ${label}`} aria-pressed={selected} onClick={()=>followHardware(data.id)}>

@@ -5,6 +5,7 @@ import { useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import { useCosmosStore } from './store/useCosmosStore';
 import { UNITS } from './types';
+import { trueSpanUnits } from '@/features/left-behind/lib/nasaModels';
 import { useLeftBehindStore } from '@/features/left-behind/state/useLeftBehindStore';
 import { getHardware } from '@/features/left-behind/data/dataClient';
 
@@ -390,7 +391,10 @@ export const CameraController = () => {
       if (!live) { useLeftBehindStore.getState().selectHardware(null); return; }
       tmpTarget.current.set(...live); tmpDelta.current.subVectors(tmpTarget.current, orbitControls.target);
       orbitControls.target.copy(tmpTarget.current); camera.position.add(tmpDelta.current);
-      ensureBodyClearance(); orbitControls.update(); return;
+      ensureBodyClearance();
+      // Zoom down to the hardware's true size (with a small margin), never inside it.
+      orbitControls.minDistance = (trueSpanUnits.get(hardwareId) ?? 1e-5) * 0.8;
+      orbitControls.update(); return;
     }
 
     // After fly-to: continuously follow the selected object (keep it centered)
