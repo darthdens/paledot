@@ -29,6 +29,7 @@ const MOBILE_TEXTURE_WHITELIST = [
 
 // Import NASA texture maps - only essential ones are used on mobile
 import { maybeUpgradeSurface } from '@/components/cosmos/lib/hdSurfaces';
+import { Atmosphere, ATMOSPHERES } from './Atmosphere';
 import { hasRelief, loadRelief, reliefSync, METRE, RELIEF_GLSL } from '@/components/cosmos/lib/relief';
 
 const FLAT_HEIGHT = (() => { const t = new THREE.DataTexture(new Uint16Array([0]), 1, 1, THREE.RedFormat, THREE.HalfFloatType); t.needsUpdate = true; return t; })();
@@ -615,11 +616,6 @@ export const TexturedPlanet = ({
       setObjectWorldPosition(object.id, [worldPos.current.x, worldPos.current.y, worldPos.current.z]);
     }
 
-    // Atmosphere pulse
-    if (atmosphereRef.current) {
-      const scale = 1 + Math.sin(time * 0.5) * 0.02;
-      atmosphereRef.current.scale.setScalar(scale);
-    }
   }, -1);
 
   // Create orbit line (only for planets orbiting sun, not moons) with compressed distances
@@ -1961,8 +1957,9 @@ export const TexturedPlanet = ({
           )}
 
 
-          {/* Atmosphere glow - enhanced with sun-facing intensity */}
-          {visuals.hasAtmosphere && (
+          {/* True-scale scattering atmosphere where the body has a real one; legacy glow otherwise */}
+          {ATMOSPHERES[object.id] && <Atmosphere id={object.id} radius={planetSize} />}
+          {visuals.hasAtmosphere && !ATMOSPHERES[object.id] && (
             <mesh ref={atmosphereRef}>
               <sphereGeometry args={[planetSize * 1.08, 64, 64]} />
               <shaderMaterial
