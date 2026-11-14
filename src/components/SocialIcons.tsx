@@ -1,4 +1,4 @@
-import echoLogo from "@/assets/echo-logo.webp";
+import echoLogo from "@/assets/echo-logo.png";
 
 interface IconProps {
   className?: string;
