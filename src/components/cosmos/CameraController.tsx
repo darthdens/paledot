@@ -5,6 +5,7 @@ import { useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import { useCosmosStore } from './store/useCosmosStore';
 import { UNITS } from './types';
+import { bodyRadius } from '@/features/left-behind/lib/bodyScale';
 import { trueSpanUnits } from '@/features/left-behind/lib/nasaModels';
 import { useLeftBehindStore } from '@/features/left-behind/state/useLeftBehindStore';
 import { getHardware } from '@/features/left-behind/data/dataClient';
@@ -288,7 +289,8 @@ export const CameraController = () => {
         if (!position) continue;
         tmpTarget.current.set(...position);
         tmpDelta.current.subVectors(camera.position, tmpTarget.current);
-        const clearance = bodyClearance(body.size, camera.near);
+        // Landed hardware sits on the surface, so following it only keeps the camera above ground.
+        const clearance = hardwareId ? bodyRadius(body.size) * 1.000001 + camera.near : bodyClearance(body.size, camera.near);
         if (tmpDelta.current.length() < clearance) {
           if (tmpDelta.current.lengthSq() === 0) tmpDelta.current.set(0, 0, 1);
           camera.position.copy(tmpTarget.current).add(tmpDelta.current.setLength(clearance));
