@@ -29,7 +29,7 @@ const MOBILE_TEXTURE_WHITELIST = [
 
 // Import NASA texture maps - only essential ones are used on mobile
 import { maybeUpgradeSurface } from '@/components/cosmos/lib/hdSurfaces';
-import { hasRelief, loadRelief, METRE, RELIEF_GLSL, RELIEF_NEAR_RADII } from '@/components/cosmos/lib/relief';
+import { hasRelief, loadRelief, reliefSync, METRE, RELIEF_GLSL, RELIEF_NEAR_RADII } from '@/components/cosmos/lib/relief';
 
 const FLAT_HEIGHT = (() => { const t = new THREE.DataTexture(new Uint16Array([0]), 1, 1, THREE.RedFormat, THREE.HalfFloatType); t.needsUpdate = true; return t; })();
 const sphereRaycast = new THREE.Sphere();
@@ -348,6 +348,7 @@ export const TexturedPlanet = ({
   // Real elevation (Earth/Moon/Mars): loaded near the body; denser sphere once it is ready.
   const reliefState = useRef({ requested: false });
   const [reliefReady, setReliefReady] = useState(false);
+  const holeRect = useRef(new THREE.Vector4(0, 0, 0, 0)); // shared object: site caps edit it in place
   
   const setSelectedObject = useCosmosStore(state => state.setSelectedObject);
   const setHoveredObject = useCosmosStore(state => state.setHoveredObject);
@@ -559,6 +560,7 @@ export const TexturedPlanet = ({
           (material.uniforms['reliefTexel']!.value as THREE.Vector2).set(1 / r.width, 1 / r.height);
           material.uniforms['reliefOn']!.value = 1;
           setReliefReady(true);
+          hdState.current.requested = false; // the re-render rebuilds uniforms; re-apply the cached HD maps
         }).catch(() => { reliefState.current.requested = false; });
       }
       planetMaterialRef.current.uniforms["time"]!.value = time;
@@ -741,12 +743,13 @@ export const TexturedPlanet = ({
                 planetMapSecondary: { value: planetTextures.secondary || placeholderTexture },
                 cloudMap: { value: earthCloudsMap },
                 useProcedural: { value: planetTextures.useProcedural ? 1.0 : 0.0 },
-                heightMap: { value: FLAT_HEIGHT },
-                reliefOn: { value: 0 },
-                reliefTexel: { value: new THREE.Vector2(1, 1) },
+                // Uniforms are rebuilt on re-render, so derive relief values from the loaded state.
+                heightMap: { value: (reliefReady && reliefSync(object.id)?.texture) || FLAT_HEIGHT },
+                reliefOn: { value: reliefReady ? 1 : 0 },
+                reliefTexel: { value: new THREE.Vector2(1 / (reliefSync(object.id)?.width ?? 1), 1 / (reliefSync(object.id)?.height ?? 1)) },
                 reliefRadiusM: { value: planetSize / METRE },
                 reliefScale: { value: METRE },
-                holeRect: { value: new THREE.Vector4(0, 0, 0, 0) },
+                holeRect: { value: holeRect.current },
               }}
               vertexShader={`
                 varying vec3 vNormal;
