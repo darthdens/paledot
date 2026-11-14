@@ -40,4 +40,8 @@ describe('Left Behind source and sampling rules', () => {
     expect(acceptablePhoto({ data: [{ nasa_id: 'x', title: 'Voyager spacecraft', keywords: ['patch'] }] }, voyager)).toBe(false);
     expect(acceptablePhoto({ data: [{ nasa_id: 'x', title: 'Voyager spacecraft', keywords: [] }] }, voyager, 'Voyager spacecraft')).toBe(true);
   });
+  it('never assigns a Voyager 2 image to Voyager 1', () => {
+    if (!voyager) throw new Error('Missing Voyager');
+    expect(acceptablePhoto({ data: [{ nasa_id: 'PIA22915', title: 'Voyager 2 Spacecraft Instruments' }] }, voyager, 'Voyager spacecraft')).toBe(false);
+  });
 });
