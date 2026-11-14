@@ -327,6 +327,10 @@ export const CameraController = () => {
         const position = positions[body.id];
         if (!position) continue;
         tmpTarget.current.set(...position);
+        // Published body positions are throttled (~0.1 s) and lag a moving Moon/Mars by many km; near a landed
+        // machine use the centre implied by its pin (same frame), or the camera gets shoved off the surface.
+        const pin = hardwareId ? landedPins.get(hardwareId) : undefined;
+        if (pin && pin.body === body.id) tmpTarget.current.set(...pin.world).addScaledVector(tmpDelta.current.set(...pin.normal), -bodyRadius(body.size));
         tmpDelta.current.subVectors(camera.position, tmpTarget.current);
         // Landed hardware sits on the surface, so following it only keeps the camera above ground.
         // Not tied to camera.near: near is derived from this clearance while following, which used to lock the camera ~10 km up.
