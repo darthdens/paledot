@@ -16,6 +16,7 @@ import { followHardware } from '../lib/hardwareNavigation';
 import { machineCopy } from '../lib/machineCopy';
 import { nasaModels } from '../lib/nasaModels';
 import { HardwareModel } from './HardwareModel';
+import { trueSpanUnits } from '../lib/nasaModels';
 
 class SceneBoundary extends Component<{ children: ReactNode }, { failed: boolean }> {
   override state = { failed: false };
@@ -53,7 +54,9 @@ export function HardwareTrack({ data, nearest }: { data: Trajectory; nearest: bo
       future.computeLineDistances(); future.frustumCulled=false;future.position.set(...origin);future.renderOrder=2;
       const past=new THREE.Line(geometry,new THREE.LineBasicMaterial({color,transparent:true,opacity:.45,linewidth:1,depthWrite:false,depthTest:false}));
       past.frustumCulled=false;past.position.set(...origin);past.renderOrder=1;
-      return { points,past,future };
+      const scene=new Float64Array(points.length*3);
+      points.forEach((pt,i)=>{const v=eclipticKmToScene(...pt.km);scene[i*3]=v[0];scene[i*3+1]=v[1];scene[i*3+2]=v[2];});
+      return { points,past,future,scene };
     });
   },[data]);
   const tip = useMemo(()=> {
@@ -67,7 +70,7 @@ export function HardwareTrack({ data, nearest }: { data: Trajectory; nearest: bo
   },[graphics]);
   useEffect(()=>()=>{tip.geometry.dispose();tip.material.dispose();},[tip]);
   useEffect(()=>()=>{ for(const g of graphics){g.past.geometry.dispose();g.past.material.dispose();g.future.geometry.dispose();g.future.material.dispose();} delete useCosmosStore.getState().objectWorldPositions[`hw:${data.id}`]; },[graphics,data.id]);
-  useFrame(()=> {
+  useFrame(({camera,size})=> {
     const time=useSimClock.getState().simDate;
     const trails=useCosmosStore.getState().showTrails;
     for(const g of graphics) {
@@ -83,14 +86,27 @@ export function HardwareTrack({ data, nearest }: { data: Trajectory; nearest: bo
     tip.visible=false;
     if(anchor.current)anchor.current.hidden=!p;
     if (!p) { delete useCosmosStore.getState().objectWorldPositions[`hw:${data.id}`]; return; }
-    node.position.set(...eclipticKmToScene(...p.km));
+    const here=eclipticKmToScene(...p.km);
+    node.position.set(...here);
+    // Re-centre path vertices on the machine every frame: Float32 vertices millions of units from
+    // their origin jitter by kilometres, which flickers at metre-scale zoom.
+    for(const g of graphics){
+      for(const line of [g.past,g.future]){
+        const attr=line.geometry.getAttribute('position') as THREE.BufferAttribute;const arr=attr.array as Float32Array;
+        for(let i=0;i<arr.length;i++)arr[i]=(g.scene[i] ?? 0)-(here[i%3] ?? 0);
+        attr.needsUpdate=true;line.position.set(...here);
+      }
+    }
     const chunk=[...graphics].reverse().find(g=>(g.points[0]?.time ?? Infinity)<=time);
     const last=chunk?.points.filter(point=>point.time<=time).at(-1);
     if(last && positionAt(data.id,new Date((last.time+time)/2))) {
-      const a=eclipticKmToScene(...last.km),b=eclipticKmToScene(...p.km);tip.position.set(...a);
-      const attribute=tip.geometry.getAttribute('position');attribute.setXYZ(0,0,0,0);attribute.setXYZ(1,b[0]-a[0],b[1]-a[1],b[2]-a[2]);attribute.needsUpdate=true;tip.visible=trails;
+      const a=eclipticKmToScene(...last.km),b=here;tip.position.set(...b);
+      const attribute=tip.geometry.getAttribute('position');attribute.setXYZ(0,a[0]-b[0],a[1]-b[1],a[2]-b[2]);attribute.setXYZ(1,0,0,0);attribute.needsUpdate=true;tip.visible=trails;
     }
     node.updateWorldMatrix(true,false);node.getWorldPosition(world);
+    // Hide the ring once the true-size model is bigger on screen than the ring itself.
+    const span=trueSpanUnits.get(data.id);
+    if(anchor.current&&span){const cam=camera as THREE.PerspectiveCamera;const px=span/(2*cam.position.distanceTo(world)*Math.tan(THREE.MathUtils.degToRad((cam.fov??60)/2)))*size.height;anchor.current.hidden=px>18;}
     useCosmosStore.getState().setObjectWorldPosition(`hw:${data.id}`,[world.x,world.y,world.z]);
   },-0.25);
   const model=nasaModels[data.id];
