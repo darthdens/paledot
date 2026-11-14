@@ -25,5 +25,23 @@
   "datum": "sea level",
   "credit": "NOAA NCEI ETOPO1 Global Relief Model (ice surface)",
   "sourceUrl": "https://www.ncei.noaa.gov/products/etopo-global-relief-model"
+ },
+ "mercury": {
+  "width": 5760,
+  "height": 2880,
+  "minM": -5378,
+  "maxM": 4471,
+  "datum": "sphere 2439.4 km",
+  "credit": "NASA/JHUAPL/Carnegie Institution of Washington (MESSENGER); USGS Astrogeology global DEM 665 m v2",
+  "sourceUrl": "https://astrogeology.usgs.gov/search/map/mercury_messenger_global_dem_665m"
+ },
+ "ceres": {
+  "width": 4320,
+  "height": 2160,
+  "minM": -27947,
+  "maxM": 17042,
+  "datum": "sphere 470 km",
+  "credit": "NASA/JPL-Caltech/UCLA/MPS/DLR/IDA (Dawn); DLR HAMO global DTM",
+  "sourceUrl": "https://astrogeology.usgs.gov/search/map/ceres_dawn_fc_hamo_dtm_dlr_global_60ppd"
  }
 }

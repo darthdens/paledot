@@ -1015,7 +1015,7 @@ export const TexturedPlanet = ({
                     float heightU = dot(texture2D(planetMap, vUv + vec2(0.0, texelSize)).rgb, vec3(0.299, 0.587, 0.114));
                     float heightD = dot(texture2D(planetMap, vUv + vec2(0.0, -texelSize)).rgb, vec3(0.299, 0.587, 0.114));
                     
-                    float bumpStrength = 2.0;
+                    float bumpStrength = reliefOn > 0.5 ? 0.0 : 2.0; // real MESSENGER relief replaces the image bump
                     vec3 bumpNormal = normalize(vec3(
                       (heightL - heightR) * bumpStrength,
                       (heightD - heightU) * bumpStrength,

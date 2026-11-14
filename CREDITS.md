@@ -125,3 +125,5 @@ Confirm each licence against package metadata (Prompt 11 check 12).
 - Earth global relief: [NOAA NCEI ETOPO1 Global Relief Model](https://www.ncei.noaa.gov/products/etopo-global-relief-model) via [NOAA CoastWatch ERDDAP](https://coastwatch.pfeg.noaa.gov/erddap/griddap/etopo180.html) (US Government, public domain).
 - Apollo 11/15/16/17 site terrain: [LROC NAC DTMs](https://data.lroc.im-ldi.com/lroc/view_rdr_product/NAC_DTM_APOLLO11) — NASA/GSFC/Arizona State University (public domain).
 - Jezero (Ingenuity) and Viking 1 site terrain: [HiRISE DTMs](https://www.uahirise.org/dtm/ESP_045994_1985) ([Viking 1](https://www.uahirise.org/dtm/PSP_001521_2025)) — NASA/JPL-Caltech/UArizona (public domain).
+- [Mercury MESSENGER global DEM 665 m v2](https://astrogeology.usgs.gov/search/map/mercury_messenger_global_dem_665m) — NASA/JHUAPL/Carnegie Institution of Washington, USGS Astrogeology. Public domain (US Government work).
+- [Ceres Dawn FC HAMO global DTM](https://astrogeology.usgs.gov/search/map/ceres_dawn_fc_hamo_dtm_dlr_global_60ppd) — NASA/JPL-Caltech/UCLA/MPS/DLR/IDA. Public domain NASA mission data (credit required).
