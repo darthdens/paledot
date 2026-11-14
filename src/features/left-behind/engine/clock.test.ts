@@ -10,8 +10,8 @@ it('opens today, playing at one simulated second per real second', () => {
   expect(useSimClock.getState().rate).toBe(1);
   expect(advanceDate(CLOCK_START,1,1)).toBe(CLOCK_START+1000);
 });
-it('offers real time, hour, day, month and year per second', () => {
-  expect(CLOCK_RATES).toEqual([1,3600,86400,2592000,31557600]);
+it('offers real time, minute, hour, day, month and year per second', () => {
+  expect(CLOCK_RATES).toEqual([1,60,3600,86400,2592000,31557600]);
   for (const rate of CLOCK_RATES) expect(advanceDate(CLOCK_START,1,rate)).toBe(CLOCK_START+rate*1000);
 });
 it('clamps scrubbing to 1 January 1957 through 31 December 2100', () => {
@@ -24,8 +24,8 @@ it('paused clock never advances', () => {
   useSimClock.getState().togglePlaying(); const date = useSimClock.getState().simDate;
   useSimClock.getState().advanceClock(1); expect(useSimClock.getState().simDate).toBe(date);
 });
-it('shortcuts step through the five rates without wrapping', () => {
-  useSimClock.getState().changeSpeed(1); expect(useSimClock.getState().rate).toBe(3600);
+it('shortcuts step through the six rates without wrapping', () => {
+  useSimClock.getState().changeSpeed(1); expect(useSimClock.getState().rate).toBe(60);
   useSimClock.getState().changeSpeed(-1); expect(useSimClock.getState().rate).toBe(1);
   useSimClock.getState().changeSpeed(-1); expect(useSimClock.getState().rate).toBe(1);
 });
@@ -36,4 +36,11 @@ it('Begin at Earth pauses and restores the previous playing state and speed', ()
   expect(useSimClock.getState().rate).toBe(86400);
   useSimClock.getState().togglePlaying(); useCosmosStore.getState().startTour(); useCosmosStore.getState().stopTour();
   expect(useSimClock.getState().isPlaying).toBe(false);
+});
+
+it('one minute per second advances exactly 60 seconds', () => {
+  useSimClock.getState().setSimDate(Date.UTC(2026,10,14,13,0,0));
+  useSimClock.getState().setRate(60);
+  useSimClock.getState().advanceClock(1);
+  expect(useSimClock.getState().simDate).toBe(Date.UTC(2026,10,14,13,1,0));
 });

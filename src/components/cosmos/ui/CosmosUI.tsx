@@ -3,7 +3,7 @@ const LeftBehindDateControl = lazy(() => import('@/features/left-behind/ui/DateC
 import { useLanguage } from '@/i18n/LanguageContext';
 import { Button } from '@/components/ui/button';
 import { useSimClock } from '@/features/left-behind/state/useSimClock';
-import { dateCopy } from '@/features/left-behind/lib/dateCopy';
+import { dateCopy, formatSimDate } from '@/features/left-behind/lib/dateCopy';
 import { LeftBehindMenu } from '@/features/left-behind/ui/LeftBehindMenu';
 import { TourChoices } from '@/features/left-behind/ui/TourChoices';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
@@ -118,6 +118,7 @@ export const CosmosUI = () => {
   const menuOpen = useLeftBehindStore(s => s.menuOpen);
   const dateControlOpen = useSimClock(s => s.dateControlOpen);
   const rate = useSimClock(s => s.rate);
+  const simSecond = useSimClock(s => Math.floor(s.simDate / 1000));
   const clockName = tr({ en: dateCopy[language].date, fr: dateCopy[language].date });
   const toggleTimeMenu = () => { useLeftBehindStore.getState().setMenuOpen(false); useSimClock.getState().setDateControlOpen(!dateControlOpen); };
   const lbCopy = leftBehindCopy[language];
@@ -167,7 +168,7 @@ export const CosmosUI = () => {
       const target = e.target as Node;
       
       // Close time slider if clicking outside
-      if (timeMenuOpen && !(target instanceof Element && target.closest('[data-lb-date-chip]')) && timeSliderRef.current && !timeSliderRef.current.contains(target) && 
+      if (timeMenuOpen && timeSliderRef.current && !timeSliderRef.current.contains(target) && 
           timeSpeedButtonRef.current && !timeSpeedButtonRef.current.contains(target)) {
         useSimClock.getState().setDateControlOpen(false);
       }
@@ -727,12 +728,12 @@ export const CosmosUI = () => {
 
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Button ref={timeSpeedButtonRef} size="icon" variant="ghost" onClick={toggleTimeMenu} className={`h-9 w-9 backdrop-blur-xs text-white ${timeMenuOpen ? 'bg-white/25' : 'bg-white/10 hover:bg-white/20'}`}>
+                  <Button ref={timeSpeedButtonRef} data-clock-trigger aria-label={clockName} aria-expanded={timeMenuOpen} size="icon" variant="ghost" onClick={toggleTimeMenu} className={`group relative h-9 w-9 backdrop-blur-xs text-foreground ${timeMenuOpen ? 'bg-white/25' : 'bg-white/10 hover:bg-white/20'}`}>
                     <Clock className="w-5 h-5" />
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent variant="dark" side="bottom">
-                  {clockName}
+                  <span className="font-mono text-[11px] tabular-nums">{formatSimDate(simSecond * 1000, locale)}</span>
                 </TooltipContent>
               </Tooltip>
 
@@ -863,7 +864,7 @@ export const CosmosUI = () => {
               >
                 <div className="flex items-center gap-2">
                   <Clock className="w-4 h-4 text-white/70" />
-                  <span className="text-sm text-white/90">{clockName}</span>
+                  <span className="flex flex-col items-start"><span className="text-sm text-foreground">{clockName}</span><span className="font-mono text-[10px] tabular-nums text-muted-foreground">{formatSimDate(simSecond * 1000, locale)}</span></span>
                 </div>
                 {rate > 1 && <div className="w-2 h-2 rounded-full bg-green-400" />}
               </button>
