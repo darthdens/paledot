@@ -2,7 +2,7 @@ import { useLanguage } from '@/i18n/LanguageContext';
 import { useSiteBrand } from '@/lib/site-brand';
 import { Button } from '@/components/ui/button';
 import { Globe, X, MapPin, Heart } from 'lucide-react';
-import portraitImg from '@/assets/dens-portrait.jpg';
+import portraitImg from '@/assets/dens-portrait.webp';
 
 const APP_VERSION = '1.0.0';
 

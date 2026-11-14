@@ -9,7 +9,7 @@
    "lon": 23.47314,
    "tiers": [
     {
-     "file": "apollo-11-near.jpg",
+     "file": "apollo-11-near.webp",
      "tier": "near",
      "west": 23.42366974623268,
      "south": 0.6246931706747879,
@@ -25,7 +25,7 @@
      "fallback": "LRO Wide Angle Camera global mosaic (303 ppd)"
     },
     {
-     "file": "apollo-11-mid.jpg",
+     "file": "apollo-11-mid.webp",
      "tier": "mid",
      "west": 22.813536616435698,
      "south": 0.01460227566383876,
@@ -49,7 +49,7 @@
    "lon": 3.63803,
    "tiers": [
     {
-     "file": "apollo-15-near.jpg",
+     "file": "apollo-15-near.webp",
      "tier": "near",
      "west": 3.582931173975441,
      "south": 26.08227317067479,
@@ -65,7 +65,7 @@
      "fallback": "LRO Wide Angle Camera global mosaic (303 ppd)"
     },
     {
-     "file": "apollo-15-mid.jpg",
+     "file": "apollo-15-mid.webp",
      "tier": "mid",
      "west": 2.903378986339215,
      "south": 25.47218227566384,
@@ -89,7 +89,7 @@
    "lon": 15.5037,
    "tiers": [
     {
-     "file": "apollo-16-near.jpg",
+     "file": "apollo-16-near.webp",
      "tier": "near",
      "west": 15.453620306460225,
      "south": -9.022366829325211,
@@ -105,7 +105,7 @@
      "fallback": "LRO Wide Angle Camera global mosaic (303 ppd)"
     },
     {
-     "file": "apollo-16-mid.jpg",
+     "file": "apollo-16-mid.webp",
      "tier": "mid",
      "west": 14.835970752803,
      "south": -9.63245772433616,
@@ -129,7 +129,7 @@
    "lon": 30.7769,
    "tiers": [
     {
-     "file": "apollo-17-near.jpg",
+     "file": "apollo-17-near.webp",
      "tier": "near",
      "west": 30.724194731493352,
      "south": 20.140133170674787,
@@ -145,7 +145,7 @@
      "fallback": "LRO Wide Angle Camera global mosaic (303 ppd)"
     },
     {
-     "file": "apollo-17-mid.jpg",
+     "file": "apollo-17-mid.webp",
      "tier": "mid",
      "west": 30.07416308657801,
      "south": 19.53004227566384,
@@ -169,7 +169,7 @@
    "lon": -47.94999999999999,
    "tiers": [
     {
-     "file": "viking-1-near.jpg",
+     "file": "viking-1-near.webp",
      "tier": "near",
      "west": -48.02306570972307,
      "south": 22.20238438765236,
@@ -185,7 +185,7 @@
      "fallback": "Viking MDIM 2.1 colour mosaic (232 m)"
     },
     {
-     "file": "viking-1-mid.jpg",
+     "file": "viking-1-mid.webp",
      "tier": "mid",
      "west": -48.497992822923095,
      "south": 21.76288290739269,
@@ -209,7 +209,7 @@
    "lon": -5.5265999999999735,
    "tiers": [
     {
-     "file": "opportunity-near.jpg",
+     "file": "opportunity-near.webp",
      "tier": "near",
      "west": -5.594254638478424,
      "south": -2.013815612347641,
@@ -225,7 +225,7 @@
      "fallback": "Viking MDIM 2.1 colour mosaic (232 m)"
     },
     {
-     "file": "opportunity-mid.jpg",
+     "file": "opportunity-mid.webp",
      "tier": "mid",
      "west": -6.03400978858835,
      "south": -2.453317092607308,
@@ -249,7 +249,7 @@
    "lon": 77.4508,
    "tiers": [
     {
-     "file": "ingenuity-near.jpg",
+     "file": "ingenuity-near.webp",
      "tier": "near",
      "west": 77.43298071048565,
      "south": 18.42779609691309,
@@ -265,7 +265,7 @@
      "fallback": "Viking MDIM 2.1 colour mosaic (232 m)"
     },
     {
-     "file": "ingenuity-mid.jpg",
+     "file": "ingenuity-mid.webp",
      "tier": "mid",
      "west": 77.094414209713,
      "south": 18.106621938261796,
