@@ -120,15 +120,15 @@
   {
     "id": "ingenuity-2",
     "machineId": "ingenuity",
-    "nasaId": "PIA24584",
-    "title": "Ingenuity's First Black-and-White Image From the Air",
+    "nasaId": "PIA24593",
+    "title": "First Aerial Color Image of Mars",
     "credit": "NASA/JPL-Caltech",
-    "sourceUrl": "https://images.nasa.gov/details/PIA24584",
-    "imageUrl": "http://images-assets.nasa.gov/image/PIA24584/PIA24584~orig.jpg",
-    "dateTaken": "2021-04-19T00:00:00Z",
-    "alt": "Ingenuity's First Black-and-White Image From the Air.",
-    "caption": "Ingenuity's First Black-and-White Image From the Air",
-    "description": "NASA's Ingenuity Mars Helicopter took this shot, capturing its own shadow, while hovering over the Martian surface on April 19, 2021, during the first instance of powered, controlled flight on another planet. It used its navigation camera, which autonomously tracks the ground during flight.  The Ingenuity Mars Helicopter was built by JPL, which also manages this technology demonstration project for NASA Headquarters. It is supported by NASA's Science Mission Directorate, Aeronautics Research Mission Directorate, and Space Technology Mission Directorate. NASA's Ames Research Center and Langley Research Center provided significant flight performance analysis and technical assistance during Ingenuity's development.  A key objective for Perseverance's mission on Mars is astrobiology, including the search for signs of ancient microbial life. The rover will characterize the planet's geology and past climate, pave the way for human exploration of the Red Planet, and be the first mission to collect and cache Martian rock and regolith (broken rock and dust).  Subsequent NASA missions, in cooperation with ESA (European Space Agency), would send spacecraft to Mars to collect these sealed samples from the surface and return them to Earth for in-depth analysis.  The Mars 2020 Perseverance mission is part of NASA's Moon to Mars exploration approach, which includes Artemis missions to the Moon that will help prepare for human exploration of the Red Planet.  https://photojournal.jpl.nasa.gov/catalog/PIA24584"
+    "sourceUrl": "https://images.nasa.gov/details/PIA24593",
+    "imageUrl": "http://images-assets.nasa.gov/image/PIA24593/PIA24593~medium.jpg",
+    "dateTaken": "2021-04-23T00:00:00Z",
+    "alt": "First Aerial Color Image of Mars.",
+    "caption": "First Aerial Color Image of Mars",
+    "description": "This is the first color image of the Martian surface taken by an aerial vehicle while it was aloft. The Ingenuity Mars Helicopter captured it with its color camera during its second successful flight test on April 22, 2021. At the time this image, Ingenuity was 17 feet (5.2 meters) above the surface and pitching (moving the camera's field of view upward) so the helicopter could begin its 7-foot (2-meter) translation to the west — away from the rover. The image demonstrates the utility of scouting Martian terrain from an aerial perspective.  The winding parallel discolorations in the surface reveal the tread of the six-wheeled rover. Perseverance itself is located top center, just out frame. \"Wright Brothers Field\" is in the vicinity of the helicopter's shadow, bottom center, with the actual point of takeoff of the helicopter just below the image. A portion of the landing pads on two of the helicopter's four landing legs can be seen in on the left and right sides of the image, and a small portion of the horizon can be seen at the upper right and left corners.  Mounted in the helicopter's fuselage and pointed approximately 22 degree below the horizon, Ingenuity's high-resolution color camera contains a 4208-by-3120-pixel sensor.   https://photojournal.jpl.nasa.gov/catalog/PIA24593"
   },
   {
     "id": "voyager-2-1",
@@ -146,15 +146,16 @@
   {
     "id": "voyager-2-2",
     "machineId": "voyager-2",
-    "nasaId": "PIA18182",
-    "title": "Uranus as seen by NASA Voyager 2",
-    "credit": "NASA/JPL-Caltech",
-    "sourceUrl": "https://images.nasa.gov/details/PIA18182",
-    "imageUrl": "http://images-assets.nasa.gov/image/PIA18182/PIA18182~medium.jpg",
-    "dateTaken": "1986-12-18T00:00:00Z",
-    "alt": "Uranus as seen by NASA Voyager 2.",
-    "caption": "Uranus as seen by NASA Voyager 2",
-    "description": "This is an image of the planet Uranus taken by the spacecraft Voyager 2 in 1986."
+    "nasaId": "",
+    "title": "TODO(source)",
+    "credit": "TODO(source)",
+    "sourceUrl": "https://images-api.nasa.gov/search?q=Voyager%20spacecraft&media_type=image",
+    "imageUrl": "",
+    "dateTaken": null,
+    "alt": "",
+    "caption": "",
+    "todo": true,
+    "note": "TODO(source): no qualifying NASA photo for voyager-2: Voyager spacecraft"
   },
   {
     "id": "voyager-1-1",
@@ -203,14 +204,15 @@
   {
     "id": "voyager-1-4",
     "machineId": "voyager-1",
-    "nasaId": "PIA17464",
-    "title": "Voyager 1 Launch 1977",
-    "credit": "NASA/KSC",
-    "sourceUrl": "https://images.nasa.gov/details/PIA17464",
-    "imageUrl": "http://images-assets.nasa.gov/image/PIA17464/PIA17464~medium.jpg",
-    "dateTaken": "2013-09-19T21:57:28Z",
-    "alt": "Voyager 1 Launch 1977.",
-    "caption": "Voyager 1 Launch 1977",
-    "description": "This photograph from Sept. 5, 1977, shows the launch of NASA Voyager 1 spacecraft from NASA Kennedy Space Center at Cape Canaveral, Fla."
+    "nasaId": "",
+    "title": "TODO(source)",
+    "credit": "TODO(source)",
+    "sourceUrl": "https://images-api.nasa.gov/search?q=Voyager%20spacecraft&media_type=image",
+    "imageUrl": "",
+    "dateTaken": null,
+    "alt": "",
+    "caption": "",
+    "todo": true,
+    "note": "TODO(source): no qualifying NASA photo for voyager-1: Voyager spacecraft"
   }
 ]
