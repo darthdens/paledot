@@ -647,6 +647,16 @@ All colors MUST be HSL.
 .paledot .pd-hardware-selected { border-color: hsl(var(--dot)); }
 .paledot .pd-hardware-ring-model { width: 14px; height: 14px; }
 .paledot .pd-hardware-ring-model.pd-hardware-selected { border-color: hsl(var(--dot)); }
+/* Left Behind · built during NASA Space Apps Challenge 2026 (14–15 Nov 2026) · AI-assisted (Lovable, Claude) */
+.paledot.pd-pin-anchor { background: transparent; position: relative; width: 44px; height: 44px; }
+.paledot .pd-pin-ring { position: relative; display: block; width: 12px; height: 12px; border: 1px solid hsl(var(--foreground)); border-radius: 50%; }
+.paledot .pd-pin-ring.pd-hardware-selected { border-color: hsl(var(--dot)); }
+.paledot .pd-pin-pulse .pd-pin-ring::after { content: ''; position: absolute; inset: -1px; border: 1px solid hsl(var(--foreground)); border-radius: 50%; animation: pd-pin-pulse 2s ease-out 1 forwards; }
+@keyframes pd-pin-pulse { from { transform: scale(1); opacity: .9; } to { transform: scale(4); opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .paledot .pd-pin-pulse .pd-pin-ring::after { animation: none; display: none; } }
+.paledot .pd-pin-chip { min-height: 44px; font: 400 11px/16px var(--pd-font-mono); text-transform: uppercase; letter-spacing: .08em; }
+.paledot .pd-descent-label { display: block; white-space: nowrap; font: 400 10px/14px var(--pd-font-mono); color: hsl(var(--muted-foreground)); pointer-events: none; }
+.paledot .pd-descent-label[hidden], .paledot.pd-pin-anchor[hidden] { display: none; }
 .paledot .pd-hardware-label { position: absolute; top: 14px; left: 38px; font: 400 11px/16px var(--pd-font-mono); letter-spacing: 0; white-space: nowrap; pointer-events: none; color: hsl(var(--foreground)); }
 
 .paledot .pd-hardware-label small { display: block; font-size: 10px; color: hsl(var(--muted-foreground)); }
