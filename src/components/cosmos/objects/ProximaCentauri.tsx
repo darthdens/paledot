@@ -54,8 +54,6 @@ const PROXIMA_DIAMETER = 214550;
  */
 export const ProximaCentauri = ({ visualScale = 0.001 }: ProximaCentauriProps) => {
   const starRef = useRef<THREE.Mesh>(null);
-  const coronaRef = useRef<THREE.Mesh>(null);
-  const glowRef = useRef<THREE.Mesh>(null);
 
   const matRef = useRef<THREE.ShaderMaterial>(null);
   const spriteRef = useRef<THREE.Sprite>(null);
