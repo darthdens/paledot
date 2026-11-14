@@ -69,9 +69,35 @@ def level_for(key, dpp_target):
   z = math.ceil(math.log2(180 / (L["tile"] * dpp_target)))
   return max(0, min(L["max"], z))
 
+GIBS = "https://gibs.earthdata.nasa.gov/wmts/epsg4326/best/{layer}/default/{time}/500m/{z}/{r}/{c}.{ext}"
+
+def gibs_global(layer, time, ext, z=4):
+  """NASA GIBS EPSG:4326 500m matrix: 512 px tiles, level 4 = 20x10 tiles of 18 degrees."""
+  cols, rows = 20, 10
+  canvas = Image.new("RGB", (cols * 512, rows * 512))
+  def one(rc):
+    r, c = rc
+    for _ in range(3):
+      try:
+        x = S.get(GIBS.format(layer=layer, time=time, ext=ext, z=z, r=r, c=c), timeout=60)
+        if x.ok: return Image.open(io.BytesIO(x.content)).convert("RGB")
+      except Exception: pass
+    raise RuntimeError(f"GIBS tile {layer} {r}/{c} failed")
+  jobs = [(r, c) for r in range(rows) for c in range(cols)]
+  with ThreadPoolExecutor(12) as ex:
+    for (r, c), im in zip(jobs, ex.map(one, jobs)): canvas.paste(im, (c * 512, r * 512))
+  return canvas
+
 def globals_():
+  for layer, time, ext, out in (("BlueMarble_NextGeneration", "default", "jpeg", "earth-day"), ("VIIRS_Black_Marble", "2016-01-01", "png", "earth-night")):
+    if out in sys.argv[2:] or not sys.argv[2:]:
+      im = gibs_global(layer, time, ext)
+      for w in (8192, 4096):
+        im.resize((w, w // 2), Image.LANCZOS).save(f"public/textures/hd/{out}-{w}.jpg", quality=88, optimize=True, progressive=True)
+      print("global", out, im.size)
   for key, out in (("wac", "moon"), ("mdim", "mars")):
-    im, _ = region(key, 5 if key == "wac" else 5, -180, -90, 180, 90)
+    if sys.argv[2:] and out not in sys.argv[2:]: continue
+    im, _ = region(key, 4, -180, -90, 180, 90)
     im = im.convert("RGB")
     for w in (8192, 4096):
       im.resize((w, w // 2), Image.LANCZOS).save(f"public/textures/hd/{out}-{w}.jpg", quality=88, optimize=True, progressive=True)
