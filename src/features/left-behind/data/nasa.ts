@@ -3,9 +3,13 @@ import type { Machine, Photo, Segment, Trajectory, TrajectorySettings } from './
 
 const DAY = 86400000;
 export async function getJson(url: string) {
-  const response = await fetch(url, { signal: AbortSignal.timeout(90000) });
-  if (!response.ok) throw new Error(`NASA request failed (${response.status}): ${url}`);
-  return response.json();
+  for (let attempt = 0; attempt < 3; attempt++) {
+    const response = await fetch(url, { signal: AbortSignal.timeout(90000) });
+    if (response.ok) return response.json();
+    if (response.status < 500 || attempt === 2) throw new Error(`NASA request failed (${response.status}): ${url}`);
+    await new Promise(resolve => setTimeout(resolve, 1000 * (attempt + 1)));
+  }
+  throw new Error('NASA request unavailable');
 }
 
 export function planWindows(settings: TrajectorySettings, machine: Machine) {
@@ -61,16 +65,30 @@ export async function buildTrajectory(settings: TrajectorySettings, machine: Mac
   }
   const query: string[] = [];
   const segments: Segment[] = [];
+  const gaps: string[] = [];
   for (const window of windows) {
     const formatDate = (date: number) => new Date(date).toISOString().slice(0, 19).replace('T', ' ');
     const params = new URLSearchParams({ format: 'json', COMMAND: `'${target}'`, OBJ_DATA: "'NO'", MAKE_EPHEM: "'YES'", EPHEM_TYPE: "'VECTORS'", CENTER: window.center === 'mars' ? "'500@499'" : "'500@10'", REF_PLANE: "'ECLIPTIC'", REF_SYSTEM: "'ICRF'", OUT_UNITS: "'KM-S'", VEC_TABLE: "'1'", CSV_FORMAT: "'YES'", TIME_TYPE: "'UT'", START_TIME: `'${formatDate(window.from)}'`, STOP_TIME: `'${formatDate(window.to)}'`, STEP_SIZE: `'${window.stepSeconds / 60} m'` });
     const url = `https://ssd.jpl.nasa.gov/api/horizons.api?${params}`;
     query.push(url);
-    const result = await getJson(url);
+    let result = await getJson(url);
+    // JPL does not include launch ascent for Mars 2020. Start only at its
+    // explicitly reported first epoch and retain the gap, never interpolate it.
+    const unavailableBefore = result.error?.match(/prior to A\.D\. (\d{4}-[A-Z]{3}-\d{2} [\d:.]+) UT/i)?.[1];
+    if (unavailableBefore && window === windows[0]) {
+      const epoch = Date.parse(`${unavailableBefore} UTC`);
+      if (Number.isFinite(epoch) && epoch < window.to) {
+        gaps.push(`TODO(source): no Horizons positions between ${formatDate(window.from)} UTC and ${unavailableBefore} UTC`);
+        params.set('START_TIME', `'${formatDate(Math.ceil(epoch / 1000) * 1000)}'`);
+        const clippedUrl = `https://ssd.jpl.nasa.gov/api/horizons.api?${params}`;
+        query.push(clippedUrl);
+        result = await getJson(clippedUrl);
+      }
+    }
     if (result.error) throw new Error(`Horizons: ${result.error}`);
     segments.push({ center: window.center, stepSeconds: window.stepSeconds, ...parseVectors(result.result ?? '') });
   }
-  return { id: settings.id, source: 'horizons', target, query, retrievedAt: new Date().toISOString(), frame: 'heliocentric ecliptic J2000', units: 'km', segments };
+  return { id: settings.id, source: 'horizons', target, query, retrievedAt: new Date().toISOString(), frame: 'heliocentric ecliptic J2000', units: 'km', segments, ...(gaps.length ? { note: gaps.join('; ') } : {}) };
 }
 
 type LibraryItem = { data?: { nasa_id: string; title: string; description?: string; keywords?: string[]; photographer?: string; secondary_creator?: string; center?: string; date_created?: string }[] };
