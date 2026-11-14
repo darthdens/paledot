@@ -1,3 +1,4 @@
+import { bodyRadius, UNIFIED_SCALE } from '@/features/left-behind/lib/bodyScale';
 // TexturedPlanet - Renders planets with realistic lighting and shadows
 import { useRef, useMemo, useEffect, useState } from 'react';
 import { useFrame, useLoader } from '@react-three/fiber';
@@ -303,8 +304,8 @@ const PLANET_VISUALS: Record<string, {
 export const TexturedPlanet = ({ 
   object, 
   showOrbit = true, 
-  visualScale = 80,
-  distanceScale = 0.15 
+  visualScale = UNIFIED_SCALE,
+  distanceScale = UNIFIED_SCALE 
 }: TexturedPlanetProps) => {
   const planetRef = useRef<THREE.Mesh>(null);
   const groupRef = useRef<THREE.Group>(null);
@@ -334,14 +335,9 @@ export const TexturedPlanet = ({
   // Get parent planet size for shadow-sm calculations (moons only)
   const parentPlanetSize = useMemo(() => {
     if (!isMoon || !object.parentId) return 0;
-    // Planet sizes in km - need to match celestialObjects data
-    const planetSizes: Record<string, number> = {
-      earth: 12742,
-      jupiter: 139820,
-      saturn: 116460,
-    };
-    return (planetSizes[object.parentId] || 0) * visualScale;
-  }, [isMoon, object.parentId, visualScale]);
+    const parent = celestialObjects.find(body => body.id === object.parentId);
+    return parent ? bodyRadius(parent.size) : 0;
+  }, [isMoon, object.parentId]);
 
   // Check if we're on mobile
   const isMobile = useMemo(() => isMobileDevice(), []);
@@ -443,7 +439,7 @@ export const TexturedPlanet = ({
     return new THREE.CanvasTexture(canvas);
   }, []);
   
-  const planetSize = object.size * visualScale;
+  const planetSize = bodyRadius(object.size);
   const orbitRadius = (object.orbitRadius || 0) * distanceScale;
   const tiltRadians = ((visuals.tilt || 0) * Math.PI) / 180;
 

@@ -1,3 +1,4 @@
+import { bodyFlyToDistance, UNIFIED_SCALE, isSolidBody } from '@/features/left-behind/lib/bodyScale';
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { ScaleLevel, CelestialObject, SCALE_BOUNDARIES } from '../types';
@@ -81,7 +82,6 @@ interface CosmosStore {
   showTrails: boolean;
   showRealPeriods: boolean;
   showPerformanceHUD: boolean;
-  useExaggeratedScale: boolean;
   recentJumps: string[];
 
   // Audio
@@ -124,7 +124,6 @@ interface CosmosStore {
   toggleTrails: () => void;
   toggleRealPeriods: () => void;
   togglePerformanceHUD: () => void;
-  toggleExaggeratedScale: () => void;
   addRecentJump: (objectId: string) => void;
   jumpToObject: (object: CelestialObject) => void;
   goHome: () => void;
@@ -190,7 +189,6 @@ export const useCosmosStore = create<CosmosStore>()(
       showRealPeriods: false,
       showPerformanceHUD: false,
 
-      useExaggeratedScale: true,
       recentJumps: [],
 
       isMuted: false,
@@ -305,7 +303,6 @@ export const useCosmosStore = create<CosmosStore>()(
 
       togglePerformanceHUD: () => set((state) => ({ showPerformanceHUD: !state.showPerformanceHUD })),
 
-      toggleExaggeratedScale: () => set((state) => ({ useExaggeratedScale: !state.useExaggeratedScale })),
       
       addRecentJump: (objectId) => {
         const { recentJumps } = get();
@@ -317,7 +314,7 @@ export const useCosmosStore = create<CosmosStore>()(
         const { addRecentJump } = get();
         addRecentJump(object.id);
         // Calculate camera position based on object
-        const distance = Math.max(object.size * 5, 10000);
+        const distance = isSolidBody(object) ? bodyFlyToDistance(object.size) / UNIFIED_SCALE : Math.max(object.size * 5, 10000);
         const position: [number, number, number] = [
           object.position[0],
           object.position[1],

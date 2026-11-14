@@ -1,3 +1,5 @@
+import { bodyFlyToDistance, bodyClearance, isSolidBody, portraitFramingFactor } from '@/features/left-behind/lib/bodyScale';
+import { celestialObjects } from './data/celestialObjects';
 import { useEffect, useRef } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
@@ -7,7 +9,7 @@ import { UNITS } from './types';
 const UNIFIED_SCALE = 0.001;
 
 export const CameraController = () => {
-  const { camera, controls } = useThree();
+  const { camera, controls, size } = useThree();
   const selectedObject = useCosmosStore((state) => state.selectedObject);
   const currentScale = useCosmosStore((state) => state.currentScale);
   const isFollowing = useCosmosStore((state) => state.isFollowing);
@@ -136,11 +138,8 @@ export const CameraController = () => {
         // Galaxy size is in light-years - view from close (0.4x size) to fill the screen
         visualSize = selectedObject.size * UNIFIED_SCALE;
         flyToDistance.current = Math.max(visualSize * 0.4, 1e8);
-      } else if (selectedObject.category === 'stars' && selectedObject.id !== 'sun') {
-        // Distant stars have 500x visual boost applied in their component
-        // Use boosted size for camera distance calculation
-        const boostedSize = visualSize * 500;
-        flyToDistance.current = Math.max(boostedSize * 5, 50000);
+      } else if (isSolidBody(selectedObject)) {
+        flyToDistance.current = bodyFlyToDistance(selectedObject.size) * portraitFramingFactor(size.width / size.height);
       } else {
         flyToDistance.current = Math.max(visualSize * 5, 50);
       }
@@ -213,12 +212,29 @@ export const CameraController = () => {
 
     startFlyTo(currentLivePos);
     return undefined;
-  }, [selectedObject, camera, controls, isTouring]);
+  }, [selectedObject, camera, controls, isTouring, size.width, size.height]);
 
   useFrame((_, delta) => {
     if (!controls) return;
     const orbitControls = controls as any;
     if (!orbitControls.target) return;
+
+    const ensureBodyClearance = () => {
+      const positions = useCosmosStore.getState().objectWorldPositions;
+      for (const body of celestialObjects) {
+        if (!isSolidBody(body)) continue;
+        const position = positions[body.id];
+        if (!position) continue;
+        tmpTarget.current.set(...position);
+        tmpDelta.current.subVectors(camera.position, tmpTarget.current);
+        const clearance = bodyClearance(body.size, camera.near);
+        if (tmpDelta.current.length() < clearance) {
+          if (tmpDelta.current.lengthSq() === 0) tmpDelta.current.set(0, 0, 1);
+          camera.position.copy(tmpTarget.current).add(tmpDelta.current.setLength(clearance));
+        }
+      }
+      orbitControls.minDistance = selectedObject && isSolidBody(selectedObject) ? bodyClearance(selectedObject.size, camera.near) : 0.001;
+    };
 
     if (isAnimating.current) {
       // Slower animation speed for tour (more cinematic), faster for object selection
@@ -242,7 +258,8 @@ export const CameraController = () => {
           tourCameraTarget?.followObjectId;
 
         if (shouldTrackTourTarget) {
-          const livePos = useCosmosStore.getState().objectWorldPositions[tourCameraTarget!.followObjectId!];
+          const followId = tourCameraTarget?.followObjectId;
+          const livePos = followId ? useCosmosStore.getState().objectWorldPositions[followId] : undefined;
           if (livePos) {
             endTarget.current.set(livePos[0], livePos[1], livePos[2]);
             endPosition.current.copy(endTarget.current).add(tourOffset.current);
@@ -278,6 +295,7 @@ export const CameraController = () => {
       } else {
         camera.position.lerpVectors(startPosition.current, endPosition.current, eased);
       }
+      ensureBodyClearance();
       orbitControls.update();
       return;
     }
@@ -298,6 +316,8 @@ export const CameraController = () => {
       }
       return;
     }
+
+    ensureBodyClearance();
 
     // After fly-to: continuously follow the selected object (keep it centered)
     // Follow objects that can move due to orbits/galactic rotation

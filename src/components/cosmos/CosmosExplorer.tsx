@@ -1,3 +1,4 @@
+import { bodyRadius, portraitFramingFactor } from '@/features/left-behind/lib/bodyScale';
 // Cosmos Explorer - Solar System visualization with fly-to navigation
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls, PerspectiveCamera } from '@react-three/drei';
@@ -139,11 +140,12 @@ export const CosmosExplorer = () => {
 
   // Start camera looking at Earth - the natural starting point for exploration
   const earthOrbitRadius = UNITS.KM_PER_AU * UNIFIED_SCALE; // Earth's distance from Sun in scene units
-  const earthVisualRadius = (12742 * UNIFIED_SCALE) / 2; // Earth's radius in scene units
+  const earthVisualRadius = bodyRadius(12742);
+  const initialFraming = portraitFramingFactor(typeof window === 'undefined' ? 1 : window.innerWidth / window.innerHeight); // Earth's radius in scene units
   const initialCameraPosition: [number, number, number] = [
-    earthOrbitRadius + earthVisualRadius * 8, // Slightly offset from Earth on X
-    earthVisualRadius * 4, // A bit above Earth
-    earthVisualRadius * 10, // Far enough to see Earth nicely
+    earthOrbitRadius + earthVisualRadius * 4 * initialFraming, // Slightly offset from Earth on X
+    earthVisualRadius * 2 * initialFraming, // A bit above Earth
+    earthVisualRadius * 5 * initialFraming, // Far enough to see Earth nicely
   ];
 
   return (
@@ -171,7 +173,8 @@ export const CosmosExplorer = () => {
               zoomSpeed={2}
               panSpeed={1}
               rotateSpeed={0.5}
-              minDistance={1}
+              minDistance={0.001}
+              target={[earthOrbitRadius, 0, 0]}
               maxDistance={1e21}
             />
 

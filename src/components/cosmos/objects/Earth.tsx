@@ -1,3 +1,4 @@
+import { bodyRadius, UNIFIED_SCALE } from '@/features/left-behind/lib/bodyScale';
 import { useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
@@ -24,7 +25,7 @@ export const Earth = ({ position = [0, 0, 0] }: EarthProps) => {
     <group position={position}>
       {/* Earth sphere */}
       <mesh ref={earthRef}>
-        <sphereGeometry args={[6371, 64, 64]} />
+        <sphereGeometry args={[bodyRadius(12742), 64, 64]} />
         <meshStandardMaterial
           color="#6b93d6"
           roughness={0.8}
@@ -34,7 +35,7 @@ export const Earth = ({ position = [0, 0, 0] }: EarthProps) => {
 
       {/* Cloud layer */}
       <mesh ref={cloudsRef}>
-        <sphereGeometry args={[6400, 32, 32]} />
+        <sphereGeometry args={[6400 * UNIFIED_SCALE, 32, 32]} />
         <meshStandardMaterial
           color="#ffffff"
           transparent
@@ -45,7 +46,7 @@ export const Earth = ({ position = [0, 0, 0] }: EarthProps) => {
 
       {/* Atmosphere glow */}
       <mesh ref={atmosphereRef}>
-        <sphereGeometry args={[6600, 32, 32]} />
+        <sphereGeometry args={[6600 * UNIFIED_SCALE, 32, 32]} />
         <shaderMaterial
           transparent
           depthWrite={false}
@@ -73,7 +74,7 @@ export const Earth = ({ position = [0, 0, 0] }: EarthProps) => {
 
       {/* Continents effect using simple colored patches */}
       <mesh rotation={[0, 0, 0.4]}>
-        <sphereGeometry args={[6372, 32, 32]} />
+        <sphereGeometry args={[6372 * UNIFIED_SCALE, 32, 32]} />
         <meshStandardMaterial
           color="#228B22"
           transparent

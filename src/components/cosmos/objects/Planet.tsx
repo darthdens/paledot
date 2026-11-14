@@ -1,3 +1,4 @@
+import { bodyRadius, UNIFIED_SCALE } from '@/features/left-behind/lib/bodyScale';
 import { useRef, useMemo } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
@@ -13,7 +14,7 @@ export const Planet = ({ object, showOrbit = true, scale = 1 }: PlanetProps) => 
   const planetRef = useRef<THREE.Mesh>(null);
   const groupRef = useRef<THREE.Group>(null);
 
-  const planetSize = object.size * scale;
+  const planetSize = bodyRadius(object.size);
   const orbitRadius = object.orbitRadius || 0;
   const orbitSpeed = object.orbitSpeed || 0;
 
