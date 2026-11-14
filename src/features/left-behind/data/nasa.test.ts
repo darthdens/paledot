@@ -38,10 +38,21 @@ describe('Left Behind source and sampling rules', () => {
     if (!voyager) throw new Error('Missing Voyager');
     expect(acceptablePhoto({ data: [{ nasa_id: 'x', title: 'Voyager logo', keywords: [] }] }, voyager)).toBe(false);
     expect(acceptablePhoto({ data: [{ nasa_id: 'x', title: 'Voyager spacecraft', keywords: ['patch'] }] }, voyager)).toBe(false);
-    expect(acceptablePhoto({ data: [{ nasa_id: 'x', title: 'Voyager spacecraft', keywords: [] }] }, voyager, 'Voyager spacecraft')).toBe(true);
+    expect(acceptablePhoto({ data: [{ nasa_id: 'x', title: 'Voyager 1 spacecraft testing', description: 'Voyager 1 spacecraft before launch.', keywords: [] }] }, voyager, 'Voyager spacecraft')).toBe(true);
   });
   it('never assigns a Voyager 2 image to Voyager 1', () => {
     if (!voyager) throw new Error('Missing Voyager');
     expect(acceptablePhoto({ data: [{ nasa_id: 'PIA22915', title: 'Voyager 2 Spacecraft Instruments' }] }, voyager, 'Voyager spacecraft')).toBe(false);
+  });
+  it('accepts a description-qualified Apollo reflector photograph', () => {
+    const machine = machines.find(m => m.id === 'apollo-11');
+    if (!machine) throw new Error('Missing Apollo');
+    expect(acceptablePhoto({ data: [{ nasa_id: '6900957', title: 'Saturn Apollo Program', description: 'Apollo 11 astronaut carrying the Laser Ranging Retroreflector.' }] }, machine, 'Apollo 11 laser ranging retroreflector')).toBe(true);
+  });
+  it('requires Ingenuity first-flight hardware instead of an aerial image it took', () => {
+    const machine = machines.find(m => m.id === 'ingenuity');
+    if (!machine) throw new Error('Missing Ingenuity');
+    expect(acceptablePhoto({ data: [{ nasa_id: 'PIA24593', title: 'First Aerial Color Image of Mars', description: 'Ingenuity Mars Helicopter first flight.' }] }, machine, 'Ingenuity Mars helicopter first flight')).toBe(false);
+    expect(acceptablePhoto({ data: [{ nasa_id: 'PIA24586', title: "Perseverance’s Navcam View of Ingenuity’s First Flight", description: 'Ingenuity Mars Helicopter hovering.' }] }, machine, 'Ingenuity Mars helicopter first flight')).toBe(true);
   });
 });

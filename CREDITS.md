@@ -6,6 +6,8 @@ Every resource used by Pale Dot: Left Behind. Each row is ready to copy into the
 
 ## NASA Data (form field: NASA Data)
 
+Data was fetched from the JPL Horizons API and NASA Image and Video Library API during the event and saved as static files in `public/left-behind/`. JPL Photojournal supplies metadata for the listed legacy image IDs. NASA media use guidance: https://www.nasa.gov/nasa-brand-center/images-and-media/ ; retain each manifest credit, respect third-party rights, and do not imply endorsement.
+
 | Link text | URL | Used for |
 | --- | --- | --- |
 | JPL Horizons System and API (NASA/JPL Solar System Dynamics) | https://ssd.jpl.nasa.gov/horizons/ | Every machine's real flight path, distance and light-time |
@@ -27,7 +29,22 @@ Every resource used by Pale Dot: Left Behind. Each row is ready to copy into the
 | NSSDCA: Voyager Project Information | https://nssdc.gsfc.nasa.gov/planetary/voyager.html | Facts, dates and coordinates in hardware.json |
 | https://science.nasa.gov/missions/voyager-program/voyager-celebrates-its-10th-anniversary/ | https://science.nasa.gov/missions/voyager-program/voyager-celebrates-its-10th-anniversary/ | Facts, dates and coordinates in hardware.json |
 | NASA: Voyager mission status | https://science.nasa.gov/?p=338314 | Facts, dates and coordinates in hardware.json |
-| [each other NASA photo chosen in prompt-00: ID and title] | [its sourceUrl from the photo manifest] | [card / tour step] |
+| as11-40-5917: View of footpad of Apollo 11 Lunar Module as it rested on lunar surface (NASA/JSC) | https://images.nasa.gov/details/as11-40-5917 | NASA media use guidance (https://www.nasa.gov/nasa-brand-center/images-and-media/); exact manifest credit retained |
+| 6900957: Saturn Apollo Program (NASA/MSFC) | https://images.nasa.gov/details/6900957 | NASA media use guidance (https://www.nasa.gov/nasa-brand-center/images-and-media/); exact manifest credit retained |
+| as15-86-11603: Astronaut James Irwin works at Lunar Roving Vehicle during Apollo 15 EVA (NASA/JSC) | https://images.nasa.gov/details/as15-86-11603 | NASA media use guidance (https://www.nasa.gov/nasa-brand-center/images-and-media/); exact manifest credit retained |
+| as17-137-20979: Close-up of lunar roving vehicle at Apollo 17 Taurus-Littrow landing site (NASA/JSC) | https://images.nasa.gov/details/as17-137-20979 | NASA media use guidance (https://www.nasa.gov/nasa-brand-center/images-and-media/); exact manifest credit retained |
+| PIA00563: First Color Image From Viking Lander 1 (NASA/JPL) | https://images.nasa.gov/details/PIA00563 | NASA media use guidance (https://www.nasa.gov/nasa-brand-center/images-and-media/); exact manifest credit retained |
+| PIA00381: First Photograph Taken On Mars Surface (NASA/JPL) | https://images.nasa.gov/details/PIA00381 | NASA media use guidance (https://www.nasa.gov/nasa-brand-center/images-and-media/); exact manifest credit retained |
+| PIA15114: Opportunity Rover Self-Portrait From 2007 (NASA/JPL-Caltech/Cornell) | https://images.nasa.gov/details/PIA15114 | NASA media use guidance (https://www.nasa.gov/nasa-brand-center/images-and-media/); exact manifest credit retained |
+| PIA22218: Opportunity Rover Views Ground Texture 'Perseverance Valley' (NASA/JPL-Caltech) | https://images.nasa.gov/details/PIA22218 | NASA media use guidance (https://www.nasa.gov/nasa-brand-center/images-and-media/); exact manifest credit retained |
+| PIA24648: Mastcam-Z Views Ingenuity After Fifth Flight (NASA/JPL-Caltech/ASU/MSSS) | https://images.nasa.gov/details/PIA24648 | NASA media use guidance (https://www.nasa.gov/nasa-brand-center/images-and-media/); exact manifest credit retained |
+| PIA24586: Perseverance's Navcam View of Ingenuity's First Flight (NASA/JPL-Caltech) | https://images.nasa.gov/details/PIA24586 | NASA media use guidance (https://www.nasa.gov/nasa-brand-center/images-and-media/); exact manifest credit retained |
+| PIA02246: Voyager Color Image of Triton (NASA/JPL) | https://images.nasa.gov/details/PIA02246 | NASA media use guidance (https://www.nasa.gov/nasa-brand-center/images-and-media/); exact manifest credit retained |
+| PIA21743: Voyager 2 Encapsulation (NASA/JPL-Caltech/KSC) | https://images.nasa.gov/details/PIA21743 | NASA media use guidance (https://www.nasa.gov/nasa-brand-center/images-and-media/); exact manifest credit retained |
+| PIA00452: Solar System Portrait - Earth as Pale Blue Dot (NASA/JPL) | https://images.nasa.gov/details/PIA00452 | NASA media use guidance (https://www.nasa.gov/nasa-brand-center/images-and-media/); exact manifest credit retained |
+| PIA23645: Pale Blue Dot Revisited (NASA/JPL-Caltech) | https://images.nasa.gov/details/PIA23645 | NASA media use guidance (https://www.nasa.gov/nasa-brand-center/images-and-media/); exact manifest credit retained |
+| PIA00451: Solar System Portrait - 60 Frame Mosaic (NASA/JPL) | https://images.nasa.gov/details/PIA00451 | NASA media use guidance (https://www.nasa.gov/nasa-brand-center/images-and-media/); exact manifest credit retained |
+| 101-KSC-77P-229: KSC-77PP-229 (NASA or National Aeronautics and Space Administration) | https://images.nasa.gov/details/101-KSC-77P-229 | NASA media use guidance (https://www.nasa.gov/nasa-brand-center/images-and-media/); exact manifest credit retained |
 
 ## Other data and resources (form field: Space Agency Partner & Other Data)
 
@@ -60,7 +77,6 @@ Confirm each licence against package metadata (Prompt 11 check 12).
 | vaul | https://github.com/emilkowalski/vaul | MIT |
 | DM Sans (Google Fonts) | https://fonts.google.com/specimen/DM+Sans | SIL Open Font License 1.1 |
 | DM Mono (Google Fonts) | https://fonts.google.com/specimen/DM+Mono | SIL Open Font License 1.1 |
-| Supabase (Edge Function and Storage for the data service) | https://supabase.com | Service used by the app |
 | [anything else Prompt 11 reports] | [URL] | [licence] |
 
 ### AI tools

@@ -44,15 +44,17 @@ export function parseVectors(text: string): { start: string; positions: number[]
 export async function buildTrajectory(settings: TrajectorySettings, machine: Machine): Promise<Trajectory> {
   let target = settings.horizonsTarget;
   if (!target && settings.lookup) {
-    const lookupUrl = `https://ssd.jpl.nasa.gov/api/horizons_lookup.api?sstr=${encodeURIComponent(settings.lookup)}&group=sct`;
-    const lookup = await getJson(lookupUrl);
     const launch = (settings.launch ?? machine.launchDate).slice(0, 10);
     const arrival = (settings.arrival ?? machine.landingDate ?? settings.stop ?? '').slice(0, 10);
-    const record = (lookup.result ?? []).find((entry: { spkid?: string; name?: string }) => {
-      const dates = entry.name?.match(/\d{4}-\d{2}-\d{2}/g);
-      return dates && dates.length >= 2 && (dates[0] ?? '') <= launch && (dates[1] ?? '') >= arrival;
-    });
-    target = record?.spkid ? String(record.spkid) : null;
+    const searches = settings.id === 'opportunity' ? ['MER-1', 'Opportunity'] : [settings.lookup];
+    for (const search of searches) {
+      const lookup = await getJson(`https://ssd.jpl.nasa.gov/api/horizons_lookup.api?sstr=${encodeURIComponent(search)}&group=sct`);
+      const record = (lookup.result ?? []).find((entry: { spkid?: string; name?: string }) => {
+        const dates = entry.name?.match(/\d{4}-\d{2}-\d{2}/g);
+        return dates && dates.length >= 2 && (dates[0] ?? '') <= launch && (dates[1] ?? '') >= arrival;
+      });
+      if (record?.spkid) { target = String(record.spkid); break; }
+    }
   }
   if (!target) {
     if (settings.fallback !== 'simplified') throw new Error('TODO(source): no usable Horizons target');
@@ -95,18 +97,39 @@ type LibraryItem = { data?: { nasa_id: string; title: string; description?: stri
 export function acceptablePhoto(item: LibraryItem, machine: Machine, query?: string) {
   const data = item.data?.[0];
   if (!data || /\b(logo|insignia|patch|emblem)\b/i.test([data.title, ...(data.keywords ?? [])].join(' '))) return false;
-  if (query && /\b(simulations?|trainer|artists?|concept|illustration|animation|diagram|chart|team|logbook|logs?|montage|3D)\b/i.test(data.title)) return false;
+  if (/\b(simulations?|trainer|model|artists?|concept|illustration|animation|diagram|chart|instruments|magnetic|team|logbook|logs?|montage|3D)\b/i.test(data.title)) return false;
   if (/Voyager [12]/i.test(data.title) && !data.title.includes(machine.name) && machine.id.startsWith('voyager')) return false;
   if (!query) return true;
+  if (machine.id === 'viking-1' && /first.*(?:photograph|image)/i.test(data.title) && /Viking (?:Lander )?1/i.test(data.description ?? '')) return true;
+  if (query === 'Voyager spacecraft') {
+    const physical = /encapsulat|testing|flight hardware|preparing for launch|system test|in Florida/i.test(data.title + ' ' + data.description);
+    if (!physical || !/spacecraft/i.test(data.description ?? '')) return false;
+    if (!new RegExp(machine.name.replace(' ', '[ -]'), 'i').test(data.title + ' ' + data.description)) return false;
+    return true;
+  }
+  if (machine.id === 'ingenuity' && query.includes('first flight')) {
+    return /Ingenuity.*first flight/i.test(data.title) && /helicopter/i.test(data.description ?? '');
+  }
   const name = machine.id === 'lunar-rovers' ? query.match(/Apollo \d+/i)?.[0] ?? 'Apollo' : machine.id.startsWith('voyager') ? 'Voyager' : machine.id.replaceAll('-', ' ');
-  return data.title.toLowerCase().includes(name.toLowerCase());
+  if (data.title.toLowerCase().includes(name.toLowerCase())) return true;
+  // These searches require the actual hardware, not merely an image it took.
+  if (machine.id === 'apollo-11' && query.includes('retroreflector')) {
+    return /Apollo 11/i.test(data.description ?? '') && /retroreflector|laser ranging/i.test(data.title + ' ' + data.description);
+  }
+  if (machine.id === 'ingenuity' && query.includes('first flight')) {
+    return /Ingenuity/i.test(data.description ?? '') && /helicopter/i.test(data.title + ' ' + data.description) && /first flight|first.*flight/i.test(data.title + ' ' + data.description);
+  }
+  return false;
 }
 
 export async function buildPhotos(machines: Machine[]): Promise<Photo[]> {
   const manifest: Photo[] = [];
   for (const machine of machines) for (const [index, entry] of machine.photos.entries()) {
-    const search = entry.nasaId ? `nasa_id=${encodeURIComponent(entry.nasaId)}` : `q=${encodeURIComponent(entry.query ?? '')}&media_type=image`;
-    const response = await getJson(`https://images-api.nasa.gov/search?${search}`);
+    // Visually reviewed alternatives: no astronaut suit insignia; distinct first Viking image.
+    const reviewedId = machine.id === 'apollo-11' && entry.nasaId === 'as11-40-5903' ? 'as11-40-5917' : machine.id === 'viking-1' && entry.query ? 'PIA00381' : entry.nasaId;
+    const search = reviewedId ? `nasa_id=${encodeURIComponent(reviewedId)}` : `q=${encodeURIComponent(entry.query ?? '')}&media_type=image`;
+    const alternateQuery = machine.id === 'voyager-1' && entry.query === 'Voyager spacecraft' ? 'Voyager 1 spacecraft assembly' : null;
+    const response = await getJson(`https://images-api.nasa.gov/search?${alternateQuery ? `q=${encodeURIComponent(alternateQuery)}&media_type=image` : search}`);
     const items: LibraryItem[] = response.collection?.items ?? [];
     const score = (item: LibraryItem) => {
       const title = item.data?.[0]?.title.toLowerCase() ?? '';
@@ -118,7 +141,7 @@ export async function buildPhotos(machines: Machine[]): Promise<Photo[]> {
     if (data) {
       const assets = await getJson(`https://images-api.nasa.gov/asset/${encodeURIComponent(data.nasa_id)}`);
       const urls: string[] = (assets.collection?.items ?? []).map((asset: { href: string }) => asset.href).filter((url: string) => /\.jpe?g($|\?)/i.test(url));
-      const imageUrl = urls.find(url => /~medium\./i.test(url)) ?? urls.find(url => /~large\./i.test(url)) ?? urls[0];
+      const imageUrl = (urls.find(url => /~medium\./i.test(url)) ?? urls.find(url => /~large\./i.test(url)) ?? urls[0])?.replace(/^http:/, 'https:');
       if (!imageUrl) throw new Error(`TODO(source): no JPEG for ${data.nasa_id}`);
       photo = { id: `${machine.id}-${index + 1}`, machineId: machine.id, nasaId: data.nasa_id, title: data.title, credit: data.secondary_creator ?? data.photographer ?? (data.center ? `NASA/${data.center}` : 'TODO(source): image credit'), sourceUrl: `https://images.nasa.gov/details/${data.nasa_id}`, imageUrl, dateTaken: data.date_created ?? null, alt: data.title.replace(/[.!?]+$/, '') + '.', caption: data.title };
     } else if (entry.nasaId && ['PIA00452', 'PIA23645', 'PIA00451', 'PIA00563'].includes(entry.nasaId)) {
@@ -130,7 +153,10 @@ export async function buildPhotos(machines: Machine[]): Promise<Photo[]> {
       const title = rawTitle?.replace(/\s+/g, ' ').replace(/^PIA\d+:\s*/, '').replace(/\s*\|.*$/, '').trim();
       if (!title) throw new Error(`TODO(source): missing Photojournal title for ${entry.nasaId}`);
       photo = { id: `${machine.id}-${index + 1}`, machineId: machine.id, nasaId: entry.nasaId, title, credit: 'NASA/JPL-Caltech', sourceUrl, imageUrl: `https://photojournal.jpl.nasa.gov/jpeg/${entry.nasaId}.jpg`, dateTaken: null, alt: title.replace(/[.!?]+$/, '') + '.', caption: title };
-    } else throw new Error(`TODO(source): no qualifying NASA photo for ${machine.id}: ${entry.query ?? entry.nasaId}`);
+    } else {
+      photo = { id: `${machine.id}-${index + 1}`, machineId: machine.id, nasaId: '', title: 'TODO(source)', credit: 'TODO(source)', sourceUrl: `https://images-api.nasa.gov/search?${search}`, imageUrl: '', dateTaken: null, alt: '', caption: '', todo: true, note: `TODO(source): no qualifying NASA photo for ${machine.id}: ${entry.query ?? entry.nasaId}` };
+    }
+    if (data?.description) photo.description = data.description;
     if (entry.role) photo.role = entry.role;
     if (entry.role === 'pale-blue-dot' || entry.role === 'pale-blue-dot-revisited') photo.earthMarker = null;
     manifest.push(photo);
