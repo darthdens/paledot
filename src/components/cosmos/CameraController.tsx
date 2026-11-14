@@ -338,6 +338,7 @@ export const CameraController = () => {
         if (tmpDelta.current.length() < clearance) {
           if (tmpDelta.current.lengthSq() === 0) tmpDelta.current.set(0, 0, 1);
           camera.position.copy(tmpTarget.current).add(tmpDelta.current.setLength(clearance));
+          if (import.meta.env.DEV) (window as unknown as { __push?: unknown }).__push = [body.id, clearance, hardwareId];
         }
       }
       // Following hardware: allow zooming down to its true size (the generic 1 km floor hid it).
