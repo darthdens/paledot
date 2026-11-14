@@ -22,7 +22,7 @@ const createSunGlowTexture = () => {
   const gradient = ctx.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2);
   
   // Bright white center → Yellow → Orange → Fade
-  gradient.addColorStop(0, 'rgba(255, 255, 240, 1)');       // Bright white-yellow center
+  gradient.addColorStop(0, 'rgba(255, 225, 150, 1)');       // Bright white-yellow center
   gradient.addColorStop(0.08, 'rgba(255, 245, 180, 0.9)');  // Warm white
   gradient.addColorStop(0.18, 'rgba(255, 220, 100, 0.7)');  // Yellow
   gradient.addColorStop(0.35, 'rgba(255, 180, 50, 0.45)');  // Yellow-orange
@@ -50,7 +50,7 @@ const createOuterGlowTexture = () => {
   const gradient = ctx.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2);
   
   // More subtle, natural gradient
-  gradient.addColorStop(0, 'rgba(255, 240, 200, 0.6)');
+  gradient.addColorStop(0, 'rgba(255, 200, 120, 0.6)');
   gradient.addColorStop(0.1, 'rgba(255, 210, 130, 0.4)');
   gradient.addColorStop(0.25, 'rgba(255, 180, 80, 0.2)');
   gradient.addColorStop(0.45, 'rgba(255, 140, 50, 0.08)');
@@ -156,7 +156,7 @@ const PHOTO_FS = `
     vec3 n = normalize(vN);
     float mu = clamp(dot(n, normalize(vV)), 0.0, 1.0);
     // Linear limb darkening, I(mu) = 1 - u(1 - mu), with u larger at shorter wavelengths
-    vec3 u = vec3(0.50, 0.62, 0.74);
+    vec3 u = vec3(0.45, 0.70, 0.90);
     vec3 limb = 1.0 - u * (1.0 - mu);
 
     // Granulation: unit sphere * 600 -> cells ~1,150 km across on the real Sun
@@ -172,9 +172,10 @@ const PHOTO_FS = `
     float sg = worley(ps, 3.0);
     float sup = mix(1.0, 0.94 + 0.08 * sg, sFade);
 
-    vec3 base = vec3(1.0, 0.96, 0.90);         // warm white photosphere
+    vec3 base = vec3(1.0, 0.72, 0.28);         // familiar golden-orange look (filtered-photo style, not true colour)
     vec3 col = base * limb * gran * sup;
-    gl_FragColor = vec4(col * 3.2, 1.0);       // HDR so bloom picks it up
+    vec3 core = mix(col, vec3(1.0, 0.92, 0.7), pow(mu, 6.0) * 0.35);
+    gl_FragColor = vec4(core * 1.6, 1.0);       // HDR so bloom picks it up
   }
 `;
 
@@ -312,7 +313,7 @@ export const Sun = ({ position = [0, 0, 0], visualScale = UNIFIED_SCALE }: SunPr
               float r = 1.0 - abs(dot(vN, vV));
               // Brightest right at the solar limb, falling off steeply outwards
               float a = pow(1.0 - r, 6.0) * 0.9;
-              gl_FragColor = vec4(vec3(1.0, 0.97, 0.92) * a, a);
+              gl_FragColor = vec4(vec3(1.0, 0.6, 0.2) * a, a);
             }
           `}
         />
