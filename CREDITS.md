@@ -80,6 +80,13 @@ Confirm each licence against package metadata (Prompt 11 check 12).
 | [anything else Prompt 11 reports] | [URL] | [licence] |
 
 ### AI tools
+### Real-date planetary calculations
+
+| Link text | URL | Licence / notes |
+| --- | --- | --- |
+| Astronomy Engine | https://github.com/cosinekitty/astronomy | MIT; heliocentric planet positions and geocentric Moon positions, rotated from J2000 equatorial to ecliptic coordinates |
+
+### AI tools
 
 | Link text | URL | How it was used |
 | --- | --- | --- |
