@@ -702,7 +702,7 @@ export const CosmosUI = () => {
 
             {/* Divider before sound */}
             {brand === 'paledot' && <Tooltip>
-              <TooltipTrigger asChild><Button data-lb-menu-trigger size="icon" variant="ghost" aria-label={lbName} aria-pressed={menuOpen} onClick={toggleLeftBehind} className={`h-8 w-8 sm:h-9 sm:w-9 backdrop-blur-xs text-foreground ${menuOpen ? 'bg-foreground/25' : 'bg-foreground/10 hover:bg-foreground/20'}`}><Satellite className="w-4 h-4 sm:w-5 sm:h-5" /></Button></TooltipTrigger>
+              <TooltipTrigger asChild><Button data-lb-menu-trigger size="icon" variant="ghost" aria-label={lbName} aria-pressed={menuOpen} onClick={toggleLeftBehind} className={`h-8 w-8 sm:h-9 sm:w-9 backdrop-blur-xs text-foreground ring-1 ring-inset ring-foreground/45 ${menuOpen ? 'bg-foreground/30' : 'bg-foreground/20 hover:bg-foreground/30'}`}><Satellite className="w-4 h-4 sm:w-5 sm:h-5" /></Button></TooltipTrigger>
               <TooltipContent variant="dark" side="bottom">{lbName}</TooltipContent>
             </Tooltip>}
             <div className="hidden lg:block w-px h-6 bg-white/20 mx-0.5" />
