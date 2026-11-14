@@ -6,6 +6,7 @@ import { useFullscreenStore } from '../store/useFullscreenStore';
 import { quickJumpCategories, getObjectById } from '../data/celestialObjects';
 import { useSiteBrand } from '@/lib/site-brand';
 import { HardwareJumpChoices } from '@/features/left-behind/ui/HardwareJumpChoices';
+import { JumpCategory } from '@/features/left-behind/ui/JumpCategory';
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 
 const translations = {
@@ -256,13 +257,25 @@ export const QuickJumpMenu = () => {
           </div>
         )}
 
-        {brand==='paledot' && showQuickJump && <HardwareJumpChoices />}
-
         {/* Categories */}
         <div className="p-1 sm:p-2">
+          {brand==='paledot' && showQuickJump && <HardwareJumpChoices expanded={expandedCategory==='hardware'} onToggle={()=>setExpandedCategory(expandedCategory==='hardware'?null:'hardware')} />}
           {quickJumpCategories.map(category => {
             const expandable = isCategoryExpandable(category.id);
             
+            if (brand === 'paledot' && expandable) return <JumpCategory key={category.id} title={tr(category.name)} expanded={expandedCategory===category.id} onToggle={()=>toggleCategory(category.id)}>
+              {category.locations.map(locationId=>{
+                const obj=getObjectById(locationId);
+                if(!obj)return null;
+                const implemented=isItemImplemented(category.id,locationId);
+                return <Button key={locationId} variant="ghost" disabled={!implemented} onClick={()=>handleJump(locationId)}
+                  className="w-full h-auto min-h-7 max-sm:min-h-11 justify-start gap-2 p-1.5 rounded-[4px] text-xs font-normal text-muted-foreground hover:text-foreground hover:bg-accent/60">
+                  <span className="w-2 h-2 rounded-full shrink-0" style={{backgroundColor:obj.color}} />
+                  <span className="truncate">{tr(obj.name)}</span>
+                  {!implemented&&<Clock className="ml-auto h-3 w-3" />}
+                </Button>;
+              })}
+            </JumpCategory>;
             return (
               <div key={category.id} className="mb-1">
                 {/* Category header */}
