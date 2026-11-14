@@ -125,8 +125,10 @@ export function acceptablePhoto(item: LibraryItem, machine: Machine, query?: str
 export async function buildPhotos(machines: Machine[]): Promise<Photo[]> {
   const manifest: Photo[] = [];
   for (const machine of machines) for (const [index, entry] of machine.photos.entries()) {
-    const search = entry.nasaId ? `nasa_id=${encodeURIComponent(entry.nasaId)}` : `q=${encodeURIComponent(entry.query ?? '')}&media_type=image`;
-    const alternateQuery = machine.id === 'voyager-1' && entry.query === 'Voyager spacecraft' ? 'Voyager 1 spacecraft assembly' : machine.id === 'viking-1' && entry.query ? 'Viking Lander 1 first image' : null;
+    // Visually reviewed alternatives: no astronaut suit insignia; distinct first Viking image.
+    const reviewedId = machine.id === 'apollo-11' && entry.nasaId === 'as11-40-5903' ? 'as11-40-5917' : machine.id === 'viking-1' && entry.query ? 'PIA00381' : entry.nasaId;
+    const search = reviewedId ? `nasa_id=${encodeURIComponent(reviewedId)}` : `q=${encodeURIComponent(entry.query ?? '')}&media_type=image`;
+    const alternateQuery = machine.id === 'voyager-1' && entry.query === 'Voyager spacecraft' ? 'Voyager 1 spacecraft assembly' : null;
     const response = await getJson(`https://images-api.nasa.gov/search?${alternateQuery ? `q=${encodeURIComponent(alternateQuery)}&media_type=image` : search}`);
     const items: LibraryItem[] = response.collection?.items ?? [];
     const score = (item: LibraryItem) => {
