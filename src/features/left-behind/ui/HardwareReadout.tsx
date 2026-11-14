@@ -32,7 +32,7 @@ export function HardwareReadout() {
   useEffect(()=>{setInspect(false);},[id]);
   useEffect(()=>{if(selectedObject&&id)useLeftBehindStore.getState().selectHardware(null);},[selectedObject,id]);
   const opener=useRef<HTMLElement|null>(null);
-  useEffect(()=>{if(id){const a=document.activeElement;opener.current=a instanceof HTMLElement&&a!==document.body?a:null;setMinimized(false);}},[id]);
+  useEffect(()=>{if(id){const a=document.activeElement;opener.current=a instanceof HTMLElement&&a!==document.body?a:null;setMinimized(true);}},[id]);
   const close=()=>{const el=opener.current;useLeftBehindStore.getState().selectHardware(null);if(el?.isConnected)requestAnimationFrame(()=>el.focus());};
   useEffect(()=>{if(!id)return;const onKey=(e:KeyboardEvent)=>{if(e.key==='Escape'&&!inspect&&!document.querySelector('[role=dialog]')){close();}};window.addEventListener('keydown',onKey);return()=>window.removeEventListener('keydown',onKey);});
   const landed=id?landedPins.has(id):false;
