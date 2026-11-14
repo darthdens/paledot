@@ -29,13 +29,15 @@ export function LeftBehindMenu() {
   return <div ref={ref} data-lb-menu role="region" aria-label={text(copy.name)} className="pd-card rounded-lg absolute top-12 right-2 sm:top-[60px] sm:right-4 z-[10002] w-[min(300px,calc(100vw-1rem))] max-h-[calc(100dvh-5rem)] overflow-y-auto bg-foreground/10 backdrop-blur-xs p-2">
     <Button variant="ghost" aria-expanded={toursOpen} onClick={() => setToursOpen(!toursOpen)} className="w-full min-h-11 justify-between px-3 text-sm"><span>{text(copy.tours)}</span><ChevronDown className={`h-4 w-4 ${toursOpen ? 'rotate-180' : ''}`} /></Button>
     {toursOpen && <TourChoices onBegin={() => { useLeftBehindStore.getState().setMenuOpen(false); useCosmosStore.getState().startTour(); }} />}
-    <label className="flex min-h-11 items-center justify-between gap-3 text-sm text-foreground">
+    <div className="my-1 border-t border-border" />
+    <label className="flex min-h-11 w-full cursor-pointer items-center justify-between gap-3 rounded-md px-3 text-sm text-foreground hover:bg-accent/40">
       <span>{text(copy.machines)}</span><Switch className="pd-machine-switch" aria-label={text(copy.machines)} checked={machinesVisible} onCheckedChange={() => useLeftBehindStore.getState().toggleMachines()} />
     </label>
-    <label className="flex min-h-11 items-center justify-between gap-3 text-sm text-foreground">
+    <label className="flex min-h-11 w-full cursor-pointer items-center justify-between gap-3 rounded-md px-3 text-sm text-foreground hover:bg-accent/40">
       <span>{machineCopy[language].full}</span><Switch className="pd-machine-switch" aria-label={machineCopy[language].full} checked={fullPathsVisible} onCheckedChange={() => useLeftBehindStore.getState().toggleFullPaths()} />
     </label>
-    <Button variant="ghost" disabled className="w-full min-h-11 justify-start">{text(copy.signal)}</Button>
-    <Button variant="ghost" disabled className="w-full min-h-11 justify-start">{text(copy.know)}</Button>
+    <div className="my-1 border-t border-border" />
+    <Button variant="ghost" disabled className="w-full min-h-11 justify-start px-3 text-sm">{text(copy.signal)}</Button>
+    <Button variant="ghost" disabled className="w-full min-h-11 justify-start px-3 text-sm">{text(copy.know)}</Button>
   </div>;
 }
