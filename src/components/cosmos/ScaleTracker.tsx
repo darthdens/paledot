@@ -1,5 +1,6 @@
 import { landedPins } from '@/features/left-behind/lib/pinRegistry';
-import { closeViewNear } from '@/features/left-behind/lib/bodyScale';
+import { closeViewNear, bodyRadius } from '@/features/left-behind/lib/bodyScale';
+import { celestialObjects } from './data/celestialObjects';
 import { useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import { useCosmosStore } from './store/useCosmosStore';
@@ -56,6 +57,10 @@ export const ScaleTracker = () => {
 };
 
 /** Height of the camera above the landed pin's local ground plane (scene units). */
-function groundClearance(p: THREE.Vector3, pin: { world: [number, number, number]; normal: [number, number, number] }) {
-  return (p.x - pin.world[0]) * pin.normal[0] + (p.y - pin.world[1]) * pin.normal[1] + (p.z - pin.world[2]) * pin.normal[2];
+function groundClearance(p: THREE.Vector3, pin: { world: [number, number, number]; normal: [number, number, number]; body: string }) {
+  // Altitude above the body's sphere (centre implied by the pin), so far-side views don't collapse the near plane.
+  const body = celestialObjects.find(o => o.id === pin.body);
+  const r = body ? bodyRadius(body.size) : 0;
+  const cx = pin.world[0] - pin.normal[0] * r, cy = pin.world[1] - pin.normal[1] * r, cz = pin.world[2] - pin.normal[2] * r;
+  return Math.hypot(p.x - cx, p.y - cy, p.z - cz) - r;
 }
