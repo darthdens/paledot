@@ -57,7 +57,7 @@ function TierCap({ tier, order, radius, mesh, body }: { tier: TerrainTier; order
 
   const material = useMemo(() => {
     const src = mesh.material as THREE.ShaderMaterial;
-    const globalMap = src.uniforms?.planetMap;
+    const globalMap = src.uniforms?.['planetMap'];
     // Patch rectangle inside the global equirectangular map (u = 0.5 at 0° lon).
     const u0 = (tier.west + offset + 180) / 360, v0 = (tier.south + 90) / 180;
     return new THREE.ShaderMaterial({
@@ -107,7 +107,7 @@ function TierCap({ tier, order, radius, mesh, body }: { tier: TerrainTier; order
         }`,
     });
   }, [mesh.material, tier, order, body, offset]);
-  useEffect(() => { material.uniforms.detailMap!.value = tex; }, [material, tex]);
+  useEffect(() => { material.uniforms['detailMap']!.value = tex; }, [material, tex]);
   useEffect(() => () => material.dispose(), [material]);
   if (!tex) return null;
   return <mesh geometry={geometry} material={material} renderOrder={1 + order} raycast={() => null} />;
