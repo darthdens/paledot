@@ -1,7 +1,7 @@
 <!-- Left Behind · built during NASA Space Apps Challenge 2026 (14–15 Nov 2026) · AI-assisted (Lovable, Claude) -->
 # Roadmap
 ## Voyager 1 · One last look
-- [ ] Integrate all six parts into the shared Voyager 1 tour card, controls and collapse/swipe behaviour; number them 4.1–4.6 and verify continuation to step 5 on desktop and phone.
+- [x] Integrate all six parts into the shared Voyager 1 tour card, controls and collapse/swipe behaviour; number them 4.1–4.6. Live navigation, collapse, NASA photo toggle, Family Portrait selection and continuation to step 5 verified; desktop/360px card screenshots checked with canvas hidden only during UI testing. 31 focused tests pass; scene rendering unchanged.
 - [x] Replace the placeholder with the staged, clock-paused experience and direct hash entry; live direct entry and continuation to heliopause verified.
 - [x] Verify real-distance/angular-size calculations and identify Earth in both NASA images; credited photo toggle, pixel comparison and tappable Family Portrait verified.
 - [x] Translate new narration and controls into all seven locales; 28 focused tests pass and app builds. Desktop controls checked with canvas hidden only during testing to avoid software-GPU stalls.
