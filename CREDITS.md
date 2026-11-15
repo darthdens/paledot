@@ -140,7 +140,66 @@ Confirm each licence against package metadata (Prompt 11 check 12).
 | vaul | https://github.com/emilkowalski/vaul | MIT |
 | DM Sans (Google Fonts) | https://fonts.google.com/specimen/DM+Sans | SIL Open Font License 1.1 |
 | DM Mono (Google Fonts) | https://fonts.google.com/specimen/DM+Mono | SIL Open Font License 1.1 |
-| [anything else Prompt 11 reports] | [URL] | [licence] |
+| @capacitor/android | https://capacitorjs.com | MIT |
+| @capacitor/core | https://capacitorjs.com | MIT |
+| @capacitor/ios | https://capacitorjs.com | MIT |
+| @hookform/resolvers | https://react-hook-form.com | MIT |
+| @radix-ui/react-accordion | https://radix-ui.com/primitives | MIT |
+| @radix-ui/react-alert-dialog | https://radix-ui.com/primitives | MIT |
+| @radix-ui/react-aspect-ratio | https://radix-ui.com/primitives | MIT |
+| @radix-ui/react-avatar | https://radix-ui.com/primitives | MIT |
+| @radix-ui/react-checkbox | https://radix-ui.com/primitives | MIT |
+| @radix-ui/react-collapsible | https://radix-ui.com/primitives | MIT |
+| @radix-ui/react-context-menu | https://radix-ui.com/primitives | MIT |
+| @radix-ui/react-dialog | https://radix-ui.com/primitives | MIT |
+| @radix-ui/react-dropdown-menu | https://radix-ui.com/primitives | MIT |
+| @radix-ui/react-hover-card | https://radix-ui.com/primitives | MIT |
+| @radix-ui/react-label | https://radix-ui.com/primitives | MIT |
+| @radix-ui/react-menubar | https://radix-ui.com/primitives | MIT |
+| @radix-ui/react-navigation-menu | https://radix-ui.com/primitives | MIT |
+| @radix-ui/react-popover | https://radix-ui.com/primitives | MIT |
+| @radix-ui/react-progress | https://radix-ui.com/primitives | MIT |
+| @radix-ui/react-radio-group | https://radix-ui.com/primitives | MIT |
+| @radix-ui/react-scroll-area | https://radix-ui.com/primitives | MIT |
+| @radix-ui/react-select | https://radix-ui.com/primitives | MIT |
+| @radix-ui/react-separator | https://radix-ui.com/primitives | MIT |
+| @radix-ui/react-slider | https://radix-ui.com/primitives | MIT |
+| @radix-ui/react-slot | https://radix-ui.com/primitives | MIT |
+| @radix-ui/react-switch | https://radix-ui.com/primitives | MIT |
+| @radix-ui/react-tabs | https://radix-ui.com/primitives | MIT |
+| @radix-ui/react-toast | https://radix-ui.com/primitives | MIT |
+| @radix-ui/react-toggle | https://radix-ui.com/primitives | MIT |
+| @radix-ui/react-toggle-group | https://radix-ui.com/primitives | MIT |
+| @radix-ui/react-tooltip | https://radix-ui.com/primitives | MIT |
+| @react-three/drei | https://github.com/pmndrs/drei | MIT |
+| @react-three/fiber | https://github.com/pmndrs/react-three-fiber | MIT |
+| @react-three/postprocessing | https://github.com/pmndrs/react-postprocessing | MIT |
+| @supabase/supabase-js | https://github.com/supabase/supabase-js/tree/master/packages/core/supabase-js | MIT |
+| @tailwindcss/vite | https://tailwindcss.com | MIT |
+| @tanstack/react-query | https://tanstack.com/query | MIT |
+| @tanstack/react-router | https://tanstack.com/router | MIT |
+| @tanstack/react-start | https://tanstack.com/start | MIT |
+| @tanstack/router-plugin | https://tanstack.com/router | MIT |
+| class-variance-authority | https://github.com/joe-bell/cva | Apache-2.0 |
+| clsx | https://github.com/lukeed/clsx | MIT |
+| cmdk | https://github.com/pacocoursey/cmdk | MIT |
+| date-fns | https://github.com/date-fns/date-fns | MIT |
+| embla-carousel-autoplay | https://www.embla-carousel.com | MIT |
+| iconoir-react | https://iconoir.com | MIT |
+| input-otp | https://input-otp.rodz.dev/ | MIT |
+| lucide-react | https://lucide.dev | ISC |
+| next-themes | https://github.com/pacocoursey/next-themes | MIT |
+| qrcode.react | https://github.com/zpao/qrcode.react | ISC |
+| react-day-picker | https://daypicker.dev | MIT |
+| react-dom | https://react.dev/ | MIT |
+| react-hook-form | https://react-hook-form.com | MIT |
+| react-resizable-panels | https://react-resizable-panels.vercel.app/ | MIT |
+| recharts | https://github.com/recharts/recharts | MIT |
+| sonner | https://sonner.emilkowal.ski/ | MIT |
+| tailwind-merge | https://github.com/dcastil/tailwind-merge | MIT |
+| tw-animate-css | https://github.com/Wombosvideo/tw-animate-css | MIT |
+| vite-tsconfig-paths | https://github.com/aleclarson/vite-tsconfig-paths | MIT |
+| zod | https://zod.dev | MIT |
 
 ### Real-date planetary calculations
 
