@@ -1,5 +1,5 @@
 import { portraitFramingFactor } from '@/features/left-behind/lib/bodyScale';
-import { useEffect, useCallback, useState, useRef } from 'react';
+import { useEffect, useCallback, useState, useRef, type ReactNode } from 'react';
 import { useLanguage } from '@/i18n/LanguageContext';
 import { Button } from '@/components/ui/button';
 import { Play, Pause, SkipForward, SkipBack, X, ChevronUp, ChevronDown } from 'lucide-react';
@@ -17,7 +17,7 @@ import { captionText } from '@/features/left-behind/lib/dataText';
 import { tourPhotoIds } from '@/features/left-behind/lib/tourPresentation';
 import { tourSlideSeconds } from '@/features/left-behind/lib/tourPlayback';
 import { useTourPlayback } from '@/features/left-behind/lib/useTourPlayback';
-import { OneLastLook } from '@/features/left-behind/ui/OneLastLook';
+import { OneLastLook, type LastLookPanel } from '@/features/left-behind/ui/OneLastLook';
 import { useLeftBehindStore } from '@/features/left-behind/state/useLeftBehindStore';
 
 const translations = {
@@ -404,15 +404,19 @@ export const TourOverlay = () => {
 
   // Touch handlers for swipe gestures
   const handleTouchStart = (e: React.TouchEvent) => {
-    touchStartX.current = e.touches[0]!.clientX;
-    touchStartY.current = e.touches[0]!.clientY;
+    const touch = e.touches[0];
+    if (!touch) return;
+    touchStartX.current = touch.clientX;
+    touchStartY.current = touch.clientY;
   };
 
-  const handleTouchEnd = (e: React.TouchEvent) => {
+  const handleTouchEnd = (e: React.TouchEvent, previous: () => void, next: () => void) => {
     if (touchStartX.current === null || touchStartY.current === null) return;
     
-    const touchEndX = e.changedTouches[0]!.clientX;
-    const touchEndY = e.changedTouches[0]!.clientY;
+    const touch = e.changedTouches[0];
+    if (!touch) return;
+    const touchEndX = touch.clientX;
+    const touchEndY = touch.clientY;
     
     const deltaX = touchEndX - touchStartX.current;
     const deltaY = touchEndY - touchStartY.current;
@@ -421,10 +425,10 @@ export const TourOverlay = () => {
     if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > SWIPE_THRESHOLD) {
       if (deltaX > 0) {
         // Swipe right - go to previous
-        handlePrevious();
+        previous();
       } else {
         // Swipe left - go to next
-        handleNext();
+        next();
       }
     }
     
@@ -433,11 +437,10 @@ export const TourOverlay = () => {
   };
   
   if (!isTouring || !currentStop) return null;
-  if (isLastLook) return <OneLastLook onPrevious={handlePrevious} onNext={handleNext} />;
-
-  return (
+  const renderPanel = ({ title, label, progress, children, previous, next, nextDisabled = false }: LastLookPanel) => (
     <div 
-      className={`${isFullscreen ? 'fixed' : 'absolute'} z-[10001] bg-white/10 backdrop-blur-xs rounded-lg overflow-hidden animate-slide-in-right
+      data-tour-panel
+      className={`${isFullscreen ? 'fixed' : 'absolute'} z-[10001] bg-card/90 backdrop-blur-xs rounded-lg border border-border overflow-hidden motion-safe:animate-slide-in-right
         bottom-2 left-2 right-2
         sm:bottom-4 sm:top-auto sm:left-auto sm:right-4 sm:w-80
         md:w-96`}
@@ -449,19 +452,19 @@ export const TourOverlay = () => {
       role="region"
       aria-label={pickText(tour.title, language, tr)}
       onTouchStart={handleTouchStart}
-      onTouchEnd={handleTouchEnd}
+      onTouchEnd={e => handleTouchEnd(e, previous, next)}
     >
       {/* Overall tour progress bar - inside the card */}
-      <div className="h-1 bg-white/10">
+      <div className="h-1 bg-muted/50">
         <div 
-          className="h-full bg-blue-500 transition-all duration-300"
-          style={{ width: `${((tourIndex + 1) / totalStops) * 100}%` }}
+          className="h-full bg-primary transition-all duration-300"
+          style={{ width: `${progress * 100}%` }}
         />
       </div>
       
       {/* Header - clickable to toggle collapse */}
       <div 
-        className="flex items-center justify-between px-3 py-2 sm:p-3 border-b border-white/10 cursor-pointer hover:bg-white/5 transition-colors gap-2"
+        className="flex items-center justify-between px-3 py-2 sm:p-3 border-b border-border cursor-pointer hover:bg-muted/30 transition-colors gap-2"
         onClick={toggleCollapse}
       >
         <div className="flex items-center gap-2 min-w-0 flex-1">
@@ -473,7 +476,7 @@ export const TourOverlay = () => {
                 cy="18"
                 r="16"
                 fill="none"
-                stroke="rgba(255,255,255,0.1)"
+                className="stroke-border"
                 strokeWidth="3"
               />
               <circle
@@ -481,30 +484,30 @@ export const TourOverlay = () => {
                 cy="18"
                 r="16"
                 fill="none"
-                stroke="#3b82f6"
+                className="stroke-primary"
                 strokeWidth="3"
-                strokeDasharray={`${((tourIndex + 1) / totalStops) * 100} 100`}
+                strokeDasharray={`${progress * 100} 100`}
                 strokeLinecap="round"
               />
             </svg>
-            <span className="absolute inset-0 flex items-center justify-center text-[10px] sm:text-xs text-white font-medium">
-              {tourIndex + 1}
+            <span className="absolute inset-0 flex items-center justify-center text-[10px] sm:text-xs text-foreground font-medium">
+              {label}
             </span>
           </div>
           
-          <span className={`text-white/50 text-[10px] sm:text-xs transition-opacity duration-300 flex-shrink-0 ${isCollapsed ? 'hidden' : 'block'}`}>
-            {tourIndex + 1}/{totalStops}
+          <span className={`text-muted-foreground text-[10px] sm:text-xs transition-opacity duration-300 flex-shrink-0 ${isCollapsed ? 'hidden' : 'block'}`}>
+            {label}/{totalStops}
           </span>
           <div className="min-w-0">
-            {tour.onEnd !== 'end-frame' && <p className="text-white/50 text-[10px] sm:text-xs truncate">{pickText(tour.title, language, tr)}</p>}
-            <h2 className="text-white font-semibold text-sm truncate min-w-0">
-              {pickText(currentStop.title, language, tr)}
+            {tour.onEnd !== 'end-frame' && <p className="text-muted-foreground text-[10px] sm:text-xs truncate">{pickText(tour.title, language, tr)}</p>}
+            <h2 className="text-foreground font-semibold text-sm truncate min-w-0">
+              {title}
             </h2>
           </div>
         </div>
         <div className="flex items-center gap-1 flex-shrink-0">
           {/* Collapsed controls */}
-          <div className={`flex items-center gap-1 transition-all duration-300 ${isCollapsed ? 'opacity-100' : 'opacity-0 w-0 overflow-hidden'}`}>
+          <div className={`${isCollapsed ? 'flex' : 'hidden'} items-center gap-1`}>
             <Button
               size="icon"
               variant="ghost"
@@ -513,7 +516,7 @@ export const TourOverlay = () => {
                 e.stopPropagation();
                 togglePause();
               }}
-              className="h-7 w-7 sm:h-8 sm:w-8 rounded-full bg-white/10 hover:bg-white/20 text-white"
+              className="h-11 w-11 rounded-full bg-muted/50 hover:bg-muted text-foreground"
             >
               {isPaused ? (
                 <Play className="w-3 h-3 sm:w-4 sm:h-4" />
@@ -526,19 +529,20 @@ export const TourOverlay = () => {
               size="icon"
               variant="ghost"
               aria-label={t.next}
+              disabled={nextDisabled}
               onClick={(e) => {
                 e.stopPropagation();
-                handleNext();
+                next();
               }}
-              className="h-7 w-7 sm:h-8 sm:w-8 text-white/70 hover:text-white hover:bg-white/10"
+              className="h-11 w-11 text-muted-foreground hover:text-foreground hover:bg-muted/50"
             >
               <SkipForward className="w-3 h-3 sm:w-4 sm:h-4" />
             </Button>
           </div>
           
-          <div className="h-6 w-6 flex items-center justify-center text-white/70">
+          <Button variant="ghost" size="icon" className="h-11 w-11 text-muted-foreground" aria-label={isCollapsed ? t.expand : t.collapse} aria-expanded={!isCollapsed} onClick={e => { e.stopPropagation(); toggleCollapse(); }}>
             {isCollapsed ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-          </div>
+          </Button>
           <Button
             size="icon"
             variant="ghost"
@@ -547,7 +551,7 @@ export const TourOverlay = () => {
               handleExit();
             }}
             aria-label={t.exitTour}
-            className="h-6 w-6 text-white/70 hover:text-white hover:bg-white/10"
+            className="h-11 w-11 text-muted-foreground hover:text-foreground hover:bg-muted/50"
           >
             <X className="w-4 h-4" />
           </Button>
@@ -556,26 +560,24 @@ export const TourOverlay = () => {
       
       {/* Content - collapsible with smooth animation */}
       <div 
+        inert={isCollapsed}
         className={`grid transition-all duration-300 ease-out ${isCollapsed ? 'grid-rows-[0fr]' : 'grid-rows-[1fr]'}`}
       >
         <div className="overflow-hidden">
           {/* Content area */}
-          <div className="p-3 sm:p-4 space-y-2 sm:space-y-3 max-h-[25vh] sm:max-h-none overflow-y-auto">
-            <p aria-live="polite" className="text-white/80 text-xs sm:text-sm leading-relaxed line-clamp-4 sm:line-clamp-none">
-              {pickText(currentStop.narration, language, tr)}
-            </p>
-            <TourPhotos ids={tourPhotoIds(activeTourId, currentStop)} />
+          <div className="p-3 sm:p-4 space-y-2 sm:space-y-3 max-h-[25vh] sm:max-h-[50vh] overflow-y-auto overscroll-contain" aria-live="polite">
+            {children}
           </div>
           
           {/* Controls */}
-          <div className="flex items-center justify-between px-2 py-2 sm:p-3 border-t border-white/10 bg-white/5">
+          <div className="flex items-center justify-between px-2 py-2 sm:p-3 border-t border-border bg-muted/30">
             <Button
               size="sm"
               variant="ghost"
-              onClick={handlePrevious}
+              onClick={previous}
               aria-label={t.previous}
-              disabled={tourIndex === 0}
-              className="text-[10px] sm:text-xs text-white/70 hover:text-white hover:bg-white/10 disabled:opacity-30 px-2 sm:px-3 h-7 sm:h-8"
+              disabled={tourIndex === 0 && !isLastLook}
+              className="text-[10px] sm:text-xs text-muted-foreground hover:text-foreground hover:bg-muted/50 disabled:opacity-30 px-2 sm:px-3 h-11"
             >
               <SkipBack className="w-3 h-3 sm:w-4 sm:h-4 mr-0.5 sm:mr-1" />
               <span className="hidden xs:inline">{t.previous}</span>
@@ -586,7 +588,7 @@ export const TourOverlay = () => {
               variant="ghost"
               onClick={togglePause}
               aria-label={isPaused ? t.play : t.pause}
-              className="h-8 w-8 sm:h-10 sm:w-10 rounded-full bg-white/10 hover:bg-white/20 text-white"
+              className="h-11 w-11 rounded-full bg-muted/50 hover:bg-muted text-foreground"
             >
               {isPaused ? (
                 <Play className="w-4 h-4 sm:w-5 sm:h-5" />
@@ -598,9 +600,10 @@ export const TourOverlay = () => {
             <Button
               size="sm"
               variant="ghost"
-              onClick={handleNext}
+              onClick={next}
               aria-label={t.next}
-              className="text-[10px] sm:text-xs text-white/70 hover:text-white hover:bg-white/10 px-2 sm:px-3 h-7 sm:h-8"
+              disabled={nextDisabled}
+              className="text-[10px] sm:text-xs text-muted-foreground hover:text-foreground hover:bg-muted/50 px-2 sm:px-3 h-11"
             >
               <span className="hidden xs:inline">{t.next}</span>
               <SkipForward className="w-3 h-3 sm:w-4 sm:h-4 ml-0.5 sm:ml-1" />
@@ -610,6 +613,12 @@ export const TourOverlay = () => {
       </div>
     </div>
   );
+  if (isLastLook) return <OneLastLook tourIndex={tourIndex} totalStops={totalStops} renderPanel={renderPanel} onPrevious={handlePrevious} onNext={handleNext} />;
+  const content: ReactNode = <>
+    <p className="text-foreground/80 text-xs sm:text-sm leading-relaxed line-clamp-4 sm:line-clamp-none">{pickText(currentStop.narration, language, tr)}</p>
+    <TourPhotos ids={tourPhotoIds(activeTourId, currentStop)} />
+  </>;
+  return renderPanel({ title: pickText(currentStop.title, language, tr), label: String(tourIndex + 1), progress: (tourIndex + 1) / totalStops, children: content, previous: handlePrevious, next: handleNext });
 };
 
 type TourPhoto = { id: string; imageUrl: string; alt: string; credit: string; nasaId: string; sourceUrl: string; caption: { en: string; fr: string } & Record<string, string> };

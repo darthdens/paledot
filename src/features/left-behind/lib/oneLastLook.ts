@@ -10,6 +10,10 @@ export const lookMeasurements = (voyager: number[], earth: number[], diameterKm:
   return { distanceKm, sunKm, angularRadians: diameterKm / distanceKm };
 };
 export const pixelWidths = (dpr: number) => ({ screen: 1 / dpr, voyager: .12 / dpr });
+export const lastLookProgress = (tourIndex: number, stage: number, totalStops: number) => ({
+  label: `${tourIndex + 1}.${stage + 1}`,
+  fraction: (tourIndex + (stage + 1) / 6) / totalStops,
+});
 export const useOneLastLook = create<{ stage: number; turn: number; points: Record<string, { x: number; y: number }>; setStage: (stage: number) => void }>(set => ({
   stage: 0, turn: 0, points: {}, setStage: stage => set({ stage, turn: stage > 1 ? 1 : 0 }),
 }));
