@@ -4,6 +4,8 @@
 
 Presentation deck: [Pale Dot · Left Behind](/files/paledot-left-behind-deck), uploaded unchanged by Dens Akoka. User-supplied document; no new licence granted. Its NASA imagery credits and AI disclosure remain embedded in the PDF.
 
+Presentation videos: [Pale Dot · Left Behind](https://paledot.org/files/paledot-left-behind.mp4) and [Pale Dot · Left Behind · vertical](https://paledot.org/files/paledot-left-behind-vertical.mp4), uploaded unchanged by Dens Akoka. User-supplied media; no new licence granted or third-party rights inferred.
+
 Every resource used by Pale Dot: Left Behind. Each row is ready to copy into the project page: **Link text** goes in "Link Text", **URL** in "Link Url". The "Confirm All Work is Original" box says every external resource is listed in the form's two link fields, so keep this file complete. Lovable adds rows when it adds a library or asset, and Prompt 11 checks for anything missing. Open each URL once before submitting.
 
 ## NASA Data (form field: NASA Data)

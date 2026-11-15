@@ -15,6 +15,8 @@ import { Route as RobotsDottxtRouteImport } from './routes/robots[.]txt'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as FilesPaledotLeftBehindDeckRouteImport } from './routes/files.paledot-left-behind-deck'
 import { Route as FilesPaledotLeftBehindDeckDotpdfRouteImport } from './routes/files.paledot-left-behind-deck[.]pdf'
+import { Route as FilesPaledotLeftBehindVerticalDotmp4RouteImport } from './routes/files.paledot-left-behind-vertical[.]mp4'
+import { Route as FilesPaledotLeftBehindDotmp4RouteImport } from './routes/files.paledot-left-behind[.]mp4'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -48,6 +50,18 @@ const FilesPaledotLeftBehindDeckDotpdfRoute =
     path: '/files/paledot-left-behind-deck.pdf',
     getParentRoute: () => rootRouteImport,
   } as any)
+const FilesPaledotLeftBehindVerticalDotmp4Route =
+  FilesPaledotLeftBehindVerticalDotmp4RouteImport.update({
+    id: '/files/paledot-left-behind-vertical.mp4',
+    path: '/files/paledot-left-behind-vertical.mp4',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const FilesPaledotLeftBehindDotmp4Route =
+  FilesPaledotLeftBehindDotmp4RouteImport.update({
+    id: '/files/paledot-left-behind.mp4',
+    path: '/files/paledot-left-behind.mp4',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -56,6 +70,8 @@ export interface FileRoutesByFullPath {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/files/paledot-left-behind-deck': typeof FilesPaledotLeftBehindDeckRoute
   '/files/paledot-left-behind-deck.pdf': typeof FilesPaledotLeftBehindDeckDotpdfRoute
+  '/files/paledot-left-behind-vertical.mp4': typeof FilesPaledotLeftBehindVerticalDotmp4Route
+  '/files/paledot-left-behind.mp4': typeof FilesPaledotLeftBehindDotmp4Route
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -64,6 +80,8 @@ export interface FileRoutesByTo {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/files/paledot-left-behind-deck': typeof FilesPaledotLeftBehindDeckRoute
   '/files/paledot-left-behind-deck.pdf': typeof FilesPaledotLeftBehindDeckDotpdfRoute
+  '/files/paledot-left-behind-vertical.mp4': typeof FilesPaledotLeftBehindVerticalDotmp4Route
+  '/files/paledot-left-behind.mp4': typeof FilesPaledotLeftBehindDotmp4Route
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -73,6 +91,8 @@ export interface FileRoutesById {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/files/paledot-left-behind-deck': typeof FilesPaledotLeftBehindDeckRoute
   '/files/paledot-left-behind-deck.pdf': typeof FilesPaledotLeftBehindDeckDotpdfRoute
+  '/files/paledot-left-behind-vertical.mp4': typeof FilesPaledotLeftBehindVerticalDotmp4Route
+  '/files/paledot-left-behind.mp4': typeof FilesPaledotLeftBehindDotmp4Route
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -83,6 +103,8 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/files/paledot-left-behind-deck'
     | '/files/paledot-left-behind-deck.pdf'
+    | '/files/paledot-left-behind-vertical.mp4'
+    | '/files/paledot-left-behind.mp4'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -91,6 +113,8 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/files/paledot-left-behind-deck'
     | '/files/paledot-left-behind-deck.pdf'
+    | '/files/paledot-left-behind-vertical.mp4'
+    | '/files/paledot-left-behind.mp4'
   id:
     | '__root__'
     | '/'
@@ -99,6 +123,8 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/files/paledot-left-behind-deck'
     | '/files/paledot-left-behind-deck.pdf'
+    | '/files/paledot-left-behind-vertical.mp4'
+    | '/files/paledot-left-behind.mp4'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -108,6 +134,8 @@ export interface RootRouteChildren {
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   FilesPaledotLeftBehindDeckRoute: typeof FilesPaledotLeftBehindDeckRoute
   FilesPaledotLeftBehindDeckDotpdfRoute: typeof FilesPaledotLeftBehindDeckDotpdfRoute
+  FilesPaledotLeftBehindVerticalDotmp4Route: typeof FilesPaledotLeftBehindVerticalDotmp4Route
+  FilesPaledotLeftBehindDotmp4Route: typeof FilesPaledotLeftBehindDotmp4Route
 }
 
 declare module '@tanstack/react-router' {
@@ -154,6 +182,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof FilesPaledotLeftBehindDeckDotpdfRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/files/paledot-left-behind-vertical.mp4': {
+      id: '/files/paledot-left-behind-vertical.mp4'
+      path: '/files/paledot-left-behind-vertical.mp4'
+      fullPath: '/files/paledot-left-behind-vertical.mp4'
+      preLoaderRoute: typeof FilesPaledotLeftBehindVerticalDotmp4RouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/files/paledot-left-behind.mp4': {
+      id: '/files/paledot-left-behind.mp4'
+      path: '/files/paledot-left-behind.mp4'
+      fullPath: '/files/paledot-left-behind.mp4'
+      preLoaderRoute: typeof FilesPaledotLeftBehindDotmp4RouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -164,6 +206,9 @@ const rootRouteChildren: RootRouteChildren = {
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   FilesPaledotLeftBehindDeckRoute: FilesPaledotLeftBehindDeckRoute,
   FilesPaledotLeftBehindDeckDotpdfRoute: FilesPaledotLeftBehindDeckDotpdfRoute,
+  FilesPaledotLeftBehindVerticalDotmp4Route:
+    FilesPaledotLeftBehindVerticalDotmp4Route,
+  FilesPaledotLeftBehindDotmp4Route: FilesPaledotLeftBehindDotmp4Route,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
