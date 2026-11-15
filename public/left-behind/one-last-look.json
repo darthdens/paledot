@@ -1,0 +1,15 @@
+{
+  "date": "1990-02-14T12:00:00Z",
+  "source": "JPL Horizons",
+  "sourceUrl": "https://ssd.jpl.nasa.gov/api/horizons.api?format=json&COMMAND=%27399%27&CENTER=%27500%4010%27&MAKE_EPHEM=%27YES%27&EPHEM_TYPE=%27VECTORS%27&START_TIME=%271990-02-14+12%3A00%27&STOP_TIME=%271990-02-14+12%3A01%27&STEP_SIZE=%271+m%27&TIME_TYPE=%27UT%27&OUT_UNITS=%27KM-S%27&REF_PLANE=%27ECLIPTIC%27&REF_SYSTEM=%27J2000%27&VEC_TABLE=%272%27&CSV_FORMAT=%27YES%27",
+  "frame": "heliocentric ecliptic J2000",
+  "units": "km",
+  "timeType": "UT",
+  "earthKm": [
+    -122009158.4550898,
+    83316000.93982047,
+    1967.206514000893
+  ],
+  "earthDiameterKm": 12742,
+  "diameterSourceUrl": "https://nssdc.gsfc.nasa.gov/planetary/factsheet/earthfact.html"
+}
