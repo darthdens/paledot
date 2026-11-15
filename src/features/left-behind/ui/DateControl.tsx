@@ -39,7 +39,7 @@ export function DateControl() {
         <Popover open={picker === 'date'} onOpenChange={open => setPicker(open ? 'date' : null)}>
           <PopoverTrigger asChild><Button variant="outline" aria-label={text(copy.calendar)} className="w-full min-h-11 min-w-0 justify-between gap-1 px-2 font-mono text-[11px] font-normal tabular-nums"><span className="min-w-0 truncate">{new Intl.DateTimeFormat(locale, { day:'2-digit', month:'2-digit', year:'numeric', timeZone:'UTC' }).format(current)}</span><CalendarIcon className="shrink-0 size-4" /></Button></PopoverTrigger>
           <PopoverContent align="end" sideOffset={8} collisionPadding={8} className={pickerClass} aria-label={text(copy.calendar)}>
-            <Calendar mode="single" selected={calendarDate} defaultMonth={calendarDate} locale={calendarLocales[locale]} captionLayout="dropdown" navLayout="after" startMonth={new Date(1957,0,1)} endMonth={new Date(2100,11,31)} disabled={{ before: new Date(1957,0,1), after: new Date(2100,11,31) }} autoFocus onSelect={date => { if (date) { state.setSimDate(replaceUtcDay(useSimClock.getState().simDate, date)); setPicker(null); } }} />
+            <Calendar mode="single" selected={calendarDate} defaultMonth={calendarDate} locale={calendarLocales[locale]} weekStartsOn={locale === 'en-US' ? 0 : 1} captionLayout="dropdown" navLayout="after" startMonth={new Date(1957,0,1)} endMonth={new Date(2100,11,31)} disabled={{ before: new Date(1957,0,1), after: new Date(2100,11,31) }} autoFocus onSelect={date => { if (date) { state.setSimDate(replaceUtcDay(useSimClock.getState().simDate, date)); setPicker(null); } }} />
           </PopoverContent>
         </Popover>
       </div>
@@ -55,7 +55,7 @@ export function DateControl() {
                 <div role="listbox" aria-label={timeLabels[language][i]} className="h-[220px] overflow-y-auto overscroll-contain rounded-md border border-border p-1">
                   {Array.from({length: part === 'hour' ? 24 : 60}, (_, value) => {
                     const selected = value === (part === 'hour' ? current.getUTCHours() : part === 'minute' ? current.getUTCMinutes() : current.getUTCSeconds());
-                    return <Button key={value} variant="ghost" role="option" aria-selected={selected} onClick={() => state.setSimDate(replaceUtcTime(useSimClock.getState().simDate,part,value))} className={`w-full min-h-11 h-11 px-0 font-mono text-sm tabular-nums ${selected ? 'bg-accent text-accent-foreground' : 'text-foreground'}`}>{String(value).padStart(2,'0')}</Button>;
+                    return <Button key={value} variant="ghost" role="option" aria-selected={selected} onClick={() => state.setSimDate(replaceUtcTime(useSimClock.getState().simDate,part,value))} className={`w-full min-h-11 h-11 px-0 font-mono text-sm tabular-nums ${selected ? 'bg-primary text-primary-foreground' : 'text-foreground'}`}>{String(value).padStart(2,'0')}</Button>;
                   })}
                 </div>
               </div>)}

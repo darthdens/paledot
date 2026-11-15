@@ -190,7 +190,7 @@ export const CosmosUI = () => {
       const target = e.target as Node;
       
       // Close time slider if clicking outside
-      if (timeMenuOpen && timeSliderRef.current && !timeSliderRef.current.contains(target) && 
+      if (timeMenuOpen && !(target instanceof Element && target.closest('.cosmos-clock-picker')) && timeSliderRef.current && !timeSliderRef.current.contains(target) && 
           timeSpeedButtonRef.current && !timeSpeedButtonRef.current.contains(target)) {
         useSimClock.getState().setDateControlOpen(false);
       }
@@ -210,6 +210,7 @@ export const CosmosUI = () => {
 
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
+        if (document.querySelector('.cosmos-clock-picker')) return;
         if (timeMenuOpen) { useSimClock.getState().setDateControlOpen(false); }
         if (showMoreMenu) setShowMoreMenu(false);
         if (showLanguageMenu) setShowLanguageMenu(false);
