@@ -26,6 +26,11 @@ const PaleDot = () => {
   useEffect(() => {
     const openHash = () => {
       const hash = window.location.hash;
+      if (hash === '#lb-one-last-look') {
+        useLeftBehindStore.setState({ pendingTourId: 'voyager-1', pendingStopId: 'voyager-1-one-last-look', menuOpen: false });
+        setStarted(true);
+        return;
+      }
       // #lb-<tour-id>: start that tour once loading has finished (see CosmosExplorer).
       if (hash.startsWith('#lb-') && hasTour(hash.slice(4))) {
         useLeftBehindStore.setState({ pendingTourId: hash.slice(4), menuOpen: false });

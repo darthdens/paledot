@@ -14,7 +14,9 @@ import { getHardware } from '@/features/left-behind/data/dataClient';
 import { getTour } from './data/tours';
 import { encounterView, flightDuration, flightFrame, flightLength, lookBackView, pinOffset, spaceOffset, type Anchor, type CameraView } from '@/features/left-behind/lib/tourCamera';
 import { getEphemeris } from '@/features/left-behind/engine/runtime';
-import { getLoadedTrajectory } from '@/features/left-behind/engine/trajectory';
+import { getLoadedTrajectory, evaluateTrajectory } from '@/features/left-behind/engine/trajectory';
+import { LOOK_DATE, TURN_SECONDS, PORTRAIT_PLANETS, useOneLastLook } from '@/features/left-behind/lib/oneLastLook';
+import { slerpUnit } from '@/features/left-behind/lib/tourCamera';
 import { isEphemerisBody } from '@/features/left-behind/engine/ephemeris';
 import { eclipticKmToScene } from '@/features/left-behind/lib/units';
 
@@ -406,6 +408,47 @@ export const CameraController = () => {
     if (!controls) return;
     const orbitControls = controls as any;
     if (!orbitControls.target) return;
+    const state = useCosmosStore.getState();
+    const special = state.isTouring && state.activeTourId === 'voyager-1' && getTour('voyager-1').stops[state.tourIndex]?.id === 'voyager-1-one-last-look';
+    if (special) {
+      const track = getLoadedTrajectory('voyager-1');
+      const position = track && evaluateTrajectory(track, new Date(LOOK_DATE));
+      const before = track && evaluateTrajectory(track, new Date(LOOK_DATE - 86400000));
+      const after = track && evaluateTrajectory(track, new Date(LOOK_DATE + 86400000));
+      if (!position || !before || !after) return;
+      hwFlight.current = null;
+      isAnimating.current = false;
+      const origin = new THREE.Vector3(...eclipticKmToScene(...position.km));
+      const travel = new THREE.Vector3(...eclipticKmToScene(...after.km)).sub(new THREE.Vector3(...eclipticKmToScene(...before.km))).normalize();
+      const look = useOneLastLook.getState();
+      const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const turn = look.stage === 0 ? 0 : look.stage > 1 || reduced ? 1 : Math.min(1, look.turn + (state.isPaused ? 0 : delta / TURN_SECONDS));
+      const sunward = origin.clone().negate().normalize();
+      const direction = slerpUnit(travel, sunward, turn * turn * (3 - 2 * turn));
+      camera.position.copy(origin).addScaledVector(travel, -0.00003);
+      camera.up.set(0, 1, 0);
+      orbitControls.target.copy(camera.position).addScaledVector(direction, 1);
+      orbitControls.minDistance = 1e-8;
+      orbitControls.update();
+      camera.lookAt(orbitControls.target);
+      camera.updateMatrixWorld();
+      const points: Record<string, { x: number; y: number }> = {};
+      const positions = getEphemeris()?.positionsAt(LOOK_DATE);
+      for (const id of PORTRAIT_PLANETS) {
+        const km = positions?.[id];
+        if (!km) continue;
+        const point = new THREE.Vector3(...eclipticKmToScene(...km));
+        if (point.clone().sub(camera.position).dot(direction) <= 0) continue;
+        point.project(camera);
+        if (Math.abs(point.x) < .9 && Math.abs(point.y) < .85) points[id] = { x: (point.x + 1) / 2, y: (1 - point.y) / 2 };
+      }
+      const changed = PORTRAIT_PLANETS.some(id => {
+        const a = look.points[id], b = points[id];
+        return (!!a !== !!b) || (a && b && (Math.abs(a.x - b.x) > .001 || Math.abs(a.y - b.y) > .001));
+      });
+      if (turn !== look.turn || changed) useOneLastLook.setState({ turn, ...(changed ? { points } : {}) });
+      return;
+    }
     const following = !!hardwareId && !isTouring;
     if (!following) { hwFlight.current = null; followView.current = null; followNormal.current = null; }
     // On a landed machine, "up" is the local ground normal so the horizon is level; elsewhere world up.

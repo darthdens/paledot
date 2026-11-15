@@ -1,9 +1,10 @@
 <!-- Left Behind · built during NASA Space Apps Challenge 2026 (14–15 Nov 2026) · AI-assisted (Lovable, Claude) -->
 # Roadmap
 ## Voyager 1 · One last look
-- [ ] Replace the placeholder with the staged, clock-paused experience and direct hash entry; retain continuation to heliopause.
-- [ ] Verify real-distance/angular-size calculations and identify Earth in both NASA images; add credited image and Family Portrait interactions.
-- [ ] Translate every new string into all seven locales and verify desktop, portrait phone, reduced motion and existing tours.
+- [x] Replace the placeholder with the staged, clock-paused experience and direct hash entry; live direct entry and continuation to heliopause verified.
+- [x] Verify real-distance/angular-size calculations and identify Earth in both NASA images; credited photo toggle, pixel comparison and tappable Family Portrait verified.
+- [x] Translate new narration and controls into all seven locales; 28 focused tests pass and app builds. Desktop controls checked with canvas hidden only during testing to avoid software-GPU stalls.
+- [ ] Verify real-time camera rotation, six-ring readability and complete portrait-phone interaction on a hardware-GPU device; sandbox software rendering stalls during repeated scene checks, so these visual checks remain unverified.
 ## Whole-repository open-source release
 - [x] Scan current files and reachable Git history: only allowed public anon keys detected; no private credentials/private URLs found. All six public application tables have RLS; some managed internal tables do not.
 - [x] Add Apache 2.0 licence and update README, event scope and credits without app changes; unknown texture rights remain disclosed.
