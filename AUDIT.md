@@ -38,4 +38,15 @@
 - Some allocation remains in trajectory evaluation, nearest ranking and camera flight helpers; this audit reduces specific hot-loop allocation, does not certify zero allocation throughout the feature.
 - No console page errors appeared in completed keyboard/phone runs; warnings across every feature state remain unverified.
 
-No Echo, analytics, Capacitor, scale, texture quality or tour content changes were made.
+No Echo, analytics, Capacitor, scale, texture quality or tour content changes were made in the original accessibility audit.
+
+## Follow-up: incorrect maps and rights — 15 November 2026
+- Removed eleven old binaries: the eight misassigned assets, fictional Ceres, and unidentified Earth clouds/base Moon. Replaced with traced CDN WebP assets; attribution, URLs, projection conversions, hashes and limitations in CREDITS.md and texture-sources.json.
+- Seven rendered worlds now use body-specific mission mosaics: Ceres (Dawn), Pluto (New Horizons), Europa (Voyager/Galileo), Enceladus/Iapetus/Titan (Cassini/Voyager) and Triton (Voyager 2). Base Moon uses the already documented HD LRO WAC mosaic; Earth clouds use the supplier's directly fetched CC BY 4.0 map, not an assumed licence for the old file.
+- Corrected retained Phobos and Deimos assets. Neither has a body entry in the current catalogue, so neither was rendered; no new objects or features added. Deimos remains its official source's native 1440×720 instead of upscaling to invent detail. Main maps retain 2048×1024 and base Moon 1024×512.
+- Sourced textures bypass fictional hearts, cracks, tiger stripes, cantaloupe patterns and albedo-derived fake relief in the existing shaders. Lighting, real relief, scale, camera and tours remain unchanged. Titan keeps orange haze over its infrared mosaic; this is not measured visible-light colour.
+- Missing Pluto/Triton/Europa observations have alpha coverage and uniform neutral material, not black terrain or fabricated fill. West-positive mosaics mirrored and 0..360 east-positive sources shifted according to their labels. All changes documented; no AI imagery.
+- Opening loader and planet renderer share the corrected asset URLs. Live scene readback confirms all seven corrected world textures are loaded at 2048×1024 with the sourced-surface shader active. This does not certify every world at every close-up angle or actual iOS rendering.
+- Added 14 source/accuracy regressions. Complete suite: 28 files / 175 tests pass; preview build OK. No page errors in the completed visible-scene run.
+- Retried unmodified visible scene: Voyager 1's actual Launch→Jupiter camera flight completed and Jupiter screenshot captured. Thirty samples over 8.89 seconds yielded only three distinct camera frames in the software renderer; this cannot prove flicker-free motion or phone FPS. Another run stalled at screenshot capture before Voyager 2/Apollo checks. Those, signal-pulse motion and One last look rotation remain blocked on reliable GPU visual checks; no unverified camera change made.
+- Original licence identities are still unknowable, but those files are no longer shipped; the replacement sources close the active-asset rights gaps. Older historical comparison statements in CREDITS.md are explicitly retired evidence, not current assignments.
