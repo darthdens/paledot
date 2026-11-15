@@ -6,6 +6,18 @@ import { positionAt } from '../engine/trajectory';
 import { useSimClock } from '../state/useSimClock';
 import { landedPins } from './pinRegistry';
 import { getHardware } from '../data/dataClient';
+import { machineVisit } from './framing';
+import { loadTrajectory } from '../engine/trajectory';
+import type { Machine } from '../data/types';
+
+export async function visitMachine(machine: Machine) {
+  const visit = machineVisit(machine, useSimClock.getState().simDate);
+  useCosmosStore.getState().stopTour();
+  useSimClock.getState().setSimDate(visit.date);
+  await loadTrajectory(visit.target);
+  useLeftBehindStore.setState({ framingView: null, machinesVisible: true, menuOpen: false });
+  return followHardware(visit.target);
+}
 
 // Landing sites known from hardware.json, so landed machines stay reachable even when the Moon/Mars
 // (and so their pins) aren't mounted, e.g. when the camera is outside the Solar System.

@@ -2,6 +2,8 @@
 import { create } from 'zustand';
 type LeftBehindState = {
   machinesVisible: boolean; menuOpen: boolean;
+  framingView: 'intro' | 'machines' | 'knowledge' | 'summary' | null;
+  openFraming: (view: 'intro' | 'machines' | 'knowledge' | 'summary') => void;
   fullPathsVisible: boolean;
   selectedHardwareId: string | null; followTargetId: string | null;
   activeTourId: string | null; tourStepIndex: number;
@@ -18,6 +20,8 @@ type LeftBehindState = {
 };
 export const useLeftBehindStore = create<LeftBehindState>(set => ({
   machinesVisible: true, menuOpen: false, selectedHardwareId: null,
+  framingView: null,
+  openFraming: framingView => set({ framingView, menuOpen: false }),
   fullPathsVisible: false,
   followTargetId: null, activeTourId: null, tourStepIndex: 0,
   setMenuOpen: menuOpen => set({ menuOpen }),
