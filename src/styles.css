@@ -732,3 +732,6 @@ All colors MUST be HSL.
 .paledot [data-explorer-dropdown], .paledot [data-quick-jump], .paledot [data-object-search] { background-color: hsl(var(--card) / .97); color: hsl(var(--foreground)); }
 .paledot [data-explorer-dropdown] :is(.text-white\/40,.text-white\/50,.text-white\/60,.text-white\/70), .paledot [data-bottom-card] :is(.text-white\/40,.text-white\/50,.text-white\/60) { color: hsl(var(--muted-foreground)); }
 .paledot [data-object-search] :is(.text-white\/40,.text-white\/50) { color: hsl(var(--muted-foreground)); }
+.paledot [data-explorer-ui-root]:has([data-tour-panel]) [data-explorer-dropdown],
+.paledot [data-explorer-ui-root]:has([data-machine-readout]) [data-explorer-dropdown],
+.paledot [data-explorer-ui-root]:has([data-bottom-card]) [data-explorer-dropdown] { max-height: min(var(--pd-dropdown-height, 25dvh), 25dvh) !important; }
