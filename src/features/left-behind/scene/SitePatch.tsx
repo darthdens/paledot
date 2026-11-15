@@ -6,7 +6,7 @@ import { loadSiteHeights } from '../lib/terrainHeights';
 import * as THREE from 'three';
 import { useThree } from '@react-three/fiber';
 import { getTerrainIndex, terrainImageUrl, type TerrainTier } from '../data/dataClient';
-import { TEXTURE_LON_OFFSET_DEG } from '../lib/geo';
+import { TEXTURE_LON_OFFSET_DEG, latLonToLocal } from '../lib/geo';
 
 const SEGMENTS: Record<string, number> = { near: 512, mid: 256 };
 
@@ -39,7 +39,7 @@ export function SitePatch({ body, lat, lon, radius, mesh }: { body: 'moon' | 'ma
     const mid = tiers.find(t => t.tier === 'mid'); const u = (mesh.material as THREE.ShaderMaterial).uniforms?.['holeRect'];
     if (!mid || !u) return;
     const centre = mesh.getWorldPosition(new THREE.Vector3());
-    const surface = new THREE.Vector3().setFromSphericalCoords(radius, Math.PI / 2 - lat * Math.PI / 180, Math.PI + (lon + (TEXTURE_LON_OFFSET_DEG[body] ?? 0)) * Math.PI / 180).applyMatrix4(mesh.matrixWorld);
+    const surface = new THREE.Vector3(...latLonToLocal(lat, lon, radius, TEXTURE_LON_OFFSET_DEG[body] ?? 0)).applyMatrix4(mesh.matrixWorld);
     // No missing globe fragments before a real cap is ready, from orbit, or on the far side.
     if (!readyCaps.current.has(mid.file) || camera.position.distanceTo(surface) > radius * 0.1 || surface.clone().sub(centre).dot(camera.position.clone().sub(surface)) <= 0) {
       (u.value as THREE.Vector4).set(0, 0, 0, 0); return;
