@@ -1,9 +1,16 @@
 // Left Behind · built during NASA Space Apps Challenge 2026 (14–15 Nov 2026) · AI-assisted (Lovable, Claude)
 import { describe, expect, it } from 'vitest';
-import { LOOK_DATE, TURN_SECONDS, PORTRAIT_PLANETS, lookMeasurements, pixelWidths } from './oneLastLook';
+import { LOOK_DATE, TURN_SECONDS, PORTRAIT_PLANETS, lookMeasurements, pixelWidths, lastLookProgress } from './oneLastLook';
 import { useSimClock } from '../state/useSimClock';
 import { leftBehindTours } from '../data/tours';
 describe('One last look physical rules', () => {
+  it('numbers the six nested stages 4.1 through 4.6 without advancing the parent stop', () => {
+    expect(Array.from({ length: 6 }, (_, stage) => lastLookProgress(3, stage, 6).label)).toEqual(['4.1', '4.2', '4.3', '4.4', '4.5', '4.6']);
+  });
+  it('completes parent step four only after the sixth nested stage', () => {
+    expect(lastLookProgress(3, 0, 6).fraction).toBeCloseTo(19 / 36);
+    expect(lastLookProgress(3, 5, 6).fraction).toBe(4 / 6);
+  });
   it('uses 14 February 1990 noon UTC', () => expect(new Date(LOOK_DATE).toISOString()).toBe('1990-02-14T12:00:00.000Z'));
   it('turns over three seconds', () => expect(TURN_SECONDS).toBe(3));
   it('marks only the six photographed planets', () => expect([...PORTRAIT_PLANETS]).toEqual(['venus', 'earth', 'jupiter', 'saturn', 'uranus', 'neptune']));
