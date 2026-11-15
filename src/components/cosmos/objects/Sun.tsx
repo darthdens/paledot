@@ -41,6 +41,27 @@ const createSunGlowTexture = () => {
   return tex;
 };
 
+// Star point seen from the outer Solar System: bright golden core with a short soft falloff.
+const createStarPointTexture = () => {
+  const size = 128;
+  const canvas = document.createElement('canvas');
+  canvas.width = size;
+  canvas.height = size;
+  const ctx = canvas.getContext('2d')!;
+  const gradient = ctx.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2);
+  gradient.addColorStop(0, 'rgba(255, 240, 200, 1)');
+  gradient.addColorStop(0.08, 'rgba(255, 215, 140, 1)');
+  gradient.addColorStop(0.2, 'rgba(255, 170, 70, 0.45)');
+  gradient.addColorStop(0.45, 'rgba(255, 130, 40, 0.1)');
+  gradient.addColorStop(1, 'rgba(255, 100, 20, 0)');
+  ctx.fillStyle = gradient;
+  ctx.fillRect(0, 0, size, size);
+  const tex = new THREE.CanvasTexture(canvas);
+  tex.minFilter = THREE.LinearFilter;
+  tex.magFilter = THREE.LinearFilter;
+  return tex;
+};
+
 // Outer glow texture - softer, more natural
 const createOuterGlowTexture = () => {
   const size = 512;
@@ -204,6 +225,7 @@ export const Sun = ({ position = [0, 0, 0], visualScale = UNIFIED_SCALE }: SunPr
   const photoUniforms = useMemo(() => ({ uTime: { value: 0 } }), []);
   const glowTexture = useMemo(() => createSunGlowTexture(), []);
   const outerGlowTexture = useMemo(() => createOuterGlowTexture(), []);
+  const starPointTexture = useMemo(() => createStarPointTexture(), []);
   
   const setSelectedObject = useCosmosStore(state => state.setSelectedObject);
   const setHoveredObject = useCosmosStore(state => state.setHoveredObject);
@@ -372,7 +394,7 @@ export const Sun = ({ position = [0, 0, 0], visualScale = UNIFIED_SCALE }: SunPr
 
       {/* Distant star point: constant size on screen, only far from the Sun */}
       <sprite ref={starRef} renderOrder={13} scale={[0.045, 0.045, 1]} visible={false}>
-        <spriteMaterial map={glowTexture} transparent opacity={0} sizeAttenuation={false} blending={THREE.AdditiveBlending} depthWrite={false} depthTest={true} />
+        <spriteMaterial map={starPointTexture} transparent opacity={0} sizeAttenuation={false} blending={THREE.AdditiveBlending} depthWrite={false} depthTest={true} />
       </sprite>
 
       {/* Point light from sun - reduced intensity */}
