@@ -70,12 +70,15 @@ NASA models are public-domain US-government resources according to the [NASA 3D 
 | Link text | URL | Licence / notes |
 | --- | --- | --- |
 | Pale Dot base platform by Dens Akoka (existed before the event) | https://paledot.org | Apache License 2.0; copyright 2026 Dens Akoka. Pale Dot name/logo and external assets excluded; see LICENSE |
-| Project repository, with HACKATHON.md and this file | [https://github.com/<you>/<repo>] | Shows what was built during the event |
-| Pre-existing planet and moon textures (`src/assets/textures/`) | Source URL unknown; see provenance note below | Original source/product and licence unverified; do not assume public domain |
+| Project repository, with HACKATHON.md and this file | https://github.com/darthdens/paledot | Shows what was built during the event |
+| Solar System Scope planet maps by INOVE | https://www.solarsystemscope.com/textures/ | CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/); matched Earth day/night, Mercury, Venus atmosphere, Mars, Jupiter, Saturn, Uranus, Neptune and fictional Ceres; converted to WebP. Maps are colour-adjusted and may include fictional gap fill; not unaltered NASA imagery |
+| Remaining pre-existing planet and moon textures (`src/assets/textures/`) | Source URL unknown; see provenance note below | Earth clouds, Moon, Pluto, Titan, Europa, Enceladus, Triton, Iapetus, Phobos and Deimos remain unverified; do not assume public domain |
 | Johns Hopkins APL: Voyager 2 Illuminates Boundary of Interstellar Space | https://www.jhuapl.edu/news/news-releases/191106-voyager-2-illuminates-boundary-interstellar-space | Heliopause facts |
 | LROC (NASA Lunar Reconnaissance Orbiter Camera, Arizona State University) coordinates | https://www.lroc.asu.edu/data/support/downloads/2016_LROC_Coordinates_of_Human_Features.pdf | Rover positions on the Moon |
 
 Texture provenance audit: the original Earth day/night/cloud and Moon JPEGs were introduced in commit `60a77c5` (10 Jan 2026, 20:43:37 GMT); its renderer comments call them “NASA texture maps” and the Moon “LROC”, but provide no download URL or product identifier. Ceres was introduced in `6c9d2ea` (10 Jan 2026, 21:31:29 GMT), with a “NASA texture” comment but no source URL. Searches of filenames, source comments and repository history did not establish exact origins/licences for the other pre-existing textures either. Event WebP conversion does not establish provenance. These unknown pre-event sources remain a submission-credit gap; the separately documented event HD maps have identified sources.
+
+Follow-up audit, 15 November 2026: downloaded the supplier's published 2K JPEG originals and compared decoded RGB images at 256×128 against the existing WebP maps. Ten maps above match closely (mean absolute channel differences 0.26–0.54 out of 255; correlation 0.998–0.99996), consistent with lossy WebP conversion. Earth clouds and Moon did not meet that match quality and are not assigned this licence. The Ceres map matches the supplier's explicitly **fictional** map; it is a pre-existing artistic surface colour layer, not Dawn-measured albedo. The separately sourced Dawn relief remains real terrain data. No texture was replaced or degraded in this audit. Supplier attribution and conversion notice above apply to both brands; remaining unidentified assets are not cleared for redistribution.
 
 ### Other data used during the event
 
