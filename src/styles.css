@@ -234,6 +234,9 @@ All colors MUST be HSL.
   html[data-pd-cursor] a *, html[data-pd-cursor] button *, html[data-pd-cursor] [role="menuitem"] *, html[data-pd-cursor] [role="option"] * {
     cursor: pointer !important;
   }
+  html[data-pd-cursor] label:has([role="switch"]), html[data-pd-cursor] label:has([role="switch"]) * {
+    cursor: pointer !important;
+  }
 
   body {
     background-color: hsl(var(--background));
