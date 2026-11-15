@@ -793,13 +793,13 @@ All colors MUST be HSL.
 .paledot [data-explorer-toolbar], .paledot [data-region-control] { top: 8px; }
 .paledot .cosmos-search-input input { padding-left: 12px; padding-right: 4px; outline: none !important; box-shadow: none !important; }
 .paledot [data-search-open="true"] [data-search-trigger]:focus-visible { outline-offset: -2px; }
-.paledot .pd-machine-switch { position: relative; }
-.paledot .pd-machine-switch > span { width: 16px; height: 16px; box-shadow: none; transform: none !important; translate: 1px 0 !important; transition: translate 150ms ease-out, background-color 150ms ease-out; }
-.paledot .pd-machine-switch[data-state="checked"] { background-color: hsl(var(--dot) / .22); border-color: hsl(var(--dot)); }
-.paledot .pd-machine-switch[data-state="checked"] > span { background-color: hsl(var(--dot)); translate: 17px 0 !important; }
-.paledot .pd-machine-switch[data-state="unchecked"] { background-color: hsl(var(--surface-2)); border-color: hsl(var(--border-strong)); }
-.paledot .pd-machine-switch[data-state="unchecked"] > span { background-color: hsl(var(--muted-foreground)); }
-@media (max-width: 1023px) {
+.paledot .pd-machine-switch { position: relative; box-sizing: border-box !important; width: 36px !important; min-width: 36px !important; height: 20px !important; min-height: 20px !important; padding: 0 !important; border-width: 1px !important; align-items: center !important; }
+.paledot .pd-machine-switch > span { width: 14px !important; height: 14px !important; box-shadow: none !important; transform: none !important; translate: 2px 0 !important; transition: translate 150ms ease-out, background-color 150ms ease-out; }
+.paledot .pd-machine-switch[data-state="checked"] { background-color: hsl(var(--dot) / .18) !important; border-color: hsl(var(--dot) / .7) !important; }
+.paledot .pd-machine-switch[data-state="checked"] > span { background-color: hsl(var(--dot)) !important; translate: 18px 0 !important; }
+.paledot .pd-machine-switch[data-state="unchecked"] { background-color: hsl(var(--surface-2)) !important; border-color: hsl(var(--border-strong)) !important; }
+.paledot .pd-machine-switch[data-state="unchecked"] > span { background-color: hsl(var(--muted-foreground)) !important; }
+@media (max-width: 639px) {
   .paledot [data-explorer-ui-root]:has([data-search-open="true"]) [data-region-control] { visibility: hidden; }
 }
 @media (max-width: 639px) {
@@ -812,7 +812,7 @@ All colors MUST be HSL.
   .paledot [data-region-control], .paledot [data-region-control][data-region-expanded="true"] { width: 64px; }
   .paledot [data-region-control] > div { overflow: visible; }
   .paledot [data-region-control] [data-region-title] { display: none; }
-  .paledot [data-region-panel] { position: absolute; top: 52px; left: 0; width: min(320px, calc(100vw - 16px - env(safe-area-inset-left) - env(safe-area-inset-right))); border-radius: 10px; background-color: hsl(var(--card) / .97); box-shadow: inset 0 0 0 1px hsl(var(--border)); overflow: hidden; transition: grid-template-rows 300ms ease-out, opacity 300ms ease-out; }
+  .paledot [data-region-panel] { position: absolute; top: 52px; left: 0; width: max-content; max-width: min(320px, calc(100vw - 16px - env(safe-area-inset-left) - env(safe-area-inset-right))); border-radius: 10px; background-color: hsl(var(--card) / .97); box-shadow: inset 0 0 0 1px hsl(var(--border)); overflow: hidden; transition: grid-template-rows 300ms ease-out, opacity 300ms ease-out; }
   .paledot [data-region-control][data-region-expanded="false"] [data-region-panel] { opacity: 0; pointer-events: none; }
   .paledot [data-region-panel-title] { display: flex; }
   .paledot [data-region-panel] p { color: hsl(var(--muted-foreground)); }
