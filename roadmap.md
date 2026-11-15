@@ -1,5 +1,8 @@
 <!-- Left Behind · built during NASA Space Apps Challenge 2026 (14–15 Nov 2026) · AI-assisted (Lovable, Claude) -->
 # Roadmap
+## Source and acceptance audit
+- [ ] Open every `verify: true` fact source, compare the exact claim, and store dated verification evidence plus stronger primary links where needed.
+- [ ] Run the complete test suite and recheck outstanding live acceptance items; leave unproven visual checks explicitly open.
 ## Complete framing acceptance
 - [x] Replace the Voyager 1 summary popup with an opaque black ending and delayed quiet seven-machine summary; actual last-stop completion and screenshot verified. Begin at Earth code unchanged; 10 focused tests pass.
 - [ ] Verify uninterrupted camera flights, phone glossary clearance over a rendered object, and Begin at Earth through its ending. Blocker: software-GPU checks repeatedly stall; Begin at Earth reached all 26 stops but its ending capture did not finish.
