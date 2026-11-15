@@ -44,6 +44,10 @@ import { CosmosBootGate } from './ui/CosmosBootGate';
 import { preloadAllRelief } from './lib/relief';
 import { preloadHdSurfaces } from './lib/hdSurfaces';
 import { useSiteBrand } from '@/lib/site-brand';
+import { useOverlayClearance } from '@/features/left-behind/ui/useOverlayClearance';
+import { useSimClock } from '@/features/left-behind/state/useSimClock';
+import { useLanguage } from '@/i18n/LanguageContext';
+import { formatSimDate } from '@/features/left-behind/lib/dateCopy';
 import { SimulationClock } from '@/features/left-behind/scene/SimulationClock';
 import { useLeftBehindStore } from '@/features/left-behind/state/useLeftBehindStore';
 const LeftBehindLayer = lazy(() => import('@/features/left-behind/scene/LeftBehindLayer').then(m => ({ default: m.LeftBehindLayer })));
@@ -63,9 +67,14 @@ const GalaxyTimeManager = () => {
 
 export const CosmosExplorer = () => {
   const brand = useSiteBrand();
+  const { language, locale } = useLanguage();
+  const simSecond = useSimClock(s => Math.floor(s.simDate/1000));
+  const canvasLabels = { en: '3D view of the Solar System on {date}', fr: 'Vue 3D du Système solaire le {date}', es: 'Vista 3D del Sistema Solar el {date}', pt: 'Vista 3D do Sistema Solar em {date}', it: 'Vista 3D del Sistema solare il {date}', de: '3D-Ansicht des Sonnensystems am {date}' };
+  const canvasLabel = canvasLabels[language].replace('{date}', formatSimDate(simSecond*1000,locale));
   const machinesVisible = useLeftBehindStore(s => s.machinesVisible);
   const menuOpen = useLeftBehindStore(s => s.menuOpen);
   const containerRef = useRef<HTMLDivElement>(null);
+  useOverlayClearance(containerRef);
 
   // We separate "textures are loaded" vs "scene is warmed up" so the loader can actually
   // hide all the heavy work (geometry generation + shader compilation).
@@ -182,7 +191,7 @@ export const CosmosExplorer = () => {
       )}
 
       {/* Keep the scene mounted immediately so heavy work happens behind the loader */}
-      <Canvas gl={{ alpha: false }}>
+      <Canvas gl={{ alpha: false }} role="img" aria-label={canvasLabel}>
         <Suspense fallback={null}>
           <Selection>
             <PerspectiveCamera makeDefault position={initialCameraPosition} fov={60} near={0.1} far={1e12} />

@@ -14,7 +14,7 @@ import { loadTrajectory, sampleTrajectory } from '../engine/trajectory';
 import { latLonToLocal, TEXTURE_LON_OFFSET_DEG } from '../lib/geo';
 import { followHardware } from '../lib/hardwareNavigation';
 import { machineCopy } from '../lib/machineCopy';
-import { landedPins } from '../lib/pinRegistry';
+import { landedPins, type LandedPin } from '../lib/pinRegistry';
 import { useSurfaceAttachmentStore } from '../state/surfaceAttachments';
 import { useLeftBehindStore } from '../state/useLeftBehindStore';
 import { useSimClock } from '../state/useSimClock';
@@ -28,8 +28,8 @@ function SiteExtra({ body, lat, lon, radius }: { body: Body; lat: number; lon: n
   const object = useMemo(() => {
     const g = buildRetroreflector(); g.scale.setScalar(1e-6); // metres -> scene units (1 unit = 1000 km)
     const p = latLonToLocal(lat, lon, radius, TEXTURE_LON_OFFSET_DEG[body] ?? 0);
-    const n = new THREE.Vector3(p[0], p[1], p[2]).normalize();
-    g.position.set(p[0], p[1], p[2]); g.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), n);
+    const n = new THREE.Vector3(...p).normalize();
+    g.position.set(...p); g.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), n);
     g.traverse(o => { const m = o as THREE.Mesh; if (m.isMesh) { m.frustumCulled = false; m.raycast = noRaycast; } });
     return g;
   }, [body, lat, lon, radius]);
@@ -58,7 +58,13 @@ function SurfacePin({ spec }: { spec: PinSpec }) {
     l.raycast = noRaycast; return l;
   }, []);
   useEffect(() => () => { line.geometry.dispose(); (line.material as THREE.Material).dispose(); landedPins.delete(spec.trajId); }, [line, spec.trajId]);
-  const tmp = useMemo(() => ({ a: new THREE.Vector3(), b: new THREE.Vector3(), c: new THREE.Vector3() }), []);
+  const tmp = useMemo(() => ({ a: new THREE.Vector3(), b: new THREE.Vector3(), c: new THREE.Vector3(), inverse: new THREE.Matrix4(), ground: new THREE.Vector3(), radius: 1 }), []);
+  const fixedNormal = useMemo(() => new THREE.Vector3(...latLonToLocal(spec.lat, spec.lon, 1, TEXTURE_LON_OFFSET_DEG[spec.body] ?? 0)), [spec]);
+  const pin = useMemo<LandedPin>(() => ({ world: [0,0,0], normal: [0,1,0], centre: [0,0,0], body: spec.body, groundAt: (x,y,z) => {
+    const v = tmp.ground.set(x,y,z).applyMatrix4(tmp.inverse), r = v.length() || 1;
+    const lat = Math.asin(v.y/r)*180/Math.PI, lon = Math.atan2(-v.z,v.x)*180/Math.PI-(TEXTURE_LON_OFFSET_DEG[spec.body] ?? 0);
+    return tmp.radius + groundHeightM(spec.body,lat,lon)*METRE;
+  } }), [spec, tmp]);
   useFrame(({ camera, scene }) => {
     refreshOccluders(scene);
     const node = group.current, mesh = node?.parent?.parent?.parent as THREE.Mesh | undefined;
@@ -76,22 +82,20 @@ function SurfacePin({ spec }: { spec: PinSpec }) {
     // Real ground height (site DTM / global map) once the body shows its relief; flat sphere before that.
     if (reliefSync(spec.body)) preloadSiteHeights(spec.body);
     const ground = radius + groundHeightM(spec.body, spec.lat, spec.lon) * METRE;
-    const p = latLonToLocal(spec.lat, spec.lon, ground, TEXTURE_LON_OFFSET_DEG[spec.body] ?? 0);
-    if (followed && (!patch || patch.radius !== radius || patch.mesh !== mesh)) setPatch({ local: [p[0], p[1], p[2]], radius, mesh });
+    const p = tmp.a.copy(fixedNormal).multiplyScalar(ground);
+    if (followed && (!patch || patch.radius !== radius || patch.mesh !== mesh)) setPatch({ local: [p.x, p.y, p.z], radius, mesh });
     else if (!followed && patch) setPatch(null);
     const attr = line.geometry.getAttribute('position') as THREE.BufferAttribute;
-    attr.setXYZ(0, p[0], p[1], p[2]); attr.setXYZ(1, p[0] * (1 + LEADER), p[1] * (1 + LEADER), p[2] * (1 + LEADER)); attr.needsUpdate = true;
-    top.current.position.set(p[0] * (1 + LEADER), p[1] * (1 + LEADER), p[2] * (1 + LEADER));
+    attr.setXYZ(0, p.x, p.y, p.z); attr.setXYZ(1, p.x * (1 + LEADER), p.y * (1 + LEADER), p.z * (1 + LEADER)); attr.needsUpdate = true;
+    top.current.position.set(p.x * (1 + LEADER), p.y * (1 + LEADER), p.z * (1 + LEADER));
     node.updateWorldMatrix(true, false);
-    const world = tmp.a.set(...p).applyMatrix4(node.matrixWorld), centre = tmp.b.setFromMatrixPosition(node.matrixWorld);
+    const world = tmp.a.applyMatrix4(node.matrixWorld), centre = tmp.b.setFromMatrixPosition(node.matrixWorld);
     const normal = tmp.c.subVectors(world, centre).normalize();
-    const inv = node.matrixWorld.clone().invert(), body = spec.body, offset = TEXTURE_LON_OFFSET_DEG[spec.body] ?? 0, v = new THREE.Vector3();
-    const groundAt = (x: number, y: number, z: number) => {
-      v.set(x, y, z).applyMatrix4(inv); const r = v.length() || 1;
-      const lat = Math.asin(v.y / r) * 180 / Math.PI, lon = Math.atan2(-v.z, v.x) * 180 / Math.PI - offset;
-      return radius + groundHeightM(body, lat, lon) * METRE;
-    };
-    landedPins.set(spec.trajId, { world: [world.x, world.y, world.z], body: spec.body, normal: [normal.x, normal.y, normal.z], centre: [centre.x, centre.y, centre.z], groundAt });
+    tmp.inverse.copy(node.matrixWorld).invert(); tmp.radius = radius;
+    pin.world[0]=world.x; pin.world[1]=world.y; pin.world[2]=world.z;
+    pin.normal[0]=normal.x; pin.normal[1]=normal.y; pin.normal[2]=normal.z;
+    pin.centre[0]=centre.x; pin.centre[1]=centre.y; pin.centre[2]=centre.z;
+    landedPins.set(spec.trajId, pin);
     if (ring.current && !ring.current.hidden && isOccluded(camera.position, world)) ring.current.hidden = true;
   }, -0.3);
   return <group ref={group} name={`pin-${spec.trajId}`} visible={false}>
@@ -151,27 +155,27 @@ function CrowdChip({ body }: { body: Body }) {
   const group = useRef<THREE.Group>(null), el = useRef<HTMLDivElement>(null);
   const [count, setCount] = useState(0);
   const { language } = useLanguage(); const copy = machineCopy[language];
-  const tmp = useMemo(() => ({ v: new THREE.Vector3(), list: [] as THREE.Vector2[] }), []);
+  const tmp = useMemo(() => ({ v: new THREE.Vector3(), occ: new THREE.Vector3(), list: Array.from({length:7}, () => new THREE.Vector2()), pins: [] as LandedPin[] }), []);
   useFrame(({ camera, size }) => {
-    const occ = new THREE.Vector3();
-    const pins = [...landedPins.values()].filter(p => p.body === body && !isOccluded(camera.position, occ.set(...p.world)));
+    const pins = tmp.pins; pins.length = 0;
+    for (const pin of landedPins.values()) if (pin.body === body && !isOccluded(camera.position, tmp.occ.set(...pin.world))) pins.push(pin);
     const scale = useCosmosStore.getState().currentScale;
     if (scale !== 'earth' && scale !== 'solarSystem') { crowded[body] = false; if (el.current) el.current.hidden = true; return; }
-    let close = false; tmp.list.length = 0;
-    for (const p of pins) { tmp.v.set(...p.world).project(camera); tmp.list.push(new THREE.Vector2((tmp.v.x + 1) * size.width / 2, (1 - tmp.v.y) * size.height / 2)); }
-    for (let i = 0; i < tmp.list.length && !close; i++) for (let j = i + 1; j < tmp.list.length; j++) if (tmp.list[i]!.distanceTo(tmp.list[j]!) < CROWD_PX) { close = true; break; }
+    let close = false;
+    for (let i=0;i<pins.length;i++) { const pin=pins[i], point=tmp.list[i]; if (!pin || !point) continue; tmp.v.set(...pin.world).project(camera); point.set((tmp.v.x+1)*size.width/2,(1-tmp.v.y)*size.height/2); }
+    for (let i=0;i<pins.length&&!close;i++) for(let j=i+1;j<pins.length;j++) { const a=tmp.list[i], b=tmp.list[j]; if(a&&b&&a.distanceTo(b)<CROWD_PX) {close=true;break;} }
     crowded[body] = close;
     if (pins.length !== count) setCount(pins.length);
     if (el.current) el.current.hidden = !close;
     if (close && group.current) {
-      tmp.v.set(0, 0, 0); for (const p of pins) tmp.v.add({ x: p.world[0], y: p.world[1], z: p.world[2] } as THREE.Vector3);
+      tmp.v.set(0, 0, 0); for (const p of pins) tmp.v.add(tmp.occ.set(...p.world));
       tmp.v.divideScalar(pins.length); group.current.parent?.worldToLocal(tmp.v); group.current.position.copy(tmp.v);
     }
   }, -0.2);
   const text = (body === 'moon' ? copy.sites : copy.machinesCount).replace('{n}', String(count));
   return <group ref={group}><Html center zIndexRange={[40, 30]}>
     <div ref={el} hidden className="paledot dark pd-pin-chip-anchor">
-      <button type="button" className="pd-pin-chip" onClick={() => { const target = celestialObjects.find(o => o.id === body); useLeftBehindStore.getState().selectHardware(null); if (target) useCosmosStore.getState().setSelectedObject(target); }}><span className="pd-pin-chip-dot" aria-hidden />{text}</button>
+      <Button variant="ghost" type="button" className="pd-pin-chip" onClick={() => { const target = celestialObjects.find(o => o.id === body); useLeftBehindStore.getState().selectHardware(null); if (target) useCosmosStore.getState().setSelectedObject(target); }}><span className="pd-pin-chip-dot" aria-hidden />{text}</Button>
     </div>
   </Html></group>;
 }

@@ -33,10 +33,10 @@ const PALE_BLUE = /pale[- ]blue[- ]dot|sagan/i;
 function PhotoBox({ photo, caption, onOpen, label, missing }: { photo: ManifestPhoto; caption: string; onOpen: () => void; label: string; missing: string }) {
   const [failed, setFailed] = useState(false);
   return <figure className="space-y-1.5">
-    <button type="button" onClick={onOpen} disabled={failed} aria-label={`${label}: ${photo.alt}`} className="pd-photo-box block w-full aspect-[4/3] overflow-hidden rounded-[6px] border border-border bg-muted/40">
+    <Button variant="ghost" type="button" onClick={onOpen} disabled={failed} aria-label={`${label}: ${photo.alt}`} className="pd-photo-box block h-auto p-0 w-full aspect-[4/3] overflow-hidden rounded-[6px] border border-border bg-muted/40">
       {failed ? <span className="grid h-full place-items-center text-xs text-muted-foreground">{missing}</span>
         : <img src={photo.imageUrl} alt={photo.alt} loading="lazy" decoding="async" onError={() => setFailed(true)} className="h-full w-full object-cover" />}
-    </button>
+    </Button>
     <figcaption className="text-xs text-foreground">{caption}<span className="block pd-photo-credit text-muted-foreground">{photo.credit} · {photo.nasaId}</span></figcaption>
   </figure>;
 }
@@ -78,13 +78,13 @@ export function MachineCard({ machine, following = false, extra = [], unfollowLa
     return measurementsAt(machine.trajectories[0]?.id ?? machine.id, now)?.earthKm ?? null;
   }, [machine]);
   const fmtDate = (d: string) => new Date(`${d.slice(0, 10)}T00:00:00Z`).toLocaleDateString(numberLocale, { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' });
-  const heading = 'text-white/50 text-xs';
-  const Bullets = ({ items }: { items: { k: string; text: string }[] }) => <ul className="space-y-1">{items.map(i => <li key={i.k} className="text-white/80 text-xs flex items-start gap-1.5"><span className="text-white/40 mt-0.5">•</span><span><GlossaryText text={i.text} /></span></li>)}</ul>;
+  const heading = 'text-muted-foreground text-xs';
+  const Bullets = ({ items }: { items: { k: string; text: string }[] }) => <ul className="space-y-1">{items.map(i => <li key={i.k} className="text-foreground text-xs flex items-start gap-1.5"><span className="text-muted-foreground mt-0.5">•</span><span><GlossaryText text={i.text} /></span></li>)}</ul>;
 
   return <div className="space-y-3" data-machine-card>
     <div className="flex flex-wrap items-center gap-2">
-      <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-white/10 text-white/80 border border-white/20">{[kind, place, year].filter(Boolean).join(' · ')}</span>
-      {statusText && <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-white/10 text-white/80 border border-white/20" data-machine-status>{statusText}</span>}
+      <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-muted/50 text-foreground border border-border">{[kind, place, year].filter(Boolean).join(' · ')}</span>
+      {statusText && <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-muted/50 text-foreground border border-border" data-machine-status>{statusText}</span>}
     </div>
 
     <section aria-label={t.photos}>
@@ -97,13 +97,13 @@ export function MachineCard({ machine, following = false, extra = [], unfollowLa
     {did.length > 0 && <section className="space-y-1"><h4 className={heading}>{t.whatItDid}</h4><Bullets items={did.map(f => ({ k: f.id, text: T(f.text) }))} /></section>}
     {machine.leftBehind?.length ? <section className="space-y-1"><h4 className={heading}>{t.leftBehind}</h4><Bullets items={machine.leftBehind.map(x => ({ k: x, text: T(x) }))} /></section> : null}
     <section className="space-y-1"><h4 className={heading}>{t.whereNow}</h4>
-      <div className="text-white/80 text-xs">{machine.whereNow ? <GlossaryText text={T(machine.whereNow)} /> : 'TODO(source)'}</div>
-      {distance !== null && <div className="bg-white/5 rounded-[4px] p-2 text-xs sm:text-sm"><div className="text-white/50 text-xs">{t.distanceToday}</div><div className="text-white font-medium tabular-nums">{Math.round(distance).toLocaleString(numberLocale)} km<span className="block text-[10px] text-muted-foreground">{t.calculated}</span></div></div>}
+      <div className="text-foreground text-xs">{machine.whereNow ? <GlossaryText text={T(machine.whereNow)} /> : 'TODO(source)'}</div>
+      {distance !== null && <div className="bg-muted/30 rounded-[4px] p-2 text-xs sm:text-sm"><div className="text-muted-foreground text-xs">{t.distanceToday}</div><div className="text-foreground font-medium tabular-nums">{Math.round(distance).toLocaleString(numberLocale)} km<span className="block text-[10px] text-muted-foreground">{t.calculated}</span></div></div>}
     </section>
     {machine.keyDates?.length ? <section className="space-y-1"><h4 className={heading}>{t.keyDates}</h4>
-      <dl className="grid grid-cols-2 gap-2 text-xs">{machine.keyDates.map(d => <div key={d.label + d.date} className="bg-white/5 rounded-[4px] p-2"><dt className="text-white/50 text-xs">{T(d.label)}</dt><dd className="text-white font-medium tabular-nums">{fmtDate(d.date)}<span className="block text-[10px] text-muted-foreground">{d.factId ? t.nasaReported : 'TODO(source)'}</span></dd></div>)}</dl>
+      <dl className="grid grid-cols-2 gap-2 text-xs">{machine.keyDates.map(d => <div key={d.label + d.date} className="bg-muted/30 rounded-[4px] p-2"><dt className="text-muted-foreground text-xs">{T(d.label)}</dt><dd className="text-foreground font-medium tabular-nums">{fmtDate(d.date)}<span className="block text-[10px] text-muted-foreground">{d.factId ? t.nasaReported : 'TODO(source)'}</span></dd></div>)}</dl>
     </section> : null}
-    {machine.sources?.length ? <section className="space-y-1"><h4 className={heading}>{t.sources}</h4><ul className="space-y-1 text-xs">{machine.sources.map(s => <li key={s.url}><a href={s.url} target="_blank" rel="noopener noreferrer" className="inline-flex items-start gap-1 text-white/80 underline-offset-2 hover:underline hover:text-white">{T(s.title)}<ExternalLink className="mt-0.5 h-3 w-3 shrink-0" aria-hidden /></a></li>)}</ul></section> : null}
+    {machine.sources?.length ? <section className="space-y-1"><h4 className={heading}>{t.sources}</h4><ul className="space-y-1 text-xs">{machine.sources.map(s => <li key={s.url}><a href={s.url} target="_blank" rel="noopener noreferrer" className="inline-flex items-start gap-1 text-foreground underline-offset-2 hover:underline hover:text-foreground">{T(s.title)}<ExternalLink className="mt-0.5 h-3 w-3 shrink-0" aria-hidden /></a></li>)}</ul></section> : null}
 
     {(() => {
       const actions: Action[] = [
@@ -116,7 +116,7 @@ export function MachineCard({ machine, following = false, extra = [], unfollowLa
         ...extra,
       ];
       // Two columns; with an odd count the first action takes the full row.
-      return <div className="grid grid-cols-2 gap-2 pt-1">{actions.map((a, i) => <Button key={a.key} size="sm" disabled={a.disabled} onClick={a.onClick} className={`max-sm:h-11 gap-1.5 text-xs bg-white/10 hover:bg-white/20 text-white border-0 ${i === 0 && actions.length % 2 ? 'col-span-2' : ''}`}>{a.icon}<span className="truncate">{a.label}</span></Button>)}</div>;
+      return <div className="grid grid-cols-2 gap-2 pt-1">{actions.map((a, i) => <Button key={a.key} size="sm" disabled={a.disabled} onClick={a.onClick} className={`min-h-11 gap-1.5 text-xs bg-muted/50 hover:bg-accent text-foreground border-0 ${i === 0 && actions.length % 2 ? 'col-span-2' : ''}`}>{a.icon}<span className="truncate">{a.label}</span></Button>)}</div>;
     })()}
 
     <Dialog open={!!open} onOpenChange={o => !o && setOpen(null)}>

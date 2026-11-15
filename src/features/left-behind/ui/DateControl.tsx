@@ -12,7 +12,7 @@ export function DateControl() {
   const text = (value: string) => tr({ en: value, fr: value });
   const state = useSimClock();
   const labels = [copy.real, copy.minute, copy.hour, copy.day, copy.month, copy.year];
-  return <div className="w-[min(320px,calc(100vw-2rem))] p-3 space-y-3 text-foreground" role="group" aria-label={text(copy.date)}>
+  return <div className="w-[min(320px,calc(100vw-2rem))] p-3 space-y-3 text-foreground" data-date-fields role="group" aria-label={text(copy.date)}>
     <div className="pd-hud-label">{text(copy.date)}</div>
     <output className="block font-mono text-xs tabular-nums">{formatSimDate(state.simDate, locale)}</output>
     <div className="grid grid-cols-2 gap-2">

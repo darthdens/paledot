@@ -687,7 +687,7 @@ export const CosmosUI = () => {
 
             <Tooltip>
               <TooltipTrigger asChild>
-                <Button ref={quickJumpButtonRef} size="icon" variant="ghost" onClick={handleQuickJumpClick} className={`h-8 w-8 sm:h-9 sm:w-9 backdrop-blur-xs text-white ${showQuickJump ? 'bg-white/25' : 'bg-white/10 hover:bg-white/20'}`}>
+                <Button ref={quickJumpButtonRef} size="icon" variant="ghost" aria-label={t.quickJump} onClick={handleQuickJumpClick} className={`h-8 w-8 sm:h-9 sm:w-9 backdrop-blur-xs text-white ${showQuickJump ? 'bg-white/25' : 'bg-white/10 hover:bg-white/20'}`}>
                   <Compass className="w-4 h-4 sm:w-5 sm:h-5" />
                 </Button>
               </TooltipTrigger>
@@ -698,7 +698,7 @@ export const CosmosUI = () => {
 
             <Tooltip>
               <TooltipTrigger asChild>
-                <Button size="icon" variant="ghost" onClick={goHome} className="h-8 w-8 sm:h-9 sm:w-9 bg-white/10 hover:bg-white/20 backdrop-blur-xs text-white">
+                <Button size="icon" variant="ghost" aria-label={t.home} onClick={goHome} className="h-8 w-8 sm:h-9 sm:w-9 bg-white/10 hover:bg-white/20 backdrop-blur-xs text-white">
                   <Home className="w-4 h-4 sm:w-5 sm:h-5" />
                 </Button>
               </TooltipTrigger>
@@ -721,7 +721,7 @@ export const CosmosUI = () => {
               
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Button size="icon" variant="ghost" onClick={toggleOrbits} className={`h-9 w-9 backdrop-blur-xs text-white ${showOrbits ? 'bg-white/25' : 'bg-white/10 hover:bg-white/20'}`}>
+                  <Button size="icon" variant="ghost" aria-label={showOrbits ? t.hideOrbits : t.showOrbits} onClick={toggleOrbits} className={`h-9 w-9 backdrop-blur-xs text-white ${showOrbits ? 'bg-white/25' : 'bg-white/10 hover:bg-white/20'}`}>
                     {showOrbits ? <CircleDot className="w-5 h-5" /> : <CircleOff className="w-5 h-5" />}
                   </Button>
                 </TooltipTrigger>
@@ -732,7 +732,7 @@ export const CosmosUI = () => {
 
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Button size="icon" variant="ghost" onClick={toggleTrails} className={`h-9 w-9 backdrop-blur-xs text-white ${showTrails ? 'bg-white/25' : 'bg-white/10 hover:bg-white/20'}`}>
+                  <Button size="icon" variant="ghost" aria-label={showTrails ? t.hideTrails : t.showTrails} onClick={toggleTrails} className={`h-9 w-9 backdrop-blur-xs text-white ${showTrails ? 'bg-white/25' : 'bg-white/10 hover:bg-white/20'}`}>
                     <Orbit className="w-5 h-5" />
                   </Button>
                 </TooltipTrigger>
@@ -754,7 +754,7 @@ export const CosmosUI = () => {
 
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Button size="icon" variant="ghost" onClick={toggleSizeComparison} className="h-9 w-9 bg-white/10 hover:bg-white/20 backdrop-blur-xs text-white">
+                  <Button size="icon" variant="ghost" aria-label={t.sizeComparison} onClick={toggleSizeComparison} className="h-9 w-9 bg-white/10 hover:bg-white/20 backdrop-blur-xs text-white">
                     <BarChart3 className="w-5 h-5" />
                   </Button>
                 </TooltipTrigger>
@@ -767,7 +767,7 @@ export const CosmosUI = () => {
               
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Button size="icon" variant="ghost" onClick={() => setShowControlHints(true)} className="h-9 w-9 bg-white/10 hover:bg-white/20 backdrop-blur-xs text-white">
+                  <Button size="icon" variant="ghost" aria-label={t.help} onClick={() => setShowControlHints(true)} className="h-9 w-9 bg-white/10 hover:bg-white/20 backdrop-blur-xs text-white">
                     <HelpCircle className="w-5 h-5" />
                   </Button>
                 </TooltipTrigger>
@@ -778,7 +778,7 @@ export const CosmosUI = () => {
 
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Button size="icon" variant="ghost" onClick={() => setShowAbout(true)} className="h-9 w-9 bg-white/10 hover:bg-white/20 backdrop-blur-xs text-white">
+                  <Button size="icon" variant="ghost" aria-label={t.about} onClick={() => setShowAbout(true)} className="h-9 w-9 bg-white/10 hover:bg-white/20 backdrop-blur-xs text-white">
                     <Info className="w-5 h-5" />
                   </Button>
                 </TooltipTrigger>
@@ -814,7 +814,8 @@ export const CosmosUI = () => {
                   ref={moreMenuButtonRef}
                   size="icon" 
                   variant="ghost" 
-                  onClick={() => { setShowLanguageMenu(false); setShowMoreMenu(!showMoreMenu); }} 
+                  aria-label={tx("More options", "Plus d’options")} aria-expanded={showMoreMenu}
+                  onClick={() => { useLeftBehindStore.getState().setMenuOpen(false); useSimClock.getState().setDateControlOpen(false); useCosmosStore.setState({showQuickJump:false}); setShowLanguageMenu(false); setShowMoreMenu(!showMoreMenu); }} 
                   className={`lg:hidden h-8 w-8 sm:h-9 sm:w-9 backdrop-blur-xs text-white ${showMoreMenu ? 'bg-white/25' : 'bg-white/10 hover:bg-white/20'}`}
                 >
                   <MoreVertical className="w-4 h-4 sm:w-5 sm:h-5" />
@@ -831,6 +832,8 @@ export const CosmosUI = () => {
       {/* Mobile & Tablet more menu - same style as QuickJump */}
       <div
         ref={moreMenuRef}
+        data-explorer-dropdown
+        inert={!showMoreMenu}
         className={`lg:hidden ${uiFixed ? 'fixed' : 'absolute'} z-[10001] bg-white/10 backdrop-blur-xs rounded-lg overflow-hidden transition-all duration-300 ease-out ${
           showMoreMenu ? 'opacity-100 scale-100' : 'opacity-0 scale-95 pointer-events-none'
         }`}
@@ -850,7 +853,7 @@ export const CosmosUI = () => {
           <div className="overflow-hidden">
             <div className="p-2 min-w-[180px] space-y-0.5">
               {/* Toggle options */}
-              <button
+              <Button variant="ghost"
                 onClick={() => { toggleOrbits(); }}
                 className="w-full flex items-center justify-between p-2 rounded-[4px] hover:bg-white/10 transition-colors"
               >
@@ -859,9 +862,9 @@ export const CosmosUI = () => {
                   <span className="text-sm text-white/90">{showOrbits ? t.hideOrbits : t.showOrbits}</span>
                 </div>
                 {showOrbits && <div className="w-2 h-2 rounded-full bg-green-400" />}
-              </button>
+              </Button>
 
-              <button
+              <Button variant="ghost"
                 onClick={() => { toggleTrails(); }}
                 className="w-full flex items-center justify-between p-2 rounded-[4px] hover:bg-white/10 transition-colors"
               >
@@ -870,9 +873,9 @@ export const CosmosUI = () => {
                   <span className="text-sm text-white/90">{showTrails ? t.hideTrails : t.showTrails}</span>
                 </div>
                 {showTrails && <div className="w-2 h-2 rounded-full bg-green-400" />}
-              </button>
+              </Button>
 
-              <button
+              <Button variant="ghost"
                 onClick={() => { toggleTimeMenu(); setShowMoreMenu(false); }}
                 className="w-full flex items-center justify-between p-2 rounded-[4px] hover:bg-white/10 transition-colors"
               >
@@ -881,20 +884,20 @@ export const CosmosUI = () => {
                   <span className="flex flex-col items-start"><span className="text-sm text-foreground">{clockName}</span><span className="font-mono text-[10px] tabular-nums text-muted-foreground">{formatSimDate(simSecond * 1000, locale)}</span></span>
                 </div>
                 {rate > 1 && <div className="w-2 h-2 rounded-full bg-green-400" />}
-              </button>
+              </Button>
 
-              <button
+              <Button variant="ghost"
                 onClick={() => { toggleSizeComparison(); setShowMoreMenu(false); }}
                 className="w-full flex items-center gap-2 p-2 rounded-[4px] hover:bg-white/10 transition-colors"
               >
                 <BarChart3 className="w-4 h-4 text-white/70" />
                 <span className="text-sm text-white/90">{t.sizeComparison}</span>
-              </button>
+              </Button>
 
               {/* Divider */}
               <div className="border-t border-white/10 my-1" />
 
-              <button
+              <Button variant="ghost"
                 onClick={() => { setShowControlHints(true); setShowMoreMenu(false); }}
                 className="w-full flex items-center justify-between p-2 rounded-[4px] hover:bg-white/10 transition-colors"
               >
@@ -902,23 +905,23 @@ export const CosmosUI = () => {
                   <HelpCircle className="w-4 h-4 text-white/70" />
                   <span className="text-sm text-white/90">{t.help}</span>
                 </div>
-              </button>
+              </Button>
 
-              <button
+              <Button variant="ghost"
                 onClick={() => { setShowAbout(true); setShowMoreMenu(false); }}
                 className="w-full flex items-center gap-2 p-2 rounded-[4px] hover:bg-white/10 transition-colors"
               >
                 <Info className="w-4 h-4 text-white/70" />
                 <span className="text-sm text-white/90">{t.about}</span>
-              </button>
+              </Button>
 
-              <button
+              <Button variant="ghost"
                 onClick={() => { setShowMoreMenu(false); setTimeout(() => setShowLanguageMenu(true), 0); }}
                 className="w-full flex items-center gap-2 p-2 rounded-[4px] hover:bg-white/10 transition-colors"
               >
                 <FlagIcon locale={locale} className="w-4 h-4" />
                 <span className="text-sm text-white/90">{tx('Language', 'Langue')}</span>
-              </button>
+              </Button>
 
             </div>
           </div>
@@ -928,6 +931,8 @@ export const CosmosUI = () => {
       {/* Mobile & Tablet language menu - same style as More menu */}
       <div
         ref={languageMenuRef}
+        data-explorer-dropdown
+        inert={!showLanguageMenu}
         className={`lg:hidden ${uiFixed ? 'fixed' : 'absolute'} z-[10001] bg-white/10 backdrop-blur-xs rounded-lg overflow-hidden transition-all duration-300 ease-out ${
           showLanguageMenu ? 'opacity-100 scale-100' : 'opacity-0 scale-95 pointer-events-none'
         }`}
@@ -956,6 +961,9 @@ export const CosmosUI = () => {
       {!showControlHints && (
         <div
           ref={timeSliderRef}
+          data-explorer-dropdown
+          data-date-control
+          inert={!timeMenuOpen}
           className={`${uiFixed ? 'fixed' : 'absolute'} top-12 right-2 sm:top-[60px] sm:right-4 z-[10000] bg-white/10 backdrop-blur-xs rounded-lg overflow-hidden transition-all duration-300 ease-out ${
             timeMenuOpen ? 'opacity-100 scale-100' : 'opacity-0 scale-95 pointer-events-none'
           }`}

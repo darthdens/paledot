@@ -691,3 +691,47 @@ All colors MUST be HSL.
 @media (prefers-reduced-motion: reduce) {
   [data-lb-dialog-overlay] { animation: none; }
 }
+
+/* Left Behind · built during NASA Space Apps Challenge 2026 (14–15 Nov 2026) · AI-assisted (Lovable, Claude) */
+/* Shared audit constraints: safe-area clearance, touch targets and motion preference. */
+.paledot :where(button, a, input, [tabindex]):focus-visible { outline: 2px solid hsl(var(--ring)); outline-offset: 2px; }
+.paledot :where(button, input, select, textarea) { min-height: 44px; }
+.paledot button { min-width: 44px; }
+.paledot :where([data-machine-card], [data-tour-panel], [data-lb-framing], [data-signal-view]) a { display: inline-flex; min-height: 44px; align-items: center; overflow-wrap: anywhere; }
+.paledot [data-explorer-toolbar] { left: auto; right: max(8px, env(safe-area-inset-right)); }
+.paledot [data-explorer-toolbar] button { width: 44px; height: 44px; flex-shrink: 0; }
+.paledot [data-object-search] { top: 60px; left: max(8px, env(safe-area-inset-left)); right: max(8px, env(safe-area-inset-right)); width: auto; max-width: 360px; }
+.paledot [data-explorer-dropdown] { top: 60px !important; right: max(8px, env(safe-area-inset-right)) !important; max-height: calc(100dvh - 100px - env(safe-area-inset-top) - env(safe-area-inset-bottom)); overflow-y: auto; overscroll-behavior: contain; }
+.paledot [data-bottom-card], .paledot [data-tour-panel], .paledot .pd-machine-readout { bottom: max(8px, env(safe-area-inset-bottom)); max-height: calc(100dvh - 160px - env(safe-area-inset-top) - env(safe-area-inset-bottom)); }
+.paledot .pd-machine-note { bottom: max(8px, env(safe-area-inset-bottom)); }
+.paledot [data-tour-panel] { display: flex; flex-direction: column; }
+.paledot [data-tour-panel] > div:last-child { min-height: 0; }
+.paledot [data-tour-panel] > div:last-child > div { min-height: 0; display: flex; flex-direction: column; }
+.paledot [data-tour-panel] [aria-live] { min-height: 0; }
+.paledot [data-tour-panel] [aria-live] + div { flex-shrink: 0; }
+.paledot:has([data-object-search]) [data-explorer-dropdown] { top: 132px !important; }
+.paledot [data-explorer-ui-root]:has([data-tour-panel]) [data-explorer-dropdown],
+.paledot [data-explorer-ui-root]:has([data-machine-readout]) [data-explorer-dropdown],
+.paledot [data-explorer-ui-root]:has([data-bottom-card]) [data-explorer-dropdown] { max-height: calc(45dvh - 92px - env(safe-area-inset-top)); }
+@media (max-width: 639px), (max-height: 500px) {
+  .paledot [data-tour-panel], .paledot [data-bottom-card], .paledot .pd-machine-readout { left: max(8px, env(safe-area-inset-left)) !important; right: max(8px, env(safe-area-inset-right)) !important; width: auto !important; max-width: none !important; }
+  .paledot [data-tour-panel] [aria-live], .paledot .pd-machine-readout > div:last-child > div > div { max-height: min(25dvh, calc(100dvh - 260px - env(safe-area-inset-top) - env(safe-area-inset-bottom))); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .paledot *, .paledot *::before, .paledot *::after { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; scroll-behavior: auto !important; }
+}
+
+/* Left Behind · built during NASA Space Apps Challenge 2026 (14–15 Nov 2026) · AI-assisted (Lovable, Claude) */
+.paledot [data-region-control] { max-width: calc(100% - 260px); }
+.paledot [data-object-search] input { color: hsl(var(--foreground)); }
+.paledot [data-object-search] input::placeholder { color: hsl(var(--muted-foreground)); opacity: 1; }
+.paledot [data-date-control] { max-width: calc(100vw - 16px - env(safe-area-inset-left) - env(safe-area-inset-right)); }
+.paledot [data-tour-panel], .paledot [data-bottom-card], .paledot [data-machine-readout] { pointer-events: auto; }
+.paledot [data-explorer-ui-root] > [data-search-trigger] { position: absolute; top: 60px; left: max(8px, env(safe-area-inset-left)); z-index: 10000; }
+.paledot [data-explorer-ui-root] [data-explorer-dropdown] { top: var(--pd-dropdown-top, 60px) !important; max-height: var(--pd-dropdown-height, calc(100dvh - 100px)) !important; }
+.paledot [data-explorer-dropdown], .paledot [data-quick-jump], .paledot [data-object-search] { background-color: hsl(var(--card) / .97); color: hsl(var(--foreground)); }
+.paledot [data-explorer-dropdown] :is(.text-white\/40,.text-white\/50,.text-white\/60,.text-white\/70), .paledot [data-bottom-card] :is(.text-white\/40,.text-white\/50,.text-white\/60) { color: hsl(var(--muted-foreground)); }
+.paledot [data-object-search] :is(.text-white\/40,.text-white\/50) { color: hsl(var(--muted-foreground)); }
+.paledot [data-explorer-ui-root]:has([data-tour-panel]) [data-explorer-dropdown],
+.paledot [data-explorer-ui-root]:has([data-machine-readout]) [data-explorer-dropdown],
+.paledot [data-explorer-ui-root]:has([data-bottom-card]) [data-explorer-dropdown] { max-height: min(var(--pd-dropdown-height, 25dvh), 25dvh) !important; }
