@@ -3,7 +3,6 @@ import { describe, expect, it } from 'vitest';
 import { LOOK_DATE, TURN_SECONDS, PORTRAIT_PLANETS, lookMeasurements, pixelWidths } from './oneLastLook';
 import { useSimClock } from '../state/useSimClock';
 import { leftBehindTours } from '../data/tours';
-import { lookCopy } from './oneLastLookCopy';
 describe('One last look physical rules', () => {
   it('uses 14 February 1990 noon UTC', () => expect(new Date(LOOK_DATE).toISOString()).toBe('1990-02-14T12:00:00.000Z'));
   it('turns over three seconds', () => expect(TURN_SECONDS).toBe(3));
@@ -11,7 +10,7 @@ describe('One last look physical rules', () => {
   it('uses one physical display pixel at 2x density', () => expect(pixelWidths(2).screen).toBe(.5));
   it('compares against 0.12 of the screen pixel', () => expect(pixelWidths(2).voyager).toBe(.06));
   it('calculates Earth angular size from diameter divided by distance', () => {
-    const m = lookMeasurements([-2354970130.4, -4496911492.6, 3270063452.8], [-122007246.968, 83318732.07, 1967.21], 12742);
+    const m = lookMeasurements([-2354970130.4, -4496911492.6, 3270063452.8], [-122009158.4550898, 83316000.93982047, 1967.206514000893], 12742);
     expect(m.distanceKm).toBeCloseTo(6054576840.2, -3);
     expect(m.angularRadians).toBeCloseTo(2.1045236e-6, 12);
     expect(m.angularRadians * 1800 / (2 * Math.tan(25 * Math.PI / 180))).toBeLessThan(1);
