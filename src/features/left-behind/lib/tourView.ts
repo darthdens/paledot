@@ -15,7 +15,7 @@ export function tourView(stop: TourStop | undefined, positions: Positions, machi
     return { target: machine.clone().addScaledVector(toward, distance * 2), offset: toward.multiplyScalar(-distance * 3) };
   }
   const target = machine.clone().addScaledVector(toward, 0.5);
-  const sun = positions.sun ?? [0, 0, 0];
+  const sun = positions['sun'] ?? [0, 0, 0];
   const lit = new Vector3(...sun).sub(target).normalize();
   const side = toward.clone().normalize().cross(lit);
   if (side.lengthSq() < 1e-10) side.set(0, 1, 0);

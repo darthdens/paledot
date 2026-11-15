@@ -6,7 +6,8 @@ import type { TourStop } from '@/components/cosmos/types';
 export function tourPhotoIds(tourId: string, stop: TourStop): string[] {
   if (stop.photoIds?.length && !stop.id.endsWith('-neptune')) return stop.photoIds;
   const bodyPhotos: Record<string, string> = { earth: 'earth-archive', jupiter: 'voyager-jupiter', saturn: 'voyager-saturn', uranus: 'voyager-uranus', neptune: 'voyager-neptune' };
-  if (bodyPhotos[stop.locationId] && (tourId === 'begin-at-earth' || stop.viewBodyId)) return [bodyPhotos[stop.locationId]];
+  const bodyPhoto = bodyPhotos[stop.locationId];
+  if (bodyPhoto && (tourId === 'begin-at-earth' || stop.viewBodyId)) return [bodyPhoto];
   if (tourId === 'begin-at-earth') return [];
   return [{ 'lunar-rovers': 'lunar-rovers-1', 'voyager-1': 'voyager-1-4', 'voyager-2': 'voyager-2-2' }[tourId] ?? `${tourId}-1`];
 }
