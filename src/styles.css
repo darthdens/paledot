@@ -597,6 +597,10 @@ All colors MUST be HSL.
   background-color: hsl(var(--surface) / .72);
   box-shadow: inset 0 0 0 1px hsl(var(--border));
 }
+.paledot div[data-language-dropdown] {
+  background-color: hsl(var(--surface) / .72);
+  box-shadow: inset 0 0 0 1px hsl(var(--border));
+}
 /* Rows inside menus stay softly rounded inside the 10px panel. */
 .paledot div.bg-white\/10 button:not([role="switch"]), .paledot [role="menu"] button:not([role="switch"]) { border-radius: 6px; }
 
