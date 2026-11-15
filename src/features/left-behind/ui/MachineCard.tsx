@@ -1,6 +1,6 @@
 // Left Behind · built during NASA Space Apps Challenge 2026 (14–15 Nov 2026) · AI-assisted (Lovable, Claude)
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { CalendarClock, Compass, ExternalLink, EyeOff, Map } from 'lucide-react';
+import { CalendarClock, Compass, ExternalLink, EyeOff, Map, Radio } from 'lucide-react';
 import type { Machine, Photo } from '../data/types';
 import { getPhotoManifest } from '../data/dataClient';
 import { Button } from '@/components/ui/button';
@@ -16,6 +16,8 @@ import { useSimClock } from '../state/useSimClock';
 import { useLeftBehindStore } from '../state/useLeftBehindStore';
 import { useCosmosStore } from '@/components/cosmos/store/useCosmosStore';
 import { hasTour } from '@/components/cosmos/data/tours';
+import { useSignal } from '../state/useSignal';
+import { signalCopy } from '../lib/signalCopy';
 
 export type CardMachine = Machine & {
   place?: string; status?: { type: string; since: string | null };
@@ -104,6 +106,7 @@ export function MachineCard({ machine, following = false, extra = [], unfollowLa
 
     {(() => {
       const actions: Action[] = [
+        { key: 'signal', icon: <Radio className="w-3 h-3" />, label: signalCopy[language].title, onClick: () => useSignal.getState().show(machine.id) },
         { key: 'tour', icon: <Map className="w-3 h-3" />, label: t.takeTour, disabled: !hasTour(machine.id), onClick: () => useCosmosStore.getState().startTour(machine.id) },
         following && unfollowLabel
           ? { key: 'fly', icon: <EyeOff className="w-3 h-3" />, label: unfollowLabel, onClick: () => useLeftBehindStore.getState().toggleHardwareFollow() }

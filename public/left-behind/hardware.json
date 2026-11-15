@@ -85,6 +85,11 @@
           "sourceUrl": "https://jpl.nasa.gov/news/the-apollo-experiment-that-keeps-on-giving/"
         },
         {
+          "id": "a11-light-return",
+          "text": "Lunar laser ranging measures a round-trip light interval of about 2.5 seconds.",
+          "sourceUrl": "https://ntrs.nasa.gov/citations/19720047864"
+        },
+        {
           "id": "a11-recede",
           "text": "Lunar laser ranging shows the Moon is moving away from Earth by about 3.8 cm (1.5 inches) a year.",
           "sourceUrl": "https://jpl.nasa.gov/news/the-apollo-experiment-that-keeps-on-giving/"
