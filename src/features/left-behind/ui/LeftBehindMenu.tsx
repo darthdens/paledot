@@ -20,7 +20,9 @@ export function LeftBehindMenu() {
   const text = (value: string) => tr({ en: value, fr: value });
   const machinesVisible = useLeftBehindStore(s => s.machinesVisible);
   const fullPathsVisible = useLeftBehindStore(s => s.fullPathsVisible);
+  const open = useLeftBehindStore(s => s.menuOpen);
   useEffect(() => {
+    if (!open) return;
     const close = (event: MouseEvent) => {
       if (event.target instanceof Element && !ref.current?.contains(event.target) && !event.target.closest('[data-lb-menu-trigger]')) useLeftBehindStore.getState().setMenuOpen(false);
     };
@@ -28,9 +30,10 @@ export function LeftBehindMenu() {
     document.addEventListener('mousedown', close);
     document.addEventListener('keydown', escape);
     return () => { document.removeEventListener('mousedown', close); document.removeEventListener('keydown', escape); };
-  }, []);
+  }, [open]);
   const row = 'w-full h-auto min-h-7 max-sm:min-h-11 flex items-center justify-between gap-2 p-1.5 sm:p-2 rounded-[4px] text-xs sm:text-sm text-foreground hover:bg-accent/60 cursor-pointer';
-  return <div ref={ref} data-lb-menu data-explorer-dropdown role="region" aria-label={text(copy.name)} className="absolute top-12 right-2 sm:top-[60px] sm:right-4 z-[10002] w-[calc(100vw-1rem)] max-w-56 sm:max-w-64 max-h-[calc(100dvh-5rem)] overflow-y-auto bg-white/10 backdrop-blur-xs rounded-lg animate-scale-in origin-top-right">
+  return <div ref={ref} data-lb-menu data-explorer-dropdown inert={!open} aria-hidden={!open} role="region" aria-label={text(copy.name)} className={`absolute top-12 right-2 sm:top-[60px] sm:right-4 z-[10002] bg-white/10 backdrop-blur-xs rounded-lg overflow-hidden ${open ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
+    <div className={`grid transition-[grid-template-rows] duration-300 ease-out ${open ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'}`}><div className="min-h-0 overflow-hidden"><div className="cosmos-dropdown-scroll">
     <div className="flex items-center justify-between p-2 sm:p-3 border-b border-white/10">
       <div className="min-w-0"><h3 className="text-foreground font-semibold text-sm">{text(copy.name)}</h3><p className="text-[10px] leading-relaxed text-muted-foreground">(NASA Space Apps Challenge)</p></div>
       <Button size="icon" variant="ghost" aria-label={tx('Close', 'Fermer')} onClick={() => useLeftBehindStore.getState().setMenuOpen(false)} className="h-11 w-11 shrink-0 text-muted-foreground hover:text-foreground hover:bg-accent/60"><X className="w-4 h-4" /></Button>
@@ -51,5 +54,5 @@ export function LeftBehindMenu() {
       <Button variant="ghost" onClick={() => useSignal.getState().show()} className={`${row} justify-start font-normal`}>{text(copy.signal)}</Button>
       <Button variant="ghost" onClick={() => useLeftBehindStore.getState().openFraming('knowledge')} className={`${row} justify-start font-normal`}>{text(copy.know)}</Button>
     </div>
-  </div>;
+  </div></div></div></div>;
 }

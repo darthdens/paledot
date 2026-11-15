@@ -218,18 +218,20 @@ export const YouAreHereLabel = () => {
   const locationInfo = getLocationInfo();
   
   return (
-    <div data-region-control className={`${isFullscreen
+    <div data-region-control data-region-expanded={!isMinimized} className={`${isFullscreen
       ? 'fixed top-[calc(0.5rem+env(safe-area-inset-top))] left-[calc(0.5rem+env(safe-area-inset-left))]'
       : 'absolute top-2 sm:top-4 left-2 sm:left-4'} z-10 max-w-[calc(100%-13rem)] md:max-w-[calc(100%-2rem)] animate-fade-in`}>
       <div className="bg-white/10 backdrop-blur-md rounded-lg overflow-hidden max-w-full md:max-w-none">
         <Button
           variant="ghost"
+          aria-label={locationInfo.title}
+          aria-expanded={!isMinimized}
           onClick={() => setIsMinimized(!isMinimized)}
           className="h-auto w-full grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2 md:gap-3 px-2.5 md:px-3 min-h-8 py-1.5 md:py-2 hover:bg-white/5 transition-colors"
         >
           <div className="flex min-w-0 items-center gap-2 text-white">
             <span className="shrink-0">{getScaleIcon(currentScale)}</span>
-            <span className="truncate text-sm font-semibold">{locationInfo.title}</span>
+            <span data-region-title className="truncate text-sm font-semibold">{locationInfo.title}</span>
           </div>
           {isMinimized ? (
             <ChevronDown className="w-4 h-4 shrink-0 text-white/60" />
