@@ -729,17 +729,16 @@ All colors MUST be HSL.
 .paledot [data-explorer-dropdown], .paledot [data-quick-jump], .paledot [data-object-search] { background-color: hsl(var(--card) / .97); color: hsl(var(--foreground)); }
 .paledot [data-explorer-dropdown] :is(.text-white\/40,.text-white\/50,.text-white\/60,.text-white\/70), .paledot [data-bottom-card] :is(.text-white\/40,.text-white\/50,.text-white\/60) { color: hsl(var(--muted-foreground)); }
 .paledot [data-object-search] :is(.text-white\/40,.text-white\/50) { color: hsl(var(--muted-foreground)); }
-.paledot [data-explorer-ui-root]:has([data-tour-panel]) [data-explorer-dropdown],
-.paledot [data-explorer-ui-root]:has([data-machine-readout]) [data-explorer-dropdown],
-.paledot [data-explorer-ui-root]:has([data-bottom-card]) [data-explorer-dropdown] { max-height: min(var(--pd-dropdown-height, 25dvh), 25dvh) !important; }
 .paledot [data-date-control] > div > div { overflow: visible; }
 .paledot [data-download-status] { bottom: max(8px, env(safe-area-inset-bottom)); }
 .paledot:has([data-bottom-card], [data-machine-readout], [data-tour-panel]) [data-download-status] { top: auto; bottom: max(var(--pd-download-bottom, 8px), env(safe-area-inset-bottom)); }
 
 /* Shared toolbar search and menu geometry; animations never change control height. */
 .cosmos-search-field { position: absolute; left: 0; top: 0; display: flex; height: 44px; width: 44px; overflow: hidden; border-radius: 8px; transition: width 300ms ease-out; }
-[data-search-open="true"] .cosmos-search-field { width: var(--search-expanded-width, 280px); background: hsl(var(--card)); border: 1px solid hsl(var(--border)); z-index: 10004; }
+[data-search-open="true"] .cosmos-search-field { width: var(--search-expanded-width, 280px); background: hsl(var(--card)); box-shadow: inset 0 0 0 1px hsl(var(--border)); z-index: 10004; }
+.paledot [data-object-search] { border: none; }
 .cosmos-search-input { display: flex; align-items: center; min-width: 0; flex: 1; opacity: 0; transition: opacity 200ms ease-out; }
+.cosmos-search-input input { padding-inline: 4px; }
 [data-search-open="true"] .cosmos-search-input { opacity: 1; }
 [data-search-results] { width: var(--search-expanded-width, 280px); min-width: 0; z-index: 10005; max-height: var(--pd-dropdown-height, 240px); }
 [data-explorer-toolbar] button { min-width: 44px; min-height: 44px; }
@@ -750,9 +749,13 @@ All colors MUST be HSL.
 .cosmos-more-row svg { flex-shrink: 0; width: 20px; height: 20px; }
 .paledot [data-more-menu] { min-width: min(280px, calc(100vw - 16px)); }
 .paledot [data-explorer-dropdown] { min-width: min(280px, calc(100vw - 16px)); }
+.paledot [data-quick-jump] { top: var(--pd-dropdown-top, 92px) !important; right: max(8px, env(safe-area-inset-right)) !important; }
+.paledot [data-quick-jump] > div > div { width: min(320px, calc(100vw - 16px)); max-width: none; max-height: var(--pd-dropdown-height, 400px) !important; }
+[data-more-menu] > div > div { overflow: visible; }
 @media (max-width: 639px) {
   .paledot [data-explorer-toolbar] { max-width: calc(100% - 146px); }
   .paledot [data-explorer-toolbar] > div { flex-wrap: wrap; }
   .paledot [data-region-control] { max-width: 130px; }
+  .paledot [data-search-slot] { order: 10; margin-right: auto; }
 }
 @media (prefers-reduced-motion: reduce) { .cosmos-search-field, .cosmos-search-input { transition: none; } }
