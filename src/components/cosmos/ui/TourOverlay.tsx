@@ -17,6 +17,8 @@ import { captionText } from '@/features/left-behind/lib/dataText';
 import { tourPhotoIds } from '@/features/left-behind/lib/tourPresentation';
 import { tourSlideSeconds } from '@/features/left-behind/lib/tourPlayback';
 import { useTourPlayback } from '@/features/left-behind/lib/useTourPlayback';
+import { OneLastLook } from '@/features/left-behind/ui/OneLastLook';
+import { useLeftBehindStore } from '@/features/left-behind/state/useLeftBehindStore';
 
 const translations = {
   en: {
@@ -67,6 +69,7 @@ export const TourOverlay = () => {
   const tour = getTour(activeTourId);
   const tourStops = tour.stops;
   const currentStop = tourStops[tourIndex];
+  const isLastLook = activeTourId === 'voyager-1' && currentStop?.id === 'voyager-1-one-last-look';
   const totalStops = tourStops.length;
   const followRetry = useRef<ReturnType<typeof setInterval> | null>(null);
   useEffect(() => {
@@ -323,12 +326,15 @@ export const TourOverlay = () => {
   useEffect(() => {
     if (isTouring) {
       // Always navigate to the first stop when tour starts, regardless of current position
-      goToStop(0);
+      const requested = useLeftBehindStore.getState().pendingStopId;
+      useLeftBehindStore.setState({ pendingStopId: null });
+      const index = requested ? tourStops.findIndex(s => s.id === requested) : 0;
+      goToStop(Math.max(0, index));
     }
   }, [isTouring, activeTourId]); // eslint-disable-line react-hooks/exhaustive-deps
   
   useTourPlayback(
-    isTouring && currentStop ? `${activeTourId}:${currentStop.id}` : null,
+    isTouring && currentStop && !isLastLook ? `${activeTourId}:${currentStop.id}` : null,
     isPaused,
     currentStop ? tourSlideSeconds(currentStop, tour.onEnd !== 'end-frame') : 0,
     () => {
@@ -342,7 +348,7 @@ export const TourOverlay = () => {
 
   // Keyboard shortcuts
   useEffect(() => {
-    if (!isTouring) return;
+    if (!isTouring || isLastLook) return;
 
     const handleKeyDown = (e: KeyboardEvent) => {
       // Prevent default behavior for our shortcuts
@@ -372,7 +378,7 @@ export const TourOverlay = () => {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isTouring, tourIndex, goToStop, togglePause, stopTour, tourStops.length]);
+  }, [isTouring, isLastLook, tourIndex, goToStop, togglePause, stopTour, tourStops.length]);
   
   const handlePrevious = () => {
     if (tourIndex > 0) {
@@ -427,6 +433,7 @@ export const TourOverlay = () => {
   };
   
   if (!isTouring || !currentStop) return null;
+  if (isLastLook) return <OneLastLook onPrevious={handlePrevious} onNext={handleNext} />;
 
   return (
     <div 
