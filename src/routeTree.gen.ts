@@ -12,6 +12,8 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as RobotsDottxtRouteImport } from './routes/robots[.]txt'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as FilesPaledotLeftBehindDeckRouteImport } from './routes/files.paledot-left-behind-deck'
+import { Route as FilesPaledotLeftBehindDeckDotpdfRouteImport } from './routes/files.paledot-left-behind-deck[.]pdf'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -28,35 +30,71 @@ const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   path: '/sitemap.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
+const FilesPaledotLeftBehindDeckRoute =
+  FilesPaledotLeftBehindDeckRouteImport.update({
+    id: '/files/paledot-left-behind-deck',
+    path: '/files/paledot-left-behind-deck',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const FilesPaledotLeftBehindDeckDotpdfRoute =
+  FilesPaledotLeftBehindDeckDotpdfRouteImport.update({
+    id: '/files/paledot-left-behind-deck.pdf',
+    path: '/files/paledot-left-behind-deck.pdf',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/robots.txt': typeof RobotsDottxtRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/files/paledot-left-behind-deck': typeof FilesPaledotLeftBehindDeckRoute
+  '/files/paledot-left-behind-deck.pdf': typeof FilesPaledotLeftBehindDeckDotpdfRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/robots.txt': typeof RobotsDottxtRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/files/paledot-left-behind-deck': typeof FilesPaledotLeftBehindDeckRoute
+  '/files/paledot-left-behind-deck.pdf': typeof FilesPaledotLeftBehindDeckDotpdfRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/robots.txt': typeof RobotsDottxtRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/files/paledot-left-behind-deck': typeof FilesPaledotLeftBehindDeckRoute
+  '/files/paledot-left-behind-deck.pdf': typeof FilesPaledotLeftBehindDeckDotpdfRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/robots.txt' | '/sitemap.xml'
+  fullPaths:
+    | '/'
+    | '/robots.txt'
+    | '/sitemap.xml'
+    | '/files/paledot-left-behind-deck'
+    | '/files/paledot-left-behind-deck.pdf'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/robots.txt' | '/sitemap.xml'
-  id: '__root__' | '/' | '/robots.txt' | '/sitemap.xml'
+  to:
+    | '/'
+    | '/robots.txt'
+    | '/sitemap.xml'
+    | '/files/paledot-left-behind-deck'
+    | '/files/paledot-left-behind-deck.pdf'
+  id:
+    | '__root__'
+    | '/'
+    | '/robots.txt'
+    | '/sitemap.xml'
+    | '/files/paledot-left-behind-deck'
+    | '/files/paledot-left-behind-deck.pdf'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   RobotsDottxtRoute: typeof RobotsDottxtRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  FilesPaledotLeftBehindDeckRoute: typeof FilesPaledotLeftBehindDeckRoute
+  FilesPaledotLeftBehindDeckDotpdfRoute: typeof FilesPaledotLeftBehindDeckDotpdfRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -82,6 +120,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SitemapDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/files/paledot-left-behind-deck': {
+      id: '/files/paledot-left-behind-deck'
+      path: '/files/paledot-left-behind-deck'
+      fullPath: '/files/paledot-left-behind-deck'
+      preLoaderRoute: typeof FilesPaledotLeftBehindDeckRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/files/paledot-left-behind-deck.pdf': {
+      id: '/files/paledot-left-behind-deck.pdf'
+      path: '/files/paledot-left-behind-deck.pdf'
+      fullPath: '/files/paledot-left-behind-deck.pdf'
+      preLoaderRoute: typeof FilesPaledotLeftBehindDeckDotpdfRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -89,6 +141,8 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   RobotsDottxtRoute: RobotsDottxtRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
+  FilesPaledotLeftBehindDeckRoute: FilesPaledotLeftBehindDeckRoute,
+  FilesPaledotLeftBehindDeckDotpdfRoute: FilesPaledotLeftBehindDeckDotpdfRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

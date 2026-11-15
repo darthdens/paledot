@@ -30,8 +30,9 @@ export const PALEDOT_EXTRA_META = [
 // Head links for the paledot brand (replace the four favicon links in src/routes/__root.tsx when brand === "paledot").
 export const PALEDOT_HEAD_LINKS = [
   { rel: "icon", type: "image/svg+xml", href: "/paledot/favicon.svg" },
-  { rel: "icon", href: "/paledot/favicon.ico", sizes: "48x48" },
+  { rel: "icon", href: "/paledot/favicon.ico", sizes: "16x16 32x32 48x48" },
   { rel: "icon", type: "image/png", sizes: "32x32", href: "/paledot/favicon-32.png" },
+  { rel: "icon", type: "image/png", sizes: "192x192", href: "/paledot/icon-192.png" },
   { rel: "apple-touch-icon", sizes: "180x180", href: "/paledot/apple-touch-icon.png" },
   { rel: "manifest", href: "/paledot/site.webmanifest" },
 ];
