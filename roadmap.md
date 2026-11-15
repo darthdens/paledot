@@ -1,5 +1,7 @@
 <!-- Left Behind · built during NASA Space Apps Challenge 2026 (14–15 Nov 2026) · AI-assisted (Lovable, Claude) -->
 # Roadmap
+## Presentation PDF
+- [ ] Host uploaded deck, add branded viewer and direct PDF address; verify site icons and document response.
 ## Toolbar and dropdown consistency
 - [x] Fix calendar month/year selection with themed selectors; align arrows in the same header row, use shared hover/focus and 6px selected-day corners. Browser-selected February 1990, next/previous month and day 14 read back correctly; 360px screenshot checked, eight tests pass, build OK.
 - [x] Match language dropdown to the shared 8px trigger gap and 300ms vertical disclosure; retain clock contents for closing animation and restore picker reveal/collapse. Language menu is 200px on desktop/tablet/phone; time picker 264px. Desktop gap and motion inspected; 834/360 menu screenshots checked; eight tests pass, build OK.
