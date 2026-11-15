@@ -11,6 +11,8 @@ import { useSimClock } from '@/features/left-behind/state/useSimClock';
 import { landedPins } from '@/features/left-behind/lib/pinRegistry';
 import { useLeftBehindStore } from '@/features/left-behind/state/useLeftBehindStore';
 import { getHardware } from '@/features/left-behind/data/dataClient';
+import { getTour } from './data/tours';
+import { tourView } from '@/features/left-behind/lib/tourView';
 
 const UNIFIED_SCALE = 0.001;
 
@@ -44,6 +46,14 @@ export const CameraController = () => {
   const machineTourFlight = useRef(false);
   const machineFlightNormal = useRef(new THREE.Vector3());
   const machineSide = useRef(new THREE.Vector3());
+  const machineViewDistance = useRef(0);
+  const narrativeView = () => {
+    const state = useCosmosStore.getState();
+    if (!state.isTouring || state.activeTourId === 'begin-at-earth' || !hardwareId) return null;
+    const live = state.objectWorldPositions[`hw:${hardwareId}`];
+    if (!live) return null;
+    return tourView(getTour(state.activeTourId).stops[state.tourIndex], state.objectWorldPositions, new THREE.Vector3(...live), machineViewDistance.current);
+  };
 
   // Follow smoothing (avoid jitter + avoid per-frame allocations)
   const smoothedTarget = useRef(new THREE.Vector3());
@@ -130,6 +140,9 @@ export const CameraController = () => {
         cameraOffset.current.copy(machineFlightNormal.current).multiplyScalar(distance * 0.6).addScaledVector(machineSide.current, distance * 0.8);
       }
       machineTourFlight.current = useCosmosStore.getState().isTouring && useCosmosStore.getState().activeTourId !== 'begin-at-earth';
+      machineViewDistance.current = distance;
+      const view = narrativeView();
+      if (view) { endTarget.current.copy(view.target); cameraOffset.current.copy(view.offset); }
       machineStartOffset.current.subVectors(camera.position, orbit.target);
       machineEndOffset.current.copy(cameraOffset.current);
       endPosition.current.copy(endTarget.current).add(cameraOffset.current);
@@ -391,7 +404,12 @@ export const CameraController = () => {
     if (isAnimating.current) {
       if (hardwareId && !isTouring) {
         const live = useCosmosStore.getState().objectWorldPositions[`hw:${hardwareId}`];
-        if (live) { endTarget.current.set(...live); endPosition.current.copy(endTarget.current).add(cameraOffset.current); }
+        if (live) {
+          const view = narrativeView();
+          if (view) { endTarget.current.copy(view.target); machineEndOffset.current.copy(view.offset); cameraOffset.current.copy(view.offset); }
+          else endTarget.current.set(...live);
+          endPosition.current.copy(endTarget.current).add(cameraOffset.current);
+        }
         else if (useCosmosStore.getState().isTouring) return;
         else { isAnimating.current = false; useLeftBehindStore.getState().selectHardware(null); return; }
       }
@@ -511,6 +529,12 @@ export const CameraController = () => {
       const live = useCosmosStore.getState().objectWorldPositions[`hw:${hardwareId}`];
       if (!live) { if (!useCosmosStore.getState().isTouring) useLeftBehindStore.getState().selectHardware(null); return; }
       tmpTarget.current.set(...live); tmpDelta.current.subVectors(tmpTarget.current, orbitControls.target);
+      const view = narrativeView();
+      if (view) {
+        orbitControls.target.copy(view.target);
+        camera.position.copy(view.target).add(view.offset);
+        ensureBodyClearance(); orbitControls.update(); return;
+      }
       orbitControls.target.copy(tmpTarget.current); camera.position.add(tmpDelta.current);
       ensureBodyClearance();
       // Zoom down to the hardware's true size (with a small margin), never inside it.

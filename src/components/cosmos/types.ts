@@ -51,6 +51,9 @@ export interface TourStop {
   follow?: string;
   distanceKm?: number;
   photoIds?: string[];
+  /** Narrative camera framing; not measured spacecraft attitude. */
+  viewBodyId?: string;
+  viewMode?: 'encounter' | 'look-back';
   factIds?: string[];
 }
 

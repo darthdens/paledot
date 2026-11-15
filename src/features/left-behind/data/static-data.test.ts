@@ -21,12 +21,15 @@ describe('Saved NASA data', () => {
       expect(data.source).toBe('simplified'); expect(data.segments).toBeUndefined(); expect(data.milestones?.launch).toMatch(/^\d{4}-/);
     }
   });
-  it('preserves all sixteen photo slots with source credits or explicit placeholders', () => {
+  it('preserves the sixteen machine photo slots and five sourced tour photographs', () => {
     const photos: Photo[] = JSON.parse(readFileSync('public/left-behind/photos/manifest.json', 'utf8'));
-    expect(photos).toHaveLength(16); expect(new Set(photos.map(p => p.id)).size).toBe(16);
+    expect(photos).toHaveLength(21); expect(new Set(photos.map(p => p.id)).size).toBe(21);
+    for (const [id, count] of [['apollo-11',2],['lunar-rovers',2],['viking-1',2],['opportunity',2],['ingenuity',2],['voyager-2',2],['voyager-1',4]] as const) {
+      expect(photos.filter(p => p.id.startsWith(`${id}-`))).toHaveLength(count);
+    }
     for (const photo of photos) {
       if (photo.todo) { expect(photo.title).toBe('TODO(source)'); expect(photo.imageUrl).toBe(''); }
-      else { expect(photo.sourceUrl).toMatch(/^https:\/\//); expect(photo.imageUrl).toMatch(/^https:\/\//); expect(photo.credit).toMatch(/NASA/); }
+      else { expect(photo.sourceUrl).toMatch(/^https:\/\//); expect(photo.imageUrl).toMatch(/^\/__l5e\/assets-v1\/.*\.webp$/); expect(photo.credit).toMatch(/NASA/); }
     }
   });
 });

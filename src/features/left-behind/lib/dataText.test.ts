@@ -12,6 +12,6 @@ describe('machine card translations', () => {
     expect(missing).toEqual([]);
   });
   it('every photo caption exists in es, pt, it and de', () => {
-    for (const p of man) for (const l of ['es', 'pt', 'it', 'de']) expect((data.captions as Record<string, Record<string, string>>)[p.id]?.[l]).toBeTruthy();
+    for (const p of man) for (const l of ['es', 'pt', 'it', 'de']) expect(p.caption?.[l] ?? (data.captions as Record<string, Record<string, string>>)[p.id]?.[l]).toBeTruthy();
   });
 });

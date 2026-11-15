@@ -127,3 +127,13 @@ Confirm each licence against package metadata (Prompt 11 check 12).
 - Jezero (Ingenuity) and Viking 1 site terrain: [HiRISE DTMs](https://www.uahirise.org/dtm/ESP_045994_1985) ([Viking 1](https://www.uahirise.org/dtm/PSP_001521_2025)) — NASA/JPL-Caltech/UArizona (public domain).
 - [Mercury MESSENGER global DEM 665 m v2](https://astrogeology.usgs.gov/search/map/mercury_messenger_global_dem_665m) — NASA/JHUAPL/Carnegie Institution of Washington, USGS Astrogeology. Public domain (US Government work).
 - [Ceres Dawn FC HAMO global DTM](https://astrogeology.usgs.gov/search/map/ceres_dawn_fc_hamo_dtm_dlr_global_60ppd) — NASA/JPL-Caltech/UCLA/MPS/DLR/IDA. Public domain NASA mission data (credit required).
+
+## Guided-tour archival photographs
+
+All tour photographs are NASA archival images, not recordings of the simulated viewpoint. Optimised WebP copies retain the exact credits in the manifest. Use: NASA media use guidance (https://www.nasa.gov/nasa-brand-center/images-and-media/), subject to each stated third-party credit.
+
+- [PIA18033: Earth](https://images.nasa.gov/details/PIA18033) — NASA.
+- [PIA01384: Jupiter Great Red Spot](https://images.nasa.gov/details/PIA01384) — NASA/JPL.
+- [PIA00030: Saturn With Rhea and Dione True Color](https://images.nasa.gov/details/PIA00030) — NASA/JPL.
+- [PIA18182: Uranus as seen by NASA Voyager 2](https://images.nasa.gov/details/PIA18182) — NASA/JPL-Caltech.
+- [PIA01492: PIA01492](https://images.nasa.gov/details/PIA01492) — NASA/JPL.
