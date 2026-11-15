@@ -1,12 +1,13 @@
 // Left Behind · built during NASA Space Apps Challenge 2026 (14–15 Nov 2026) · AI-assisted (Lovable, Claude)
 import * as Dialog from '@radix-ui/react-dialog';
+import { DialogOverlay } from '@/components/ui/dialog';
 import { cn } from '@/lib/utils';
 
 /** One backdrop and one glass surface for every Left Behind modal view. */
 export function LeftBehindDialogOverlay({ className, ...props }: Dialog.DialogOverlayProps) {
-  return <Dialog.Overlay
+  return <DialogOverlay
     data-lb-dialog-overlay
-    className={cn('paledot dark fixed inset-0 z-[10020] bg-background/60 backdrop-blur-sm motion-safe:animate-in motion-safe:fade-in motion-safe:duration-200', className)}
+    className={cn('z-[10020]', className)}
     {...props}
   />;
 }
