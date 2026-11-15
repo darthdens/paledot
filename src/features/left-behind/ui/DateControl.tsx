@@ -1,33 +1,68 @@
 // Left Behind · built during NASA Space Apps Challenge 2026 (14–15 Nov 2026) · AI-assisted (Lovable, Claude)
-import { Play, Pause } from 'lucide-react';
+import { useState } from 'react';
+import { Play, Pause, CalendarIcon, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Calendar } from '@/components/ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { enGB, enUS, fr, es, pt, it, de } from 'react-day-picker/locale';
 import { useLanguage } from '@/i18n/LanguageContext';
+import { useSiteBrand } from '@/lib/site-brand';
 import { useSimClock } from '../state/useSimClock';
 import { CLOCK_RATES, CLOCK_START, CLOCK_END } from '../engine/clock';
 import { dateCopy, formatSimDate } from '../lib/dateCopy';
+import { replaceUtcDay, replaceUtcTime } from '../lib/dateEditing';
+
+const calendarLocales = { 'en-GB': enGB, 'en-US': enUS, fr, es, pt, it, de };
+const timeLabels = {
+  en: ['Hours', 'Minutes', 'Seconds'], fr: ['Heures', 'Minutes', 'Secondes'],
+  es: ['Horas', 'Minutos', 'Segundos'], pt: ['Horas', 'Minutos', 'Segundos'],
+  it: ['Ore', 'Minuti', 'Secondi'], de: ['Stunden', 'Minuten', 'Sekunden'],
+};
 
 export function DateControl() {
   const { language, locale, tr } = useLanguage();
   const copy = dateCopy[language];
   const text = (value: string) => tr({ en: value, fr: value });
   const state = useSimClock();
+  const brand = useSiteBrand();
+  const [picker, setPicker] = useState<'date' | 'time' | null>(null);
+  const current = new Date(state.simDate);
+  const calendarDate = new Date(current.getUTCFullYear(), current.getUTCMonth(), current.getUTCDate());
+  const pickerClass = `${brand === 'paledot' ? 'paledot' : ''} cosmos-clock-picker pointer-events-auto z-[10010] w-[min(340px,calc(100vw-16px))] max-h-[calc(100dvh-16px-env(safe-area-inset-top)-env(safe-area-inset-bottom))] overflow-y-auto rounded-lg border-border bg-card p-3 text-foreground`;
   const labels = [copy.real, copy.minute, copy.hour, copy.day, copy.month, copy.year];
   return <div className="w-[min(320px,calc(100vw-2rem))] p-3 space-y-3 text-foreground" data-date-fields role="group" aria-label={text(copy.date)}>
     <div className="pd-hud-label">{text(copy.date)}</div>
     <output className="block font-mono text-xs tabular-nums">{formatSimDate(state.simDate, locale)}</output>
     <div className="grid grid-cols-2 gap-2">
-      <label className="min-w-0 space-y-1">
+      <div className="min-w-0 space-y-1">
         <span className="text-[10px] text-muted-foreground">{text(copy.calendar)}</span>
-        <div className="flex min-h-11 items-center gap-2 rounded-md border border-border bg-muted/30 px-2 focus-within:ring-2 focus-within:ring-ring">
-          <input type="date" aria-label={text(copy.calendar)} value={new Date(state.simDate).toISOString().slice(0,10)} min="1957-01-01" max="2100-12-31" onChange={e => state.setSimDate(Date.parse(`${e.target.value}T${new Date(state.simDate).toISOString().slice(11,19)}Z`))} className="min-w-0 w-full bg-transparent font-mono text-[11px] tabular-nums outline-none" />
-        </div>
-      </label>
-      <label className="min-w-0 space-y-1">
+        <Popover open={picker === 'date'} onOpenChange={open => setPicker(open ? 'date' : null)}>
+          <PopoverTrigger asChild><Button variant="outline" aria-label={text(copy.calendar)} className="w-full min-h-11 min-w-0 justify-between gap-1 px-2 font-mono text-[11px] font-normal tabular-nums"><span className="min-w-0 truncate">{new Intl.DateTimeFormat(locale, { day:'2-digit', month:'2-digit', year:'numeric', timeZone:'UTC' }).format(current)}</span><CalendarIcon className="shrink-0 size-4" /></Button></PopoverTrigger>
+          <PopoverContent align="end" sideOffset={8} collisionPadding={8} className={pickerClass} aria-label={text(copy.calendar)}>
+            <Calendar mode="single" selected={calendarDate} defaultMonth={calendarDate} locale={calendarLocales[locale]} captionLayout="dropdown" navLayout="after" startMonth={new Date(1957,0,1)} endMonth={new Date(2100,11,31)} disabled={{ before: new Date(1957,0,1), after: new Date(2100,11,31) }} autoFocus onSelect={date => { if (date) { state.setSimDate(replaceUtcDay(useSimClock.getState().simDate, date)); setPicker(null); } }} />
+          </PopoverContent>
+        </Popover>
+      </div>
+      <div className="min-w-0 space-y-1">
         <span className="text-[10px] text-muted-foreground">{text(copy.time)}</span>
-        <div className="flex min-h-11 items-center gap-2 rounded-md border border-border bg-muted/30 px-2 focus-within:ring-2 focus-within:ring-ring">
-          <input type="time" step="1" aria-label={text(copy.time)} value={new Date(state.simDate).toISOString().slice(11,19)} onChange={e => state.setSimDate(Date.parse(`${new Date(state.simDate).toISOString().slice(0,10)}T${e.target.value.length === 5 ? e.target.value + ':00' : e.target.value}Z`))} className="min-w-0 w-full bg-transparent font-mono text-[11px] tabular-nums outline-none" />
-        </div>
-      </label>
+        <Popover open={picker === 'time'} onOpenChange={open => setPicker(open ? 'time' : null)}>
+          <PopoverTrigger asChild><Button variant="outline" aria-label={text(copy.time)} className="w-full min-h-11 min-w-0 justify-between gap-1 px-2 font-mono text-[11px] font-normal tabular-nums"><span>{current.toISOString().slice(11,19)}</span><Clock className="shrink-0 size-4" /></Button></PopoverTrigger>
+          <PopoverContent align="end" sideOffset={8} collisionPadding={8} className={pickerClass} aria-label={text(copy.time)}>
+            <div className="pd-hud-label mb-3">{text(copy.time)}</div>
+            <div className="grid grid-cols-3 gap-2">
+              {(['hour','minute','second'] as const).map((part, i) => <div key={part} className="min-w-0">
+                <div className="mb-2 truncate text-center text-[10px] text-muted-foreground">{timeLabels[language][i]}</div>
+                <div role="listbox" aria-label={timeLabels[language][i]} className="h-[220px] overflow-y-auto overscroll-contain rounded-md border border-border p-1">
+                  {Array.from({length: part === 'hour' ? 24 : 60}, (_, value) => {
+                    const selected = value === (part === 'hour' ? current.getUTCHours() : part === 'minute' ? current.getUTCMinutes() : current.getUTCSeconds());
+                    return <Button key={value} variant="ghost" role="option" aria-selected={selected} onClick={() => state.setSimDate(replaceUtcTime(useSimClock.getState().simDate,part,value))} className={`w-full min-h-11 h-11 px-0 font-mono text-sm tabular-nums ${selected ? 'bg-accent text-accent-foreground' : 'text-foreground'}`}>{String(value).padStart(2,'0')}</Button>;
+                  })}
+                </div>
+              </div>)}
+            </div>
+          </PopoverContent>
+        </Popover>
+      </div>
     </div>
     <div className="flex items-center justify-between gap-2">
       <Button variant="outline" size="icon" className="pd-pill min-h-11 min-w-11" aria-label={text(state.isPlaying ? copy.pause : copy.play)} title={text(state.isPlaying ? copy.pause : copy.play)} onClick={state.togglePlaying}>{state.isPlaying ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}</Button>
