@@ -706,6 +706,11 @@ All colors MUST be HSL.
 .paledot :where([data-machine-card], [data-tour-panel], [data-lb-framing], [data-signal-view]) a { display: inline-flex; min-height: 44px; align-items: center; overflow-wrap: anywhere; }
 .paledot [data-explorer-toolbar] { left: auto; right: max(8px, env(safe-area-inset-right)); }
 .paledot [data-explorer-toolbar] button:not([role="option"]) { width: 44px; height: 44px; flex-shrink: 0; }
+.cosmos-clock-picker { transform-origin: var(--radix-popover-content-transform-origin); animation: none !important; }
+.cosmos-calendar [data-selected="true"] { background: hsl(var(--primary)); color: hsl(var(--primary-foreground)); }
+.cosmos-calendar .rdp-dropdown_root > [aria-hidden="true"], .cosmos-calendar .dropdown_root > [aria-hidden="true"] { display: none; }
+.cosmos-calendar select + [aria-hidden="true"] { display: none; }
+.cosmos-calendar button { min-width: 0; }
 .paledot [data-explorer-dropdown] { top: 60px !important; right: max(8px, env(safe-area-inset-right)) !important; max-height: calc(100dvh - 100px - env(safe-area-inset-top) - env(safe-area-inset-bottom)); overflow-y: auto; overscroll-behavior: contain; }
 .paledot [data-bottom-card], .paledot [data-tour-panel], .paledot .pd-machine-readout { bottom: max(8px, env(safe-area-inset-bottom)); max-height: calc(100dvh - 160px - env(safe-area-inset-top) - env(safe-area-inset-bottom)); }
 .paledot .pd-machine-note { bottom: max(8px, env(safe-area-inset-bottom)); }
