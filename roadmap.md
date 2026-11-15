@@ -1,5 +1,10 @@
 <!-- Left Behind · built during NASA Space Apps Challenge 2026 (14–15 Nov 2026) · AI-assisted (Lovable, Claude) -->
 # Roadmap
+## Left Behind framing
+- [ ] Add entry-specific intro and seven distance-ordered machine choices with date-safe navigation.
+- [ ] Add Voyager 1-only final summary without changing Begin at Earth or its end frame.
+- [ ] Add twelve translated glossary definitions, a sourced How we know drawer, exact repository credits and teacher questions.
+- [ ] Add machine search if it can reuse the existing navigation; verify entry flows and mobile layout, and report glossary definitions.
 ## Signal spacing and Left Behind emphasis
 - [x] Match mobile signal top clearance to the toolbar and equalise close-button top/right inset; 360px popup checked at y=32px with equal 8px header insets.
 - [x] Place Left Behind first across devices, separate it on desktop and add a reduced-motion-safe occasional icon shake.
