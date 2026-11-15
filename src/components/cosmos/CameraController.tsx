@@ -12,7 +12,7 @@ import { landedPins } from '@/features/left-behind/lib/pinRegistry';
 import { useLeftBehindStore } from '@/features/left-behind/state/useLeftBehindStore';
 import { getHardware } from '@/features/left-behind/data/dataClient';
 import { getTour } from './data/tours';
-import { encounterView, flightBump, flightDuration, flightFrame, lookBackView, pinOffset, spaceOffset, type Anchor, type CameraView } from '@/features/left-behind/lib/tourCamera';
+import { encounterView, flightDuration, flightFrame, flightLength, lookBackView, pinOffset, spaceOffset, type Anchor, type CameraView } from '@/features/left-behind/lib/tourCamera';
 import { getEphemeris } from '@/features/left-behind/engine/runtime';
 import { getLoadedTrajectory } from '@/features/left-behind/engine/trajectory';
 import { isEphemerisBody } from '@/features/left-behind/engine/ephemeris';
@@ -46,7 +46,7 @@ export const CameraController = () => {
   const cameraOffset = useRef(new THREE.Vector3());
   const tourOffset = useRef(new THREE.Vector3());
   // Machine follows and Left Behind tours: a followed view plus an optional flight between two views.
-  type HwFlight = { start: CameraView; end: CameraView; bump: number; duration: number; t: number; hop: { from: string; to: string } | null; tour: boolean };
+  type HwFlight = { start: CameraView; end: CameraView; duration: number; t: number; hop: { from: string; to: string } | null; tour: boolean };
   const hwFlight = useRef<HwFlight | null>(null);
   const followView = useRef<CameraView | null>(null);
   const followNormal = useRef<THREE.Vector3 | null>(null);
@@ -86,11 +86,8 @@ export const CameraController = () => {
     const fromPin = pinOf(start.anchor), toPin = pinOf(end.anchor);
     const hop = fromPin && toPin && fromPin.body === toPin.body && start.anchor.kind === 'hw' && end.anchor.kind === 'hw' && start.anchor.id !== end.anchor.id
       ? { from: start.anchor.id, to: end.anchor.id } : null;
-    const d0 = s.offset.length(), d1 = e.offset.length();
-    const separation = s.target.distanceTo(e.target);
-    const bump = flightBump(separation, d0, d1);
-    const angle = hop && fromPin && toPin ? new THREE.Vector3(...fromPin.normal).angleTo(new THREE.Vector3(...toPin.normal)) : 0;
-    const duration = flightDuration(d0, d1, bump, angle) * (tour ? 1 : 0.45);
+    const sphere = hop && toPin ? { centre: new THREE.Vector3(...toPin.centre), radius: 0 } : undefined;
+    const duration = flightDuration(flightLength({ startTarget: s.target, endTarget: e.target, startOffset: s.offset, endOffset: e.offset, sphere })) * (tour ? 1 : 0.45);
     followView.current = end;
     followNormal.current = toPin ? new THREE.Vector3(...toPin.normal) : null;
     isAnimating.current = false;
@@ -99,7 +96,7 @@ export const CameraController = () => {
       orbit.target.copy(e.target); camera.position.copy(e.target).add(e.offset); orbit.update();
       return;
     }
-    hwFlight.current = { start, end, bump, duration: Math.max(1, duration), t: 0, hop, tour };
+    hwFlight.current = { start, end, duration: Math.max(1, duration), t: 0, hop, tour };
   };
 
   // Follow smoothing (avoid jitter + avoid per-frame allocations)
@@ -459,7 +456,7 @@ export const CameraController = () => {
       const s1 = s0 ?? e0;
       const toPin = f.hop ? landedPins.get(f.hop.to) : undefined;
       const sphere = toPin ? { centre: new THREE.Vector3(...toPin.centre), radius: 0 } : undefined;
-      const frame = flightFrame({ t: f.t, startTarget: s1.target, endTarget: e0.target, startOffset: s1.offset, endOffset: e0.offset, bump: f.bump, sphere });
+      const frame = flightFrame({ t: f.t, startTarget: s1.target, endTarget: e0.target, startOffset: s1.offset, endOffset: e0.offset, sphere });
       orbitControls.target.copy(frame.target);
       camera.position.copy(frame.target).add(frame.offset);
       if (frame.up) camera.up.copy(frame.up);

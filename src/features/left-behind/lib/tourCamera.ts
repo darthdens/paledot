@@ -14,7 +14,7 @@ export type CameraView = { anchor: Anchor; rel: Vector3; offset: Vector3 };
 export type Sphere = { centre: Vector3; radius: number };
 
 const smoother = (x: number) => { const t = Math.min(1, Math.max(0, x)); return t * t * t * (t * (t * 6 - 15) + 10); };
-const MAX_BUMP_DISTANCE = 5e6; // ~33 AU: stays within Solar System scale so planets and markers stay mounted
+const RHO = 1.4; // zoom-out vs pan trade-off of the van Wijk & Nuij path (≈√2 is the perceptual optimum)
 
 /** Unit-vector slerp that tolerates opposite directions. */
 export function slerpUnit(a: Vector3, b: Vector3, t: number, out = new Vector3()) {
@@ -22,46 +22,70 @@ export function slerpUnit(a: Vector3, b: Vector3, t: number, out = new Vector3()
   return out.copy(a).applyQuaternion(new Quaternion().slerp(q, t)).normalize();
 }
 
-/** Extra log-distance at mid-flight so far-apart start and end both fit in view (zoom out, travel, zoom in). */
-export function flightBump(separation: number, d0: number, d1: number) {
-  if (!(separation > 0)) return 0;
-  const mean = Math.exp((Math.log(d0) + Math.log(d1)) / 2);
-  const wanted = Math.min(separation * 0.7, MAX_BUMP_DISTANCE);
-  return Math.max(0, Math.log(wanted / Math.max(mean, 1e-12)));
-}
-
-/** Seconds: longer for bigger zoom ratios, wider travel and longer surface hops. */
-export function flightDuration(d0: number, d1: number, bump: number, hopAngle = 0) {
-  return Math.min(7, Math.max(2.2, 2.2 + 0.22 * Math.abs(Math.log(Math.max(d1, 1e-12) / Math.max(d0, 1e-12))) + 0.45 * bump + 2.5 * hopAngle));
-}
-
-export type FlightInput = { t: number; startTarget: Vector3; endTarget: Vector3; startOffset: Vector3; endOffset: Vector3; bump: number; sphere?: Sphere | undefined };
 /**
- * One flight frame. Zooming in turns the view first and descends after; zooming out climbs first and turns after,
- * so the camera never swings through a body at close range. Distance is interpolated in log space.
+ * Smooth zoom-and-pan path (van Wijk & Nuij 2003): travel `separation` while the viewing distance goes d0 → d1,
+ * zooming out just enough on the way that the scene moves at a constant perceived speed (no rush at the end).
+ * Returns the path length S and, for s in [0, S], the travelled fraction and distance.
  */
-export function flightFrame({ t, startTarget, endTarget, startOffset, endOffset, bump, sphere }: FlightInput) {
+export function zoomPath(separation: number, d0: number, d1: number) {
+  const w0 = Math.max(d0, 1e-12), w1 = Math.max(d1, 1e-12);
+  if (!(separation > 1e-9 * Math.min(w0, w1))) {
+    const k = Math.log(w1 / w0);
+    const S = Math.abs(k) / RHO;
+    return { S, at: (s: number) => ({ fraction: S > 0 ? s / S : 1, distance: S > 0 ? w0 * Math.exp(k * s / S) : w1 }) };
+  }
+  const u1 = separation, r2 = RHO * RHO;
+  const b0 = (w1 * w1 - w0 * w0 + r2 * r2 * u1 * u1) / (2 * w0 * r2 * u1);
+  const b1 = (w1 * w1 - w0 * w0 - r2 * r2 * u1 * u1) / (2 * w1 * r2 * u1);
+  const z0 = -Math.asinh(b0), z1 = -Math.asinh(b1);
+  const S = (z1 - z0) / RHO;
+  return { S, at: (s: number) => {
+    const z = RHO * s + z0;
+    const u = w0 / r2 * (Math.cosh(z0) * Math.tanh(z) - Math.sinh(z0));
+    return { fraction: Math.min(1, Math.max(0, u / u1)), distance: w0 * Math.cosh(z0) / Math.cosh(z) };
+  } };
+}
+
+/** Seconds, from the path length: a short hop ~2 s, Saturn to the edge of the planets ~7 s. */
+export function flightDuration(pathLength: number) { return Math.min(7, Math.max(2, 1.5 + 0.25 * pathLength)); }
+
+export type FlightInput = { t: number; startTarget: Vector3; endTarget: Vector3; startOffset: Vector3; endOffset: Vector3; sphere?: Sphere | undefined };
+
+const travel = (startTarget: Vector3, endTarget: Vector3, sphere?: Sphere) => {
+  if (!sphere) return startTarget.distanceTo(endTarget);
+  const a = startTarget.clone().sub(sphere.centre), b = endTarget.clone().sub(sphere.centre);
+  return a.angleTo(b) * (a.length() + b.length()) / 2;
+};
+/** Path length of a flight (for its duration). */
+export function flightLength(input: Omit<FlightInput, 't'>) {
+  return zoomPath(travel(input.startTarget, input.endTarget, input.sphere), input.startOffset.length(), input.endOffset.length()).S;
+}
+
+/**
+ * One flight frame. Target and distance follow the zoom path; zooming in turns the view first, zooming out turns
+ * it last, so the camera never swings round close to a body. On a surface hop the target runs along the ground.
+ */
+export function flightFrame({ t, startTarget, endTarget, startOffset, endOffset, sphere }: FlightInput) {
   const d0 = Math.max(startOffset.length(), 1e-12), d1 = Math.max(endOffset.length(), 1e-12);
+  const path = zoomPath(travel(startTarget, endTarget, sphere), d0, d1);
+  const { fraction, distance } = t >= 1 ? { fraction: 1, distance: d1 } : path.at(path.S * smoother(t));
   const zoomIn = d1 < d0;
   const eDir = zoomIn ? smoother(t / 0.6) : smoother((t - 0.4) / 0.6);
-  const eDist = zoomIn ? smoother((t - 0.25) / 0.75) : smoother(t / 0.75);
-  const eTarget = smoother(t);
-  const arch = Math.sin(Math.PI * Math.min(1, Math.max(0, t)));
-  const distance = Math.exp(Math.log(d0) + (Math.log(d1) - Math.log(d0)) * eDist + bump * arch * arch);
   const direction = slerpUnit(startOffset.clone().divideScalar(d0), endOffset.clone().divideScalar(d1), eDir);
   let target: Vector3, up: Vector3 | null = null;
   if (sphere) {
     const a = startTarget.clone().sub(sphere.centre), b = endTarget.clone().sub(sphere.centre);
     const ra = a.length(), rb = b.length();
-    const radial = slerpUnit(a.normalize(), b.normalize(), eTarget);
-    target = sphere.centre.clone().addScaledVector(radial, ra + (rb - ra) * eTarget);
+    const radial = slerpUnit(a.normalize(), b.normalize(), fraction);
+    target = sphere.centre.clone().addScaledVector(radial, ra + (rb - ra) * fraction);
     // Mid-hop: ride behind and above the ground track, looking ahead along the way.
     const ahead = b.clone().sub(radial.clone().multiplyScalar(b.dot(radial)));
     if (ahead.lengthSq() > 1e-12) ahead.normalize();
     const hop = radial.clone().addScaledVector(ahead, -0.8).normalize();
+    const arch = Math.sin(Math.PI * Math.min(1, Math.max(0, t)));
     direction.multiplyScalar(1 - arch).addScaledVector(hop, arch).normalize();
     up = radial;
-  } else target = startTarget.clone().lerp(endTarget, eTarget);
+  } else target = startTarget.clone().lerp(endTarget, fraction);
   return { target, offset: direction.multiplyScalar(distance), up };
 }
 
