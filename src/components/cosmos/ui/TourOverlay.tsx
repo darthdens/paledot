@@ -533,6 +533,7 @@ export const TourOverlay = () => {
               e.stopPropagation();
               handleExit();
             }}
+            aria-label={t.exitTour}
             className="h-6 w-6 text-white/70 hover:text-white hover:bg-white/10"
           >
             <X className="w-4 h-4" />
@@ -559,6 +560,7 @@ export const TourOverlay = () => {
               size="sm"
               variant="ghost"
               onClick={handlePrevious}
+              aria-label={t.previous}
               disabled={tourIndex === 0}
               className="text-[10px] sm:text-xs text-white/70 hover:text-white hover:bg-white/10 disabled:opacity-30 px-2 sm:px-3 h-7 sm:h-8"
             >
@@ -570,6 +572,7 @@ export const TourOverlay = () => {
               size="icon"
               variant="ghost"
               onClick={togglePause}
+              aria-label={isPaused ? t.play : t.pause}
               className="h-8 w-8 sm:h-10 sm:w-10 rounded-full bg-white/10 hover:bg-white/20 text-white"
             >
               {isPaused ? (
@@ -583,6 +586,7 @@ export const TourOverlay = () => {
               size="sm"
               variant="ghost"
               onClick={handleNext}
+              aria-label={t.next}
               className="text-[10px] sm:text-xs text-white/70 hover:text-white hover:bg-white/10 px-2 sm:px-3 h-7 sm:h-8"
             >
               <span className="hidden xs:inline">{t.next}</span>
