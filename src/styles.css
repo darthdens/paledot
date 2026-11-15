@@ -590,14 +590,10 @@ All colors MUST be HSL.
 }
 .paledot button[class*="bg-blue-"]:hover { box-shadow: inset 0 0 0 1px hsl(var(--dot) / .6); }
 /* Panels, dropdowns, cards and tooltips: same surface, hairline and radius. */
-.paledot div[class*="bg-white/10"], .paledot div[class*="bg-black/"][class*="backdrop-blur"], .paledot [role="menu"], .paledot [role="dialog"], .paledot [data-radix-popper-content-wrapper] > * {
+.paledot div[class*="bg-white/10"], .paledot div[class*="bg-black/"][class*="backdrop-blur"], .paledot [data-language-dropdown], .paledot [role="menu"], .paledot [role="dialog"], .paledot [data-radix-popper-content-wrapper] > * {
   border-radius: 10px;
 }
-.paledot div.bg-white\/10, .paledot div[class*="bg-black/"][class*="backdrop-blur"] {
-  background-color: hsl(var(--surface) / .72);
-  box-shadow: inset 0 0 0 1px hsl(var(--border));
-}
-.paledot div[data-language-dropdown] {
+.paledot div.bg-white\/10, .paledot div[class*="bg-black/"][class*="backdrop-blur"], .paledot div[data-language-dropdown] {
   background-color: hsl(var(--surface) / .72);
   box-shadow: inset 0 0 0 1px hsl(var(--border));
 }
