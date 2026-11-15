@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as RobotsDottxtRouteImport } from './routes/robots[.]txt'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as DownloadsPaledotLeftBehindSourceDotzipRouteImport } from './routes/downloads.paledot-left-behind-source[.]zip'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -28,35 +29,58 @@ const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   path: '/sitemap.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DownloadsPaledotLeftBehindSourceDotzipRoute =
+  DownloadsPaledotLeftBehindSourceDotzipRouteImport.update({
+    id: '/downloads/paledot-left-behind-source.zip',
+    path: '/downloads/paledot-left-behind-source.zip',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/robots.txt': typeof RobotsDottxtRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/downloads/paledot-left-behind-source.zip': typeof DownloadsPaledotLeftBehindSourceDotzipRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/robots.txt': typeof RobotsDottxtRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/downloads/paledot-left-behind-source.zip': typeof DownloadsPaledotLeftBehindSourceDotzipRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/robots.txt': typeof RobotsDottxtRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/downloads/paledot-left-behind-source.zip': typeof DownloadsPaledotLeftBehindSourceDotzipRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/robots.txt' | '/sitemap.xml'
+  fullPaths:
+    | '/'
+    | '/robots.txt'
+    | '/sitemap.xml'
+    | '/downloads/paledot-left-behind-source.zip'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/robots.txt' | '/sitemap.xml'
-  id: '__root__' | '/' | '/robots.txt' | '/sitemap.xml'
+  to:
+    | '/'
+    | '/robots.txt'
+    | '/sitemap.xml'
+    | '/downloads/paledot-left-behind-source.zip'
+  id:
+    | '__root__'
+    | '/'
+    | '/robots.txt'
+    | '/sitemap.xml'
+    | '/downloads/paledot-left-behind-source.zip'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   RobotsDottxtRoute: typeof RobotsDottxtRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  DownloadsPaledotLeftBehindSourceDotzipRoute: typeof DownloadsPaledotLeftBehindSourceDotzipRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -82,6 +106,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SitemapDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/downloads/paledot-left-behind-source.zip': {
+      id: '/downloads/paledot-left-behind-source.zip'
+      path: '/downloads/paledot-left-behind-source.zip'
+      fullPath: '/downloads/paledot-left-behind-source.zip'
+      preLoaderRoute: typeof DownloadsPaledotLeftBehindSourceDotzipRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -89,6 +120,8 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   RobotsDottxtRoute: RobotsDottxtRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
+  DownloadsPaledotLeftBehindSourceDotzipRoute:
+    DownloadsPaledotLeftBehindSourceDotzipRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
