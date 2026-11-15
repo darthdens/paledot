@@ -1,8 +1,11 @@
 <!-- Left Behind · built during NASA Space Apps Challenge 2026 (14–15 Nov 2026) · AI-assisted (Lovable, Claude) -->
 # Roadmap
+## Complete framing acceptance
+- [ ] Replace the Voyager 1 summary popup with an opaque, quiet full-screen ending; preserve the Begin at Earth ending.
+- [ ] Verify uninterrupted camera flights, phone glossary clearance over a rendered object, and Begin at Earth through its ending.
 ## Consistent overlays and complete provenance
-- [ ] Share one backdrop, animation and glass surface across Send a signal, Machines, How we know and the final summary; add the NASA Space Apps Challenge line beneath both Left behind headings.
-- [ ] Re-check all NASA image metadata and simplified-path milestone sources; store real UTC retrieval timestamps and source URLs, with regression tests.
+- [x] Share the tour-photo backdrop across Send a signal, Machines and How we know; add the NASA Space Apps Challenge line beneath both Left behind headings. Desktop/phone checked.
+- [x] Re-check all 21 NASA image records and six simplified-path milestone sources; store real UTC retrieval timestamps and source URLs, with regression tests.
 - [ ] Verify desktop/mobile overlay consistency, visible-canvas camera flights and glossary clearance over the live scene.
 ## Left Behind framing
 - [x] Add entry-specific intro and seven distance-ordered machine choices with date-safe navigation; Apollo 11 launch and Voyager 2 card verified in the preview.
