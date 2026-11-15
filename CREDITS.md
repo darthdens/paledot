@@ -65,7 +65,7 @@ NASA models are public-domain US-government resources according to the [NASA 3D 
 
 | Link text | URL | Licence / notes |
 | --- | --- | --- |
-| Pale Dot base platform by Dens Akoka (existed before the event) | https://paledot.org | [licence chosen, or as agreed with organisers] |
+| Pale Dot base platform by Dens Akoka (existed before the event) | https://paledot.org | Apache License 2.0; copyright 2026 Dens Akoka. Pale Dot name/logo and external assets excluded; see LICENSE |
 | Project repository, with HACKATHON.md and this file | [https://github.com/<you>/<repo>] | Shows what was built during the event |
 | Pre-existing planet and moon textures (`src/assets/textures/`) | Source URL unknown; see provenance note below | Original source/product and licence unverified; do not assume public domain |
 | Johns Hopkins APL: Voyager 2 Illuminates Boundary of Interstellar Space | https://www.jhuapl.edu/news/news-releases/191106-voyager-2-illuminates-boundary-interstellar-space | Heliopause facts |

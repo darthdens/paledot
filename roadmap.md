@@ -1,5 +1,9 @@
 <!-- Left Behind · built during NASA Space Apps Challenge 2026 (14–15 Nov 2026) · AI-assisted (Lovable, Claude) -->
 # Roadmap
+## Whole-repository open-source release
+- [x] Scan current files and reachable Git history: only allowed public anon keys detected; no private credentials/private URLs found. All six public application tables have RLS; some managed internal tables do not.
+- [x] Add Apache 2.0 licence and update README, event scope and credits without app changes; unknown texture rights remain disclosed.
+- [x] Remove the prior download directory, stored archive and redirect; verify official licence text and list all changed files in the release summary.
 ## Tour autoplay
 - [x] Correct milliseconds/seconds mismatch; slide-keyed autoplay retains elapsed time through pause/resume. Live Voyager 1 advances from launch through Jupiter to Saturn without Next; screenshot checked, no runtime errors, 103 tests pass.
 ## Tour viewpoints and archival photographs
