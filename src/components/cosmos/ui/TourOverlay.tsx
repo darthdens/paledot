@@ -507,7 +507,7 @@ export const TourOverlay = () => {
         </div>
         <div className="flex items-center gap-1 flex-shrink-0">
           {/* Collapsed controls */}
-          <div className="flex items-center gap-1" hidden={!isCollapsed}>
+          <div className={`${isCollapsed ? 'flex' : 'hidden'} items-center gap-1`}>
             <Button
               size="icon"
               variant="ghost"
