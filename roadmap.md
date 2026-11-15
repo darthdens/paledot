@@ -1,7 +1,10 @@
 <!-- Left Behind · built during NASA Space Apps Challenge 2026 (14–15 Nov 2026) · AI-assisted (Lovable, Claude) -->
 # Roadmap
 ## Finish visual checks and texture-rights audit
-- [ ] Follow-up requested 15 November: retry visible-scene motion with short isolated captures and investigate exact original sources for the ten unidentified maps; retain evidence and do not replace assets or infer licences from resemblance alone.
+- [x] Follow-up 15 November: identify eight more supplier sources without replacing assets. Phobos is fictional Ceres; Pluto/Iapetus fictional Haumea; Europa/Triton/Deimos fictional Makemake; Enceladus fictional Eris; Titan a Saturn-ring strip. Exact duplicate checks and supplier-original comparisons recorded in CREDITS.md. All 157 tests pass.
+- [ ] Resolve the last two original licences: Earth clouds and the low-resolution Moon. NASA candidates do not match; supplier resemblance alone is insufficient. These two remain blocked from redistribution.
+- [ ] Replace the eight misassigned textures with correctly sourced, body-specific imagery without reducing quality. Newly found scientific-accuracy issue, not fixed by documenting licences; no assets changed in this audit.
+- [ ] Complete visible motion acceptance: a real Voyager 1 Launch → Jupiter transition and visible Jupiter frame were captured with the unchanged canvas; live camera-state samples were obtained, but capture delays and sparse sampling cannot prove flicker-free motion. Voyager 2, landings, phone glossary clearance, signal pulse and One last look rotation/rings still require reliable live visual checks.
 - [ ] Finish visible-scene checks: machine-tour smoothness, phone glossary clearance, signal pulse and One last look rings/rotation still require a hardware-GPU device. This audit: 157 tests pass; saved signal restored in a fresh page; Begin at Earth reached its actual end frame with buttons present (settled animation capture stalled); all six One last look phone panels and continuation to step 5 checked with canvas hidden. No scene quality changed.
 - [x] Compare supplier originals: ten old maps match Solar System Scope CC BY 4.0; add attribution/conversion notice and identify Ceres as fictional. Ten other maps remain blocked from redistribution pending exact origins; no assets changed.
 ## Opening-screen clock
