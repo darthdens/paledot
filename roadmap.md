@@ -1,10 +1,10 @@
 <!-- Left Behind · built during NASA Space Apps Challenge 2026 (14–15 Nov 2026) · AI-assisted (Lovable, Claude) -->
 # Roadmap
 ## Complete remaining audit acceptance
-- [ ] Run bundled 3D verification with the faster available renderer; diagnose confirmed motion issues without lowering scene quality.
-- [ ] Add on-demand download progress for large photos and terrain with seven-language accessible status and behavioural tests.
-- [ ] Recheck all four phone orientations, keyboard/photos/signal/date flows, touch wiring and overlap; fix confirmed problems.
-- [ ] Run mobile Lighthouse and controlled before/after loading/frame measurements; report exact environment and unavailable historical/device baselines.
+- [x] Bundled 3D verification succeeds with lavapipe: visible phone scene, 1.2% motion difference, zero page/request errors. Removed inactive zero-intensity composer causing SelectiveBloom warnings; no scene-quality reduction.
+- [x] On-demand progress for photos and terrain above 500 KB, seven-language status, object-URL cleanup and three tests. Live slow-photo check: 8% visible above tour card, then completed 1280px image and progress cleared.
+- [x] Four phone orientations checked without hiding canvas; no horizontal overflow or active undersized buttons. Keyboard photo/signal/close, pinch wiring with machine card, date edits and scrolling pass; axe reports zero violations in tested machine/date/knowledge states. Fixed clipped date controls and missing accessible names.
+- [ ] Final real-device acceptance: actual iOS safe areas, all live-object glossary states, uninterrupted tour/signal/One last look motion and 30+ phone FPS need hardware GPU. Local mobile Lighthouse before/after 55 performance / 100 accessibility; TBT 7436→6526ms, FCP ~2420ms unchanged. Published audit still ERR_ABORTED; historical pre-feature baseline unavailable. Detailed measurements in AUDIT.md.
 ## Correct inaccurate maps and resolve texture rights
 - [x] Replace eight misassigned files, fictional Ceres, and the two untraceable assets with eleven sourced WebP assets; source evidence and coverage limits in texture-sources.json and CREDITS.md. Phobos/Deimos assets corrected, but their catalogue bodies are absent and are not newly added.
 - [x] Check renderer assignments, longitude transforms and live scene loading; 14 source regressions added, all 175 tests pass. Seven corrected textures read back from the actual visible scene; opening loader shares their URLs.
