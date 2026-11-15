@@ -48,8 +48,8 @@ export function PaleDotTitleScreen({ onBegin, onLeftBehind }: { onBegin: () => v
         <button type="button" data-action className="pd-pill" onClick={onBegin}>
           {t.begin}
         </button>
-        <Button type="button" variant="outline" data-action className="pd-pill min-h-11" onClick={onLeftBehind}>
-          {tr({ en: leftBehindCopy[language].name, fr: leftBehindCopy[language].name })}
+        <Button type="button" variant="outline" data-action className="pd-pill min-h-11 flex-col gap-1" onClick={onLeftBehind}>
+          <span>{tr({ en: leftBehindCopy[language].name, fr: leftBehindCopy[language].name })}</span><span className="text-[10px] text-muted-foreground">(NASA Space Apps Challenge)</span>
         </Button>
       </div>
       <div className="pd-readout">

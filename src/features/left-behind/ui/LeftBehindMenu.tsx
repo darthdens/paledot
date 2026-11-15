@@ -31,7 +31,7 @@ export function LeftBehindMenu() {
   const row = 'w-full h-auto min-h-7 max-sm:min-h-11 flex items-center justify-between gap-2 p-1.5 sm:p-2 rounded-[4px] text-xs sm:text-sm text-foreground hover:bg-accent/60 cursor-pointer';
   return <div ref={ref} data-lb-menu role="region" aria-label={text(copy.name)} className="absolute top-12 right-2 sm:top-[60px] sm:right-4 z-[10002] w-[calc(100vw-1rem)] max-w-56 sm:max-w-64 max-h-[calc(100dvh-5rem)] overflow-y-auto bg-white/10 backdrop-blur-xs rounded-lg animate-scale-in origin-top-right">
     <div className="flex items-center justify-between p-2 sm:p-3 border-b border-white/10">
-      <h3 className="text-foreground font-semibold text-sm">{text(copy.name)}</h3>
+      <div className="min-w-0"><h3 className="text-foreground font-semibold text-sm">{text(copy.name)}</h3><p className="text-[10px] leading-relaxed text-muted-foreground">(NASA Space Apps Challenge)</p></div>
       <Button size="icon" variant="ghost" aria-label={tx('Close', 'Fermer')} onClick={() => useLeftBehindStore.getState().setMenuOpen(false)} className="h-6 w-6 text-white/70 hover:text-white hover:bg-white/10"><X className="w-4 h-4" /></Button>
     </div>
     <div className="p-2 [&>*:last-child]:mb-0">

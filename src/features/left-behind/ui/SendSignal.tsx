@@ -60,9 +60,9 @@ export function SendSignal() {
   return <DialogPrimitive.Root open={open} onOpenChange={o => !o && useSignal.getState().close()}>
     <DialogPrimitive.Portal>
       <DialogPrimitive.Overlay className="fixed inset-0 z-[10020] bg-background/10" />
-      <DialogPrimitive.Content data-signal-view className="paledot dark pd-card fixed z-[10021] bottom-[max(0.5rem,env(safe-area-inset-bottom))] left-2 right-2 flex max-h-[calc(100dvh-4.5rem)] flex-col overflow-hidden rounded-lg border border-border bg-card/90 backdrop-blur-md sm:bottom-auto sm:top-1/2 sm:left-1/2 sm:right-auto sm:w-[560px] sm:max-w-[calc(100vw-2rem)] sm:-translate-x-1/2 sm:-translate-y-1/2">
-        <header className="flex shrink-0 items-center justify-between gap-3 border-b border-border px-4 py-2">
-          <DialogPrimitive.Title className="text-sm font-semibold">{T(c.title)}</DialogPrimitive.Title>
+      <DialogPrimitive.Content data-signal-view className="paledot dark pd-card fixed z-[10021] bottom-[max(0.5rem,env(safe-area-inset-bottom))] left-2 right-2 flex max-h-[calc(100dvh-2.5rem-env(safe-area-inset-top)-env(safe-area-inset-bottom))] flex-col overflow-hidden rounded-lg border border-border bg-card/90 backdrop-blur-md sm:max-h-[calc(100dvh-4.5rem)] sm:bottom-auto sm:top-1/2 sm:left-1/2 sm:right-auto sm:w-[560px] sm:max-w-[calc(100vw-2rem)] sm:-translate-x-1/2 sm:-translate-y-1/2">
+        <header className="flex shrink-0 items-center justify-between gap-3 border-b border-border p-2">
+          <DialogPrimitive.Title className="pl-2 text-sm font-semibold">{T(c.title)}</DialogPrimitive.Title>
           <Button variant="ghost" size="icon" className="h-11 w-11 text-muted-foreground" aria-label={T(c.close)} onClick={() => useSignal.getState().close()}><X className="h-4 w-4" /></Button>
         </header>
         <div className="overflow-y-auto overscroll-contain p-4 space-y-4">
