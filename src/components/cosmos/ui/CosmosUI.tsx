@@ -645,9 +645,6 @@ export const CosmosUI = () => {
         </div>
       )}
 
-      {/* Search bar */}
-      <ObjectSearch isFullscreen={isFullscreen} />
-
       {/* Top controls - icon buttons with tooltips */}
       <div
         data-explorer-toolbar
@@ -671,6 +668,7 @@ export const CosmosUI = () => {
               </Tooltip>
               <div role="separator" aria-orientation="vertical" className="hidden lg:block w-px h-6 bg-border mx-1" />
             </>}
+            <ObjectSearch onOpen={() => { setShowMoreMenu(false); setShowLanguageMenu(false); useSimClock.getState().setDateControlOpen(false); useLeftBehindStore.getState().setMenuOpen(false); useCosmosStore.setState({showQuickJump:false}); }} />
             {/* Essential controls - always visible */}
             {!native && (
               <Tooltip>
@@ -832,6 +830,7 @@ export const CosmosUI = () => {
       {/* Mobile & Tablet more menu - same style as QuickJump */}
       <div
         ref={moreMenuRef}
+        data-more-menu
         data-explorer-dropdown
         inert={!showMoreMenu}
         className={`lg:hidden ${uiFixed ? 'fixed' : 'absolute'} z-[10001] bg-white/10 backdrop-blur-xs rounded-lg overflow-hidden transition-all duration-300 ease-out ${

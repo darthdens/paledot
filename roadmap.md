@@ -1,5 +1,9 @@
 <!-- Left Behind · built during NASA Space Apps Challenge 2026 (14–15 Nov 2026) · AI-assisted (Lovable, Claude) -->
 # Roadmap
+## Toolbar and dropdown consistency
+- [ ] Put Search beside Quick Jump; animate a fixed-height field horizontally with matching collapse.
+- [ ] Align dropdowns to measured toolbar dimensions and enlarge phone menus.
+- [ ] Unify every More-menu row and verify phone, tablet and desktop layouts.
 ## Complete remaining audit acceptance
 - [x] Complete Voyager 1 (11 panels including six nested stages), Begin at Earth (28 stops) and signal form sends checked in 390×844 portrait / 844×390 landscape; real endings captured, no horizontal overflow or page errors in final run. Deterministic reduced-motion/manual Next checks, not real-device smoothness.
 - [x] Bundled 3D verification succeeds with lavapipe: visible phone scene, 1.2% motion difference, zero page/request errors. Removed inactive zero-intensity composer causing SelectiveBloom warnings; no scene-quality reduction.

@@ -5,7 +5,6 @@ import { Button } from '@/components/ui/button';
 import { Search, X } from 'lucide-react';
 import { celestialObjects } from '../data/celestialObjects';
 import { useCosmosStore } from '../store/useCosmosStore';
-import { cn } from '@/lib/utils';
 import { useSiteBrand } from '@/lib/site-brand';
 import { getHardware } from '@/features/left-behind/data/dataClient';
 import { visitMachine } from '@/features/left-behind/lib/hardwareNavigation';
@@ -36,10 +35,10 @@ const translations = {
 };
 
 interface ObjectSearchProps {
-  isFullscreen: boolean;
+  onOpen?: () => void;
 }
 
-export const ObjectSearch = ({ isFullscreen }: ObjectSearchProps) => {
+export const ObjectSearch = ({ onOpen }: ObjectSearchProps) => {
   const { language, tr, tx, numberLocale } = useLanguage();
   const t = tr(translations);
   const brand = useSiteBrand();
@@ -48,6 +47,9 @@ export const ObjectSearch = ({ isFullscreen }: ObjectSearchProps) => {
   const [query, setQuery] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const openSearch = () => { onOpen?.(); setIsOpen(true); };
+  const closeSearch = () => { setIsOpen(false); setQuery(''); triggerRef.current?.focus(); };
   const { setSelectedObject, stopTour } = useCosmosStore();
   useEffect(() => {
     if (!isOpen || brand !== 'paledot') return;
@@ -91,7 +93,7 @@ export const ObjectSearch = ({ isFullscreen }: ObjectSearchProps) => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
         e.preventDefault();
-        setIsOpen(true);
+        onOpen?.(); setIsOpen(true);
       }
       if (e.key === 'Escape' && isOpen) {
         setIsOpen(false);
@@ -114,41 +116,11 @@ export const ObjectSearch = ({ isFullscreen }: ObjectSearchProps) => {
     return t[type as keyof typeof t] || type;
   };
 
-  if (!isOpen) {
-    return (
-      <Button
-        size="icon"
-        variant="ghost"
-        onClick={() => setIsOpen(true)}
-        className="h-7 w-7 sm:h-9 sm:w-9 bg-white/10 hover:bg-white/20 text-white"
-        aria-label={t.placeholder} title={t.placeholder} data-search-trigger
-      >
-        <Search className="w-3.5 h-3.5 sm:w-5 sm:h-5" />
-      </Button>
-    );
-  }
-
   return (
-    <div
-      ref={containerRef}
-      data-object-search
-      className={cn(
-        'z-[10001] bg-black/90 backdrop-blur-xs rounded-lg shadow-lg border border-white/20',
-        isFullscreen ? 'fixed' : 'absolute',
-        'top-2 sm:top-4 left-2 sm:left-4 right-2 sm:right-auto w-auto sm:w-80'
-      )}
-      style={
-        isFullscreen
-          ? {
-              top: 'calc(0.5rem + env(safe-area-inset-top))',
-              left: 'calc(0.5rem + env(safe-area-inset-left))',
-              right: 'calc(0.5rem + env(safe-area-inset-right))',
-            }
-          : undefined
-      }
-    >
-      <div className="flex items-center gap-2 p-2">
-        <Search className="w-4 h-4 text-white/50 flex-shrink-0" />
+    <div ref={containerRef} data-search-slot className="relative h-11 w-11 shrink-0" data-search-open={isOpen}>
+      <div data-object-search={isOpen ? '' : undefined} className="cosmos-search-field">
+        <Button ref={triggerRef} size="icon" variant="ghost" onClick={() => isOpen ? closeSearch() : openSearch()} aria-label={t.placeholder} title={t.placeholder} aria-expanded={isOpen} data-search-trigger className="h-11 w-11 shrink-0 bg-foreground/10 hover:bg-foreground/20 text-foreground"><Search className="h-5 w-5" /></Button>
+        <div className="cosmos-search-input" inert={!isOpen}>
         <Input
           ref={inputRef}
           type="text"
@@ -156,24 +128,22 @@ export const ObjectSearch = ({ isFullscreen }: ObjectSearchProps) => {
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder={t.placeholder}
-          className="flex-1 bg-transparent border-none text-white placeholder:text-white/40 h-8 text-sm focus-visible:ring-0 focus-visible:ring-offset-0"
+          className="min-w-0 flex-1 bg-transparent border-none text-foreground placeholder:text-muted-foreground h-11 text-sm focus-visible:ring-0 focus-visible:ring-offset-0"
         />
         <Button
           size="icon"
           variant="ghost"
-          onClick={() => {
-            setIsOpen(false);
-            setQuery('');
-          }}
+          onClick={closeSearch}
           aria-label={tx("Close", "Fermer")}
-          className="h-11 w-11 text-muted-foreground hover:text-white hover:bg-white/10"
+          className="h-11 w-11 shrink-0 text-muted-foreground hover:bg-foreground/10"
         >
           <X className="w-4 h-4" />
         </Button>
+        </div>
       </div>
 
-      {query.trim() && (
-        <div className="max-h-60 overflow-y-auto border-t border-white/10">
+      {isOpen && query.trim() && (
+        <div data-search-results className="absolute left-0 top-[52px] w-full min-w-64 max-h-60 overflow-y-auto border border-border bg-card text-foreground rounded-lg">
           {filteredObjects.length === 0 && filteredMachines.length === 0 ? (
             <p className="text-white/50 text-sm p-3 text-center">{t.noResults}</p>
           ) : (

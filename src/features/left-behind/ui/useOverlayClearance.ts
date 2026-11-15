@@ -11,6 +11,8 @@ export function useOverlayClearance(root: React.RefObject<HTMLDivElement | null>
       const toolbar=el.querySelector('[data-explorer-toolbar]')?.getBoundingClientRect();
       const search=el.querySelector('[data-object-search]')?.getBoundingClientRect();
       const top=Math.max(toolbar?.bottom??bounds.top+52,search?.bottom??0)+8;
+      const searchSlot=el.querySelector('[data-search-slot]')?.getBoundingClientRect();
+      if(searchSlot)el.style.setProperty('--search-expanded-width',`${Math.min(320,innerWidth-searchSlot.left-8)}px`);
       let bottom=Math.min(bounds.bottom,window.visualViewport?.height??innerHeight)-8;
       for(const card of el.querySelectorAll('[data-bottom-card],[data-tour-panel],[data-machine-readout]')){
         const r=card.getBoundingClientRect();if(r.height>0)bottom=Math.min(bottom,r.top-8);
