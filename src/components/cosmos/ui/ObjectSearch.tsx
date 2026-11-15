@@ -117,7 +117,7 @@ export const ObjectSearch = ({ onOpen }: ObjectSearchProps) => {
   };
 
   return (
-    <div ref={containerRef} data-search-slot className="relative h-11 w-11 shrink-0" data-search-open={isOpen}>
+    <div ref={containerRef} data-search-slot className="relative h-11 shrink-0" data-search-open={isOpen}>
       <div data-object-search={isOpen ? '' : undefined} className="cosmos-search-field">
         <Button ref={triggerRef} size="icon" variant="ghost" onClick={() => isOpen ? closeSearch() : openSearch()} aria-label={t.placeholder} title={t.placeholder} aria-expanded={isOpen} data-search-trigger className="h-11 w-11 shrink-0 bg-foreground/10 hover:bg-foreground/20 text-foreground"><Search className="h-5 w-5" /></Button>
         <div className="cosmos-search-input" inert={!isOpen}>

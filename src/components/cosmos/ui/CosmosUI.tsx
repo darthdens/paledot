@@ -985,7 +985,7 @@ export const CosmosUI = () => {
         </div>
       )}
 
-      {brand === 'paledot' && menuOpen && !showControlHints && <LeftBehindMenu />}
+      {brand === 'paledot' && !showControlHints && <LeftBehindMenu />}
 
       {/* About modal */}
       <AboutModal open={showAbout} onOpenChange={setShowAbout} />
