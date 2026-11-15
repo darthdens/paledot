@@ -507,7 +507,7 @@ export const TourOverlay = () => {
         </div>
         <div className="flex items-center gap-1 flex-shrink-0">
           {/* Collapsed controls */}
-          <div className={`flex items-center gap-1 transition-all duration-300 ${isCollapsed ? 'opacity-100' : 'opacity-0 w-0 overflow-hidden'}`}>
+          <div className="flex items-center gap-1" hidden={!isCollapsed}>
             <Button
               size="icon"
               variant="ghost"
@@ -540,9 +540,9 @@ export const TourOverlay = () => {
             </Button>
           </div>
           
-          <div className="h-6 w-6 flex items-center justify-center text-muted-foreground">
+          <Button variant="ghost" size="icon" className="h-11 w-11 text-muted-foreground" aria-label={isCollapsed ? t.expand : t.collapse} aria-expanded={!isCollapsed} onClick={e => { e.stopPropagation(); toggleCollapse(); }}>
             {isCollapsed ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-          </div>
+          </Button>
           <Button
             size="icon"
             variant="ghost"
@@ -560,6 +560,7 @@ export const TourOverlay = () => {
       
       {/* Content - collapsible with smooth animation */}
       <div 
+        inert={isCollapsed}
         className={`grid transition-all duration-300 ease-out ${isCollapsed ? 'grid-rows-[0fr]' : 'grid-rows-[1fr]'}`}
       >
         <div className="overflow-hidden">
