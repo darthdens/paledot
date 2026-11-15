@@ -28,8 +28,8 @@ function SiteExtra({ body, lat, lon, radius }: { body: Body; lat: number; lon: n
   const object = useMemo(() => {
     const g = buildRetroreflector(); g.scale.setScalar(1e-6); // metres -> scene units (1 unit = 1000 km)
     const p = latLonToLocal(lat, lon, radius, TEXTURE_LON_OFFSET_DEG[body] ?? 0);
-    const n = new THREE.Vector3(p.x, p.y, p.z).normalize();
-    g.position.set(p.x, p.y, p.z); g.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), n);
+    const n = new THREE.Vector3(...p).normalize();
+    g.position.set(...p); g.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), n);
     g.traverse(o => { const m = o as THREE.Mesh; if (m.isMesh) { m.frustumCulled = false; m.raycast = noRaycast; } });
     return g;
   }, [body, lat, lon, radius]);
