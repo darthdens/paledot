@@ -67,9 +67,19 @@ NASA models are public-domain US-government resources according to the [NASA 3D 
 | --- | --- | --- |
 | Pale Dot base platform by Dens Akoka (existed before the event) | https://paledot.org | [licence chosen, or as agreed with organisers] |
 | Project repository, with HACKATHON.md and this file | [https://github.com/<you>/<repo>] | Shows what was built during the event |
-| Planet and moon textures | [source URL] | [licence] |
+| Pre-existing planet and moon textures (`src/assets/textures/`) | Source URL unknown; see provenance note below | Original source/product and licence unverified; do not assume public domain |
 | Johns Hopkins APL: Voyager 2 Illuminates Boundary of Interstellar Space | https://www.jhuapl.edu/news/news-releases/191106-voyager-2-illuminates-boundary-interstellar-space | Heliopause facts |
 | LROC (NASA Lunar Reconnaissance Orbiter Camera, Arizona State University) coordinates | https://www.lroc.asu.edu/data/support/downloads/2016_LROC_Coordinates_of_Human_Features.pdf | Rover positions on the Moon |
+
+Texture provenance audit: the original Earth day/night/cloud and Moon JPEGs were introduced in commit `60a77c5` (10 Jan 2026, 20:43:37 GMT); its renderer comments call them “NASA texture maps” and the Moon “LROC”, but provide no download URL or product identifier. Ceres was introduced in `6c9d2ea` (10 Jan 2026, 21:31:29 GMT), with a “NASA texture” comment but no source URL. Searches of filenames, source comments and repository history did not establish exact origins/licences for the other pre-existing textures either. Event WebP conversion does not establish provenance. These unknown pre-event sources remain a submission-credit gap; the separately documented event HD maps have identified sources.
+
+### Other data used during the event
+
+| Link text | URL | Licence / use |
+| --- | --- | --- |
+| NOAA NCEI ETOPO1 Global Relief Model | https://www.ncei.noaa.gov/products/etopo-global-relief-model | US Government public domain; global Earth relief, retrieved via NOAA CoastWatch ERDDAP https://coastwatch.pfeg.noaa.gov/erddap/griddap/etopo180.html |
+| Boeing Lunar Roving Vehicle press kit (Apollo 17, hosted by Ninfinger) | http://www.ninfinger.org/karld/LRV%20Documents/A17_LunarRover2.pdf | Historical Boeing document; redistribution licence not established. Used as a dimensional reference (track width) for the simplified LRV; PDF is not bundled |
+| Esri OnMars CTX tile service | https://astro.arcgis.com | MRO CTX mosaic tiles used by `scripts/left-behind/fetch_surfaces.py`; NASA/JPL/MSSS, Caltech Murray Lab imagery, served through Esri OnMars. Endpoint: https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer ; retain imagery credits and check service redistribution terms; no blanket Esri licence claimed |
 
 ### Libraries and fonts in the shipped app
 

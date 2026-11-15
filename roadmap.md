@@ -46,3 +46,8 @@ Verification: 24 tests pass; four Pale Dot entries and desktop/360px date checks
 ## Machines in the universe
 - [x] Show NASA models in the 3D universe as screen-size markers (Voyager 1 checked in preview).
 - [x] Category badge in the selected-machine panel, all languages.
+
+## Checkpoint paperwork and source package
+- [ ] Update event scope from history and complete requested credits.
+- [ ] Create and inspect the event source ZIP and per-file baseline patches, without secrets.
+- [ ] Verify the preview download and report contents, size and upload batches.
