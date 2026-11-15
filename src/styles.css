@@ -711,7 +711,7 @@ All colors MUST be HSL.
 @keyframes cosmos-picker-expand { from { clip-path: inset(0 0 100% 0); opacity: 0; } to { clip-path: inset(0); opacity: 1; } }
 @keyframes cosmos-picker-collapse { from { clip-path: inset(0); opacity: 1; } to { clip-path: inset(0 0 100% 0); opacity: 0; } }
 @media (prefers-reduced-motion: reduce) { .cosmos-clock-picker { animation: none !important; } }
-.cosmos-calendar [data-selected="true"] { background: hsl(var(--primary)); color: hsl(var(--primary-foreground)); }
+.cosmos-calendar button[data-selected="true"] { background: hsl(var(--primary)); color: hsl(var(--primary-foreground)); }
 .cosmos-calendar .rdp-dropdown_root > [aria-hidden="true"], .cosmos-calendar .dropdown_root > [aria-hidden="true"] { display: none; }
 .cosmos-calendar select + [aria-hidden="true"] { display: none; }
 .cosmos-calendar button { min-width: 0; }
