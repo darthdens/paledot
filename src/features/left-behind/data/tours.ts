@@ -17,6 +17,8 @@ const H = {
 
 type StopIn = Omit<TourStop, 'locationId' | 'cameraPosition' | 'scaleLevel' | 'duration'> & { duration?: number; locationId?: string };
 const stop = (tour: string, s: StopIn): TourStop => ({
+  ...(tour.startsWith('voyager') && ['jupiter', 'saturn', 'uranus', 'neptune'].includes(s.locationId ?? '') ? { viewBodyId: s.locationId, viewMode: 'encounter' as const } : {}),
+  ...(s.id === 'one-last-look' ? { viewBodyId: 'sun', viewMode: 'look-back' as const, photoIds: ['voyager-1-3', 'voyager-1-2'] } : {}),
   locationId: 'earth', cameraPosition: [0, 0, 0], scaleLevel: 'solarSystem', duration: 15, ...s, id: `${tour}-${s.id}`,
 });
 const title = (id: string): TourText => {
