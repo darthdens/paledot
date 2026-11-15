@@ -1,5 +1,9 @@
 <!-- Left Behind · built during NASA Space Apps Challenge 2026 (14–15 Nov 2026) · AI-assisted (Lovable, Claude) -->
 # Roadmap
+## Source and acceptance audit
+- [x] Open all seven `verify: true` fact sources and confirm claims against NASA/APL/NIST. Preserve dated evidence and original-link limitations beside each fact; replace three insufficient primary links. Seven new regressions pass.
+- [x] Run complete suite: 25 files / 153 tests pass; build OK. Live Apollo 11 entry and one flight's progress/completion observed without finishFlight. This does not prove visually smooth flights throughout every tour.
+- [ ] Confirm uninterrupted tour visuals, phone glossary clearance, and full Begin at Earth ending on a hardware-GPU device. Fresh live checks stalled during phone/ending interactions; no acceptance claim made from incomplete runs.
 ## Complete framing acceptance
 - [x] Replace the Voyager 1 summary popup with an opaque black ending and delayed quiet seven-machine summary; actual last-stop completion and screenshot verified. Begin at Earth code unchanged; 10 focused tests pass.
 - [ ] Verify uninterrupted camera flights, phone glossary clearance over a rendered object, and Begin at Earth through its ending. Blocker: software-GPU checks repeatedly stall; Begin at Earth reached all 26 stops but its ending capture did not finish.
