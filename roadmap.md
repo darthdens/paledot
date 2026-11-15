@@ -1,7 +1,7 @@
 <!-- Left Behind · built during NASA Space Apps Challenge 2026 (14–15 Nov 2026) · AI-assisted (Lovable, Claude) -->
 # Roadmap
 ## Toolbar and dropdown consistency
-- [ ] Correct shared open/close motion and full-height menu scrolling; Search expands left in toolbar flow; unify edge spacing, cursors and compact/expanded phone region control.
+- [x] Correct shared grid open/close motion (no scale), keep Left Behind mounted for collapse, and restore full-height scrollable Quick Jump/menus. Search expands left in toolbar flow instead of covering controls; 8px edge spacing, pointer cursors and compact icon/arrow phone region with wide details. Verified 360/393 phones and tablet: matching menu bounds, no overflow/page errors; five focused tests pass. Hardware motion feel remains unmeasurable here.
 - [x] Put Search in the toolbar; fixed 44px-height left-to-right expansion and reverse collapse, keyboard focus and on-demand results retained. Phones wrap with a usable second-row field.
 - [x] Align dropdowns to measured toolbar dimensions, enlarge phone menus and remove obsolete card-open height caps while retaining measured card clearance.
 - [x] Unify every More-menu row (48px minimum, left alignment, icons and spacing). Checked 360/390 phones, landscape, 768px tablet and desktop; no horizontal overflow/page errors; five focused tests pass. Scene quality unchanged.
