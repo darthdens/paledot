@@ -1,5 +1,5 @@
 // Left Behind · built during NASA Space Apps Challenge 2026 (14–15 Nov 2026) · AI-assisted (Lovable, Claude)
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, useRef, useCallback } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { METRE, RELIEF_GLSL, reliefSync } from '@/components/cosmos/lib/relief';
 import { loadSiteHeights } from '../lib/terrainHeights';
@@ -22,6 +22,8 @@ const wrap = (lon: number) => ((lon + 540) % 360) - 180;
  */
 export function SitePatch({ body, lat, lon, radius, mesh }: { body: 'moon' | 'mars'; lat: number; lon: number; radius: number; mesh: THREE.Mesh }) {
   const [tiers, setTiers] = useState<TerrainTier[]>([]);
+  const readyCaps = useRef(new Set<string>());
+  const capReady = useCallback((file: string, ready: boolean) => { if (ready) readyCaps.current.add(file); else readyCaps.current.delete(file); }, []);
   useEffect(() => {
     let alive = true;
     getTerrainIndex().then(idx => {
@@ -33,20 +35,27 @@ export function SitePatch({ body, lat, lon, radius, mesh }: { body: 'moon' | 'ma
     return () => { alive = false; };
   }, [body, lat, lon]);
   // The body skips drawing inside the mid cap (minus its fade band), so its coarser relief can't poke through.
-  useEffect(() => {
+  useFrame(({ camera }) => {
     const mid = tiers.find(t => t.tier === 'mid'); const u = (mesh.material as THREE.ShaderMaterial).uniforms?.['holeRect'];
     if (!mid || !u) return;
+    const centre = mesh.getWorldPosition(new THREE.Vector3());
+    const surface = new THREE.Vector3().setFromSphericalCoords(radius, Math.PI / 2 - lat * Math.PI / 180, Math.PI + (lon + (TEXTURE_LON_OFFSET_DEG[body] ?? 0)) * Math.PI / 180).applyMatrix4(mesh.matrixWorld);
+    // No missing globe fragments before a real cap is ready, from orbit, or on the far side.
+    if (!readyCaps.current.has(mid.file) || camera.position.distanceTo(surface) > radius * 0.1 || surface.clone().sub(centre).dot(camera.position.clone().sub(surface)) <= 0) {
+      (u.value as THREE.Vector4).set(0, 0, 0, 0); return;
+    }
     const off = TEXTURE_LON_OFFSET_DEG[body] ?? 0, w = mid.east - mid.west, h = mid.north - mid.south;
     (u.value as THREE.Vector4).set((mid.west + off + w * 0.1 + 180) / 360, (mid.south + h * 0.1 + 90) / 180, (mid.east + off - w * 0.1 + 180) / 360, (mid.north - h * 0.1 + 90) / 180);
-    return () => { (u.value as THREE.Vector4).set(0, 0, 0, 0); };
-  }, [tiers, mesh, body]);
-  return <>{tiers.map((t, i) => <TierCap key={t.file} tier={t} order={i} radius={radius} mesh={mesh} body={body} />)}</>;
+  });
+  useEffect(() => () => { const u = (mesh.material as THREE.ShaderMaterial).uniforms?.['holeRect']; if (u) (u.value as THREE.Vector4).set(0, 0, 0, 0); }, [mesh]);
+  return <>{tiers.map((t, i) => <TierCap key={t.file} tier={t} order={i} radius={radius} mesh={mesh} body={body} onReady={capReady} />)}</>;
 }
 
-function TierCap({ tier, order, radius, mesh, body }: { tier: TerrainTier; order: number; radius: number; mesh: THREE.Mesh; body: 'moon' | 'mars' }) {
+function TierCap({ tier, order, radius, mesh, body, onReady }: { tier: TerrainTier; order: number; radius: number; mesh: THREE.Mesh; body: 'moon' | 'mars'; onReady: (file: string, ready: boolean) => void }) {
   const gl = useThree(s => s.gl);
   const [tex, setTex] = useState<THREE.Texture | null>(null);
   const [local, setLocal] = useState<THREE.Texture | null>(null);
+  useEffect(() => { onReady(tier.file, !!tex); return () => onReady(tier.file, false); }, [tex, tier.file, onReady]);
   useEffect(() => {
     let alive = true;
     if (tier.heightFile) void loadSiteHeights(tier).then(h => { if (alive) setLocal(h.texture); }).catch(() => {});
