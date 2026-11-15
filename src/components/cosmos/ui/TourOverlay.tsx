@@ -15,6 +15,8 @@ import { celestialObjects } from '../data/celestialObjects';
 import { UNITS } from '../types';
 import { captionText } from '@/features/left-behind/lib/dataText';
 import { tourPhotoIds } from '@/features/left-behind/lib/tourPresentation';
+import { tourSlideSeconds } from '@/features/left-behind/lib/tourPlayback';
+import { useTourPlayback } from '@/features/left-behind/lib/useTourPlayback';
 
 const translations = {
   en: {
@@ -325,24 +327,18 @@ export const TourOverlay = () => {
     }
   }, [isTouring, activeTourId]); // eslint-disable-line react-hooks/exhaustive-deps
   
-  // Auto-advance when not paused
-  useEffect(() => {
-    if (!isTouring || isPaused || !currentStop) return;
-    
-    const duration = currentStop.duration * 1000; // Convert to ms
-    // Narration cannot finish a moving date range early (Apollo's journey is longer than 15 s).
-    const remainingRange = useSimClock.getState().tourPlay;
-    const rangeDuration = remainingRange ? Math.max(0, (remainingRange.until - useSimClock.getState().simDate) / remainingRange.rate * 1000) : 0;
-    const timer = setTimeout(() => {
+  useTourPlayback(
+    isTouring && currentStop ? `${activeTourId}:${currentStop.id}` : null,
+    isPaused,
+    currentStop ? tourSlideSeconds(currentStop, tour.onEnd !== 'end-frame') : 0,
+    () => {
       if (tourIndex < tourStops.length - 1) {
         goToStop(tourIndex + 1);
       } else {
         finishTour();
       }
-    }, Math.max(duration, rangeDuration) + (tour.onEnd === 'end-frame' ? 0 : 1000));
-    
-    return () => clearTimeout(timer);
-  }, [isTouring, isPaused, tourIndex, currentStop, goToStop, finishTour, tourStops.length]);
+    }
+  );
 
   // Keyboard shortcuts
   useEffect(() => {
