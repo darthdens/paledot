@@ -1,5 +1,9 @@
 <!-- Left Behind · built during NASA Space Apps Challenge 2026 (14–15 Nov 2026) · AI-assisted (Lovable, Claude) -->
 # Roadmap
+## Tour viewpoints and archival photographs
+- [ ] Frame flybys towards their encounter planets and One last look towards the Sun, preserving surface views and true scale.
+- [ ] Show sourced NASA photographs in every tour, using WebP assets and translated captions.
+- [ ] Audit all supported tour languages, run focused tests and verify the live tour flow.
 ## Guided-tour continuity
 - [x] Fix shared machine transitions, date jumps and stale host navigation.
 - [x] Replace unfinished rover narration with sourced content; guard surface cut-outs until caps are ready and near.
