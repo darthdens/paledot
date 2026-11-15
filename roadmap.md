@@ -1,5 +1,10 @@
 <!-- Left Behind · built during NASA Space Apps Challenge 2026 (14–15 Nov 2026) · AI-assisted (Lovable, Claude) -->
 # Roadmap
+## Send a signal
+- [ ] Enable the Left Behind menu and MachineCard entry points with one shared glass view in all seven locales.
+- [ ] Calculate real-current-time distances, one-way light times and saved real-time progress for all seven machines; label provenance and logarithmic scale.
+- [ ] Add the selected-target true-light-speed scene pulse, reduced-motion handling, minute-limited announcements and reset.
+- [ ] Test physical rules and persistence; verify sending, reopening and keyboard/phone layout through the live app.
 ## Voyager 1 · One last look
 - [x] Integrate all six parts into the shared Voyager 1 tour card, controls and collapse/swipe behaviour; number them 4.1–4.6. Live navigation, collapse, NASA photo toggle, Family Portrait selection and continuation to step 5 verified; desktop/360px card screenshots checked with canvas hidden only during UI testing. 31 focused tests pass; scene rendering unchanged.
 - [x] Replace the placeholder with the staged, clock-paused experience and direct hash entry; live direct entry and continuation to heliopause verified.
