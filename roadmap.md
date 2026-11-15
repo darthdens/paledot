@@ -1,7 +1,7 @@
 <!-- Left Behind · built during NASA Space Apps Challenge 2026 (14–15 Nov 2026) · AI-assisted (Lovable, Claude) -->
 # Roadmap
 ## Finish visual checks and texture-rights audit
-- [ ] Run focused live checks for machine-tour movement, mobile glossary, Begin at Earth ending, signal persistence/pulse, and One last look; fix reproducible problems without changing scene quality.
+- [ ] Finish visible-scene checks: machine-tour smoothness, phone glossary clearance, signal pulse and One last look rings/rotation still require a hardware-GPU device. This audit: 157 tests pass; saved signal restored in a fresh page; Begin at Earth reached its actual end frame with buttons present (settled animation capture stalled); all six One last look phone panels and continuation to step 5 checked with canvas hidden. No scene quality changed.
 - [x] Compare supplier originals: ten old maps match Solar System Scope CC BY 4.0; add attribution/conversion notice and identify Ceres as fictional. Ten other maps remain blocked from redistribution pending exact origins; no assets changed.
 ## Opening-screen clock
 - [x] Keep time advancing before the scene loads with one shared elapsed-time cursor. Opening readout ticks live; scene handoff checked with canvas hidden after mount to avoid software-GPU delays; 22 clock/tour tests pass. No scene-quality changes.
@@ -12,7 +12,7 @@
 - [x] Run complete suite: 25 files / 153 tests pass; build OK. Live Apollo 11 entry and one flight's progress/completion observed without finishFlight. This does not prove visually smooth flights throughout every tour.
 - [ ] Confirm uninterrupted tour visuals, phone glossary clearance, and full Begin at Earth ending on a hardware-GPU device. Fresh live checks stalled during phone/ending interactions; no acceptance claim made from incomplete runs.
 ## Complete framing acceptance
-- [x] Replace the Voyager 1 summary popup with an opaque black ending and delayed quiet seven-machine summary; actual last-stop completion and screenshot verified. Begin at Earth code unchanged; 10 focused tests pass.
+- [x] Voyager 1 summary completion verified; subsequently restyled to the shared Send a signal popup at the user's request. Begin at Earth remains unchanged.
 - [ ] Verify uninterrupted camera flights, phone glossary clearance over a rendered object, and Begin at Earth through its ending. Blocker: software-GPU checks repeatedly stall; Begin at Earth reached all 26 stops but its ending capture did not finish.
 ## Consistent overlays and complete provenance
 - [x] Share the tour-photo backdrop across Send a signal, Machines and How we know; add the NASA Space Apps Challenge line beneath both Left behind headings. Desktop/phone checked.
