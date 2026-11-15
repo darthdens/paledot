@@ -111,4 +111,4 @@ This list intersects files present at c76c475 with all commit changes since 14 N
 
 - Submitted for judging: 15 November 2026, 20:45 GMT
 - Everything built during the event: https://github.com/darthdens/paledot/compare/c76c475...main
-- Wayback Machine snapshot of paledot.org at submission: unavailable; no snapshot URL is recorded in the repository, and the Wayback CDX index returned no successful HTML captures for 14–15 November 2026 when checked. No submission snapshot is claimed.
+- Wayback Machine snapshot of paledot.org near submission: https://web.archive.org/web/20261115204404/https://paledot.org/ (15 November 2026, 20:44:04 GMT; captured 56 seconds before the recorded submission time). Wayback returned the capture URL and HTTP 200 with the matching Memento timestamp. This archives the published homepage response, not a verified offline copy of every interactive asset.
