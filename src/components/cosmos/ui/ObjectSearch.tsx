@@ -121,7 +121,7 @@ export const ObjectSearch = ({ isFullscreen }: ObjectSearchProps) => {
         variant="ghost"
         onClick={() => setIsOpen(true)}
         className="h-7 w-7 sm:h-9 sm:w-9 bg-white/10 hover:bg-white/20 text-white"
-        title="Search (Ctrl+K)"
+        aria-label={t.placeholder} title={t.placeholder} data-search-trigger
       >
         <Search className="w-3.5 h-3.5 sm:w-5 sm:h-5" />
       </Button>
@@ -131,6 +131,7 @@ export const ObjectSearch = ({ isFullscreen }: ObjectSearchProps) => {
   return (
     <div
       ref={containerRef}
+      data-object-search
       className={cn(
         'z-[10001] bg-black/90 backdrop-blur-xs rounded-lg shadow-lg border border-white/20',
         isFullscreen ? 'fixed' : 'absolute',
@@ -151,6 +152,7 @@ export const ObjectSearch = ({ isFullscreen }: ObjectSearchProps) => {
         <Input
           ref={inputRef}
           type="text"
+          aria-label={t.placeholder}
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder={t.placeholder}
@@ -163,7 +165,8 @@ export const ObjectSearch = ({ isFullscreen }: ObjectSearchProps) => {
             setIsOpen(false);
             setQuery('');
           }}
-          className="h-6 w-6 text-white/50 hover:text-white hover:bg-white/10"
+          aria-label={tx("Close", "Fermer")}
+          className="h-11 w-11 text-muted-foreground hover:text-white hover:bg-white/10"
         >
           <X className="w-4 h-4" />
         </Button>
@@ -178,7 +181,7 @@ export const ObjectSearch = ({ isFullscreen }: ObjectSearchProps) => {
               {filteredMachines.map(machine => <li key={machine.id}><Button variant="ghost" className="h-auto min-h-11 w-full justify-start whitespace-normal px-3 py-2 text-left font-normal text-foreground" onClick={() => { void visitMachine(machine); setIsOpen(false); setQuery(''); }}>{dataText(machine.name, language)}</Button></li>)}
               {filteredObjects.map((obj) => (
                 <li key={obj.id}>
-                  <button
+                  <Button variant="ghost"
                     onClick={() => handleSelect(obj)}
                     className="w-full px-3 py-2 text-left hover:bg-white/10 flex items-center justify-between gap-2 transition-colors"
                   >
@@ -188,7 +191,7 @@ export const ObjectSearch = ({ isFullscreen }: ObjectSearchProps) => {
                     <span className="text-white/40 text-xs flex-shrink-0">
                       {getTypeLabel(obj.type)}
                     </span>
-                  </button>
+                  </Button>
                 </li>
               ))}
             </ul>

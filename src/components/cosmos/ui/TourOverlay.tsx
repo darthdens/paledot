@@ -467,8 +467,7 @@ export const TourOverlay = () => {
       
       {/* Header - clickable to toggle collapse */}
       <div 
-        className="flex items-center justify-between px-3 py-2 sm:p-3 border-b border-border cursor-pointer hover:bg-muted/30 transition-colors gap-2"
-        onClick={toggleCollapse}
+        className="flex items-center justify-between px-3 py-2 sm:p-3 border-b border-border gap-2"
       >
         <div className="flex items-center gap-2 min-w-0 flex-1">
           {/* Progress indicator (visible when collapsed) */}
@@ -568,7 +567,7 @@ export const TourOverlay = () => {
       >
         <div className="overflow-hidden">
           {/* Content area */}
-          <div className="p-3 sm:p-4 space-y-2 sm:space-y-3 max-h-[25vh] sm:max-h-[50vh] overflow-y-auto overscroll-contain" aria-live="polite">
+          <div className="p-3 sm:p-4 space-y-2 sm:space-y-3 max-h-[25vh] sm:max-h-[50vh] overflow-y-auto overscroll-contain" aria-live="polite" aria-atomic="true">
             {children}
           </div>
           
@@ -618,7 +617,7 @@ export const TourOverlay = () => {
   );
   if (isLastLook) return <OneLastLook tourIndex={tourIndex} totalStops={totalStops} renderPanel={renderPanel} onPrevious={handlePrevious} onNext={handleNext} />;
   const content: ReactNode = <>
-    <div className="text-foreground/80 text-xs sm:text-sm leading-relaxed">{tour.onEnd === 'end-frame' ? pickText(currentStop.narration, language, tr) : <GlossaryText key={currentStop.id} text={pickText(currentStop.narration, language, tr)} />}</div>
+    <div className="text-foreground text-xs sm:text-sm leading-relaxed">{tour.onEnd === 'end-frame' ? pickText(currentStop.narration, language, tr) : <GlossaryText key={currentStop.id} text={pickText(currentStop.narration, language, tr)} />}</div>
     <TourPhotos ids={tourPhotoIds(activeTourId, currentStop)} />
   </>;
   return renderPanel({ title: pickText(currentStop.title, language, tr), label: String(tourIndex + 1), progress: (tourIndex + 1) / totalStops, children: content, previous: handlePrevious, next: handleNext });
@@ -633,6 +632,7 @@ function TourPhotos({ ids }: { ids: string[] }) {
   const [open, setOpen] = useState<TourPhoto | null>(null);
   useEffect(() => {
     let alive = true;
+    if (!ids.length) { setPhotos([]); return; }
     void getPhotoManifest().then(list => { if (alive) setPhotos(ids.map(id => (list as unknown as TourPhoto[]).find(p => p.id === id)).filter((p): p is TourPhoto => !!p)); }).catch(() => {});
     return () => { alive = false; };
   }, [ids.join('|')]);

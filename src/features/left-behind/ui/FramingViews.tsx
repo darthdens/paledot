@@ -39,7 +39,7 @@ export function FramingViews() {
     void getHardware().then(async h => {
       const ms = h.machines as CardMachine[];
       const all = await Promise.all(ms.flatMap(m => m.trajectories.map(t => getTrajectory(t.id))));
-      const photos = await getPhotoManifest();
+      const photos = view === 'knowledge' ? await getPhotoManifest() : [];
       const race = buildSignalRace(ms, all, Date.now(), '');
       if (!alive) return;
       setPhotoRetrievedAt(photos.find(photo => photo.retrievedAt)?.retrievedAt ?? null);
