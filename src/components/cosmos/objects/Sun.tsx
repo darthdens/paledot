@@ -252,6 +252,11 @@ export const Sun = ({ position = [0, 0, 0], visualScale = UNIFIED_SCALE }: SunPr
         const point = THREE.MathUtils.smoothstep(d, 1000, 4000) * (1 - THREE.MathUtils.smoothstep(d, 1e5, 2e5));
         (starRef.current.material as THREE.SpriteMaterial).opacity = point;
         starRef.current.visible = point > 0.001;
+        // Sit just in front of the photosphere (toward the camera) so the solid Sun sphere can't depth-hide it.
+        if (point > 0.001) {
+          const lifted = state.camera.position.clone().sub(worldPos.current).normalize().multiplyScalar(sunSize * 1.2).add(worldPos.current);
+          starRef.current.position.copy(groupRef.current.worldToLocal(lifted));
+        }
       }
     }
     if (photoMatRef.current) {
