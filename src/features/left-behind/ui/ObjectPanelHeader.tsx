@@ -6,7 +6,7 @@ export function ObjectPanelHeader({ title, minimized, onToggle, onClose, closeLa
   title: string; minimized: boolean; onToggle: () => void; onClose: () => void; closeLabel: string;
 }) {
   // The whole header strip (the entire card when collapsed) takes the hover colour.
-  return <div className="relative flex items-center transition-colors hover:bg-accent/40">
+  return <div className="relative flex items-center transition-colors hover:bg-accent/60">
     <Button variant="ghost" onClick={onToggle} aria-expanded={!minimized} style={{ minHeight: 68 }}
       className="min-w-0 flex-1 h-auto justify-between gap-2 rounded-none py-3 pl-3 pr-[60px] text-foreground hover:bg-transparent">
       <span className="truncate text-sm sm:text-base font-semibold">{title}</span>
