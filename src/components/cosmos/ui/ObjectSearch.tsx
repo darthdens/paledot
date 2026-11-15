@@ -148,7 +148,7 @@ export const ObjectSearch = ({ onOpen }: ObjectSearchProps) => {
             <p className="text-white/50 text-sm p-3 text-center">{t.noResults}</p>
           ) : (
             <ul>
-              {filteredMachines.map(machine => <li key={machine.id}><Button variant="ghost" className="h-auto min-h-11 w-full justify-start whitespace-normal px-3 py-2 text-left font-normal text-foreground" onClick={() => { void visitMachine(machine); setIsOpen(false); setQuery(''); }}>{dataText(machine.name, language)}</Button></li>)}
+              {filteredMachines.map(machine => <li key={machine.id}><Button variant="ghost" className="h-auto min-h-11 w-full justify-start whitespace-normal px-3 py-2 text-left font-normal text-foreground" onClick={() => { void visitMachine(machine); setIsOpen(false); setQuery(''); }}><span className="min-w-0">{dataText(machine.name, language)}</span></Button></li>)}
               {filteredObjects.map((obj) => (
                 <li key={obj.id}>
                   <Button variant="ghost"
