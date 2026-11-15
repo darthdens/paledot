@@ -21,7 +21,7 @@ import { signalCopy } from '../lib/signalCopy';
 import { GlossaryText } from './GlossaryText';
 
 export type CardMachine = Machine & {
-  place?: string; status?: { type: string; since: string | null };
+  place?: string; status?: { type: string; since: string | null; text?: string };
   keyDates?: { label: string; date: string; factId?: string }[]; leftBehind?: string[]; whereNow?: string;
   facts?: { id: string; text: string; sourceUrl: string }[]; sources?: { title: string; url: string }[];
 };

@@ -58,7 +58,7 @@ export function FramingViews() {
   </ul>;
   return <Dialog.Root open={!!view} onOpenChange={open => { if (!open) close(); }}>
     <Dialog.Portal>
-      <Dialog.Overlay className={`fixed inset-0 z-[10020] ${view === 'summary' ? 'bg-background motion-safe:animate-in motion-safe:fade-in motion-safe:duration-1000' : 'bg-background/20'}`} />
+      <Dialog.Overlay className={`paledot dark fixed inset-0 z-[10020] ${view === 'summary' ? 'bg-background motion-safe:animate-in motion-safe:fade-in motion-safe:duration-1000' : 'bg-background/20'}`} />
       <Dialog.Content data-lb-framing={view} className={`paledot dark pd-card fixed z-[10021] left-2 right-2 bottom-[max(0.5rem,env(safe-area-inset-bottom))] max-h-[calc(100dvh-2.5rem-env(safe-area-inset-top)-env(safe-area-inset-bottom))] flex flex-col overflow-hidden rounded-lg border border-border bg-card/80 backdrop-blur-md sm:bottom-auto sm:left-1/2 sm:top-1/2 sm:right-auto sm:w-[560px] sm:max-w-[calc(100vw-2rem)] sm:-translate-x-1/2 sm:-translate-y-1/2 ${view === 'summary' ? 'motion-safe:animate-in motion-safe:fade-in motion-safe:duration-1000' : ''}`}>
         <header className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2 border-b border-border p-2">
           <Dialog.Title className="min-w-0 pl-2 text-base font-semibold">{T(heading)}</Dialog.Title>
