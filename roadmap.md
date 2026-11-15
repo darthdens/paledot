@@ -1,5 +1,7 @@
 <!-- Left Behind · built during NASA Space Apps Challenge 2026 (14–15 Nov 2026) · AI-assisted (Lovable, Claude) -->
 # Roadmap
+## Tour autoplay
+- [x] Correct milliseconds/seconds mismatch; slide-keyed autoplay retains elapsed time through pause/resume. Live Voyager 1 advances from launch through Jupiter to Saturn without Next; screenshot checked, no runtime errors, 103 tests pass.
 ## Tour viewpoints and archival photographs
 - [x] Frame Voyager flybys around their encounter planets and spacecraft; One last look points towards the Sun. Live Voyager 1 Jupiter/Saturn midpoint and Sunward direction verified; real-device smoothness remains unverified.
 - [x] Show sourced NASA photographs in every tour, using WebP assets and translated captions. All machine slides have imagery; Begin at Earth uses relevant existing-body photographs, without assigning unrelated NASA photos to galaxies.
