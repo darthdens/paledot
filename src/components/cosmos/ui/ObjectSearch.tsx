@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { useLanguage } from '@/i18n/LanguageContext';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Search, X } from 'lucide-react';
+import { Search } from 'lucide-react';
 import { celestialObjects } from '../data/celestialObjects';
 import { useCosmosStore } from '../store/useCosmosStore';
 import { useSiteBrand } from '@/lib/site-brand';
@@ -119,7 +119,7 @@ export const ObjectSearch = ({ onOpen }: ObjectSearchProps) => {
   return (
     <div ref={containerRef} data-search-slot className="relative h-11 shrink-0" data-search-open={isOpen}>
       <div data-object-search={isOpen ? '' : undefined} className="cosmos-search-field">
-        <Button ref={triggerRef} size="icon" variant="ghost" onClick={() => isOpen ? closeSearch() : openSearch()} aria-label={t.placeholder} title={t.placeholder} aria-expanded={isOpen} data-search-trigger className="h-11 w-11 shrink-0 bg-foreground/10 hover:bg-foreground/20 text-foreground"><Search className="h-5 w-5" /></Button>
+        <Button ref={triggerRef} size="icon" variant="ghost" onClick={() => isOpen ? closeSearch() : openSearch()} aria-label={isOpen ? tx('Close search', 'Fermer la recherche') : t.placeholder} title={isOpen ? tx('Close search', 'Fermer la recherche') : t.placeholder} aria-expanded={isOpen} data-search-trigger className={`h-11 w-11 shrink-0 text-foreground ${isOpen ? 'bg-transparent hover:bg-foreground/10' : 'bg-foreground/10 hover:bg-foreground/20'}`}><Search className="h-5 w-5" /></Button>
         <div className="cosmos-search-input" inert={!isOpen}>
         <Input
           ref={inputRef}
@@ -130,15 +130,6 @@ export const ObjectSearch = ({ onOpen }: ObjectSearchProps) => {
           placeholder={t.placeholder}
           className="min-w-0 flex-1 bg-transparent border-none text-foreground placeholder:text-muted-foreground h-11 text-sm focus-visible:ring-0 focus-visible:ring-offset-0"
         />
-        <Button
-          size="icon"
-          variant="ghost"
-          onClick={closeSearch}
-          aria-label={tx("Close", "Fermer")}
-          className="h-11 w-11 shrink-0 text-muted-foreground hover:bg-foreground/10"
-        >
-          <X className="w-4 h-4" />
-        </Button>
         </div>
       </div>
 
