@@ -44,12 +44,13 @@ export function PaleDotTitleScreen({ onBegin, onLeftBehind }: { onBegin: () => v
       </div>
       <PaleDotWordmark lit />
       <p className="pd-desc">{t.descriptor}</p>
-      <div className="pd-actions">
+      <div className="pd-actions items-center">
         <button type="button" data-action className="pd-pill" onClick={onBegin}>
           {t.begin}
         </button>
-        <Button type="button" variant="outline" data-action className="pd-pill min-h-11 flex-col gap-1" onClick={onLeftBehind}>
-          <span>{tr({ en: leftBehindCopy[language].name, fr: leftBehindCopy[language].name })}</span><span className="text-[10px] text-muted-foreground">(NASA Space Apps Challenge)</span>
+        <Button type="button" variant="outline" data-action className="pd-pill h-auto min-h-11 max-w-full flex-col" onClick={onLeftBehind}>
+          <span className="block leading-5">{tr({ en: leftBehindCopy[language].name, fr: leftBehindCopy[language].name })}</span>
+          <span className="block text-[10px] leading-4 text-muted-foreground">(NASA Space Apps Challenge)</span>
         </Button>
       </div>
       <div className="pd-readout">
