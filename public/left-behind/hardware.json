@@ -1,5 +1,5 @@
 {
-  "_note": "Left Behind data, compiled 14 Nov 2026 during NASA Space Apps Challenge 2026 (AI-assisted research with Claude). Each fact links to its source; 'verify': true marks facts whose source page should be opened and checked once.",
+  "_note": "Left Behind data, compiled 14 Nov 2026 during NASA Space Apps Challenge 2026 (AI-assisted research with Claude). Each fact links to its source; 'verify': true marks an outstanding source check. Checked facts retain 'verify': false, verifiedAt, verificationSources and verificationNote; these record source checks, not new measurements.",
   "machines": [
     {
       "id": "apollo-11",
@@ -441,8 +441,13 @@
         {
           "id": "mer-launch",
           "text": "Opportunity launched from Cape Canaveral on 7 July 2003 (US time).",
-          "sourceUrl": "https://science.nasa.gov/missions/mer/nasas-opportunity-rover-mission-on-mars-comes-to-end/",
-          "verify": true
+          "sourceUrl": "https://science.nasa.gov/mission/mer-opportunity/",
+          "verify": false,
+          "verifiedAt": "2026-11-15T11:45:04Z",
+          "verificationSources": [
+            "https://science.nasa.gov/mission/mer-opportunity/"
+          ],
+          "verificationNote": "NASA gives July 7, 2003 at 20:18:15 PDT; the stored UTC launch is July 8. The original news release does not specify the launch day."
         },
         {
           "id": "mer-coords",
@@ -563,8 +568,14 @@
         {
           "id": "ing-launch",
           "text": "Ingenuity travelled to Mars attached to the belly of the Perseverance rover, launched on 30 July 2020.",
-          "sourceUrl": "https://phys.org/news/2024-01-years-mars-nasa-ingenuity-helicopter.html",
-          "verify": true
+          "sourceUrl": "https://science.nasa.gov/mission/mars-2020-perseverance/",
+          "verify": false,
+          "verifiedAt": "2026-11-15T11:45:04Z",
+          "verificationSources": [
+            "https://science.nasa.gov/mission/mars-2020-perseverance/",
+            "https://www.nasa.gov/news-release/after-three-years-on-mars-nasas-ingenuity-helicopter-mission-ends/"
+          ],
+          "verificationNote": "NASA Mars 2020 gives July 30, 2020 and says Ingenuity was strapped to the rover belly for the journey. Original Phys.org link returned an anti-bot page."
         },
         {
           "id": "ing-landing",
@@ -707,7 +718,13 @@
           "id": "v2-helio",
           "text": "Voyager 2 crossed the heliopause into interstellar space on 5 November 2018, about 119 AU from the Sun.",
           "sourceUrl": "https://www.jhuapl.edu/news/news-releases/191106-voyager-2-illuminates-boundary-interstellar-space",
-          "verify": true
+          "verify": false,
+          "verifiedAt": "2026-11-15T11:45:04Z",
+          "verificationSources": [
+            "https://www.jhuapl.edu/news/news-releases/191106-voyager-2-illuminates-boundary-interstellar-space",
+            "https://science.nasa.gov/resource/oort-cloud-and-scale-of-the-solar-system-infographic/"
+          ],
+          "verificationNote": "APL confirms November 5, 2018; NASA December 2018 infographic gives around 119 AU. Original APL page does not give 119 AU."
         }
       ],
       "sources": [
@@ -839,7 +856,12 @@
           "id": "v1-pbd",
           "text": "In the narrow-angle image of Earth, our planet is a point of light only 0.12 pixel in size, seen from more than 6 billion kilometres (4 billion miles) away.",
           "sourceUrl": "https://photojournal.jpl.nasa.gov/catalog/pia00452",
-          "verify": true
+          "verify": false,
+          "verifiedAt": "2026-11-15T11:45:04Z",
+          "verificationSources": [
+            "https://photojournal.jpl.nasa.gov/catalog/pia00452"
+          ],
+          "verificationNote": "NASA Photojournal explicitly gives Earth as a 0.12-pixel crescent and a distance of more than 4 billion miles."
         },
         {
           "id": "v1-pbd2020",
@@ -849,8 +871,13 @@
         {
           "id": "v1-helio",
           "text": "Voyager 1 crossed the heliopause into interstellar space on 25 August 2012, the first spacecraft to do so.",
-          "sourceUrl": "https://www.jhuapl.edu/news/news-releases/191106-voyager-2-illuminates-boundary-interstellar-space",
-          "verify": true
+          "sourceUrl": "https://science.nasa.gov/mission/voyager/questions-and-answers-with-dr-ed-stone/",
+          "verify": false,
+          "verifiedAt": "2026-11-15T11:45:04Z",
+          "verificationSources": [
+            "https://science.nasa.gov/mission/voyager/questions-and-answers-with-dr-ed-stone/"
+          ],
+          "verificationNote": "NASA Voyager Q&A explicitly identifies August 25, 2012; the original APL page mentions only 2012."
         },
         {
           "id": "v1-lightday",
@@ -899,13 +926,24 @@
         "id": "dsn",
         "text": "NASA talks to the Voyagers through the Deep Space Network, with antenna complexes at Goldstone (California), Madrid (Spain) and Canberra (Australia).",
         "sourceUrl": "https://www.nasa.gov/communicating-with-missions/dsn/",
-        "verify": true
+        "verify": false,
+        "verifiedAt": "2026-11-15T11:45:04Z",
+        "verificationSources": [
+          "https://www.nasa.gov/communicating-with-missions/dsn/",
+          "https://www.jhuapl.edu/news/news-releases/191106-voyager-2-illuminates-boundary-interstellar-space"
+        ],
+        "verificationNote": "NASA identifies Goldstone, Madrid and Canberra; APL states Voyager data is transmitted through NASA DSN."
       },
       {
         "id": "light-speed",
         "text": "Light and radio signals travel 299,792.458 km every second.",
         "sourceUrl": "https://physics.nist.gov/cgi-bin/cuu/Value?c",
-        "verify": true
+        "verify": false,
+        "verifiedAt": "2026-11-15T11:45:04Z",
+        "verificationSources": [
+          "https://physics.nist.gov/cgi-bin/cuu/Value?c"
+        ],
+        "verificationNote": "NIST gives 299792458 metres per second, exact; conversion to kilometres per second is 299792.458."
       }
     ]
   }
