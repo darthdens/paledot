@@ -636,8 +636,8 @@ export const CosmosUI = () => {
               >
                 {t.explore}
               </Button>
-              {brand === 'paledot' && <Button size="sm" variant="outline" className="pd-pill" onClick={() => { setShowControlHints(false); useLeftBehindStore.getState().setMenuOpen(true); }}>
-                <Satellite className="h-4 w-4" />{tr({ en: lbCopy.entry, fr: lbCopy.entry })}
+              {brand === 'paledot' && <Button size="sm" variant="outline" className="pd-pill h-auto min-h-11" onClick={() => { setShowControlHints(false); useLeftBehindStore.getState().setMenuOpen(true); }}>
+                <Satellite className="h-4 w-4" /><span className="flex flex-col gap-1"><span>{tr({ en: lbCopy.entry, fr: lbCopy.entry })}</span><span className="text-[10px] text-muted-foreground">(NASA Space Apps Challenge)</span></span>
               </Button>}
             </div>
             {brand === 'paledot' && showTourChoices && <div className="pd-card rounded-lg p-2 max-h-[min(360px,40dvh)] overflow-y-auto mx-auto w-full max-w-sm"><TourChoices onBegin={id => { setShowTourChoices(false); setShowControlHints(false); startTour(id); }} /></div>}
@@ -664,6 +664,13 @@ export const CosmosUI = () => {
       >
         <TooltipProvider delayDuration={300}>
           <div className="flex items-center justify-end gap-1 sm:gap-1.5">
+            {brand === 'paledot' && <>
+              <Tooltip>
+                <TooltipTrigger asChild><Button data-lb-menu-trigger size="icon" variant="ghost" aria-label={lbName} aria-pressed={menuOpen} onClick={toggleLeftBehind} className={`h-8 w-8 sm:h-9 sm:w-9 backdrop-blur-xs text-foreground ${menuOpen ? 'bg-foreground/25' : 'bg-foreground/10 hover:bg-foreground/20'}`}><Satellite className={`w-4 h-4 sm:w-5 sm:h-5 ${menuOpen ? '' : 'pd-lb-buzz'}`} /></Button></TooltipTrigger>
+                <TooltipContent variant="dark" side="bottom"><span className="block">{lbName}</span><span className="block text-[10px] text-muted-foreground">(NASA Space Apps Challenge)</span></TooltipContent>
+              </Tooltip>
+              <div role="separator" aria-orientation="vertical" className="hidden lg:block w-px h-6 bg-border mx-1" />
+            </>}
             {/* Essential controls - always visible */}
             {!native && (
               <Tooltip>
@@ -701,10 +708,6 @@ export const CosmosUI = () => {
             </Tooltip>
 
             {/* Divider before sound */}
-            {brand === 'paledot' && <Tooltip>
-              <TooltipTrigger asChild><Button data-lb-menu-trigger size="icon" variant="ghost" aria-label={lbName} aria-pressed={menuOpen} onClick={toggleLeftBehind} className={`h-8 w-8 sm:h-9 sm:w-9 backdrop-blur-xs text-foreground ${menuOpen ? 'bg-foreground/25' : 'bg-foreground/10 hover:bg-foreground/20'}`}><Satellite className="w-4 h-4 sm:w-5 sm:h-5" /></Button></TooltipTrigger>
-              <TooltipContent variant="dark" side="bottom">{lbName}</TooltipContent>
-            </Tooltip>}
             <div className="hidden lg:block w-px h-6 bg-white/20 mx-0.5" />
 
             {/* Ambient Music Controller - always visible */}

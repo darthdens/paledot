@@ -674,3 +674,14 @@ All colors MUST be HSL.
 }
 .pd-nasa-inspector { z-index: 30000; }
 .pd-nasa-inspector ~ * { letter-spacing: 0; }
+
+/* Left Behind · built during NASA Space Apps Challenge 2026 (14–15 Nov 2026) · AI-assisted (Lovable, Claude) */
+.paledot .pd-lb-buzz { animation: pd-lb-buzz 8s ease-in-out infinite; transform-origin: center; }
+@keyframes pd-lb-buzz {
+  0%, 86%, 100% { transform: rotate(0); }
+  88%, 92% { transform: rotate(-9deg); }
+  90%, 94% { transform: rotate(9deg); }
+  96% { transform: rotate(-4deg); }
+  98% { transform: rotate(4deg); }
+}
+@media (prefers-reduced-motion: reduce) { .paledot .pd-lb-buzz { animation: none; } }

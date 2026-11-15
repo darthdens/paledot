@@ -1,5 +1,9 @@
 <!-- Left Behind · built during NASA Space Apps Challenge 2026 (14–15 Nov 2026) · AI-assisted (Lovable, Claude) -->
 # Roadmap
+## Signal spacing and Left Behind emphasis
+- [x] Match mobile signal top clearance to the toolbar and equalise close-button top/right inset; 360px popup checked at y=32px with equal 8px header insets.
+- [x] Place Left Behind first across devices, separate it on desktop and add a reduced-motion-safe occasional icon shake.
+- [x] Add the NASA Space Apps Challenge proper-name subtitle to Left Behind text entries; phone menu and 360/768/1280px signal layouts checked in the preview (canvas hidden for UI checks only).
 ## Send a signal
 - [x] Enable the Left Behind menu and MachineCard entry points with one shared glass view in all seven locales.
 - [x] Calculate real-current-time distances, one-way light times and saved real-time progress for all seven machines; label provenance and logarithmic scale.
