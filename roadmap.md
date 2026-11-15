@@ -2,7 +2,7 @@
 # Roadmap
 ## Finish visual checks and texture-rights audit
 - [ ] Run focused live checks for machine-tour movement, mobile glossary, Begin at Earth ending, signal persistence/pulse, and One last look; fix reproducible problems without changing scene quality.
-- [ ] Trace pre-existing texture sources and usage terms; record only proven matches and leave unidentified assets explicitly blocked from redistribution.
+- [x] Compare supplier originals: ten old maps match Solar System Scope CC BY 4.0; add attribution/conversion notice and identify Ceres as fictional. Ten other maps remain blocked from redistribution pending exact origins; no assets changed.
 ## Opening-screen clock
 - [x] Keep time advancing before the scene loads with one shared elapsed-time cursor. Opening readout ticks live; scene handoff checked with canvas hidden after mount to avoid software-GPU delays; 22 clock/tour tests pass. No scene-quality changes.
 ## Match entry and ending popups
