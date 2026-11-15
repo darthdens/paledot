@@ -252,11 +252,7 @@ export const YouAreHereLabel = () => {
             <span className="shrink-0">{getScaleIcon(currentScale)}</span>
             <span data-region-title className="truncate text-sm font-semibold">{locationInfo.title}</span>
           </div>
-          {isMinimized ? (
-            <ChevronDown className="w-4 h-4 shrink-0 text-white/60" />
-          ) : (
-            <ChevronUp className="w-4 h-4 shrink-0 text-white/60" />
-          )}
+          <ChevronDown className={`w-4 h-4 shrink-0 text-white/60 transition-transform duration-300 ${isMinimized ? '' : 'rotate-180'}`} />
         </Button>
         
         <div 
@@ -270,10 +266,15 @@ export const YouAreHereLabel = () => {
             </div>
             <div className="px-3 pb-3 space-y-1 border-t border-white/10 pt-2">
               <p className="text-white/70 text-xs">{locationInfo.subtitle}</p>
-              <div className="mt-2 space-y-0.5">
-                {locationInfo.details.map((detail, index) => (
-                  <p key={index} className="text-white/60 text-xs">• {detail}</p>
-                ))}
+              <div className="mt-2">
+                <ul className="space-y-1">
+                  {locationInfo.details.map((detail, index) => (
+                    <li key={index} className="text-white/80 text-xs flex items-start gap-1.5">
+                      <span className="text-white/40 mt-0.5">•</span>
+                      <span>{detail}</span>
+                    </li>
+                  ))}
+                </ul>
               </div>
             </div>
           </div>
