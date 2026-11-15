@@ -757,5 +757,7 @@ All colors MUST be HSL.
   .paledot [data-explorer-toolbar] > div { flex-wrap: wrap; }
   .paledot [data-region-control] { max-width: 130px; }
   .paledot [data-search-slot] { order: 10; margin-right: auto; }
+  .paledot [data-explorer-toolbar]:has([data-search-slot]) { width: calc(100% - 146px); }
+  .paledot [data-explorer-toolbar] > div > :last-child { order: 11; }
 }
 @media (prefers-reduced-motion: reduce) { .cosmos-search-field, .cosmos-search-input { transition: none; } }
