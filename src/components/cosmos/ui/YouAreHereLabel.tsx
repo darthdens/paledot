@@ -218,7 +218,7 @@ export const YouAreHereLabel = () => {
   const locationInfo = getLocationInfo();
   
   return (
-    <div className={`${isFullscreen
+    <div data-region-control className={`${isFullscreen
       ? 'fixed top-[calc(0.5rem+env(safe-area-inset-top))] left-[calc(0.5rem+env(safe-area-inset-left))]'
       : 'absolute top-2 sm:top-4 left-2 sm:left-4'} z-10 max-w-[calc(100%-13rem)] md:max-w-[calc(100%-2rem)] animate-fade-in`}>
       <div className="bg-white/10 backdrop-blur-md rounded-lg overflow-hidden max-w-full md:max-w-none">
@@ -239,6 +239,7 @@ export const YouAreHereLabel = () => {
         </Button>
         
         <div 
+          inert={isMinimized}
           className={`grid transition-all duration-300 ease-out ${isMinimized ? 'grid-rows-[0fr]' : 'grid-rows-[1fr]'}`}
         >
           <div className="overflow-hidden">

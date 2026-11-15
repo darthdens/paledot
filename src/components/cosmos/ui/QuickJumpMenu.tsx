@@ -147,6 +147,8 @@ export const QuickJumpMenu = () => {
   const menu = (
     <div
       ref={menuRef}
+      inert={!showQuickJump}
+      aria-hidden={!showQuickJump}
       data-quick-jump
       className={`${isFullscreen ? 'fixed' : 'absolute'} z-[10001] bg-white/10 backdrop-blur-xs rounded-lg overflow-hidden transition-all duration-300 ease-out ${
         showQuickJump ? 'opacity-100 scale-100' : 'opacity-0 scale-95 pointer-events-none'

@@ -493,7 +493,7 @@ export const CameraController = () => {
 
     if (following && hwFlight.current) {
       const f = hwFlight.current;
-      f.t = Math.min(1, f.t + delta / f.duration);
+      f.t = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 1 : Math.min(1, f.t + delta / f.duration);
       const s0 = viewPose(f.start), e0 = viewPose(f.end);
       if (!e0) { if (!useCosmosStore.getState().isTouring) { hwFlight.current = null; } return; }
       const s1 = s0 ?? e0;
@@ -510,7 +510,7 @@ export const CameraController = () => {
     if (isAnimating.current) {
       // Slower animation speed for tour (more cinematic), faster for object selection
       const animSpeed = isTourAnimation.current ? 0.4 : 1.2;
-      animationProgress.current += delta * animSpeed;
+      animationProgress.current = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 1 : animationProgress.current + delta * animSpeed;
 
       if (animationProgress.current >= 1) {
         animationProgress.current = 1;
