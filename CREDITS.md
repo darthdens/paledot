@@ -141,9 +141,13 @@ Confirm each licence against package metadata (Prompt 11 check 12).
 | Tailwind CSS | https://tailwindcss.com | MIT |
 | shadcn/ui | https://ui.shadcn.com | MIT |
 | Embla Carousel | https://www.embla-carousel.com | MIT |
+| embla-carousel-react | https://github.com/davidjerleke/embla-carousel/tree/master/packages/embla-carousel-react | MIT |
 | vaul | https://github.com/emilkowalski/vaul | MIT |
 | DM Sans (Google Fonts) | https://fonts.google.com/specimen/DM+Sans | SIL Open Font License 1.1 |
 | DM Mono (Google Fonts) | https://fonts.google.com/specimen/DM+Mono | SIL Open Font License 1.1 |
+| Space Grotesk (Google Fonts; Cosmos typography) | https://fonts.google.com/specimen/Space+Grotesk | SIL Open Font License 1.1 |
+| Playfair Display (Google Fonts; Cosmos typography) | https://fonts.google.com/specimen/Playfair+Display | SIL Open Font License 1.1 |
+| JetBrains Mono (Google Fonts; Cosmos typography) | https://fonts.google.com/specimen/JetBrains+Mono | SIL Open Font License 1.1 |
 | @capacitor/android | https://capacitorjs.com | MIT |
 | @capacitor/core | https://capacitorjs.com | MIT |
 | @capacitor/ios | https://capacitorjs.com | MIT |
@@ -250,3 +254,31 @@ All tour photographs are NASA archival images, not recordings of the simulated v
 - [PIA00030: Saturn With Rhea and Dione True Color](https://images.nasa.gov/details/PIA00030) — NASA/JPL.
 - [PIA18182: Uranus as seen by NASA Voyager 2](https://images.nasa.gov/details/PIA18182) — NASA/JPL-Caltech.
 - [PIA01492: PIA01492](https://images.nasa.gov/details/PIA01492) — NASA/JPL.
+
+### Additional resource rows for the submission form
+
+These rows also cover resources described in the terrain and photograph lists above.
+
+| Link text | URL | Licence / use |
+| --- | --- | --- |
+| NASA SVS CGI Moon Kit: LRO LOLA LDEM_16 | https://svs.gsfc.nasa.gov/4720 | NASA/GSFC/LRO/LOLA; public-domain global Moon relief |
+| MGS MOLA MEGDR | https://pds-geosciences.wustl.edu/missions/mgs/megdr.html | NASA/GSFC/MGS/MOLA Science Team; public-domain Mars relief |
+| LROC Apollo 11 terrain | https://data.lroc.im-ldi.com/lroc/view_rdr_product/NAC_DTM_APOLLO11 | NASA/GSFC/Arizona State University; Apollo 11 DTM |
+| LROC Apollo 15 terrain | https://data.lroc.im-ldi.com/lroc/view_rdr_product/NAC_DTM_APOLLO15 | NASA/GSFC/Arizona State University; Apollo 15 DTM |
+| LROC Apollo 16 terrain | https://data.lroc.im-ldi.com/lroc/view_rdr_product/NAC_DTM_APOLLO16 | NASA/GSFC/Arizona State University; Apollo 16 DTM |
+| LROC Apollo 17 terrain | https://data.lroc.im-ldi.com/lroc/view_rdr_product/NAC_DTM_APOLLO17 | NASA/GSFC/Arizona State University; Apollo 17 DTM |
+| HiRISE Jezero DTM | https://www.uahirise.org/dtm/ESP_045994_1985 | NASA/JPL-Caltech/UArizona; Ingenuity site terrain |
+| HiRISE Viking 1 DTM | https://www.uahirise.org/dtm/PSP_001521_2025 | NASA/JPL-Caltech/UArizona; Viking 1 site terrain |
+| Mercury MESSENGER global DEM | https://astrogeology.usgs.gov/search/map/mercury_messenger_global_dem_665m | NASA/JHUAPL/Carnegie Institution of Washington/USGS; public-domain relief |
+| Ceres Dawn FC HAMO global DTM | https://astrogeology.usgs.gov/search/map/ceres_dawn_fc_hamo_dtm_dlr_global_60ppd | NASA/JPL-Caltech/UCLA/MPS/DLR/IDA; retain mission contributors |
+| PIA18033: Earth | https://images.nasa.gov/details/PIA18033 | NASA; guided-tour archival photograph |
+| PIA01384: Jupiter Great Red Spot | https://images.nasa.gov/details/PIA01384 | NASA/JPL; guided-tour archival photograph |
+| PIA00030: Saturn With Rhea and Dione True Color | https://images.nasa.gov/details/PIA00030 | NASA/JPL; guided-tour archival photograph |
+| PIA18182: Uranus as seen by NASA Voyager 2 | https://images.nasa.gov/details/PIA18182 | NASA/JPL-Caltech; guided-tour archival photograph |
+| PIA01492 | https://images.nasa.gov/details/PIA01492 | NASA/JPL; guided-tour archival photograph |
+| NSSDCA: The Apollo Lunar Roving Vehicle | https://nssdc.gsfc.nasa.gov/planetary/lunar/apollo_lrv.html | US Government factual reference for the simplified rover |
+| JPL: Apollo 11 Experiment Continues to Return Valuable Data | https://www.jpl.nasa.gov/news/apollo-11-experiment-continues-to-return-valuable-data/ | Factual reference for the simplified reflector |
+| Dens Akoka portrait and site identity | https://dens.so | Creator identity assets; external rights are not inferred. Pale Dot name/logo are excluded from the code licence |
+| Bundled ambient soundtrack (`public/audio/space-ambient.mp3`) | https://github.com/darthdens/paledot/blob/main/public/audio/space-ambient.mp3 | Used by both brands; original author, supplier URL and redistribution licence are not established in the repository. Repository link identifies the file, not rights clearance |
+
+Outstanding rights/source limitation: the historical Boeing LRV reference is documented above with its original HTTP URL; its HTTPS equivalent returned HTTP 400 during this check. The original soundtrack supplier and licence also remain unverified. These gaps are disclosed rather than replaced with invented sources or licences.
