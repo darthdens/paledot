@@ -1,3 +1,4 @@
+// Left Behind · built during NASA Space Apps Challenge 2026 (14–15 Nov 2026) · AI-assisted (Lovable, Claude)
 import type { Tour, TourText } from '../types';
 import { tourStops } from './tourStops';
 
