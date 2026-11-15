@@ -715,6 +715,11 @@ All colors MUST be HSL.
 .cosmos-calendar .rdp-dropdown_root > [aria-hidden="true"], .cosmos-calendar .dropdown_root > [aria-hidden="true"] { display: none; }
 .cosmos-calendar select + [aria-hidden="true"] { display: none; }
 .cosmos-calendar button { min-width: 0; }
+.cosmos-clock-picker .cosmos-calendar button, .cosmos-clock-picker [role="option"] { border-radius: 6px; }
+.cosmos-calendar-select > span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cosmos-calendar-select > svg { flex-shrink: 0; }
+.cosmos-calendar-options[data-side="bottom"] { transform: none; }
+.cosmos-calendar-options[data-side="top"] { transform: none; }
 .paledot [data-explorer-dropdown] { top: 60px !important; right: max(8px, env(safe-area-inset-right)) !important; max-height: calc(100dvh - 100px - env(safe-area-inset-top) - env(safe-area-inset-bottom)); overflow-y: auto; overscroll-behavior: contain; }
 .paledot [data-bottom-card], .paledot [data-tour-panel], .paledot .pd-machine-readout { bottom: max(8px, env(safe-area-inset-bottom)); max-height: calc(100dvh - 160px - env(safe-area-inset-top) - env(safe-area-inset-bottom)); }
 .paledot .pd-machine-note { bottom: max(8px, env(safe-area-inset-bottom)); }
