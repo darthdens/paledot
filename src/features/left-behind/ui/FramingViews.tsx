@@ -65,7 +65,7 @@ export function FramingViews() {
   return <Dialog.Root open={!!view} onOpenChange={open => { if (!open) close(); }}>
     <Dialog.Portal>
       <LeftBehindDialogOverlay />
-      <LeftBehindDialogContent data-lb-framing={view}>
+      <LeftBehindDialogContent data-lb-framing={view} className={view === 'summary' ? 'h-[calc(100dvh-2.5rem-env(safe-area-inset-top)-env(safe-area-inset-bottom))] sm:h-auto' : undefined}>
         <header className="flex shrink-0 items-center justify-between gap-3 border-b border-border p-2">
           <div className="min-w-0 pl-2"><Dialog.Title className="text-sm font-semibold">{T(heading)}</Dialog.Title>{(view === 'intro' || view === 'summary') && <p className="mt-1 text-[10px] leading-relaxed text-muted-foreground">{CHALLENGE}</p>}</div>
           <Button variant="ghost" size="icon" className="h-11 w-11 shrink-0 text-muted-foreground" aria-label={T(c.close)} onClick={close}><X className="h-4 w-4" /></Button>
