@@ -1,5 +1,9 @@
 <!-- Left Behind · built during NASA Space Apps Challenge 2026 (14–15 Nov 2026) · AI-assisted (Lovable, Claude) -->
 # Roadmap
+## Correct inaccurate maps and resolve texture rights
+- [x] Replace eight misassigned files, fictional Ceres, and the two untraceable assets with eleven sourced WebP assets; source evidence and coverage limits in texture-sources.json and CREDITS.md. Phobos/Deimos assets corrected, but their catalogue bodies are absent and are not newly added.
+- [x] Check renderer assignments, longitude transforms and live scene loading; 14 source regressions added, all 175 tests pass. Seven corrected textures read back from the actual visible scene; opening loader shares their URLs.
+- [ ] Reliable motion acceptance still blocked by software GPU: Voyager 1's actual flight completed with a visible Jupiter screenshot, but only three distinct frames across 30 samples. Further run stalled on screenshot before Voyager 2/Apollo checks; no flicker-free claim or unproven camera edit.
 ## Phone, accessibility, clock and Left Behind audit
 - [x] Fix confirmed touch-target, focus, hidden-menu keyboard, search/dropdown/card clearance and reduced-motion issues without adding features; every change listed in AUDIT.md.
 - [x] Remove specific hot-loop vector/matrix/list allocations and redundant hidden-line updates; avoid unnecessary photo-manifest reads. Remaining evaluator/camera allocations disclosed in AUDIT.md.
@@ -7,8 +11,8 @@
 - [ ] Lighthouse acceptance blocked: published document load ERR_ABORTED, throttled baseline timed out, no historical pre-feature timing. No scores/FPS/loading improvement claimed; complete change report in AUDIT.md.
 ## Finish visual checks and texture-rights audit
 - [x] Follow-up 15 November: identify eight more supplier sources without replacing assets. Phobos is fictional Ceres; Pluto/Iapetus fictional Haumea; Europa/Triton/Deimos fictional Makemake; Enceladus fictional Eris; Titan a Saturn-ring strip. Exact duplicate checks and supplier-original comparisons recorded in CREDITS.md. All 157 tests pass.
-- [ ] Resolve the last two original licences: Earth clouds and the low-resolution Moon. NASA candidates do not match; supplier resemblance alone is insufficient. These two remain blocked from redistribution.
-- [ ] Replace the eight misassigned textures with correctly sourced, body-specific imagery without reducing quality. Newly found scientific-accuracy issue, not fixed by documenting licences; no assets changed in this audit.
+- [x] Retire the last two untraceable originals rather than invent their licences: Earth clouds replaced with directly fetched CC BY 4.0 INOVE map; base Moon derived from the already sourced LRO WAC HD map.
+- [x] Replace all eight misassigned files and fictional Ceres; eleven replacements recorded with exact sources, hashes and transformations in CREDITS.md and texture-sources.json. Deimos is native 1440×720, never previously rendered; no artificial upscale. Existing mobile procedural fallbacks unchanged.
 - [ ] Complete visible motion acceptance: a real Voyager 1 Launch → Jupiter transition and visible Jupiter frame were captured with the unchanged canvas; live camera-state samples were obtained, but capture delays and sparse sampling cannot prove flicker-free motion. Voyager 2, landings, phone glossary clearance, signal pulse and One last look rotation/rings still require reliable live visual checks.
 - [ ] Finish visible-scene checks: machine-tour smoothness, phone glossary clearance, signal pulse and One last look rings/rotation still require a hardware-GPU device. This audit: 157 tests pass; saved signal restored in a fresh page; Begin at Earth reached its actual end frame with buttons present (settled animation capture stalled); all six One last look phone panels and continuation to step 5 checked with canvas hidden. No scene quality changed.
 - [x] Compare supplier originals: initial ten maps plus eight follow-up files identified as Solar System Scope CC BY 4.0; attribution/conversion notices recorded. Only Earth clouds and the low-resolution Moon remain unidentified; misassigned fictional maps require separate correction. No assets changed.

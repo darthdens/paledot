@@ -1,0 +1,310 @@
+[
+  {
+    "body": "pluto",
+    "file": "pluto.webp",
+    "sourceUrl": "https://astrogeology.usgs.gov/search/map/pluto_new_horizons_lorri_mvic_global_mosaic_300m",
+    "downloadUrl": "https://planetarymaps.usgs.gov/mosaic/Pluto_NewHorizons_Global_Mosaic_300m_Jul2017_8bit.tif",
+    "credit": "NASA/JHUAPL/SwRI/LPI",
+    "licence": "NASA media-use / USGS public-domain data; retain mission contributors",
+    "nativeSize": [
+      24888,
+      12444
+    ],
+    "size": [
+      2048,
+      1024
+    ],
+    "sha256": "b06ced1afecbaf33ef567a2c39132f09ea852e78361e5714eeceb432d03a4557",
+    "bytes": 417570,
+    "retrievedAt": "2026-11-15",
+    "projection": "Equirectangular, north up",
+    "longitude": "-180..180 east-positive",
+    "modifications": {
+      "webpQuality": 95,
+      "horizontalFlip": false,
+      "halfWidthLongitudeShift": true,
+      "missingCoverageAlpha": true
+    },
+    "limitations": "Unobserved areas use a uniform neutral surface, not measured imagery."
+  },
+  {
+    "body": "titan",
+    "file": "titan.webp",
+    "sourceUrl": "https://astrogeology.usgs.gov/search/map/titan_cassini_iss_global_mosaic_4005m",
+    "downloadUrl": "https://planetarymaps.usgs.gov/mosaic/Titan_ISS_P19658_Mosaic_Global_4km.tif",
+    "credit": "NASA/JPL-Caltech/SSI",
+    "licence": "NASA media-use / USGS public-domain data; retain mission contributors",
+    "nativeSize": [
+      4040,
+      2020
+    ],
+    "size": [
+      2048,
+      1024
+    ],
+    "sha256": "b5597c3bc9ce31c50a39285deb83fe426be2dfd99dc4852037dbf1bb34aba1cf",
+    "bytes": 474678,
+    "retrievedAt": "2026-11-15",
+    "projection": "Equirectangular, north up",
+    "longitude": "-180..180 east-positive",
+    "modifications": {
+      "webpQuality": 95,
+      "horizontalFlip": true,
+      "halfWidthLongitudeShift": false,
+      "missingCoverageAlpha": false
+    },
+    "limitations": "Infrared methane-window mosaic, not visible-light surface colour; existing orange haze retained."
+  },
+  {
+    "body": "europa",
+    "file": "europa.webp",
+    "sourceUrl": "https://astrogeology.usgs.gov/search/map/europa_voyager_galileo_ssi_global_mosaic_500m",
+    "downloadUrl": "https://planetarymaps.usgs.gov/mosaic/Europa_Voyager_GalileoSSI_global_mosaic_500m.tif",
+    "credit": "NASA/JPL/USGS, Voyager/Galileo SSI",
+    "licence": "NASA media-use / USGS public-domain data; retain mission contributors",
+    "nativeSize": [
+      19631,
+      9816
+    ],
+    "size": [
+      2048,
+      1024
+    ],
+    "sha256": "2734fc2501a08136aac4d3086bfa11549ac7e72212ec86ee3d3e20cb50dfc022",
+    "bytes": 681084,
+    "retrievedAt": "2026-11-15",
+    "projection": "Equirectangular, north up",
+    "longitude": "-180..180 east-positive",
+    "modifications": {
+      "webpQuality": 95,
+      "horizontalFlip": true,
+      "halfWidthLongitudeShift": false,
+      "missingCoverageAlpha": true
+    },
+    "limitations": "Unobserved areas use a uniform neutral surface, not measured imagery."
+  },
+  {
+    "body": "ceres",
+    "file": "ceres.webp",
+    "sourceUrl": "https://dawngis.dlr.de/data/Ceres/mosaic_ceres.php",
+    "downloadUrl": "https://dawngis.dlr.de/data/Ceres/mosaics/HAMO/clear/Ceres_HAMO_mosaic_global.png",
+    "credit": "NASA/JPL-Caltech/UCLA/MPS/DLR/IDA",
+    "licence": "NASA media-use / USGS public-domain data; retain mission contributors",
+    "nativeSize": [
+      21093,
+      10546
+    ],
+    "size": [
+      2048,
+      1024
+    ],
+    "sha256": "6783b4a456da02e1854afea97e671080c8c4f8bd37cf80ee158d057ca1051969",
+    "bytes": 1095540,
+    "retrievedAt": "2026-11-15",
+    "projection": "Equirectangular, north up",
+    "longitude": "-180..180 east-positive",
+    "modifications": {
+      "webpQuality": 95,
+      "horizontalFlip": false,
+      "halfWidthLongitudeShift": true,
+      "missingCoverageAlpha": false
+    },
+    "limitations": "Monochrome mosaic, not measured true-colour albedo."
+  },
+  {
+    "body": "enceladus",
+    "file": "enceladus.webp",
+    "sourceUrl": "https://astrogeology.usgs.gov/search/map/enceladus_cassini_global_mosaic_110m",
+    "downloadUrl": "https://planetarymaps.usgs.gov/mosaic/Enceladus_Cassini_mosaic_global_110m.tif",
+    "credit": "NASA/JPL-Caltech/SSI/USGS",
+    "licence": "NASA media-use / USGS public-domain data; retain mission contributors",
+    "nativeSize": [
+      14401,
+      7201
+    ],
+    "size": [
+      2048,
+      1024
+    ],
+    "sha256": "91b3040dc16c96d2c196f821425d442828931bccf8b394c86ee46cf9fc71c6c2",
+    "bytes": 1004250,
+    "retrievedAt": "2026-11-15",
+    "projection": "Equirectangular, north up",
+    "longitude": "-180..180 east-positive",
+    "modifications": {
+      "webpQuality": 95,
+      "horizontalFlip": true,
+      "halfWidthLongitudeShift": false,
+      "missingCoverageAlpha": false
+    },
+    "limitations": "Monochrome mosaic, not measured true-colour albedo."
+  },
+  {
+    "body": "triton",
+    "file": "triton.webp",
+    "sourceUrl": "https://astrogeology.usgs.gov/search/map/triton_voyager_2_global_color_mosaic_600m",
+    "downloadUrl": "https://planetarymaps.usgs.gov/mosaic/Triton_Voyager2_ClrMosaic_GlobalFill_600m.tif",
+    "credit": "NASA/JPL/Paul Schenk/LPI",
+    "licence": "NASA media-use / USGS public-domain data; retain mission contributors",
+    "nativeSize": [
+      14138,
+      7069
+    ],
+    "size": [
+      2048,
+      1024
+    ],
+    "sha256": "7f8c3961cd33cbf916ff3a2eea6681d99e03fe1dea8f1eab407b1d18a437546c",
+    "bytes": 296204,
+    "retrievedAt": "2026-11-15",
+    "projection": "Equirectangular, north up",
+    "longitude": "-180..180 east-positive",
+    "modifications": {
+      "webpQuality": 95,
+      "horizontalFlip": false,
+      "halfWidthLongitudeShift": false,
+      "missingCoverageAlpha": true
+    },
+    "limitations": "Unobserved areas use a uniform neutral surface, not measured imagery."
+  },
+  {
+    "body": "iapetus",
+    "file": "iapetus.webp",
+    "sourceUrl": "https://astrogeology.usgs.gov/search/map/iapetus_cassini_voyager_global_mosaic_803m",
+    "downloadUrl": "https://planetarymaps.usgs.gov/mosaic/Iapetus_Cassini_Voyager_mosaic_global_783m.tif",
+    "credit": "NASA/JPL-Caltech/SSI/USGS",
+    "licence": "NASA media-use / USGS public-domain data; retain mission contributors",
+    "nativeSize": [
+      5760,
+      2880
+    ],
+    "size": [
+      2048,
+      1024
+    ],
+    "sha256": "fc572a5198a0fd4bdc9939cd66ea41870e94747bfa11841ede6ad98b14dda43f",
+    "bytes": 771254,
+    "retrievedAt": "2026-11-15",
+    "projection": "Equirectangular, north up",
+    "longitude": "-180..180 east-positive",
+    "modifications": {
+      "webpQuality": 95,
+      "horizontalFlip": true,
+      "halfWidthLongitudeShift": false,
+      "missingCoverageAlpha": false
+    },
+    "limitations": "Monochrome mosaic, not measured true-colour albedo."
+  },
+  {
+    "body": "phobos",
+    "file": "phobos.webp",
+    "sourceUrl": "https://astrogeology.usgs.gov/search/map/phobos_viking_global_mosaic_5m",
+    "downloadUrl": "https://planetarymaps.usgs.gov/mosaic/Phobos_Viking_Mosaic_40ppd_DLRcontrol.tif",
+    "credit": "NASA Viking / Phil Stooke / USGS",
+    "licence": "NASA media-use / USGS public-domain data; retain mission contributors",
+    "nativeSize": [
+      14400,
+      7200
+    ],
+    "size": [
+      2048,
+      1024
+    ],
+    "sha256": "5164288bd0a51215be0e257275160ef7eb2a5d4af2dc8b870f10528e4733c71b",
+    "bytes": 658140,
+    "retrievedAt": "2026-11-15",
+    "projection": "Equirectangular, north up",
+    "longitude": "-180..180 east-positive",
+    "modifications": {
+      "webpQuality": 95,
+      "horizontalFlip": false,
+      "halfWidthLongitudeShift": false,
+      "missingCoverageAlpha": false
+    },
+    "limitations": "Monochrome mosaic, not measured true-colour albedo."
+  },
+  {
+    "body": "deimos",
+    "file": "deimos.webp",
+    "sourceUrl": "https://github.com/nasa/NASA-3D-Resources",
+    "downloadUrl": "https://raw.githubusercontent.com/nasa/NASA-3D-Resources/11ebb4ee043715aefbba6aeec8a61746fad67fa7/Images%20and%20Textures/Mars%20-%20Deimos/Mars%20-%20Deimos.jpg",
+    "credit": "NASA/JPL-Caltech, NASA 3D Resources",
+    "licence": "NASA media-use / USGS public-domain data; retain mission contributors",
+    "nativeSize": [
+      1440,
+      720
+    ],
+    "size": [
+      1440,
+      720
+    ],
+    "sha256": "5b55033042cd3a950e05c901fea35961d536a83da79ccb475e012ceb69e0042c",
+    "bytes": 141750,
+    "retrievedAt": "2026-11-15",
+    "projection": "Equirectangular, north up",
+    "longitude": "NASA renderer-ready texture; exact mission projection not documented",
+    "modifications": {
+      "webpQuality": 95,
+      "horizontalFlip": false,
+      "halfWidthLongitudeShift": false,
+      "missingCoverageAlpha": false
+    },
+    "limitations": "Native 1440x720 NASA renderer texture; no invented upscale detail."
+  },
+  {
+    "body": "moon",
+    "file": "moon.webp",
+    "sourceUrl": "https://trek.nasa.gov/moon/",
+    "downloadUrl": "https://trek.nasa.gov/tiles/Moon/EQ/LRO_WAC_Mosaic_Global_303ppd_v02/1.0.0/default/default028mm/",
+    "credit": "NASA/GSFC/Arizona State University, LRO WAC via NASA Moon Trek",
+    "licence": "NASA media-use / USGS public-domain data; retain mission contributors",
+    "nativeSize": [
+      4096,
+      2048
+    ],
+    "size": [
+      1024,
+      512
+    ],
+    "sha256": "0e6bbdb5a7ae782d8dacddb05ca60d304c29a1c9fc2ff8531df84239228f01e1",
+    "bytes": 249242,
+    "retrievedAt": "2026-11-15",
+    "projection": "Equirectangular, north up",
+    "longitude": "-180..180 east-positive",
+    "modifications": {
+      "webpQuality": 95,
+      "horizontalFlip": false,
+      "halfWidthLongitudeShift": false,
+      "missingCoverageAlpha": false
+    },
+    "limitations": ""
+  },
+  {
+    "body": "earth-clouds",
+    "file": "earth-clouds.webp",
+    "sourceUrl": "https://www.solarsystemscope.com/textures/",
+    "downloadUrl": "https://www.solarsystemscope.com/textures/download/2k_earth_clouds.jpg",
+    "credit": "INOVE / Solar System Scope",
+    "licence": "CC BY 4.0",
+    "nativeSize": [
+      2048,
+      1024
+    ],
+    "size": [
+      2048,
+      1024
+    ],
+    "sha256": "b1d2ae0704393cb66526e6d4b4db5d94a911e2a703986de48be52e9f89e0afda",
+    "bytes": 857912,
+    "retrievedAt": "2026-11-15",
+    "projection": "Equirectangular, north up",
+    "longitude": "-180..180 east-positive",
+    "modifications": {
+      "webpQuality": 95,
+      "horizontalFlip": false,
+      "halfWidthLongitudeShift": false,
+      "missingCoverageAlpha": false
+    },
+    "limitations": "Static artistic cloud composite, not current weather."
+  }
+]

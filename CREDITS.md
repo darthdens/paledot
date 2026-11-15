@@ -72,8 +72,8 @@ NASA models are public-domain US-government resources according to the [NASA 3D 
 | Pale Dot base platform by Dens Akoka (existed before the event) | https://paledot.org | Apache License 2.0; copyright 2026 Dens Akoka. Pale Dot name/logo and external assets excluded; see LICENSE |
 | Project repository, with HACKATHON.md and this file | https://github.com/darthdens/paledot | Shows what was built during the event |
 | Solar System Scope planet maps by INOVE | https://www.solarsystemscope.com/textures/ | CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/); matched Earth day/night, Mercury, Venus atmosphere, Mars, Jupiter, Saturn, Uranus, Neptune and fictional Ceres; converted to WebP. Maps are colour-adjusted and may include fictional gap fill; not unaltered NASA imagery |
-| Misassigned Solar System Scope textures (eight files) | https://www.solarsystemscope.com/textures/ | CC BY 4.0; Phobos uses fictional Ceres, Pluto/Iapetus fictional Haumea, Europa/Triton/Deimos fictional Makemake, Enceladus fictional Eris, Titan a Saturn-ring strip. These are not scientific maps of the named bodies; see follow-up below |
-| Remaining unidentified pre-existing textures | Source URL unknown | Earth clouds and the low-resolution Moon map remain unverified; do not assume public domain. The separately sourced event HD Moon map is documented below |
+| Retired misassigned Solar System Scope textures (eight files) | https://www.solarsystemscope.com/textures/ | Removed 15 November 2026; historical audit evidence below. Replacement sources listed below |
+| Retired unidentified Earth clouds and low-resolution Moon | Source URL unknown | Removed 15 November 2026, not relicensed by assumption. Replaced with traced sources below |
 | Johns Hopkins APL: Voyager 2 Illuminates Boundary of Interstellar Space | https://www.jhuapl.edu/news/news-releases/191106-voyager-2-illuminates-boundary-interstellar-space | Heliopause facts |
 | LROC (NASA Lunar Reconnaissance Orbiter Camera, Arizona State University) coordinates | https://www.lroc.asu.edu/data/support/downloads/2016_LROC_Coordinates_of_Human_Features.pdf | Rover positions on the Moon |
 
@@ -94,6 +94,26 @@ Second follow-up, 15 November 2026: eight of the ten previously unidentified fil
 Method: decode RGB with Pillow, resize both images to 256×128 using the same resampler, compare mean absolute channel difference and Pearson correlation; byte-identity checks use SHA-256. NASA 3D Resources originals for the named bodies were also downloaded and compared, but **did not match**; NASA's collection-wide reuse permission is not attributed to the existing files. Earth clouds have high correlation with the supplier's cloud maps but MAE above 8/255, and the low-resolution Moon differs more substantially: neither is cleared on resemblance alone. Supplier licence page and NASA collection reuse statement were opened during this audit.
 
 ### Other data used during the event
+
+### Corrected world maps — 15 November 2026
+
+The earlier comparison tables are historical evidence, **not the current map assignments**. All eleven old binaries (eight misassignments, fictional Ceres, untraceable clouds and Moon) have been removed. Replacement WebP files are stored as CDN asset pointers; `src/assets/textures/texture-sources.json` records exact download URLs, hashes, dimensions, date, transformations and limitations. Quality 95 WebP, no AI imagery, no invented terrain or upscaling. Main replacements retain 2048×1024; Moon retains 1024×512 from the existing documented HD LRO WAC map. Deimos retains its NASA source's native 1440×720; it was not rendered previously (nor was Phobos: both IDs are absent from the body catalogue), so no scene detail is reduced and no new bodies are added.
+
+| Replacement | Source and credit | Rights / interpretation |
+| --- | --- | --- |
+| Pluto | [New Horizons LORRI/MVIC 300m mosaic](https://astrogeology.usgs.gov/search/map/pluto_new_horizons_lorri_mvic_global_mosaic_300m), NASA/JHUAPL/SwRI/LPI | NASA mission data / USGS public-domain distribution; retain contributors; monochrome, not measured true-colour |
+| Titan | [Cassini ISS 4005m mosaic](https://astrogeology.usgs.gov/search/map/titan_cassini_iss_global_mosaic_4005m), NASA/JPL-Caltech/SSI | NASA media-use guidance; infrared methane-window surface map, not visible-light colour; orange haze is a visual treatment |
+| Europa | [Voyager/Galileo SSI 500m mosaic](https://astrogeology.usgs.gov/search/map/europa_voyager_galileo_ssi_global_mosaic_500m), NASA/JPL/USGS | USGS public-domain distribution, retain mission credit; monochrome |
+| Enceladus | [Cassini 110m mosaic](https://astrogeology.usgs.gov/search/map/enceladus_cassini_global_mosaic_110m), NASA/JPL-Caltech/SSI/USGS | NASA media-use guidance / USGS distribution, monochrome |
+| Iapetus | [Cassini/Voyager mosaic](https://astrogeology.usgs.gov/search/map/iapetus_cassini_voyager_global_mosaic_803m), NASA/JPL-Caltech/SSI/USGS | NASA media-use guidance / USGS distribution, monochrome |
+| Triton | [Voyager 2 600m colour mosaic](https://astrogeology.usgs.gov/search/map/triton_voyager_2_global_color_mosaic_600m), NASA/JPL/Paul Schenk/LPI | NASA media-use guidance / USGS distribution; filter-synthesised colour, not unprocessed true-colour |
+| Phobos | [Viking 5m mosaic](https://astrogeology.usgs.gov/search/map/phobos_viking_global_mosaic_5m), NASA Viking/Phil Stooke/USGS | USGS public-domain distribution; source notes artistic illumination balancing, not invented map geometry; retained asset only, catalogue body absent |
+| Deimos | [NASA 3D Resources Mars–Deimos](https://github.com/nasa/NASA-3D-Resources/tree/11ebb4ee043715aefbba6aeec8a61746fad67fa7/Images%20and%20Textures/Mars%20-%20Deimos), NASA/JPL-Caltech | Repository states assets free and without copyright; [NASA media guidance](https://www.nasa.gov/nasa-brand-center/images-and-media/). Exact mission/projection not documented; retained asset only, catalogue body absent |
+| Ceres | [DLR Dawn HAMO clear-filter global mosaic](https://dawngis.dlr.de/data/Ceres/mosaic_ceres.php), NASA/JPL-Caltech/UCLA/MPS/DLR/IDA; [NASA PDS dataset](https://pds.nasa.gov/ds-view/pds/viewProfile.jsp?dsid=DAWN-A-FC2-5-CERESMOSAIC-V1.0) | Publicly distributed NASA mission data, retain all contributors; monochrome, not fictional albedo |
+| Moon base map | [NASA Moon Trek](https://trek.nasa.gov/moon/), LRO WAC global 303ppd v02, NASA/GSFC/Arizona State University | NASA mission imagery; downsample of the already sourced HD map; same -180..180 longitude placement |
+| Earth clouds | [INOVE/Solar System Scope cloud map](https://www.solarsystemscope.com/textures/download/2k_earth_clouds.jpg) | [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/), converted to WebP; static artistic composite, not current weather |
+
+Longitude conversions follow each ISIS label: west-positive mosaics mirrored; 0..360 east-positive products half-width shifted to -180..180. Missing observations on Pluto, Triton and Europa retain coverage alpha; the renderer shows uniform neutral material there, not black terrain, cloned imagery or procedural invented detail. These areas are not measured maps. Existing mobile procedural fallbacks remain unchanged; corrected-source accuracy applies where the mission texture is used.
 
 | Link text | URL | Licence / use |
 | --- | --- | --- |
