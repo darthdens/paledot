@@ -1,5 +1,10 @@
 <!-- Left Behind · built during NASA Space Apps Challenge 2026 (14–15 Nov 2026) · AI-assisted (Lovable, Claude) -->
 # Roadmap
+## Guided-tour continuity
+- [ ] Fix shared machine transitions, date jumps and stale host navigation.
+- [ ] Replace unfinished rover narration with sourced content; repair surface occlusion.
+- [ ] Frame Voyagers close in deep space and show only the active machine's tour trail.
+- [ ] Verify all tours, pause/exit and original tour preservation.
 - [x] Match NASA Quick Jump category structure and selected-object panel; desktop/360px screenshots, category exclusivity, Voyager selection, follow toggle and close checked. UI screenshots hide the canvas to avoid software-GPU stalls; no scene changes made.
 - [x] Replace Left Behind mode with Pale Dot-only menu and machine visibility.
 - [x] Share real-date clock, ephemerides, orbital motion and date controls across both brands.
