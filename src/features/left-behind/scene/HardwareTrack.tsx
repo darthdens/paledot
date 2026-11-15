@@ -47,6 +47,9 @@ export function HardwareTrack({ data, nearest }: { data: Trajectory; nearest: bo
   const full = useLeftBehindStore(s=>s.fullPathsVisible);
   const { language } = useLanguage();
   const world = useMemo(()=>new THREE.Vector3(),[]);
+  const published = useMemo<[number,number,number]>(()=>[0,0,0],[]);
+  const date = useMemo(()=>new Date(),[]);
+  const local = useMemo<[number,number,number]>(()=>[0,0,0],[]);
   const graphics = useMemo(()=> {
     const skin = document.querySelector('.paledot');
     const style = skin ? getComputedStyle(skin) : null;
@@ -101,7 +104,7 @@ export function HardwareTrack({ data, nearest }: { data: Trajectory; nearest: bo
       g.future.geometry.setDrawRange(low,Math.max(0,g.points.length-low));
     }
     const node=marker.current;if(!node)return;
-    const p=positionAt(data.id,new Date(time)); node.visible=!!p;
+    date.setTime(time); const p=positionAt(data.id,date); node.visible=!!p;
     tip.visible=false;lead.visible=false;
     if(anchor.current)anchor.current.hidden=!p;
     const pin=p?undefined:landedPins.get(data.id);
@@ -119,22 +122,25 @@ export function HardwareTrack({ data, nearest }: { data: Trajectory; nearest: bo
     // Re-centre path vertices on the machine every frame: Float32 vertices millions of units from
     // their origin jitter by kilometres, which flickers at metre-scale zoom.
     for(const g of graphics){
-      for(const line of [g.past,g.future]){
+      for(let lineIndex=0;lineIndex<2;lineIndex++){
+        const line=lineIndex===0?g.past:g.future; if(!line.visible)continue;
         const attr=line.geometry.getAttribute('position') as THREE.BufferAttribute;const arr=attr.array as Float32Array;
         for(let i=0;i<arr.length;i++)arr[i]=(g.scene[i] ?? 0)-(here[i%3] ?? 0);
         attr.needsUpdate=true;line.position.set(...here);
       }
     }
-    const chunk=[...graphics].reverse().find(g=>(g.points[0]?.time ?? Infinity)<=time);
-    const last=chunk?.points.filter(point=>point.time<=time).at(-1);
-    if(last && positionAt(data.id,new Date((last.time+time)/2))) {
+    let chunk: (typeof graphics)[number] | undefined;
+    for(let i=graphics.length-1;i>=0;i--){const g=graphics[i];if(g&&(g.points[0]?.time ?? Infinity)<=time){chunk=g;break;}}
+    let index=0; if(chunk) { let hi=chunk.points.length; while(index<hi){const mid=(index+hi)>>>1;if((chunk.points[mid]?.time ?? Infinity)<=time)index=mid+1;else hi=mid;} }
+    const last=chunk?.points[index-1];
+    if(trails&&last && positionAt(data.id,new Date((last.time+time)/2))) {
       const a=eclipticKmToScene(...last.km);tip.position.set(...here);
-      fillLocal(tip,[a[0]-here[0],a[1]-here[1],a[2]-here[2]]);tip.visible=trails;
+      local[0]=a[0]-here[0];local[1]=a[1]-here[1];local[2]=a[2]-here[2];fillLocal(tip,local);tip.visible=trails;
     }
-    const next=chunk?.points.find(point=>point.time>time);
+    const next=chunk?.points[index];
     if(full&&trails&&next&&positionAt(data.id,new Date((next.time+time)/2))){
       const n=eclipticKmToScene(...next.km);lead.position.set(...here);
-      fillLocal(lead,[n[0]-here[0],n[1]-here[1],n[2]-here[2]]);lead.visible=true;
+      local[0]=n[0]-here[0];local[1]=n[1]-here[1];local[2]=n[2]-here[2];fillLocal(lead,local);lead.visible=true;
     }
     node.updateWorldMatrix(true,false);node.getWorldPosition(world);
     // Hide the ring once the true-size model is bigger on screen than the ring itself.
@@ -146,7 +152,7 @@ export function HardwareTrack({ data, nearest }: { data: Trajectory; nearest: bo
     // Like surface pins: no machine markers or labels beyond Solar System scale.
     if(anchor.current&&!['earth','solarSystem'].includes(useCosmosStore.getState().currentScale))anchor.current.hidden=true;
     if(anchor.current&&!anchor.current.hidden&&isOccluded(camera.position,world))anchor.current.hidden=true;
-    useCosmosStore.getState().setObjectWorldPosition(`hw:${data.id}`,[world.x,world.y,world.z]);
+    published[0]=world.x;published[1]=world.y;published[2]=world.z;useCosmosStore.getState().setObjectWorldPosition(`hw:${data.id}`,published);
   },-0.25);
   const model=nasaModels[data.id];
   const label=data.id.replaceAll('-',' ').toUpperCase();
@@ -155,7 +161,7 @@ export function HardwareTrack({ data, nearest }: { data: Trajectory; nearest: bo
     <primitive object={lead}/>
     {graphics.map((g,i)=><group key={i}><primitive object={g.past}/><primitive object={g.future}/></group>)}
     <group ref={marker} visible={false} name={`hw:${data.id}`}>
-      {!model&&simplifiedModels[data.id]&&<SceneBoundary><SimplifiedHardwareModel id={data.id} build={simplifiedModels[data.id]!} selected={selected} parent={PARENTS[data.id]}/></SceneBoundary>}
+      {!model&&simplifiedModels[data.id]&&<SceneBoundary><SimplifiedHardwareModel id={data.id} build={simplifiedModels[data.id] ?? (()=>new THREE.Group())} selected={selected} parent={PARENTS[data.id]}/></SceneBoundary>}
       {model&&<SceneBoundary><Suspense fallback={null}><HardwareModel id={data.id} url={model.url} selected={selected} parent={PARENTS[data.id]}/></Suspense></SceneBoundary>}
       <Html center zIndexRange={[40,30]}>
         <div ref={anchor} hidden className="paledot dark pd-hardware-anchor" onPointerEnter={()=>setHover(true)} onPointerLeave={()=>setHover(false)}>

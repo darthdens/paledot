@@ -34,14 +34,15 @@ export function SitePatch({ body, lat, lon, radius, mesh }: { body: 'moon' | 'ma
     }).catch(() => {});
     return () => { alive = false; };
   }, [body, lat, lon]);
+  const scratch = useMemo(() => ({ centre: new THREE.Vector3(), surface: new THREE.Vector3(), normal: new THREE.Vector3(), view: new THREE.Vector3(), local: new THREE.Vector3(...latLonToLocal(lat, lon, radius, TEXTURE_LON_OFFSET_DEG[body] ?? 0)) }), [lat, lon, radius, body]);
   // The body skips drawing inside the mid cap (minus its fade band), so its coarser relief can't poke through.
   useFrame(({ camera }) => {
     const mid = tiers.find(t => t.tier === 'mid'); const u = (mesh.material as THREE.ShaderMaterial).uniforms?.['holeRect'];
     if (!mid || !u) return;
-    const centre = mesh.getWorldPosition(new THREE.Vector3());
-    const surface = new THREE.Vector3(...latLonToLocal(lat, lon, radius, TEXTURE_LON_OFFSET_DEG[body] ?? 0)).applyMatrix4(mesh.matrixWorld);
+    const centre = mesh.getWorldPosition(scratch.centre);
+    const surface = scratch.surface.copy(scratch.local).applyMatrix4(mesh.matrixWorld);
     // No missing globe fragments before a real cap is ready, from orbit, or on the far side.
-    if (!readyCaps.current.has(mid.file) || camera.position.distanceTo(surface) > radius * 0.1 || surface.clone().sub(centre).dot(camera.position.clone().sub(surface)) <= 0) {
+    if (!readyCaps.current.has(mid.file) || camera.position.distanceTo(surface) > radius * 0.1 || scratch.normal.subVectors(surface, centre).dot(scratch.view.subVectors(camera.position, surface)) <= 0) {
       (u.value as THREE.Vector4).set(0, 0, 0, 0); return;
     }
     const off = TEXTURE_LON_OFFSET_DEG[body] ?? 0, w = mid.east - mid.west, h = mid.north - mid.south;
