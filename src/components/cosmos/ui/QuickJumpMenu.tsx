@@ -179,6 +179,7 @@ export const QuickJumpMenu = () => {
         <Button
           size="icon"
           variant="ghost"
+          aria-label={tx('Close', 'Fermer')}
           onClick={toggleQuickJump}
           className="h-6 w-6 text-white/70 hover:text-white hover:bg-white/10"
         >

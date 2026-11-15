@@ -44,6 +44,7 @@ import { CosmosBootGate } from './ui/CosmosBootGate';
 import { preloadAllRelief } from './lib/relief';
 import { preloadHdSurfaces } from './lib/hdSurfaces';
 import { useSiteBrand } from '@/lib/site-brand';
+import { useOverlayClearance } from '@/features/left-behind/ui/useOverlayClearance';
 import { useSimClock } from '@/features/left-behind/state/useSimClock';
 import { useLanguage } from '@/i18n/LanguageContext';
 import { formatSimDate } from '@/features/left-behind/lib/dateCopy';
@@ -73,6 +74,7 @@ export const CosmosExplorer = () => {
   const machinesVisible = useLeftBehindStore(s => s.machinesVisible);
   const menuOpen = useLeftBehindStore(s => s.menuOpen);
   const containerRef = useRef<HTMLDivElement>(null);
+  useOverlayClearance(containerRef);
 
   // We separate "textures are loaded" vs "scene is warmed up" so the loader can actually
   // hide all the heavy work (geometry generation + shader compilation).

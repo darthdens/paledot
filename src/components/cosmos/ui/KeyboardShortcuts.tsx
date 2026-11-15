@@ -1,4 +1,5 @@
 import { useSimClock } from '@/features/left-behind/state/useSimClock';
+import { isSceneShortcutTarget } from '@/features/left-behind/lib/keyboardScope';
 // KeyboardShortcuts - Handle keyboard navigation in Cosmos Explorer
 import { useEffect } from 'react';
 import { useCosmosStore } from '../store/useCosmosStore';
@@ -11,7 +12,7 @@ export const KeyboardShortcuts = () => {
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       // Ignore if typing in an input
-      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) {
+      if (!isSceneShortcutTarget(e.target)) {
         return;
       }
       
