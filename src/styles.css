@@ -737,4 +737,4 @@ All colors MUST be HSL.
 .paledot [data-explorer-ui-root]:has([data-bottom-card]) [data-explorer-dropdown] { max-height: min(var(--pd-dropdown-height, 25dvh), 25dvh) !important; }
 .paledot [data-date-control] > div > div { overflow: visible; }
 .paledot [data-download-status] { bottom: max(8px, env(safe-area-inset-bottom)); }
-.paledot:has([data-bottom-card], [data-machine-readout], [data-tour-panel]) [data-download-status] { top: max(8px, env(safe-area-inset-top)); bottom: auto; }
+.paledot:has([data-bottom-card], [data-machine-readout], [data-tour-panel]) [data-download-status] { top: auto; bottom: max(var(--pd-download-bottom, 8px), env(safe-area-inset-bottom)); }
