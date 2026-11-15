@@ -199,6 +199,7 @@ export const Sun = ({ position = [0, 0, 0], visualScale = UNIFIED_SCALE }: SunPr
   
   const s1 = useRef<THREE.Sprite>(null), s2 = useRef<THREE.Sprite>(null), s3 = useRef<THREE.Sprite>(null);
   const coronaShellRef = useRef<THREE.Mesh>(null);
+  const starRef = useRef<THREE.Sprite>(null);
   const photoMatRef = useRef<THREE.ShaderMaterial>(null);
   const photoUniforms = useMemo(() => ({ uTime: { value: 0 } }), []);
   const glowTexture = useMemo(() => createSunGlowTexture(), []);
@@ -223,6 +224,13 @@ export const Sun = ({ position = [0, 0, 0], visualScale = UNIFIED_SCALE }: SunPr
       const sp = [[s1, 0.9], [s2, 0.5], [s3, 0.28]] as const;
       for (const [r, o] of sp) if (r.current) { (r.current.material as THREE.SpriteMaterial).opacity = o * far; r.current.visible = far > 0.001; }
       if (coronaShellRef.current) coronaShellRef.current.visible = d > 1.4;
+      // Beyond the giant planets the halo shrinks below a pixel, yet the Sun is still by far the brightest star:
+      // a fixed-pixel-size star point keeps it visible (e.g. Voyager 1's look back), fading out past ~1,000 AU.
+      if (starRef.current) {
+        const point = THREE.MathUtils.smoothstep(d, 1000, 4000) * (1 - THREE.MathUtils.smoothstep(d, 1e5, 2e5));
+        (starRef.current.material as THREE.SpriteMaterial).opacity = point;
+        starRef.current.visible = point > 0.001;
+      }
     }
     if (photoMatRef.current) {
       // Granules evolve on the simulation clock (real lifetime ~5-10 min); wrapped to keep float precision
@@ -360,6 +368,11 @@ export const Sun = ({ position = [0, 0, 0], visualScale = UNIFIED_SCALE }: SunPr
           depthWrite={false}
           depthTest={true}
         />
+      </sprite>
+
+      {/* Distant star point: constant size on screen, only far from the Sun */}
+      <sprite ref={starRef} renderOrder={13} scale={[0.045, 0.045, 1]} visible={false}>
+        <spriteMaterial map={glowTexture} transparent opacity={0} sizeAttenuation={false} blending={THREE.AdditiveBlending} depthWrite={false} depthTest={true} />
       </sprite>
 
       {/* Point light from sun - reduced intensity */}
