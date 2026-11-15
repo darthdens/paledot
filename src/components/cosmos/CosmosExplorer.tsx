@@ -3,7 +3,7 @@ import { bodyRadius, portraitFramingFactor } from '@/features/left-behind/lib/bo
 // Cosmos Explorer - Solar System visualization with fly-to navigation
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls, PerspectiveCamera } from '@react-three/drei';
-import { EffectComposer, Selection } from '@react-three/postprocessing';
+import { Selection } from '@react-three/postprocessing';
 import { DimStars } from './objects/DimStars';
 import { Suspense, lazy, useEffect, useRef, useState, useCallback, useMemo } from 'react';
 import * as THREE from 'three';
@@ -192,7 +192,7 @@ export const CosmosExplorer = () => {
       )}
 
       {/* Keep the scene mounted immediately so heavy work happens behind the loader */}
-      {isPaleDot && <DownloadStatus />}
+      {brand === 'paledot' && <DownloadStatus />}
       <Canvas gl={{ alpha: false }} role="img" aria-label={canvasLabel}>
         <Suspense fallback={null}>
           <Selection>
@@ -314,9 +314,6 @@ export const CosmosExplorer = () => {
             <CosmicWeb visualScale={UNIFIED_SCALE} />
 
             {/* Bloom post-processing - disabled (was making galaxies look overexposed) */}
-            <EffectComposer>
-
-            </EffectComposer>
 
             {/* Performance stats */}
             <PerformanceHUD />

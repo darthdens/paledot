@@ -14,7 +14,7 @@ export function isLargeDownload(progress: DownloadProgress) {
 }
 /** Stream only when requested, preserving native HTTP caching. No opening-screen prefetch. */
 export async function downloadBlob(url: string, signal?: AbortSignal): Promise<Blob> {
-  const response = await fetch(url, { signal });
+  const response = await fetch(url, { signal: signal ?? null });
   if (!response.ok) throw new Error(`Asset download failed (${response.status})`);
   const total = Number(response.headers.get('content-length')) || null;
   const reader = response.body?.getReader();
