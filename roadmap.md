@@ -1,5 +1,10 @@
 <!-- Left Behind · built during NASA Space Apps Challenge 2026 (14–15 Nov 2026) · AI-assisted (Lovable, Claude) -->
 # Roadmap
+## Phone, accessibility, clock and Left Behind audit
+- [ ] Fix confirmed touch-target, focus, hidden-menu keyboard, search/dropdown/card clearance and reduced-motion issues without adding features.
+- [ ] Remove confirmed hot-loop allocations/redundant hidden-line updates and unnecessary photo-manifest requests; preserve real scale and rendering quality.
+- [ ] Verify clock controls, tours/photos/signals, four phone orientations, console output and existing tests; measure loading and frame cadence before/after where the sandbox supports it.
+- [ ] Check published mobile Lighthouse; report historical-baseline and physical-device limitations explicitly. Report every change in an audit record.
 ## Finish visual checks and texture-rights audit
 - [x] Follow-up 15 November: identify eight more supplier sources without replacing assets. Phobos is fictional Ceres; Pluto/Iapetus fictional Haumea; Europa/Triton/Deimos fictional Makemake; Enceladus fictional Eris; Titan a Saturn-ring strip. Exact duplicate checks and supplier-original comparisons recorded in CREDITS.md. All 157 tests pass.
 - [ ] Resolve the last two original licences: Earth clouds and the low-resolution Moon. NASA candidates do not match; supplier resemblance alone is insufficient. These two remain blocked from redistribution.
