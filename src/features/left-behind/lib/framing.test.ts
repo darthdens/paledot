@@ -2,7 +2,7 @@
 import { describe, expect, it } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { machineVisit, needsMachineSummary } from './framing';
-import type { Machine } from '../data/types';
+import type { Machine, Photo, Trajectory } from '../data/types';
 const machines = JSON.parse(readFileSync('public/left-behind/hardware.json', 'utf8')).machines as Machine[];
 describe('Left Behind framing rules', () => {
   it('visits Apollo 11 on its landing date when the clock precedes its existence', () => {
@@ -19,5 +19,17 @@ describe('Left Behind framing rules', () => {
     expect(needsMachineSummary('voyager-1')).toBe(true);
     expect(needsMachineSummary('begin-at-earth')).toBe(false);
     expect(needsMachineSummary('voyager-2')).toBe(false);
+  });
+  it('stores a real NASA metadata retrieval timestamp on every cached image', () => {
+    const photos = JSON.parse(readFileSync('public/left-behind/photos/manifest.json', 'utf8')) as Photo[];
+    expect(photos).toHaveLength(21);
+    for (const photo of photos) expect(Number.isFinite(Date.parse(photo.retrievedAt ?? ''))).toBe(true);
+  });
+  it('stores retrieval timestamps and milestone sources on every simplified path', () => {
+    for (const id of ['apollo-11', 'apollo-15', 'apollo-16', 'apollo-17', 'viking-1', 'opportunity']) {
+      const track = JSON.parse(readFileSync(`public/left-behind/trajectories/${id}.json`, 'utf8')) as Trajectory;
+      expect(Number.isFinite(Date.parse(track.retrievedAt ?? ''))).toBe(true);
+      expect(track.milestoneSources?.length).toBeGreaterThan(0);
+    }
   });
 });
