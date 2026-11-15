@@ -1,5 +1,5 @@
 // Left Behind · built during NASA Space Apps Challenge 2026 (14–15 Nov 2026) · AI-assisted (Lovable, Claude)
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Play, Pause, CalendarIcon, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
@@ -18,6 +18,22 @@ const timeLabels = {
   es: ['Horas', 'Minutos', 'Segundos'], pt: ['Horas', 'Minutos', 'Segundos'],
   it: ['Ore', 'Minuti', 'Secondi'], de: ['Stunden', 'Minuten', 'Sekunden'],
 };
+
+function TimeColumn({ part, label, value }: { part: 'hour' | 'minute' | 'second'; label: string; value: number }) {
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => { ref.current?.querySelector('[aria-selected="true"]')?.scrollIntoView({ block: 'center' }); }, []);
+  return <div className="min-w-0"><div className="mb-2 truncate text-center text-[10px] text-muted-foreground">{label}</div>
+    <div ref={ref} role="listbox" aria-label={label} className="h-[220px] overflow-y-auto overscroll-contain rounded-md border border-border p-1" onKeyDown={event => {
+      if (!['ArrowUp','ArrowDown','Home','End'].includes(event.key)) return;
+      event.preventDefault();
+      const options = Array.from(ref.current?.querySelectorAll<HTMLButtonElement>('[role="option"]') ?? []);
+      const focused = options.findIndex(option => option === document.activeElement);
+      const next = event.key === 'Home' ? 0 : event.key === 'End' ? options.length - 1 : Math.max(0, Math.min(options.length - 1, focused + (event.key === 'ArrowDown' ? 1 : -1)));
+      options[next]?.focus(); options[next]?.click();
+    }}>
+      {Array.from({ length: part === 'hour' ? 24 : 60 }, (_, number) => <Button key={number} variant="ghost" role="option" aria-selected={number === value} tabIndex={number === value ? 0 : -1} onClick={() => useSimClock.getState().setSimDate(replaceUtcTime(useSimClock.getState().simDate, part, number))} className={`w-full min-h-11 h-11 px-0 font-mono text-sm tabular-nums ${number === value ? 'bg-primary text-primary-foreground' : 'text-foreground'}`}>{String(number).padStart(2,'0')}</Button>)}
+    </div></div>;
+}
 
 export function DateControl() {
   const { language, locale, tr } = useLanguage();
@@ -38,7 +54,7 @@ export function DateControl() {
         <span className="text-[10px] text-muted-foreground">{text(copy.calendar)}</span>
         <Popover open={picker === 'date'} onOpenChange={open => setPicker(open ? 'date' : null)}>
           <PopoverTrigger asChild><Button variant="outline" aria-label={text(copy.calendar)} className="w-full min-h-11 min-w-0 justify-between gap-1 px-2 font-mono text-[11px] font-normal tabular-nums"><span className="min-w-0 truncate">{new Intl.DateTimeFormat(locale, { day:'2-digit', month:'2-digit', year:'numeric', timeZone:'UTC' }).format(current)}</span><CalendarIcon className="shrink-0 size-4" /></Button></PopoverTrigger>
-          <PopoverContent align="end" sideOffset={8} collisionPadding={8} className={pickerClass} aria-label={text(copy.calendar)}>
+          <PopoverContent onEscapeKeyDown={event => event.stopPropagation()} align="end" sideOffset={8} collisionPadding={8} className={pickerClass} aria-label={text(copy.calendar)}>
             <Calendar mode="single" selected={calendarDate} defaultMonth={calendarDate} locale={calendarLocales[locale]} weekStartsOn={locale === 'en-US' ? 0 : 1} captionLayout="dropdown" navLayout="after" startMonth={new Date(1957,0,1)} endMonth={new Date(2100,11,31)} disabled={{ before: new Date(1957,0,1), after: new Date(2100,11,31) }} autoFocus onSelect={date => { if (date) { state.setSimDate(replaceUtcDay(useSimClock.getState().simDate, date)); setPicker(null); } }} />
           </PopoverContent>
         </Popover>
@@ -47,18 +63,10 @@ export function DateControl() {
         <span className="text-[10px] text-muted-foreground">{text(copy.time)}</span>
         <Popover open={picker === 'time'} onOpenChange={open => setPicker(open ? 'time' : null)}>
           <PopoverTrigger asChild><Button variant="outline" aria-label={text(copy.time)} className="w-full min-h-11 min-w-0 justify-between gap-1 px-2 font-mono text-[11px] font-normal tabular-nums"><span>{current.toISOString().slice(11,19)}</span><Clock className="shrink-0 size-4" /></Button></PopoverTrigger>
-          <PopoverContent align="end" sideOffset={8} collisionPadding={8} className={pickerClass} aria-label={text(copy.time)}>
+          <PopoverContent onEscapeKeyDown={event => event.stopPropagation()} align="end" sideOffset={8} collisionPadding={8} className={pickerClass} aria-label={text(copy.time)}>
             <div className="pd-hud-label mb-3">{text(copy.time)}</div>
             <div className="grid grid-cols-3 gap-2">
-              {(['hour','minute','second'] as const).map((part, i) => <div key={part} className="min-w-0">
-                <div className="mb-2 truncate text-center text-[10px] text-muted-foreground">{timeLabels[language][i]}</div>
-                <div role="listbox" aria-label={timeLabels[language][i]} className="h-[220px] overflow-y-auto overscroll-contain rounded-md border border-border p-1">
-                  {Array.from({length: part === 'hour' ? 24 : 60}, (_, value) => {
-                    const selected = value === (part === 'hour' ? current.getUTCHours() : part === 'minute' ? current.getUTCMinutes() : current.getUTCSeconds());
-                    return <Button key={value} variant="ghost" role="option" aria-selected={selected} onClick={() => state.setSimDate(replaceUtcTime(useSimClock.getState().simDate,part,value))} className={`w-full min-h-11 h-11 px-0 font-mono text-sm tabular-nums ${selected ? 'bg-primary text-primary-foreground' : 'text-foreground'}`}>{String(value).padStart(2,'0')}</Button>;
-                  })}
-                </div>
-              </div>)}
+              {(['hour','minute','second'] as const).map((part, i) => <TimeColumn key={part} part={part} label={timeLabels[language][i] ?? ''} value={part === 'hour' ? current.getUTCHours() : part === 'minute' ? current.getUTCMinutes() : current.getUTCSeconds()} />)}
             </div>
           </PopoverContent>
         </Popover>
