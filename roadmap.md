@@ -1,5 +1,7 @@
 <!-- Left Behind · built during NASA Space Apps Challenge 2026 (14–15 Nov 2026) · AI-assisted (Lovable, Claude) -->
 # Roadmap
+## Opening-screen clock
+- [ ] Keep time advancing before the scene loads with one shared elapsed-time cursor; verify the title-screen readout and scene handoff, pause and speed tests.
 ## Match entry and ending popups
 - [x] Remove the summary-only black backdrop and transparent surface; match entry/summary headers and spacing to Send a signal. Desktop and 360px popup checks passed; five framing tests pass. Canvas hidden only for popup layout screenshots.
 ## Source and acceptance audit
