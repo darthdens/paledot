@@ -17,6 +17,7 @@ export function useOverlayClearance(root: React.RefObject<HTMLDivElement | null>
       }
       el.style.setProperty('--pd-dropdown-top',`${top-bounds.top}px`);
       el.style.setProperty('--pd-dropdown-height',`${Math.max(44,bottom-top)}px`);
+      el.style.setProperty('--pd-download-bottom',`${Math.max(8,innerHeight-bottom)}px`);
     };
     const schedule=()=>{if(!frame)frame=requestAnimationFrame(measure);};
     const resize=new ResizeObserver(schedule);

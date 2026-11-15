@@ -98,6 +98,7 @@ export const AmbientMusicController = () => {
     <div className="flex items-center" onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
       {/* Volume slider with mute button (shows when playing and toggled) */}
       <div
+        inert={!showVolumeSlider}
         className={`flex items-center gap-1 transition-all duration-300 ease-out overflow-hidden ${
           showVolumeSlider ? 'w-28 opacity-100 mr-1' : 'w-0 opacity-0'
         }`}
@@ -129,6 +130,7 @@ export const AmbientMusicController = () => {
           <Button
             variant="ghost"
             size="icon"
+            aria-label={tooltipLabel}
             onClick={handleButtonClick}
             className={`h-8 w-8 sm:h-9 sm:w-9 backdrop-blur-xs text-foreground ${
               !isMuted ? 'bg-foreground/25' : 'bg-foreground/10 hover:bg-foreground/20'

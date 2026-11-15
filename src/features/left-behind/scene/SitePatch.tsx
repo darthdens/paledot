@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState, useRef, useCallback } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { METRE, RELIEF_GLSL, reliefSync } from '@/components/cosmos/lib/relief';
 import { loadSiteHeights } from '../lib/terrainHeights';
+import { downloadBlob } from '../data/download';
 import * as THREE from 'three';
 import { useThree } from '@react-three/fiber';
 import { getTerrainIndex, terrainImageUrl, type TerrainTier } from '../data/dataClient';
@@ -64,12 +65,19 @@ function TierCap({ tier, order, radius, mesh, body, onReady }: { tier: TerrainTi
   }, [tier]);
   useEffect(() => {
     let alive = true, loaded: THREE.Texture | null = null;
-    new THREE.TextureLoader().loadAsync(terrainImageUrl(tier.file)).then(t => {
+    const controller = new AbortController();
+    let objectUrl: string | undefined;
+    downloadBlob(terrainImageUrl(tier.file), controller.signal).then(blob => {
+      if (!alive) return null;
+      objectUrl = URL.createObjectURL(blob);
+      return new THREE.TextureLoader().loadAsync(objectUrl);
+    }).then(t => {
+      if (!t) return;
       t.colorSpace = THREE.NoColorSpace; t.anisotropy = gl.capabilities.getMaxAnisotropy();
       t.wrapS = t.wrapT = THREE.ClampToEdgeWrapping; loaded = t;
       if (alive) setTex(t); else t.dispose();
     }).catch(() => {});
-    return () => { alive = false; loaded?.dispose(); };
+    return () => { alive = false; controller.abort(); loaded?.dispose(); if (objectUrl) URL.revokeObjectURL(objectUrl); };
   }, [tier.file, gl]);
 
   const offset = TEXTURE_LON_OFFSET_DEG[body] ?? 0;

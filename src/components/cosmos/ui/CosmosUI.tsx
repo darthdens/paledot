@@ -675,7 +675,7 @@ export const CosmosUI = () => {
             {!native && (
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Button size="icon" variant="ghost" onClick={toggleFullscreen} className="h-8 w-8 sm:h-9 sm:w-9 bg-white/10 hover:bg-white/20 backdrop-blur-xs text-white">
+                  <Button size="icon" variant="ghost" aria-label={isFullscreen ? t.exitFullscreen : t.fullscreen} onClick={toggleFullscreen} className="h-8 w-8 sm:h-9 sm:w-9 bg-white/10 hover:bg-white/20 backdrop-blur-xs text-white">
                     {isFullscreen ? <Minimize className="w-4 h-4 sm:w-5 sm:h-5" /> : <Maximize className="w-4 h-4 sm:w-5 sm:h-5" />}
                   </Button>
                 </TooltipTrigger>

@@ -50,3 +50,40 @@ No Echo, analytics, Capacitor, scale, texture quality or tour content changes we
 - Added 14 source/accuracy regressions. Complete suite: 28 files / 175 tests pass; preview build OK. No page errors in the completed visible-scene run.
 - Retried unmodified visible scene: Voyager 1's actual Launch→Jupiter camera flight completed and Jupiter screenshot captured. Thirty samples over 8.89 seconds yielded only three distinct camera frames in the software renderer; this cannot prove flicker-free motion or phone FPS. Another run stalled at screenshot capture before Voyager 2/Apollo checks. Those, signal-pulse motion and One last look rotation remain blocked on reliable GPU visual checks; no unverified camera change made.
 - Original licence identities are still unknowable, but those files are no longer shipped; the replacement sources close the active-asset rights gaps. Older historical comparison statements in CREDITS.md are explicitly retired evidence, not current assignments.
+
+## Acceptance completion work — 15 November 2026
+
+### Every change
+- Added streaming progress for on-demand photos and site terrain above 500,000 bytes, including unknown-length transfers once they cross the threshold. Status is translated in all seven locales, positioned above an open bottom card, and does not intercept gestures. Progress is throttled to download events, not scene frames.
+- Photo slots use visibility-triggered downloads, preserve alt text, reuse native HTTP cache and revoke object URLs/abort on unmount. Machine photos, tour thumbnails/viewers and One last look photos share this path. Terrain textures and site heights report through the same progress store; no additional opening-screen prefetch.
+- Removed the inactive zero-intensity SelectiveBloom/empty composer that emitted missing-light warnings. The effect had intensity zero; no visual-quality setting, geometry, lighting, scale or active effect reduced.
+- Canvas wrapper uses an accessible group instead of an image role around interactive markers. Fullscreen and sound buttons have accessible names; hidden sound controls are inert and the slider thumb receives its accessible name.
+- One last look keyboard handling uses the shared scope guard, preventing scene shortcuts from stealing keys inside dialogs/inputs.
+- Fixed date control's nested overflow clipping: all date/speed/scrubber options can now scroll within the shared dropdown. Phone landscape previously hid the lower controls.
+- Added three download regressions (500 KB threshold, streaming completion/cleanup, failure cleanup). No dependencies added. All 178 tests across 29 files pass; preview build OK.
+
+### Checks actually completed
+- Real canvas retained at 360×740, 390×844, 740×360 and 844×390: no document horizontal overflow; active button/input scan found no targets under 44px. Tour/menu bounds did not overlap; date fields scroll in 52–211px available dropdown heights.
+- Keyboard Next→photo→Escape keeps tour open; Send a signal sends “Acceptance” and closes. Machine card opens; injected two-touch pinch changes actual camera position with the card open. This verifies browser touch wiring, not physical iPhone feel.
+- Date input edits read back as 1990-02-14T12:00:00Z in all four orientations. Machine/date/How we know tested states have zero axe WCAG A/AA violations after fixes. No page errors in completed flows. This is not every language/photo/device state or a universal contrast certification.
+- Actual slow photo response: “Downloading · 8%” visible above the tour at x124/y455 on 390×844, then status clears and the real 1280px image reads back complete via its blob URL.
+- Bundled **3d-game** verification now completes using lavapipe without hiding the canvas: phone screenshot nonblank (mean luminance 14, standard deviation 33.2), 1.2% pixels changed over 1000ms, no page errors or failed asset requests. Only software-driver ReadPixels stall warnings remain.
+- Apollo 11 transition produced eight distinct camera positions over sixteen samples and completed; Voyager 2 endpoint captured after photo loading, but that sampling window missed the flight itself. Nested One last look entry in this final run timed out; no claim of complete motion acceptance.
+
+### Measured before/after and remaining blockers
+
+Local mobile Lighthouse with Left Behind code present, same sandbox Chrome:
+
+| Metric | Before this follow-up | After |
+| --- | ---: | ---: |
+| Accessibility | 100 | 100 |
+| Performance | 55 | 55 |
+| FCP / LCP | 2420 ms | 2421 ms |
+| Total blocking time | 7436 ms | 6526 ms |
+| Speed index | 15560 ms | 15410 ms |
+
+These are single-run development-server/software-GPU measurements, not production or mid-range phone results. No meaningful first-paint regression in this pair; this is not proof of historical pre-Left-Behind parity or unchanged full-loader duration.
+
+Controlled 390×844 lavapipe scene runs: NASA layer off 37.96s scene-ready, 1.14 FPS (7 frames/6.13s); layer on 40.77s scene-ready, 0.82 FPS (5 frames/6.07s). These are software-renderer timings and layer-state comparison, **not before/after code FPS** or a phone profile; the layer switch occurs after readiness, so the readiness difference is run-to-run variability, not layer-loading causation.
+
+Published paledot.org mobile Lighthouse still fails document navigation with ERR_ABORTED despite an HTTP 200 fetch; fixes were not published automatically. No production score claimed. Historical pre-feature code/performance baseline is unavailable. The sandbox cannot be converted into a physical GPU; smoothness, 30+ phone FPS, true iOS safe-area behaviour, full visible-object glossary clearance, signal pulse and uninterrupted One last look rotation remain hardware-dependent. To check those states, open the preview's Left Behind menu and play Voyager 1/Voyager 2/Apollo 11, then Send a signal; One last look is Voyager 1 step 4.1–4.6. No scene quality was reduced to disguise these limits.

@@ -57,7 +57,9 @@ const Slider = React.forwardRef<
           )}
         />
       </SliderPrimitive.Track>
-      <SliderPrimitive.Thumb 
+      <SliderPrimitive.Thumb
+        aria-label={props['aria-label']}
+        aria-labelledby={props['aria-labelledby']}
         className={cn(
           "block h-5 w-5 rounded-full border-2 ring-offset-background transition-colors focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 cursor-grab active:cursor-grabbing relative z-50 pointer-events-auto",
           variant === "light" ? "border-white bg-white" : "border-secondary bg-background"

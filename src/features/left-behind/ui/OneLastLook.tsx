@@ -1,4 +1,5 @@
 // Left Behind · built during NASA Space Apps Challenge 2026 (14–15 Nov 2026) · AI-assisted (Lovable, Claude)
+import { ProgressImage } from './ProgressImage';
 import { useEffect, useState, type ReactNode } from 'react';
 import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/i18n/LanguageContext';
@@ -9,6 +10,7 @@ import { evaluateTrajectory } from '../engine/trajectory';
 import { lookCopy } from '../lib/oneLastLookCopy';
 import { LOOK_DATE, lastLookProgress, lookMeasurements, pixelWidths, PORTRAIT_PLANETS, useOneLastLook } from '../lib/oneLastLook';
 import { useTourPlayback } from '../lib/useTourPlayback';
+import { isSceneShortcutTarget } from '../lib/keyboardScope';
 
 const frames = [
   { i: 2, x: 39 / 1280, y: 123 / 384, w: 52 / 1280, h: 53 / 384 },
@@ -56,7 +58,7 @@ export function OneLastLook({ onPrevious, onNext, tourIndex, totalStops, renderP
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       if (!['ArrowLeft', 'ArrowRight', 'Space', 'Escape'].includes(e.code)) return;
-      if (e.target instanceof Element && e.target.closest('button')) return;
+      if (!isSceneShortcutTarget(e.target)) return;
       e.preventDefault();
       if (e.code === 'ArrowRight') next();
       if (e.code === 'ArrowLeft') previous();
@@ -94,7 +96,7 @@ export function OneLastLook({ onPrevious, onNext, tourIndex, totalStops, renderP
             {!portrait && <div className="flex flex-wrap gap-2">{[false, true].map(v => <Button key={String(v)} variant="ghost" aria-pressed={v === revisited} className={`min-h-11 rounded-full border ${v === revisited ? 'border-primary text-primary' : 'border-border'}`} onClick={() => setRevisited(v)}>{c[v ? 8 : 7]}</Button>)}</div>}
             <figure>
               <div className={`relative mx-auto w-full ${portrait ? '' : 'max-w-44'}`} style={{ aspectRatio: portrait ? '1280 / 384' : revisited ? '1280 / 1266' : '453 / 614' }}>
-                <img key={photo.id} src={photo.imageUrl} alt={portrait ? c[13] : heading} className="absolute inset-0 h-full w-full object-contain motion-safe:animate-in motion-safe:fade-in motion-safe:duration-700" />
+                <ProgressImage key={photo.id} src={photo.imageUrl} alt={portrait ? c[13] : heading} className="absolute inset-0 h-full w-full object-contain motion-safe:animate-in motion-safe:fade-in motion-safe:duration-700" />
                 {!portrait && photo.earthMarker && <span data-earth-ring className="absolute h-5 w-5 -translate-x-1/2 -translate-y-1/2 rounded-full border border-primary" style={{ left: `${photo.earthMarker.x * 100}%`, top: `${photo.earthMarker.y * 100}%` }} />}
                 {portrait && frames.map(f => <Button key={f.i} variant="ghost" aria-label={c[23 + f.i]} className="absolute min-h-11 min-w-11 p-0 border border-transparent focus-visible:border-primary hover:border-primary rounded-none" style={{ left: `${f.x * 100}%`, top: `${f.y * 100}%`, width: `${f.w * 100}%`, height: `${f.h * 100}%` }} onClick={() => setPlanet(f.i)} />)}
               </div>
