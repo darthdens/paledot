@@ -1,5 +1,8 @@
 <!-- Left Behind · built during NASA Space Apps Challenge 2026 (14–15 Nov 2026) · AI-assisted (Lovable, Claude) -->
 # Roadmap
+## Submission content and final paperwork
+- [x] Review uploaded submission wording against saved mission data and implemented signal/One last look features. Flag seven tour groups versus individual machines, missing final coordinates, simplified paths, illustrative viewpoint, non-NASA assets, incomplete form credits and unverified demo duration. YouTube oEmbed resolves; all cached photo IDs appear in CREDITS.md. No app code changed.
+- [ ] Finalise HACKATHON.md and CREDITS.md after actual submission time and Wayback URLs are supplied; confirm the recorded repository/compare links. LICENSE and README licence mention already present.
 ## Presentation videos
 - [x] Serve both unchanged MP4 uploads at /files/paledot-left-behind.mp4 and /files/paledot-left-behind-vertical.mp4 using existing streaming and domain-favicon logic. Both checksums match; 200/HEAD and 206 ranges pass; desktop/360px playback and seeking to 5 seconds verified. Pale Dot favicon checksum matches; six tests pass, build OK. Live addresses require publishing; native media-tab icon display remains browser-controlled.
 ## Presentation PDF
