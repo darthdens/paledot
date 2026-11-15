@@ -7,7 +7,7 @@ const seen = new Set<string>();
 function Term({ word, definition }: { word: string; definition: string }) {
   const [open, setOpen] = useState(false);
   return <span className="relative inline">
-    <Button variant="link" type="button" aria-expanded={open} className="inline h-auto p-0 text-inherit text-[length:inherit] font-normal underline decoration-dotted underline-offset-4" onMouseEnter={() => setOpen(true)} onMouseLeave={() => setOpen(false)} onFocus={() => setOpen(true)} onBlur={() => setOpen(false)} onClick={() => setOpen(v => !v)} onKeyDown={e => { if (e.key === 'Escape') setOpen(false); }}>{word}</Button>
+    <Button variant="link" type="button" aria-expanded={open} className="inline h-auto p-0 text-inherit text-[length:inherit] font-normal underline decoration-dotted underline-offset-4" onMouseEnter={() => setOpen(true)} onMouseLeave={() => setOpen(false)} onFocus={() => setOpen(true)} onBlur={() => setOpen(false)} onClick={() => setOpen(true)} onKeyDown={e => { if (e.key === 'Escape') setOpen(false); }}>{word}</Button>
     {open && <span role="tooltip" className="block my-2 rounded-md border border-border bg-card p-3 text-xs text-foreground leading-relaxed sm:absolute sm:bottom-full sm:left-0 sm:z-[10030] sm:mb-2 sm:w-64">{definition}</span>}
   </span>;
 }
