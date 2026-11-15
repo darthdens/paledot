@@ -3,6 +3,7 @@
 ## Presentation PDF
 - [x] Host unchanged 701,032-byte deck at /files/paledot-left-behind-deck.pdf with branded viewer /files/paledot-left-behind-deck. Viewer inherits domain-specific icons; Pale Dot SVG/ICO/PNG/apple icons return 200. PDF checksum matches upload; desktop/360px viewer checked. Native PDF-tab favicon behavior and physical iOS PDF rendering cannot be guaranteed.
 ## Toolbar and dropdown consistency
+- [x] Reproduce Month-open → Year-button dismissal on a 360px touch viewport; replace modal calendar selectors with non-modal choices. Direct switching in both directions and February 1990 selection now retain the clock menu; three date tests pass and build OK.
 - [x] Fix calendar month/year selection with themed selectors; align arrows in the same header row, use shared hover/focus and 6px selected-day corners. Browser-selected February 1990, next/previous month and day 14 read back correctly; 360px screenshot checked, eight tests pass, build OK.
 - [x] Match language dropdown to the shared 8px trigger gap and 300ms vertical disclosure; retain clock contents for closing animation and restore picker reveal/collapse. Language menu is 200px on desktop/tablet/phone; time picker 264px. Desktop gap and motion inspected; 834/360 menu screenshots checked; eight tests pass, build OK.
 - [x] Replace native date/time popups with themed calendar and UTC time columns. Date selection and 09:30:05 UTC readback checked; 360/390 portrait screenshots captured; 15 focused tests pass and build OK. Software-GPU timeout prevented completing the landscape check.
