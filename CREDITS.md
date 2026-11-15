@@ -264,9 +264,6 @@ These rows also cover resources described in the terrain and photograph lists ab
 | NASA SVS CGI Moon Kit: LRO LOLA LDEM_16 | https://svs.gsfc.nasa.gov/4720 | NASA/GSFC/LRO/LOLA; public-domain global Moon relief |
 | MGS MOLA MEGDR | https://pds-geosciences.wustl.edu/missions/mgs/megdr.html | NASA/GSFC/MGS/MOLA Science Team; public-domain Mars relief |
 | LROC Apollo 11 terrain | https://data.lroc.im-ldi.com/lroc/view_rdr_product/NAC_DTM_APOLLO11 | NASA/GSFC/Arizona State University; Apollo 11 DTM |
-| LROC Apollo 15 terrain | https://data.lroc.im-ldi.com/lroc/view_rdr_product/NAC_DTM_APOLLO15 | NASA/GSFC/Arizona State University; Apollo 15 DTM |
-| LROC Apollo 16 terrain | https://data.lroc.im-ldi.com/lroc/view_rdr_product/NAC_DTM_APOLLO16 | NASA/GSFC/Arizona State University; Apollo 16 DTM |
-| LROC Apollo 17 terrain | https://data.lroc.im-ldi.com/lroc/view_rdr_product/NAC_DTM_APOLLO17 | NASA/GSFC/Arizona State University; Apollo 17 DTM |
 | HiRISE Jezero DTM | https://www.uahirise.org/dtm/ESP_045994_1985 | NASA/JPL-Caltech/UArizona; Ingenuity site terrain |
 | HiRISE Viking 1 DTM | https://www.uahirise.org/dtm/PSP_001521_2025 | NASA/JPL-Caltech/UArizona; Viking 1 site terrain |
 | Mercury MESSENGER global DEM | https://astrogeology.usgs.gov/search/map/mercury_messenger_global_dem_665m | NASA/JHUAPL/Carnegie Institution of Washington/USGS; public-domain relief |
