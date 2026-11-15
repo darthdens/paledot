@@ -22,9 +22,10 @@ function CalendarDropdown({ options, value, onChange, disabled, 'aria-label': la
     <PopoverContent align="start" sideOffset={8} collisionPadding={8} onEscapeKeyDown={event => event.stopPropagation()} onCloseAutoFocus={event => event.preventDefault()} onOpenAutoFocus={event => {
       event.preventDefault();
       const selected = listRef.current?.querySelector<HTMLButtonElement>('[aria-selected="true"]');
-      selected?.focus();
-      selected?.scrollIntoView({ block: 'nearest' });
-    }} className={cn(brand === 'paledot' && 'paledot', 'cosmos-clock-picker cosmos-calendar-options z-[10020] w-auto min-w-[8rem] max-h-[min(264px,var(--radix-popover-content-available-height))] overflow-y-auto p-1 bg-card text-foreground border-border')}>
+      selected?.focus({ preventScroll: true });
+      const scroller = listRef.current?.parentElement;
+      if (scroller && selected) scroller.scrollTop = selected.offsetTop - scroller.clientHeight / 2 + selected.clientHeight / 2;
+    }} className={cn(brand === 'paledot' && 'paledot', 'cosmos-clock-picker cosmos-calendar-options z-[10020] min-w-[var(--radix-popover-trigger-width)] max-w-[var(--radix-popover-content-available-width)] max-h-[min(264px,var(--radix-popover-content-available-height))] overflow-y-auto p-1 bg-card text-foreground border-border', options?.length === 12 ? 'w-40' : 'w-28')}>
       <div ref={listRef} role="listbox" aria-label={label} onKeyDown={event => {
         if (!['ArrowUp', 'ArrowDown', 'Home', 'End'].includes(event.key)) return;
         event.preventDefault();
