@@ -1,5 +1,7 @@
 <!-- Left Behind · built during NASA Space Apps Challenge 2026 (14–15 Nov 2026) · AI-assisted (Lovable, Claude) -->
 # Roadmap
+## Match entry and ending popups
+- [x] Remove the summary-only black backdrop and transparent surface; match entry/summary headers and spacing to Send a signal. Desktop and 360px popup checks passed; five framing tests pass. Canvas hidden only for popup layout screenshots.
 ## Source and acceptance audit
 - [x] Open all seven `verify: true` fact sources and confirm claims against NASA/APL/NIST. Preserve dated evidence and original-link limitations beside each fact; replace three insufficient primary links. Seven new regressions pass.
 - [x] Run complete suite: 25 files / 153 tests pass; build OK. Live Apollo 11 entry and one flight's progress/completion observed without finishFlight. This does not prove visually smooth flights throughout every tour.
