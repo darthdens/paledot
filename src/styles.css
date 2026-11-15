@@ -688,14 +688,6 @@ All colors MUST be HSL.
 @media (prefers-reduced-motion: reduce) { .paledot .pd-lb-buzz { animation: none; } }
 
 /* Left Behind · built during NASA Space Apps Challenge 2026 (14–15 Nov 2026) · AI-assisted (Lovable, Claude) */
-.paledot.pd-summary-backdrop { background: hsl(var(--journey-backdrop)); animation: pd-summary-darken 600ms ease-out both; }
-.paledot.pd-summary-content { border: 0; background: transparent; box-shadow: none; backdrop-filter: none; animation: pd-summary-reveal 500ms ease-out 600ms both; }
-.pd-summary-content > header { border: 0; }
-.pd-summary-content ul { border: 0; }
-.pd-summary-content li { border: 0; }
-@keyframes pd-summary-darken { from { opacity: 0; } to { opacity: 1; } }
-@keyframes pd-summary-reveal { from { opacity: 0; } to { opacity: 1; } }
 @media (prefers-reduced-motion: reduce) {
-  .paledot.pd-summary-backdrop, .paledot.pd-summary-content { animation: none; }
   [data-lb-dialog-overlay] { animation: none; }
 }

@@ -64,13 +64,13 @@ export function FramingViews() {
   </ul>;
   return <Dialog.Root open={!!view} onOpenChange={open => { if (!open) close(); }}>
     <Dialog.Portal>
-      <LeftBehindDialogOverlay className={view === 'summary' ? 'paledot pd-summary-backdrop' : undefined} />
-      <LeftBehindDialogContent data-lb-framing={view} className={view === 'summary' ? 'pd-summary-content' : undefined}>
-        <header className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2 border-b border-border p-2">
-          <div className="min-w-0 pl-2"><Dialog.Title className="text-base font-semibold">{T(heading)}</Dialog.Title>{(view === 'intro' || view === 'summary') && <p className="mt-1 text-[10px] leading-relaxed text-muted-foreground">{CHALLENGE}</p>}</div>
+      <LeftBehindDialogOverlay />
+      <LeftBehindDialogContent data-lb-framing={view}>
+        <header className="flex shrink-0 items-center justify-between gap-3 border-b border-border p-2">
+          <div className="min-w-0 pl-2"><Dialog.Title className="text-sm font-semibold">{T(heading)}</Dialog.Title>{(view === 'intro' || view === 'summary') && <p className="mt-1 text-[10px] leading-relaxed text-muted-foreground">{CHALLENGE}</p>}</div>
           <Button variant="ghost" size="icon" className="h-11 w-11 shrink-0 text-muted-foreground" aria-label={T(c.close)} onClick={close}><X className="h-4 w-4" /></Button>
         </header>
-        <div className="overflow-y-auto overscroll-contain p-4 space-y-5">
+        <div className="overflow-y-auto overscroll-contain p-4 space-y-4">
           <Dialog.Description className={view === 'intro' ? 'text-sm leading-relaxed text-foreground' : 'sr-only'}>{T(view === 'intro' ? c.intro : heading)}</Dialog.Description>
           {failed && <p role="alert" className="text-xs text-muted-foreground">{T(c.unavailable)}</p>}
           {view === 'intro' && <div className="grid gap-2">
