@@ -18,7 +18,7 @@ Pale Dot (paledot.org) existed before the hackathon. The last commit before the 
 
 Last commit before the event: c76c475 (22 Oct 2026). First commit of the event: ae6b56e (14 Nov 2026, 10:39 GMT).
 
-History note: ae6b56e is the first named Left Behind feature commit, not the first timestamped commit after the event start. The repository also contains setup/working commits from f096524 (14 Nov 2026, 10:30:25 GMT) through 1a1802c (10:39:16 GMT). BUILD-LOG.md includes every commit since 09:00 GMT, including those setup commits.
+History note: ae6b56e is the first named Left Behind feature commit, not the first timestamped commit after the event start. The repository also contains setup/working commits from f096524 (14 Nov 2026, 10:30:25 GMT) through 1a1802c (10:39:16 GMT). The earlier checkpoint build log included those setup commits; repository history remains the authoritative record now that the temporary download package is removed.
 
 - One app-wide real-date UTC simulation clock and date control, shared by both brands; astronomy-engine supplies dated planet and Moon positions. Playback, speeds, date selection and the persistent date readout use that clock.
 - True-scale body radii across the existing app, correcting catalogue diameters previously used as radii; shared bodyScale helpers also govern framing and camera clearance.
@@ -31,7 +31,7 @@ History note: ae6b56e is the first named Left Behind feature commit, not the fir
 
 ### Every pre-event file changed during the event
 
-This list intersects files present at c76c475 with all commit changes since 14 Nov 2026 09:00 GMT; it includes deletions, tooling/generated changes and any changes later reverted. The package supplies a two-context-line diff against c76c475 for each file; an empty net diff is explicitly recorded.
+This list intersects files present at c76c475 with all commit changes since 14 Nov 2026 09:00 GMT; it includes deletions, tooling/generated changes and any changes later reverted. Compare the repository history against c76c475 to inspect the changes; temporary source-package download files have been removed. Event documentation and release paperwork are also included in this history-based inventory.
 
 - `AGENTS.md`
 - `bun.lock`
@@ -90,6 +90,7 @@ This list intersects files present at c76c475 with all commit changes since 14 N
 - `src/components/cosmos/ui/YouAreHereLabel.tsx`
 - `src/integrations/supabase/previewAuthStorage.ts`
 - `src/pages/PaleDot.tsx`
+- `src/routeTree.gen.ts`
 - `src/routes/index.tsx`
 - `src/styles.css`
 
@@ -103,7 +104,7 @@ This list intersects files present at c76c475 with all commit changes since 14 N
 
 ## Licence and credits
 
-- Licence for the work created during the event: [MIT / Apache 2.0, as chosen; see LICENSE]
+- Apache License 2.0 (whole repository), see LICENSE
 - Every library, font, texture, dataset and photo used, with its licence or credit: `CREDITS.md`
 
 ## Finished

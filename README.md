@@ -1,3 +1,9 @@
+## Pale Dot · open source
+
+Pale Dot is open source under the [Apache License 2.0](LICENSE), copyright 2026 Dens Akoka. Left Behind, the app-wide real-date clock and the true-scale fix were built during NASA Space Apps Challenge 2026 (14–15 Nov 2026); see [HACKATHON.md](HACKATHON.md).
+
+NASA-produced images, models, surface imagery and data are public-domain US-government resources credited in [CREDITS.md](CREDITS.md), not covered by this code licence. Third-party contributions retain their own rights and credit requirements; pre-existing textures with unknown origins are not asserted to be public domain. The **Pale Dot name and logo are not covered by the licence**. Dependencies and other external resources retain their respective licences.
+
 # Welcome to your Lovable project
 
 ## Project info
