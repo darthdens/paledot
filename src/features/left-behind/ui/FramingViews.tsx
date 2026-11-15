@@ -64,8 +64,8 @@ export function FramingViews() {
   </ul>;
   return <Dialog.Root open={!!view} onOpenChange={open => { if (!open) close(); }}>
     <Dialog.Portal>
-      <LeftBehindDialogOverlay />
-      <LeftBehindDialogContent data-lb-framing={view}>
+      <LeftBehindDialogOverlay className={view === 'summary' ? 'paledot pd-summary-backdrop' : undefined} />
+      <LeftBehindDialogContent data-lb-framing={view} className={view === 'summary' ? 'pd-summary-content' : undefined}>
         <header className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2 border-b border-border p-2">
           <div className="min-w-0 pl-2"><Dialog.Title className="text-base font-semibold">{T(heading)}</Dialog.Title>{(view === 'intro' || view === 'summary') && <p className="mt-1 text-[10px] leading-relaxed text-muted-foreground">{CHALLENGE}</p>}</div>
           <Button variant="ghost" size="icon" className="h-11 w-11 shrink-0 text-muted-foreground" aria-label={T(c.close)} onClick={close}><X className="h-4 w-4" /></Button>
