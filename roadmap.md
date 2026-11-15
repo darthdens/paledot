@@ -1,7 +1,7 @@
 <!-- Left Behind · built during NASA Space Apps Challenge 2026 (14–15 Nov 2026) · AI-assisted (Lovable, Claude) -->
 # Roadmap
 ## Toolbar and dropdown consistency
-- [ ] Match language and clock-picker dropdown spacing/motion; compact phone/tablet language menu and verify layout.
+- [x] Match language dropdown to the shared 8px trigger gap and 300ms vertical disclosure; retain clock contents for closing animation and restore picker reveal/collapse. Language menu is 200px on desktop/tablet/phone; time picker 264px. Desktop gap and motion inspected; 834/360 menu screenshots checked; eight tests pass, build OK.
 - [x] Replace native date/time popups with themed calendar and UTC time columns. Date selection and 09:30:05 UTC readback checked; 360/390 portrait screenshots captured; 15 focused tests pass and build OK. Software-GPU timeout prevented completing the landscape check.
 - [x] Fix language menu rows inheriting toolbar icon dimensions; all seven desktop rows measured 184×44px with 16px flags, selection read back in French, no 390px overflow. Five locale tests pass; build OK.
 - [x] 15 Nov follow-up: desktop/tablet region and toolbar sit 8px below the date strip; search has no cross (search icon closes), no input outline, 12px left padding, and takes the full toolbar row on phones; dropdowns only stop above cards under their column (desktop Quick Jump/Left Behind now reach the screen bottom); switches show a visible accent knob; phone region details open as a dropdown below the compact button and close other menus; info card header hover fills the whole strip. Checked 393px phone and 1280px desktop.
