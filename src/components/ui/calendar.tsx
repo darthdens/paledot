@@ -7,8 +7,8 @@ import { cn } from '@/lib/utils';
 
 function CalendarDayButton({ day, modifiers, ...props }: DayButtonProps) {
   const ref = useRef<HTMLButtonElement>(null);
-  useEffect(() => { if (modifiers.focused) ref.current?.focus(); }, [modifiers.focused]);
-  return <Button ref={ref} variant="ghost" {...props} data-selected={modifiers.selected || undefined} />;
+  useEffect(() => { if (modifiers['focused']) ref.current?.focus(); }, [modifiers['focused']]);
+  return <Button ref={ref} variant="ghost" {...props} data-selected={modifiers['selected'] || undefined} />;
 }
 
 export function Calendar({ className, classNames, ...props }: React.ComponentProps<typeof DayPicker>) {
