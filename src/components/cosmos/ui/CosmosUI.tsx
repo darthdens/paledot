@@ -637,7 +637,7 @@ export const CosmosUI = () => {
                 {t.explore}
               </Button>
               {brand === 'paledot' && <Button size="sm" variant="outline" className="pd-pill h-auto min-h-11" onClick={() => { setShowControlHints(false); useLeftBehindStore.getState().setMenuOpen(true); }}>
-                <Satellite className="h-4 w-4" /><span className="flex flex-col gap-1"><span>{tr({ en: lbCopy.entry, fr: lbCopy.entry })}</span><span className="text-[10px] text-muted-foreground">(NASA Space Apps Challenge)</span></span>
+                <span className="flex flex-col gap-1"><span>{tr({ en: lbCopy.entry, fr: lbCopy.entry })}</span><span className="text-[10px] text-muted-foreground">(NASA Space Apps Challenge)</span></span>
               </Button>}
             </div>
             {brand === 'paledot' && showTourChoices && <div className="pd-card rounded-lg p-2 max-h-[min(360px,40dvh)] overflow-y-auto mx-auto w-full max-w-sm"><TourChoices onBegin={id => { setShowTourChoices(false); setShowControlHints(false); startTour(id); }} /></div>}
