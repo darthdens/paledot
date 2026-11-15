@@ -12,7 +12,7 @@ export function tourView(stop: TourStop | undefined, positions: Positions, machi
   if (toward.lengthSq() < 1e-20) return null;
   if (stop.viewMode === 'look-back') {
     toward.normalize();
-    return { target: machine.clone().addScaledVector(toward, distance * 2), offset: toward.multiplyScalar(-distance) };
+    return { target: machine.clone().addScaledVector(toward, distance * 2), offset: toward.multiplyScalar(-distance * 3) };
   }
   const target = machine.clone().addScaledVector(toward, 0.5);
   const sun = positions.sun ?? [0, 0, 0];

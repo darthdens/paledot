@@ -10,7 +10,7 @@ describe('tour viewpoints', () => {
     const view = tourView(stop, { sun: [0, 0, 0] }, machine, 0.03);
     expect(view).not.toBeNull();
     if (!view) return;
-    const camera = machine.clone().add(view.offset);
+    const camera = view.target.clone().add(view.offset);
     expect(view.target.clone().sub(camera).normalize().dot(sun.sub(camera).normalize())).toBeCloseTo(1, 10);
   });
   it('every Voyager encounter frames its actual planet and the craft', () => {
