@@ -5,7 +5,8 @@ export type TerrainTier = { file: string; tier: 'near' | 'mid'; west: number; so
   sourceMetresPerPixel: number; shownMetresPerPixel: number; source: string; credit: string;
   heightFile?: string; heightBaseM?: number; heightScaleM?: number; heightSource?: string };
 export type TerrainSite = { id: string; body: 'moon' | 'mars'; lat: number; lon: number; tiers: TerrainTier[] };
-type StaticData = Trajectory | Photo[] | { machines: Machine[] } | { sites: TerrainSite[] };
+export type LookData = { date: string; earthKm: number[]; earthDiameterKm: number; sourceUrl: string };
+type StaticData = Trajectory | Photo[] | { machines: Machine[] } | { sites: TerrainSite[] } | LookData;
 const cache = new Map<string, Promise<StaticData>>();
 async function read(path: string): Promise<StaticData> {
   const response = await fetch(`/left-behind/${path}`);
@@ -25,6 +26,9 @@ export function getTrajectory(id: string) {
 }
 export function getPhotoManifest() {
   return cached('photos', () => read('photos/manifest.json')) as Promise<Photo[]>;
+}
+export function getLookData() {
+  return cached('one-last-look', () => read('one-last-look.json')) as Promise<LookData>;
 }
 export function getHardware() {
   return cached('hardware', () => read('hardware.json')) as Promise<{ machines: Machine[] }>;

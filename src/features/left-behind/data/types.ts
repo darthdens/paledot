@@ -24,6 +24,6 @@ export type Trajectory = {
 export type Photo = {
   id: string; machineId: string; role?: string; nasaId: string; title: string;
   credit: string; sourceUrl: string; imageUrl: string; dateTaken: string | null;
-  alt: string; caption: string; earthMarker?: null;
+  alt: string; caption: string; earthMarker?: { x: number; y: number } | null;
   todo?: boolean; note?: string; description?: string;
 };

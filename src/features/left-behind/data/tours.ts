@@ -287,7 +287,7 @@ export const leftBehindTours: Tour[] = [
         'Em 12 de novembro de 1980 chega a Saturno. A passagem perto da lua Titã tira-a do plano dos planetas e termina a sua viagem planetária.',
         'Il 12 novembre 1980 raggiunge Saturno. Il passaggio vicino alla luna Titano lo porta fuori dal piano dei pianeti, chiudendo il suo giro planetario.',
         'Am 12. November 1980 erreicht sie Saturn. Der nahe Vorbeiflug am Mond Titan lenkt sie aus der Ebene der Planeten und beendet ihre Planetenreise.') },
-    { id: 'one-last-look', title: T('One last look', 'Un dernier regard', 'Una última mirada', 'Um último olhar', 'Un ultimo sguardo', 'Ein letzter Blick'), follow: 'hw:voyager-1', distanceKm: 0.03, date: '1990-02-14T00:00:00Z', factIds: ['v1-portrait'],
+    { id: 'one-last-look', title: T('One last look', 'Un dernier regard', 'Una última mirada', 'Um último olhar', 'Un ultimo sguardo', 'Ein letzter Blick'), follow: 'hw:voyager-1', distanceKm: 0.03, date: '1990-02-14T12:00:00Z', factIds: ['v1-portrait'],
       narration: T('On 14 February 1990, Voyager 1 points its cameras back toward the Sun and takes 60 frames: the first portrait of our Solar System seen from outside.',
         'Le 14 février 1990, Voyager 1 tourne ses caméras vers le Soleil et prend 60 images : le premier portrait de notre Système solaire vu de l’extérieur.',
         'El 14 de febrero de 1990, la Voyager 1 apunta sus cámaras hacia el Sol y toma 60 imágenes: el primer retrato del sistema solar visto desde fuera.',
