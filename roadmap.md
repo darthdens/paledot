@@ -1,5 +1,9 @@
 <!-- Left Behind · built during NASA Space Apps Challenge 2026 (14–15 Nov 2026) · AI-assisted (Lovable, Claude) -->
 # Roadmap
+## Correct inaccurate maps and resolve texture rights
+- [ ] Replace eight misassigned maps and the two untraceable assets with body-specific, licensed WebP sources; retain source evidence and no artificial detail.
+- [ ] Check renderer assignments, projection and texture loading; add source/assignment regression tests and update credits.
+- [ ] Retry visible tour motion and report only observed results; do not claim physical-device smoothness from software rendering.
 ## Phone, accessibility, clock and Left Behind audit
 - [x] Fix confirmed touch-target, focus, hidden-menu keyboard, search/dropdown/card clearance and reduced-motion issues without adding features; every change listed in AUDIT.md.
 - [x] Remove specific hot-loop vector/matrix/list allocations and redundant hidden-line updates; avoid unnecessary photo-manifest reads. Remaining evaluator/camera allocations disclosed in AUDIT.md.
