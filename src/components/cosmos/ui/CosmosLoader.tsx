@@ -8,8 +8,8 @@ import { useIsMobile } from '@/hooks/use-mobile';
 // Import all textures that need to be preloaded
 import earthDayTexture from '@/assets/textures/earth-day.webp';
 import earthNightTexture from '@/assets/textures/earth-night.webp';
-import earthCloudsTexture from '@/assets/textures/earth-clouds.webp';
-import moonTexture from '@/assets/textures/moon.webp';
+import earthCloudsAsset from '@/assets/textures/earth-clouds.webp.asset.json';
+import moonAsset from '@/assets/textures/moon.webp.asset.json';
 import mercuryTexture from '@/assets/textures/mercury.webp';
 import venusTexture from '@/assets/textures/venus.webp';
 import marsTexture from '@/assets/textures/mars.webp';
@@ -17,14 +17,23 @@ import jupiterTexture from '@/assets/textures/jupiter.webp';
 import saturnTexture from '@/assets/textures/saturn.webp';
 import uranusTexture from '@/assets/textures/uranus.webp';
 import neptuneTexture from '@/assets/textures/neptune.webp';
-import plutoTexture from '@/assets/textures/pluto.webp';
-import titanTexture from '@/assets/textures/titan.webp';
-import europaTexture from '@/assets/textures/europa.webp';
-import ceresTexture from '@/assets/textures/ceres.webp';
-import enceladusTexture from '@/assets/textures/enceladus.webp';
-import tritonTexture from '@/assets/textures/triton.webp';
-import iapetusTexture from '@/assets/textures/iapetus.webp';
+import plutoAsset from '@/assets/textures/pluto.webp.asset.json';
+import titanAsset from '@/assets/textures/titan.webp.asset.json';
+import europaAsset from '@/assets/textures/europa.webp.asset.json';
+import ceresAsset from '@/assets/textures/ceres.webp.asset.json';
+import enceladusAsset from '@/assets/textures/enceladus.webp.asset.json';
+import tritonAsset from '@/assets/textures/triton.webp.asset.json';
+import iapetusAsset from '@/assets/textures/iapetus.webp.asset.json';
 
+const earthCloudsTexture = earthCloudsAsset.url;
+const moonTexture = moonAsset.url;
+const plutoTexture = plutoAsset.url;
+const titanTexture = titanAsset.url;
+const europaTexture = europaAsset.url;
+const ceresTexture = ceresAsset.url;
+const enceladusTexture = enceladusAsset.url;
+const tritonTexture = tritonAsset.url;
+const iapetusTexture = iapetusAsset.url;
 // All texture paths to preload
 const ALL_TEXTURES = [
   earthDayTexture,
