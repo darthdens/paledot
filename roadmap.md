@@ -1,8 +1,8 @@
 <!-- Left Behind · built during NASA Space Apps Challenge 2026 (14–15 Nov 2026) · AI-assisted (Lovable, Claude) -->
 # Roadmap
 ## Complete framing acceptance
-- [ ] Replace the Voyager 1 summary popup with an opaque, quiet full-screen ending; preserve the Begin at Earth ending.
-- [ ] Verify uninterrupted camera flights, phone glossary clearance over a rendered object, and Begin at Earth through its ending.
+- [x] Replace the Voyager 1 summary popup with an opaque black ending and delayed quiet seven-machine summary; actual last-stop completion and screenshot verified. Begin at Earth code unchanged; 10 focused tests pass.
+- [ ] Verify uninterrupted camera flights, phone glossary clearance over a rendered object, and Begin at Earth through its ending. Blocker: software-GPU checks repeatedly stall; Begin at Earth reached all 26 stops but its ending capture did not finish.
 ## Consistent overlays and complete provenance
 - [x] Share the tour-photo backdrop across Send a signal, Machines and How we know; add the NASA Space Apps Challenge line beneath both Left behind headings. Desktop/phone checked.
 - [x] Re-check all 21 NASA image records and six simplified-path milestone sources; store real UTC retrieval timestamps and source URLs, with regression tests.
@@ -10,7 +10,7 @@
 ## Left Behind framing
 - [x] Add entry-specific intro and seven distance-ordered machine choices with date-safe navigation; Apollo 11 launch and Voyager 2 card verified in the preview.
 - [x] Add Voyager 1-only final summary without changing Begin at Earth or its end frame; last-stop completion verified on phone.
-- [x] Add twelve translated glossary definitions, a sourced How we know drawer, exact repository credits and teacher questions. Missing NASA-image/simplified-path retrieval dates remain TODO(source), never invented.
+- [x] Add twelve translated glossary definitions, a sourced How we know drawer, exact repository credits and teacher questions. NASA image metadata and simplified-source retrieval dates now verified and stored.
 - [x] Add machine search through the same navigation; Voyager 1 search selection verified, mobile introduction/list/drawer/summary screenshots checked; 132 tests pass. No new scene features; camera flights and glossary-on-object visual clearance remain unverified with the sandbox canvas hidden for UI checks.
 ## Signal spacing and Left Behind emphasis
 - [x] Match mobile signal top clearance to the toolbar and equalise close-button top/right inset; 360px popup checked at y=32px with equal 8px header insets.
