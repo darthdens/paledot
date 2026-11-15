@@ -794,7 +794,7 @@ All colors MUST be HSL.
 .paledot .cosmos-search-input input { padding-left: 12px; padding-right: 4px; outline: none !important; box-shadow: none !important; }
 .paledot [data-search-open="true"] [data-search-trigger]:focus-visible { outline-offset: -2px; }
 .paledot .pd-machine-switch { position: relative; }
-.paledot .pd-machine-switch > span { width: 16px; height: 16px; box-shadow: none; transform: translateX(1px); }
+.paledot .pd-machine-switch > span { width: 16px; height: 16px; box-shadow: none; translate: none; transform: translateX(1px); transition: transform 150ms ease-out, background-color 150ms ease-out; }
 .paledot .pd-machine-switch[data-state="checked"] { background-color: hsl(var(--dot) / .22); border-color: hsl(var(--dot)); }
 .paledot .pd-machine-switch[data-state="checked"] > span { background-color: hsl(var(--dot)); transform: translateX(17px); }
 .paledot .pd-machine-switch[data-state="unchecked"] { background-color: hsl(var(--surface-2)); border-color: hsl(var(--border-strong)); }
