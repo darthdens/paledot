@@ -1,5 +1,5 @@
 // Left Behind · built during NASA Space Apps Challenge 2026 (14–15 Nov 2026) · AI-assisted (Lovable, Claude)
-import { useMemo, useState, type ReactNode } from 'react';
+import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/i18n/LanguageContext';
 import { glossaryData } from '../lib/glossaryData';
@@ -13,9 +13,10 @@ function Term({ word, definition }: { word: string; definition: string }) {
 }
 export function GlossaryText({ text, scope = 'shared' }: { text: string; scope?: string }) {
   const { language, tr } = useLanguage();
+  const owned = useRef(new Set<string>());
   const parts = useMemo(() => {
     const result: ReactNode[] = [];
-    const candidates = glossaryData.filter(g => !seen.has(`${scope}:${language}:${g.id}`));
+    const candidates = glossaryData.filter(g => !seen.has(`${scope}:${language}:${g.id}`) || owned.current.has(`${scope}:${language}:${g.id}`));
     let cursor = 0;
     const lower = text.toLocaleLowerCase();
     while (cursor < text.length) {
@@ -25,11 +26,12 @@ export function GlossaryText({ text, scope = 'shared' }: { text: string; scope?:
       result.push(text.slice(cursor, hit.at));
       const word = text.slice(hit.at, hit.at + hit.g.terms[language].length);
       result.push(<Term key={hit.at} word={word} definition={tr({ en: hit.g.definitions[language], fr: hit.g.definitions[language] })} />);
-      seen.add(`${scope}:${language}:${hit.g.id}`);
+      owned.current.add(`${scope}:${language}:${hit.g.id}`);
       candidates.splice(candidates.indexOf(hit.g), 1);
       cursor = hit.at + word.length;
     }
     return result;
   }, [text, scope, language, tr]);
+  useEffect(() => { for (const key of owned.current) seen.add(key); }, [parts]);
   return <>{parts}</>;
 }

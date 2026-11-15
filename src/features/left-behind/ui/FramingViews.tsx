@@ -8,27 +8,16 @@ import { useCosmosStore } from '@/components/cosmos/store/useCosmosStore';
 import credits from '../../../../CREDITS.md?raw';
 import { useLeftBehindStore } from '../state/useLeftBehindStore';
 import { useSignal } from '../state/useSignal';
-import { useSimClock } from '../state/useSimClock';
 import { getHardware, getTrajectory } from '../data/dataClient';
-import { loadTrajectory } from '../engine/trajectory';
-import { followHardware } from '../lib/hardwareNavigation';
+import { visitMachine } from '../lib/hardwareNavigation';
 import { framingCopy } from '../lib/framingCopy';
 import { cardCopy, placeNames } from '../lib/cardCopy';
 import { dataText } from '../lib/dataText';
 import { buildSignalRace } from '../lib/signal';
-import { machineVisit } from '../lib/framing';
 import { glossaryData } from '../lib/glossaryData';
 import type { CardMachine } from './MachineCard';
 import type { Trajectory } from '../data/types';
 
-export async function visitMachine(machine: CardMachine) {
-  const visit = machineVisit(machine, useSimClock.getState().simDate);
-  useCosmosStore.getState().stopTour();
-  useSimClock.getState().setSimDate(visit.date);
-  useLeftBehindStore.setState({ framingView: null, machinesVisible: true, menuOpen: false });
-  await loadTrajectory(visit.target);
-  followHardware(visit.target);
-}
 export function FramingViews() {
   const { language, tr, numberLocale } = useLanguage();
   const c = framingCopy[language], card = cardCopy[language];
@@ -97,10 +86,25 @@ export function FramingViews() {
             </section>
             <section className="space-y-3"><h3 className="text-sm font-semibold">{T(c.teachers)}</h3><ul className="list-disc pl-4 space-y-3 text-xs leading-relaxed text-muted-foreground">{[c.qScale, c.qCommunication, c.qLegacy].map(q => <li key={q}>{T(q)}</li>)}</ul><a className="text-xs underline underline-offset-4" href="#lb-how-we-know" onClick={e => { e.preventDefault(); document.getElementById('lb-how-we-know')?.scrollIntoView({ behavior: 'instant', block: 'start' }); }}>{T(c.know)}</a></section>
             <section className="space-y-3"><h3 className="text-sm font-semibold">{T(c.glossary)}</h3><dl className="space-y-3 text-xs leading-relaxed">{glossaryData.map(g => <div key={g.id}><dt className="font-medium">{T(g.terms[language])}</dt><dd className="mt-1 text-muted-foreground">{T(g.definitions[language])}</dd></div>)}</dl></section>
-            <section className="space-y-3"><h3 className="text-sm font-semibold">{T(c.credits)}</h3><div className="whitespace-pre-wrap break-words text-xs leading-relaxed text-muted-foreground">{credits.replace(/^<!--.*?-->\s*/s, '')}</div></section>
+            <section className="space-y-3"><h3 className="text-sm font-semibold">{T(c.credits)}</h3><div className="break-words text-xs leading-relaxed text-muted-foreground"><CreditsText /></div></section>
           </>}
         </div>
       </Dialog.Content>
     </Dialog.Portal>
   </Dialog.Root>;
+}
+
+function CreditsText() {
+  const lines = credits.replace(/^<!--.*?-->\s*/s, '').split('\n');
+  const linkText = (text: string) => text.split(/(https?:\/\/[^\s|)]+|\[[^\]]+\]\(https?:\/\/[^)]+\))/g).map((part, i) => {
+    const match = part.match(/^\[([^\]]+)\]\((https?:\/\/[^)]+)\)$/);
+    const url = match?.[2] ?? (part.startsWith('http') ? part : null);
+    return url ? <a key={i} href={url} target="_blank" rel="noopener noreferrer" className="underline underline-offset-4">{match?.[1] ?? part}</a> : part;
+  });
+  return <div className="space-y-3">{lines.map((line, i) => {
+    if (!line.trim() || /^\|\s*[-:]+/.test(line)) return null;
+    if (line.startsWith('#')) return <h4 key={i} className="pt-3 font-medium text-foreground">{line.replace(/^#+\s*/, '')}</h4>;
+    if (line.startsWith('|')) return <p key={i} className="border-b border-border pb-2">{linkText(line.split('|').map(x => x.trim()).filter(Boolean).join(' · '))}</p>;
+    return <p key={i}>{linkText(line)}</p>;
+  })}</div>;
 }

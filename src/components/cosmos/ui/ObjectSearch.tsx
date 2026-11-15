@@ -6,6 +6,11 @@ import { Search, X } from 'lucide-react';
 import { celestialObjects } from '../data/celestialObjects';
 import { useCosmosStore } from '../store/useCosmosStore';
 import { cn } from '@/lib/utils';
+import { useSiteBrand } from '@/lib/site-brand';
+import { getHardware } from '@/features/left-behind/data/dataClient';
+import { visitMachine } from '@/features/left-behind/lib/hardwareNavigation';
+import { dataText } from '@/features/left-behind/lib/dataText';
+import type { Machine } from '@/features/left-behind/data/types';
 
 const translations = {
   en: {
@@ -37,11 +42,20 @@ interface ObjectSearchProps {
 export const ObjectSearch = ({ isFullscreen }: ObjectSearchProps) => {
   const { language, tr, tx, numberLocale } = useLanguage();
   const t = tr(translations);
+  const brand = useSiteBrand();
+  const [machines, setMachines] = useState<Machine[]>([]);
   const [isOpen, setIsOpen] = useState(false);
   const [query, setQuery] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const { setSelectedObject, stopTour } = useCosmosStore();
+  useEffect(() => {
+    if (!isOpen || brand !== 'paledot') return;
+    let alive = true;
+    void getHardware().then(h => { if (alive) setMachines(h.machines); }).catch(() => {});
+    return () => { alive = false; };
+  }, [isOpen, brand]);
+  const filteredMachines = query.trim() ? machines.filter(m => `${m.name} ${dataText(m.name, language)}`.toLocaleLowerCase().includes(query.toLocaleLowerCase())) : [];
 
   // Filter celestial objects by name
   const filteredObjects = celestialObjects.filter((obj) => {
@@ -157,10 +171,11 @@ export const ObjectSearch = ({ isFullscreen }: ObjectSearchProps) => {
 
       {query.trim() && (
         <div className="max-h-60 overflow-y-auto border-t border-white/10">
-          {filteredObjects.length === 0 ? (
+          {filteredObjects.length === 0 && filteredMachines.length === 0 ? (
             <p className="text-white/50 text-sm p-3 text-center">{t.noResults}</p>
           ) : (
             <ul>
+              {filteredMachines.map(machine => <li key={machine.id}><Button variant="ghost" className="h-auto min-h-11 w-full justify-start whitespace-normal px-3 py-2 text-left font-normal text-foreground" onClick={() => { void visitMachine(machine); setIsOpen(false); setQuery(''); }}>{dataText(machine.name, language)}</Button></li>)}
               {filteredObjects.map((obj) => (
                 <li key={obj.id}>
                   <button
