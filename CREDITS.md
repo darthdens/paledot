@@ -20,6 +20,8 @@ Data was fetched from the JPL Horizons API and NASA Image and Video Library API 
 | PIA00451: Solar System Portrait, 60-frame mosaic (NASA/JPL) | https://photojournal.jpl.nasa.gov/catalog/pia00451 | One Last Look |
 | NSSDCA: Apollo Landing Site Coordinates | https://nssdc.gsfc.nasa.gov/planetary/lunar/lunar_sites.html | Facts, dates and coordinates in hardware.json |
 | JPL: The Apollo Experiment That Keeps on Giving | https://jpl.nasa.gov/news/the-apollo-experiment-that-keeps-on-giving/ | Facts, dates and coordinates in hardware.json |
+| NASA NTRS: Single photon detection and timing in the Lunar Laser Ranging Experiment | https://ntrs.nasa.gov/citations/19720047864 | Source abstract confirms the approximate 2.5-second round-trip interval; bibliographic facts only, copyrighted paper not bundled |
+| NASA Deep Space Network | https://www.nasa.gov/communicating-with-missions/dsn/ | Existing hardware.json shared fact; Goldstone, Madrid and Canberra context in Send a signal; NASA factual information, no endorsement |
 | https://nssdc.gsfc.nasa.gov/planetary/lunar/lunar_artifact_impacts.html | https://nssdc.gsfc.nasa.gov/planetary/lunar/lunar_artifact_impacts.html | Facts, dates and coordinates in hardware.json |
 | NSSDCA: Viking Mission to Mars | https://nssdc.gsfc.nasa.gov/planetary/viking.html | Facts, dates and coordinates in hardware.json |
 | NASA: Viking | https://science.nasa.gov/mission/viking | Facts, dates and coordinates in hardware.json |

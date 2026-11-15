@@ -9,14 +9,14 @@ import { getHardware, getTrajectory } from '../data/dataClient';
 import { useSignal } from '../state/useSignal';
 import { signalCopy } from '../lib/signalCopy';
 import { dataText } from '../lib/dataText';
-import { buildSignalRace, countdown, lightSeconds, logDistance, remainingSeconds, restoreRace, saveRace, shortMessage, signalProgress, type SignalMachine, type SignalRace, type SignalRow } from '../lib/signal';
+import { buildSignalRace, countdown, LIGHT_KM_S, lightSeconds, logDistance, remainingSeconds, restoreRace, saveRace, shortMessage, signalProgress, type SignalMachine, type SignalRace, type SignalRow } from '../lib/signal';
 import type { Trajectory } from '../data/types';
 export function SendSignal() {
   const { language, numberLocale, tr } = useLanguage();
   const c = signalCopy[language];
   const T = (s: string) => tr({ en: s, fr: s });
   const open = useSignal(s => s.open), race = useSignal(s => s.race), target = useSignal(s => s.targetId);
-  const [data, setData] = useState<{ machines: SignalMachine[]; tracks: Trajectory[]; dsn: string } | null>(null);
+  const [data, setData] = useState<{ machines: SignalMachine[]; tracks: Trajectory[]; dsn: string; reflector: string } | null>(null);
   const [preview, setPreview] = useState<SignalRace | null>(null);
   const [now, setNow] = useState(0), [minute, setMinute] = useState(0);
   const [message, setMessage] = useState(''), [failed, setFailed] = useState(false), [storageFailed, setStorageFailed] = useState(false);
@@ -28,7 +28,8 @@ export function SendSignal() {
     void Promise.all([getHardware(), getTrajectory('voyager-1'), getTrajectory('voyager-2')]).then(([hardware, v1, v2]) => {
       if (!alive) return;
       const h = hardware as typeof hardware & { shared?: { facts: { id: string; sourceUrl: string }[] } };
-      const ready = { machines: hardware.machines as SignalMachine[], tracks: [v1, v2], dsn: h.shared?.facts.find(f => f.id === 'dsn')?.sourceUrl ?? '' };
+      const machines = hardware.machines as SignalMachine[];
+      const ready = { machines, tracks: [v1, v2], dsn: h.shared?.facts.find(f => f.id === 'dsn')?.sourceUrl ?? '', reflector: machines.find(m => m.id === 'apollo-11')?.facts?.find(f => f.id === 'a11-light-return')?.sourceUrl ?? '' };
       setData(ready); setPreview(buildSignalRace(ready.machines, ready.tracks, Date.now(), ''));
     }).catch(() => { if (alive) setFailed(true); });
     return () => { alive = false; };
@@ -39,7 +40,7 @@ export function SendSignal() {
     tick(); const timer = window.setInterval(tick, 250);
     return () => window.clearInterval(timer);
   }, [open]);
-  useEffect(() => { if (open && data && !race) setPreview(buildSignalRace(data.machines, data.tracks, Date.now(), '')); }, [minute, open, data, race]);
+  useEffect(() => { if (open && data && !race) { try { setPreview(buildSignalRace(data.machines, data.tracks, Date.now(), '')); } catch { setFailed(true); } } }, [minute, open, data, race]);
   const view = race ?? preview;
   const maxKm = Math.max(...(view?.rows.map(r => r.distanceKm) ?? [1]));
   const fmt = (n: number) => new Intl.NumberFormat(numberLocale, { maximumFractionDigits: 0 }).format(n);
@@ -66,7 +67,7 @@ export function SendSignal() {
         </header>
         <div className="overflow-y-auto overscroll-contain p-4 space-y-4">
           <DialogPrimitive.Description className="text-xs text-muted-foreground">{T(c.now)}<span className="block font-mono tabular-nums">{view ? date(view.sentAt) : ''}</span></DialogPrimitive.Description>
-          <form className="flex items-end gap-2" onSubmit={e => { e.preventDefault(); if (data) persist(buildSignalRace(data.machines, data.tracks, Date.now(), message)); }}>
+          <form className="flex items-end gap-2" onSubmit={e => { e.preventDefault(); if (data && !race) { try { persist(buildSignalRace(data.machines, data.tracks, Date.now(), message)); } catch { setFailed(true); } } }}>
             <div className="min-w-0 flex-1"><label htmlFor="signal-message" className="block mb-2 text-xs text-muted-foreground">{T(c.message)}</label><Input id="signal-message" value={race?.message ?? message} maxLength={40} disabled={!!race} onChange={e => setMessage(shortMessage(e.target.value))} className="h-11 bg-muted/30" /></div>
             <Button type="submit" variant="ghost" disabled={!!race || !data || failed} className="h-11 gap-2 border border-border bg-muted/50"><Radio className="h-4 w-4" />{T(c.send)}</Button>
           </form>
@@ -76,21 +77,21 @@ export function SendSignal() {
             {view.rows.map(row => {
               const progress = race ? signalProgress(race, row, now) : 0;
               const extent = logDistance(row.distanceKm, maxKm);
-              const lightKm = race ? Math.min(row.distanceKm, Math.max(0, now - race.sentAt) / 1000 * 299792.458) : 0;
+              const lightKm = race ? Math.min(row.distanceKm, Math.max(0, now - race.sentAt) / 1000 * LIGHT_KM_S) : 0;
               return <li key={row.id} data-signal-row={row.id} className="py-3 first:pt-0 last:pb-0">
                 <Button variant="ghost" aria-pressed={row.id === target} className={`h-auto min-h-11 w-full justify-start whitespace-normal px-0 py-1 text-left text-sm ${row.id === target ? 'text-primary' : 'text-foreground'}`} onClick={() => useSignal.setState({ targetId: row.id })}>{dataText(row.name, language)}</Button>
                 <p className="font-mono tabular-nums text-xs">{fmt(row.distanceKm)} km</p>
                 <p className="text-[10px] text-muted-foreground"><a target="_blank" rel="noopener noreferrer" className="hover:underline" href={row.provenance === 'ephemeris' ? 'https://github.com/cosinekitty/astronomy' : 'https://ssd.jpl.nasa.gov/horizons/'}>{row.provenance === 'ephemeris' ? T(c.ephemeris) : row.extrapolated ? T(c.extrapolated) : T(c.horizons)}</a></p>
                 <div className="relative mt-2 h-1 bg-muted/30" aria-hidden><span className="absolute left-0 top-0 h-1 bg-muted-foreground/40" style={{ width: `${extent * 100}%` }} /><span className="absolute left-0 top-0 h-1 bg-primary" style={{ width: `${logDistance(lightKm, maxKm) * 100}%` }} /></div>
                 <div className="mt-2 text-[11px] text-muted-foreground" role="progressbar" aria-label={dataText(row.name, language)} aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(progress * 100)}><span className="font-mono tabular-nums" data-signal-countdown>{status(row, now)}</span></div>
-                {race && row.status === 'in-use' && remainingSeconds(race, row, now) === 0 && <p className="text-xs text-muted-foreground">{c.roundTrip.replace('{t}', `${new Intl.NumberFormat(numberLocale, { maximumFractionDigits: 2 }).format(2 * lightSeconds(row.distanceKm))} s`)}</p>}
+                {race && row.status === 'in-use' && remainingSeconds(race, row, now) === 0 && <p className="text-xs text-muted-foreground"><a href={data?.reflector} target="_blank" rel="noopener noreferrer" className="block hover:underline">NASA · NTRS</a>{c.roundTrip.replace('{t}', `${new Intl.NumberFormat(numberLocale, { maximumFractionDigits: 2 }).format(2 * lightSeconds(row.distanceKm))} s`)}</p>}
                 {row.status === 'transmitting' && <p className="mt-1 text-xs text-muted-foreground">{c.reply.replace('{t}', countdown(race ? Math.max(0, lightSeconds(row.distanceKm) * 2 - (now - race.sentAt) / 1000) : lightSeconds(row.distanceKm) * 2))}<a href={data?.dsn} target="_blank" rel="noopener noreferrer" className="block hover:underline">{T(c.network)}</a></p>}
               </li>;
             })}
           </ul>}
           <p className="text-xs text-muted-foreground">{T(c.pulse)}</p>
           {storageFailed && <p role="alert" className="text-xs text-muted-foreground">{T(c.storage)}</p>}
-          <p className="sr-only" aria-live="polite" aria-atomic="true">{view?.rows.map(row => `${dataText(row.name, language)}: ${status(row, minute * 60000)}`).join('. ')}</p>
+          <p className="sr-only" aria-live="polite" aria-atomic="true">{view?.rows.map(row => `${dataText(row.name, language)}: ${status(row, Math.max(view.sentAt, minute * 60000))}`).join('. ')}</p>
         </div>
         <footer className="shrink-0 border-t border-border px-4 py-3 text-xs text-muted-foreground">{T(c.simulation)}</footer>
       </DialogPrimitive.Content>
