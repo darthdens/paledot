@@ -13,6 +13,8 @@ import { getPhotoManifest } from '@/features/left-behind/data/dataClient';
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { celestialObjects } from '../data/celestialObjects';
 import { UNITS } from '../types';
+import { captionText } from '@/features/left-behind/lib/dataText';
+import { tourPhotoIds } from '@/features/left-behind/lib/tourPresentation';
 
 const translations = {
   en: {
@@ -559,7 +561,7 @@ export const TourOverlay = () => {
             <p aria-live="polite" className="text-white/80 text-xs sm:text-sm leading-relaxed line-clamp-4 sm:line-clamp-none">
               {pickText(currentStop.narration, language, tr)}
             </p>
-            {currentStop.photoIds?.length ? <TourPhotos ids={currentStop.photoIds} /> : null}
+            <TourPhotos ids={tourPhotoIds(activeTourId, currentStop)} />
           </div>
           
           {/* Controls */}
@@ -618,19 +620,22 @@ function TourPhotos({ ids }: { ids: string[] }) {
     let alive = true;
     void getPhotoManifest().then(list => { if (alive) setPhotos(ids.map(id => (list as unknown as TourPhoto[]).find(p => p.id === id)).filter((p): p is TourPhoto => !!p)); }).catch(() => {});
     return () => { alive = false; };
-  }, [ids]);
+  }, [ids.join('|')]);
   if (!photos.length) return null;
-  const caption = (p: TourPhoto) => pickText(p.caption, language, tr);
+  const caption = (p: TourPhoto) => captionText(p.id, p.caption, language);
   return <>
-    <div className="flex gap-2">
-      {photos.map(p => <button key={p.id} type="button" onClick={() => setOpen(p)} aria-label={caption(p)} className="h-14 w-20 sm:h-16 sm:w-24 shrink-0 overflow-hidden rounded-[4px] bg-white/5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-ring">
-        <img src={p.imageUrl} alt={p.alt} loading="lazy" className="h-full w-full object-cover" />
-      </button>)}
+    <div className="flex gap-3 overflow-x-auto">
+      {photos.map(p => <figure key={p.id} className="w-32 sm:w-44 shrink-0">
+        <Button variant="ghost" type="button" onClick={() => setOpen(p)} aria-label={caption(p)} className="h-20 sm:h-24 w-full p-0 overflow-hidden rounded-md bg-muted/40">
+          <img src={p.imageUrl} alt={caption(p)} loading="lazy" className="h-full w-full object-contain" />
+        </Button>
+        <figcaption className="mt-1 text-xs text-muted-foreground leading-snug">{caption(p)}<a href={p.sourceUrl} target="_blank" rel="noopener noreferrer" className="block hover:underline">{p.credit} · {p.nasaId}</a></figcaption>
+      </figure>)}
     </div>
     <Dialog open={!!open} onOpenChange={o => !o && setOpen(null)}>
       <DialogContent className="paledot dark max-w-[min(96vw,1100px)] border-border bg-background p-3">
-        {open && <><DialogTitle className="sr-only">{caption(open)}</DialogTitle><DialogDescription className="sr-only">{open.alt}</DialogDescription>
-          <img src={open.imageUrl} alt={open.alt} className="max-h-[78vh] w-full object-contain" />
+        {open && <><DialogTitle className="sr-only">{caption(open)}</DialogTitle><DialogDescription className="sr-only">{caption(open)}</DialogDescription>
+          <img src={open.imageUrl} alt={caption(open)} className="max-h-[78vh] w-full object-contain" />
           <p className="text-sm text-foreground">{caption(open)}<span className="block text-xs text-muted-foreground"><a href={open.sourceUrl} target="_blank" rel="noopener noreferrer" className="hover:underline">{open.credit} · {open.nasaId}</a></span></p></>}
       </DialogContent>
     </Dialog>
