@@ -11,22 +11,23 @@ const LanguageList = ({ onPick }: { onPick?: () => void }) => {
   return (
     <div role="listbox" className="space-y-0.5">
       {LOCALES.map((l) => (
-        <button
+        <Button
+          variant="ghost"
           key={l.code}
           role="option"
           aria-selected={locale === l.code}
           lang={l.code}
           onClick={() => { setLocale(l.code); onPick?.(); }}
-          className={`w-full flex items-center justify-between gap-3 px-2 py-1.5 rounded-[4px] text-sm transition-colors ${
-            locale === l.code ? 'bg-white/25 text-white' : 'text-white/80 hover:bg-white/10'
+          className={`w-full min-h-11 h-auto grid grid-cols-[minmax(0,1fr)_16px] items-center justify-between gap-3 px-2 py-2 rounded-sm text-sm font-normal transition-colors ${
+            locale === l.code ? 'bg-accent text-accent-foreground' : 'text-foreground hover:bg-accent/60'
           }`}
         >
           <span className="flex items-center gap-2 min-w-0">
             <FlagIcon locale={l.code} className="w-4 h-4 shrink-0" />
             <span className="whitespace-nowrap">{l.label}</span>
           </span>
-          {locale === l.code && <Check className="w-3.5 h-3.5 shrink-0" />}
-        </button>
+          <span className="w-4 h-4 shrink-0">{locale === l.code && <Check className="w-4 h-4" />}</span>
+        </Button>
       ))}
     </div>
   );
@@ -38,20 +39,21 @@ export const LanguageMenuList = ({ onPick }: { onPick?: () => void }) => {
   return (
     <div role="listbox" className="space-y-0.5">
       {LOCALES.map((l) => (
-        <button
+        <Button
+          variant="ghost"
           key={l.code}
           role="option"
           aria-selected={locale === l.code}
           lang={l.code}
           onClick={() => { setLocale(l.code); onPick?.(); }}
-          className="w-full flex items-center justify-between gap-3 p-2 rounded-[4px] hover:bg-white/10 transition-colors"
+          className={`w-full min-h-11 h-auto grid grid-cols-[minmax(0,1fr)_16px] items-center gap-3 p-2 rounded-sm font-normal transition-colors ${locale === l.code ? 'bg-accent text-accent-foreground' : 'text-foreground hover:bg-accent/60'}`}
         >
           <div className="flex items-center gap-2 min-w-0">
             <FlagIcon locale={l.code} className="w-4 h-4 shrink-0" />
-            <span className="text-sm text-white/90 whitespace-nowrap">{l.label}</span>
+            <span className="text-sm whitespace-nowrap">{l.label}</span>
           </div>
-          {locale === l.code && <div className="w-2 h-2 shrink-0 rounded-full bg-green-400" />}
-        </button>
+          <span className="w-4 h-4 shrink-0">{locale === l.code && <Check className="w-4 h-4" />}</span>
+        </Button>
       ))}
     </div>
   );
