@@ -13,6 +13,10 @@ export const signalProgress = (race: SignalRace, row: SignalRow, now: number) =>
 /** One shared Earth-to-farthest logarithmic axis, not seven independently scaled distances. */
 export const logDistance = (km: number, maxKm: number) => Math.log1p(Math.max(0, km)) / Math.log1p(maxKm);
 export const shortMessage = (message: string) => Array.from(message).slice(0, 40).join('');
+export const signalPositionKm = (race: SignalRace, row: SignalRow, now: number): [number, number, number] => {
+  const distance = Math.min(row.distanceKm, Math.max(0, now - race.sentAt) / 1000 * LIGHT_KM_S);
+  return race.earthKm.map((v, i) => v + (row.direction[i] ?? 0) * distance) as [number, number, number];
+};
 export function buildSignalRace(machines: SignalMachine[], tracks: Trajectory[], now: number, message: string): SignalRace {
   const date = new Date(now), earthKm = helioPositionKm('earth', date);
   const rows = machines.map(machine => {

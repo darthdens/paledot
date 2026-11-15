@@ -1,7 +1,7 @@
 // Left Behind · built during NASA Space Apps Challenge 2026 (14–15 Nov 2026) · AI-assisted (Lovable, Claude)
 import { describe, expect, it } from 'vitest';
 import { readFileSync } from 'node:fs';
-import { buildSignalRace, lightSeconds, LIGHT_KM_S, logDistance, remainingSeconds, restoreRace, saveRace, shortMessage, signalProgress } from './signal';
+import { buildSignalRace, lightSeconds, LIGHT_KM_S, logDistance, remainingSeconds, restoreRace, saveRace, shortMessage, signalProgress, signalPositionKm } from './signal';
 import type { SignalMachine } from './signal';
 import type { Trajectory } from '../data/types';
 const machines = JSON.parse(readFileSync('public/left-behind/hardware.json', 'utf8')).machines as SignalMachine[];
@@ -10,6 +10,11 @@ const time = Date.parse('2026-11-15T03:58:00Z');
 const race = buildSignalRace(machines, tracks, time, 'Hello');
 describe('Send a signal physical rules', () => {
  it('uses exactly 299,792.458 km per second', () => expect(LIGHT_KM_S).toBe(299792.458));
+ it('moves the pulse exactly 299,792.458 km in one real second', () => {
+  const row = race.rows.find(r => r.id === 'voyager-1'); if (!row) throw new Error('missing row');
+  const p = signalPositionKm(race, row, time + 1000);
+  expect(Math.hypot(...p.map((v, i) => v - (race.earthKm[i] ?? 0)))).toBeCloseTo(299792.458, 5);
+ });
  it('Moon light time is about 1.3 seconds', () => {
   const row = race.rows.find(r => r.id === 'apollo-11');
   expect(lightSeconds(row?.distanceKm ?? 0)).toBeGreaterThan(1.1);

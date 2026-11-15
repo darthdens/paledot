@@ -15,7 +15,7 @@ export function SignalPulse() {
     const query = window.matchMedia('(prefers-reduced-motion: reduce)');
     const update = () => setReduced(query.matches); update(); query.addEventListener('change', update);
     const skin = document.querySelector('.paledot');
-    if (skin) color.set(`hsl(${getComputedStyle(skin).getPropertyValue('--primary').trim()})`);
+    if (skin) color.set(`hsl(${getComputedStyle(skin).getPropertyValue('--primary').trim().split(/\s+/).join(',')})`);
     return () => query.removeEventListener('change', update);
   }, [color]);
   useFrame(() => {
