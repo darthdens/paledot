@@ -21,6 +21,7 @@ import { OneLastLook, type LastLookPanel } from '@/features/left-behind/ui/OneLa
 import { useLeftBehindStore } from '@/features/left-behind/state/useLeftBehindStore';
 import { GlossaryText } from '@/features/left-behind/ui/GlossaryText';
 import { needsMachineSummary } from '@/features/left-behind/lib/framing';
+import { isSceneShortcutTarget } from '@/features/left-behind/lib/keyboardScope';
 
 const translations = {
   en: {
@@ -354,6 +355,7 @@ export const TourOverlay = () => {
     if (!isTouring || isLastLook) return;
 
     const handleKeyDown = (e: KeyboardEvent) => {
+      if (!isSceneShortcutTarget(e.target) || document.querySelector('[role="dialog"],[data-lb-menu]')) return;
       // Prevent default behavior for our shortcuts
       if (['ArrowLeft', 'ArrowRight', 'Space', 'Escape'].includes(e.code)) {
         e.preventDefault();
