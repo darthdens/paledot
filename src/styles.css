@@ -767,7 +767,7 @@ All colors MUST be HSL.
 [data-search-slot][data-search-open="true"] { width: var(--search-expanded-width, 280px); }
 .paledot [data-explorer-toolbar] { right: max(8px, env(safe-area-inset-right)); left: auto !important; }
 .paledot [data-region-control] { left: max(8px, env(safe-area-inset-left)); max-width: min(320px, calc(100vw - 16px)); z-index: 10003; }
-.paledot :is([data-bottom-card], [data-machine-readout], [data-tour-panel]) { bottom: max(8px, env(safe-area-inset-bottom)); }
+.paledot :is([data-bottom-card], [data-machine-readout], [data-tour-panel]) { bottom: max(8px, env(safe-area-inset-bottom)); left: max(8px, env(safe-area-inset-left)); }
 .paledot :is([data-explorer-dropdown], [data-quick-jump]) { width: min(320px, calc(100vw - 16px - env(safe-area-inset-left) - env(safe-area-inset-right))); min-width: 0; max-width: none; overflow: hidden; transform: none !important; transition: opacity 300ms ease-out; top: var(--pd-dropdown-top, 84px) !important; }
 .paledot :is([data-explorer-dropdown], [data-quick-jump]) > .grid { transition: grid-template-rows 300ms ease-out; }
 .paledot :is([data-explorer-dropdown], [data-quick-jump]) > .grid > div { min-height: 0; overflow: hidden; max-width: none; width: 100%; }
@@ -780,6 +780,8 @@ All colors MUST be HSL.
   .paledot [data-region-control][data-region-expanded="true"] { width: min(320px, calc(100vw - 16px)); }
   .paledot [data-region-control][data-region-expanded="false"] [data-region-title] { display: none; }
   .paledot [data-explorer-toolbar] > div { max-width: calc(100vw - 88px); }
+  .paledot [data-explorer-toolbar]:has([data-search-open="true"]) { max-width: calc(100vw - 16px); }
   .paledot [data-explorer-toolbar]:has([data-search-open="true"]) > div { max-width: calc(100vw - 16px); }
+  .paledot [data-region-control]:has(~ [data-explorer-toolbar] [data-search-open="true"]) { visibility: hidden; }
 }
 @media (prefers-reduced-motion: reduce) { [data-search-slot], [data-region-control] { transition: none; } }

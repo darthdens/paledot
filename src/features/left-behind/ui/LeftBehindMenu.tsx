@@ -32,7 +32,7 @@ export function LeftBehindMenu() {
     return () => { document.removeEventListener('mousedown', close); document.removeEventListener('keydown', escape); };
   }, [open]);
   const row = 'w-full h-auto min-h-7 max-sm:min-h-11 flex items-center justify-between gap-2 p-1.5 sm:p-2 rounded-[4px] text-xs sm:text-sm text-foreground hover:bg-accent/60 cursor-pointer';
-  return <div ref={ref} data-lb-menu data-explorer-dropdown inert={!open} aria-hidden={!open} role="region" aria-label={text(copy.name)} className={`absolute top-12 right-2 sm:top-[60px] sm:right-4 z-[10002] bg-white/10 backdrop-blur-xs rounded-lg overflow-hidden ${open ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
+  return <div ref={ref} data-lb-menu={open ? '' : undefined} data-lb-menu-surface data-explorer-dropdown inert={!open} aria-hidden={!open} role="region" aria-label={text(copy.name)} className={`absolute top-12 right-2 sm:top-[60px] sm:right-4 z-[10002] bg-white/10 backdrop-blur-xs rounded-lg overflow-hidden ${open ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
     <div className={`grid transition-[grid-template-rows] duration-300 ease-out ${open ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'}`}><div className="min-h-0 overflow-hidden"><div className="cosmos-dropdown-scroll">
     <div className="flex items-center justify-between p-2 sm:p-3 border-b border-white/10">
       <div className="min-w-0"><h3 className="text-foreground font-semibold text-sm">{text(copy.name)}</h3><p className="text-[10px] leading-relaxed text-muted-foreground">(NASA Space Apps Challenge)</p></div>
