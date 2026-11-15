@@ -794,13 +794,13 @@ All colors MUST be HSL.
 .paledot .cosmos-search-input input { padding-left: 12px; padding-right: 4px; outline: none !important; box-shadow: none !important; }
 .paledot [data-search-open="true"] [data-search-trigger]:focus-visible { outline-offset: -2px; }
 .paledot .pd-machine-switch { position: relative; }
-.paledot .pd-machine-switch > span { width: 16px; height: 16px; box-shadow: none; translate: none; transform: translateX(1px); transition: transform 150ms ease-out, background-color 150ms ease-out; }
+.paledot .pd-machine-switch > span { width: 16px; height: 16px; box-shadow: none; transform: none !important; translate: 1px 0 !important; transition: translate 150ms ease-out, background-color 150ms ease-out; }
 .paledot .pd-machine-switch[data-state="checked"] { background-color: hsl(var(--dot) / .22); border-color: hsl(var(--dot)); }
-.paledot .pd-machine-switch[data-state="checked"] > span { background-color: hsl(var(--dot)); transform: translateX(17px); }
+.paledot .pd-machine-switch[data-state="checked"] > span { background-color: hsl(var(--dot)); translate: 17px 0 !important; }
 .paledot .pd-machine-switch[data-state="unchecked"] { background-color: hsl(var(--surface-2)); border-color: hsl(var(--border-strong)); }
 .paledot .pd-machine-switch[data-state="unchecked"] > span { background-color: hsl(var(--muted-foreground)); }
 @media (max-width: 1023px) {
-  .paledot [data-region-control]:has(~ [data-explorer-toolbar] [data-search-open="true"]) { visibility: hidden; }
+  .paledot [data-explorer-ui-root]:has([data-search-open="true"]) [data-region-control] { visibility: hidden; }
 }
 @media (max-width: 639px) {
   /* Search takes the whole toolbar row instead of wrapping it. */
