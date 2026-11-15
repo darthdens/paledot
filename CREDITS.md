@@ -11,6 +11,8 @@ Data was fetched from the JPL Horizons API and NASA Image and Video Library API 
 | Link text | URL | Used for |
 | --- | --- | --- |
 | JPL Horizons System and API (NASA/JPL Solar System Dynamics) | https://ssd.jpl.nasa.gov/horizons/ | Every machine's real flight path, distance and light-time |
+| JPL Horizons Earth vector, 14 February 1990 12:00 UTC | https://ssd-api.jpl.nasa.gov/doc/horizons.html | US-government ephemeris data; cached Earth vector for One last look distance and angular size, heliocentric ecliptic J2000, UT input |
+| NASA Earth fact sheet | https://nssdc.gsfc.nasa.gov/planetary/factsheet/earthfact.html | NASA-reported Earth dimensions; mean diameter 12,742 km used for angular-size calculation |
 | NASA Image and Video Library API | https://images.nasa.gov | Searching and loading the NASA photographs |
 | NASA JPL Photojournal | https://photojournal.jpl.nasa.gov | Pale Blue Dot, Family Portrait and Viking images |
 | PIA00452: Pale Blue Dot (NASA/JPL-Caltech) | https://photojournal.jpl.nasa.gov/catalog/pia00452 | One Last Look |
