@@ -20,7 +20,9 @@ export const CameraController = () => {
   const currentScale = useCosmosStore((state) => state.currentScale);
   const isFollowing = useCosmosStore((state) => state.isFollowing);
   const tourCameraTarget = useCosmosStore((state) => state.tourCameraTarget);
-  const isTouring = useCosmosStore((state) => state.isTouring);
+  // Left Behind tours drive the camera through the normal machine follow, so only the original tour counts as touring here.
+  const isTouring = useCosmosStore((state) => state.isTouring && state.activeTourId === 'begin-at-earth');
+  const followNonce = useLeftBehindStore(state => state.followNonce);
   const hardwareId = useLeftBehindStore(state => state.followTargetId);
 
   const isAnimating = useRef(false);
@@ -107,7 +109,8 @@ export const CameraController = () => {
       // Frame the machine at its true size so it fills the view; fall back to the data's follow distance.
       const span = trueSpanUnits.get(hardwareId);
       // Landed machines without a true size (e.g. the lunar rovers) still close in on their pin (~50 m), like the others.
-      const distance = span ? span * 2.2 : landedPins.has(hardwareId) ? 5e-5 : (machine?.followDistanceKm ?? 5000000) * UNIFIED_SCALE;
+      const override = useLeftBehindStore.getState().followDistanceKm;
+      const distance = override ? override * UNIFIED_SCALE : span ? span * 2.2 : landedPins.has(hardwareId) ? 5e-5 : (machine?.followDistanceKm ?? 5000000) * UNIFIED_SCALE;
       startPosition.current.copy(camera.position); startTarget.current.copy(orbit.target);
       endTarget.current.set(...live); cameraOffset.current.set(distance*.5,distance*.3,distance);
       endPosition.current.copy(endTarget.current).add(cameraOffset.current);
@@ -118,7 +121,7 @@ export const CameraController = () => {
       }
     }).catch(() => { /* Static-data failure must not disturb normal navigation. */ });
     return () => { cancelled = true; if (animationTriggerId.current === `hw:${hardwareId}`) isAnimating.current = false; };
-  }, [hardwareId, controls, camera, isTouring]);
+  }, [hardwareId, controls, camera, isTouring, followNonce]);
   // "View on the surface": low and oblique over the landed pin, so the ground and horizon fill the view.
   const surfaceViewNonce = useLeftBehindStore(state => state.surfaceViewNonce);
   useEffect(() => {
