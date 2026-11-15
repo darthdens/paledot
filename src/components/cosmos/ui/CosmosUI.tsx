@@ -640,7 +640,7 @@ export const CosmosUI = () => {
                 <Satellite className="h-4 w-4" />{tr({ en: lbCopy.entry, fr: lbCopy.entry })}
               </Button>}
             </div>
-            {brand === 'paledot' && showTourChoices && <div className="pd-card rounded-lg p-2 max-h-[min(360px,40dvh)] overflow-y-auto mx-auto w-full max-w-sm"><TourChoices onBegin={() => { setShowTourChoices(false); setShowControlHints(false); startTour(); }} /></div>}
+            {brand === 'paledot' && showTourChoices && <div className="pd-card rounded-lg p-2 max-h-[min(360px,40dvh)] overflow-y-auto mx-auto w-full max-w-sm"><TourChoices onBegin={id => { setShowTourChoices(false); setShowControlHints(false); startTour(id); }} /></div>}
           </div>
         </div>
       )}

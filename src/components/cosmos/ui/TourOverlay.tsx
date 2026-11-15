@@ -547,7 +547,7 @@ export const TourOverlay = () => {
         <div className="overflow-hidden">
           {/* Content area */}
           <div className="p-3 sm:p-4 space-y-2 sm:space-y-3 max-h-[25vh] sm:max-h-none overflow-y-auto">
-            <p className="text-white/80 text-xs sm:text-sm leading-relaxed line-clamp-4 sm:line-clamp-none">
+            <p aria-live="polite" className="text-white/80 text-xs sm:text-sm leading-relaxed line-clamp-4 sm:line-clamp-none">
               {pickText(currentStop.narration, language, tr)}
             </p>
             {currentStop.photoIds?.length ? <TourPhotos ids={currentStop.photoIds} /> : null}

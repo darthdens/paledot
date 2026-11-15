@@ -9,6 +9,11 @@ import { PaleDotEndFrame } from "@/brand/paledot/PaleDotEndFrame";
 import { getObjectById } from "@/components/cosmos/data/celestialObjects";
 import { useLeftBehindStore } from '@/features/left-behind/state/useLeftBehindStore';
 import { SimulationDateReadout } from '@/features/left-behind/ui/SimulationDateReadout';
+import { registerTours, hasTour } from '@/components/cosmos/data/tours';
+import { leftBehindTours } from '@/features/left-behind/data/tours';
+
+// Left Behind tours exist on the Pale Dot brand only.
+registerTours(leftBehindTours);
 
 const LeftBehindAdmin = lazy(() => import('@/features/left-behind/data/LeftBehindAdmin'));
 
@@ -20,7 +25,14 @@ const PaleDot = () => {
   useEffect(() => { setDataAdmin(new URLSearchParams(window.location.search).get('lb-admin') === '1'); }, []);
   useEffect(() => {
     const openHash = () => {
-      if (window.location.hash !== '#left-behind') return;
+      const hash = window.location.hash;
+      // #lb-<tour-id>: start that tour once loading has finished (see CosmosExplorer).
+      if (hash.startsWith('#lb-') && hasTour(hash.slice(4))) {
+        useLeftBehindStore.setState({ pendingTourId: hash.slice(4), menuOpen: false });
+        setStarted(true);
+        return;
+      }
+      if (hash !== '#left-behind') return;
       useLeftBehindStore.getState().setMenuOpen(true);
       setStarted(true);
     };
