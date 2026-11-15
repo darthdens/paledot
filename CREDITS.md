@@ -6,7 +6,7 @@ Every resource used by Pale Dot: Left Behind. Each row is ready to copy into the
 
 ## NASA Data (form field: NASA Data)
 
-Data was fetched from the JPL Horizons API and NASA Image and Video Library API during the event and saved as static files in `public/left-behind/`. JPL Photojournal supplies metadata for the listed legacy image IDs. NASA media use guidance: https://www.nasa.gov/nasa-brand-center/images-and-media/ ; retain each manifest credit, respect third-party rights, and do not imply endorsement.
+Data was fetched from the JPL Horizons API and NASA Image and Video Library API during the event and saved as static files in `public/left-behind/`. JPL Photojournal supplies metadata for the listed legacy image IDs. On 15 November 2026, all cached image records were re-checked against the NASA Image and Video Library API and every simplified path's milestone source pages were retrieved again; the exact UTC timestamp and milestone URLs are stored beside the cached data. NASA media use guidance: https://www.nasa.gov/nasa-brand-center/images-and-media/ ; retain each manifest credit, respect third-party rights, and do not imply endorsement.
 
 | Link text | URL | Used for |
 | --- | --- | --- |
