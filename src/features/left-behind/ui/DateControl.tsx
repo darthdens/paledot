@@ -44,7 +44,7 @@ export function DateControl() {
   const [picker, setPicker] = useState<'date' | 'time' | null>(null);
   const current = new Date(state.simDate);
   const calendarDate = new Date(current.getUTCFullYear(), current.getUTCMonth(), current.getUTCDate());
-  const pickerClass = `${brand === 'paledot' ? 'paledot' : ''} cosmos-clock-picker pointer-events-auto z-[10010] w-[min(340px,calc(100vw-16px))] max-h-[calc(100dvh-16px-env(safe-area-inset-top)-env(safe-area-inset-bottom))] overflow-y-auto rounded-lg border-border bg-card p-3 text-foreground`;
+  const pickerClass = `${brand === 'paledot' ? 'paledot' : ''} cosmos-clock-picker pointer-events-auto z-[10010] ${picker === 'time' ? 'w-[min(264px,calc(100vw-16px))]' : 'w-[min(340px,calc(100vw-16px))]'} max-h-[calc(100dvh-16px-env(safe-area-inset-top)-env(safe-area-inset-bottom))] overflow-y-auto rounded-lg border-border bg-card p-3 text-foreground`;
   const labels = [copy.real, copy.minute, copy.hour, copy.day, copy.month, copy.year];
   return <div className="w-[min(320px,calc(100vw-2rem))] p-3 space-y-3 text-foreground" data-date-fields role="group" aria-label={text(copy.date)}>
     <div className="pd-hud-label">{text(copy.date)}</div>
