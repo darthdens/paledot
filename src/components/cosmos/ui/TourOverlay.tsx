@@ -87,7 +87,7 @@ export const TourOverlay = () => {
     // Trajectory data or a landing pin may still be loading: retry briefly.
     const started = Date.now();
     followRetry.current = setInterval(() => {
-      if (followHardware(id, distance) || Date.now() - started > 8000) { clearInterval(followRetry.current!); followRetry.current = null; }
+      if (followHardware(id, distance) || Date.now() - started > 20000) { clearInterval(followRetry.current!); followRetry.current = null; }
     }, 300);
   }, [setTourCameraTarget]);
 
