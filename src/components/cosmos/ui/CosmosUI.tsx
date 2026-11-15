@@ -186,11 +186,16 @@ export const CosmosUI = () => {
 
   // Click-outside and Escape key handlers for dropdowns
   useEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
+    const handleClickOutside = (e: PointerEvent) => {
       const target = e.target as Node;
+      // Inspect the original pointer path before a portalled picker updates or
+      // unmounts its clicked option (including touch-generated mouse events).
+      const insideClockPicker = e.composedPath().some(node =>
+        node instanceof Element && node.matches('.cosmos-clock-picker')
+      );
       
       // Close time slider if clicking outside
-      if (timeMenuOpen && !(target instanceof Element && target.closest('.cosmos-clock-picker')) && timeSliderRef.current && !timeSliderRef.current.contains(target) && 
+      if (timeMenuOpen && !insideClockPicker && timeSliderRef.current && !timeSliderRef.current.contains(target) && 
           timeSpeedButtonRef.current && !timeSpeedButtonRef.current.contains(target)) {
         useSimClock.getState().setDateControlOpen(false);
       }
@@ -218,11 +223,11 @@ export const CosmosUI = () => {
       }
     };
 
-    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener('pointerdown', handleClickOutside, true);
     document.addEventListener('keydown', handleEscape);
     
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('pointerdown', handleClickOutside, true);
       document.removeEventListener('keydown', handleEscape);
     };
   }, [timeMenuOpen, showMoreMenu, showLanguageMenu, showQuickJump, toggleQuickJump]);
