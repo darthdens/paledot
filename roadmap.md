@@ -1,6 +1,7 @@
 <!-- Left Behind · built during NASA Space Apps Challenge 2026 (14–15 Nov 2026) · AI-assisted (Lovable, Claude) -->
 # Roadmap
 ## Presentation PDF
+- [x] Replace the PDF redirect with same-address streaming; viewer/Open/Download use /files/paledot-left-behind-deck.pdf. Verify 200 without Location, identical checksum, 206 byte ranges and browser popup URL. Default /favicon.ico now serves the domain's icon; Cosmos original moved to /cosmos/favicon.ico. Two file-response tests pass; live domains require publishing.
 - [x] Host unchanged 701,032-byte deck at /files/paledot-left-behind-deck.pdf with branded viewer /files/paledot-left-behind-deck. Viewer inherits domain-specific icons; Pale Dot SVG/ICO/PNG/apple icons return 200. PDF checksum matches upload; desktop/360px viewer checked. Native PDF-tab favicon behavior and physical iOS PDF rendering cannot be guaranteed.
 ## Toolbar and dropdown consistency
 - [x] Reproduce Month-open → Year-button dismissal on a 360px touch viewport; replace modal calendar selectors with non-modal choices. Direct switching in both directions and February 1990 selection now retain the clock menu; three date tests pass and build OK.
