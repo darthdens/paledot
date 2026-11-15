@@ -1,5 +1,9 @@
 <!-- Left Behind · built during NASA Space Apps Challenge 2026 (14–15 Nov 2026) · AI-assisted (Lovable, Claude) -->
 # Roadmap
+## Toolbar and dropdown consistency
+- [x] Put Search in the toolbar; fixed 44px-height left-to-right expansion and reverse collapse, keyboard focus and on-demand results retained. Phones wrap with a usable second-row field.
+- [x] Align dropdowns to measured toolbar dimensions, enlarge phone menus and remove obsolete card-open height caps while retaining measured card clearance.
+- [x] Unify every More-menu row (48px minimum, left alignment, icons and spacing). Checked 360/390 phones, landscape, 768px tablet and desktop; no horizontal overflow/page errors; five focused tests pass. Scene quality unchanged.
 ## Complete remaining audit acceptance
 - [x] Complete Voyager 1 (11 panels including six nested stages), Begin at Earth (28 stops) and signal form sends checked in 390×844 portrait / 844×390 landscape; real endings captured, no horizontal overflow or page errors in final run. Deterministic reduced-motion/manual Next checks, not real-device smoothness.
 - [x] Bundled 3D verification succeeds with lavapipe: visible phone scene, 1.2% motion difference, zero page/request errors. Removed inactive zero-intensity composer causing SelectiveBloom warnings; no scene-quality reduction.

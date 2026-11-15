@@ -700,7 +700,6 @@ All colors MUST be HSL.
 .paledot :where([data-machine-card], [data-tour-panel], [data-lb-framing], [data-signal-view]) a { display: inline-flex; min-height: 44px; align-items: center; overflow-wrap: anywhere; }
 .paledot [data-explorer-toolbar] { left: auto; right: max(8px, env(safe-area-inset-right)); }
 .paledot [data-explorer-toolbar] button { width: 44px; height: 44px; flex-shrink: 0; }
-.paledot [data-object-search] { top: 60px; left: max(8px, env(safe-area-inset-left)); right: max(8px, env(safe-area-inset-right)); width: auto; max-width: 360px; }
 .paledot [data-explorer-dropdown] { top: 60px !important; right: max(8px, env(safe-area-inset-right)) !important; max-height: calc(100dvh - 100px - env(safe-area-inset-top) - env(safe-area-inset-bottom)); overflow-y: auto; overscroll-behavior: contain; }
 .paledot [data-bottom-card], .paledot [data-tour-panel], .paledot .pd-machine-readout { bottom: max(8px, env(safe-area-inset-bottom)); max-height: calc(100dvh - 160px - env(safe-area-inset-top) - env(safe-area-inset-bottom)); }
 .paledot .pd-machine-note { bottom: max(8px, env(safe-area-inset-bottom)); }
@@ -709,7 +708,6 @@ All colors MUST be HSL.
 .paledot [data-tour-panel] > div:last-child > div { min-height: 0; display: flex; flex-direction: column; }
 .paledot [data-tour-panel] [aria-live] { min-height: 0; }
 .paledot [data-tour-panel] [aria-live] + div { flex-shrink: 0; }
-.paledot:has([data-object-search]) [data-explorer-dropdown] { top: 132px !important; }
 .paledot [data-explorer-ui-root]:has([data-tour-panel]) [data-explorer-dropdown],
 .paledot [data-explorer-ui-root]:has([data-machine-readout]) [data-explorer-dropdown],
 .paledot [data-explorer-ui-root]:has([data-bottom-card]) [data-explorer-dropdown] { max-height: calc(45dvh - 92px - env(safe-area-inset-top)); }
@@ -727,14 +725,40 @@ All colors MUST be HSL.
 .paledot [data-object-search] input::placeholder { color: hsl(var(--muted-foreground)); opacity: 1; }
 .paledot [data-date-control] { max-width: calc(100vw - 16px - env(safe-area-inset-left) - env(safe-area-inset-right)); }
 .paledot [data-tour-panel], .paledot [data-bottom-card], .paledot [data-machine-readout] { pointer-events: auto; }
-.paledot [data-explorer-ui-root] > [data-search-trigger] { position: absolute; top: 60px; left: max(8px, env(safe-area-inset-left)); z-index: 10000; }
 .paledot [data-explorer-ui-root] [data-explorer-dropdown] { top: var(--pd-dropdown-top, 60px) !important; max-height: var(--pd-dropdown-height, calc(100dvh - 100px)) !important; }
 .paledot [data-explorer-dropdown], .paledot [data-quick-jump], .paledot [data-object-search] { background-color: hsl(var(--card) / .97); color: hsl(var(--foreground)); }
 .paledot [data-explorer-dropdown] :is(.text-white\/40,.text-white\/50,.text-white\/60,.text-white\/70), .paledot [data-bottom-card] :is(.text-white\/40,.text-white\/50,.text-white\/60) { color: hsl(var(--muted-foreground)); }
 .paledot [data-object-search] :is(.text-white\/40,.text-white\/50) { color: hsl(var(--muted-foreground)); }
-.paledot [data-explorer-ui-root]:has([data-tour-panel]) [data-explorer-dropdown],
-.paledot [data-explorer-ui-root]:has([data-machine-readout]) [data-explorer-dropdown],
-.paledot [data-explorer-ui-root]:has([data-bottom-card]) [data-explorer-dropdown] { max-height: min(var(--pd-dropdown-height, 25dvh), 25dvh) !important; }
 .paledot [data-date-control] > div > div { overflow: visible; }
 .paledot [data-download-status] { bottom: max(8px, env(safe-area-inset-bottom)); }
 .paledot:has([data-bottom-card], [data-machine-readout], [data-tour-panel]) [data-download-status] { top: auto; bottom: max(var(--pd-download-bottom, 8px), env(safe-area-inset-bottom)); }
+
+/* Shared toolbar search and menu geometry; animations never change control height. */
+.cosmos-search-field { position: absolute; left: 0; top: 0; display: flex; height: 44px; width: 44px; overflow: hidden; border-radius: 8px; transition: width 300ms ease-out; }
+[data-search-open="true"] .cosmos-search-field { width: var(--search-expanded-width, 280px); background: hsl(var(--card)); box-shadow: inset 0 0 0 1px hsl(var(--border)); z-index: 10004; }
+.paledot [data-object-search] { border: none; }
+.cosmos-search-input { display: flex; align-items: center; min-width: 0; flex: 1; opacity: 0; transition: opacity 200ms ease-out; }
+.cosmos-search-input input { padding-inline: 4px; }
+[data-search-open="true"] .cosmos-search-input { opacity: 1; }
+[data-search-results] { width: var(--search-expanded-width, 280px); min-width: 0; z-index: 10005; max-height: var(--pd-dropdown-height, 240px); }
+.paledot [data-explorer-toolbar] [data-search-results] button { width: 100%; height: auto; min-height: 44px; }
+[data-explorer-toolbar] button { min-width: 44px; min-height: 44px; }
+[data-more-menu] { width: min(320px, calc(100vw - 16px - env(safe-area-inset-left) - env(safe-area-inset-right))); }
+.cosmos-more-row { display: flex; align-items: center; justify-content: flex-start; gap: 8px; width: 100%; min-height: 48px; height: auto; padding: 10px 12px; border-radius: 4px; white-space: normal; text-align: left; font-weight: 400; }
+.cosmos-more-row > div:first-child { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.cosmos-more-row > div:last-child:not(:first-child) { margin-left: auto; flex-shrink: 0; }
+.cosmos-more-row svg { flex-shrink: 0; width: 20px; height: 20px; }
+.paledot [data-more-menu] { min-width: min(280px, calc(100vw - 16px)); }
+.paledot [data-explorer-dropdown] { min-width: min(280px, calc(100vw - 16px)); }
+.paledot [data-quick-jump] { top: var(--pd-dropdown-top, 92px) !important; right: max(8px, env(safe-area-inset-right)) !important; }
+.paledot [data-quick-jump] > div > div { width: min(320px, calc(100vw - 16px)); max-width: none; max-height: var(--pd-dropdown-height, 400px) !important; }
+[data-more-menu] > div > div { overflow: visible; }
+@media (max-width: 639px) {
+  .paledot [data-explorer-toolbar] { max-width: calc(100% - 146px); }
+  .paledot [data-explorer-toolbar] > div { flex-wrap: wrap; }
+  .paledot [data-region-control] { max-width: 130px; }
+  .paledot [data-search-slot] { order: 10; margin-right: auto; }
+  .paledot [data-explorer-toolbar]:has([data-search-slot]) { width: calc(100% - 146px); }
+  .paledot [data-explorer-toolbar] > div > :last-child { order: 11; }
+}
+@media (prefers-reduced-motion: reduce) { .cosmos-search-field, .cosmos-search-input { transition: none; } }
