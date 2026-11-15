@@ -29,21 +29,37 @@ export interface CelestialObject {
   cosmicStructure?: 'localGroup' | 'virgoCluster' | 'virgoSupercluster';
 }
 
+/** Tour text: English and French always; other content languages optional (fall back through the dictionary). */
+export type TourText = { en: string; fr: string; es?: string; pt?: string; it?: string; de?: string };
+
 export interface TourStop {
   id: string;
   locationId: string;
-  title: {
-    en: string;
-    fr: string;
-  };
-  narration: {
-    en: string;
-    fr: string;
-  };
+  title: TourText;
+  narration: TourText;
   duration: number; // seconds
   cameraPosition: [number, number, number];
   lookAt?: [number, number, number]; // Optional - if not set, camera looks at the object
   scaleLevel: ScaleLevel;
+  /** UTC ISO date (or "now") the app clock jumps to for this stop. */
+  date?: string;
+  /** Optional end of a date range played while the stop shows. */
+  playUntil?: string;
+  /** Simulated seconds per real second while playing (may be finer than the date control's speeds). */
+  rate?: number;
+  /** "hw:<id>": follow that NASA machine instead of flying to locationId. */
+  follow?: string;
+  distanceKm?: number;
+  photoIds?: string[];
+  factIds?: string[];
+}
+
+export interface Tour {
+  id: string;
+  title: TourText;
+  stops: TourStop[];
+  /** "end-frame": dispatch cosmos:journey-end (Begin at Earth only). */
+  onEnd: 'end-frame' | 'left-behind-summary';
 }
 
 export interface QuickJumpCategory {

@@ -3,6 +3,7 @@ import { bodyFlyToDistance, UNIFIED_SCALE, isSolidBody } from '@/features/left-b
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { ScaleLevel, CelestialObject, SCALE_BOUNDARIES } from '../types';
+import { BEGIN_AT_EARTH, getTour, hasTour } from '../data/tours';
 
 export type AnchorRect = {
   left: number;
@@ -68,6 +69,8 @@ interface CosmosStore {
 
   // Tour
   isTouring: boolean;
+  /** Tour being played; "begin-at-earth" is the original guided tour. */
+  activeTourId: string;
   tourIndex: number;
   tourSpeed: number;
   isPaused: boolean;
@@ -111,7 +114,7 @@ interface CosmosStore {
   setIsFollowing: (following: boolean) => void;
   toggleFollowing: () => void;
   setIsInStarSystem: (inStarSystem: boolean, starSystemId?: string | null) => void;
-  startTour: () => void;
+  startTour: (tourId?: string) => void;
   stopTour: () => void;
   setTourIndex: (index: number) => void;
   setTourSpeed: (speed: number) => void;
@@ -175,6 +178,7 @@ export const useCosmosStore = create<CosmosStore>()(
       currentStarSystem: 'sun', // Start in Sun's system
       
       isTouring: false,
+      activeTourId: BEGIN_AT_EARTH,
       tourIndex: 0,
       tourSpeed: 1,
       isPaused: false,
@@ -257,11 +261,14 @@ export const useCosmosStore = create<CosmosStore>()(
         currentStarSystem: inStarSystem ? starSystemId : null 
       }),
       
-      startTour: () => {
+      startTour: (tourId) => {
+        const id = typeof tourId === 'string' && hasTour(tourId) ? tourId : BEGIN_AT_EARTH;
+        if (get().isTouring) get().stopTour();
         useSimClock.getState().pauseForTour();
         const currentSpeed = get().timeSpeed;
         set({
           isTouring: true,
+          activeTourId: id,
           tourIndex: 0,
           isPaused: false,
           tourCameraTarget: null,
@@ -271,7 +278,9 @@ export const useCosmosStore = create<CosmosStore>()(
       },
       
       stopTour: () => {
-        useSimClock.getState().restoreAfterTour();
+        // Left Behind tours leave the clock paused at the current stop's date so people keep exploring from there.
+        if (getTour(get().activeTourId).onEnd === 'end-frame') useSimClock.getState().restoreAfterTour();
+        else useSimClock.getState().holdAfterTour();
         const preTourSpeed = get().preTourTimeSpeed;
         set({
           isTouring: false,

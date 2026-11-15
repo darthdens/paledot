@@ -35,7 +35,7 @@ export function LeftBehindMenu() {
     </div>
     <div className="p-2 [&>*:last-child]:mb-0">
       <JumpCategory title={text(copy.tours)} expanded={toursOpen} onToggle={() => setToursOpen(!toursOpen)}>
-        <TourChoices onBegin={() => { useLeftBehindStore.getState().setMenuOpen(false); useCosmosStore.getState().startTour(); }} />
+        <TourChoices onBegin={id => { useLeftBehindStore.getState().setMenuOpen(false); useCosmosStore.getState().setShowControlHints(false); useCosmosStore.getState().startTour(id); }} />
       </JumpCategory>
       <div className="my-2 border-t border-white/10" />
       <label className={row}>

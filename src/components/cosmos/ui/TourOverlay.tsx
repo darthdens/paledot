@@ -5,7 +5,12 @@ import { Button } from '@/components/ui/button';
 import { Play, Pause, SkipForward, SkipBack, X, ChevronUp, ChevronDown } from 'lucide-react';
 import { useCosmosStore } from '../store/useCosmosStore';
 import { useFullscreenStore } from '../store/useFullscreenStore';
-import { tourStops } from '../data/tourStops';
+import { getTour, pickText } from '../data/tours';
+import type { TourStop } from '../types';
+import { useSimClock } from '@/features/left-behind/state/useSimClock';
+import { followHardware } from '@/features/left-behind/lib/hardwareNavigation';
+import { getPhotoManifest } from '@/features/left-behind/data/dataClient';
+import { Dialog, DialogContent, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { celestialObjects } from '../data/celestialObjects';
 import { UNITS } from '../types';
 
@@ -54,8 +59,43 @@ export const TourOverlay = () => {
   const setTourCameraTarget = useCosmosStore((state) => state.setTourCameraTarget);
   const isFullscreen = useFullscreenStore((state) => state.isFullscreen);
 
+  const activeTourId = useCosmosStore((state) => state.activeTourId);
+  const tour = getTour(activeTourId);
+  const tourStops = tour.stops;
   const currentStop = tourStops[tourIndex];
   const totalStops = tourStops.length;
+  const followRetry = useRef<ReturnType<typeof setInterval> | null>(null);
+  useEffect(() => () => { if (followRetry.current) clearInterval(followRetry.current); }, []);
+
+  // Left Behind stops: set/play the app clock and follow a machine through the normal machine follow.
+  const playMachineStop = useCallback((stop: TourStop) => {
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const clock = useSimClock.getState();
+    if (stop.date) {
+      const from = stop.date === 'now' ? Date.now() : Date.parse(stop.date);
+      const until = stop.playUntil ? Date.parse(stop.playUntil) : undefined;
+      // Reduced motion: jump to the end of the range instead of playing it.
+      if (reduced && until !== undefined) clock.setTourPlayback(until);
+      else clock.setTourPlayback(from, until, stop.rate);
+    } else clock.setTourPlayback(clock.simDate);
+    setTourCameraTarget(null);
+    if (followRetry.current) { clearInterval(followRetry.current); followRetry.current = null; }
+    if (!stop.follow?.startsWith('hw:')) return;
+    const id = stop.follow.slice(3);
+    const distance = stop.distanceKm ?? null;
+    if (followHardware(id, distance)) return;
+    // Trajectory data or a landing pin may still be loading: retry briefly.
+    const started = Date.now();
+    followRetry.current = setInterval(() => {
+      if (followHardware(id, distance) || Date.now() - started > 20000) { clearInterval(followRetry.current!); followRetry.current = null; }
+    }, 300);
+  }, [setTourCameraTarget]);
+
+  const finishTour = useCallback(() => {
+    const endFrame = tour.onEnd === 'end-frame';
+    stopTour();
+    if (endFrame) window.dispatchEvent(new Event('cosmos:journey-end'));
+  }, [tour, stopTour]);
 
   const UNIFIED_SCALE = 0.001;
 
@@ -67,6 +107,7 @@ export const TourOverlay = () => {
       const stop = tourStops[index];
       if (!stop) return;
       setTourIndex(index);
+      if (stop.date || stop.follow) { playMachineStop(stop); return; }
 
       // Find and select the object for this stop
       const targetObject = celestialObjects.find((obj) => obj.id === stop.locationId);
@@ -268,7 +309,7 @@ export const TourOverlay = () => {
         }, 1200);
       }
     },
-    [setTourIndex, setSelectedObject, setTourCameraTarget]
+    [tourStops, playMachineStop, setTourIndex, setSelectedObject, setTourCameraTarget]
   );
   
   // Initialize tour on first render when touring starts - always go to stop 0
@@ -277,7 +318,7 @@ export const TourOverlay = () => {
       // Always navigate to the first stop when tour starts, regardless of current position
       goToStop(0);
     }
-  }, [isTouring, goToStop]);
+  }, [isTouring, activeTourId]); // eslint-disable-line react-hooks/exhaustive-deps
   
   // Auto-advance when not paused
   useEffect(() => {
@@ -288,14 +329,12 @@ export const TourOverlay = () => {
       if (tourIndex < tourStops.length - 1) {
         goToStop(tourIndex + 1);
       } else {
-        // Tour complete - stop
-        stopTour();
-        window.dispatchEvent(new Event('cosmos:journey-end'));
+        finishTour();
       }
     }, duration);
     
     return () => clearTimeout(timer);
-  }, [isTouring, isPaused, tourIndex, currentStop, goToStop, stopTour]);
+  }, [isTouring, isPaused, tourIndex, currentStop, goToStop, finishTour, tourStops.length]);
 
   // Keyboard shortcuts
   useEffect(() => {
@@ -329,7 +368,7 @@ export const TourOverlay = () => {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isTouring, tourIndex, goToStop, togglePause, stopTour]);
+  }, [isTouring, tourIndex, goToStop, togglePause, stopTour, tourStops.length]);
   
   const handlePrevious = () => {
     if (tourIndex > 0) {
@@ -341,8 +380,7 @@ export const TourOverlay = () => {
     if (tourIndex < tourStops.length - 1) {
       goToStop(tourIndex + 1);
     } else {
-      stopTour();
-      window.dispatchEvent(new Event('cosmos:journey-end'));
+      finishTour();
     }
   };
   
@@ -397,6 +435,8 @@ export const TourOverlay = () => {
         left: 'calc(0.5rem + env(safe-area-inset-left))',
         right: 'calc(0.5rem + env(safe-area-inset-right))',
       } : undefined}
+      role="region"
+      aria-label={pickText(tour.title, language, tr)}
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
     >
@@ -444,9 +484,12 @@ export const TourOverlay = () => {
           <span className={`text-white/50 text-[10px] sm:text-xs transition-opacity duration-300 flex-shrink-0 ${isCollapsed ? 'hidden' : 'block'}`}>
             {tourIndex + 1}/{totalStops}
           </span>
-          <h2 className="text-white font-semibold text-sm truncate min-w-0">
-            {tr(currentStop.title)}
-          </h2>
+          <div className="min-w-0">
+            {tour.onEnd !== 'end-frame' && <p className="text-white/50 text-[10px] sm:text-xs truncate">{pickText(tour.title, language, tr)}</p>}
+            <h2 className="text-white font-semibold text-sm truncate min-w-0">
+              {pickText(currentStop.title, language, tr)}
+            </h2>
+          </div>
         </div>
         <div className="flex items-center gap-1 flex-shrink-0">
           {/* Collapsed controls */}
@@ -490,6 +533,7 @@ export const TourOverlay = () => {
               e.stopPropagation();
               handleExit();
             }}
+            aria-label={t.exitTour}
             className="h-6 w-6 text-white/70 hover:text-white hover:bg-white/10"
           >
             <X className="w-4 h-4" />
@@ -504,9 +548,10 @@ export const TourOverlay = () => {
         <div className="overflow-hidden">
           {/* Content area */}
           <div className="p-3 sm:p-4 space-y-2 sm:space-y-3 max-h-[25vh] sm:max-h-none overflow-y-auto">
-            <p className="text-white/80 text-xs sm:text-sm leading-relaxed line-clamp-4 sm:line-clamp-none">
-              {tr(currentStop.narration)}
+            <p aria-live="polite" className="text-white/80 text-xs sm:text-sm leading-relaxed line-clamp-4 sm:line-clamp-none">
+              {pickText(currentStop.narration, language, tr)}
             </p>
+            {currentStop.photoIds?.length ? <TourPhotos ids={currentStop.photoIds} /> : null}
           </div>
           
           {/* Controls */}
@@ -515,6 +560,7 @@ export const TourOverlay = () => {
               size="sm"
               variant="ghost"
               onClick={handlePrevious}
+              aria-label={t.previous}
               disabled={tourIndex === 0}
               className="text-[10px] sm:text-xs text-white/70 hover:text-white hover:bg-white/10 disabled:opacity-30 px-2 sm:px-3 h-7 sm:h-8"
             >
@@ -526,6 +572,7 @@ export const TourOverlay = () => {
               size="icon"
               variant="ghost"
               onClick={togglePause}
+              aria-label={isPaused ? t.play : t.pause}
               className="h-8 w-8 sm:h-10 sm:w-10 rounded-full bg-white/10 hover:bg-white/20 text-white"
             >
               {isPaused ? (
@@ -539,6 +586,7 @@ export const TourOverlay = () => {
               size="sm"
               variant="ghost"
               onClick={handleNext}
+              aria-label={t.next}
               className="text-[10px] sm:text-xs text-white/70 hover:text-white hover:bg-white/10 px-2 sm:px-3 h-7 sm:h-8"
             >
               <span className="hidden xs:inline">{t.next}</span>
@@ -550,3 +598,33 @@ export const TourOverlay = () => {
     </div>
   );
 };
+
+type TourPhoto = { id: string; imageUrl: string; alt: string; credit: string; nasaId: string; sourceUrl: string; caption: { en: string; fr: string } & Record<string, string> };
+
+/** Stop thumbnails; tapping opens the same full-size viewer as the machine card. */
+function TourPhotos({ ids }: { ids: string[] }) {
+  const { language, tr } = useLanguage();
+  const [photos, setPhotos] = useState<TourPhoto[]>([]);
+  const [open, setOpen] = useState<TourPhoto | null>(null);
+  useEffect(() => {
+    let alive = true;
+    void getPhotoManifest().then(list => { if (alive) setPhotos(ids.map(id => (list as unknown as TourPhoto[]).find(p => p.id === id)).filter((p): p is TourPhoto => !!p)); }).catch(() => {});
+    return () => { alive = false; };
+  }, [ids]);
+  if (!photos.length) return null;
+  const caption = (p: TourPhoto) => pickText(p.caption, language, tr);
+  return <>
+    <div className="flex gap-2">
+      {photos.map(p => <button key={p.id} type="button" onClick={() => setOpen(p)} aria-label={caption(p)} className="h-14 w-20 sm:h-16 sm:w-24 shrink-0 overflow-hidden rounded-[4px] bg-white/5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-ring">
+        <img src={p.imageUrl} alt={p.alt} loading="lazy" className="h-full w-full object-cover" />
+      </button>)}
+    </div>
+    <Dialog open={!!open} onOpenChange={o => !o && setOpen(null)}>
+      <DialogContent className="paledot dark max-w-[min(96vw,1100px)] border-border bg-background p-3">
+        {open && <><DialogTitle className="sr-only">{caption(open)}</DialogTitle><DialogDescription className="sr-only">{open.alt}</DialogDescription>
+          <img src={open.imageUrl} alt={open.alt} className="max-h-[78vh] w-full object-contain" />
+          <p className="text-sm text-foreground">{caption(open)}<span className="block text-xs text-muted-foreground"><a href={open.sourceUrl} target="_blank" rel="noopener noreferrer" className="hover:underline">{open.credit} · {open.nasaId}</a></span></p></>}
+      </DialogContent>
+    </Dialog>
+  </>;
+}

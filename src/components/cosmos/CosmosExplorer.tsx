@@ -95,6 +95,13 @@ export const CosmosExplorer = () => {
     initialHomeSet.current = true;
     useCosmosStore.getState().goHome();
   }, [sceneReady]);
+  const pendingTourId = useLeftBehindStore(s => s.pendingTourId);
+  useEffect(() => {
+    if (brand !== 'paledot' || !bootDone || !sceneReady || !pendingTourId) return;
+    useLeftBehindStore.setState({ pendingTourId: null });
+    useCosmosStore.getState().setShowControlHints(false);
+    useCosmosStore.getState().startTour(pendingTourId);
+  }, [brand, bootDone, sceneReady, pendingTourId]);
   useEffect(() => {
     if (brand !== 'paledot' || !bootDone || !menuOpen) return;
     useCosmosStore.getState().setShowControlHints(false);

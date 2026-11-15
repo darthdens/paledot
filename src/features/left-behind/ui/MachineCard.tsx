@@ -14,6 +14,8 @@ import { helioPositionKm, moonPositionKm } from '../engine/ephemeris';
 import { measurementsAt } from '../engine/trajectory';
 import { useSimClock } from '../state/useSimClock';
 import { useLeftBehindStore } from '../state/useLeftBehindStore';
+import { useCosmosStore } from '@/components/cosmos/store/useCosmosStore';
+import { hasTour } from '@/components/cosmos/data/tours';
 
 export type CardMachine = Machine & {
   place?: string; status?: { type: string; since: string | null };
@@ -102,7 +104,7 @@ export function MachineCard({ machine, following = false, extra = [], unfollowLa
 
     {(() => {
       const actions: Action[] = [
-        { key: 'tour', icon: <Map className="w-3 h-3" />, label: t.takeTour, disabled: true },
+        { key: 'tour', icon: <Map className="w-3 h-3" />, label: t.takeTour, disabled: !hasTour(machine.id), onClick: () => useCosmosStore.getState().startTour(machine.id) },
         following && unfollowLabel
           ? { key: 'fly', icon: <EyeOff className="w-3 h-3" />, label: unfollowLabel, onClick: () => useLeftBehindStore.getState().toggleHardwareFollow() }
           : { key: 'fly', icon: <Compass className="w-3 h-3" />, label: t.flyTo, onClick: () => { const st = useLeftBehindStore.getState(); if (st.followTargetId === null) st.toggleHardwareFollow(); } },
