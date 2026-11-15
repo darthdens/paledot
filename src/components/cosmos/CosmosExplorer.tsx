@@ -48,6 +48,8 @@ import { SimulationClock } from '@/features/left-behind/scene/SimulationClock';
 import { useLeftBehindStore } from '@/features/left-behind/state/useLeftBehindStore';
 const LeftBehindLayer = lazy(() => import('@/features/left-behind/scene/LeftBehindLayer').then(m => ({ default: m.LeftBehindLayer })));
 const HardwareReadout = lazy(() => import('@/features/left-behind/ui/HardwareReadout').then(m => ({ default: m.HardwareReadout })));
+const SendSignal = lazy(() => import('@/features/left-behind/ui/SendSignal').then(m => ({ default: m.SendSignal })));
+const SignalPulse = lazy(() => import('@/features/left-behind/scene/SignalPulse').then(m => ({ default: m.SignalPulse })));
 
 // Allow loaders (R3F + our preload) to reuse texture requests.
 THREE.Cache.enabled = true;
@@ -254,6 +256,7 @@ export const CosmosExplorer = () => {
                 selectedObject={selectedObject}
               />
               {brand === 'paledot' && bootDone && machinesVisible && <Suspense fallback={null}><LeftBehindLayer /></Suspense>}
+              {brand === 'paledot' && bootDone && <Suspense fallback={null}><SignalPulse /></Suspense>}
 
               {/* Distant stars - tiny point-like spheres (very dim) */}
               {stars.map((star) => {
@@ -320,6 +323,7 @@ export const CosmosExplorer = () => {
           <SizeComparison />
           <YouAreHereLabel />
           {brand === 'paledot' && machinesVisible && <Suspense fallback={null}><HardwareReadout /></Suspense>}
+          {brand === 'paledot' && <Suspense fallback={null}><SendSignal /></Suspense>}
         </>
       )}
     </div>
