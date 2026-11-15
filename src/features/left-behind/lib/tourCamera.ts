@@ -35,7 +35,7 @@ export function flightDuration(d0: number, d1: number, bump: number, hopAngle = 
   return Math.min(7, Math.max(2.2, 2.2 + 0.22 * Math.abs(Math.log(Math.max(d1, 1e-12) / Math.max(d0, 1e-12))) + 0.45 * bump + 2.5 * hopAngle));
 }
 
-export type FlightInput = { t: number; startTarget: Vector3; endTarget: Vector3; startOffset: Vector3; endOffset: Vector3; bump: number; sphere?: Sphere };
+export type FlightInput = { t: number; startTarget: Vector3; endTarget: Vector3; startOffset: Vector3; endOffset: Vector3; bump: number; sphere?: Sphere | undefined };
 /**
  * One flight frame. Zooming in turns the view first and descends after; zooming out climbs first and turns after,
  * so the camera never swings through a body at close range. Distance is interpolated in log space.
