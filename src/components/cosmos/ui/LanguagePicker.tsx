@@ -99,7 +99,7 @@ export const LanguageButton = () => {
         </TooltipContent>
       </Tooltip>
       <div data-language-dropdown inert={!open}
-        className={`absolute right-0 top-[calc(100%+8px)] z-[10001] w-[200px] max-w-[calc(100vw-16px)] overflow-hidden rounded-lg border border-border bg-card/97 text-foreground transition-opacity duration-300 ease-out ${open ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
+        className={`absolute right-0 top-[calc(100%+8px)] z-[10001] w-[200px] max-w-[calc(100vw-16px)] overflow-hidden rounded-lg border border-border bg-card/97 backdrop-blur-xs text-foreground transition-opacity duration-300 ease-out ${open ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
         <div className={`grid transition-[grid-template-rows] duration-300 ease-out motion-reduce:transition-none ${open ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'}`}>
           <div className="min-h-0 overflow-hidden"><div className="p-2"><LanguageList onPick={() => setOpen(false)} /></div></div>
         </div>
