@@ -18,6 +18,7 @@ export type Segment = { center: 'sun' | 'earth' | 'mars'; start: string; stepSec
 export type Trajectory = {
   id: string; source: 'horizons' | 'simplified'; target?: string; query?: string[];
   retrievedAt?: string; frame?: string; units?: string; segments?: Segment[];
+  milestoneSources?: string[];
   milestones?: { launch: string; arrival: string | null; center: string; arrivalBody: string | null };
   note?: string;
 };
@@ -25,5 +26,5 @@ export type Photo = {
   id: string; machineId: string; role?: string; nasaId: string; title: string;
   credit: string; sourceUrl: string; imageUrl: string; dateTaken: string | null;
   alt: string; caption: string; earthMarker?: { x: number; y: number } | null;
-  todo?: boolean; note?: string; description?: string;
+  todo?: boolean; note?: string; description?: string; retrievedAt?: string;
 };

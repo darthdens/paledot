@@ -8,7 +8,7 @@ import { useCosmosStore } from '@/components/cosmos/store/useCosmosStore';
 import credits from '../../../../CREDITS.md?raw';
 import { useLeftBehindStore } from '../state/useLeftBehindStore';
 import { useSignal } from '../state/useSignal';
-import { getHardware, getTrajectory } from '../data/dataClient';
+import { getHardware, getPhotoManifest, getTrajectory } from '../data/dataClient';
 import { visitMachine } from '../lib/hardwareNavigation';
 import { framingCopy } from '../lib/framingCopy';
 import { cardCopy, placeNames } from '../lib/cardCopy';
@@ -17,6 +17,9 @@ import { buildSignalRace } from '../lib/signal';
 import { glossaryData } from '../lib/glossaryData';
 import type { CardMachine } from './MachineCard';
 import type { Trajectory } from '../data/types';
+import { LeftBehindDialogContent, LeftBehindDialogOverlay } from './DialogSurface';
+
+const CHALLENGE = '(NASA Space Apps Challenge)';
 
 export function FramingViews() {
   const { language, tr, numberLocale } = useLanguage();
@@ -27,6 +30,7 @@ export function FramingViews() {
   const [tracks, setTracks] = useState<Trajectory[]>([]);
   const [ordered, setOrdered] = useState<string[]>([]);
   const [distances, setDistances] = useState<Record<string, number>>({});
+  const [photoRetrievedAt, setPhotoRetrievedAt] = useState<string | null>(null);
   const [failed, setFailed] = useState(false);
   useEffect(() => {
     if (!view) return;
@@ -35,8 +39,10 @@ export function FramingViews() {
     void getHardware().then(async h => {
       const ms = h.machines as CardMachine[];
       const all = await Promise.all(ms.flatMap(m => m.trajectories.map(t => getTrajectory(t.id))));
+      const photos = await getPhotoManifest();
       const race = buildSignalRace(ms, all, Date.now(), '');
       if (!alive) return;
+      setPhotoRetrievedAt(photos.find(photo => photo.retrievedAt)?.retrievedAt ?? null);
       setMachines(ms); setTracks(all); setOrdered(race.rows.map(r => r.id));
       setDistances(Object.fromEntries(race.rows.map(r => [r.id, r.distanceKm])));
     }).catch(() => { if (alive) setFailed(true); });
@@ -58,10 +64,10 @@ export function FramingViews() {
   </ul>;
   return <Dialog.Root open={!!view} onOpenChange={open => { if (!open) close(); }}>
     <Dialog.Portal>
-      <Dialog.Overlay className={`paledot dark fixed inset-0 z-[10020] ${view === 'summary' ? 'bg-background motion-safe:animate-in motion-safe:fade-in motion-safe:duration-1000' : 'bg-background/20'}`} />
-      <Dialog.Content data-lb-framing={view} className={`paledot dark pd-card fixed z-[10021] left-2 right-2 bottom-[max(0.5rem,env(safe-area-inset-bottom))] max-h-[calc(100dvh-2.5rem-env(safe-area-inset-top)-env(safe-area-inset-bottom))] flex flex-col overflow-hidden rounded-lg border border-border bg-card/80 backdrop-blur-md sm:bottom-auto sm:left-1/2 sm:top-1/2 sm:right-auto sm:w-[560px] sm:max-w-[calc(100vw-2rem)] sm:-translate-x-1/2 sm:-translate-y-1/2 ${view === 'summary' ? 'motion-safe:animate-in motion-safe:fade-in motion-safe:duration-1000' : ''}`}>
+      <LeftBehindDialogOverlay />
+      <LeftBehindDialogContent data-lb-framing={view}>
         <header className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2 border-b border-border p-2">
-          <Dialog.Title className="min-w-0 pl-2 text-base font-semibold">{T(heading)}</Dialog.Title>
+          <div className="min-w-0 pl-2"><Dialog.Title className="text-base font-semibold">{T(heading)}</Dialog.Title>{(view === 'intro' || view === 'summary') && <p className="mt-1 text-[10px] leading-relaxed text-muted-foreground">{CHALLENGE}</p>}</div>
           <Button variant="ghost" size="icon" className="h-11 w-11 shrink-0 text-muted-foreground" aria-label={T(c.close)} onClick={close}><X className="h-4 w-4" /></Button>
         </header>
         <div className="overflow-y-auto overscroll-contain p-4 space-y-5">
@@ -80,7 +86,7 @@ export function FramingViews() {
             <section className="space-y-3 text-xs leading-relaxed"><h3 className="text-sm font-semibold">{T(c.sources)}</h3>
               <a className="block underline underline-offset-4" href="https://ssd-api.jpl.nasa.gov/doc/horizons.html" target="_blank" rel="noopener noreferrer">JPL Horizons API</a>
               <a className="block underline underline-offset-4" href="https://images.nasa.gov" target="_blank" rel="noopener noreferrer">NASA Image and Video Library API</a>
-              <p className="text-muted-foreground">{T(c.photoDate)}</p>
+              <p className="text-muted-foreground">{T(c.photoDate)}: {photoRetrievedAt ?? 'TODO(source)'}</p>
               <ul className="space-y-2 text-muted-foreground">{tracks.map(t => <li key={t.id}>{t.id} · {T(c.retrieved)}: {t.retrievedAt ?? 'TODO(source)'}{t.source === 'simplified' && <span className="block">{T(c.simplified)}</span>}</li>)}</ul>
               {machines.map(m => <div key={m.id}><h4 className="font-medium">{dataText(m.name, language)}</h4><ul>{m.sources?.map(s => <li key={s.url}><a className="text-muted-foreground underline underline-offset-4" href={s.url} target="_blank" rel="noopener noreferrer">{dataText(s.title, language)}</a></li>)}</ul></div>)}
             </section>
@@ -89,7 +95,7 @@ export function FramingViews() {
             <section className="space-y-3"><h3 className="text-sm font-semibold">{T(c.credits)}</h3><div className="break-words text-xs leading-relaxed text-muted-foreground"><CreditsText /></div></section>
           </>}
         </div>
-      </Dialog.Content>
+      </LeftBehindDialogContent>
     </Dialog.Portal>
   </Dialog.Root>;
 }

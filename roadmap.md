@@ -1,5 +1,9 @@
 <!-- Left Behind · built during NASA Space Apps Challenge 2026 (14–15 Nov 2026) · AI-assisted (Lovable, Claude) -->
 # Roadmap
+## Consistent overlays and complete provenance
+- [ ] Share one backdrop, animation and glass surface across Send a signal, Machines, How we know and the final summary; add the NASA Space Apps Challenge line beneath both Left behind headings.
+- [ ] Re-check all NASA image metadata and simplified-path milestone sources; store real UTC retrieval timestamps and source URLs, with regression tests.
+- [ ] Verify desktop/mobile overlay consistency, visible-canvas camera flights and glossary clearance over the live scene.
 ## Left Behind framing
 - [x] Add entry-specific intro and seven distance-ordered machine choices with date-safe navigation; Apollo 11 launch and Voyager 2 card verified in the preview.
 - [x] Add Voyager 1-only final summary without changing Begin at Earth or its end frame; last-stop completion verified on phone.

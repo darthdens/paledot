@@ -11,6 +11,7 @@ import { signalCopy } from '../lib/signalCopy';
 import { dataText } from '../lib/dataText';
 import { buildSignalRace, countdown, LIGHT_KM_S, lightSeconds, logDistance, remainingSeconds, restoreRace, saveRace, shortMessage, signalProgress, type SignalMachine, type SignalRace, type SignalRow } from '../lib/signal';
 import type { Trajectory } from '../data/types';
+import { LeftBehindDialogContent, LeftBehindDialogOverlay } from './DialogSurface';
 export function SendSignal() {
   const { language, numberLocale, tr } = useLanguage();
   const c = signalCopy[language];
@@ -59,8 +60,8 @@ export function SendSignal() {
   };
   return <DialogPrimitive.Root open={open} onOpenChange={o => !o && useSignal.getState().close()}>
     <DialogPrimitive.Portal>
-      <DialogPrimitive.Overlay className="fixed inset-0 z-[10020] bg-background/10" />
-      <DialogPrimitive.Content data-signal-view className="paledot dark pd-card fixed z-[10021] bottom-[max(0.5rem,env(safe-area-inset-bottom))] left-2 right-2 flex max-h-[calc(100dvh-2.5rem-env(safe-area-inset-top)-env(safe-area-inset-bottom))] flex-col overflow-hidden rounded-lg border border-border bg-card/90 backdrop-blur-md sm:max-h-[calc(100dvh-4.5rem)] sm:bottom-auto sm:top-1/2 sm:left-1/2 sm:right-auto sm:w-[560px] sm:max-w-[calc(100vw-2rem)] sm:-translate-x-1/2 sm:-translate-y-1/2">
+      <LeftBehindDialogOverlay />
+      <LeftBehindDialogContent data-signal-view>
         <header className="flex shrink-0 items-center justify-between gap-3 border-b border-border p-2">
           <DialogPrimitive.Title className="pl-2 text-sm font-semibold">{T(c.title)}</DialogPrimitive.Title>
           <Button variant="ghost" size="icon" className="h-11 w-11 text-muted-foreground" aria-label={T(c.close)} onClick={() => useSignal.getState().close()}><X className="h-4 w-4" /></Button>
@@ -94,7 +95,7 @@ export function SendSignal() {
           <p className="sr-only" aria-live="polite" aria-atomic="true">{view?.rows.map(row => `${dataText(row.name, language)}: ${status(row, Math.max(view.sentAt, minute * 60000))}`).join('. ')}</p>
         </div>
         <footer className="shrink-0 border-t border-border px-4 py-3 text-xs text-muted-foreground">{T(c.simulation)}</footer>
-      </DialogPrimitive.Content>
+      </LeftBehindDialogContent>
     </DialogPrimitive.Portal>
   </DialogPrimitive.Root>;
 }
