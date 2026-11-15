@@ -2,7 +2,7 @@
 import { describe, it, expect } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { Vector3 } from 'three';
-import { encounterView, flightBump, flightFrame, lookBackView, pinOffset } from './tourCamera';
+import { encounterView, flightFrame, lookBackView, pinOffset } from './tourCamera';
 import { evaluateTrajectory } from '../engine/trajectory';
 import { helioPositionKm, type PlanetId } from '../engine/ephemeris';
 import { eclipticKmToScene } from './units';
@@ -54,8 +54,7 @@ describe('tour camera', () => {
   it('flights start and end exactly on their views and move without jumps', () => {
     const startTarget = new Vector3(100, 0, 0), endTarget = new Vector3(100.001, 0, 0);
     const startOffset = new Vector3(0, 0, 60), endOffset = pinOffset(new Vector3(1, 0, 0), 5e-5);
-    const bump = flightBump(startTarget.distanceTo(endTarget), startOffset.length(), endOffset.length());
-    const at = (t: number) => { const f = flightFrame({ t, startTarget, endTarget, startOffset, endOffset, bump }); return f.target.clone().add(f.offset); };
+    const at = (t: number) => { const f = flightFrame({ t, startTarget, endTarget, startOffset, endOffset }); return f.target.clone().add(f.offset); };
     expect(at(0).distanceTo(startTarget.clone().add(startOffset))).toBeLessThan(1e-9);
     expect(at(1).distanceTo(endTarget.clone().add(endOffset))).toBeLessThan(1e-12);
     // No single 60 fps step moves the camera more than a fraction of its distance to the target.
@@ -66,14 +65,25 @@ describe('tour camera', () => {
     }
   });
 
+  it('long flights never rush: the scene moves by under a tenth of the viewing distance per frame', () => {
+    // Saturn (1990) to Voyager 1 near 40 AU: millions of scene units of travel, ending ~0.1 m-scale.
+    const startTarget = new Vector3(-1.2e6, 3e4, 8e5), endTarget = new Vector3(5.9e6, 1.2e6, -8e5);
+    const startOffset = new Vector3(900, -600, 700), endOffset = new Vector3(0, 0, 1.2e-4);
+    let previous: { target: Vector3; distance: number } | null = null;
+    for (let i = 0; i <= 480; i++) {
+      const f = flightFrame({ t: i / 480, startTarget, endTarget, startOffset, endOffset });
+      if (previous) expect(f.target.distanceTo(previous.target) / Math.min(f.offset.length(), previous.distance)).toBeLessThan(0.1);
+      previous = { target: f.target, distance: f.offset.length() };
+    }
+  });
+
   it('surface hops between sites stay above the ground', () => {
     const centre = new Vector3(), r = 1.737;
     const a = new Vector3(1, 0.3, 0).normalize(), b = new Vector3(0.6, -0.2, 0.7).normalize();
     const startOffset = pinOffset(a, 3e-5), endOffset = pinOffset(b, 3e-5);
     const startTarget = a.clone().multiplyScalar(r), endTarget = b.clone().multiplyScalar(r);
-    const bump = flightBump(startTarget.distanceTo(endTarget), 3e-5, 3e-5);
     for (let i = 0; i <= 200; i++) {
-      const f = flightFrame({ t: i / 200, startTarget, endTarget, startOffset, endOffset, bump, sphere: { centre, radius: r } });
+      const f = flightFrame({ t: i / 200, startTarget, endTarget, startOffset, endOffset, sphere: { centre, radius: r } });
       expect(f.target.clone().add(f.offset).length()).toBeGreaterThan(r);
       expect(f.target.length()).toBeCloseTo(r, 9);
     }

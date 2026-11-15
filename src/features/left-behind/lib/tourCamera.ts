@@ -46,8 +46,8 @@ export function zoomPath(separation: number, d0: number, d1: number) {
   } };
 }
 
-/** Seconds, from the path length: a short hop ~2 s, Saturn to the edge of the planets ~7 s. */
-export function flightDuration(pathLength: number) { return Math.min(7, Math.max(2, 1.5 + 0.25 * pathLength)); }
+/** Seconds, from the path length: a short hop ~2 s, Saturn to the outer Solar System ~8 s. */
+export function flightDuration(pathLength: number) { return Math.min(8, Math.max(2, 1.5 + 0.25 * pathLength)); }
 
 export type FlightInput = { t: number; startTarget: Vector3; endTarget: Vector3; startOffset: Vector3; endOffset: Vector3; sphere?: Sphere | undefined };
 
