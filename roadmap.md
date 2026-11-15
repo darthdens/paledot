@@ -1,6 +1,7 @@
 <!-- Left Behind · built during NASA Space Apps Challenge 2026 (14–15 Nov 2026) · AI-assisted (Lovable, Claude) -->
 # Roadmap
 ## Finish visual checks and texture-rights audit
+- [ ] Follow-up requested 15 November: retry visible-scene motion with short isolated captures and investigate exact original sources for the ten unidentified maps; retain evidence and do not replace assets or infer licences from resemblance alone.
 - [ ] Finish visible-scene checks: machine-tour smoothness, phone glossary clearance, signal pulse and One last look rings/rotation still require a hardware-GPU device. This audit: 157 tests pass; saved signal restored in a fresh page; Begin at Earth reached its actual end frame with buttons present (settled animation capture stalled); all six One last look phone panels and continuation to step 5 checked with canvas hidden. No scene quality changed.
 - [x] Compare supplier originals: ten old maps match Solar System Scope CC BY 4.0; add attribution/conversion notice and identify Ceres as fictional. Ten other maps remain blocked from redistribution pending exact origins; no assets changed.
 ## Opening-screen clock
