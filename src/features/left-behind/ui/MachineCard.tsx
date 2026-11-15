@@ -14,6 +14,8 @@ import { helioPositionKm, moonPositionKm } from '../engine/ephemeris';
 import { measurementsAt } from '../engine/trajectory';
 import { useSimClock } from '../state/useSimClock';
 import { useLeftBehindStore } from '../state/useLeftBehindStore';
+import { useCosmosStore } from '@/components/cosmos/store/useCosmosStore';
+import { hasTour } from '@/components/cosmos/data/tours';
 
 export type CardMachine = Machine & {
   place?: string; status?: { type: string; since: string | null };
