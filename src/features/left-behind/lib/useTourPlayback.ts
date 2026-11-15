@@ -7,15 +7,15 @@ export function useTourPlayback(key: string | null, paused: boolean, seconds: nu
   latest.current = { paused, seconds, advance };
   useEffect(() => {
     if (key === null) return;
-    let elapsed = 0;
+    let elapsedMs = 0;
     let previous = performance.now();
     let wasPaused = latest.current.paused;
     const timer = setInterval(() => {
       const now = performance.now();
       const state = latest.current;
-      if (!state.paused && !wasPaused) elapsed += (now - previous) / 1000;
+      if (!state.paused && !wasPaused) elapsedMs += now - previous;
       previous = now; wasPaused = state.paused;
-      if (!state.paused && elapsed >= state.seconds) { clearInterval(timer); state.advance(); }
+      if (!state.paused && elapsedMs >= state.seconds * 1000) { clearInterval(timer); state.advance(); }
     }, 100);
     return () => clearInterval(timer);
   }, [key]);
