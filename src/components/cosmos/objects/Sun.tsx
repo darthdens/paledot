@@ -41,6 +41,27 @@ const createSunGlowTexture = () => {
   return tex;
 };
 
+// Star point seen from the outer Solar System: bright golden core with a short soft falloff.
+const createStarPointTexture = () => {
+  const size = 128;
+  const canvas = document.createElement('canvas');
+  canvas.width = size;
+  canvas.height = size;
+  const ctx = canvas.getContext('2d')!;
+  const gradient = ctx.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2);
+  gradient.addColorStop(0, 'rgba(255, 240, 200, 1)');
+  gradient.addColorStop(0.08, 'rgba(255, 215, 140, 1)');
+  gradient.addColorStop(0.2, 'rgba(255, 170, 70, 0.45)');
+  gradient.addColorStop(0.45, 'rgba(255, 130, 40, 0.1)');
+  gradient.addColorStop(1, 'rgba(255, 100, 20, 0)');
+  ctx.fillStyle = gradient;
+  ctx.fillRect(0, 0, size, size);
+  const tex = new THREE.CanvasTexture(canvas);
+  tex.minFilter = THREE.LinearFilter;
+  tex.magFilter = THREE.LinearFilter;
+  return tex;
+};
+
 // Outer glow texture - softer, more natural
 const createOuterGlowTexture = () => {
   const size = 512;
@@ -199,10 +220,12 @@ export const Sun = ({ position = [0, 0, 0], visualScale = UNIFIED_SCALE }: SunPr
   
   const s1 = useRef<THREE.Sprite>(null), s2 = useRef<THREE.Sprite>(null), s3 = useRef<THREE.Sprite>(null);
   const coronaShellRef = useRef<THREE.Mesh>(null);
+  const starRef = useRef<THREE.Sprite>(null);
   const photoMatRef = useRef<THREE.ShaderMaterial>(null);
   const photoUniforms = useMemo(() => ({ uTime: { value: 0 } }), []);
   const glowTexture = useMemo(() => createSunGlowTexture(), []);
   const outerGlowTexture = useMemo(() => createOuterGlowTexture(), []);
+  const starPointTexture = useMemo(() => createStarPointTexture(), []);
   
   const setSelectedObject = useCosmosStore(state => state.setSelectedObject);
   const setHoveredObject = useCosmosStore(state => state.setHoveredObject);
@@ -223,6 +246,18 @@ export const Sun = ({ position = [0, 0, 0], visualScale = UNIFIED_SCALE }: SunPr
       const sp = [[s1, 0.9], [s2, 0.5], [s3, 0.28]] as const;
       for (const [r, o] of sp) if (r.current) { (r.current.material as THREE.SpriteMaterial).opacity = o * far; r.current.visible = far > 0.001; }
       if (coronaShellRef.current) coronaShellRef.current.visible = d > 1.4;
+      // Beyond the giant planets the halo shrinks below a pixel, yet the Sun is still by far the brightest star:
+      // a fixed-pixel-size star point keeps it visible (e.g. Voyager 1's look back), fading out past ~1,000 AU.
+      if (starRef.current) {
+        const point = THREE.MathUtils.smoothstep(d, 1000, 4000) * (1 - THREE.MathUtils.smoothstep(d, 1e5, 2e5));
+        (starRef.current.material as THREE.SpriteMaterial).opacity = point;
+        starRef.current.visible = point > 0.001;
+        // Sit just in front of the photosphere (toward the camera) so the solid Sun sphere can't depth-hide it.
+        if (point > 0.001) {
+          const lifted = state.camera.position.clone().sub(worldPos.current).normalize().multiplyScalar(sunSize * 1.2).add(worldPos.current);
+          starRef.current.position.copy(groupRef.current.worldToLocal(lifted));
+        }
+      }
     }
     if (photoMatRef.current) {
       // Granules evolve on the simulation clock (real lifetime ~5-10 min); wrapped to keep float precision
@@ -360,6 +395,11 @@ export const Sun = ({ position = [0, 0, 0], visualScale = UNIFIED_SCALE }: SunPr
           depthWrite={false}
           depthTest={true}
         />
+      </sprite>
+
+      {/* Distant star point: constant size on screen, only far from the Sun */}
+      <sprite ref={starRef} renderOrder={13} scale={[0.045, 0.045, 1]} visible={false}>
+        <spriteMaterial map={starPointTexture} transparent opacity={0} sizeAttenuation={false} blending={THREE.AdditiveBlending} depthWrite={false} depthTest={true} />
       </sprite>
 
       {/* Point light from sun - reduced intensity */}
