@@ -3,7 +3,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { useSignal } from '../state/useSignal';
-import { LIGHT_KM_S } from '../lib/signal';
+import { LIGHT_KM_S, signalPositionKm } from '../lib/signal';
 import { eclipticKmToScene } from '../lib/units';
 /** Screen-size point only; its position advances at physical light speed on real UTC time. */
 export function SignalPulse() {
@@ -25,8 +25,7 @@ export function SignalPulse() {
     if (!race || !row || reduced) return;
     const km = Math.max(0, Date.now() - race.sentAt) / 1000 * LIGHT_KM_S;
     node.visible = km < row.distanceKm;
-    const position = race.earthKm.map((v, i) => v + (row.direction[i] ?? 0) * Math.min(km, row.distanceKm));
-    node.position.set(...eclipticKmToScene(position[0] ?? 0, position[1] ?? 0, position[2] ?? 0));
+    node.position.set(...eclipticKmToScene(...signalPositionKm(race, row, Date.now())));
   });
   return <points ref={point} name="signal-pulse" frustumCulled={false}><bufferGeometry><bufferAttribute attach="attributes-position" args={[new Float32Array([0,0,0]), 3]} /></bufferGeometry><pointsMaterial color={color} size={4} sizeAttenuation={false} depthWrite={false} /></points>;
 }
