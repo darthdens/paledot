@@ -442,7 +442,11 @@ export const CameraController = () => {
         point.project(camera);
         if (Math.abs(point.x) < .9 && Math.abs(point.y) < .85) points[id] = { x: (point.x + 1) / 2, y: (1 - point.y) / 2 };
       }
-      useOneLastLook.setState({ turn, points });
+      const changed = PORTRAIT_PLANETS.some(id => {
+        const a = look.points[id], b = points[id];
+        return (!!a !== !!b) || (a && b && (Math.abs(a.x - b.x) > .001 || Math.abs(a.y - b.y) > .001));
+      });
+      if (turn !== look.turn || changed) useOneLastLook.setState({ turn, ...(changed ? { points } : {}) });
       return;
     }
     const following = !!hardwareId && !isTouring;
