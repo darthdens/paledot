@@ -106,10 +106,12 @@ export const CameraController = () => {
     if (!hardwareId || !controls || isTouring) return;
     const orbit = controls as unknown as { target: THREE.Vector3 };
     let cancelled = false;
+    let retry: ReturnType<typeof setTimeout> | undefined;
+    const prepareFlight = () => {
     void getHardware().then(hardware => {
       if (cancelled) return;
       const live = useCosmosStore.getState().objectWorldPositions[`hw:${hardwareId}`];
-      if (!live) return;
+      if (!live) { retry = setTimeout(prepareFlight, 100); return; }
       const machine = hardware.machines.find(m => m.trajectories.some(t => t.id === hardwareId));
       // Frame the machine at its true size so it fills the view; fall back to the data's follow distance.
       const span = trueSpanUnits.get(hardwareId);
@@ -119,6 +121,7 @@ export const CameraController = () => {
       startPosition.current.copy(camera.position); startTarget.current.copy(orbit.target);
       endTarget.current.set(...live); cameraOffset.current.set(distance*.5,distance*.3,distance);
       const pin = landedPins.get(hardwareId);
+      if (!pin) machineFlightNormal.current.set(0, 0, 0);
       if (pin) {
         machineFlightNormal.current.set(...pin.normal);
         machineSide.current.set(0, 1, 0).cross(machineFlightNormal.current);
@@ -136,7 +139,10 @@ export const CameraController = () => {
         camera.position.copy(endPosition.current); orbit.target.copy(endTarget.current); isAnimating.current = false;
       }
     }).catch(() => { /* Static-data failure must not disturb normal navigation. */ });
-    return () => { cancelled = true; if (animationTriggerId.current === `hw:${hardwareId}`) isAnimating.current = false; };
+    };
+    // Wait one scene frame for the new date's positions instead of reading stale world coordinates.
+    retry = setTimeout(prepareFlight, 0);
+    return () => { cancelled = true; clearTimeout(retry); if (animationTriggerId.current === `hw:${hardwareId}`) isAnimating.current = false; };
   }, [hardwareId, controls, camera, isTouring, followNonce]);
   // "View on the surface": low and oblique over the landed pin, so the ground and horizon fill the view.
   const surfaceViewNonce = useLeftBehindStore(state => state.surfaceViewNonce);
