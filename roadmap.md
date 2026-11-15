@@ -48,6 +48,6 @@ Verification: 24 tests pass; four Pale Dot entries and desktop/360px date checks
 - [x] Category badge in the selected-machine panel, all languages.
 
 ## Checkpoint paperwork and source package
-- [ ] Update event scope from history and complete requested credits.
-- [ ] Create and inspect the event source ZIP and per-file baseline patches, without secrets.
+- [x] Update event scope from history and complete requested credits; original low-resolution texture origins remain unknown and explicitly disclosed.
+- [x] Create and inspect the event source ZIP and per-file baseline patches, without secrets; archive externalized due to repository size limit.
 - [ ] Verify the preview download and report contents, size and upload batches.
