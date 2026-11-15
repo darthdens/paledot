@@ -945,6 +945,7 @@ export const CosmosUI = () => {
       <div
         ref={languageMenuRef}
         data-explorer-dropdown
+        data-language-dropdown
         inert={!showLanguageMenu}
         className={`lg:hidden ${uiFixed ? 'fixed' : 'absolute'} z-[10001] bg-white/10 backdrop-blur-xs rounded-lg overflow-hidden transition-all duration-300 ease-out ${
           showLanguageMenu ? 'opacity-100 scale-100' : 'opacity-0 scale-95 pointer-events-none'
@@ -993,7 +994,7 @@ export const CosmosUI = () => {
             className={`grid transition-all duration-300 ease-out ${timeMenuOpen ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'}`}
           >
             <div className="overflow-hidden">
-              {timeMenuOpen && <Suspense fallback={null}><LeftBehindDateControl /></Suspense>}
+              <Suspense fallback={null}><LeftBehindDateControl /></Suspense>
             </div>
           </div>
         </div>
