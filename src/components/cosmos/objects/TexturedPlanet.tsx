@@ -43,8 +43,8 @@ function raycastSphere(this: THREE.Mesh, raycaster: THREE.Raycaster, hits: THREE
 }
 import earthDayTexture from '@/assets/textures/earth-day.webp';
 import earthNightTexture from '@/assets/textures/earth-night.webp';
-import earthCloudsTexture from '@/assets/textures/earth-clouds.webp';
-import moonTexture from '@/assets/textures/moon.webp';
+import earthCloudsTexture from '@/assets/textures/earth-clouds.webp.asset.json';
+import moonTexture from '@/assets/textures/moon.webp.asset.json';
 import mercuryTexture from '@/assets/textures/mercury.webp';
 import venusTexture from '@/assets/textures/venus.webp';
 import marsTexture from '@/assets/textures/mars.webp';
@@ -52,14 +52,14 @@ import jupiterTexture from '@/assets/textures/jupiter.webp';
 import saturnTexture from '@/assets/textures/saturn.webp';
 import uranusTexture from '@/assets/textures/uranus.webp';
 import neptuneTexture from '@/assets/textures/neptune.webp';
-import plutoTexture from '@/assets/textures/pluto.webp';
-import titanTexture from '@/assets/textures/titan.webp';
-import europaTexture from '@/assets/textures/europa.webp';
+import plutoTexture from '@/assets/textures/pluto.webp.asset.json';
+import titanTexture from '@/assets/textures/titan.webp.asset.json';
+import europaTexture from '@/assets/textures/europa.webp.asset.json';
 // These are only loaded on desktop
-import ceresTexture from '@/assets/textures/ceres.webp';
-import enceladusTexture from '@/assets/textures/enceladus.webp';
-import tritonTexture from '@/assets/textures/triton.webp';
-import iapetusTexture from '@/assets/textures/iapetus.webp';
+import ceresTexture from '@/assets/textures/ceres.webp.asset.json';
+import enceladusTexture from '@/assets/textures/enceladus.webp.asset.json';
+import tritonTexture from '@/assets/textures/triton.webp.asset.json';
+import iapetusTexture from '@/assets/textures/iapetus.webp.asset.json';
 
 interface TexturedPlanetProps {
   object: CelestialObject;
@@ -374,8 +374,8 @@ export const TexturedPlanet = ({
   // Load NASA textures for planets - essential ones for all devices
   const earthDayMap = useLoader(THREE.TextureLoader, earthDayTexture);
   const earthNightMap = useLoader(THREE.TextureLoader, earthNightTexture);
-  const earthCloudsMap = useLoader(THREE.TextureLoader, earthCloudsTexture);
-  const moonMap = useLoader(THREE.TextureLoader, moonTexture);
+  const earthCloudsMap = useLoader(THREE.TextureLoader, earthCloudsTexture.url);
+  const moonMap = useLoader(THREE.TextureLoader, moonTexture.url);
   const mercuryMap = useLoader(THREE.TextureLoader, mercuryTexture);
   const venusMap = useLoader(THREE.TextureLoader, venusTexture);
   const marsMap = useLoader(THREE.TextureLoader, marsTexture);
@@ -383,15 +383,15 @@ export const TexturedPlanet = ({
   const saturnMap = useLoader(THREE.TextureLoader, saturnTexture);
   const uranusMap = useLoader(THREE.TextureLoader, uranusTexture);
   const neptuneMap = useLoader(THREE.TextureLoader, neptuneTexture);
-  const plutoMap = useLoader(THREE.TextureLoader, plutoTexture);
-  const titanMap = useLoader(THREE.TextureLoader, titanTexture);
-  const europaMap = useLoader(THREE.TextureLoader, europaTexture);
+  const plutoMap = useLoader(THREE.TextureLoader, plutoTexture.url);
+  const titanMap = useLoader(THREE.TextureLoader, titanTexture.url);
+  const europaMap = useLoader(THREE.TextureLoader, europaTexture.url);
   
   // Secondary textures - only load on desktop
-  const ceresMap = useLoader(THREE.TextureLoader, isMobile ? moonTexture : ceresTexture);
-  const enceladusMap = useLoader(THREE.TextureLoader, isMobile ? moonTexture : enceladusTexture);
-  const tritonMap = useLoader(THREE.TextureLoader, isMobile ? moonTexture : tritonTexture);
-  const iapetusMap = useLoader(THREE.TextureLoader, isMobile ? moonTexture : iapetusTexture);
+  const ceresMap = useLoader(THREE.TextureLoader, isMobile ? moonTexture.url : ceresTexture.url);
+  const enceladusMap = useLoader(THREE.TextureLoader, isMobile ? moonTexture.url : enceladusTexture.url);
+  const tritonMap = useLoader(THREE.TextureLoader, isMobile ? moonTexture.url : tritonTexture.url);
+  const iapetusMap = useLoader(THREE.TextureLoader, isMobile ? moonTexture.url : iapetusTexture.url);
   
   // Configure texture properties for proper spherical mapping
   useMemo(() => {
@@ -750,6 +750,7 @@ export const TexturedPlanet = ({
                 planetMapSecondary: { value: planetTextures.secondary || placeholderTexture },
                 cloudMap: { value: earthCloudsMap },
                 useProcedural: { value: planetTextures.useProcedural ? 1.0 : 0.0 },
+                sourcedSurface: { value: ['europa', 'titan', 'enceladus', 'iapetus', 'triton', 'pluto', 'ceres'].includes(object.id) && planetTextures.primary ? 1.0 : 0.0 },
                 // Uniforms are rebuilt on re-render, so derive relief values from the loaded state.
                 heightMap: { value: (reliefReady && reliefSync(object.id)?.texture) || FLAT_HEIGHT },
                 reliefOn: { value: reliefReady ? 1 : 0 },
@@ -811,6 +812,7 @@ export const TexturedPlanet = ({
                 uniform sampler2D planetMapSecondary;
                 uniform sampler2D cloudMap;
                 uniform float useProcedural;
+                uniform float sourcedSurface;
                 uniform sampler2D heightMap;
                 uniform float reliefOn;
                 uniform vec2 reliefTexel;
@@ -991,7 +993,18 @@ export const TexturedPlanet = ({
                   vec3 surfaceColor;
                   
                   // === SUN (1) - Plasma surface with granulation ===
-                  if (surfaceType > 0.5 && surfaceType < 1.5) {
+                  if (sourcedSurface > 0.5) {
+                    // Mission mosaic only: do not paint invented cracks, hearts or terrain over it.
+                    // Alpha denotes missing observations, never black terrain or synthetic detail.
+                    vec4 observed = texture2D(planetMap, vUv);
+                    surfaceColor = mix(vec3(0.35), observed.rgb, observed.a);
+                    if (surfaceType > 14.5 && surfaceType < 15.5) {
+                      // ISS uses an infrared methane window. Retain visible orange haze;
+                      // this is a visual treatment, not measured visible-light surface colour.
+                      surfaceColor = mix(surfaceColor, baseColor, 0.85);
+                    }
+                  }
+                  else if (surfaceType > 0.5 && surfaceType < 1.5) {
                     float granulation = fbm(noiseCoord * 3.0 + time * 0.1);
                     float prominences = smoothstep(0.6, 0.8, fineNoise);
                     surfaceColor = mix(baseColor, secondaryColor, granulation * 0.5);
