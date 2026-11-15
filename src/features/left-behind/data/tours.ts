@@ -21,8 +21,9 @@ const stop = (tour: string, s: StopIn): TourStop => ({
   locationId: 'earth', cameraPosition: [0, 0, 0], scaleLevel: 'solarSystem', duration: 15, ...s, id: `${tour}-${s.id}`,
 });
 const title = (id: string): TourText => {
-  const l = tourOptions.find(o => o.id === id)!.label as Record<string, string>;
-  return { en: l.en!, fr: l.fr ?? l.en!, es: l.es, pt: l.pt, it: l.it, de: l.de };
+  const l = tourOptions.find(o => o.id === id)!.label as Record<string, string | undefined>;
+  const en = l['en']!;
+  return { en, fr: l['fr'] ?? en, es: l['es'] ?? en, pt: l['pt'] ?? en, it: l['it'] ?? en, de: l['de'] ?? en };
 };
 const lb = (id: string, stops: StopIn[]): Tour => ({ id, title: title(id), onEnd: 'left-behind-summary', stops: stops.map(s => stop(id, s)) });
 
