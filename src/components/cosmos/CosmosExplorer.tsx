@@ -193,7 +193,7 @@ export const CosmosExplorer = () => {
 
       {/* Keep the scene mounted immediately so heavy work happens behind the loader */}
       {brand === 'paledot' && <DownloadStatus />}
-      <Canvas gl={{ alpha: false }} role="img" aria-label={canvasLabel}>
+      <Canvas gl={{ alpha: false }} role="group" aria-label={canvasLabel}>
         <Suspense fallback={null}>
           <Selection>
             <PerspectiveCamera makeDefault position={initialCameraPosition} fov={60} near={0.1} far={1e12} />
