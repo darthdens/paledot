@@ -850,76 +850,76 @@ export const CosmosUI = () => {
       >
         <div className={`grid transition-all duration-300 ease-out ${showMoreMenu ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'}`}>
           <div className="overflow-hidden">
-            <div className="p-2 min-w-[180px] space-y-0.5">
+            <div className="p-2 w-full space-y-1">
               {/* Toggle options */}
               <Button variant="ghost"
                 onClick={() => { toggleOrbits(); }}
-                className="w-full flex items-center justify-between p-2 rounded-[4px] hover:bg-white/10 transition-colors"
+                className="cosmos-more-row"
               >
                 <div className="flex items-center gap-2">
-                  {showOrbits ? <CircleDot className="w-4 h-4 text-white/70" /> : <CircleOff className="w-4 h-4 text-white/70" />}
-                  <span className="text-sm text-white/90">{showOrbits ? t.hideOrbits : t.showOrbits}</span>
+                  {showOrbits ? <CircleDot className="w-4 h-4 text-muted-foreground" /> : <CircleOff className="w-4 h-4 text-muted-foreground" />}
+                  <span className="text-sm text-foreground">{showOrbits ? t.hideOrbits : t.showOrbits}</span>
                 </div>
-                {showOrbits && <div className="w-2 h-2 rounded-full bg-green-400" />}
+                {showOrbits && <div className="w-2 h-2 rounded-full bg-primary" />}
               </Button>
 
               <Button variant="ghost"
                 onClick={() => { toggleTrails(); }}
-                className="w-full flex items-center justify-between p-2 rounded-[4px] hover:bg-white/10 transition-colors"
+                className="cosmos-more-row"
               >
                 <div className="flex items-center gap-2">
-                  <Orbit className="w-4 h-4 text-white/70" />
-                  <span className="text-sm text-white/90">{showTrails ? t.hideTrails : t.showTrails}</span>
+                  <Orbit className="w-4 h-4 text-muted-foreground" />
+                  <span className="text-sm text-foreground">{showTrails ? t.hideTrails : t.showTrails}</span>
                 </div>
-                {showTrails && <div className="w-2 h-2 rounded-full bg-green-400" />}
+                {showTrails && <div className="w-2 h-2 rounded-full bg-primary" />}
               </Button>
 
               <Button variant="ghost"
                 onClick={() => { toggleTimeMenu(); setShowMoreMenu(false); }}
-                className="w-full flex items-center justify-between p-2 rounded-[4px] hover:bg-white/10 transition-colors"
+                className="cosmos-more-row"
               >
                 <div className="flex items-center gap-2">
-                  <Clock className="w-4 h-4 text-white/70" />
+                  <Clock className="w-4 h-4 text-muted-foreground" />
                   <span className="flex flex-col items-start"><span className="text-sm text-foreground">{clockName}</span><span className="font-mono text-[10px] tabular-nums text-muted-foreground">{formatSimDate(simSecond * 1000, locale)}</span></span>
                 </div>
-                {rate > 1 && <div className="w-2 h-2 rounded-full bg-green-400" />}
+                {rate > 1 && <div className="w-2 h-2 rounded-full bg-primary" />}
               </Button>
 
               <Button variant="ghost"
                 onClick={() => { toggleSizeComparison(); setShowMoreMenu(false); }}
-                className="w-full flex items-center gap-2 p-2 rounded-[4px] hover:bg-white/10 transition-colors"
+                className="cosmos-more-row"
               >
-                <BarChart3 className="w-4 h-4 text-white/70" />
-                <span className="text-sm text-white/90">{t.sizeComparison}</span>
+                <BarChart3 className="w-4 h-4 text-muted-foreground" />
+                <span className="text-sm text-foreground">{t.sizeComparison}</span>
               </Button>
 
               {/* Divider */}
-              <div className="border-t border-white/10 my-1" />
+              <div className="border-t border-border !my-2" />
 
               <Button variant="ghost"
                 onClick={() => { setShowControlHints(true); setShowMoreMenu(false); }}
-                className="w-full flex items-center justify-between p-2 rounded-[4px] hover:bg-white/10 transition-colors"
+                className="cosmos-more-row"
               >
                 <div className="flex items-center gap-2">
-                  <HelpCircle className="w-4 h-4 text-white/70" />
-                  <span className="text-sm text-white/90">{t.help}</span>
+                  <HelpCircle className="w-4 h-4 text-muted-foreground" />
+                  <span className="text-sm text-foreground">{t.help}</span>
                 </div>
               </Button>
 
               <Button variant="ghost"
                 onClick={() => { setShowAbout(true); setShowMoreMenu(false); }}
-                className="w-full flex items-center gap-2 p-2 rounded-[4px] hover:bg-white/10 transition-colors"
+                className="cosmos-more-row"
               >
-                <Info className="w-4 h-4 text-white/70" />
-                <span className="text-sm text-white/90">{t.about}</span>
+                <Info className="w-4 h-4 text-muted-foreground" />
+                <span className="text-sm text-foreground">{t.about}</span>
               </Button>
 
               <Button variant="ghost"
                 onClick={() => { setShowMoreMenu(false); setTimeout(() => setShowLanguageMenu(true), 0); }}
-                className="w-full flex items-center gap-2 p-2 rounded-[4px] hover:bg-white/10 transition-colors"
+                className="cosmos-more-row"
               >
                 <FlagIcon locale={locale} className="w-4 h-4" />
-                <span className="text-sm text-white/90">{tx('Language', 'Langue')}</span>
+                <span className="text-sm text-foreground">{tx('Language', 'Langue')}</span>
               </Button>
 
             </div>
