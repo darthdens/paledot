@@ -2,7 +2,7 @@ import { useSimClock } from '@/features/left-behind/state/useSimClock';
 import { getEphemeris } from '@/features/left-behind/engine/runtime';
 import { useLanguage } from '@/i18n/LanguageContext';
 import { Button } from '@/components/ui/button';
-import { X, Navigation, ChevronDown, ChevronUp, Eye, EyeOff } from 'lucide-react';
+import { X, Navigation, ChevronDown, Eye, EyeOff } from 'lucide-react';
 import { useCosmosStore } from '../store/useCosmosStore';
 import { useFullscreenStore } from '../store/useFullscreenStore';
 import { UNITS } from '../types';
@@ -230,7 +230,7 @@ export const InfoCard = () => {
         </h3>
         <div className="flex items-center gap-1">
           <div className="h-6 w-6 flex items-center justify-center text-white/70">
-            {isMinimized ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+            <ChevronDown className={`w-4 h-4 transition-transform duration-300 ${isMinimized ? '-rotate-90' : ''}`} />
           </div>
           <Button
             size="icon"

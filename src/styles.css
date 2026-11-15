@@ -231,6 +231,9 @@ All colors MUST be HSL.
   html[data-pd-cursor] a, html[data-pd-cursor] button, html[data-pd-cursor] [role="menuitem"], html[data-pd-cursor] [role="option"] {
     cursor: pointer !important;
   }
+  html[data-pd-cursor] a *, html[data-pd-cursor] button *, html[data-pd-cursor] [role="menuitem"] *, html[data-pd-cursor] [role="option"] * {
+    cursor: pointer !important;
+  }
 
   body {
     background-color: hsl(var(--background));
@@ -795,8 +798,8 @@ All colors MUST be HSL.
 .paledot [data-search-open="true"] [data-search-trigger]:focus-visible { outline-offset: -2px; }
 .paledot .pd-machine-switch { position: relative; box-sizing: border-box !important; width: 36px !important; min-width: 36px !important; height: 20px !important; min-height: 20px !important; padding: 0 !important; border-width: 1px !important; align-items: center !important; }
 .paledot .pd-machine-switch > span { width: 14px !important; height: 14px !important; box-shadow: none !important; transform: none !important; translate: 2px 0 !important; transition: translate 150ms ease-out, background-color 150ms ease-out; }
-.paledot .pd-machine-switch[data-state="checked"] { background-color: hsl(var(--dot) / .18) !important; border-color: hsl(var(--dot) / .7) !important; }
-.paledot .pd-machine-switch[data-state="checked"] > span { background-color: hsl(var(--dot)) !important; translate: 18px 0 !important; }
+.paledot .pd-machine-switch[data-state="checked"] { background-color: hsl(var(--dot)) !important; border-color: hsl(var(--dot)) !important; }
+.paledot .pd-machine-switch[data-state="checked"] > span { background-color: hsl(var(--background)) !important; translate: 18px 0 !important; }
 .paledot .pd-machine-switch[data-state="unchecked"] { background-color: hsl(var(--surface-2)) !important; border-color: hsl(var(--border-strong)) !important; }
 .paledot .pd-machine-switch[data-state="unchecked"] > span { background-color: hsl(var(--muted-foreground)) !important; }
 @media (max-width: 639px) {
