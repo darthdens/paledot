@@ -1,5 +1,10 @@
 <!-- Left Behind · built during NASA Space Apps Challenge 2026 (14–15 Nov 2026) · AI-assisted (Lovable, Claude) -->
 # Roadmap
+## Complete remaining audit acceptance
+- [ ] Run bundled 3D verification with the faster available renderer; diagnose confirmed motion issues without lowering scene quality.
+- [ ] Add on-demand download progress for large photos and terrain with seven-language accessible status and behavioural tests.
+- [ ] Recheck all four phone orientations, keyboard/photos/signal/date flows, touch wiring and overlap; fix confirmed problems.
+- [ ] Run mobile Lighthouse and controlled before/after loading/frame measurements; report exact environment and unavailable historical/device baselines.
 ## Correct inaccurate maps and resolve texture rights
 - [x] Replace eight misassigned files, fictional Ceres, and the two untraceable assets with eleven sourced WebP assets; source evidence and coverage limits in texture-sources.json and CREDITS.md. Phobos/Deimos assets corrected, but their catalogue bodies are absent and are not newly added.
 - [x] Check renderer assignments, longitude transforms and live scene loading; 14 source regressions added, all 175 tests pass. Seven corrected textures read back from the actual visible scene; opening loader shares their URLs.
