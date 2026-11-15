@@ -32,3 +32,4 @@
 - One last look supplies content and nested navigation to the same TourOverlay panel renderer as ordinary stops. Why: card sizing, controls, collapse, swipes and progress cannot drift into a separate tour interface.
 - Signal races snapshot real-UTC Earth-relative distances at send time, persist locally, and use the shared frame conversion for their pulse; never drive the simulation clock. Why: reopening preserves elapsed light time independently of exploration.
 - Left Behind framing uses a boot-gated UI overlay state, shared date-safe machine navigation, and a Voyager-1-only summary; Credits are imported from the repository Markdown. Why: entry disclosures stay separate from ordinary menu use, with no new scene or data service.
+- Left Behind modal surfaces reuse the shared DialogOverlay used by tour photos. Why: popup dimming and transitions stay identical without a separate blur treatment.
