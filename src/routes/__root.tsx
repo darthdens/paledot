@@ -33,7 +33,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     const brand = loaderData?.brand ?? "cosmos";
     const { meta, canonical, jsonLd } = buildHead(brand);
     const icons = brand === "paledot" ? PALEDOT_HEAD_LINKS : [
-        { rel: "icon", href: "/favicon.ico", sizes: "48x48" },
+        { rel: "icon", href: "/cosmos/favicon.ico", sizes: "48x48" },
         { rel: "icon", type: "image/png", sizes: "64x64", href: "/favicon.png" },
         { rel: "icon", type: "image/png", sizes: "192x192", href: "/favicon-192.png" },
         { rel: "apple-touch-icon", type: "image/png", sizes: "180x180", href: "/apple-touch-icon.png" },
