@@ -1,4 +1,5 @@
 // Left Behind · built during NASA Space Apps Challenge 2026 (14–15 Nov 2026) · AI-assisted (Lovable, Claude)
+import { ProgressImage } from './ProgressImage';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { CalendarClock, Compass, ExternalLink, EyeOff, Map, Radio } from 'lucide-react';
 import type { Machine, Photo } from '../data/types';
@@ -35,7 +36,7 @@ function PhotoBox({ photo, caption, onOpen, label, missing }: { photo: ManifestP
   return <figure className="space-y-1.5">
     <Button variant="ghost" type="button" onClick={onOpen} disabled={failed} aria-label={`${label}: ${photo.alt}`} className="pd-photo-box block h-auto p-0 w-full aspect-[4/3] overflow-hidden rounded-[6px] border border-border bg-muted/40">
       {failed ? <span className="grid h-full place-items-center text-xs text-muted-foreground">{missing}</span>
-        : <img src={photo.imageUrl} alt={photo.alt} loading="lazy" decoding="async" onError={() => setFailed(true)} className="h-full w-full object-cover" />}
+        : <ProgressImage src={photo.imageUrl} alt={photo.alt} loading="lazy" decoding="async" onError={() => setFailed(true)} className="h-full w-full object-cover" />}
     </Button>
     <figcaption className="text-xs text-foreground">{caption}<span className="block pd-photo-credit text-muted-foreground">{photo.credit} · {photo.nasaId}</span></figcaption>
   </figure>;
@@ -122,7 +123,7 @@ export function MachineCard({ machine, following = false, extra = [], unfollowLa
     <Dialog open={!!open} onOpenChange={o => !o && setOpen(null)}>
       <DialogContent className="paledot dark max-w-[min(96vw,1100px)] border-border bg-background p-3">
         {open && <><DialogTitle className="sr-only">{capt(open)}</DialogTitle><DialogDescription className="sr-only">{open.alt}</DialogDescription>
-          <img src={open.imageUrl} alt={open.alt} className="max-h-[78vh] w-full object-contain" />
+          <ProgressImage src={open.imageUrl} alt={open.alt} className="max-h-[78vh] w-full object-contain" />
           <p className="text-sm text-foreground">{capt(open)}<span className="block text-xs text-muted-foreground"><a href={open.sourceUrl} target="_blank" rel="noopener noreferrer" className="hover:underline">{open.credit} · {open.nasaId}</a></span></p></>}
       </DialogContent>
     </Dialog>

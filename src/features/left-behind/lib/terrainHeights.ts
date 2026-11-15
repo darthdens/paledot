@@ -1,5 +1,6 @@
 // Left Behind · built during NASA Space Apps Challenge 2026 (14–15 Nov 2026) · AI-assisted (Lovable, Claude)
 import * as THREE from 'three';
+import { downloadBlob } from '../data/download';
 import { decodeHeightImage, heightAtM, heightTexture, reliefSync, sampleGrid } from '@/components/cosmos/lib/relief';
 import { getTerrainIndex, terrainImageUrl, type TerrainTier } from '../data/dataClient';
 
@@ -12,10 +13,14 @@ const cache = new Map<string, Promise<SiteHeights>>();
 const ready: SiteHeights[] = [];
 
 export function loadSiteHeights(tier: TerrainTier): Promise<SiteHeights> {
-  const file = tier.heightFile!;
+  const file = tier.heightFile;
+  if (!file) return Promise.reject(new Error('Missing site height file')); 
   let p = cache.get(file);
   if (!p) {
-    p = decodeHeightImage(terrainImageUrl(file)).then(({ width, height, values }) => {
+    p = downloadBlob(terrainImageUrl(file)).then(async blob => {
+      const url = URL.createObjectURL(blob);
+      try { return await decodeHeightImage(url); } finally { URL.revokeObjectURL(url); }
+    }).then(({ width, height, values }) => {
       const data = new Float32Array(values.length), scale = tier.heightScaleM ?? 0.1;
       for (let y = 0; y < height; y++) for (let x = 0; x < width; x++) data[y * width + x] = values[(height - 1 - y) * width + x]! * scale;
       const h: SiteHeights = { tier, width, height, data, texture: heightTexture(width, height, data) };

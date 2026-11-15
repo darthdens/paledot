@@ -1,3 +1,4 @@
+import { ProgressImage } from '@/features/left-behind/ui/ProgressImage';
 import { portraitFramingFactor } from '@/features/left-behind/lib/bodyScale';
 import { useEffect, useCallback, useState, useRef, type ReactNode } from 'react';
 import { useLanguage } from '@/i18n/LanguageContext';
@@ -644,7 +645,7 @@ function TourPhotos({ ids }: { ids: string[] }) {
     <div className="flex gap-3 overflow-x-auto">
       {photos.map(p => <figure key={p.id} className="w-32 sm:w-44 shrink-0">
         <Button variant="ghost" type="button" onClick={() => setOpen(p)} aria-label={caption(p)} className="h-20 sm:h-24 w-full p-0 overflow-hidden rounded-md bg-muted/40">
-          <img src={p.imageUrl} alt={caption(p)} loading="lazy" className="h-full w-full object-contain" />
+          <ProgressImage src={p.imageUrl} alt={caption(p)} loading="lazy" className="h-full w-full object-contain" />
         </Button>
         <figcaption className="mt-1 text-xs text-muted-foreground leading-snug">{caption(p)}<a href={p.sourceUrl} target="_blank" rel="noopener noreferrer" className="block hover:underline">{p.credit} · {p.nasaId}</a></figcaption>
       </figure>)}
@@ -652,7 +653,7 @@ function TourPhotos({ ids }: { ids: string[] }) {
     <Dialog open={!!open} onOpenChange={o => !o && setOpen(null)}>
       <DialogContent className="paledot dark max-w-[min(96vw,1100px)] border-border bg-background p-3">
         {open && <><DialogTitle className="sr-only">{caption(open)}</DialogTitle><DialogDescription className="sr-only">{caption(open)}</DialogDescription>
-          <img src={open.imageUrl} alt={caption(open)} className="max-h-[78vh] w-full object-contain" />
+          <ProgressImage src={open.imageUrl} alt={caption(open)} className="max-h-[78vh] w-full object-contain" />
           <p className="text-sm text-foreground">{caption(open)}<span className="block text-xs text-muted-foreground"><a href={open.sourceUrl} target="_blank" rel="noopener noreferrer" className="hover:underline">{open.credit} · {open.nasaId}</a></span></p></>}
       </DialogContent>
     </Dialog>
