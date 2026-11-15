@@ -2,7 +2,8 @@ import { useState, useRef, useEffect } from 'react';
 import { useLanguage } from '@/i18n/LanguageContext';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Search } from 'lucide-react';
+import { Search, X } from 'lucide-react';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { celestialObjects } from '../data/celestialObjects';
 import { useCosmosStore } from '../store/useCosmosStore';
 import { useSiteBrand } from '@/lib/site-brand';
@@ -21,6 +22,10 @@ const translations = {
     nebula: 'Nebula',
     galaxy: 'Galaxy',
     'dwarf-planet': 'Dwarf Planet',
+    cluster: 'Cluster',
+    supercluster: 'Supercluster',
+    other: 'Other',
+    machine: 'NASA machine',
   },
   fr: {
     placeholder: 'Rechercher des objets célestes...',
@@ -31,6 +36,10 @@ const translations = {
     nebula: 'Nébuleuse',
     galaxy: 'Galaxie',
     'dwarf-planet': 'Planète naine',
+    cluster: 'Amas',
+    supercluster: 'Superamas',
+    other: 'Autre',
+    machine: 'Machine de la NASA',
   },
 };
 
@@ -119,7 +128,8 @@ export const ObjectSearch = ({ onOpen }: ObjectSearchProps) => {
   return (
     <div ref={containerRef} data-search-slot className="relative h-11 shrink-0" data-search-open={isOpen}>
       <div data-object-search={isOpen ? '' : undefined} className="cosmos-search-field">
-        <Button ref={triggerRef} size="icon" variant="ghost" onClick={() => isOpen ? closeSearch() : openSearch()} aria-label={isOpen ? tx('Close search', 'Fermer la recherche') : t.placeholder} title={isOpen ? tx('Close search', 'Fermer la recherche') : t.placeholder} aria-expanded={isOpen} data-search-trigger className={`h-11 w-11 shrink-0 text-foreground ${isOpen ? 'bg-transparent hover:bg-foreground/10' : 'bg-foreground/10 hover:bg-foreground/20'}`}><Search className="h-5 w-5" /></Button>
+        <Tooltip><TooltipTrigger asChild><Button ref={triggerRef} size="icon" variant="ghost" onClick={() => isOpen ? closeSearch() : openSearch()} aria-label={isOpen ? tx('Close search', 'Fermer la recherche') : t.placeholder} aria-expanded={isOpen} data-search-trigger className={`h-11 w-11 shrink-0 text-foreground ${isOpen ? 'bg-transparent hover:bg-foreground/10' : 'bg-foreground/10 hover:bg-foreground/20'}`}>{isOpen ? <X className="h-5 w-5" /> : <Search className="h-5 w-5" />}</Button></TooltipTrigger>
+        <TooltipContent variant="dark" side="bottom">{isOpen ? tx('Close search', 'Fermer la recherche') : t.placeholder}</TooltipContent></Tooltip>
         <div className="cosmos-search-input" inert={!isOpen}>
         <Input
           ref={inputRef}
@@ -139,7 +149,7 @@ export const ObjectSearch = ({ onOpen }: ObjectSearchProps) => {
             <p className="text-white/50 text-sm p-3 text-center">{t.noResults}</p>
           ) : (
             <ul>
-              {filteredMachines.map(machine => <li key={machine.id}><Button variant="ghost" className="h-auto min-h-11 w-full justify-start whitespace-normal px-3 py-2 text-left font-normal text-foreground" onClick={() => { void visitMachine(machine); setIsOpen(false); setQuery(''); }}><span className="min-w-0">{dataText(machine.name, language)}</span></Button></li>)}
+              {filteredMachines.map(machine => <li key={machine.id}><Button variant="ghost" className="h-auto min-h-11 w-full justify-start whitespace-normal px-3 py-2 text-left font-normal text-foreground" onClick={() => { void visitMachine(machine); setIsOpen(false); setQuery(''); }}><span className="min-w-0 flex-1 truncate">{dataText(machine.name, language)}</span><span className="text-white/40 text-xs flex-shrink-0">{t.machine}</span></Button></li>)}
               {filteredObjects.map((obj) => (
                 <li key={obj.id}>
                   <Button variant="ghost"
