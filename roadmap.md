@@ -2,7 +2,8 @@
 # Roadmap
 ## Submission content and final paperwork
 - [x] Review uploaded submission wording against saved mission data and implemented signal/One last look features. Flag seven tour groups versus individual machines, missing final coordinates, simplified paths, illustrative viewpoint, non-NASA assets, incomplete form credits and unverified demo duration. YouTube oEmbed resolves; all cached photo IDs appear in CREDITS.md. No app code changed.
-- [ ] Finalise HACKATHON.md and CREDITS.md after actual submission time and Wayback URLs are supplied; confirm the recorded repository/compare links. LICENSE and README licence mention already present.
+- [x] Record supplied submission time (15 Nov 2026, 20:45 GMT), existing repository/compare links and indexed pre-event Wayback capture (21 Oct 2026). Remove paperwork placeholders; disclose absent submission capture. Confirm root LICENSE and README licence mention; add missing dependency, font, terrain, photograph and identity/soundtrack resource rows without app changes.
+- [ ] Complete submission evidence and resource clearance: no submission-period Wayback capture found in the repository or CDX index; soundtrack original author/source/licence is unknown; historical Boeing reference has no working verified HTTPS equivalent. Requires actual archive evidence and supplier/rights documentation.
 ## Presentation videos
 - [x] Serve both unchanged MP4 uploads at /files/paledot-left-behind.mp4 and /files/paledot-left-behind-vertical.mp4 using existing streaming and domain-favicon logic. Both checksums match; 200/HEAD and 206 ranges pass; desktop/360px playback and seeking to 5 seconds verified. Pale Dot favicon checksum matches; six tests pass, build OK. Live addresses require publishing; native media-tab icon display remains browser-controlled.
 ## Presentation PDF

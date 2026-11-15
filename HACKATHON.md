@@ -8,7 +8,7 @@
 
 Pale Dot (paledot.org) existed before the hackathon. The last commit before the event is the last commit dated before 14 November 2026, 09:00 GMT in the repo history.
 
-- Wayback Machine snapshot of paledot.org before the event: [paste link]
+- Wayback Machine snapshot of paledot.org before the event: https://web.archive.org/web/20261021162756/https://paledot.org/ (21 October 2026, 16:27:56 UTC; verified in the Wayback CDX index).
 
 ## Started
 
@@ -109,6 +109,6 @@ This list intersects files present at c76c475 with all commit changes since 14 N
 
 ## Finished
 
-- Submitted for judging: [date and time GMT]
-- Everything built during the event: [compare link, or "repo is private"]
-- Wayback Machine snapshot of paledot.org at submission: [paste link]
+- Submitted for judging: 15 November 2026, 20:45 GMT
+- Everything built during the event: https://github.com/darthdens/paledot/compare/c76c475...main
+- Wayback Machine snapshot of paledot.org at submission: unavailable; no snapshot URL is recorded in the repository, and the Wayback CDX index returned no successful HTML captures for 14–15 November 2026 when checked. No submission snapshot is claimed.
