@@ -47,7 +47,7 @@ export function OneLastLook({ onPrevious, onNext, tourIndex, totalStops, renderP
     return () => { alive = false; useOneLastLook.getState().setStage(0); };
   }, []);
   const next = () => {
-    if (error) return;
+    if (error || !measure) return;
     if (stage < 5) { setPortrait(false); useOneLastLook.getState().setStage(stage + 1); }
     else onNext();
   };
@@ -65,12 +65,12 @@ export function OneLastLook({ onPrevious, onNext, tourIndex, totalStops, renderP
     };
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
-  }, [stage, portrait, error]);
+  }, [stage, portrait, error, measure]);
   const photo = photos.find(p => p.role === (portrait ? 'family-portrait' : revisited ? 'pale-blue-dot-revisited' : 'pale-blue-dot'));
   const widths = pixelWidths(dpr);
   const fmt = (value: number, digits = 0) => new Intl.NumberFormat(numberLocale, { maximumFractionDigits: digits }).format(value);
   const progress = lastLookProgress(tourIndex, stage, totalStops);
-  const heading = stage === 3 ? 'Pale Blue Dot' : stage === 4 ? c[10] : stage === 2 ? c[3] : c[0];
+  const heading = (stage === 3 ? 'Pale Blue Dot' : stage === 4 ? c[10] : stage === 2 ? c[3] : c[0]) ?? '';
   return <div className="absolute inset-0 z-[10001] pointer-events-none [&_[data-tour-panel]]:pointer-events-auto" data-one-last-look data-look-stage={stage}>
     {(stage === 1 || stage === 2) && PORTRAIT_PLANETS.map((id, i) => {
       const p = points[id];
@@ -93,7 +93,7 @@ export function OneLastLook({ onPrevious, onNext, tourIndex, totalStops, renderP
           {((stage === 3) || portrait) && photo && <>
             {!portrait && <div className="flex flex-wrap gap-2">{[false, true].map(v => <Button key={String(v)} variant="ghost" aria-pressed={v === revisited} className={`min-h-11 rounded-full border ${v === revisited ? 'border-primary text-primary' : 'border-border'}`} onClick={() => setRevisited(v)}>{c[v ? 8 : 7]}</Button>)}</div>}
             <figure>
-              <div className="relative mx-auto w-full max-w-44" style={{ aspectRatio: portrait ? '1280 / 384' : revisited ? '1280 / 1266' : '453 / 614' }}>
+              <div className={`relative mx-auto w-full ${portrait ? '' : 'max-w-44'}`} style={{ aspectRatio: portrait ? '1280 / 384' : revisited ? '1280 / 1266' : '453 / 614' }}>
                 <img key={photo.id} src={photo.imageUrl} alt={portrait ? c[13] : heading} className="absolute inset-0 h-full w-full object-contain motion-safe:animate-in motion-safe:fade-in motion-safe:duration-700" />
                 {!portrait && photo.earthMarker && <span data-earth-ring className="absolute h-5 w-5 -translate-x-1/2 -translate-y-1/2 rounded-full border border-primary" style={{ left: `${photo.earthMarker.x * 100}%`, top: `${photo.earthMarker.y * 100}%` }} />}
                 {portrait && frames.map(f => <Button key={f.i} variant="ghost" aria-label={c[23 + f.i]} className="absolute min-h-11 min-w-11 p-0 border border-transparent focus-visible:border-primary hover:border-primary rounded-none" style={{ left: `${f.x * 100}%`, top: `${f.y * 100}%`, width: `${f.w * 100}%`, height: `${f.h * 100}%` }} onClick={() => setPlanet(f.i)} />)}
