@@ -19,6 +19,8 @@ import { tourSlideSeconds } from '@/features/left-behind/lib/tourPlayback';
 import { useTourPlayback } from '@/features/left-behind/lib/useTourPlayback';
 import { OneLastLook, type LastLookPanel } from '@/features/left-behind/ui/OneLastLook';
 import { useLeftBehindStore } from '@/features/left-behind/state/useLeftBehindStore';
+import { GlossaryText } from '@/features/left-behind/ui/GlossaryText';
+import { needsMachineSummary } from '@/features/left-behind/lib/framing';
 
 const translations = {
   en: {
@@ -105,7 +107,8 @@ export const TourOverlay = () => {
     const endFrame = tour.onEnd === 'end-frame';
     stopTour();
     if (endFrame) window.dispatchEvent(new Event('cosmos:journey-end'));
-  }, [tour, stopTour]);
+    else if (needsMachineSummary(activeTourId)) useLeftBehindStore.getState().openFraming('summary');
+  }, [tour, stopTour, activeTourId]);
 
   const UNIFIED_SCALE = 0.001;
 
@@ -615,7 +618,7 @@ export const TourOverlay = () => {
   );
   if (isLastLook) return <OneLastLook tourIndex={tourIndex} totalStops={totalStops} renderPanel={renderPanel} onPrevious={handlePrevious} onNext={handleNext} />;
   const content: ReactNode = <>
-    <p className="text-foreground/80 text-xs sm:text-sm leading-relaxed line-clamp-4 sm:line-clamp-none">{pickText(currentStop.narration, language, tr)}</p>
+    <div className="text-foreground/80 text-xs sm:text-sm leading-relaxed">{tour.onEnd === 'end-frame' ? pickText(currentStop.narration, language, tr) : <GlossaryText key={currentStop.id} text={pickText(currentStop.narration, language, tr)} />}</div>
     <TourPhotos ids={tourPhotoIds(activeTourId, currentStop)} />
   </>;
   return renderPanel({ title: pickText(currentStop.title, language, tr), label: String(tourIndex + 1), progress: (tourIndex + 1) / totalStops, children: content, previous: handlePrevious, next: handleNext });

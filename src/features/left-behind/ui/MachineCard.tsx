@@ -18,6 +18,7 @@ import { useCosmosStore } from '@/components/cosmos/store/useCosmosStore';
 import { hasTour } from '@/components/cosmos/data/tours';
 import { useSignal } from '../state/useSignal';
 import { signalCopy } from '../lib/signalCopy';
+import { GlossaryText } from './GlossaryText';
 
 export type CardMachine = Machine & {
   place?: string; status?: { type: string; since: string | null };
@@ -78,7 +79,7 @@ export function MachineCard({ machine, following = false, extra = [], unfollowLa
   }, [machine]);
   const fmtDate = (d: string) => new Date(`${d.slice(0, 10)}T00:00:00Z`).toLocaleDateString(numberLocale, { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' });
   const heading = 'text-white/50 text-xs';
-  const Bullets = ({ items }: { items: { k: string; text: string }[] }) => <ul className="space-y-1">{items.map(i => <li key={i.k} className="text-white/80 text-xs flex items-start gap-1.5"><span className="text-white/40 mt-0.5">•</span><span>{i.text}</span></li>)}</ul>;
+  const Bullets = ({ items }: { items: { k: string; text: string }[] }) => <ul className="space-y-1">{items.map(i => <li key={i.k} className="text-white/80 text-xs flex items-start gap-1.5"><span className="text-white/40 mt-0.5">•</span><span><GlossaryText text={i.text} /></span></li>)}</ul>;
 
   return <div className="space-y-3" data-machine-card>
     <div className="flex flex-wrap items-center gap-2">
@@ -96,7 +97,7 @@ export function MachineCard({ machine, following = false, extra = [], unfollowLa
     {did.length > 0 && <section className="space-y-1"><h4 className={heading}>{t.whatItDid}</h4><Bullets items={did.map(f => ({ k: f.id, text: T(f.text) }))} /></section>}
     {machine.leftBehind?.length ? <section className="space-y-1"><h4 className={heading}>{t.leftBehind}</h4><Bullets items={machine.leftBehind.map(x => ({ k: x, text: T(x) }))} /></section> : null}
     <section className="space-y-1"><h4 className={heading}>{t.whereNow}</h4>
-      <p className="text-white/80 text-xs">{machine.whereNow ? T(machine.whereNow) : 'TODO(source)'}</p>
+      <div className="text-white/80 text-xs">{machine.whereNow ? <GlossaryText text={T(machine.whereNow)} /> : 'TODO(source)'}</div>
       {distance !== null && <div className="bg-white/5 rounded-[4px] p-2 text-xs sm:text-sm"><div className="text-white/50 text-xs">{t.distanceToday}</div><div className="text-white font-medium tabular-nums">{Math.round(distance).toLocaleString(numberLocale)} km<span className="block text-[10px] text-muted-foreground">{t.calculated}</span></div></div>}
     </section>
     {machine.keyDates?.length ? <section className="space-y-1"><h4 className={heading}>{t.keyDates}</h4>

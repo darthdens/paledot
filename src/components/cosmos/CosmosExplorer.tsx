@@ -49,6 +49,7 @@ import { useLeftBehindStore } from '@/features/left-behind/state/useLeftBehindSt
 const LeftBehindLayer = lazy(() => import('@/features/left-behind/scene/LeftBehindLayer').then(m => ({ default: m.LeftBehindLayer })));
 const HardwareReadout = lazy(() => import('@/features/left-behind/ui/HardwareReadout').then(m => ({ default: m.HardwareReadout })));
 const SendSignal = lazy(() => import('@/features/left-behind/ui/SendSignal').then(m => ({ default: m.SendSignal })));
+const FramingViews = lazy(() => import('@/features/left-behind/ui/FramingViews').then(m => ({ default: m.FramingViews })));
 const SignalPulse = lazy(() => import('@/features/left-behind/scene/SignalPulse').then(m => ({ default: m.SignalPulse })));
 
 // Allow loaders (R3F + our preload) to reuse texture requests.
@@ -323,7 +324,7 @@ export const CosmosExplorer = () => {
           <SizeComparison />
           <YouAreHereLabel />
           {brand === 'paledot' && machinesVisible && <Suspense fallback={null}><HardwareReadout /></Suspense>}
-          {brand === 'paledot' && <Suspense fallback={null}><SendSignal /></Suspense>}
+          {brand === 'paledot' && <Suspense fallback={null}><SendSignal /><FramingViews /></Suspense>}
         </>
       )}
     </div>

@@ -11,6 +11,7 @@ import { useCosmosStore } from '@/components/cosmos/store/useCosmosStore';
 import { TourChoices } from './TourChoices';
 import { machineCopy } from '../lib/machineCopy';
 import { useSignal } from '../state/useSignal';
+import { framingCopy } from '../lib/framingCopy';
 export function LeftBehindMenu() {
   const ref = useRef<HTMLDivElement>(null);
   const [toursOpen, setToursOpen] = useState(true);
@@ -46,8 +47,9 @@ export function LeftBehindMenu() {
         <span>{machineCopy[language].full}</span><Switch className="pd-machine-switch" aria-label={machineCopy[language].full} checked={fullPathsVisible} onCheckedChange={() => useLeftBehindStore.getState().toggleFullPaths()} />
       </label>
       <div className="my-2 border-t border-white/10" />
+      <Button variant="ghost" onClick={() => useLeftBehindStore.getState().openFraming('machines')} className={`${row} justify-start font-normal`}>{text(framingCopy[language].machines)}</Button>
       <Button variant="ghost" onClick={() => useSignal.getState().show()} className={`${row} justify-start font-normal`}>{text(copy.signal)}</Button>
-      <Button variant="ghost" disabled className={`${row} justify-start font-normal`}>{text(copy.know)}</Button>
+      <Button variant="ghost" onClick={() => useLeftBehindStore.getState().openFraming('knowledge')} className={`${row} justify-start font-normal`}>{text(copy.know)}</Button>
     </div>
   </div>;
 }

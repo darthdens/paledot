@@ -27,18 +27,18 @@ const PaleDot = () => {
     const openHash = () => {
       const hash = window.location.hash;
       if (hash === '#lb-one-last-look') {
-        useLeftBehindStore.setState({ pendingTourId: 'voyager-1', pendingStopId: 'voyager-1-one-last-look', menuOpen: false });
+        useLeftBehindStore.setState({ pendingTourId: 'voyager-1', pendingStopId: 'voyager-1-one-last-look', menuOpen: false, framingView: null });
         setStarted(true);
         return;
       }
       // #lb-<tour-id>: start that tour once loading has finished (see CosmosExplorer).
       if (hash.startsWith('#lb-') && hasTour(hash.slice(4))) {
-        useLeftBehindStore.setState({ pendingTourId: hash.slice(4), menuOpen: false });
+        useLeftBehindStore.setState({ pendingTourId: hash.slice(4), menuOpen: false, framingView: null });
         setStarted(true);
         return;
       }
       if (hash !== '#left-behind') return;
-      useLeftBehindStore.getState().setMenuOpen(true);
+      useLeftBehindStore.getState().openFraming('intro');
       setStarted(true);
     };
     openHash();
@@ -89,7 +89,7 @@ const PaleDot = () => {
   useEffect(() => {
     if (!started) return;
     // Always land on "Welcome to Pale Dot" (guided tour / explore) once loading ends.
-    useCosmosStore.getState().setShowControlHints(!useLeftBehindStore.getState().menuOpen);
+    useCosmosStore.getState().setShowControlHints(!useLeftBehindStore.getState().menuOpen && !useLeftBehindStore.getState().framingView && !useLeftBehindStore.getState().pendingTourId);
     const color = "#000000";
     const els = [document.documentElement, document.body];
     const prev = els.map((el) => el.style.backgroundColor);
@@ -104,7 +104,7 @@ const PaleDot = () => {
   }, [started]);
 
   if (!started) {
-    return <><PaleDotTitleScreen onBegin={() => setStarted(true)} onLeftBehind={() => { useLeftBehindStore.getState().setMenuOpen(true); setStarted(true); }} />{dataAdmin && <Suspense fallback={null}><LeftBehindAdmin /></Suspense>}<SimulationDateReadout /></>;
+    return <><PaleDotTitleScreen onBegin={() => setStarted(true)} onLeftBehind={() => { useLeftBehindStore.getState().openFraming('intro'); setStarted(true); }} />{dataAdmin && <Suspense fallback={null}><LeftBehindAdmin /></Suspense>}<SimulationDateReadout /></>;
   }
 
   return (

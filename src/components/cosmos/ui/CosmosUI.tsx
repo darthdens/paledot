@@ -636,7 +636,7 @@ export const CosmosUI = () => {
               >
                 {t.explore}
               </Button>
-              {brand === 'paledot' && <Button size="sm" variant="outline" className="pd-pill h-auto min-h-11" onClick={() => { setShowControlHints(false); useLeftBehindStore.getState().setMenuOpen(true); }}>
+              {brand === 'paledot' && <Button size="sm" variant="outline" className="pd-pill h-auto min-h-11" onClick={() => { setShowControlHints(false); useLeftBehindStore.getState().openFraming('intro'); }}>
                 <span className="flex flex-col gap-1"><span>{tr({ en: lbCopy.entry, fr: lbCopy.entry })}</span><span className="text-[10px] text-muted-foreground">(NASA Space Apps Challenge)</span></span>
               </Button>}
             </div>
