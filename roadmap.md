@@ -1,6 +1,7 @@
 <!-- Left Behind · built during NASA Space Apps Challenge 2026 (14–15 Nov 2026) · AI-assisted (Lovable, Claude) -->
 # Roadmap
 ## Toolbar and dropdown consistency
+- [x] 15 Nov follow-up: desktop/tablet region and toolbar sit 8px below the date strip; search has no cross (search icon closes), no input outline, 12px left padding, and takes the full toolbar row on phones; dropdowns only stop above cards under their column (desktop Quick Jump/Left Behind now reach the screen bottom); switches show a visible accent knob; phone region details open as a dropdown below the compact button and close other menus; info card header hover fills the whole strip. Checked 393px phone and 1280px desktop.
 - [x] Correct shared grid open/close motion (no scale), keep Left Behind mounted for collapse, and restore full-height scrollable Quick Jump/menus. Search expands left in toolbar flow instead of covering controls; 8px edge spacing, pointer cursors and compact icon/arrow phone region with wide details. Verified 360/393 phones and tablet: matching menu bounds, no overflow/page errors; five focused tests pass. Hardware motion feel remains unmeasurable here.
 - [x] Put Search in the toolbar; fixed 44px-height left-to-right expansion and reverse collapse, keyboard focus and on-demand results retained. Phones wrap with a usable second-row field.
 - [x] Align dropdowns to measured toolbar dimensions, enlarge phone menus and remove obsolete card-open height caps while retaining measured card clearance.

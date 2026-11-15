@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useLanguage } from '@/i18n/LanguageContext';
 import { useCosmosStore } from '../store/useCosmosStore';
 import { useFullscreenStore } from '../store/useFullscreenStore';
@@ -135,6 +135,25 @@ export const YouAreHereLabel = () => {
   const selectedObject = useCosmosStore((state) => state.selectedObject);
   const [isMinimized, setIsMinimized] = useState(true);
   const isFullscreen = useFullscreenStore((state) => state.isFullscreen);
+  const rootRef = useRef<HTMLDivElement>(null);
+  // Behave like the toolbar dropdowns: one open at a time, close on outside press or Escape.
+  useEffect(() => {
+    const onOther = (e: Event) => { if ((e as CustomEvent).detail !== 'region') setIsMinimized(true); };
+    window.addEventListener('cosmos:dropdown-open', onOther);
+    return () => window.removeEventListener('cosmos:dropdown-open', onOther);
+  }, []);
+  useEffect(() => {
+    if (isMinimized) return;
+    const outside = (e: MouseEvent) => { if (e.target instanceof Node && !rootRef.current?.contains(e.target)) setIsMinimized(true); };
+    const escape = (e: KeyboardEvent) => { if (e.key === 'Escape') setIsMinimized(true); };
+    document.addEventListener('mousedown', outside);
+    document.addEventListener('keydown', escape);
+    return () => { document.removeEventListener('mousedown', outside); document.removeEventListener('keydown', escape); };
+  }, [isMinimized]);
+  const toggle = () => {
+    if (isMinimized) window.dispatchEvent(new CustomEvent('cosmos:dropdown-open', { detail: 'region' }));
+    setIsMinimized(!isMinimized);
+  };
 
   // Determine which cosmic structure we're viewing from
   const getGalaxyStructure = () => {
@@ -218,7 +237,7 @@ export const YouAreHereLabel = () => {
   const locationInfo = getLocationInfo();
   
   return (
-    <div data-region-control data-region-expanded={!isMinimized} className={`${isFullscreen
+    <div ref={rootRef} data-region-control data-region-expanded={!isMinimized} className={`${isFullscreen
       ? 'fixed top-[calc(0.5rem+env(safe-area-inset-top))] left-[calc(0.5rem+env(safe-area-inset-left))]'
       : 'absolute top-2 sm:top-4 left-2 sm:left-4'} z-10 max-w-[calc(100%-13rem)] md:max-w-[calc(100%-2rem)] animate-fade-in`}>
       <div className="bg-white/10 backdrop-blur-md rounded-lg overflow-hidden max-w-full md:max-w-none">
@@ -226,7 +245,7 @@ export const YouAreHereLabel = () => {
           variant="ghost"
           aria-label={locationInfo.title}
           aria-expanded={!isMinimized}
-          onClick={() => setIsMinimized(!isMinimized)}
+          onClick={toggle}
           className="h-auto w-full grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2 md:gap-3 px-2.5 md:px-3 min-h-8 py-1.5 md:py-2 hover:bg-white/5 transition-colors"
         >
           <div className="flex min-w-0 items-center gap-2 text-white">
@@ -241,10 +260,14 @@ export const YouAreHereLabel = () => {
         </Button>
         
         <div 
+          data-region-panel
           inert={isMinimized}
           className={`grid transition-all duration-300 ease-out ${isMinimized ? 'grid-rows-[0fr]' : 'grid-rows-[1fr]'}`}
         >
           <div className="overflow-hidden">
+            <div data-region-panel-title className="hidden items-center gap-2 px-3 pt-3 pb-2 text-sm font-semibold text-foreground">
+              <span className="shrink-0">{getScaleIcon(currentScale)}</span><span className="min-w-0">{locationInfo.title}</span>
+            </div>
             <div className="px-3 pb-3 space-y-1 border-t border-white/10 pt-2">
               <p className="text-white/70 text-xs">{locationInfo.subtitle}</p>
               <div className="mt-2 space-y-0.5">

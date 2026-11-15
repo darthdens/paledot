@@ -32,4 +32,5 @@
 - One last look supplies content and nested navigation to the same TourOverlay panel renderer as ordinary stops. Why: card sizing, controls, collapse, swipes and progress cannot drift into a separate tour interface.
 - Signal races snapshot real-UTC Earth-relative distances at send time, persist locally, and use the shared frame conversion for their pulse; never drive the simulation clock. Why: reopening preserves elapsed light time independently of exploration.
 - Left Behind framing uses a boot-gated UI overlay state, shared date-safe machine navigation, and a Voyager-1-only summary; Credits are imported from the repository Markdown. Why: entry disclosures stay separate from ordinary menu use, with no new scene or data service.
-- Left Behind entry, summary and other modals share DialogSurface and the tour-photo overlay. Why: match Send a signal without special summary styling.
+- Left Behind modals share DialogSurface and the tour-photo overlay. Why: match Send a signal.
+- Region card and toolbar dropdowns sync via window event `cosmos:dropdown-open`. Why: one top dropdown open at a time.

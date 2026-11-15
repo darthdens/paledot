@@ -788,3 +788,32 @@ All colors MUST be HSL.
   .paledot [data-region-control]:has(~ [data-explorer-toolbar] [data-search-open="true"]) { visibility: hidden; }
 }
 @media (prefers-reduced-motion: reduce) { [data-search-slot], [data-region-control] { transition: none; } }
+
+/* Toolbar spacing, search field, switches and the phone region dropdown (one gutter: 8px). */
+.paledot [data-explorer-toolbar], .paledot [data-region-control] { top: 8px; }
+.paledot .cosmos-search-input input { padding-left: 12px; padding-right: 4px; outline: none !important; box-shadow: none !important; }
+.paledot [data-search-open="true"] [data-search-trigger]:focus-visible { outline-offset: -2px; }
+.paledot .pd-machine-switch { position: relative; }
+.paledot .pd-machine-switch > span { width: 16px; height: 16px; box-shadow: none; transform: none !important; translate: 1px 0 !important; transition: translate 150ms ease-out, background-color 150ms ease-out; }
+.paledot .pd-machine-switch[data-state="checked"] { background-color: hsl(var(--dot) / .22); border-color: hsl(var(--dot)); }
+.paledot .pd-machine-switch[data-state="checked"] > span { background-color: hsl(var(--dot)); translate: 17px 0 !important; }
+.paledot .pd-machine-switch[data-state="unchecked"] { background-color: hsl(var(--surface-2)); border-color: hsl(var(--border-strong)); }
+.paledot .pd-machine-switch[data-state="unchecked"] > span { background-color: hsl(var(--muted-foreground)); }
+@media (max-width: 1023px) {
+  .paledot [data-explorer-ui-root]:has([data-search-open="true"]) [data-region-control] { visibility: hidden; }
+}
+@media (max-width: 639px) {
+  /* Search takes the whole toolbar row instead of wrapping it. */
+  .paledot [data-explorer-toolbar]:has([data-search-open="true"]) { left: max(8px, env(safe-area-inset-left)) !important; }
+  .paledot [data-explorer-toolbar]:has([data-search-open="true"]) > div > :not([data-search-slot]) { display: none; }
+  .paledot [data-search-slot][data-search-open="true"] { width: calc(100vw - 16px - env(safe-area-inset-left) - env(safe-area-inset-right)); }
+  .paledot [data-search-results] { width: 100%; }
+  /* Region: the button stays compact; its details open below like the other dropdowns. */
+  .paledot [data-region-control], .paledot [data-region-control][data-region-expanded="true"] { width: 64px; }
+  .paledot [data-region-control] > div { overflow: visible; }
+  .paledot [data-region-control] [data-region-title] { display: none; }
+  .paledot [data-region-panel] { position: absolute; top: 52px; left: 0; width: min(320px, calc(100vw - 16px - env(safe-area-inset-left) - env(safe-area-inset-right))); border-radius: 10px; background-color: hsl(var(--card) / .97); box-shadow: inset 0 0 0 1px hsl(var(--border)); overflow: hidden; transition: grid-template-rows 300ms ease-out, opacity 300ms ease-out; }
+  .paledot [data-region-control][data-region-expanded="false"] [data-region-panel] { opacity: 0; pointer-events: none; }
+  .paledot [data-region-panel-title] { display: flex; }
+  .paledot [data-region-panel] p { color: hsl(var(--muted-foreground)); }
+}

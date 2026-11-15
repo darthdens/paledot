@@ -121,10 +121,11 @@ export const CosmosUI = () => {
   const rate = useSimClock(s => s.rate);
   const simSecond = useSimClock(s => Math.floor(s.simDate / 1000));
   const clockName = tr({ en: dateCopy[language].date, fr: dateCopy[language].date });
-  const toggleTimeMenu = () => { useLeftBehindStore.getState().setMenuOpen(false); useSimClock.getState().setDateControlOpen(!dateControlOpen); setShowMoreMenu(false); setShowLanguageMenu(false); useCosmosStore.setState({showQuickJump:false}); };
+  const announceDropdown = () => window.dispatchEvent(new CustomEvent('cosmos:dropdown-open', { detail: 'toolbar' }));
+  const toggleTimeMenu = () => { announceDropdown(); useLeftBehindStore.getState().setMenuOpen(false); useSimClock.getState().setDateControlOpen(!dateControlOpen); setShowMoreMenu(false); setShowLanguageMenu(false); useCosmosStore.setState({showQuickJump:false}); };
   const lbCopy = leftBehindCopy[language];
   const lbName = tr({ en: lbCopy.name, fr: lbCopy.name });
-  const toggleLeftBehind = () => { useSimClock.getState().setDateControlOpen(false); useLeftBehindStore.getState().setMenuOpen(!menuOpen); setShowMoreMenu(false); setShowLanguageMenu(false); useCosmosStore.setState({showQuickJump:false}); };
+  const toggleLeftBehind = () => { announceDropdown(); useSimClock.getState().setDateControlOpen(false); useLeftBehindStore.getState().setMenuOpen(!menuOpen); setShowMoreMenu(false); setShowLanguageMenu(false); useCosmosStore.setState({showQuickJump:false}); };
   // Pale Dot is always full-bleed too, so it hides the fullscreen toggle like the native app.
   const native = isNativeApp() || brand === 'paledot';
   // In fullscreen, dropdowns appear directly below the button row (h-8 = 32px + gap)
@@ -172,6 +173,17 @@ export const CosmosUI = () => {
   const languageMenuButtonRef = useRef<HTMLButtonElement | null>(null);
   const timeSpeedButtonRef = useRef<HTMLButtonElement | null>(null);
 
+  // The region card announces itself; close toolbar dropdowns so only one is open.
+  useEffect(() => {
+    const onRegion = (e: Event) => {
+      if ((e as CustomEvent).detail !== 'region') return;
+      setShowMoreMenu(false); setShowLanguageMenu(false);
+      useSimClock.getState().setDateControlOpen(false); useLeftBehindStore.getState().setMenuOpen(false); useCosmosStore.setState({ showQuickJump: false });
+    };
+    window.addEventListener('cosmos:dropdown-open', onRegion);
+    return () => window.removeEventListener('cosmos:dropdown-open', onRegion);
+  }, []);
+
   // Click-outside and Escape key handlers for dropdowns
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -215,6 +227,7 @@ export const CosmosUI = () => {
   }, [timeMenuOpen, showMoreMenu, showLanguageMenu, showQuickJump, toggleQuickJump]);
 
   const handleQuickJumpClick = () => {
+    announceDropdown();
     setShowMoreMenu(false); setShowLanguageMenu(false); useSimClock.getState().setDateControlOpen(false); useLeftBehindStore.getState().setMenuOpen(false);
     const el = quickJumpButtonRef.current;
     if (el) {
@@ -668,7 +681,7 @@ export const CosmosUI = () => {
               </Tooltip>
               <div role="separator" aria-orientation="vertical" className="hidden lg:block w-px h-6 bg-border mx-1" />
             </>}
-            <ObjectSearch onOpen={() => { setShowMoreMenu(false); setShowLanguageMenu(false); useSimClock.getState().setDateControlOpen(false); useLeftBehindStore.getState().setMenuOpen(false); useCosmosStore.setState({showQuickJump:false}); }} />
+            <ObjectSearch onOpen={() => { announceDropdown(); setShowMoreMenu(false); setShowLanguageMenu(false); useSimClock.getState().setDateControlOpen(false); useLeftBehindStore.getState().setMenuOpen(false); useCosmosStore.setState({showQuickJump:false}); }} />
             {/* Essential controls - always visible */}
             {!native && (
               <Tooltip>
@@ -813,7 +826,7 @@ export const CosmosUI = () => {
                   size="icon" 
                   variant="ghost" 
                   aria-label={tx("More options", "Plus d’options")} aria-expanded={showMoreMenu}
-                  onClick={() => { useLeftBehindStore.getState().setMenuOpen(false); useSimClock.getState().setDateControlOpen(false); useCosmosStore.setState({showQuickJump:false}); setShowLanguageMenu(false); setShowMoreMenu(!showMoreMenu); }} 
+                  onClick={() => { announceDropdown(); useLeftBehindStore.getState().setMenuOpen(false); useSimClock.getState().setDateControlOpen(false); useCosmosStore.setState({showQuickJump:false}); setShowLanguageMenu(false); setShowMoreMenu(!showMoreMenu); }} 
                   className={`lg:hidden h-8 w-8 sm:h-9 sm:w-9 backdrop-blur-xs text-white ${showMoreMenu ? 'bg-white/25' : 'bg-white/10 hover:bg-white/20'}`}
                 >
                   <MoreVertical className="w-4 h-4 sm:w-5 sm:h-5" />
