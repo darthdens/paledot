@@ -8,7 +8,7 @@ import { useFullscreenStore } from '../store/useFullscreenStore';
 import { getTour, pickText } from '../data/tours';
 import type { TourStop } from '../types';
 import { useSimClock } from '@/features/left-behind/state/useSimClock';
-import { followHardware } from '@/features/left-behind/lib/hardwareNavigation';
+import { followHardware, cancelPendingHardwareFollow } from '@/features/left-behind/lib/hardwareNavigation';
 import { getPhotoManifest } from '@/features/left-behind/data/dataClient';
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { celestialObjects } from '../data/celestialObjects';
@@ -65,7 +65,10 @@ export const TourOverlay = () => {
   const currentStop = tourStops[tourIndex];
   const totalStops = tourStops.length;
   const followRetry = useRef<ReturnType<typeof setInterval> | null>(null);
-  useEffect(() => () => { if (followRetry.current) clearInterval(followRetry.current); }, []);
+  useEffect(() => {
+    if (!isTouring) { if (followRetry.current) clearInterval(followRetry.current); followRetry.current = null; cancelPendingHardwareFollow(); }
+    return () => { if (followRetry.current) clearInterval(followRetry.current); cancelPendingHardwareFollow(); };
+  }, [isTouring, activeTourId]);
 
   // Left Behind stops: set/play the app clock and follow a machine through the normal machine follow.
   const playMachineStop = useCallback((stop: TourStop) => {
@@ -87,7 +90,7 @@ export const TourOverlay = () => {
     // Trajectory data or a landing pin may still be loading: retry briefly.
     const started = Date.now();
     followRetry.current = setInterval(() => {
-      if (followHardware(id, distance) || Date.now() - started > 20000) { clearInterval(followRetry.current!); followRetry.current = null; }
+      if (followHardware(id, distance) || Date.now() - started > 20000) { if (followRetry.current) clearInterval(followRetry.current); followRetry.current = null; }
     }, 300);
   }, [setTourCameraTarget]);
 
@@ -325,13 +328,16 @@ export const TourOverlay = () => {
     if (!isTouring || isPaused || !currentStop) return;
     
     const duration = currentStop.duration * 1000; // Convert to ms
+    // Narration cannot finish a moving date range early (Apollo's journey is longer than 15 s).
+    const remainingRange = useSimClock.getState().tourPlay;
+    const rangeDuration = remainingRange ? Math.max(0, (remainingRange.until - useSimClock.getState().simDate) / remainingRange.rate * 1000) : 0;
     const timer = setTimeout(() => {
       if (tourIndex < tourStops.length - 1) {
         goToStop(tourIndex + 1);
       } else {
         finishTour();
       }
-    }, duration);
+    }, Math.max(duration, rangeDuration) + (tour.onEnd === 'end-frame' ? 0 : 1000));
     
     return () => clearTimeout(timer);
   }, [isTouring, isPaused, tourIndex, currentStop, goToStop, finishTour, tourStops.length]);
@@ -497,6 +503,7 @@ export const TourOverlay = () => {
             <Button
               size="icon"
               variant="ghost"
+              aria-label={isPaused ? t.play : t.pause}
               onClick={(e) => {
                 e.stopPropagation();
                 togglePause();
@@ -513,6 +520,7 @@ export const TourOverlay = () => {
             <Button
               size="icon"
               variant="ghost"
+              aria-label={t.next}
               onClick={(e) => {
                 e.stopPropagation();
                 handleNext();

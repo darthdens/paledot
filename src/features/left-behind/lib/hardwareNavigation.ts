@@ -33,12 +33,17 @@ function select(id:string,distanceKm?:number|null){
 }
 
 let pending: ReturnType<typeof setInterval> | null = null;
+export function cancelPendingHardwareFollow() {
+  if (pending) clearInterval(pending);
+  pending = null;
+}
 /** distanceKm (tours): camera distance for this flight; null = machine default. */
 export function followHardware(id:string,distanceKm?:number|null){
+  cancelPendingHardwareFollow();
   if(!canFollowHardware(id))return false;
-  if(pending){clearInterval(pending);pending=null;}
   const date=useSimClock.getState().simDate;
-  if(positionAt(id,new Date(date))!==null||landedPins.has(id)){select(id,distanceKm);return true;}
+  // Tours retain the machine follow while its new-date pin catches up; never detour via host selection.
+  if(distanceKm!==undefined||positionAt(id,new Date(date))!==null||landedPins.has(id)){select(id,distanceKm);return true;}
   // Pin not mounted yet: fly to its host body first, then follow once the pin registers.
   const site=landedSite(id,date); const body=site&&getObjectById(site.body);
   if(!body)return false;
@@ -47,8 +52,8 @@ export function followHardware(id:string,distanceKm?:number|null){
   useCosmosStore.getState().setSelectedObject(body);
   const started=Date.now();
   pending=setInterval(()=>{
-    if(landedPins.has(id)){clearInterval(pending!);pending=null;select(id,distanceKm);}
-    else if(Date.now()-started>60000){clearInterval(pending!);pending=null;}
+    if(landedPins.has(id)){cancelPendingHardwareFollow();select(id,distanceKm);}
+    else if(Date.now()-started>60000){cancelPendingHardwareFollow();}
   },250);
   return true;
 }

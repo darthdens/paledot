@@ -20,6 +20,7 @@ import { HardwareModel, SimplifiedHardwareModel } from './HardwareModel';
 import { simplifiedModels } from '../lib/nasaModels';
 import { loadTrueSpans, trueSpanUnits } from '../lib/nasaModels';
 import { landedPins, SURFACE_BODY } from '../lib/pinRegistry';
+import { machineTrailVisible } from '../lib/tourPresentation';
 
 class SceneBoundary extends Component<{ children: ReactNode }, { failed: boolean }> {
   override state = { failed: false };
@@ -90,7 +91,7 @@ export function HardwareTrack({ data, nearest }: { data: Trajectory; nearest: bo
   useFrame(({camera,size,controls,scene})=> {
     refreshOccluders(scene);
     const time=useSimClock.getState().simDate;
-    const trails=useCosmosStore.getState().showTrails;
+    const trails=machineTrailVisible(data.id,useCosmosStore.getState());
     for(const g of graphics) {
       g.past.visible=trails;
       let low=0,high=g.points.length;

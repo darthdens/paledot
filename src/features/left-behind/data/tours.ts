@@ -5,7 +5,6 @@ import type { Tour, TourStop, TourText } from '@/components/cosmos/types';
 import { tourOptions } from '../lib/tourOptions';
 
 const T = (en: string, fr: string, es: string, pt: string, it: string, de: string): TourText => ({ en, fr, es, pt, it, de });
-const TODO: TourText = { en: 'TODO(source)', fr: 'TODO(source)' };
 
 const H = {
   launch: T('Launch', 'Lancement', 'Lanzamiento', 'Lançamento', 'Lancio', 'Start'),
@@ -21,8 +20,9 @@ const stop = (tour: string, s: StopIn): TourStop => ({
   locationId: 'earth', cameraPosition: [0, 0, 0], scaleLevel: 'solarSystem', duration: 15, ...s, id: `${tour}-${s.id}`,
 });
 const title = (id: string): TourText => {
-  const l = tourOptions.find(o => o.id === id)!.label as Record<string, string | undefined>;
-  const en = l['en']!;
+  const l = tourOptions.find(o => o.id === id)?.label as Record<string, string | undefined> | undefined;
+  if (!l) throw new Error(`Unknown tour: ${id}`);
+  const en = l['en'] ?? id;
   return { en, fr: l['fr'] ?? en, es: l['es'] ?? en, pt: l['pt'] ?? en, it: l['it'] ?? en, de: l['de'] ?? en };
 };
 const lb = (id: string, stops: StopIn[]): Tour => ({ id, title: title(id), onEnd: 'left-behind-summary', stops: stops.map(s => stop(id, s)) });
@@ -106,9 +106,14 @@ export const leftBehindTours: Tour[] = [
         'Por fim, a Apollo 17 em Taurus-Littrow. O seu veículo ficou estacionado a cerca de 20,190° N, 30,777° E.',
         'Infine l’Apollo 17 a Taurus-Littrow. Il suo veicolo fu parcheggiato infine a circa 20,190° N, 30,777° E.',
         'Zuletzt Apollo 17 bei Taurus-Littrow. Ihr Mondauto wurde zuletzt bei etwa 20,190° N, 30,777° O abgestellt.') },
-    // No fact in hardware.json describes what the rovers discovered.
-    { id: 'discovered', title: H.discovered, follow: 'hw:apollo-17', distanceKm: 0.05, factIds: [], narration: TODO },
-    { id: 'now', title: H.now, follow: 'hw:apollo-17', distanceKm: 3000, date: 'now', factIds: ['lrv-coords'],
+    { id: 'discovered', title: T('Three landing sites', 'Trois sites d’alunissage', 'Tres lugares de alunizaje', 'Três locais de alunagem', 'Tre siti di allunaggio', 'Drei Landeplätze'), follow: 'hw:apollo-17', distanceKm: 0.03, factIds: ['lrv-dates', 'lrv-coords'],
+      narration: T('Hadley-Apennine, Descartes and Taurus-Littrow: three Apollo landing sites, each with a rover left behind. The Lunar Reconnaissance Orbiter team measured the final parking locations.',
+        'Hadley-Apennin, Descartes et Taurus-Littrow : trois sites Apollo, chacun avec un véhicule laissé sur place. L’équipe du Lunar Reconnaissance Orbiter a mesuré leurs positions finales.',
+        'Hadley-Apenino, Descartes y Taurus-Littrow: tres lugares de alunizaje Apolo, cada uno con un vehículo abandonado. El equipo del Lunar Reconnaissance Orbiter midió sus posiciones finales.',
+        'Hadley-Apenino, Descartes e Taurus-Littrow: três locais Apollo, cada um com um veículo deixado para trás. A equipa do Lunar Reconnaissance Orbiter mediu as posições finais.',
+        'Hadley-Appennino, Descartes e Taurus-Littrow: tre siti Apollo, ciascuno con un veicolo lasciato sul posto. Il team del Lunar Reconnaissance Orbiter ne ha misurato le posizioni finali.',
+        'Hadley-Apennin, Descartes und Taurus-Littrow: drei Apollo-Landeplätze, an jedem blieb ein Mondauto zurück. Das Team des Lunar Reconnaissance Orbiter hat die endgültigen Parkpositionen vermessen.') },
+    { id: 'now', title: H.now, follow: 'hw:apollo-17', distanceKm: 0.03, date: 'now', factIds: ['lrv-coords'],
       narration: T('All three rovers are still parked on the Moon. The Lunar Reconnaissance Orbiter team has measured where each one was left.',
         'Les trois véhicules sont toujours garés sur la Lune. L’équipe du Lunar Reconnaissance Orbiter a mesuré où chacun a été laissé.',
         'Los tres vehículos siguen aparcados en la Luna. El equipo del Lunar Reconnaissance Orbiter midió dónde quedó cada uno.',
@@ -248,14 +253,14 @@ export const leftBehindTours: Tour[] = [
         'Em agosto de 1989 chega a Neptuno. A Voyager 2 continua a ser a única nave a ter visitado Úrano e Neptuno.',
         'Nell’agosto 1989 raggiunge Nettuno. Il Voyager 2 resta l’unica sonda ad aver visitato Urano e Nettuno.',
         'Im August 1989 erreicht sie Neptun. Voyager 2 ist bis heute die einzige Raumsonde, die Uranus und Neptun besucht hat.') },
-    { id: 'heliopause', title: H.helio, follow: 'hw:voyager-2', distanceKm: 5000000, date: '2018-11-05T00:00:00Z', factIds: ['v2-helio'],
+    { id: 'heliopause', title: H.helio, follow: 'hw:voyager-2', distanceKm: 0.03, date: '2018-11-05T00:00:00Z', factIds: ['v2-helio'],
       narration: T('On 5 November 2018, about 119 AU from the Sun, Voyager 2 crosses the heliopause into interstellar space.',
         'Le 5 novembre 2018, à environ 119 UA du Soleil, Voyager 2 franchit l’héliopause et entre dans l’espace interstellaire.',
         'El 5 de noviembre de 2018, a unas 119 UA del Sol, la Voyager 2 cruza la heliopausa hacia el espacio interestelar.',
         'Em 5 de novembro de 2018, a cerca de 119 UA do Sol, a Voyager 2 cruza a heliopausa para o espaço interestelar.',
         'Il 5 novembre 2018, a circa 119 UA dal Sole, il Voyager 2 attraversa l’eliopausa ed entra nello spazio interstellare.',
         'Am 5. November 2018 überquert Voyager 2 rund 119 AE von der Sonne entfernt die Heliopause in den interstellaren Raum.') },
-    { id: 'now', title: H.now, follow: 'hw:voyager-2', distanceKm: 5000000, date: 'now', factIds: ['v2-helio', 'v2-neptune'],
+    { id: 'now', title: H.now, follow: 'hw:voyager-2', distanceKm: 0.03, date: 'now', factIds: ['v2-helio', 'v2-neptune'],
       narration: T('Today Voyager 2 travels through interstellar space, beyond the heliopause: the only visitor so far to Uranus and Neptune.',
         'Aujourd’hui, Voyager 2 voyage dans l’espace interstellaire, au-delà de l’héliopause : le seul visiteur d’Uranus et de Neptune à ce jour.',
         'Hoy la Voyager 2 viaja por el espacio interestelar, más allá de la heliopausa: la única visitante de Urano y Neptuno hasta ahora.',
@@ -281,21 +286,21 @@ export const leftBehindTours: Tour[] = [
         'Il 12 novembre 1980 raggiunge Saturno. Il passaggio vicino alla luna Titano lo porta fuori dal piano dei pianeti, chiudendo il suo giro planetario.',
         'Am 12. November 1980 erreicht sie Saturn. Der nahe Vorbeiflug am Mond Titan lenkt sie aus der Ebene der Planeten und beendet ihre Planetenreise.') },
     // Placeholder: the full One Last Look step is built in the next prompt.
-    { id: 'one-last-look', title: T('One last look', 'Un dernier regard', 'Una última mirada', 'Um último olhar', 'Un ultimo sguardo', 'Ein letzter Blick'), follow: 'hw:voyager-1', distanceKm: 5000000, date: '1990-02-14T00:00:00Z', factIds: ['v1-portrait'],
+    { id: 'one-last-look', title: T('One last look', 'Un dernier regard', 'Una última mirada', 'Um último olhar', 'Un ultimo sguardo', 'Ein letzter Blick'), follow: 'hw:voyager-1', distanceKm: 0.03, date: '1990-02-14T00:00:00Z', factIds: ['v1-portrait'],
       narration: T('On 14 February 1990, Voyager 1 points its cameras back toward the Sun and takes 60 frames: the first portrait of our Solar System seen from outside.',
         'Le 14 février 1990, Voyager 1 tourne ses caméras vers le Soleil et prend 60 images : le premier portrait de notre Système solaire vu de l’extérieur.',
         'El 14 de febrero de 1990, la Voyager 1 apunta sus cámaras hacia el Sol y toma 60 imágenes: el primer retrato del sistema solar visto desde fuera.',
         'Em 14 de fevereiro de 1990, a Voyager 1 aponta as câmaras para o Sol e tira 60 imagens: o primeiro retrato do Sistema Solar visto de fora.',
         'Il 14 febbraio 1990 il Voyager 1 punta le fotocamere verso il Sole e scatta 60 immagini: il primo ritratto del Sistema solare visto dall’esterno.',
         'Am 14. Februar 1990 richtet Voyager 1 ihre Kameras zurück zur Sonne und macht 60 Aufnahmen: das erste Porträt unseres Sonnensystems von außen.') },
-    { id: 'heliopause', title: H.helio, follow: 'hw:voyager-1', distanceKm: 5000000, date: '2012-08-25T00:00:00Z', factIds: ['v1-helio'],
+    { id: 'heliopause', title: H.helio, follow: 'hw:voyager-1', distanceKm: 0.03, date: '2012-08-25T00:00:00Z', factIds: ['v1-helio'],
       narration: T('On 25 August 2012, Voyager 1 crosses the heliopause, the first spacecraft to reach interstellar space.',
         'Le 25 août 2012, Voyager 1 franchit l’héliopause : c’est le premier vaisseau à atteindre l’espace interstellaire.',
         'El 25 de agosto de 2012, la Voyager 1 cruza la heliopausa: la primera nave en llegar al espacio interestelar.',
         'Em 25 de agosto de 2012, a Voyager 1 cruza a heliopausa: a primeira nave a chegar ao espaço interestelar.',
         'Il 25 agosto 2012 il Voyager 1 attraversa l’eliopausa: la prima sonda a raggiungere lo spazio interstellare.',
         'Am 25. August 2012 überquert Voyager 1 die Heliopause, als erste Raumsonde im interstellaren Raum.') },
-    { id: 'now', title: H.now, follow: 'hw:voyager-1', distanceKm: 5000000, date: 'now', factIds: ['v1-instruments', 'v1-lightday'],
+    { id: 'now', title: H.now, follow: 'hw:voyager-1', distanceKm: 0.03, date: 'now', factIds: ['v1-instruments', 'v1-lightday'],
       narration: T('Two of its science instruments still work: the magnetometer and the plasma wave instrument. On 18 November 2026, Voyager 1 will be one light-day from Earth.',
         'Deux de ses instruments scientifiques fonctionnent encore : le magnétomètre et l’instrument d’ondes de plasma. Le 18 novembre 2026, Voyager 1 sera à un jour-lumière de la Terre.',
         'Dos de sus instrumentos científicos siguen funcionando: el magnetómetro y el instrumento de ondas de plasma. El 18 de noviembre de 2026, la Voyager 1 estará a un día luz de la Tierra.',

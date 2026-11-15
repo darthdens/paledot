@@ -39,6 +39,11 @@ export const CameraController = () => {
   const flyToDistance = useRef(1000);
   const cameraOffset = useRef(new THREE.Vector3());
   const tourOffset = useRef(new THREE.Vector3());
+  const machineStartOffset = useRef(new THREE.Vector3());
+  const machineEndOffset = useRef(new THREE.Vector3());
+  const machineTourFlight = useRef(false);
+  const machineFlightNormal = useRef(new THREE.Vector3());
+  const machineSide = useRef(new THREE.Vector3());
 
   // Follow smoothing (avoid jitter + avoid per-frame allocations)
   const smoothedTarget = useRef(new THREE.Vector3());
@@ -101,10 +106,12 @@ export const CameraController = () => {
     if (!hardwareId || !controls || isTouring) return;
     const orbit = controls as unknown as { target: THREE.Vector3 };
     let cancelled = false;
+    let retry: ReturnType<typeof setTimeout> | undefined;
+    const prepareFlight = () => {
     void getHardware().then(hardware => {
       if (cancelled) return;
       const live = useCosmosStore.getState().objectWorldPositions[`hw:${hardwareId}`];
-      if (!live) return;
+      if (!live) { retry = setTimeout(prepareFlight, 100); return; }
       const machine = hardware.machines.find(m => m.trajectories.some(t => t.id === hardwareId));
       // Frame the machine at its true size so it fills the view; fall back to the data's follow distance.
       const span = trueSpanUnits.get(hardwareId);
@@ -113,6 +120,18 @@ export const CameraController = () => {
       const distance = override ? override * UNIFIED_SCALE : span ? span * 2.2 : landedPins.has(hardwareId) ? 5e-5 : (machine?.followDistanceKm ?? 5000000) * UNIFIED_SCALE;
       startPosition.current.copy(camera.position); startTarget.current.copy(orbit.target);
       endTarget.current.set(...live); cameraOffset.current.set(distance*.5,distance*.3,distance);
+      const pin = landedPins.get(hardwareId);
+      if (!pin) machineFlightNormal.current.set(0, 0, 0);
+      if (pin) {
+        machineFlightNormal.current.set(...pin.normal);
+        machineSide.current.set(0, 1, 0).cross(machineFlightNormal.current);
+        if (machineSide.current.lengthSq() < 1e-6) machineSide.current.set(1, 0, 0);
+        machineSide.current.normalize();
+        cameraOffset.current.copy(machineFlightNormal.current).multiplyScalar(distance * 0.6).addScaledVector(machineSide.current, distance * 0.8);
+      }
+      machineTourFlight.current = useCosmosStore.getState().isTouring && useCosmosStore.getState().activeTourId !== 'begin-at-earth';
+      machineStartOffset.current.subVectors(camera.position, orbit.target);
+      machineEndOffset.current.copy(cameraOffset.current);
       endPosition.current.copy(endTarget.current).add(cameraOffset.current);
       isTourAnimation.current = false; animationProgress.current = 0;
       isAnimating.current = true; animationTriggerId.current = `hw:${hardwareId}`;
@@ -120,7 +139,10 @@ export const CameraController = () => {
         camera.position.copy(endPosition.current); orbit.target.copy(endTarget.current); isAnimating.current = false;
       }
     }).catch(() => { /* Static-data failure must not disturb normal navigation. */ });
-    return () => { cancelled = true; if (animationTriggerId.current === `hw:${hardwareId}`) isAnimating.current = false; };
+    };
+    // Wait one scene frame for the new date's positions instead of reading stale world coordinates.
+    retry = setTimeout(prepareFlight, 0);
+    return () => { cancelled = true; clearTimeout(retry); if (animationTriggerId.current === `hw:${hardwareId}`) isAnimating.current = false; };
   }, [hardwareId, controls, camera, isTouring, followNonce]);
   // "View on the surface": low and oblique over the landed pin, so the ground and horizon fill the view.
   const surfaceViewNonce = useLeftBehindStore(state => state.surfaceViewNonce);
@@ -370,6 +392,7 @@ export const CameraController = () => {
       if (hardwareId && !isTouring) {
         const live = useCosmosStore.getState().objectWorldPositions[`hw:${hardwareId}`];
         if (live) { endTarget.current.set(...live); endPosition.current.copy(endTarget.current).add(cameraOffset.current); }
+        else if (useCosmosStore.getState().isTouring) return;
         else { isAnimating.current = false; useLeftBehindStore.getState().selectHardware(null); return; }
       }
       // Slower animation speed for tour (more cinematic), faster for object selection
@@ -384,6 +407,33 @@ export const CameraController = () => {
       // Ease in-out cubic
       const t = animationProgress.current;
       const eased = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+
+      if (hardwareId && !isTouring && machineTourFlight.current) {
+        // Dates can move the whole Solar System by millions of km. Carry the camera's relative
+        // view to the new machine position, then ease only its viewing distance/orientation.
+        const pin = landedPins.get(hardwareId);
+        if (pin) {
+          const normal = machineFlightNormal.current;
+          tmpTarget.current.set(...pin.normal);
+          if (normal.lengthSq() > 0) {
+            const rotation = new THREE.Quaternion().setFromUnitVectors(normal, tmpTarget.current);
+            machineStartOffset.current.applyQuaternion(rotation);
+            machineEndOffset.current.applyQuaternion(rotation);
+          }
+          normal.copy(tmpTarget.current);
+        }
+        const from = machineStartOffset.current, to = machineEndOffset.current;
+        const d0 = Math.max(from.length(), 1e-10), d1 = Math.max(to.length(), 1e-10);
+        tmpDelta.current.copy(from).divideScalar(d0);
+        tmpTarget.current.copy(to).divideScalar(d1);
+        tmpDelta.current.lerp(tmpTarget.current, eased);
+        if (tmpDelta.current.lengthSq() < 1e-12) tmpDelta.current.copy(tmpTarget.current);
+        tmpDelta.current.normalize().multiplyScalar(Math.exp(Math.log(d0) + (Math.log(d1) - Math.log(d0)) * eased));
+        orbitControls.target.copy(endTarget.current);
+        camera.position.copy(endTarget.current).add(tmpDelta.current);
+        cameraOffset.current.copy(machineEndOffset.current);
+        ensureBodyClearance(); orbitControls.update(); return;
+      }
 
       // Track moving/rotating targets during animation so the stop stays centered
       if (selectedObject) {
@@ -459,7 +509,7 @@ export const CameraController = () => {
 
     if (hardwareId && !isTouring) {
       const live = useCosmosStore.getState().objectWorldPositions[`hw:${hardwareId}`];
-      if (!live) { useLeftBehindStore.getState().selectHardware(null); return; }
+      if (!live) { if (!useCosmosStore.getState().isTouring) useLeftBehindStore.getState().selectHardware(null); return; }
       tmpTarget.current.set(...live); tmpDelta.current.subVectors(tmpTarget.current, orbitControls.target);
       orbitControls.target.copy(tmpTarget.current); camera.position.add(tmpDelta.current);
       ensureBodyClearance();

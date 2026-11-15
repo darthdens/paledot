@@ -22,6 +22,29 @@ describe('Left Behind tours', () => {
   it('narrations are at most 45 words', () => {
     for (const t of leftBehindTours) for (const s of t.stops) expect(s.narration.en.split(/\s+/).length, s.id).toBeLessThanOrEqual(45);
   });
+  it('the sixth lunar-rover step uses sourced facts rather than an unfinished entry', () => {
+    const step = leftBehindTours.find(t => t.id === 'lunar-rovers')?.stops[5];
+    expect(step?.factIds).toEqual(['lrv-dates', 'lrv-coords']);
+  });
+  it('the lunar-rover final step remains a close surface view', () => {
+    const step = leftBehindTours.find(t => t.id === 'lunar-rovers')?.stops.at(-1);
+    expect(step?.follow).toBe('hw:apollo-17');
+    expect(step?.distanceKm).toBe(0.03);
+  });
+  it('Viking, Opportunity and Ingenuity step four follows the same Mars machine as arrival', () => {
+    for (const id of ['viking-1', 'opportunity', 'ingenuity']) {
+      const tour = leftBehindTours.find(t => t.id === id);
+      expect(tour?.stops[3]?.follow).toBe(`hw:${id}`);
+      expect(tour?.stops[3]?.follow).toBe(tour?.stops[2]?.follow);
+    }
+  });
+  it('both Voyagers frame their interstellar stops at 30 metres', () => {
+    for (const id of ['voyager-1', 'voyager-2']) {
+      const tour = leftBehindTours.find(t => t.id === id);
+      expect(tour?.stops.find(s => s.id === `${id}-heliopause`)?.distanceKm).toBe(0.03);
+      expect(tour?.stops.at(-1)?.distanceKm).toBe(0.03);
+    }
+  });
   it('Voyager tours have a stop per flyby', () => {
     expect(leftBehindTours.find(t => t.id === 'voyager-2')!.stops.map(s => s.id.replace('voyager-2-', ''))).toEqual(['launch', 'jupiter', 'saturn', 'uranus', 'neptune', 'heliopause', 'now']);
     expect(leftBehindTours.find(t => t.id === 'voyager-1')!.stops.map(s => s.id.replace('voyager-1-', ''))).toEqual(['launch', 'jupiter', 'saturn-titan', 'one-last-look', 'heliopause', 'now']);
